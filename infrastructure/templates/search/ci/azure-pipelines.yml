@@ -13,12 +13,12 @@ pr: none
 
 parameters:
   - name: deploySearchConfig
-    displayName: Does the Azure Search configuration need creating/updating?
+    displayName: Create/update the Azure AI Search configuration after deployment?
     type: string
     values:
       - Yes
       - No
-    default: No
+    default: Yes
   - name: forceDeployToEnvironment
     displayName: Set to either dev, test or preprod to force a deploy to that environment from the chosen branch.
     type: string

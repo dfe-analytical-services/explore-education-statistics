@@ -66,7 +66,7 @@ const DataBlockDetailsForm = ({
         .required('Enter a table title')
         .max(
           dataBlockTableTitleMaxLength,
-          `Table title must be ${dataBlockTableTitleMaxLength} characters or less`,
+          `Table title must be ${dataBlockTableTitleMaxLength} characters or fewer`,
         ),
       source: Yup.string(),
       highlightName: Yup.string().when('isHighlight', {
@@ -76,7 +76,7 @@ const DataBlockDetailsForm = ({
             .required('Enter a featured table name')
             .max(
               featuredTableNameMaxLength,
-              `Featured table name must be ${featuredTableNameMaxLength} characters or less`,
+              `Featured table name must be ${featuredTableNameMaxLength} characters or fewer`,
             ),
       }),
       highlightDescription: Yup.string().when('isHighlight', {
@@ -86,7 +86,7 @@ const DataBlockDetailsForm = ({
             .required('Enter a featured table description')
             .max(
               featuredTableDescriptionMaxLength,
-              `Featured table description must be ${featuredTableDescriptionMaxLength} characters or less`,
+              `Featured table description must be ${featuredTableDescriptionMaxLength} characters or fewer`,
             ),
       }),
       isHighlight: Yup.boolean(),

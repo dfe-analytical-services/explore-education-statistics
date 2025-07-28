@@ -20,13 +20,13 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 using static Moq.MockBehavior;
 using File = System.IO.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
-{
-    public class DataGuidanceFileWriterTests : IDisposable
-    {
-        private readonly DataFixture _dataFixture = new();
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
-        private const string TestDataGuidance = @"
+public class DataGuidanceFileWriterTests : IDisposable
+{
+    private readonly DataFixture _dataFixture = new();
+
+    private const string TestDataGuidance = @"
             <h2>Description</h2>
             <p>
                 This document describes the data included in the ‘Children looked after in England 
@@ -48,878 +48,877 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             </ul>
             ";
 
-        private const string TestBasicDataGuidance = @"
+    private const string TestBasicDataGuidance = @"
             <p>
                 This document describes the data included in the ‘Children looked after in England'
             </p>
         ";
 
-        private readonly List<string> _filePaths = new();
+    private readonly List<string> _filePaths = new();
 
-        public void Dispose()
+    public void Dispose()
+    {
+        // Cleanup any files that have been
+        // written to the filesystem.
+        _filePaths.ForEach(File.Delete);
+    }
+
+    [Fact]
+    public async Task WriteToStream_ListDataSetsReturnsNotFound()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestDataGuidance);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            // Cleanup any files that have been
-            // written to the filesystem.
-            _filePaths.ForEach(File.Delete);
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task WriteToStream_ListDataSetsReturnsNotFound()
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(new NotFoundResult());
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestDataGuidance);
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
-            var contextId = Guid.NewGuid().ToString();
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
 
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            var path = GenerateFilePath();
+            await using var stream = File.OpenWrite(path);
 
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                async () => { await writer.WriteToStream(stream, releaseVersion); }
+            );
 
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(new NotFoundResult());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                var path = GenerateFilePath();
-                await using var stream = File.OpenWrite(path);
-
-                var exception = await Assert.ThrowsAsync<ArgumentException>(
-                    async () => { await writer.WriteToStream(stream, releaseVersion); }
-                );
-
-                Assert.Equal($"Could not find data sets for release version: {releaseVersion.Id}", exception.Message);
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
+            Assert.Equal($"Could not find data sets for release version: {releaseVersion.Id}", exception.Message);
         }
 
-        [Fact]
-        public async Task WriteToStream_MultipleDataSets()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestDataGuidance);
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
 
-            var dataSets = new List<DataGuidanceDataSetViewModel>
+    [Fact]
+    public async Task WriteToStream_MultipleDataSets()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
             {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = @"
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
                             measured on or around their birthday).
                         </p>",
-                    GeographicLevels = new List<string>
-                    {
-                        "Local Authority",
-                        "National",
-                        "Regional"
-                    },
-                    TimePeriods = new TimePeriodLabels("2018", "2020"),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                        new("Age at end", "age_end"),
-                        new("Number of leavers", "number_of_leavers"),
-                        new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "Data set 1 footnote 1"),
-                        new(Guid.NewGuid(), "Data set 1 footnote 2"),
-                    }
-                },
-                new()
+                GeographicLevels = new List<string>
                 {
-                    Filename = "test-2.csv",
-                    Name = "Test data 2",
-                    Content = @"
+                    "Local Authority",
+                    "National",
+                    "Regional"
+                },
+                TimePeriods = new TimePeriodLabels("2018", "2020"),
+                Variables = new List<LabelValue>
+                {
+                    new("Accommodation type", "accommodation_type"),
+                    new("Age at end", "age_end"),
+                    new("Number of leavers", "number_of_leavers"),
+                    new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "Data set 1 footnote 1"),
+                    new(Guid.NewGuid(), "Data set 1 footnote 2"),
+                }
+            },
+            new()
+            {
+                Filename = "test-2.csv",
+                Name = "Test data 2",
+                Content = @"
                         <p>
                             Number and proportion of population participating in education, training and employment 
                             by age, gender and labour market status.
                         </p>",
-                    GeographicLevels = new List<string>
-                    {
-                        "National",
-                    },
-                    TimePeriods = new TimePeriodLabels("2018", "2018"),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Academic age", "age"),
-                        new("Activity", "category"),
-                        new("Gender", "gender"),
-                        new("Labour market status", "labour_market_status"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "Data set 2 footnote 1"),
-                        new(Guid.NewGuid(), "Data set 2 footnote 2"),
-                        new(Guid.NewGuid(), "Data set 2 footnote 3"),
-                        new(Guid.NewGuid(), "Data set 2 footnote 4"),
-                    }
+                GeographicLevels = new List<string>
+                {
+                    "National",
+                },
+                TimePeriods = new TimePeriodLabels("2018", "2018"),
+                Variables = new List<LabelValue>
+                {
+                    new("Academic age", "age"),
+                    new("Activity", "category"),
+                    new("Gender", "gender"),
+                    new("Labour market status", "labour_market_status"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "Data set 2 footnote 1"),
+                    new(Guid.NewGuid(), "Data set 2 footnote 2"),
+                    new(Guid.NewGuid(), "Data set 2 footnote 3"),
+                    new(Guid.NewGuid(), "Data set 2 footnote 4"),
                 }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
             }
+        };
 
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+        var contextId = Guid.NewGuid().ToString();
 
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task WriteToStream_SingleDataSet()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestDataGuidance);
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            var dataSets = new List<DataGuidanceDataSetViewModel>
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_SingleDataSet()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
             {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = @"
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
                             measured on or around their birthday). See <a href=""https://test.com"">reference information</a>.
                         </p>",
-                    GeographicLevels = new List<string>
-                    {
-                        "Local Authority",
-                        "National",
-                        "Regional"
-                    },
-                    TimePeriods = new TimePeriodLabels("2018", "2020"),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                        new("Age at end", "age_end"),
-                        new("Number of leavers", "number_of_leavers"),
-                        new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "Footnote 1"),
-                        new(Guid.NewGuid(), "Footnote 2"),
-                    }
+                GeographicLevels = new List<string>
+                {
+                    "Local Authority",
+                    "National",
+                    "Regional"
+                },
+                TimePeriods = new TimePeriodLabels("2018", "2020"),
+                Variables = new List<LabelValue>
+                {
+                    new("Accommodation type", "accommodation_type"),
+                    new("Age at end", "age_end"),
+                    new("Number of leavers", "number_of_leavers"),
+                    new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "Footnote 1"),
+                    new(Guid.NewGuid(), "Footnote 2"),
                 }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
             }
+        };
 
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+        var contextId = Guid.NewGuid().ToString();
 
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task WriteToStream_NoDataGuidance()
-        {
-            // Release has no data guidance (aka data guidance)
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(string.Empty);
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            var dataSets = new List<DataGuidanceDataSetViewModel>
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_NoDataGuidance()
+    {
+        // Release has no data guidance (aka data guidance)
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(string.Empty);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
             {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = @"
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
                             measured on or around their birthday).
                         </p>",
-                    GeographicLevels = new List<string>
-                    {
-                        "Local Authority",
-                        "National",
-                        "Regional"
-                    },
-                    TimePeriods = new TimePeriodLabels("2018", "2020"),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                        new("Age at end", "age_end"),
-                        new("Number of leavers", "number_of_leavers"),
-                        new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_EmptyDataSets()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestDataGuidance);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithSingleProperties()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
+                GeographicLevels = new List<string>
                 {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = "<p>Test file content</p>",
-                    GeographicLevels = new List<string>
-                    {
-                        "Local Authority",
-                    },
-                    TimePeriods = new TimePeriodLabels("2018", "2018"),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "Footnote 1")
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithEmptyProperties()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
+                    "Local Authority",
+                    "National",
+                    "Regional"
+                },
+                TimePeriods = new TimePeriodLabels("2018", "2020"),
+                Variables = new List<LabelValue>
                 {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
+                    new("Accommodation type", "accommodation_type"),
+                    new("Age at end", "age_end"),
+                    new("Number of leavers", "number_of_leavers"),
+                    new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
                 }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
             }
+        };
 
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+        var contextId = Guid.NewGuid().ToString();
 
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task WriteToStream_FileWithEmptyTimePeriodStart()
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = "",
-                    GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("", "2019"),
-                    Variables = new List<LabelValue>()
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithEmptyTimePeriodEnd()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    TimePeriods = new TimePeriodLabels("2018", ""),
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithEmptyVariable()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    TimePeriods = new TimePeriodLabels("2018", ""),
-                    Variables = new List<LabelValue>
-                    {
-                        new("", "")
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithOverTenFootnotesAndMultiline()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = "",
-                    GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("2018", ""),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "Footnote 1"),
-                        new(Guid.NewGuid(), "Footnote 2"),
-                        new(Guid.NewGuid(), "Footnote 3"),
-                        new(Guid.NewGuid(), "Footnote 4"),
-                        new(Guid.NewGuid(), "Footnote 5"),
-                        new(Guid.NewGuid(), "Footnote 6"),
-                        new(Guid.NewGuid(), "Footnote 7"),
-                        new(Guid.NewGuid(), "Footnote 8"),
-                        // New lines are stripped out by text conversion
-                        new(
-                            Guid.NewGuid(),
-                            string.Join("\n", "Footnote 9", "over some", "lines.")
-                        ),
-                        new(Guid.NewGuid(), "Footnote 10"),
-                        new(
-                            Guid.NewGuid(),
-                            string.Join("\n", "Footnote 11", "over some", "other lines.")
-                        ),
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithHtmlFootnotes()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = "",
-                    GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("2018", ""),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "<p>Footnote with paragraph 1</p><p>And paragraph 2</p>"),
-                        new(Guid.NewGuid(), @"Footnote with <a href=""https://test.com"">some link</a> embedded"),
-                        new(Guid.NewGuid(), @"<a href=""https://test-2.com"">Another footnote link</a>"),
-                        new(Guid.NewGuid(), "A plain footnote"),
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileWithEmptyFootnote()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var dataSets = new List<DataGuidanceDataSetViewModel>
-            {
-                new()
-                {
-                    Filename = "test-1.csv",
-                    Name = "Test data 1",
-                    Content = "",
-                    GeographicLevels = new List<string>(),
-                    TimePeriods = new TimePeriodLabels("2018", ""),
-                    Variables = new List<LabelValue>
-                    {
-                        new("Accommodation type", "accommodation_type"),
-                    },
-                    Footnotes = new List<FootnoteViewModel>
-                    {
-                        new(Guid.NewGuid(), "")
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(dataSets);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, releaseVersion);
-
-                Snapshot.Match(stream.ReadToEnd());
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        [Fact]
-        public async Task WriteToStream_FileStream()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication()))
-                .WithDataGuidance(TestBasicDataGuidance);
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
-                .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.Entry(releaseVersion).ReloadAsync();
-
-                var writer = BuildDataGuidanceFileWriter(
-                    contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
-                );
-
-                var path = GenerateFilePath();
-                await using var stream = File.OpenWrite(path);
-
-                await writer.WriteToStream(stream, releaseVersion);
-
-                var text = await File.ReadAllTextAsync(path);
-
-                Assert.Contains(releaseVersion.Release.Publication.Title, text);
-            }
-
-            VerifyAllMocks(dataGuidanceDataSetService);
-        }
-
-        private string GenerateFilePath()
-        {
-            var path = Path.GetTempPath() + Guid.NewGuid() + ".txt";
-            _filePaths.Add(path);
-
-            return path;
-        }
-
-        private static DataGuidanceFileWriter BuildDataGuidanceFileWriter(
-            ContentDbContext contentDbContext,
-            IDataGuidanceDataSetService? dataGuidanceDataSetService = null)
-        {
-            return new DataGuidanceFileWriter(
-                contentDbContext,
-                dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(Strict)
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
             );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
         }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_EmptyDataSets()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestDataGuidance);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithSingleProperties()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "<p>Test file content</p>",
+                GeographicLevels = new List<string>
+                {
+                    "Local Authority",
+                },
+                TimePeriods = new TimePeriodLabels("2018", "2018"),
+                Variables = new List<LabelValue>
+                {
+                    new("Accommodation type", "accommodation_type"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "Footnote 1")
+                }
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithEmptyProperties()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithEmptyTimePeriodStart()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "",
+                GeographicLevels = new List<string>(),
+                TimePeriods = new TimePeriodLabels("", "2019"),
+                Variables = new List<LabelValue>()
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithEmptyTimePeriodEnd()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                TimePeriods = new TimePeriodLabels("2018", ""),
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithEmptyVariable()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                TimePeriods = new TimePeriodLabels("2018", ""),
+                Variables = new List<LabelValue>
+                {
+                    new("", "")
+                }
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithOverTenFootnotesAndMultiline()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "",
+                GeographicLevels = new List<string>(),
+                TimePeriods = new TimePeriodLabels("2018", ""),
+                Variables = new List<LabelValue>
+                {
+                    new("Accommodation type", "accommodation_type"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "Footnote 1"),
+                    new(Guid.NewGuid(), "Footnote 2"),
+                    new(Guid.NewGuid(), "Footnote 3"),
+                    new(Guid.NewGuid(), "Footnote 4"),
+                    new(Guid.NewGuid(), "Footnote 5"),
+                    new(Guid.NewGuid(), "Footnote 6"),
+                    new(Guid.NewGuid(), "Footnote 7"),
+                    new(Guid.NewGuid(), "Footnote 8"),
+                    // New lines are stripped out by text conversion
+                    new(
+                        Guid.NewGuid(),
+                        string.Join("\n", "Footnote 9", "over some", "lines.")
+                    ),
+                    new(Guid.NewGuid(), "Footnote 10"),
+                    new(
+                        Guid.NewGuid(),
+                        string.Join("\n", "Footnote 11", "over some", "other lines.")
+                    ),
+                }
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithHtmlFootnotes()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "",
+                GeographicLevels = new List<string>(),
+                TimePeriods = new TimePeriodLabels("2018", ""),
+                Variables = new List<LabelValue>
+                {
+                    new("Accommodation type", "accommodation_type"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "<p>Footnote with paragraph 1</p><p>And paragraph 2</p>"),
+                    new(Guid.NewGuid(), @"Footnote with <a href=""https://test.com"">some link</a> embedded"),
+                    new(Guid.NewGuid(), @"<a href=""https://test-2.com"">Another footnote link</a>"),
+                    new(Guid.NewGuid(), "A plain footnote"),
+                }
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithEmptyFootnote()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "",
+                GeographicLevels = new List<string>(),
+                TimePeriods = new TimePeriodLabels("2018", ""),
+                Variables = new List<LabelValue>
+                {
+                    new("Accommodation type", "accommodation_type"),
+                },
+                Footnotes = new List<FootnoteViewModel>
+                {
+                    new(Guid.NewGuid(), "")
+                }
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileStream()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            var path = GenerateFilePath();
+            await using var stream = File.OpenWrite(path);
+
+            await writer.WriteToStream(stream, releaseVersion);
+
+            var text = await File.ReadAllTextAsync(path);
+
+            Assert.Contains(releaseVersion.Release.Publication.Title, text);
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    private string GenerateFilePath()
+    {
+        var path = Path.GetTempPath() + Guid.NewGuid() + ".txt";
+        _filePaths.Add(path);
+
+        return path;
+    }
+
+    private static DataGuidanceFileWriter BuildDataGuidanceFileWriter(
+        ContentDbContext contentDbContext,
+        IDataGuidanceDataSetService? dataGuidanceDataSetService = null)
+    {
+        return new DataGuidanceFileWriter(
+            contentDbContext,
+            dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(Strict)
+        );
     }
 }

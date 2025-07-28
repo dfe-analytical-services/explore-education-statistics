@@ -14,14 +14,20 @@ public class AnalyticsWritePublicZipDownloadStrategy(
     ICommonAnalyticsWriteStrategyWorkflow<CaptureZipDownloadRequest> workflow
 ) : IAnalyticsWriteStrategy
 {
+    public static readonly string[] OutputSubPaths = ["public", "zip-downloads"];
+    
     private readonly IWorkflowActor<CaptureZipDownloadRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.PublicZipDownloadsDirectoryPath());
+        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
 
     public Type RequestType => typeof(CaptureZipDownloadRequest);
 
-    public async Task Report(IAnalyticsCaptureRequestBase request, CancellationToken cancellationToken)
+    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
-        await workflow.Report(_workflowActor, request, cancellationToken);
+        if (request is not CaptureZipDownloadRequest captureRequest)
+        {
+            throw new ArgumentException($"Request must be of type {nameof(CaptureZipDownloadRequest)}. It is {request.GetType().FullName}", nameof(request));
+        }
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
     private class WorkflowActor(string analyticsPath)

@@ -53,6 +53,14 @@ param hostingMode string = 'default'
 ])
 param publicNetworkAccess string = 'Disabled'
 
+@description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
+@allowed([
+  'disabled'
+  'free'
+  'standard'
+])
+param semanticRankerAvailability string = 'free'
+
 @description('Indicates whether the resource should have a system-assigned managed identity.')
 param systemAssignedIdentity bool = false
 
@@ -73,7 +81,9 @@ param alerts {
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentityName) ? 'UserAssigned' : 'None')
+var identityType = systemAssignedIdentity
+  ? (!empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned')
+  : (!empty(userAssignedIdentityName) ? 'UserAssigned' : 'None')
 
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
   name: userAssignedIdentityName
@@ -98,12 +108,15 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
     replicaCount: replicaCount
     networkRuleSet: {
       bypass: length(ipRules) > 0 ? 'AzureServices' : 'None'
-      ipRules: [for ipRule in ipRules: {
-        value: ipRule.cidr
-      }]
+      ipRules: [
+        for ipRule in ipRules: {
+          value: ipRule.cidr
+        }
+      ]
     }
     partitionCount: partitionCount
     publicNetworkAccess: publicNetworkAccess
+    semanticSearch: semanticRankerAvailability
     hostingMode: hostingMode
   }
   tags: tagValues

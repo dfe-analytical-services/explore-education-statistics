@@ -43,6 +43,13 @@ param allowedOrigins array = []
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
 param storageFirewallRules IpRange[] = []
 
+@description('Specifies additional setting to add to the Containerised Function App.')
+param appSettings {
+  name: string
+  @secure()
+  value: string
+}[]
+
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet')
 param privateEndpoints {
   functionApp: string?
@@ -269,53 +276,56 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       http20Enabled: true
       minTlsVersion: '1.3'
       preWarmedInstanceCount: preWarmedInstanceCount
-      appSettings: [
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: applicationInsightsConnectionString
-        }
-        // Use managed identity to access the storage account rather than key based access with a connection string
-        {
-          name: 'AzureWebJobsStorage__accountName'
-          value: deploymentStorageAccountModule.outputs.storageAccountName
-        }
-        {
-          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
-        }
-        {
-          name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
-          value: !functionAppExists ? '1' : null
-        }
-        {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: fileShareModule.outputs.fileShareName
-        }
-        {
-          name: 'WEBSITE_CONTENTOVERVNET'
-          value: '1'
-        }
-        {
-          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
-          value: 'false'
-        }
-        {
-          name: 'DOCKER_REGISTRY_SERVER_URL'
-          value: acrLoginServer
-        }
-        {
-          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
-          value: dockerPullManagedIdentityClientId
-        }
-        {
-          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
-          value: dockerPullManagedIdentitySecretValue
-        }
-      ]
+      appSettings: union(
+        [
+          {
+            name: 'FUNCTIONS_EXTENSION_VERSION'
+            value: '~4'
+          }
+          {
+            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+            value: applicationInsightsConnectionString
+          }
+          // Use managed identity to access the storage account rather than key based access with a connection string
+          {
+            name: 'AzureWebJobsStorage__accountName'
+            value: deploymentStorageAccountModule.outputs.storageAccountName
+          }
+          {
+            name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+            value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+          }
+          {
+            name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
+            value: !functionAppExists ? '1' : null
+          }
+          {
+            name: 'WEBSITE_CONTENTSHARE'
+            value: fileShareModule.outputs.fileShareName
+          }
+          {
+            name: 'WEBSITE_CONTENTOVERVNET'
+            value: '1'
+          }
+          {
+            name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+            value: 'false'
+          }
+          {
+            name: 'DOCKER_REGISTRY_SERVER_URL'
+            value: acrLoginServer
+          }
+          {
+            name: 'DOCKER_REGISTRY_SERVER_USERNAME'
+            value: dockerPullManagedIdentityClientId
+          }
+          {
+            name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
+            value: dockerPullManagedIdentitySecretValue
+          }
+        ],
+        appSettings
+      )
     }
     httpsOnly: true
     redundancyMode: redundancyMode
@@ -342,7 +352,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
   )
 }
 
-module privateEndpointModule '../../public-api/components/privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id

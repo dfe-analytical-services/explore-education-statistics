@@ -6,21 +6,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+
+public interface IDataImportService
 {
-    public interface IDataImportService
-    {
-        Task<DataImport?> GetImport(Guid fileId);
+    Task<DataImport?> GetImport(Guid fileId);
 
-        Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId,
-            Guid fileId);
+    Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId,
+        Guid fileId);
 
-        Task DeleteImport(Guid fileId);
+    Task DeleteImport(Guid fileId);
 
-        Task<bool> HasIncompleteImports(Guid releaseVersionId);
+    Task<bool> HasIncompleteImports(Guid releaseVersionId);
 
-        Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
+    Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
 
-        Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null);
-    }
+    Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null);
 }

@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}=        Calendar year 2000
-${PUBLICATION_NAME}=    UI tests - public release visibility %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Public release visibility %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***

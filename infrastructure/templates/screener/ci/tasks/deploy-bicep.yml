@@ -36,4 +36,6 @@ steps:
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              screenerDockerImageTag='$(screenerDockerImageTag)'
+              screenerDockerImageTag='$(screenerDockerImageTag)' \
+              screenerAppRegistrationClientId='$(screenerAppRegistrationClientId)' \
+              devopsServicePrincipalId="$servicePrincipalId"

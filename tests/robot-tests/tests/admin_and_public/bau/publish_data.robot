@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    Publish data %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                      Financial year 3000-01
 ${RELEASE_2_NAME}=                      Financial year 3001-02 provisional
 ${SUBJECT_1_NAME}=                      UI test subject 1
@@ -533,7 +533,7 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
 Check latest release is correct
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release
     user checks page contains    View releases (1)
 
     user opens details dropdown    View releases (1)

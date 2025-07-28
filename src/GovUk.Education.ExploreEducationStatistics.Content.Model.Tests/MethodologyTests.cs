@@ -5,157 +5,156 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests;
+
+public class MethodologyTests
 {
-    public class MethodologyTests
+    [Fact]
+    public void IsLatestVersionOfMethodology_FalseWithEmptyVersions()
     {
-        [Fact]
-        public void IsLatestVersionOfMethodology_FalseWithEmptyVersions()
+        var methodology = new Methodology
         {
-            var methodology = new Methodology
-            {
-                Versions = new List<MethodologyVersion>()
-            };
+            Versions = new List<MethodologyVersion>()
+        };
 
-            Assert.False(methodology.IsLatestVersionOfMethodology(Guid.NewGuid()));
-        }
+        Assert.False(methodology.IsLatestVersionOfMethodology(Guid.NewGuid()));
+    }
 
-        [Fact]
-        public void IsLatestVersionOfMethodology_TrueForSingleVersion()
+    [Fact]
+    public void IsLatestVersionOfMethodology_TrueForSingleVersion()
+    {
+        var version = new MethodologyVersion
         {
-            var version = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                Version = 0
-            };
+            Id = Guid.NewGuid(),
+            PreviousVersionId = null,
+            PublishingStrategy = Immediately,
+            Status = Draft,
+            Version = 0
+        };
 
-            var methodology = new Methodology
-            {
-                Versions = AsList(version)
-            };
-
-            Assert.True(methodology.IsLatestVersionOfMethodology(version.Id));
-        }
-
-        [Fact]
-        public void IsLatestVersionOfMethodology_FalseForPreviousVersion()
+        var methodology = new Methodology
         {
-            var previousVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = null,
-                PublishingStrategy = Immediately,
-                Status = Approved,
-                Version = 0
-            };
+            Versions = AsList(version)
+        };
 
-            var latestVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = previousVersion.Id,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                Version = 1
-            };
+        Assert.True(methodology.IsLatestVersionOfMethodology(version.Id));
+    }
 
-            var methodology = new Methodology
-            {
-                Versions = AsList(previousVersion, latestVersion)
-            };
-
-            Assert.False(methodology.IsLatestVersionOfMethodology(previousVersion.Id));
-        }
-
-        [Fact]
-        public void IsLatestVersionOfMethodology_TrueForLatestVersion()
+    [Fact]
+    public void IsLatestVersionOfMethodology_FalseForPreviousVersion()
+    {
+        var previousVersion = new MethodologyVersion
         {
-            var previousVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = null,
-                PublishingStrategy = Immediately,
-                Status = Approved,
-                Version = 0
-            };
+            Id = Guid.NewGuid(),
+            PreviousVersionId = null,
+            PublishingStrategy = Immediately,
+            Status = Approved,
+            Version = 0
+        };
 
-            var latestVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = previousVersion.Id,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                Version = 1
-            };
-
-            var methodology = new Methodology
-            {
-                Versions = AsList(previousVersion, latestVersion)
-            };
-
-            Assert.True(methodology.IsLatestVersionOfMethodology(latestVersion.Id));
-        }
-
-        [Fact]
-        public void LatestVersion_ArgumentExceptionWithEmptyVersions()
+        var latestVersion = new MethodologyVersion
         {
-            var methodology = new Methodology
-            {
-                Versions = new List<MethodologyVersion>()
-            };
+            Id = Guid.NewGuid(),
+            PreviousVersionId = previousVersion.Id,
+            PublishingStrategy = Immediately,
+            Status = Draft,
+            Version = 1
+        };
 
-            Assert.Throws<ArgumentException>(() => methodology.LatestVersion());
-        }
-
-        [Fact]
-        public void LatestVersion_SingleVersionIsLatest()
+        var methodology = new Methodology
         {
-            var version = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                Version = 0
-            };
+            Versions = AsList(previousVersion, latestVersion)
+        };
 
-            var methodology = new Methodology
-            {
-                Versions = AsList(version)
-            };
+        Assert.False(methodology.IsLatestVersionOfMethodology(previousVersion.Id));
+    }
 
-            Assert.Equal(version, methodology.LatestVersion());
-        }
-
-        [Fact]
-        public void LatestVersion_CorrectVersionIsLatest()
+    [Fact]
+    public void IsLatestVersionOfMethodology_TrueForLatestVersion()
+    {
+        var previousVersion = new MethodologyVersion
         {
-            var previousVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = null,
-                PublishingStrategy = Immediately,
-                Status = Approved,
-                Version = 0
-            };
+            Id = Guid.NewGuid(),
+            PreviousVersionId = null,
+            PublishingStrategy = Immediately,
+            Status = Approved,
+            Version = 0
+        };
 
-            var latestVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = previousVersion.Id,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                Version = 1
-            };
+        var latestVersion = new MethodologyVersion
+        {
+            Id = Guid.NewGuid(),
+            PreviousVersionId = previousVersion.Id,
+            PublishingStrategy = Immediately,
+            Status = Draft,
+            Version = 1
+        };
 
-            var methodology = new Methodology
-            {
-                Versions = AsList(previousVersion, latestVersion)
-            };
+        var methodology = new Methodology
+        {
+            Versions = AsList(previousVersion, latestVersion)
+        };
 
-            Assert.Equal(latestVersion, methodology.LatestVersion());
-        }
+        Assert.True(methodology.IsLatestVersionOfMethodology(latestVersion.Id));
+    }
+
+    [Fact]
+    public void LatestVersion_ArgumentExceptionWithEmptyVersions()
+    {
+        var methodology = new Methodology
+        {
+            Versions = new List<MethodologyVersion>()
+        };
+
+        Assert.Throws<ArgumentException>(() => methodology.LatestVersion());
+    }
+
+    [Fact]
+    public void LatestVersion_SingleVersionIsLatest()
+    {
+        var version = new MethodologyVersion
+        {
+            Id = Guid.NewGuid(),
+            PreviousVersionId = null,
+            PublishingStrategy = Immediately,
+            Status = Draft,
+            Version = 0
+        };
+
+        var methodology = new Methodology
+        {
+            Versions = AsList(version)
+        };
+
+        Assert.Equal(version, methodology.LatestVersion());
+    }
+
+    [Fact]
+    public void LatestVersion_CorrectVersionIsLatest()
+    {
+        var previousVersion = new MethodologyVersion
+        {
+            Id = Guid.NewGuid(),
+            PreviousVersionId = null,
+            PublishingStrategy = Immediately,
+            Status = Approved,
+            Version = 0
+        };
+
+        var latestVersion = new MethodologyVersion
+        {
+            Id = Guid.NewGuid(),
+            PreviousVersionId = previousVersion.Id,
+            PublishingStrategy = Immediately,
+            Status = Draft,
+            Version = 1
+        };
+
+        var methodology = new Methodology
+        {
+            Versions = AsList(previousVersion, latestVersion)
+        };
+
+        Assert.Equal(latestVersion, methodology.LatestVersion());
     }
 }

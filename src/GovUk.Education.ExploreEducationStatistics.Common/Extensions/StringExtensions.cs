@@ -1,4 +1,6 @@
 #nullable enable
+using AngleSharp.Text;
+using NaturalSort.Extension;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,8 +10,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using AngleSharp.Text;
-using NaturalSort.Extension;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -76,7 +76,7 @@ public static class StringExtensions
 
     public static string TrimToLower(this string value)
     {
-        return value.Trim().ToLower(); 
+        return value.Trim().ToLower();
     }
 
     public static string TrimIndent(this string value)
@@ -118,9 +118,30 @@ public static class StringExtensions
 
     public static string ToUpperFirst(this string input)
     {
-        return input.IsNullOrEmpty() ?
-            input :
-            char.ToUpperInvariant(input[0]) + input[1..];
+        return input.IsNullOrEmpty()
+            ? input
+            : char.ToUpperInvariant(input[0]) + input[1..];
+    }
+
+    public static string ToTitleCase(this string input)
+    {
+        var titleCasedInputBuilder = new StringBuilder();
+
+        var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        words.ForEach(word =>
+        {
+            titleCasedInputBuilder.Append(word
+                .ToLowerInvariant()
+                .ToUpperFirst())
+                .Append(' ');
+        });
+
+        return input.IsNullOrEmpty()
+            ? input
+            : titleCasedInputBuilder
+                .ToString()
+                .TrimEnd();
     }
 
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
@@ -128,7 +149,7 @@ public static class StringExtensions
         return string.IsNullOrEmpty(value);
     }
 
-    public static bool IsNullOrWhitespace([NotNullWhen(false)]this string? value)
+    public static bool IsNullOrWhitespace([NotNullWhen(false)] this string? value)
     {
         return string.IsNullOrWhiteSpace(value);
     }

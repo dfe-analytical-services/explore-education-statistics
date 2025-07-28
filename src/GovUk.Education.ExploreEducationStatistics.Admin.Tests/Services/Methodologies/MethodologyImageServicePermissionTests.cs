@@ -18,97 +18,96 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies;
+
+public class MethodologyImageServicePermissionTests
 {
-    public class MethodologyImageServicePermissionTests
+    private readonly MethodologyVersion _methodologyVersion = new()
     {
-        private readonly MethodologyVersion _methodologyVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        Id = Guid.NewGuid()
+    };
 
-        [Fact]
-        public async Task DeleteAll()
-        {
-            var methodologyFileRepository = new Mock<IMethodologyFileRepository>(Strict);
+    [Fact]
+    public async Task DeleteAll()
+    {
+        var methodologyFileRepository = new Mock<IMethodologyFileRepository>(Strict);
 
-            methodologyFileRepository.Setup(mock => mock.GetByFileType(_methodologyVersion.Id, Image))
-                .ReturnsAsync(new List<MethodologyFile>
+        methodologyFileRepository.Setup(mock => mock.GetByFileType(_methodologyVersion.Id, Image))
+            .ReturnsAsync(new List<MethodologyFile>
+            {
+                new()
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        FileId = Guid.NewGuid()
-                    }
-                });
+                    Id = Guid.NewGuid(),
+                    FileId = Guid.NewGuid()
+                }
+            });
 
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMethodologyImageService(
-                            methodologyFileRepository: methodologyFileRepository.Object,
-                            userService: userService.Object);
-                        return service.DeleteAll(_methodologyVersion.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task Delete()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMethodologyImageService(userService: userService.Object);
-                        return service.Delete(methodologyVersionId: _methodologyVersion.Id,
-                            fileIds: new List<Guid>());
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task Upload()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMethodologyImageService(userService: userService.Object);
-                        return service.Upload(methodologyVersionId: _methodologyVersion.Id,
-                            formFile: new Mock<IFormFile>().Object);
-                    }
-                );
-        }
-
-        private MethodologyImageService SetupMethodologyImageService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IPrivateBlobStorageService privateBlobStorageService = null,
-            IFileValidatorService fileValidatorService = null,
-            IFileRepository fileRepository = null,
-            IMethodologyFileRepository methodologyFileRepository = null,
-            IUserService userService = null)
-        {
-            return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
-                contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
-                fileValidatorService ?? Mock.Of<IFileValidatorService>(),
-                fileRepository ?? Mock.Of<IFileRepository>(),
-                methodologyFileRepository ?? Mock.Of<IMethodologyFileRepository>(),
-                userService ?? Mock.Of<IUserService>()
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupMethodologyImageService(
+                        methodologyFileRepository: methodologyFileRepository.Object,
+                        userService: userService.Object);
+                    return service.DeleteAll(_methodologyVersion.Id);
+                }
             );
-        }
+    }
 
-        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
-        {
-            return MockUtils.MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                _methodologyVersion.Id, _methodologyVersion);
-        }
+    [Fact]
+    public async Task Delete()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupMethodologyImageService(userService: userService.Object);
+                    return service.Delete(methodologyVersionId: _methodologyVersion.Id,
+                        fileIds: new List<Guid>());
+                }
+            );
+    }
+
+    [Fact]
+    public async Task Upload()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupMethodologyImageService(userService: userService.Object);
+                    return service.Upload(methodologyVersionId: _methodologyVersion.Id,
+                        formFile: new Mock<IFormFile>().Object);
+                }
+            );
+    }
+
+    private MethodologyImageService SetupMethodologyImageService(
+        ContentDbContext contentDbContext = null,
+        IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
+        IPrivateBlobStorageService privateBlobStorageService = null,
+        IFileValidatorService fileValidatorService = null,
+        IFileRepository fileRepository = null,
+        IMethodologyFileRepository methodologyFileRepository = null,
+        IUserService userService = null)
+    {
+        return new(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
+            contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
+            privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
+            fileValidatorService ?? Mock.Of<IFileValidatorService>(),
+            fileRepository ?? Mock.Of<IFileRepository>(),
+            methodologyFileRepository ?? Mock.Of<IMethodologyFileRepository>(),
+            userService ?? Mock.Of<IUserService>()
+        );
+    }
+
+    private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+    {
+        return MockUtils.MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+            _methodologyVersion.Id, _methodologyVersion);
     }
 }

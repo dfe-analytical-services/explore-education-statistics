@@ -29,8 +29,6 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { Fragment } from 'react';
-import Button from '@common/components/Button';
-import downloadService from '@frontend/services/downloadService';
 
 interface Props {
   releaseVersion: ReleaseVersion;
@@ -60,12 +58,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
     <Page
       title={releaseVersion.publication.title}
       caption={releaseVersion.title}
-      description={
-        releaseVersion.summarySection.content &&
-        releaseVersion.summarySection.content.length > 0
-          ? releaseVersion.summarySection.content[0].body
-          : ''
-      }
+      description={releaseVersion.publication.summary}
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
       ]}
@@ -142,9 +135,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                 {!releaseVersion.publication.isSuperseded && (
                   <>
                     {releaseVersion.latestRelease ? (
-                      <Tag>This is the latest data</Tag>
+                      <Tag>This is the latest release</Tag>
                     ) : (
-                      <Tag colour="orange">This is not the latest data</Tag>
+                      <Tag colour="orange">This is not the latest release</Tag>
                     )}
                   </>
                 )}
@@ -237,23 +230,19 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               <ul className="govuk-list">
                 {showAllFilesButton && (
                   <li>
-                    <Button
-                      className="govuk-button  govuk-!-margin-bottom-3"
-                      onClick={async () => {
-                        await downloadService.downloadZip(
-                          releaseVersion.id,
-                          'ReleaseUsefulInfo',
-                        );
-
+                    <Link
+                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files?fromPage=ReleaseUsefulInfo`}
+                      onClick={() => {
                         logEvent({
                           category: `${releaseVersion.publication.title} release page - Useful information`,
                           action: 'Download all data button clicked',
                           label: `Publication: ${releaseVersion.publication.title}, Release: ${releaseVersion.title}, File: All files`,
                         });
                       }}
+                      id="download-all-data-link"
                     >
                       Download all data (zip)
-                    </Button>
+                    </Link>
                   </li>
                 )}
                 {!!releaseVersion.relatedDashboardsSection?.content.length && (
@@ -450,13 +439,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
           downloadFiles={releaseVersion.downloadFiles}
           hasDataGuidance={releaseVersion.hasDataGuidance}
           renderAllFilesLink={
-            <Button
-              onClick={async () => {
-                await downloadService.downloadZip(
-                  releaseVersion.id,
-                  'ReleaseDownloads',
-                );
-
+            <Link
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files?fromPage=ReleaseDownloads`}
+              onClick={() => {
                 logEvent({
                   category: 'Downloads',
                   action: `Release page all files, Release: ${releaseVersion.title}, File: All files`,
@@ -464,7 +449,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               }}
             >
               Download all data (ZIP)
-            </Button>
+            </Link>
           }
           renderCreateTablesLink={
             <Link

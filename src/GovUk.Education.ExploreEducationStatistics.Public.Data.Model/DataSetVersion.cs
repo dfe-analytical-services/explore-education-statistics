@@ -75,14 +75,18 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public SemVersion SemVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
-    public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1);
+    public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1).WithPatch(0);
     
     public SemVersion NextPatchVersion() => SemVersion().WithPatch(VersionPatch + 1);
 
     public bool IsFirstVersion => VersionMajor == 1 && VersionMinor == 0 && VersionPatch == 0;
 
     public DataSetVersionType VersionType
-        => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
+        => VersionPatch == 0 
+            ? VersionMinor == 0 
+                ? DataSetVersionType.Major 
+                : DataSetVersionType.Minor 
+            : DataSetVersionType.Patch;
 
     public bool CanBeDeleted => Status is DataSetVersionStatus.Failed
         or DataSetVersionStatus.Mapping

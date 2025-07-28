@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -23,6 +24,7 @@ public static class JsonSerializationUtils
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
         };
+        settings.Converters.Add(new StringEnumConverter());
         
         return JsonConvert.SerializeObject(
             value: obj,

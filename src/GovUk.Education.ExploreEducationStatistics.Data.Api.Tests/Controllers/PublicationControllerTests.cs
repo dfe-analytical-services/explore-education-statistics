@@ -20,183 +20,182 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
+
+public class PublicationControllerTests : CacheServiceTestFixture
 {
-    public class PublicationControllerTests : CacheServiceTestFixture
+    [Fact]
+    public async Task ListLatestReleaseSubjects()
     {
-        [Fact]
-        public async Task ListLatestReleaseSubjects()
+        var subjects = new List<SubjectViewModel>();
+
+        var latestReleaseVersionId = Guid.NewGuid();
+
+        var publication = new Publication
         {
-            var subjects = new List<SubjectViewModel>();
+            Id = Guid.NewGuid(),
+            LatestPublishedReleaseVersionId = latestReleaseVersionId
+        };
 
-            var latestReleaseVersionId = Guid.NewGuid();
+        var (controller, mocks) = BuildControllerAndMocks();
 
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                LatestPublishedReleaseVersionId = latestReleaseVersionId
-            };
+        var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", latestReleaseVersionId);
 
-            var (controller, mocks) = BuildControllerAndMocks();
+        SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
-            var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", latestReleaseVersionId);
+        mocks
+            .cacheKeyService
+            .Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseVersionId))
+            .ReturnsAsync(cacheKey);
 
-            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
+        mocks.cacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
+            .ReturnsAsync(null!);
 
-            mocks
-                .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseVersionId))
-                .ReturnsAsync(cacheKey);
+        mocks
+            .releaseService
+            .Setup(s => s.ListSubjects(latestReleaseVersionId))
+            .ReturnsAsync(subjects);
 
-            mocks.cacheService
-                .Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
-                .ReturnsAsync(null!);
+        mocks.cacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, subjects))
+            .Returns(Task.CompletedTask);
 
-            mocks
-                .releaseService
-                .Setup(s => s.ListSubjects(latestReleaseVersionId))
-                .ReturnsAsync(subjects);
+        var result = await controller.ListLatestReleaseSubjects(publication.Id);
+        VerifyAllMocks(mocks);
 
-            mocks.cacheService
-                .Setup(s => s.SetItemAsync<object>(cacheKey, subjects))
-                .Returns(Task.CompletedTask);
+        result.AssertOkResult(subjects);
+    }
 
-            var result = await controller.ListLatestReleaseSubjects(publication.Id);
-            VerifyAllMocks(mocks);
-
-            result.AssertOkResult(subjects);
-        }
-
-        [Fact]
-        public async Task ListLatestReleaseSubjects_PublicationHasNoPublishedRelease()
+    [Fact]
+    public async Task ListLatestReleaseSubjects_PublicationHasNoPublishedRelease()
+    {
+        var publication = new Publication
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                LatestPublishedReleaseVersionId = null
-            };
+            Id = Guid.NewGuid(),
+            LatestPublishedReleaseVersionId = null
+        };
 
-            var (controller, mocks) = BuildControllerAndMocks();
+        var (controller, mocks) = BuildControllerAndMocks();
 
-            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
+        SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
-            var result = await controller.ListLatestReleaseSubjects(publication.Id);
-            VerifyAllMocks(mocks);
+        var result = await controller.ListLatestReleaseSubjects(publication.Id);
+        VerifyAllMocks(mocks);
 
-            result.AssertNotFoundResult();
-        }
+        result.AssertNotFoundResult();
+    }
 
-        [Fact]
-        public async Task ListLatestReleaseFeaturedTables()
+    [Fact]
+    public async Task ListLatestReleaseFeaturedTables()
+    {
+        var latestReleaseId = Guid.NewGuid();
+
+        var publication = new Publication
         {
-            var latestReleaseId = Guid.NewGuid();
+            Id = Guid.NewGuid(),
+            LatestPublishedReleaseVersionId = latestReleaseId
+        };
 
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                LatestPublishedReleaseVersionId = latestReleaseId
-            };
-
-            var featuredTables = new List<FeaturedTableViewModel>
-            {
-                new
-                (
-                    Id: Guid.NewGuid(),
-                    Name: "name",
-                    Description: "description",
-                    SubjectId: Guid.NewGuid(),
-                    DataBlockId: Guid.NewGuid(),
-                    DataBlockParentId: Guid.NewGuid(),
-                    Order: 0
-                ),
-            };
-
-            var (controller, mocks) = BuildControllerAndMocks();
-
-            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
-
-            mocks.releaseService
-                .Setup(s => s.ListFeaturedTables(latestReleaseId))
-                .ReturnsAsync(featuredTables);
-
-            var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
-            VerifyAllMocks(mocks);
-
-            result.AssertOkResult(featuredTables);
-        }
-
-        [Fact]
-        public async Task ListLatestReleaseFeaturedTables_PublicationHasNoPublishedRelease()
+        var featuredTables = new List<FeaturedTableViewModel>
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                LatestPublishedReleaseVersionId = null
-            };
-
-            var (controller, mocks) = BuildControllerAndMocks();
-
-            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
-
-            var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
-            VerifyAllMocks(mocks);
-
-            result.AssertNotFoundResult();
-        }
-
-        [Fact]
-        public void SubjectViewModel_SerializeAndDeserialize()
-        {
-            var original = new SubjectViewModel(
-                Guid.NewGuid(),
-                "Name",
-                0,
-                "Content",
-                new TimePeriodLabels
-                {
-                    From = "2020",
-                    To = "2022"
-                },
-                new List<string> { "level1" },
-                new List<string> { "filter1", },
-                new List<string>
-                {
-                    "indicator1", "indicator2", "indicator3", "indicator4",
-                },
-                new FileInfo
-                {
-                    Created = DateTime.Now,
-                    Id = Guid.NewGuid(),
-                    Name = "Name",
-                    Size = "1234",
-                    Summary = "Summary",
-                    Type = FileType.Ancillary,
-                    FileName = "Filename",
-                    UserName = "UserName"
-                },
-                DateTime.Now);
-
-            var converted = DeserializeObject<SubjectViewModel>(SerializeObject(original));
-            converted.AssertDeepEqualTo(original);
-        }
-
-        private (PublicationController controller,
+            new
             (
-            Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
-            Mock<IReleaseService> releaseService,
-            Mock<ICacheKeyService> cacheKeyService,
-            Mock<IBlobCacheService> cacheService
-            ) mocks
-            ) BuildControllerAndMocks()
-        {
-            var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
-            var releaseService = new Mock<IReleaseService>(Strict);
-            var cacheKeyService = new Mock<ICacheKeyService>(Strict);
-            var controller = new PublicationController(
-                contentPersistenceHelper.Object, releaseService.Object, cacheKeyService.Object);
+                Id: Guid.NewGuid(),
+                Name: "name",
+                Description: "description",
+                SubjectId: Guid.NewGuid(),
+                DataBlockId: Guid.NewGuid(),
+                DataBlockParentId: Guid.NewGuid(),
+                Order: 0
+            ),
+        };
 
-            return (controller,
-                (contentPersistenceHelper, releaseService, cacheKeyService, BlobCacheService));
-        }
+        var (controller, mocks) = BuildControllerAndMocks();
+
+        SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
+
+        mocks.releaseService
+            .Setup(s => s.ListFeaturedTables(latestReleaseId))
+            .ReturnsAsync(featuredTables);
+
+        var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
+        VerifyAllMocks(mocks);
+
+        result.AssertOkResult(featuredTables);
+    }
+
+    [Fact]
+    public async Task ListLatestReleaseFeaturedTables_PublicationHasNoPublishedRelease()
+    {
+        var publication = new Publication
+        {
+            Id = Guid.NewGuid(),
+            LatestPublishedReleaseVersionId = null
+        };
+
+        var (controller, mocks) = BuildControllerAndMocks();
+
+        SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
+
+        var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
+        VerifyAllMocks(mocks);
+
+        result.AssertNotFoundResult();
+    }
+
+    [Fact]
+    public void SubjectViewModel_SerializeAndDeserialize()
+    {
+        var original = new SubjectViewModel(
+            Guid.NewGuid(),
+            "Name",
+            0,
+            "Content",
+            new TimePeriodLabels
+            {
+                From = "2020",
+                To = "2022"
+            },
+            new List<string> { "level1" },
+            new List<string> { "filter1", },
+            new List<string>
+            {
+                "indicator1", "indicator2", "indicator3", "indicator4",
+            },
+            new FileInfo
+            {
+                Created = DateTime.Now,
+                Id = Guid.NewGuid(),
+                Name = "Name",
+                Size = "1234",
+                Summary = "Summary",
+                Type = FileType.Ancillary,
+                FileName = "Filename",
+                UserName = "UserName"
+            },
+            DateTime.Now);
+
+        var converted = DeserializeObject<SubjectViewModel>(SerializeObject(original));
+        converted.AssertDeepEqualTo(original);
+    }
+
+    private (PublicationController controller,
+        (
+        Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
+        Mock<IReleaseService> releaseService,
+        Mock<ICacheKeyService> cacheKeyService,
+        Mock<IBlobCacheService> cacheService
+        ) mocks
+        ) BuildControllerAndMocks()
+    {
+        var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
+        var releaseService = new Mock<IReleaseService>(Strict);
+        var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+        var controller = new PublicationController(
+            contentPersistenceHelper.Object, releaseService.Object, cacheKeyService.Object);
+
+        return (controller,
+            (contentPersistenceHelper, releaseService, cacheKeyService, BlobCacheService));
     }
 }

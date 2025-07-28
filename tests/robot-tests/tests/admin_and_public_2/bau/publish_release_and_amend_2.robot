@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}         Academic year Q1 2020/21
-${PUBLICATION_NAME}     UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}         Seven filters
 ${SECOND_SUBJECT}       upload file test
 ${THIRD_SUBJECT}        upload file test with filter subject
@@ -316,7 +316,7 @@ Check new release status history entry is present
 Go to permalink page & check for error element to be present
     user navigates to    ${PERMA_LOCATION_URL}
     user waits until page contains
-    ...    WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.
+    ...    A newer release of this publication is available and may include updated figures.
 
 Check the table has the same results as original table
     user checks table row heading contains    1    1    Total

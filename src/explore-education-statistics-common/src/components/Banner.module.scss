@@ -1,18 +1,12 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .container {
-  background: govuk-colour('blue');
-  margin-top: -10px;
+  background: govuk-tint($govuk-brand-colour, 95%);
+  border-bottom: 1px solid govuk-tint($govuk-brand-colour, 50%);
   padding: govuk-spacing(2) 0;
-
-  p {
-    color: govuk-colour('white');
-  }
 }
 
 .close {
-  color: govuk-colour('white') !important;
-
   &:hover {
     text-decoration: none;
   }

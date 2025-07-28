@@ -6,44 +6,43 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.Authoriza
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement
 {
-    public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement
+}
+
+public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
+    : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
+        ReleaseVersion releaseVersion)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            context.Succeed(requirement);
+            return;
         }
-
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
-            ReleaseVersion releaseVersion)
+        
+        if (await _authorizationHandlerService
+                .HasRolesOnPublicationOrReleaseVersion(
+                    context.User.GetUserId(),
+                    releaseVersion.PublicationId,
+                    releaseVersion.Id,
+                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                    ReleaseEditorAndApproverRoles))
         {
-            if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-            
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrReleaseVersion(
-                        context.User.GetUserId(),
-                        releaseVersion.PublicationId,
-                        releaseVersion.Id,
-                        ListOf(PublicationRole.Owner, PublicationRole.Allower),
-                        ReleaseEditorAndApproverRoles))
-            {
-                context.Succeed(requirement);
-            }
+            context.Succeed(requirement);
         }
     }
 }

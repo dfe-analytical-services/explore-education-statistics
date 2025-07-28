@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                        UI tests - prerelease %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                        Prerelease %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=                          UI test table
 ${DATABLOCK_FEATURED_NAME}=                 UI test featured table name
 ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description

@@ -11,9 +11,9 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${OWNING_PUBLICATION_NAME}=         UI tests - methodology owning publication %{RUN_IDENTIFIER}
-${ADOPTING_PUBLICATION_NAME}=       UI tests - adopting methodology publication %{RUN_IDENTIFIER}
-${OWNING_PUBLICATION_NAME_2}=       UI tests - publication with unpublished methodology %{RUN_IDENTIFIER}
+${OWNING_PUBLICATION_NAME}=         Methodology owning publication %{RUN_IDENTIFIER}
+${ADOPTING_PUBLICATION_NAME}=       Adopting methodology publication %{RUN_IDENTIFIER}
+${OWNING_PUBLICATION_NAME_2}=       Publication with unpublished methodology %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                    Calendar year 2000
 
 

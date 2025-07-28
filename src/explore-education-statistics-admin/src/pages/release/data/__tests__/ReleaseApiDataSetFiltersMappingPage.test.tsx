@@ -111,7 +111,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // new filter options
     expect(
       screen.getByRole('heading', {
-        name: 'New filter options (1) No action required',
+        name: 'Filter options not found in old dataset (1) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -134,7 +134,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped
     expect(
       screen.getByRole('heading', {
-        name: 'Auto mapped filter options (4) No action required',
+        name: 'Filter options found in both (4) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -205,7 +205,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       within(navItems[3]).getByRole('link', {
-        name: 'New filter options',
+        name: 'Filter options not found in old dataset',
       }),
     ).toHaveAttribute('href', '#new-filter-options');
     const newSubItems = within(navItems[3]).getAllByRole('listitem');
@@ -218,7 +218,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       within(navItems[5]).getByRole('link', {
-        name: 'Auto mapped filter options',
+        name: 'Filter options found in both',
       }),
     ).toHaveAttribute('href', '#auto-mapped-filter-options');
     const autoMappedSubItems = within(navItems[5]).getAllByRole('listitem');
@@ -399,7 +399,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'New filter options (0) No action required',
+        name: 'Filter options not found in old dataset (0) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -414,7 +414,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders a message if there are no auto mapped filter options', async () => {
+  test('renders a message if there are no filter options found in both', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getFiltersMapping.mockResolvedValue({
       candidates: {
@@ -453,12 +453,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Auto mapped filter options (0) No action required',
+        name: 'Filter options found in both (0) No action required',
       }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('No auto mapped filter options.'),
+      screen.getByText('No filter options found in both.'),
     ).toBeInTheDocument();
 
     expect(screen.queryByTestId('auto-mapped')).not.toBeInTheDocument();
@@ -505,7 +505,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // new filter1 table
       expect(
         screen.getByRole('heading', {
-          name: 'New filter options (1) No action required',
+          name: 'Filter options not found in old dataset (1) No action required',
         }),
       ).toBeInTheDocument();
       const newFilterOptionsAccordion = within(
@@ -533,7 +533,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(unmappedFilterOption).getByRole('button', {
-          name: 'Edit mapping for Filter 1 Option 2',
+          name: 'Map option for Filter 1 Option 2',
         }),
       );
 
@@ -594,7 +594,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Remove from new filter options
       expect(
         screen.getByRole('heading', {
-          name: 'New filter options (0) No action required',
+          name: 'Filter options not found in old dataset (0) No action required',
         }),
       ).toBeInTheDocument();
       expect(
@@ -634,7 +634,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(unmappedFilterOption).getByRole('button', {
-          name: 'Edit mapping for Filter 1 Option 2',
+          name: 'Map option for Filter 1 Option 2',
         }),
       );
 
@@ -773,7 +773,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // auto mapped table
       expect(
         screen.getByRole('heading', {
-          name: 'Auto mapped filter options (4) No action required',
+          name: 'Filter options found in both (4) No action required',
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
@@ -803,7 +803,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // new filter options table
       expect(
         screen.getByRole('heading', {
-          name: 'New filter options (1) No action required',
+          name: 'Filter options not found in old dataset (1) No action required',
         }),
       ).toBeInTheDocument();
       const newFilterOptionsAccordion = within(
@@ -821,7 +821,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(autoMappedFilter).getByRole('button', {
-          name: 'Edit mapping for Filter 1 Option 1',
+          name: 'Map option for Filter 1 Option 1',
         }),
       );
 
@@ -863,7 +863,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         });
 
         expect(
-          screen.getByText('Auto mapped filter options (3)'),
+          screen.getByText('Filter options found in both (3)'),
         ).toBeInTheDocument();
       });
 
@@ -890,7 +890,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Add to new filter options table
       expect(
         screen.getByRole('heading', {
-          name: 'New filter options (2) No action required',
+          name: 'Filter options not found in old dataset (2) No action required',
         }),
       ).toBeInTheDocument();
       expect(
@@ -922,7 +922,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // auto mapped table
       expect(
         screen.getByRole('heading', {
-          name: 'Auto mapped filter options (4) No action required',
+          name: 'Filter options found in both (4) No action required',
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
@@ -951,7 +951,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(autoMappedFilter).getByRole('button', {
-          name: 'Edit mapping for Filter 1 Option 1',
+          name: 'Map option for Filter 1 Option 1',
         }),
       );
 
@@ -994,7 +994,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         });
 
         expect(
-          screen.getByText('Auto mapped filter options (3)'),
+          screen.getByText('Filter options found in both (3)'),
         ).toBeInTheDocument();
       });
 
@@ -1158,12 +1158,14 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       ).toHaveAttribute('href', '#new-filter-columns');
 
       expect(
-        within(navItems[3]).getByRole('link', { name: 'New filter options' }),
+        within(navItems[3]).getByRole('link', {
+          name: 'Filter options not found in old dataset',
+        }),
       ).toHaveAttribute('href', '#new-filter-options');
 
       expect(
         within(navItems[4]).getByRole('link', {
-          name: 'Auto mapped filter options',
+          name: 'Filter options found in both',
         }),
       ).toHaveAttribute('href', '#auto-mapped-filter-options');
     });

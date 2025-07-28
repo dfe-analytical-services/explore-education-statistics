@@ -1,7 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -16,13 +14,18 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
     public class ReleaseDataFileServicePermissionTests
     {
         private readonly ReleaseVersion _releaseVersion = new()
@@ -125,6 +128,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetAccoutrementsSummary()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = _releaseVersion,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    Type = FileType.Data,
+                }
+            };
+
+            var persistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);
+
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(
+                            contentPersistenceHelper: persistenceHelper.Object,
+                            userService: userService.Object);
+                        return service.GetAccoutrementsSummary(
+                            releaseVersionId: releaseFile.ReleaseVersionId,
+                            fileId: releaseFile.FileId);
+                    }
+                );
+        }
+
+        [Fact]
         public async Task ListAll()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
@@ -218,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
-                            dataSetFiles: new Mock<List<DataSetUploadResultViewModel>>().Object,
+                            dataSetUploadIds: [],
                             cancellationToken: default);
                     }
                 );
@@ -233,25 +267,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
+            IUserService? userService = null,
             IDataSetFileStorage? dataSetFileStorage = null,
-            IUserService? userService = null)
+            IDataBlockService? dataBlockService = null,
+            IFootnoteRepository? footnoteRepository = null,
+            IDataSetScreenerClient? dataSetScreenerClient = null,
+            IReplacementPlanService? replacementPlanService = null,
+            IMapper? mapper = null)
         {
-            contentDbContext ??= new Mock<ContentDbContext>().Object;
-            privateBlobStorageService ??= new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object;
-            dataImportService ??= new Mock<IDataImportService>(MockBehavior.Strict).Object;
-            userService ??= new Mock<IUserService>(MockBehavior.Strict).Object;
+            contentDbContext ??= Mock.Of<ContentDbContext>();
 
             return new ReleaseDataFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                privateBlobStorageService,
-                dataSetValidator ?? new Mock<IDataSetValidator>(MockBehavior.Strict).Object,
+                privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
+                dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
-                dataImportService,
-                userService,
-                dataSetFileStorage ?? new Mock<IDataSetFileStorage>(MockBehavior.Strict).Object
+                releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
+                dataImportService ?? Mock.Of<IDataImportService>(MockBehavior.Strict),
+                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
+                dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
+                dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
+                dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+                replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
+                mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }
 
@@ -262,4 +303,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return mock;
         }
     }
-}

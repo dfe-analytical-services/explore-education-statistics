@@ -12,8 +12,63 @@ interface DataFileInfo extends FileInfo {
   userName: string;
   created: string;
   status: ImportStatusCode;
-  replacedBy?: string;
+  replacedBy?: string; // the fileId of the replacement file, if it exists
+  replacedByDataFile?: ReplacementDataFileInfo; // additional info about the replacement file - although not always returned by the backend, even if it exists!
   permissions: DataFilePermissions;
+}
+
+interface ReplacementDataFileInfo extends DataFileInfo {
+  hasValidReplacementPlan?: boolean;
+}
+
+export interface DataSetInfo {
+  id: string | undefined;
+  extension: string;
+  summary: string | undefined;
+  dataSetTitle: string;
+  dataFileId: string;
+  dataFileName: string;
+  dataFileSize: number;
+  rows: number | undefined;
+  metaFileId: string;
+  metaFileName: string;
+  metaFileSize: number;
+  status: ImportStatusCode;
+  permissions: DataFilePermissions;
+  publicApiDataSetId: string | undefined;
+  publicApiDataSetVersion: string | undefined;
+  dataSetUpload: DataSetUpload | undefined;
+  created: string;
+  userName: string;
+  replacedBy?: string;
+}
+
+export interface DataSetUpload {
+  id: string;
+  dataSetTitle: string;
+  dataFileName: string;
+  dataFileSize: string;
+  metaFileName: string;
+  metaFileSize: string;
+  status: DataSetUploadStatus;
+  screenerResult?: ScreenerResult; // Nullable if screening fails
+  created: Date;
+  uploadedBy: string;
+  replacingFileId?: string;
+}
+
+export interface ScreenerResult {
+  overallResult: ScreenerOverallResult;
+  message: string;
+  testResults: ScreenerTestSummary[];
+}
+
+export interface ScreenerTestSummary {
+  id: string;
+  testFunctionName: string;
+  result: ScreenerTestResult;
+  notes: string | undefined;
+  stage: ScreenerTestStage;
 }
 
 export interface DeleteDataFilePlan {
@@ -21,6 +76,7 @@ export interface DeleteDataFilePlan {
   footnoteIds: string[];
 }
 
+// Mapped from DataFileInfo - see mapFile function below
 export interface DataFile {
   id: string;
   title: string;
@@ -35,12 +91,22 @@ export interface DataFile {
   userName: string;
   status: ImportStatusCode;
   replacedBy?: string;
+  replacedByDataFile?: ReplacementDataFile;
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
   permissions: DataFilePermissions;
   publicApiDataSetId?: string;
   publicApiDataSetVersion?: string;
+}
+
+export interface ReplacementDataFile extends DataFile {
+  hasValidReplacementPlan?: boolean;
+}
+
+export interface DataSetAccoutrements {
+  dataBlocks: { id: string; name: string }[];
+  footnotes: { id: string; content: string }[];
 }
 
 export type UploadDataFilesRequest = {
@@ -56,16 +122,7 @@ export type UploadZipDataFileRequest = {
   replacingFileId?: string;
 };
 
-export type DataSetUploadResult = {
-  title: string;
-  dataFileName: string;
-  dataFileId: string;
-  dataFileSize: number;
-  metaFileName: string;
-  metaFileId: string;
-  metaFileSize: number;
-  replacingFileId?: string;
-};
+export type FileType = 'data' | 'metadata';
 
 export interface DataFileUpdateRequest {
   title: string;
@@ -74,8 +131,6 @@ export interface DataFileUpdateRequest {
 export type ImportStatusCode =
   | 'COMPLETE'
   | 'QUEUED'
-  | 'UPLOADING'
-  | 'PROCESSING_ARCHIVE_FILE'
   | 'STAGE_1'
   | 'STAGE_2'
   | 'STAGE_3'
@@ -83,6 +138,24 @@ export type ImportStatusCode =
   | 'FAILED'
   | 'CANCELLING'
   | 'CANCELLED';
+
+export type DataSetUploadStatus =
+  | 'UPLOADING'
+  | 'SCREENING'
+  | 'FAILED_SCREENING'
+  | 'PENDING_REVIEW'
+  | 'PENDING_IMPORT';
+
+export type ScreenerOverallResult = 'Passed' | 'Failed';
+
+export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
+
+export type ScreenerTestStage =
+  | 'InitialFileValidation'
+  | 'PreScreening1'
+  | 'PreScreening2'
+  | 'FullChecks'
+  | 'Passed';
 
 export interface DataFileImportStatus {
   status: ImportStatusCode;
@@ -102,22 +175,37 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
       size: parseInt(size, 10),
       unit,
     },
+    replacedByDataFile:
+      file.replacedByDataFile === undefined
+        ? undefined
+        : mapFile(file.replacedByDataFile),
   };
 }
 
 const releaseDataFileService = {
-  getDataFiles(releaseId: string): Promise<DataFile[]> {
-    return client
-      .get<DataFileInfo[]>(`/release/${releaseId}/data`)
-      .then(response => {
-        const dataFiles = response.filter(file => file.metaFileName.length > 0);
-        return dataFiles.map(mapFile);
-      });
+  async getDataFiles(releaseId: string): Promise<DataFile[]> {
+    const response = await client.get<DataFileInfo[]>(
+      `/releaseVersions/${releaseId}/data`,
+    );
+    const dataFiles = response.filter(file => file.metaFileName.length > 0);
+    return dataFiles.map(mapFile);
   },
-  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
-    return client
-      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
-      .then(mapFile);
+  async getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+    const result = await client.get<DataFileInfo>(
+      `/releaseVersions/${releaseId}/data/${fileId}`,
+    );
+    return mapFile(result);
+  },
+  async getDataSetUploads(releaseId: string): Promise<DataSetUpload[]> {
+    return client.get<DataSetUpload[]>(`/releaseVersions/${releaseId}/uploads`);
+  },
+  getDataSetAccoutrementsSummary(
+    releaseVersionId: string,
+    fileId: string,
+  ): Promise<DataSetAccoutrements> {
+    return client.get<DataSetAccoutrements>(
+      `/release/${releaseVersionId}/data/${fileId}/accoutrements-summary`,
+    );
   },
   async uploadDataSetFilePairForReplacement(
     releaseId: string,
@@ -161,7 +249,7 @@ const releaseDataFileService = {
   async uploadDataSetFilePair(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<DataSetUploadResult[]> {
+  ): Promise<void> {
     const { dataFile, metadataFile, title, replacingFileId } = request;
 
     const data = new FormData();
@@ -171,12 +259,12 @@ const releaseDataFileService = {
     data.append('metaFile', metadataFile);
     data.append('replacingFileId', replacingFileId ?? '');
 
-    return client.post<DataSetUploadResult[]>('/releaseVersions/data', data);
+    return client.post('/releaseVersions/data', data);
   },
   async uploadZippedDataSetFilePair(
     releaseId: string,
     request: UploadZipDataFileRequest,
-  ): Promise<DataSetUploadResult[]> {
+  ): Promise<void> {
     const { zipFile, title, replacingFileId } = request;
 
     const data = new FormData();
@@ -185,52 +273,50 @@ const releaseDataFileService = {
     data.append('zipFile', zipFile);
     data.append('replacingFileId', replacingFileId ?? '');
 
-    return client.post<DataSetUploadResult[]>(
-      '/releaseVersions/zip-data',
-      data,
-    );
+    return client.post('/releaseVersions/zip-data', data);
   },
   async uploadBulkZipDataSetFile(
     releaseId: string,
     zipFile: File,
-  ): Promise<DataSetUploadResult[]> {
+  ): Promise<void> {
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('zipFile', zipFile);
 
-    return client.post<DataSetUploadResult[]>(
-      'releaseVersions/upload-bulk-zip-data',
-      data,
-    );
+    return client.post('releaseVersions/upload-bulk-zip-data', data);
+  },
+  async deleteDataSetUpload(
+    releaseId: string,
+    uploadId: string,
+  ): Promise<void> {
+    await client.delete(`/releaseVersions/${releaseId}/upload/${uploadId}`);
   },
   async importDataSets(
     releaseId: string,
-    dataSetUploadResults: DataSetUploadResult[],
-  ): Promise<DataFile[]> {
-    const files = await client.post<DataFileInfo[]>(
-      `/releases/${releaseId}/import-data-sets`,
-      dataSetUploadResults,
+    dataSetUploadIds: string[],
+  ): Promise<void> {
+    await client.post<DataFileInfo[]>(
+      `/releaseVersions/${releaseId}/import-data-sets`,
+      dataSetUploadIds,
     );
-
-    return files.map(file => mapFile(file));
   },
-  updateDataFilesOrder(
+  async updateDataFilesOrder(
     releaseId: string,
     order: string[],
   ): Promise<DataFile[]> {
-    return client
-      .put<DataFileInfo[]>(`/release/${releaseId}/data/order`, order)
-      .then(response => {
-        const dataFiles = response.filter(file => file.metaFileName.length > 0);
-        return dataFiles.map(mapFile);
-      });
+    const response = await client.put<DataFileInfo[]>(
+      `/release/${releaseId}/data/order`,
+      order,
+    );
+    const dataFiles = response.filter(file => file.metaFileName.length > 0);
+    return dataFiles.map(mapFile);
   },
   getDataFileImportStatus(
     releaseId: string,
-    dataFile: DataFile,
+    dataFileId: string,
   ): Promise<DataFileImportStatus> {
     return client.get<DataFileImportStatus>(
-      `/release/${releaseId}/data/${dataFile.id}/import/status`,
+      `/release/${releaseId}/data/${dataFileId}/import/status`,
     );
   },
 
@@ -245,11 +331,30 @@ const releaseDataFileService = {
   deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
-  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
-    return client
+  async downloadFile(
+    releaseId: string,
+    id: string,
+    fileName: string,
+  ): Promise<void> {
+    await client
       .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
+      .then(response => downloadFile({ file: response, fileName }));
+  },
+  async downloadTemporaryFile(
+    releaseId: string,
+    fileType: FileType,
+    dataSetUploadId: string,
+    fileName: string,
+  ): Promise<void> {
+    await client
+      .get<Blob>(
+        `/releaseVersions/${releaseId}/${fileType}/${dataSetUploadId}/download`,
+        {
+          responseType: 'blob',
+        },
+      )
       .then(response => downloadFile({ file: response, fileName }));
   },
   updateFile(

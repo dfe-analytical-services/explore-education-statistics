@@ -1,6 +1,7 @@
 import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import TryNewSearchBanner from '@frontend/components/TryNewSearchBanner';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
@@ -13,7 +14,11 @@ function HomePage() {
     });
 
   return (
-    <Page title="Explore our statistics and data" isHomepage>
+    <Page
+      title="Explore our statistics and data"
+      isHomepage
+      customBannerContent={<TryNewSearchBanner />}
+    >
       <div className="govuk-grid-row dfe-card__container">
         <HomepageCard
           title="Find statistics and data"
@@ -72,6 +77,19 @@ function HomePage() {
           <p className="govuk-caption-m">
             Browse our A to Z list of definitions for terms used across our
             statistics.
+          </p>
+
+          <h3 className="govuk-!-margin-bottom-1">
+            <Link
+              to="https://api.education.gov.uk/statistics/docs"
+              onClick={() => logLinkClick('API documentation')}
+            >
+              API documentation
+            </Link>
+          </h3>
+          <p className="govuk-caption-m">
+            Find out how to automate access to statistics and data through our
+            API (application programming interface).
           </p>
         </div>
       </div>

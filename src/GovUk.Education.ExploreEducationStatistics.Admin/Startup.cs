@@ -1,10 +1,14 @@
 #nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -24,6 +28,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -87,11 +92,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -137,8 +138,8 @@ using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.S
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin;
+
     public class Startup(
         IConfiguration configuration,
         IHostEnvironment hostEnvironment)
@@ -396,6 +397,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<FeatureFlagsOptions>(
                 configuration.GetSection(FeatureFlagsOptions.Section));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.Configure<DataScreenerClientOptions>(
+                configuration.GetRequiredSection(DataScreenerClientOptions.Section));
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -428,6 +431,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
+            services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
+            services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseImageService, ReleaseImageService>();
@@ -475,6 +480,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
+            services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
             services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
@@ -487,7 +494,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPostgreSqlRepository, PostgreSqlRepository>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IAdminEventRaiser, AdminEventRaiser>();
+
+            // If operating within Azure, register authentication managers that obtain access
+            // tokens for authenticating the Admin App Service with the target service.
+            //
+            // Otherwise, for non-Azure environments (local and integration test) register
+            // authentication managers that simply authenticate themselves via an HTTP header.
+            if (hostEnvironment.IsProduction())
+            {
+                services.AddScoped(
+                    typeof(IHttpClientAzureAuthenticationManager<>),
+                    typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>));
+            }
+            else
+            {
+                services.AddScoped(
+                    typeof(IHttpClientAzureAuthenticationManager<>),
+                    typeof(HttpHeaderHttpClientAuthenticationManager<>));
+            }
+
+            
             services.AddEventGridClient(configuration);
+
+            services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
+            {
+                var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
+                httpClient.BaseAddress = new Uri(options.Value.Url);
+            });
 
             if (publicDataDbExists)
             {
@@ -495,14 +528,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 
                 services.AddTransient<IDataSetService, DataSetService>();
@@ -551,8 +582,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
                 return new LoggingNotificationClient(logger);
             });
+            
             services.AddTransient<IEmailService, EmailService>();
-
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
@@ -569,6 +600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
             services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
             services.AddTransient<IObservationService, ObservationService>();
+            services.AddTransient<IOrganisationService, OrganisationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
@@ -610,7 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
-            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider => 
+            services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                 new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
@@ -1020,4 +1052,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
-}

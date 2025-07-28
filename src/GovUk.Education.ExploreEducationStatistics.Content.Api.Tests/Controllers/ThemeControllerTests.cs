@@ -13,58 +13,57 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
+
+public class ThemeControllerTests
 {
-    public class ThemeControllerTests
+    private static readonly List<AllMethodologiesThemeViewModel> MethodologyThemes = new()
     {
-        private static readonly List<AllMethodologiesThemeViewModel> MethodologyThemes = new()
+        new AllMethodologiesThemeViewModel
         {
-            new AllMethodologiesThemeViewModel
-            {
-                Id = Guid.NewGuid(),
-                Title = "Publication title",
-                Publications = AsList(
-                    new AllMethodologiesPublicationViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Publication title",
-                        Methodologies = AsList(
-                            new MethodologyVersionSummaryViewModel
-                            {
-                                Id = Guid.NewGuid(),
-                                Slug = "methodology-slug",
-                                Title = "Methodology title"
-                            }
-                        )
-                    })
-            }
-        };
-
-        [Fact]
-        public async Task GetMethodologyThemes()
-        {
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-
-            var controller = BuildController(methodologyCacheService.Object);
-
-            methodologyCacheService
-                .Setup(mock => mock.GetSummariesTree())
-                .ReturnsAsync(MethodologyThemes);
-
-            var result = await controller.GetMethodologyThemes();
-
-            VerifyAllMocks(methodologyCacheService);
-
-            result.AssertOkResult(MethodologyThemes);
+            Id = Guid.NewGuid(),
+            Title = "Publication title",
+            Publications = AsList(
+                new AllMethodologiesPublicationViewModel
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication title",
+                    Methodologies = AsList(
+                        new MethodologyVersionSummaryViewModel
+                        {
+                            Id = Guid.NewGuid(),
+                            Slug = "methodology-slug",
+                            Title = "Methodology title"
+                        }
+                    )
+                })
         }
+    };
 
-        private static ThemeController BuildController(
-            IMethodologyCacheService? methodologyCacheService = null,
-            IThemeService? themeService = null)
-        {
-            return new ThemeController(
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                themeService ?? Mock.Of<IThemeService>(Strict));
-        }
+    [Fact]
+    public async Task GetMethodologyThemes()
+    {
+        var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+
+        var controller = BuildController(methodologyCacheService.Object);
+
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesTree())
+            .ReturnsAsync(MethodologyThemes);
+
+        var result = await controller.GetMethodologyThemes();
+
+        VerifyAllMocks(methodologyCacheService);
+
+        result.AssertOkResult(MethodologyThemes);
+    }
+
+    private static ThemeController BuildController(
+        IMethodologyCacheService? methodologyCacheService = null,
+        IThemeService? themeService = null)
+    {
+        return new ThemeController(
+            methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+            themeService ?? Mock.Of<IThemeService>(Strict));
     }
 }

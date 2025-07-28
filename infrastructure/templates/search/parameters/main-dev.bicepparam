@@ -4,4 +4,4 @@ using '../main.bicep'
 param environmentName = 'Development'
 
 param contentApiUrl = 'https://content.dev.explore-education-statistics.service.gov.uk'
-param publicSiteUrl = 'https://dev.explore-education-statistics.service.gov.uk'
+param searchServiceSemanticRankerAvailability = 'free'

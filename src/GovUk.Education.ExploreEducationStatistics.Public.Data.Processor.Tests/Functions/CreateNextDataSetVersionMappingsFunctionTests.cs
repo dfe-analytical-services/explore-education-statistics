@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
@@ -533,14 +534,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             // Arrange
             var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
-            ProcessDataSetVersionContext? processNextDataSetVersionContext = null;
-            StartOrchestrationOptions? startOrchestrationOptions = null;
-            SetUpMockDurableTaskClient(durableTaskClientMock, (_, input, options, _) =>
-            {
-                processNextDataSetVersionContext =
-                    Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
-                startOrchestrationOptions = options;
-            });
+            SetUpMockDurableTaskClient(durableTaskClientMock, (_, [UsedImplicitly] input, _, _) => 
+                Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input));
 
             SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();

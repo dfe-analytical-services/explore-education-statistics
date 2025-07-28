@@ -270,12 +270,7 @@ function getSortedDataSetCategoryRange(
     (axisConfiguration.max ?? dataSetCategories.length) + 1,
   );
 
-  // If no `sortAsc` has been set, we should default
-  // to true as it's not really natural to sort in
-  // descending order most of the time.
-  return axisConfiguration.sortAsc ?? true
-    ? sortedDataSetCategoriesRange
-    : sortedDataSetCategoriesRange.reverse();
+  return sortedDataSetCategoriesRange;
 }
 
 interface Options {

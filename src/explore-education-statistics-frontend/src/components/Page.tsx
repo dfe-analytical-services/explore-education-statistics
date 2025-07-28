@@ -20,6 +20,7 @@ type Props = {
   pageMeta?: PageMetaProps;
   className?: string;
   children?: ReactNode;
+  customBannerContent?: ReactNode;
   wide?: boolean;
   isHomepage?: boolean;
 } & BreadcrumbsProps;
@@ -34,6 +35,7 @@ const Page = ({
   pageMeta,
   className,
   children = null,
+  customBannerContent = null,
   wide = false,
   isHomepage = false,
   breadcrumbs = [],
@@ -57,6 +59,8 @@ const Page = ({
         })}
       >
         <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u" />
+
+        {customBannerContent}
 
         <Breadcrumbs
           breadcrumbs={

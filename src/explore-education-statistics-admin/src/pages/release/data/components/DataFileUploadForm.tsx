@@ -61,6 +61,7 @@ const fileErrorMappings = {
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
+  DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
 };
 
 function baseErrorMappings(
@@ -121,12 +122,14 @@ interface Props {
   dataFiles?: DataFile[];
   isDataReplacement?: boolean;
   onSubmit: (values: DataFileUploadFormValues) => void | Promise<void>;
+  onCancel?: () => void;
 }
 
 export default function DataFileUploadForm({
   dataFiles,
   isDataReplacement = false,
   onSubmit,
+  onCancel,
 }: Props) {
   const [selectedFileType, setSelectedFileType] = useState<FileType>('csv');
 
@@ -201,7 +204,7 @@ export default function DataFileUploadForm({
               })
               .max(
                 titleMaxLength,
-                `Title must be ${titleMaxLength} characters or less`,
+                `Title must be ${titleMaxLength} characters or fewer`,
               ),
         }),
       });
@@ -316,6 +319,7 @@ export default function DataFileUploadForm({
                   disabled={formState.isSubmitting}
                   onClick={() => {
                     reset();
+                    onCancel?.();
                   }}
                 >
                   Cancel

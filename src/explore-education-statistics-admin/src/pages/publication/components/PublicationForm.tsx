@@ -11,6 +11,9 @@ import Yup from '@common/validation/yup';
 import React, { ReactNode, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 
+const titleMaxLength = 65;
+const summaryMaxLength = 160;
+
 interface FormValues {
   title: string;
   summary: string;
@@ -50,10 +53,18 @@ export default function PublicationForm({
 }: Props) {
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
-      title: Yup.string().required('Enter a publication title'),
+      title: Yup.string()
+        .required('Enter a publication title')
+        .max(
+          titleMaxLength,
+          `Title must be ${titleMaxLength} characters or fewer`,
+        ),
       summary: Yup.string()
         .required('Enter a publication summary')
-        .max(160, 'Summary must be 160 characters or less'),
+        .max(
+          summaryMaxLength,
+          `Summary must be ${summaryMaxLength} characters or fewer`,
+        ),
       teamName: Yup.string().required('Enter a team name'),
       teamEmail: Yup.string()
         .required('Enter a team email address')
@@ -125,13 +136,14 @@ export default function PublicationForm({
           label="Publication title"
           name="title"
           className="govuk-!-width-two-thirds"
+          maxLength={titleMaxLength}
         />
 
         <FormFieldTextArea<FormValues>
           label="Publication summary"
           name="summary"
           className="govuk-!-width-one-half"
-          maxLength={160}
+          maxLength={summaryMaxLength}
         />
 
         <FormFieldset

@@ -22,9 +22,9 @@ function CookieBanner({ wide }: Props) {
   }, [isBannerSeen]);
 
   return isMounted && isVisible ? (
-    <div className={styles.container}>
+    <div className={classNames('govuk-cookie-banner', styles.container)}>
       <div
-        className={classNames('govuk-cookie-banner', 'govuk-width-container', {
+        className={classNames('govuk-width-container', {
           'dfe-width-container--wide': wide,
         })}
         data-nosnippet

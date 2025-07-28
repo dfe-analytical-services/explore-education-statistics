@@ -27,6 +27,11 @@ Validate "Absence by characteristic" subject details
     user checks summary list contains    Content    Absence by characteristic data guidance content
 
 Validate back takes you to step 1
+    # EES-6361 - add a manual pause in here to give the page time to fully re-render before hitting
+    # the browser back button.
+    # When EES-6361 is fixed, we can remove this pause.
+    sleep    2s
+
     user goes back
     user waits until table tool wizard step is available    1    Choose a publication
     user clicks element    id:publicationForm-submit
@@ -38,6 +43,11 @@ Select subject "Absence by characteristic"
     user checks previous table tool step contains    2    Data set    Absence by characteristic
 
 Validate back takes you to step 2
+    # EES-6361 - add a manual pause in here to give the page time to fully re-render before hitting
+    # the browser back button.
+    # When EES-6361 is fixed, we can remove this pause.
+    sleep    2s
+
     user goes back
     user waits until table tool wizard step is available    2    Select a data set
     user clicks element    id:publicationDataStepForm-submit

@@ -28,7 +28,6 @@ export default function UserTestingBanner() {
         </p>
         <p className="govuk-!-margin-bottom-2">
           <Link
-            className="govuk-link--inverse"
             to="https://forms.office.com/e/QVWqCbbxCj"
             target="_blank"
             rel="noopener noreferrer"

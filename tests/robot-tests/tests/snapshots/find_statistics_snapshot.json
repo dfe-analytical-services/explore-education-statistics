@@ -16,7 +16,7 @@
   {
     "publication_summary": "Annual release on academy transfers in England, including why academies transferred and any associated grant funding that was provided.",
     "publication_title": "Academy transfers and funding",
-    "published": "18 Jul 2024",
+    "published": "24 Jul 2025",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships",
-    "published": "27 Mar 2025",
+    "published": "17 Jul 2025",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -70,9 +70,9 @@
     "theme": "Early years"
   },
   {
-    "publication_summary": "",
+    "publication_summary": "Nationally representative survey of parents of children aged 0-14 on their use, experiences and views on early education and childcare.",
     "publication_title": "Childcare and early years survey of parents",
-    "published": "25 Jul 2024",
+    "published": "10 Jul 2025",
     "release_type": "Official statistics",
     "theme": "Early years"
   },
@@ -154,9 +154,9 @@
     "theme": "Further education"
   },
   {
-    "publication_summary": "Number of practitioners and settings that have registered for, and completed, strands of the early years education recovery (EYER) programme. .",
+    "publication_summary": "Number of practitioners and settings that have registered for, and completed, strands of the early years education recovery (EYER) programme.",
     "publication_title": "Early years education recovery",
-    "published": "27 Sep 2024",
+    "published": "4 Jul 2025",
     "release_type": "Management information",
     "theme": "Early years"
   },
@@ -182,13 +182,6 @@
     "theme": "UK education and training statistics"
   },
   {
-    "publication_summary": "Statistics on children aged 2 to 4 registered for funded early education and childcare entitlements in England, including on staff and providers delivering them",
-    "publication_title": "Education provision: children under 5 years of age",
-    "published": "11 Jul 2024",
-    "release_type": "Accredited official statistics",
-    "theme": "Early years"
-  },
-  {
     "publication_summary": "An examination of the education, children's social care background of children cautioned or sentenced for offences at national and local authority level. ",
     "publication_title": "Education, children\u2019s social care and offending: local authority level dashboard",
     "published": "30 Mar 2023",
@@ -198,7 +191,7 @@
   {
     "publication_summary": "Children and young people in England with an education, health and care plan (EHCP), including annual local authority activity on EHCP requests and assessment.",
     "publication_title": "Education, health and care plans",
-    "published": "13 Jun 2024",
+    "published": "26 Jun 2025",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
@@ -212,7 +205,7 @@
   {
     "publication_summary": "Official statistics on vacancies, skills gaps and training, from the Employer Skills Survey.",
     "publication_title": "Employer Skills Survey",
-    "published": "28 Sep 2023",
+    "published": "24 Jul 2025",
     "release_type": "Official statistics",
     "theme": "UK education and training statistics"
   },
@@ -259,9 +252,16 @@
     "theme": "Pupils and schools"
   },
   {
+    "publication_summary": "Annual January statistics on children under 5 registered for government funded entitlements in England, and on providers and staff delivering them.",
+    "publication_title": "Funded early education and childcare",
+    "published": "17 Jul 2025",
+    "release_type": "Accredited official statistics",
+    "theme": "Early years"
+  },
+  {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "27 Mar 2025",
+    "published": "17 Jul 2025",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -324,7 +324,7 @@
   {
     "publication_summary": "Accredited official statistics on the headline statistics on attainment in key stage 2 national curriculum assessments in England.",
     "publication_title": "Key stage 2 attainment: National headlines",
-    "published": "9 Jul 2024",
+    "published": "8 Jul 2025",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -359,14 +359,14 @@
   {
     "publication_summary": "Earnings and employment for higher education university graduates & postgraduates by subject studied and characteristics. Longitudinal Education Outcomes (LEO).",
     "publication_title": "LEO Graduate and Postgraduate Outcomes",
-    "published": "20 Jun 2024",
+    "published": "26 Jun 2025",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
   {
     "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
     "publication_title": "LEO Graduate outcomes provider level data",
-    "published": "23 May 2024",
+    "published": "26 Jun 2025",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
@@ -380,7 +380,7 @@
   {
     "publication_summary": "School Places scorecard for local authorities in England. School places delivered, planned and needed, pupil forecasting accuracy, cost of school places.",
     "publication_title": "Local authority school places scorecards",
-    "published": "27 Jun 2024",
+    "published": "26 Jun 2025",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -392,7 +392,7 @@
     "theme": "Destination of pupils and students"
   },
   {
-    "publication_summary": "",
+    "publication_summary": "Ad-hoc statistics on the child and provider characteristics for looked after children aged 16 to 17 in independent or semi-independent placements",
     "publication_title": "Looked after children aged 16 to 17 in independent or semi-independent placements",
     "published": "23 Mar 2023",
     "release_type": "Ad hoc statistics",
@@ -406,7 +406,7 @@
     "theme": "School and college outcomes and performance"
   },
   {
-    "publication_summary": "",
+    "publication_summary": "Attainment statistics for KS2 pupils who attended multi-academy trusts (MATs) in England",
     "publication_title": "Multi-academy trust performance measures at key stage 2",
     "published": "8 Oct 2020",
     "release_type": "Official statistics",
@@ -422,7 +422,7 @@
   {
     "publication_summary": "Annual release providing national projections for the number of pupils in schools in England by type of school, age and whether full time or part time.",
     "publication_title": "National pupil projections",
-    "published": "18 Jul 2024",
+    "published": "17 Jul 2025",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -471,14 +471,14 @@
   {
     "publication_summary": "Participation and not in education, employment or training (NEET) figures ages 16 to 18 in England. Includes institution type and qualification aim breakdowns.",
     "publication_title": "Participation in education, training and employment age 16 to 18",
-    "published": "26 Sep 2024",
+    "published": "26 Jun 2025",
     "release_type": "Accredited official statistics",
     "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "LA management information on participation and not in education or training (NEET) age 16 to 17. Includes ethnicity, SEND figures and comparative NEET scorecard",
     "publication_title": "Participation in education, training and NEET age 16 to 17 by local authority",
-    "published": "30 Jan 2025",
+    "published": "17 Jul 2025",
     "release_type": "Management information",
     "theme": "Destination of pupils and students"
   },
@@ -541,12 +541,12 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "12 Jun 2025",
+    "published": "24 Jul 2025",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
   {
-    "publication_summary": "",
+    "publication_summary": "Analysis of pupil yield from housing developments for each local authority in England by education type, phase, housing type, tenure, and size.",
     "publication_title": "Pupil yield from housing developments",
     "published": "9 Aug 2023",
     "release_type": "Management information",
@@ -660,7 +660,7 @@
   {
     "publication_summary": "Student loan forecasts for English borrower entrants, outlay and repayments, with average loan amounts, lifetime repayments and cost to government",
     "publication_title": "Student loan forecasts for England",
-    "published": "27 Jun 2024",
+    "published": "3 Jul 2025",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
@@ -674,14 +674,14 @@
   {
     "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
     "publication_title": "Suspensions and permanent exclusions in England",
-    "published": "24 Apr 2025",
+    "published": "10 Jul 2025",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
   {
-    "publication_summary": "",
-    "publication_title": "Teacher and Leader development: ECF and NPQs",
-    "published": "11 Jul 2024",
+    "publication_summary": "Statistics on ECTs participating in the Early Career Framework and teachers and leaders participating in reformed National Professional Qualifications.",
+    "publication_title": "Teacher and leader development: ECF and NPQs",
+    "published": "10 Jul 2025",
     "release_type": "Official statistics in development",
     "theme": "Teachers and school workforce"
   },

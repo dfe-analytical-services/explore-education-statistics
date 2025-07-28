@@ -22,6 +22,8 @@ public abstract record DataSetVersionViewModel
 
     public required IdTitleViewModel File { get; init; }
 
+    public Guid? OriginalFileId { get; set; }
+    
     public required IdTitleViewModel ReleaseVersion { get; init; }
 
     public long TotalResults { get; init; }
@@ -79,13 +81,22 @@ public record DataSetLiveVersionSummaryViewModel : DataSetVersionSummaryViewMode
     public required DateTimeOffset Published { get; init; }
 }
 
-public record MappingStatusViewModel
+public record MajorChangesStatus
+{
+    public required bool HasDeletionChanges { get; init; } 
+
+    public required bool LocationsHaveMajorChange { get; init; }
+
+    public required bool FiltersHaveMajorChange { get; init; }
+    
+    public bool IsMajorVersionUpdate => HasDeletionChanges || LocationsHaveMajorChange || FiltersHaveMajorChange;
+}
+
+public record MappingStatusViewModel : MajorChangesStatus
 {
     public required bool LocationsComplete { get; init; }
     
     public required bool FiltersComplete { get; init; }
-    
-    public required bool HasMajorVersionUpdate { get; init; } 
 }
 
 public record DataSetVersionInfoViewModel 

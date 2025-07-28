@@ -1,17 +1,16 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Services
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
+
+public enum ValidationErrorMessages
 {
-    public enum ValidationErrorMessages
-    {
-        // Table builder queries
-        QueryExceedsMaxAllowableTableSize,
+    // Table builder queries
+    QueryExceedsMaxAllowableTableSize,
 
-        // Updating Filters
-        FiltersDifferFromSubject,
-        FilterGroupsDifferFromSubject,
-        FilterItemsDifferFromSubject,
+    // Updating Filters
+    FiltersDifferFromSubject,
+    FilterGroupsDifferFromSubject,
+    FilterItemsDifferFromSubject,
 
-        // Updating Indicators
-        IndicatorGroupsDifferFromSubject,
-        IndicatorsDifferFromSubject,
-    }
+    // Updating Indicators
+    IndicatorGroupsDifferFromSubject,
+    IndicatorsDifferFromSubject,
 }

@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData    Footnotes
 
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - publication_owner %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     Publication_owner %{RUN_IDENTIFIER}
 ${RELEASE_TYPE}         Academic year 2025/26
 ${RELEASE_NAME}         ${PUBLICATION_NAME} - ${RELEASE_TYPE}
 ${SUBJECT_NAME}         UI test subject

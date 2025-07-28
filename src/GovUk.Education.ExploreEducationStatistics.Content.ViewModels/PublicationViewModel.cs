@@ -10,6 +10,8 @@ public record PublicationViewModel
 
     public string Slug { get; init; } = string.Empty;
 
+    public string Summary { get; init; } = string.Empty;
+
     public Guid LatestReleaseId { get; init; }
 
     public bool IsSuperseded { get; init; }
@@ -38,6 +40,7 @@ public record PublicationViewModel
         Id = publication.Id;
         Title = publication.Title;
         Slug = publication.Slug;
+        Summary = publication.Summary;
         LatestReleaseId = publication.LatestReleaseId;
         IsSuperseded = publication.IsSuperseded;
         SupersededBy = publication.SupersededBy;

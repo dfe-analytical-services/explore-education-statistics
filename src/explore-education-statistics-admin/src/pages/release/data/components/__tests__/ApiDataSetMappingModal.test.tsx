@@ -43,7 +43,7 @@ describe('ApiDataSetMappingModal', () => {
       />,
     );
     await user.click(
-      screen.getByRole('button', { name: 'Edit mapping for Location 1' }),
+      screen.getByRole('button', { name: 'Map option for Location 1' }),
     );
 
     const modal = within(screen.getByRole('dialog'));
@@ -74,7 +74,7 @@ describe('ApiDataSetMappingModal', () => {
       />,
     );
     await user.click(
-      screen.getByRole('button', { name: 'Edit mapping for Location 1' }),
+      screen.getByRole('button', { name: 'Map option for Location 1' }),
     );
 
     await user.click(screen.getByLabelText('Location 2'));

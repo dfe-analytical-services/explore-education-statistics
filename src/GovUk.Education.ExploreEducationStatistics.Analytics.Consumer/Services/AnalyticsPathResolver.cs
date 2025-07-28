@@ -10,7 +10,7 @@ public class AnalyticsPathResolver : AnalyticsPathResolverBase
 {
     private readonly string _basePath;
 
-    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options, IHostEnvironment environment)
+    public AnalyticsPathResolver(IOptions<AnalyticsOptions> options)
     {
         if (options.Value.BasePath.IsNullOrWhitespace())
         {
@@ -19,17 +19,8 @@ public class AnalyticsPathResolver : AnalyticsPathResolverBase
                 paramName: nameof(options)
             );
         }
-        
-        var originalPath = options.Value.BasePath;
-        if (environment.IsDevelopment())
-        {
-            _basePath = Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(originalPath));
-        }
-        else
-        {
-            _basePath = originalPath;
-        }
 
+        _basePath = options.Value.BasePath;
     }
 
     public override string GetBasePath()

@@ -5,11 +5,10 @@ import DataFileUploadForm, {
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
-  DataSetUploadResult,
   DataFile,
   DataFileImportStatus,
+  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import DataSetUploadModalConfirm from '@admin/pages/release/data/components/DataSetUploadModalConfirm';
 import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
 import DataFilesReplacementTable from '@admin/pages/release/data/components/DataFilesReplacementTable';
 import Button from '@common/components/Button';
@@ -19,6 +18,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import dataReplacementService from '@admin/services/dataReplacementService';
 
 interface Props {
   publicationId: string;
@@ -34,84 +34,140 @@ export default function ReleaseDataUploadsSection({
   onDataFilesChange,
 }: Props) {
   const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
-  const [uploadResults, setUploadResults] = useState<DataSetUploadResult[]>();
+  const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
+    [],
+  );
   const [isReordering, toggleReordering] = useToggle(false);
 
+  // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
+  // warnings. At this stage, the data set will be returned from `listUploads`. If the file has no errors from the
+  // screener tests and the user has pressed a button to continue the import, the data set then starts being imported
+  // properly, and will then be returned from `list` instead.
+  //
+  // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
+  // sets that have moved beyond the screener and are now being imported by the Data.Processor
   const {
     data: initialDataFiles,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
+  const {
+    data: initialDataSetUploads,
+    isLoading: isLoadingUploads,
+    refetch: refetchDataSetUploads,
+  } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+
+  const uploadsWithoutReplacements = allDataSetUploads.filter(
+    upload => !upload.replacingFileId,
+  );
+
+  const uploadsWithReplacements = allDataSetUploads.filter(
+    upload => upload.replacingFileId,
+  );
 
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
     setAllDataFiles(initialDataFiles ?? []);
-  }, [initialDataFiles]);
+    setAllDataSetUploads(initialDataSetUploads ?? []);
+  }, [initialDataFiles, initialDataSetUploads]);
 
   useEffect(() => {
     onDataFilesChange?.(allDataFiles);
   }, [allDataFiles, onDataFilesChange]);
 
-  const replacedDataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => dataFile.replacedBy),
+  const dataFilesExcludingReplacements = useMemo(
+    () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
-  // TODO - bulk confirmation of replacements
-  //  const validReplacedDataFiles = replacedDataFiles.filter(
-  //   file => file.status === 'COMPLETE',
-  // );
-  // const allowBulkConfirm = validReplacedDataFiles.length > 1;
-
-  const dataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
+  const inProgressReplacementDataFiles = useMemo(
+    () => allDataFiles.filter(dataFile => dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
-  const confirmDataSetImport = useCallback(
-    async (dataSetUploadResults: DataSetUploadResult[]) => {
-      await releaseDataFileService.importDataSets(
-        releaseVersionId,
-        dataSetUploadResults,
-      );
-
-      setUploadResults(undefined);
-      await refetchDataFiles();
-    },
-    [releaseVersionId, setUploadResults, refetchDataFiles],
+  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
+    originalFile =>
+      originalFile.replacedByDataFile?.status === 'COMPLETE' &&
+      originalFile.replacedByDataFile?.hasValidReplacementPlan,
   );
 
   const handleStatusChange = useCallback(
-    async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
-      // EES-5732 UI tests related to data replacement sometimes fail
-      // because of a permission call for the replaced file being called,
-      // probably caused by the speed of the tests.
-      // This prevents this happening.
-      if (status === 'NOT_FOUND') {
-        return;
-      }
+    async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
+      try {
+        const permissions = await permissionService.getDataFilePermissions(
+          releaseVersionId,
+          dataFile.id,
+        );
 
-      const permissions = await permissionService.getDataFilePermissions(
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles.map(file =>
+            file.fileName !== dataFile.fileName
+              ? file
+              : {
+                  ...dataFile,
+                  rows: importStatus.totalRows,
+                  status: importStatus.status,
+                  permissions,
+                },
+          ),
+        );
+      } catch {
+        refetchDataFiles();
+      }
+    },
+    [releaseVersionId, setAllDataFiles, refetchDataFiles],
+  );
+
+  const handleReplacementStatusChange = useCallback(
+    async (updatedDataFile: DataFile) => {
+      try {
+        const permissions = await permissionService.getDataFilePermissions(
+          releaseVersionId,
+          updatedDataFile.id,
+        );
+
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles.map(file =>
+            file.fileName !== updatedDataFile.fileName
+              ? file
+              : {
+                  ...updatedDataFile,
+                  permissions,
+                },
+          ),
+        );
+      } catch {
+        refetchDataFiles();
+      }
+    },
+    [releaseVersionId, setAllDataFiles, refetchDataFiles],
+  );
+
+  const handleDataSetImport = useCallback(
+    async (dataSetUploadIds: string[]) => {
+      await releaseDataFileService.importDataSets(
         releaseVersionId,
-        dataFile.id,
+        dataSetUploadIds,
       );
 
-      setAllDataFiles(currentDataFiles =>
-        currentDataFiles.map(file =>
-          file.fileName !== dataFile.fileName
-            ? file
-            : {
-                ...dataFile,
-                rows: totalRows,
-                status,
-                permissions,
-                replacedBy: file.replacedBy,
-              },
-        ),
+      setAllDataSetUploads(uploads =>
+        uploads.filter(upload => !dataSetUploadIds.includes(upload.id)),
+      );
+
+      await refetchDataFiles();
+      await refetchDataSetUploads();
+    },
+    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
+  );
+
+  const handleDeleteUploadConfirm = useCallback(
+    async (deletedUploadId: string) => {
+      setAllDataSetUploads(uploads =>
+        uploads.filter(upload => upload.id !== deletedUploadId),
       );
     },
-    [releaseVersionId],
+    [],
   );
 
   const handleDeleteConfirm = useCallback(async (deletedFileId: string) => {
@@ -128,52 +184,41 @@ export default function ReleaseDataUploadsSection({
             return;
           }
 
-          const uploadResponse =
-            await releaseDataFileService.uploadDataSetFilePair(
-              releaseVersionId,
-              {
-                title: values.title,
-                dataFile: values.dataFile as File,
-                metadataFile: values.metadataFile as File,
-              },
-            );
-
-          await refetchDataFiles();
-          setUploadResults(uploadResponse);
+          await releaseDataFileService.uploadDataSetFilePair(releaseVersionId, {
+            title: values.title,
+            dataFile: values.dataFile as File,
+            metadataFile: values.metadataFile as File,
+          });
           break;
         }
         case 'zip': {
           if (!values.title) {
             return;
           }
-          const uploadResponse =
-            await releaseDataFileService.uploadZippedDataSetFilePair(
-              releaseVersionId,
-              {
-                title: values.title,
-                zipFile: values.zipFile as File,
-              },
-            );
-
-          await refetchDataFiles();
-          setUploadResults(uploadResponse);
+          await releaseDataFileService.uploadZippedDataSetFilePair(
+            releaseVersionId,
+            {
+              title: values.title,
+              zipFile: values.zipFile as File,
+            },
+          );
           break;
         }
         case 'bulkZip': {
-          const uploadResponse =
-            await releaseDataFileService.uploadBulkZipDataSetFile(
-              releaseVersionId,
-              values.bulkZipFile!,
-            );
-
-          setUploadResults(uploadResponse);
+          await releaseDataFileService.uploadBulkZipDataSetFile(
+            releaseVersionId,
+            values.bulkZipFile!,
+          );
           break;
         }
         default:
           break;
       }
+
+      await refetchDataFiles();
+      await refetchDataSetUploads();
     },
-    [releaseVersionId, refetchDataFiles],
+    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
   );
 
   const handleConfirmReordering = useCallback(
@@ -189,8 +234,14 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, toggleReordering],
   );
 
-  // TODO - bulk confirmation of replacements
-  // const handleConfirmAllReplacements = () => {};
+  const handleConfirmAllReplacements = async () => {
+    await dataReplacementService.replaceData(
+      releaseVersionId,
+      validReplacementDataFiles.map(file => file.id),
+    );
+
+    await refetchDataFiles();
+  };
 
   return (
     <>
@@ -224,19 +275,7 @@ export default function ReleaseDataUploadsSection({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <>
-          <DataFileUploadForm
-            dataFiles={allDataFiles}
-            onSubmit={handleSubmit}
-          />
-          {uploadResults === undefined || uploadResults.length === 0 ? null : (
-            <DataSetUploadModalConfirm
-              uploadResults={uploadResults}
-              onConfirm={confirmDataSetImport}
-              onCancel={() => setUploadResults(undefined)}
-            />
-          )}
-        </>
+        <DataFileUploadForm dataFiles={allDataFiles} onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
@@ -245,8 +284,8 @@ export default function ReleaseDataUploadsSection({
 
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
-      <LoadingSpinner loading={isLoading}>
-        {allDataFiles.length > 0 ? (
+      <LoadingSpinner loading={isLoading || isLoadingUploads}>
+        {allDataFiles.length > 0 || allDataSetUploads.length > 0 ? (
           <>
             <h2>Uploaded data files</h2>
 
@@ -255,12 +294,11 @@ export default function ReleaseDataUploadsSection({
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {/* TODO - bulk confirmation of replacements */}
-                {/* {allowBulkConfirm && (
+                {validReplacementDataFiles.length > 1 && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
                   </Button>
-                )} */}
+                )}
               </div>
             )}
 
@@ -272,26 +310,36 @@ export default function ReleaseDataUploadsSection({
               />
             ) : (
               <>
-                {replacedDataFiles.length > 0 && (
+                {(inProgressReplacementDataFiles.length > 0 ||
+                  uploadsWithReplacements.length > 0) && (
                   <DataFilesReplacementTable
+                    canUpdateRelease={canUpdateRelease}
                     caption="Data file replacements"
-                    dataFiles={replacedDataFiles}
+                    dataFiles={inProgressReplacementDataFiles}
+                    dataSetUploads={uploadsWithReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
-                    onConfirmAction={refetchDataFiles}
+                    onConfirmReplacement={refetchDataFiles}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
+                    onReplacementStatusChange={handleReplacementStatusChange}
                   />
                 )}
 
-                {dataFiles.length > 0 && (
+                {(dataFilesExcludingReplacements.length > 0 ||
+                  uploadsWithoutReplacements.length > 0) && (
                   <DataFilesTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data files"
-                    dataFiles={dataFiles}
+                    dataFiles={dataFilesExcludingReplacements}
+                    dataSetUploads={uploadsWithoutReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data files table"
                     onDeleteFile={handleDeleteConfirm}
+                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDataSetImport={handleDataSetImport}
                     onStatusChange={handleStatusChange}
                   />
                 )}

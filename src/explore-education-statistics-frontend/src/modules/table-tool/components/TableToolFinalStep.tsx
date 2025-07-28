@@ -154,7 +154,7 @@ const TableToolFinalStep = ({
             fileName={`data-${selectedPublication.slug}`}
             onCsvDownload={() => tableBuilderService.getTableCsv(query)}
             tableRef={dataTableRef}
-            onSubmit={fileFormat =>
+            onSubmit={fileFormat => {
               logEvent({
                 category: 'Table tool',
                 action:
@@ -168,8 +168,19 @@ const TableToolFinalStep = ({
                     table.subjectMeta.timePeriodRange.length - 1
                   ].label
                 }`,
-              })
-            }
+              });
+
+              tableBuilderService.recordDownload({
+                dataSetName: table.subjectMeta.subjectName,
+                publicationName: table.subjectMeta.publicationName,
+                releaseVersionId: selectedPublication.selectedRelease.id,
+                releasePeriodAndLabel:
+                  selectedPublication.selectedRelease.title,
+                subjectId: query.subjectId,
+                query,
+                downloadFormat: fileFormat,
+              });
+            }}
           />
         </>
       )}

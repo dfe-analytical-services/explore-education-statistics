@@ -27,6 +27,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
+  onReplacementStatusChange: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -34,15 +35,18 @@ export default function DataFilesReplacementTableRow({
   publicationId,
   releaseVersionId,
   onConfirmAction,
+  onReplacementStatusChange,
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
+  const [canCancel, toggleCanCancel] = useToggle(false);
 
-  const { data: replacementDataFile, isLoading } = useQuery(
-    releaseDataFileQueries.getDataFile(
+  const { data: replacementDataFile, isLoading } = useQuery({
+    ...releaseDataFileQueries.getDataFile(
       releaseVersionId,
       dataFile.replacedBy ?? '',
     ),
-  );
+    initialData: dataFile.replacedByDataFile,
+  });
 
   const { data: plan } = useQuery({
     ...dataFileReplacementQueries.getReplacementPlan(
@@ -57,21 +61,45 @@ export default function DataFilesReplacementTableRow({
     if (replacementDataFile?.status === 'COMPLETE') {
       toggleFetchPlan.on();
     }
-  }, [replacementDataFile?.status, toggleFetchPlan]);
+  }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
 
-  const handleStatusChange = (
-    _file: DataFile,
-    importStatus: DataFileImportStatus,
+  useEffect(() => {
+    onReplacementStatusChange({
+      ...dataFile,
+      ...(dataFile.replacedByDataFile && {
+        replacedByDataFile: {
+          ...dataFile.replacedByDataFile,
+          hasValidReplacementPlan: plan?.valid ?? false,
+        },
+      }),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan, onReplacementStatusChange]);
+
+  const handleStatusChange = async (
+    _: DataFile,
+    replacementImportStatus: DataFileImportStatus,
   ) => {
-    if (importStatus.status === 'COMPLETE') {
+    if (replacementImportStatus.status === 'COMPLETE') {
       toggleFetchPlan.on();
+      toggleCanCancel.on();
+
+      onReplacementStatusChange({
+        ...dataFile,
+        ...(dataFile.replacedByDataFile && {
+          replacedByDataFile: {
+            ...dataFile.replacedByDataFile,
+            status: replacementImportStatus.status,
+          },
+        }),
+      });
     }
   };
 
   if (!replacementDataFile) {
     return (
       <tr>
-        <td>
+        <td colSpan={4}>
           <LoadingSpinner loading={isLoading} />
         </td>
       </tr>
@@ -120,32 +148,34 @@ export default function DataFilesReplacementTableRow({
             View details
           </Link>
           <>
-            <ModalConfirm
-              title="Cancel data replacement"
-              triggerButton={
-                <ButtonText variant="secondary">Cancel replacement</ButtonText>
-              }
-              onConfirm={async () => {
-                await releaseDataFileService.deleteDataFiles(
-                  releaseVersionId,
-                  replacementDataFile.id,
-                );
-                onConfirmAction?.();
-              }}
-            >
-              <p>
-                Are you sure you want to cancel this data replacement? The
-                pending replacement data file will be deleted.
-              </p>
-            </ModalConfirm>
+            {(canCancel || replacementDataFile.status === 'COMPLETE') && (
+              <ModalConfirm
+                title="Cancel data replacement"
+                triggerButton={
+                  <ButtonText variant="secondary">
+                    Cancel replacement
+                  </ButtonText>
+                }
+                onConfirm={async () => {
+                  await releaseDataFileService.deleteDataFiles(
+                    releaseVersionId,
+                    replacementDataFile.id,
+                  );
+                  onConfirmAction?.();
+                }}
+              >
+                <p>
+                  Are you sure you want to cancel this data replacement? The
+                  pending replacement data file will be deleted.
+                </p>
+              </ModalConfirm>
+            )}
             {plan?.valid && (
               <ButtonText
                 onClick={async () => {
-                  await dataReplacementService.replaceData(
-                    releaseVersionId,
+                  await dataReplacementService.replaceData(releaseVersionId, [
                     dataFile.id,
-                    replacementDataFile.id,
-                  );
+                  ]);
 
                   onConfirmAction?.();
                 }}

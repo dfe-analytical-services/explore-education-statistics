@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using InterpolatedSql.Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,9 +14,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
-public abstract class PublicCsvDownloadsProcessorTests
+public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
 {
-    private readonly string _resourcesPath = Path.Combine(
+    protected override string ResourcesPath => Path.Combine(
         Assembly.GetExecutingAssembly().GetDirectoryPath(),
         "Resources",
         "PublicCsvDownloads");
@@ -23,47 +24,23 @@ public abstract class PublicCsvDownloadsProcessorTests
     public class ProcessTests : PublicCsvDownloadsProcessorTests
     {
         [Fact]
-        public async Task ProcessorUsesWorkflow()
-        {
-            using var pathResolver = new TestAnalyticsPathResolver();
-
-            var workflow = new Mock<IProcessRequestFilesWorkflow>(MockBehavior.Strict);
-
-            workflow
-                .Setup(s => s.Process(It.IsAny<IWorkflowActor>()))
-                .Returns(Task.CompletedTask);
-
-            var service = BuildService(
-                pathResolver: pathResolver,
-                workflow: workflow.Object);
-
-            await service.Process();
-
-            workflow.Verify(s => s.Process(It.IsAny<IWorkflowActor>()), Times.Once);
-        }
-
-        [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            var service = BuildService();
+            SetupRequestFile(service, "CsvDownloadRequestFile1.json");
+            SetupRequestFile(service, "CsvDownloadRequestFile2.json");
 
-            SetupRequestFile(pathResolver, "CsvDownloadRequestFile1.json");
-            SetupRequestFile(pathResolver, "CsvDownloadRequestFile2.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
             // The root processing folder is safe to leave behind.
-            Assert.True(Directory.Exists(ProcessingDirectoryPath(pathResolver)));
+            Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
-            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(pathResolver)));
+            Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
+            Assert.True(Directory.Exists(service.ReportsDirectory));
             
-            Assert.True(Directory.Exists(pathResolver.PublicCsvDownloadsReportsDirectoryPath()));
-
-            var reports = Directory.GetFiles(pathResolver.PublicCsvDownloadsReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var csvDownloadsReport = Assert.Single(reports);
 
             Assert.EndsWith("public-csv-downloads.parquet", csvDownloadsReport);
@@ -89,16 +66,13 @@ public abstract class PublicCsvDownloadsProcessorTests
         [Fact]
         public async Task MultipleRequestFilesForSameCsvFile_ProduceSingleReportRow()
         {
-            using var pathResolver = new TestAnalyticsPathResolver();
+            var service = BuildService();
+            SetupRequestFile(service, "CsvDownloadRequestFile1.json");
+            SetupRequestFile(service, "CsvDownloadRequestFile1_Copy.json");
 
-            SetupRequestFile(pathResolver, "CsvDownloadRequestFile1.json");
-            SetupRequestFile(pathResolver, "CsvDownloadRequestFile1_Copy.json");
-
-            var service = BuildService(
-                pathResolver: pathResolver);
             await service.Process();
 
-            var reports = Directory.GetFiles(pathResolver.PublicCsvDownloadsReportsDirectoryPath());
+            var reports = Directory.GetFiles(service.ReportsDirectory);
             var csvDownloadsReport = Assert.Single(reports);
 
             Assert.EndsWith("public-csv-downloads.parquet", csvDownloadsReport);
@@ -127,23 +101,11 @@ public abstract class PublicCsvDownloadsProcessorTests
         }
     }
 
-    private PublicCsvDownloadsProcessor BuildService(
-        TestAnalyticsPathResolver pathResolver,
-        IProcessRequestFilesWorkflow? workflow = null)
+    private PublicCsvDownloadsProcessor BuildService()
     {
         return new PublicCsvDownloadsProcessor(
-            pathResolver: pathResolver,
-            workflow: workflow ?? new ProcessRequestFilesWorkflow(
-                logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
-                temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"));
-    }
-
-    private void SetupRequestFile(TestAnalyticsPathResolver pathResolver, string filename)
-    {
-        Directory.CreateDirectory(pathResolver.PublicCsvDownloadsDirectoryPath());
-
-        var sourceFilePath = Path.Combine(_resourcesPath, filename);
-        File.Copy(sourceFilePath, Path.Combine(pathResolver.PublicCsvDownloadsDirectoryPath(), filename));
+            pathResolver: PathResolver,
+            workflow: Workflow);
     }
 
     private async Task AssertReportRow(
@@ -151,7 +113,7 @@ public abstract class PublicCsvDownloadsProcessorTests
         string jsonFileName,
         int numRequests)
     {
-        var jsonText = await File.ReadAllTextAsync(Path.Combine(_resourcesPath, jsonFileName));
+        var jsonText = await File.ReadAllTextAsync(Path.Combine(ResourcesPath, jsonFileName));
 
         var request = JsonConvert.DeserializeObject<CaptureCsvDownloadRequest>(jsonText);
         Assert.NotNull(request);
@@ -172,16 +134,6 @@ public abstract class PublicCsvDownloadsProcessorTests
 
         Assert.Equal(hashSb.ToString(), row.CsvDownloadHash);
         Assert.Equal(numRequests, row.Downloads);
-    }
-
-    private static string ProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(pathResolver.PublicCsvDownloadsDirectoryPath(), "processing");
-    }
-    
-    private static string TemporaryProcessingDirectoryPath(TestAnalyticsPathResolver pathResolver)
-    {
-        return Path.Combine(ProcessingDirectoryPath(pathResolver), "temp-processing-folder");
     }
 
     public record CaptureCsvDownloadRequest(

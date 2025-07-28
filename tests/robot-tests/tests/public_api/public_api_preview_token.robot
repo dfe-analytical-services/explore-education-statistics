@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=        UI tests - Public API - preview token %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=        Public API - preview token %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=            Academic year Q1 3000/01
 ${SUBJECT_NAME_1}=          ${PUBLICATION_NAME} - Subject 1
 ${PREVIEW_TOKEN_NAME}=      Test token

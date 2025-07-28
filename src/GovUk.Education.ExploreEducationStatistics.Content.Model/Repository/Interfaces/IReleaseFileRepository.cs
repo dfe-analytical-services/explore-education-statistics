@@ -30,7 +30,8 @@ public interface IReleaseFileRepository
     Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId,
         Guid fileId);
 
-    Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+    Task<List<ReleaseFile>> GetByFileType(
+        Guid releaseVersionId,
         CancellationToken cancellationToken = default,
         params FileType[] types);
 
@@ -44,4 +45,8 @@ public interface IReleaseFileRepository
         string? name = null,
         string? fileName = null,
         string? summary = null);
+
+    Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
+        CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
+            Guid originalFileId);
 }

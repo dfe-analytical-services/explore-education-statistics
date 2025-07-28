@@ -7,12 +7,12 @@ from urllib.parse import urlparse, urlunparse
 
 import utilities_init
 from robot.libraries.BuiltIn import BuiltIn
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from SeleniumLibrary.utils import is_noney
 from tests.libs.logger import get_logger
-from tests.libs.selenium_elements import element_finder, sl, waiting
+from tests.libs.selenium_elements import element_finder, sl
 
 logger = get_logger(__name__)
 
@@ -91,167 +91,85 @@ def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
     raise last_exception
 
 
-def user_waits_until_parent_contains_element(
+def wait_until_parent_contains_element(
     parent_locator_or_element: object,
     child_locator: str,
     timeout: int = None,
     error: str = None,
     count: int = None,
     retries: int = 5,
-    delay: float = 1.0,
 ):
-    try:
-        default_timeout = BuiltIn().get_variable_value("${TIMEOUT}")
-        timeout_per_retry = timeout / retries if timeout is not None else int(default_timeout) / retries
+    default_timeout = BuiltIn().get_variable_value("${TIMEOUT}")
+    retry_delay = timeout / retries if timeout is not None else int(default_timeout) / retries
+    normalised_child_locator = _normalise_child_locator(child_locator)
+    expected_count = None if is_noney(count) else count
 
-        child_locator = _normalise_child_locator(child_locator)
+    def check_correct_number_of_matching_child_elements_are_present():
+        parent_el = _get_webelement_from_locator(parent_locator_or_element, timeout=0.1, error=error)
+        child_elements = sl().find_elements(normalised_child_locator, parent=parent_el)
 
-        def parent_contains_matching_element() -> bool:
-            parent_el = _get_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
-            return element_finder().find(child_locator, required=False, parent=parent_el) is not None
-
-        if is_noney(count):
-            return retry_or_fail_with_delay(
-                waiting()._wait_until,
-                retries,
-                delay,
-                parent_contains_matching_element,
-                "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator_or_element, child_locator),
-                timeout_per_retry,
-                error,
+        if expected_count is None and len(child_elements) == 0:
+            raise AssertionError(
+                f"Expected at least one matching child element but found none "
+                f"under parent {parent_locator_or_element} using child selector {normalised_child_locator}"
             )
 
-        count = int(count)
-
-        def parent_contains_matching_elements() -> bool:
-            parent_el = _get_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
-            return len(sl().find_elements(child_locator, parent=parent_el)) == count
-
-        retry_or_fail_with_delay(
-            waiting()._wait_until,
-            retries,
-            delay,
-            parent_contains_matching_elements,
-            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>."
-            % (parent_locator_or_element, count, child_locator),
-            timeout_per_retry,
-            error,
-        )
-    except Exception as err:
-        logger.warning(
-            f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
-            f"with parent {parent_locator_or_element} and child locator {child_locator} - {err}"
-        )
-        raise_assertion_error(err)
-
-
-def user_waits_until_parent_contains_element_without_retries(
-    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
-):
-    try:
-        child_locator = _normalise_child_locator(child_locator)
-
-        def parent_contains_matching_element() -> bool:
-            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
-            return element_finder().find(child_locator, required=False, parent=parent_el) is not None
-
-        if is_noney(count):
-            return waiting()._wait_until(
-                parent_contains_matching_element,
-                "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
-                timeout,
-                error,
+        if expected_count is not None and len(child_elements) != expected_count:
+            raise AssertionError(
+                f"Expected {expected_count} child elements but found {len(child_elements)} "
+                f"under parent {parent_locator_or_element} using child selector {normalised_child_locator}"
             )
 
-        count = int(count)
-
-        def parent_contains_matching_elements() -> bool:
-            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
-            return len(sl().find_elements(child_locator, parent=parent_el)) == count
-
-        waiting()._wait_until(
-            parent_contains_matching_elements,
-            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
-            timeout,
-            error,
-        )
-    except Exception as err:
-        logger.warning(
-            f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
-            f"with parent {parent_locator} and child locator {child_locator} - {err}"
-        )
-        raise_assertion_error(err)
+    return do_with_retries(
+        action=check_correct_number_of_matching_child_elements_are_present,
+        action_description="wait_until_parent_contains_element",
+        allowed_exception_types=AssertionError,
+        retries=retries,
+        retry_delay=retry_delay,
+    )
 
 
-def user_waits_until_parent_does_not_contain_element(
-    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
+def wait_until_parent_does_not_contain_element(
+    parent_locator_or_element: object, child_locator: str, timeout: int = None, error: str = None, retries: int = 5
 ):
-    try:
-        child_locator = _normalise_child_locator(child_locator)
+    default_timeout = BuiltIn().get_variable_value("${TIMEOUT}")
+    retry_delay = timeout / retries if timeout is not None else int(default_timeout) / retries
+    normalised_child_locator = _normalise_child_locator(child_locator)
 
-        def parent_does_not_contain_matching_element() -> bool:
-            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
-            return element_finder().find(child_locator, required=False, parent=parent_el) is None
+    def check_child_elements_are_not_present():
+        parent_el = _get_webelement_from_locator(parent_locator_or_element, timeout=0.1, error=error)
+        child_elements = sl().find_elements(normalised_child_locator, parent=parent_el)
 
-        if is_noney(count):
-            return waiting()._wait_until(
-                parent_does_not_contain_matching_element,
-                "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (parent_locator, child_locator),
-                timeout,
-                error,
+        if len(child_elements) > 0:
+            raise AssertionError(
+                f"Expected no matching child elements but found {len(child_elements)} "
+                f"under parent {parent_locator_or_element} using child selector {normalised_child_locator}"
             )
 
-        count = int(count)
-
-        def parent_does_not_contain_matching_elements() -> bool:
-            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
-            return len(sl().find_elements(child_locator, parent=parent_el)) != count
-
-        waiting()._wait_until(
-            parent_does_not_contain_matching_elements,
-            "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>."
-            % (parent_locator, count, child_locator),
-            timeout,
-            error,
-        )
-    except Exception as err:
-        logger.warning(
-            f"Error whilst executing utilities.py "
-            f"user_waits_until_parent_does_not_contain_element() with parent {parent_locator} "
-            f"and child locator {child_locator} - {err}"
-        )
-        raise_assertion_error(err)
+    return do_with_retries(
+        action=check_child_elements_are_not_present,
+        action_description="user_waits_until_parent_does_not_contain_element",
+        allowed_exception_types=AssertionError,
+        retries=retries,
+        retry_delay=retry_delay,
+    )
 
 
 def get_child_element(parent_locator: object, child_locator: str, retries: int = 5, delay: float = 1.0):
-    for attempt in range(retries):
-        try:
-            children = get_child_elements(parent_locator, child_locator)
-            if not children:
-                if attempt < retries - 1:
-                    logger.info(f"Retrying... ({attempt + 1}/{retries})")
-                    time.sleep(delay)
-                    continue
-                else:
-                    raise_assertion_error(
-                        f"No elements matching child locator '{child_locator}' under parent locator '{parent_locator}' after {retries} retries"
-                    )
-            if len(children) > 1:
-                logger.warning(
-                    f"Multiple ({len(children)}) elements found for child locator '{child_locator}' under parent locator '{parent_locator}'. "
-                    f"Returning the first element. Consider refining the parent selector."
-                )
-            return children[0]
+    def get_element():
+        children = get_child_elements(parent_locator, child_locator)
+        if not children:
+            raise NoSuchElementException(
+                f"No elements matching child locator '{child_locator}' under parent locator '{parent_locator}'"
+            )
+        if len(children) > 1:
+            logger.warning(
+                f"Multiple ({len(children)}) elements found for child locator '{child_locator}' under parent locator '{parent_locator}'. "
+                f"Returning the first element. Consider refining the parent selector."
+            )
+        return children[0]
 
-        except Exception as err:
-            if attempt < retries - 1:
-                logger.info(f"Retrying due to error... ({attempt + 1}/{retries})")
-                time.sleep(delay)
-                continue
-            else:
-                raise_assertion_error(
-                    f"Error in get_child_element() with parent '{parent_locator}' and child locator '{child_locator}': {err}"
-                )
+    return do_with_retries(get_element, "get_child_element", NoSuchElementException, retries, delay)
 
 
 def get_child_elements(parent_locator: object, child_locator: str):
@@ -270,8 +188,17 @@ def user_sets_focus_to_element(selector):
 
 
 def user_scrolls_element_to_center_of_view(locator_or_element: object):
-    element = _get_webelement_from_locator(locator_or_element)
-    sl().driver.execute_script('arguments[0].scrollIntoView({behavior: "instant", block: "center"})', element)
+    def scroll_to_element():
+        element = _get_webelement_from_locator(locator_or_element)
+        sl().driver.execute_script('arguments[0].scrollIntoView({behavior: "instant", block: "center"})', element)
+
+    do_with_retries(
+        scroll_to_element,
+        "user_scrolls_element_to_center_of_view",
+        StaleElementReferenceException,
+        retries=3,
+        retry_delay=2,
+    )
 
 
 def set_cookie_from_json(cookie_json):
@@ -403,12 +330,27 @@ def remove_auth_from_url(publicUrl: str):
 
 
 def get_child_element_with_retry(parent_locator: object, child_locator: str, max_retries=3, retry_delay=2):
+    def get_element():
+        return get_child_element(parent_locator, child_locator)
+
+    return do_with_retries(
+        get_element, "get_child_element_with_retry", NoSuchElementException, max_retries, retry_delay
+    )
+
+
+def do_with_retries(action, action_description: str, allowed_exception_types, retries: int, retry_delay: int):
+    last_exception = None
     retry_count = 0
-    while retry_count < max_retries:
+
+    while retry_count < retries:
         try:
-            return get_child_element(parent_locator, child_locator)
-        except NoSuchElementException:
+            return action()
+        except allowed_exception_types as ex:
+            last_exception = ex
             retry_count += 1
-            logger.warning(f"Child element not found, after ({max_retries}) retries")
             time.sleep(retry_delay)
-    raise AssertionError(f"Failed to find child element after {max_retries} retries.")
+
+    raise_assertion_error(
+        f"Failed to perform action {action_description} after {retries} retries."
+        f"Got the following exception:\r\n\r\n{last_exception}"
+    )

@@ -3,13 +3,10 @@ import {
   IpRange
 } from '../../common/types.bicep'
 
-import {
-  AzureFileShareMount
-  EntraIdAuthentication
-} from '../../public-api/types.bicep'
+// import {
+//   EntraIdAuthentication
+// } from '../../public-api/types.bicep'
 
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
 import { ResourceNames } from '../types.bicep'
 
 @description('Specifies common resource naming variables.')
@@ -39,6 +36,13 @@ param screenerAppRegistrationClientId string
 @description('Specifies the principal id of the Azure DevOps SPN.')
 @secure()
 param devopsServicePrincipalId string
+
+@description('The access key name for the Core storage account.')
+@secure()
+param coreStorageAccessKeyName string
+
+@description('The endpoint URL for the core storage blob service.')
+param coreStorageBlobEndpoint string
 
 @description('Specifies the login server from the registry.')
 @secure()
@@ -102,22 +106,31 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     applicationInsightsConnectionString: applicationInsightsConnectionString
     healthCheckPath: '/api/screen'
     appServicePlanName: resourceNames.screener.screenerFunction
+    appSettings: [
+      {
+        name: 'STORAGE_URL'
+        value: coreStorageBlobEndpoint
+      }
+      {
+        name: 'STORAGE_KEY'
+        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${coreStorageAccessKeyName})'
+      }
+      {
+        name: 'STORAGE_CONTAINER_NAME'
+        value: 'releases-temp'
+      }
+    ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
-    // entraIdAuthentication: {
-    //   appRegistrationClientId: screenerAppRegistrationClientId
-    //   allowedClientIds: [
-    //     adminAppClientId
-    //     devopsServicePrincipalId
-    //   ]
-    //   allowedPrincipalIds: []
-    //   requireAuthentication: true
-    // }
-    // userAssignedManagedIdentityParams: {
-    //   id: screenerFunctionAppManagedIdentity.id
-    //   name: screenerFunctionAppManagedIdentity.name
-    //   principalId: screenerFunctionAppManagedIdentity.properties.principalId
-    // }
+    entraIdAuthentication: {
+      appRegistrationClientId: screenerAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+        devopsServicePrincipalId
+      ]
+      allowedPrincipalIds: []
+      requireAuthentication: true
+    }
     dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
     dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
     deploymentStorageAccountName: resourceNames.screener.screenerFunctionStorageAccount

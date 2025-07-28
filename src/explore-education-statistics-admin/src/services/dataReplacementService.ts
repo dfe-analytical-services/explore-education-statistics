@@ -93,8 +93,10 @@ export interface DataBlockReplacementPlan {
 
 export interface MappingStatus {
   locationsComplete: boolean;
+  locationsHaveMajorChange: boolean;
   filtersComplete: boolean;
-  hasMajorVersionUpdate: boolean;
+  filtersHaveMajorChange: boolean;
+  isMajorVersionUpdate: boolean;
 }
 
 export interface ApiDataSetVersionPlan {
@@ -120,21 +122,19 @@ export interface DataReplacementPlan {
 const dataReplacementService = {
   getReplacementPlan(
     releaseVersionId: string,
-    fileId: string,
-    replacementFileId: string,
+    originalFileId: string,
   ): Promise<DataReplacementPlan> {
     return client.get(
-      `releases/${releaseVersionId}/data/${fileId}/replacement-plan/${replacementFileId}`,
+      `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
   },
   replaceData(
     releaseVersionId: string,
-    fileId: string,
-    replacementFileId: string,
+    originalFileIds: string[],
   ): Promise<void> {
-    return client.post(
-      `releases/${releaseVersionId}/data/${fileId}/replacement/${replacementFileId}`,
-    );
+    return client.post(`releases/${releaseVersionId}/data/replacements`, {
+      originalFileIds,
+    });
   },
 };
 
