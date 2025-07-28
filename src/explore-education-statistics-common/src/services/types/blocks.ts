@@ -11,7 +11,8 @@ export type BlockType =
   | 'MarkDownBlock'
   | 'HtmlBlock'
   | 'DataBlock'
-  | 'EmbedBlockLink';
+  | 'EmbedBlockLink'
+  | 'EINStatsBlock';
 
 export interface BaseBlock {
   id: string;
@@ -33,6 +34,19 @@ export interface MarkdownBlock extends BaseBlock {
 export interface HtmlBlock extends BaseBlock {
   type: 'HtmlBlock';
   body: string;
+}
+
+export interface EINStatsBlock extends BaseBlock {
+  title: string;
+  value: string;
+  trend: string;
+  linkUrl?: string;
+  linkTitle?: string;
+}
+
+export interface EINStatTile {
+  type: 'EINStatsBlock';
+  statTiles: EINStatsBlock[];
 }
 
 export type ContentBlock = MarkdownBlock | HtmlBlock;

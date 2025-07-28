@@ -11,6 +11,9 @@ import BoundaryLevelEditPage from '@admin/pages/bau/BoundaryLevelEditPage';
 import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
 import GlossaryPage from '@admin/pages/bau/GlossaryPage';
 import PageFeedbackPage from '@admin/pages/bau/PageFeedbackPage';
+import EducationInNumbersCreatePage from '@admin/pages/education-in-numbers/EducationInNumbersCreatePage';
+import EducationInNumbersListPage from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
+import EducationInNumbersPage from '@admin/pages/education-in-numbers/EducationInNumbersPage';
 
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
@@ -95,6 +98,27 @@ export const administrationUserManageRoute: ProtectedRouteProps = {
   protectionAction: permissions => permissions.isBauUser,
 };
 
+export const educationInNumbersListRoute: ProtectedRouteProps = {
+  path: '/education-in-numbers',
+  component: EducationInNumbersListPage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
+export const educationInNumbersCreateRoute: ProtectedRouteProps = {
+  path: '/education-in-numbers/create',
+  component: EducationInNumbersCreatePage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
+export const educationInNumbersRoute: ProtectedRouteProps = {
+  path: '/education-in-numbers/:educationInNumbersPageId',
+  component: EducationInNumbersPage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
 const administrationRoutes = {
   administrationIndexRoute,
   administrationImportsRoute,
@@ -108,6 +132,9 @@ const administrationRoutes = {
   administrationInvitedUsersRoute,
   administrationPreReleaseUsersRoute,
   administrationUserManageRoute,
+  educationInNumbersListRoute,
+  educationInNumbersCreateRoute,
+  educationInNumbersRoute,
 };
 
 export default administrationRoutes;
