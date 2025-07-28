@@ -279,19 +279,30 @@ export default function ReleaseApiDataSetDetailsPage() {
         replaceRouteParams,
       )}`
     : '';
+
+  const incompletesFound =
+    dataSet?.draftVersion?.mappingStatus &&
+    (!dataSet.draftVersion.mappingStatus.filtersComplete ||
+      !dataSet.draftVersion.mappingStatus.locationsComplete);
+
+  const errorSummaryHeadingPrefix =
+    'This API data set can not be published because it has ';
+
+  const errorSummaryHeading = incompletesFound
+    ? `${errorSummaryHeadingPrefix} incomplete location or filter manual mapping.`
+    : `${errorSummaryHeadingPrefix} major changes that are not allowed.`;
+
+  const errorBody = incompletesFound
+    ? 'The data file uploaded has not been able to be fully auto mapped and as a result has incomplete location or filter manual mapping.'
+    : 'The data file uploaded has resulted in a major version update which is not allowed in release amendments. Major version type changes can only be made as part of new releases.';
   const majorVersionErrorSummary = (
     <div className="govuk-inset-text InsetText_error__ZDwli" role="alert">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
-        This API data set can not be published because it is either incomplete
-        or has a major version update.
+        {errorSummaryHeading}
       </h2>
       <div className="govuk-error-summary__body">
         <ul className="govuk-list govuk-error-summary__list">
-          <li>
-            The data file uploaded has incomplete sections or has resulted in a
-            major version update which is not allowed in release amendments.
-            Major version type changes can only be made as part of new releases.
-          </li>
+          <li>{errorBody}</li>
           <li>
             Please select a mapping configuration that does not result in a
             major version.
