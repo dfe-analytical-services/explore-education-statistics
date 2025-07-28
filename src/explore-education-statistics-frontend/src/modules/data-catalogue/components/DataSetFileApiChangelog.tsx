@@ -51,24 +51,14 @@ export default function DataSetFileApiChangelog({
             (Object.keys(patch.majorChanges).length ||
               Object.keys(patch.minorChanges).length ||
               (patch.notes?.length ?? 0) > 0) && (
-              <React.Fragment
-                key={
-                  patch.versionNumber
-                    ? `${patch.versionNumber.major}.${patch.versionNumber.minor}.${patch.versionNumber.patch}`
-                    : idx
-                }
-              >
+              <React.Fragment key={`${patch.versionNumber}`}>
                 {patch.notes && (
                   <p data-testid="public-guidance-notes">{patch.notes}</p>
                 )}
                 <ApiDataSetChangelog
                   majorChanges={patch.majorChanges}
                   minorChanges={patch.minorChanges}
-                  version={
-                    patch.versionNumber.patch > 0
-                      ? `${patch.versionNumber.major}.${patch.versionNumber.minor}.${patch.versionNumber.patch}`
-                      : `${patch.versionNumber.major}.${patch.versionNumber.minor}`
-                  }
+                  version={patch.versionNumber}
                 />
                 {patchHistory.length > 0 && idx !== patchHistory.length - 1 && (
                   <SectionBreak size="xl" />

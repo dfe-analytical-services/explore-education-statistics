@@ -139,7 +139,6 @@ export default function DataSetFilePage({
     const hasNoPatchApiChangelog =
       !apiDataSetVersionChanges ||
       !apiDataSetVersionChanges.patchHistory ||
-      !apiDataSetVersionChanges.patchHistory ||
       apiDataSetVersionChanges.patchHistory.every(
         change => !change || !Object.keys(change.minorChanges).length,
       );

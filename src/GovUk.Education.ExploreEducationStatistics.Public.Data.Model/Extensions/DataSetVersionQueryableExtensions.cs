@@ -57,14 +57,15 @@ public static class DataSetVersionQueryableExtensions
     public static async Task<Either<ActionResult, DataSetVersion[]>> GetPreviousPatchVersions(
         this IQueryable<DataSetVersion> queryable,
         Guid dataSetId,
-        DataSetVersionNumber version,
-        CancellationToken cancellationToken = default) => 
-        version.Patch == 0 
-             ? throw new ArgumentException( $"Patch version must be specified in version supplied ({version}).")
+        string version,
+        CancellationToken cancellationToken = default) =>
+        DataSetVersionNumber.TryParse(version, out var versionNumber) 
+            ? versionNumber.Patch == 0 ? throw new ArgumentException($"Patch version must be specified in version supplied ({version}).")
                 : await queryable
                     .Where(dsv => dsv.DataSetId == dataSetId)
-                    .WherePreviousPatchVersion(version)
-                    .ToArrayAsync(cancellationToken);
+                    .WherePreviousPatchVersion(versionNumber)
+                    .ToArrayAsync(cancellationToken) 
+            : throw new ArgumentException($"Version supplied ({version}) is not a valid version number.");
 
     private static IQueryable<DataSetVersion> WherePreviousPatchVersion(
         this IQueryable<DataSetVersion> query,

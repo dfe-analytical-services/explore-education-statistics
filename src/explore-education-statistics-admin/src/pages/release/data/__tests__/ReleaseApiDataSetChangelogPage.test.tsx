@@ -134,7 +134,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });
@@ -179,7 +179,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });
@@ -225,7 +225,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: {},
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });
@@ -266,7 +266,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: {},
       minorChanges: minorChangeSet,
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });
@@ -307,7 +307,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });
@@ -348,7 +348,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });
@@ -370,7 +370,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
-      versionNumber: { major: 1, minor: 0, patch: 0 },
+      versionNumber: '1.0.0',
       notes: '',
       patchHistory: [],
     });

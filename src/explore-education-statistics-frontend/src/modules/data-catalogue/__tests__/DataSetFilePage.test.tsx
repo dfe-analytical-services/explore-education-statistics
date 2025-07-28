@@ -353,7 +353,7 @@ describe('DataSetFilePage', () => {
           ],
         },
         minorChanges: {},
-        versionNumber: { major: 2, minor: 0, patch: 0 },
+        versionNumber: '2.0.0',
         notes: '',
         patchHistory: [],
       };
@@ -380,7 +380,7 @@ describe('DataSetFilePage', () => {
       const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
         majorChanges: {},
         minorChanges: {},
-        versionNumber: { major: 2, minor: 1, patch: 2 },
+        versionNumber: '2.1.2',
         notes: '',
         patchHistory: [
           {
@@ -397,7 +397,7 @@ describe('DataSetFilePage', () => {
                 },
               ],
             },
-            versionNumber: { major: 2, minor: 1, patch: 1 },
+            versionNumber: '2.1.1',
             notes: '',
             patchHistory: [],
           },
@@ -473,7 +473,7 @@ describe('DataSetFilePage', () => {
           ],
         },
         minorChanges: {},
-        versionNumber: { major: 1, minor: 0, patch: 0 },
+        versionNumber: '1.0.0',
         notes: '',
         patchHistory: [],
       };
@@ -501,7 +501,7 @@ describe('DataSetFilePage', () => {
       const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
         majorChanges: {},
         minorChanges: {},
-        versionNumber: { major: 2, minor: 1, patch: 2 },
+        versionNumber: '2.1.2',
         notes: '',
         patchHistory: [
           {
@@ -518,7 +518,7 @@ describe('DataSetFilePage', () => {
                 },
               ],
             },
-            versionNumber: { major: 2, minor: 1, patch: 1 },
+            versionNumber: '2.1.1',
             notes: 'test',
             patchHistory: [],
           },
@@ -565,7 +565,7 @@ describe('DataSetFilePage', () => {
           apiDataSetVersionChanges={{
             majorChanges: {},
             minorChanges: {},
-            versionNumber: { major: 1, minor: 0, patch: 0 },
+            versionNumber: '1.0.0',
             notes: '',
             patchHistory: [],
           }}

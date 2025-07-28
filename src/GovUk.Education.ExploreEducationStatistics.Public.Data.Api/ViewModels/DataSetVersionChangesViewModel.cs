@@ -9,7 +9,7 @@ public record DataSetVersionChangesViewModel
 {
     public string? Notes { get; set; }
     
-    public required DataSetVersionNumber VersionNumber { get; set; }
+    public required string VersionNumber { get; set; }
     /// <summary>
     /// Any major changes that were made to the data set.
     /// </summary>

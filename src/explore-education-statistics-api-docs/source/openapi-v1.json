@@ -2625,11 +2625,7 @@
             "nullable": true
           },
           "versionNumber": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataSetVersionNumber"
-              }
-            ]
+            "type": "string"
           },
           "majorChanges": {
             "allOf": [
@@ -2692,27 +2688,6 @@
             "description": "The maximum number of results per page.",
             "format": "int32",
             "default": 10
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataSetVersionNumber": {
-        "type": "object",
-        "properties": {
-          "major": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "minor": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "patch": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
           }
         },
         "additionalProperties": false

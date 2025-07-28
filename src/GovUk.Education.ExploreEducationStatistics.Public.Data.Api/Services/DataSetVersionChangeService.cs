@@ -55,7 +55,7 @@ public class DataSetVersionChangeService(
 
     private Task<Either<ActionResult, List<DataSetVersionChangesViewModel>>> GetPreviousChanges(
         Guid dataSetId,
-        DataSetVersionNumber dataSetVersion,
+        string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
         return publicDataDbContext.DataSetVersions
@@ -123,10 +123,7 @@ public class DataSetVersionChangeService(
 
         return new DataSetVersionChangesViewModel
         {
-            VersionNumber = new DataSetVersionNumber(
-                dataSetVersion.VersionMajor, 
-                dataSetVersion.VersionMinor, 
-                dataSetVersion.VersionPatch),
+            VersionNumber = dataSetVersion.PublicVersion,
             Notes = dataSetVersion.Notes,
             MajorChanges = new ChangeSetViewModel
             {

@@ -8,14 +8,8 @@ import {
   TimePeriodOption,
 } from '@common/services/types/apiDataSetMeta';
 
-export interface DataSetVersionNumber {
-  major: number;
-  minor: number;
-  patch: number;
-}
-
 export interface ApiDataSetVersionChanges {
-  versionNumber: DataSetVersionNumber;
+  versionNumber: string;
   majorChanges: ChangeSet;
   minorChanges: ChangeSet;
   notes?: string;

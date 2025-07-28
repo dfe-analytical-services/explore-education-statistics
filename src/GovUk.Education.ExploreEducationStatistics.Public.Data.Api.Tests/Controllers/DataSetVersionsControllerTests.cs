@@ -1171,8 +1171,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             Assert.Equal(2, viewModel.PatchHistory.Count);
 
-            Assert.Equal(new DataSetVersionNumber(2, 1, 0), viewModel.PatchHistory[0].VersionNumber);
-            Assert.Equal(new DataSetVersionNumber(2, 1, 1), viewModel.PatchHistory[1].VersionNumber);
+            Assert.Equal("2.1.0", viewModel.PatchHistory[0].VersionNumber);
+            Assert.Equal("2.1.1", viewModel.PatchHistory[1].VersionNumber);
             Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationGroups!);
             Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationOptions!);
             Assert.Single(viewModel.PatchHistory[1].MinorChanges.LocationOptions!);
