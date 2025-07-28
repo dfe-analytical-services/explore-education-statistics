@@ -1,4 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -19,13 +26,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -1674,7 +1674,8 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(3, zip.Entries.Count);
-            Assert.Equal("data/data.csv", zip.Entries[0].FullName);
+            Assert.StartsWith("data/data", zip.Entries[0].FullName);
+            Assert.EndsWith(".csv", zip.Entries[0].FullName);
             Assert.Equal("Test data blob", zip.Entries[0].Open().ReadToEnd());
 
             Assert.Equal("supporting-files/ancillary.pdf", zip.Entries[1].FullName);
@@ -1775,10 +1776,12 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(3, zip.Entries.Count);
-            Assert.Equal("data/data-1.csv", zip.Entries[0].FullName);
+            Assert.StartsWith("data/data-1", zip.Entries[0].FullName);
+            Assert.EndsWith(".csv", zip.Entries[0].FullName);
             Assert.Equal("Test data 1 blob", zip.Entries[0].Open().ReadToEnd());
 
-            Assert.Equal("data/data-2.csv", zip.Entries[1].FullName);
+            Assert.StartsWith("data/data-2", zip.Entries[1].FullName);
+            Assert.EndsWith(".csv", zip.Entries[1].FullName);
             Assert.Equal("Test data 2 blob", zip.Entries[1].Open().ReadToEnd());
 
             // Data guidance is generated if there is at least one data file

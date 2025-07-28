@@ -102,7 +102,7 @@ export default function ReleaseDataUploadsSection({
 
         setAllDataFiles(currentDataFiles =>
           currentDataFiles.map(file =>
-            file.fileName !== dataFile.fileName
+            file.id !== dataFile.id
               ? file
               : {
                   ...dataFile,
@@ -129,7 +129,7 @@ export default function ReleaseDataUploadsSection({
 
         setAllDataFiles(currentDataFiles =>
           currentDataFiles.map(file =>
-            file.fileName !== updatedDataFile.fileName
+            file.id !== updatedDataFile.id
               ? file
               : {
                   ...updatedDataFile,
@@ -275,7 +275,7 @@ export default function ReleaseDataUploadsSection({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={allDataFiles} onSubmit={handleSubmit} />
+        <DataFileUploadForm onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.

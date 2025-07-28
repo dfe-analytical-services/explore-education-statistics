@@ -1,8 +1,9 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -73,8 +74,16 @@ public static class FileExtensions
         return file.Type switch
         {
             Ancillary => $"supporting-files/{file.Filename}",
-            Data => $"data/{file.Filename}",
+            Data => $"data/{AddTimestampToFileName(file.Filename)}",
             _ => throw new ArgumentOutOfRangeException(nameof(file.Type), "Unexpected file type"),
         };
+    }
+
+    private static string? AddTimestampToFileName(string fileName)
+    {
+        var fileNamePart = System.IO.Path.GetFileNameWithoutExtension(fileName);
+        var fileExtensionPart = System.IO.Path.GetExtension(fileName);
+
+        return $"{fileNamePart}{Stopwatch.GetTimestamp()}{fileExtensionPart}";
     }
 }

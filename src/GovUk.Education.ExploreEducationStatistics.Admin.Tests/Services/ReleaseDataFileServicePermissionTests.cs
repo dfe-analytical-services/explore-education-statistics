@@ -186,43 +186,41 @@ public class ReleaseDataFileServicePermissionTests
             );
     }
 
-    [Fact]
-    public async Task Upload()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupReleaseDataFileService(userService: userService.Object);
-                    return service.Upload(
-                        releaseVersionId: _releaseVersion.Id,
-                        dataFile: new Mock<IManagedStreamFile>().Object,
-                        metaFile: new Mock<IManagedStreamFile>().Object,
-                        dataSetTitle: "",
-                        replacingFileId: null,
-                        cancellationToken: default);
-                }
-            );
-    }
+        [Fact]
+        public async Task Upload()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(userService: userService.Object);
+                        return service.Upload(
+                            releaseVersionId: _releaseVersion.Id,
+                            dataFile: new Mock<IManagedStreamFile>().Object,
+                            metaFile: new Mock<IManagedStreamFile>().Object,
+                            dataSetTitle: "",
+                            cancellationToken: default);
+                    }
+                );
+        }
 
-    [Fact]
-    public async Task UploadAsZip()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupReleaseDataFileService(userService: userService.Object);
-                    return service.UploadFromZip(releaseVersionId: _releaseVersion.Id,
-                        zipFile: new Mock<IManagedStreamZipFile>().Object,
-                        dataSetTitle: "",
-                        replacingFileId: null,
-                        cancellationToken: default);
-                }
-            );
-    }
+        [Fact]
+        public async Task UploadAsZip()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(userService: userService.Object);
+                        return service.UploadFromZip(releaseVersionId: _releaseVersion.Id,
+                            zipFile: new Mock<IManagedStreamZipFile>().Object,
+                            dataSetTitle: "",
+                            cancellationToken: default);
+                    }
+                );
+        }
 
     [Fact]
     public async Task ValidateAndUploadBulkZip()

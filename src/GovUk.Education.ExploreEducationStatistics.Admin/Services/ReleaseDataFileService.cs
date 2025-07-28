@@ -303,7 +303,6 @@ public class ReleaseDataFileService(
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
         string dataSetTitle,
-        Guid? replacingFileId,
         CancellationToken cancellationToken)
     {
         return await persistenceHelper
@@ -311,15 +310,11 @@ public class ReleaseDataFileService(
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
-                return await persistenceHelper
-                    .CheckOptionalEntityExists<File>(replacingFileId)
-                    .OnSuccess(async replacingFile
-                        => await ValidateDataSetCsvPair(
-                            releaseVersionId,
-                            dataFile,
-                            metaFile,
-                            dataSetTitle,
-                            replacingFile))
+                return await ValidateDataSetCsvPair(
+                    releaseVersionId,
+                    dataFile,
+                    metaFile,
+                    dataSetTitle)
                     .OnSuccess(async dataSet
                         => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
                     .OnSuccess(dataSetUploads
@@ -327,35 +322,6 @@ public class ReleaseDataFileService(
                             => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
                     .OnSuccess(async dataSetUploads
                         => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
-            });
-    }
-
-    // TODO (EES-6176): Remove once manual replacement process has been consolidated to use Upload
-    public async Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
-        Guid releaseVersionId,
-        IManagedStreamFile dataFile,
-        IManagedStreamFile metaFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken)
-    {
-        return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(async _ =>
-            {
-                return await persistenceHelper
-                    .CheckOptionalEntityExists<File>(replacingFileId)
-                    .OnSuccess(async replacingFile
-                        => await ValidateDataSetCsvPair(
-                            releaseVersionId,
-                            dataFile,
-                            metaFile,
-                            dataSetTitle,
-                            replacingFile,
-                            performAutoReplacement: true))
-                    .OnSuccess(async dataSet
-                        => await dataSetFileStorage.UploadDataSet(releaseVersionId, dataSet, cancellationToken));
             });
     }
 
@@ -363,7 +329,6 @@ public class ReleaseDataFileService(
         Guid releaseVersionId,
         IManagedStreamZipFile zipFile,
         string dataSetTitle,
-        Guid? replacingFileId,
         CancellationToken cancellationToken)
     {
         return await persistenceHelper
@@ -371,14 +336,10 @@ public class ReleaseDataFileService(
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
-                return await persistenceHelper
-                    .CheckOptionalEntityExists<File>(replacingFileId)
-                    .OnSuccess(async replacingFile
-                        => await ValidateDataSetZip(
-                            releaseVersionId,
-                            zipFile,
-                            dataSetTitle,
-                            replacingFile))
+                return await ValidateDataSetZip(
+                    releaseVersionId,
+                    zipFile,
+                    dataSetTitle)
                     .OnSuccess(async dataSet
                         => await dataSetFileStorage.UploadDataSetsToTemporaryStorage(releaseVersionId, [dataSet], cancellationToken))
                     .OnSuccess(dataSetUploads
@@ -386,28 +347,6 @@ public class ReleaseDataFileService(
                             => dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(releaseVersionId, dataSetUpload, cancellationToken)))
                     .OnSuccess(async dataSetUploads
                         => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
-            });
-    }
-
-    // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadFromZip
-    public async Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
-        Guid releaseVersionId,
-        IManagedStreamZipFile zipFormFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken)
-    {
-        return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(async _ =>
-            {
-                return await persistenceHelper
-                    .CheckOptionalEntityExists<File>(replacingFileId)
-                    .OnSuccess(async replacingFile
-                        => await ValidateDataSetZip(releaseVersionId, zipFormFile, dataSetTitle, replacingFile, performAutoReplacement: true))
-                    .OnSuccess(async dataSet
-                        => await dataSetFileStorage.UploadDataSet(releaseVersionId, dataSet, cancellationToken));
             });
     }
 
@@ -464,54 +403,43 @@ public class ReleaseDataFileService(
         Guid releaseVersionId,
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
-        string dataSetTitle,
-        File? replacingFile,
-        bool performAutoReplacement = false)
+        string dataSetTitle)
     {
         return await ValidateAndBuildDataSet(
             releaseVersionId,
             BuildDataSetFile(dataFile),
             BuildDataSetFile(metaFile),
-            dataSetTitle,
-            replacingFile,
-            performAutoReplacement);
+            dataSetTitle);
     }
 
     private async Task<Either<ActionResult, DataSet>> ValidateDataSetZip(
         Guid releaseVersionId,
         IManagedStreamZipFile zipFile,
-        string dataSetTitle,
-        File? replacingFile,
-        bool performAutoReplacement = false)
+        string dataSetTitle)
     {
         var dataSetFiles = ExtractDataSetZipFile(zipFile);
 
         var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
         var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
 
-        return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle, replacingFile, performAutoReplacement);
+        return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle);
     }
 
     private async Task<Either<ActionResult, DataSet>> ValidateAndBuildDataSet(
         Guid releaseVersionId,
         FileDto dataFile,
         FileDto metaFile,
-        string dataSetTitle,
-        File? replacingFile,
-        bool performAutoReplacement = false)
+        string dataSetTitle)
     {
-        var newDataSetTitle = await GetReleaseVersionDataSetTitle(releaseVersionId, dataSetTitle, replacingFile);
-
         var dataSet = new DataSetDto
         {
             ReleaseVersionId = releaseVersionId,
-            Title = newDataSetTitle,
+            Title = dataSetTitle,
             DataFile = dataFile,
             MetaFile = metaFile,
-            ReplacingFile = replacingFile,
         };
 
-        var validationResult = await dataSetValidator.ValidateDataSet(dataSet, performAutoReplacement);
+        var validationResult = await dataSetValidator.ValidateDataSet(dataSet);
 
         return validationResult.IsLeft
             ? ValidationUtils.ValidationResult(validationResult.Left)
@@ -548,7 +476,7 @@ public class ReleaseDataFileService(
         var dataSets = new List<DataSet>();
         foreach (var dataSetDto in dataSetDtos)
         {
-            await dataSetValidator.ValidateDataSet(dataSetDto, performAutoReplacement: true)
+            await dataSetValidator.ValidateDataSet(dataSetDto)
                 .OnSuccessDo(dataSets.Add)
                 .OnFailureDo(errors.AddRange);
         }
@@ -571,7 +499,6 @@ public class ReleaseDataFileService(
                 Title = dataSet.DataSetTitle,
                 DataFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.DataFileName),
                 MetaFile = dataSetFiles.FirstOrDefault(file => file.FileName == dataSet.MetaFileName),
-                ReplacingFile = dataSet.ReplacingFile,
             });
         }
 
@@ -671,14 +598,14 @@ public class ReleaseDataFileService(
             .Select(rf => rf.File)
             .ToList();
 
-    var dataImportsDict = await contentDbContext.DataImports
-        .AsSplitQuery()
-        .Include(di => di.File.CreatedBy)
-        .Include(di => di.MetaFile)
-        .Where(di => files
-            .Select(f => f.Id)
-            .Contains(di.FileId))
-        .ToDictionaryAsync(di => di.FileId);
+        var dataImportsDict = await contentDbContext.DataImports
+            .AsSplitQuery()
+            .Include(di => di.File.CreatedBy)
+            .Include(di => di.MetaFile)
+            .Where(di => files
+                .Select(f => f.Id)
+                .Contains(di.FileId))
+            .ToDictionaryAsync(di => di.FileId);
 
         // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
         // Work out if the user has permission to cancel any import which Bau users can.
@@ -712,39 +639,19 @@ public class ReleaseDataFileService(
             }
 
             return new DataFileInfo(
-            releaseFile,
-            dataImportsDict[releaseFile.FileId],
-            permissionsDict[releaseFile.FileId])
-        {
-            ReplacedByDataFile = new ReplacementDataFileInfo(
-                replacement,
-                dataImportsDict[replacement.FileId],
-                permissionsDict[replacement.FileId],
-                hasValidReplacementPlan),
-        };
-    });
+                releaseFile,
+                dataImportsDict[releaseFile.FileId],
+                permissionsDict[releaseFile.FileId])
+            {
+                ReplacedByDataFile = new ReplacementDataFileInfo(
+                    replacement,
+                    dataImportsDict[replacement.FileId],
+                    permissionsDict[replacement.FileId],
+                    hasValidReplacementPlan),
+            };
+        });
 
-    return result.ToList();
-}
-
-    /// <summary>
-    /// Determine the title which should be used for a data set.
-    /// </summary>
-    /// <remarks>
-    /// Data replacements use the title of the original data set upload, regardless of whether a new one has been provided during a subsequent upload.
-    /// </remarks>
-    private async Task<string> GetReleaseVersionDataSetTitle(
-        Guid releaseVersionId,
-        string dataSetTitle,
-        File? replacingFile)
-    {
-        if (replacingFile is not null)
-        {
-            var originalDataSetTitle = await releaseFileRepository.Find(releaseVersionId, replacingFile.Id);
-            dataSetTitle = originalDataSetTitle?.Name ?? dataSetTitle;
-        }
-
-        return dataSetTitle;
+        return result.ToList();
     }
 
     private async Task<File> GetAssociatedMetaFile(

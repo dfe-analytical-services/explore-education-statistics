@@ -167,6 +167,12 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 r => System.Text.Json.JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
                 r => System.Text.Json.JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
+
+        modelBuilder.Entity<DataSetUpload>()
+            .Property(m => m.Created)
+            .HasConversion(
+                d => d,
+                d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
     }
 
     private static void ConfigureDataImport(ModelBuilder modelBuilder)
@@ -902,7 +908,7 @@ public class ContentDbContext : DbContext
             .IsRequired()
             .HasMaxLength(50);
     }
-    
+
     private static void ConfigureReleasePublishingFeedback(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ReleasePublishingFeedback>()
@@ -914,12 +920,12 @@ public class ContentDbContext : DbContext
             .Property(feedback => feedback.EmailToken)
             .IsRequired()
             .HasMaxLength(55);
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.UserPublicationRole)
             .HasConversion(new EnumToStringConverter<PublicationRole>())
             .IsRequired();
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.Response)
             .HasConversion(new EnumToStringConverter<ReleasePublishingFeedbackResponse>())
@@ -929,11 +935,11 @@ public class ContentDbContext : DbContext
             .Property(feedback => feedback.EmailToken)
             .IsRequired()
             .HasMaxLength(55);
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .HasIndex(feedback => feedback.EmailToken)
             .IsUnique();
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.Created)
             .HasConversion(
@@ -945,7 +951,7 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.AdditionalFeedback)
             .HasMaxLength(2000);

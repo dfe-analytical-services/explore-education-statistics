@@ -213,6 +213,8 @@ Change the Release type
     ...    3000-01
     ...    Official statistics in development
 
+# TODO: Rewrite (replacement behaviour is now different)
+
 Navigate to data replacement page
     user clicks link    Data and files
     user waits until page contains data uploads table
