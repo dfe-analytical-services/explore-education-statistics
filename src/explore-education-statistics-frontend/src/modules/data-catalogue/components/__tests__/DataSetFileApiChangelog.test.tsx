@@ -7,7 +7,7 @@ describe('DataSetFileApiChangelog', () => {
       <DataSetFileApiChangelog
         patchHistory={[]}
         changes={{
-          versionNumber: { major: 1, minor: 0, patch: 0 },
+          versionNumber: '1.0.0',
           notes: '',
           patchHistory: [],
           majorChanges: {
@@ -70,7 +70,7 @@ describe('DataSetFileApiChangelog', () => {
       <DataSetFileApiChangelog
         patchHistory={[]}
         changes={{
-          versionNumber: { major: 1, minor: 0, patch: 0 },
+          versionNumber: '1.0.0',
           notes: '',
           patchHistory: [],
           majorChanges: {
@@ -106,7 +106,7 @@ describe('DataSetFileApiChangelog', () => {
       <DataSetFileApiChangelog
         patchHistory={[]}
         changes={{
-          versionNumber: { major: 1, minor: 0, patch: 0 },
+          versionNumber: '1.0.0',
           notes: '',
           patchHistory: [],
           majorChanges: {},
@@ -142,7 +142,7 @@ describe('DataSetFileApiChangelog', () => {
       <DataSetFileApiChangelog
         patchHistory={[]}
         changes={{
-          versionNumber: { major: 1, minor: 0, patch: 0 },
+          versionNumber: '1.0.0',
           notes: '',
           patchHistory: [],
           majorChanges: {},
@@ -172,7 +172,7 @@ describe('DataSetFileApiChangelog', () => {
       <DataSetFileApiChangelog
         patchHistory={[]}
         changes={{
-          versionNumber: { major: 1, minor: 0, patch: 0 },
+          versionNumber: '1.0.0',
           notes: '',
           patchHistory: [],
           majorChanges: {},

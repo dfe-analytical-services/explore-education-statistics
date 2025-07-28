@@ -192,7 +192,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
             
             // Act 
-            var result = await queryable.GetPreviousPatchVersions(dataSet.Id, new DataSetVersionNumber(3, 2, 3), CancellationToken.None);
+            var result = await queryable.GetPreviousPatchVersions(dataSet.Id, "3.2.3", CancellationToken.None);
 
             // Assert
             var actualResult = result.AssertRight();
