@@ -11,6 +11,9 @@ import BoundaryLevelEditPage from '@admin/pages/bau/BoundaryLevelEditPage';
 import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
 import GlossaryPage from '@admin/pages/bau/GlossaryPage';
 import PageFeedbackPage from '@admin/pages/bau/PageFeedbackPage';
+import EducationInNumbersCreatePage from '@admin/pages/education-in-numbers/EducationInNumbersCreatePage';
+import EducationInNumbersListPage from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
+import EducationInNumbersPage from '@admin/pages/education-in-numbers/EducationInNumbersPage';
 
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
