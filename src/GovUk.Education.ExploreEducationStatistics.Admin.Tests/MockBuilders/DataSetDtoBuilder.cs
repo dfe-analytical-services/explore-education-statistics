@@ -53,7 +53,6 @@ public class DataSetDtoBuilder
                 Title = _title,
                 DataFile = _dataFile,
                 MetaFile = _metaFile,
-                ReplacingFile = _replacingFile,
             };
     }
 

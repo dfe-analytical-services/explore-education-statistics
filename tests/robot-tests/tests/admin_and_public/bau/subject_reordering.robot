@@ -101,6 +101,8 @@ Validate new order is preserved after refresh
     user checks table cell contains    3    1    Four    testid:Data files table
     user checks table cell contains    4    1    Three    testid:Data files table
 
+# TODO: Rewrite (replacement behaviour is now different)
+
 Start replacing last subject in order
     user clicks link in table cell    4    4    Replace data    testid:Data files table
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}ordering-test-3-replacement.csv

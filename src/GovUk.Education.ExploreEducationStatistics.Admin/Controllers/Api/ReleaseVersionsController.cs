@@ -161,29 +161,6 @@ public class ReleaseVersionsController : ControllerBase
                 dataFile,
                 metaFile,
                 request.Title,
-                request.ReplacingFileId,
-                cancellationToken)
-            .HandleFailuresOrOk();
-    }
-
-    // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadDataSet
-    [HttpPost("releaseVersions/replacement-data")]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<DataFileInfo>> UploadDataSetForReplacement(
-        [FromForm] UploadDataSetRequest request,
-        CancellationToken cancellationToken)
-    {
-        await using var dataFile = new ManagedStreamFormFile(request.DataFile);
-        await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
-
-        return await _releaseDataFileService
-            .UploadForReplacement(
-                request.ReleaseVersionId,
-                dataFile,
-                metaFile,
-                request.Title,
-                request.ReplacingFileId,
                 cancellationToken)
             .HandleFailuresOrOk();
     }
@@ -196,33 +173,12 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
-        
+
         return await _releaseDataFileService
             .UploadFromZip(
                 request.ReleaseVersionId,
                 zipFile,
                 request.Title,
-                request.ReplacingFileId,
-                cancellationToken)
-            .HandleFailuresOrOk();
-    }
-
-    // TODO (EES-6176): Remove once manual replacement process has been consolidated to use UploadDataSetAsZip
-    [HttpPost("releaseVersions/replacement-zip-data")]
-    [DisableRequestSizeLimit]
-    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZipForReplacement(
-        [FromForm] UploadDataSetAsZipRequest request,
-        CancellationToken cancellationToken)
-    {
-        await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
-        
-        return await _releaseDataFileService
-            .UploadFromZipForReplacement(
-                request.ReleaseVersionId,
-                zipFile,
-                request.Title,
-                request.ReplacingFileId,
                 cancellationToken)
             .HandleFailuresOrOk();
     }

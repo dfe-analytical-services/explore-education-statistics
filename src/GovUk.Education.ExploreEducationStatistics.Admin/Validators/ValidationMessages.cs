@@ -1,11 +1,11 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
@@ -40,7 +40,7 @@ public static class ValidationMessages
         Code: nameof(DataSetVersionMappingResultedInMajorChange),
         Message: "The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments."
     );
-    
+
     public static readonly LocalizableMessage ReleaseFileMustBeOriginal = new(
         Code: nameof(ReleaseFileMustBeOriginal),
         Message: "This must be an original file linked to a replacement. You must cancel the replacement first before removing file."
@@ -340,11 +340,6 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage FileNameNotUnique = new(
-        Code: nameof(FileNameNotUnique),
-        Message: "File name '{0}' of type {1} isn't unique to this release."
-    );
-
     public static ErrorViewModel GenerateErrorInvalidFileTypeForReplacement(FileType type)
     {
         return new ErrorViewModel
@@ -358,15 +353,6 @@ public static class ValidationMessages
         Code: nameof(InvalidFileTypeForReplacement),
         Message: "Replacing file should be of type '{0}'."
     );
-
-    public static ErrorViewModel GenerateErrorFileNameNotUnique(string fileName, FileType type)
-    {
-        return new ErrorViewModel
-        {
-            Code = FileNameNotUnique.Code,
-            Message = string.Format(FileNameNotUnique.Message, fileName, type.ToString()),
-        };
-    }
 
     public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
         Code: nameof(FileSizeMustNotBeZero),
@@ -403,7 +389,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage CannotReplaceDataSetWithApiDataSet = new(
         Code: nameof(CannotReplaceDataSetWithApiDataSet),
-        Message: "Data set with title '{0}' cannot be replaced as it has an API data set."
+        Message: "Data set with title '{0}' cannot be replaced as it has an API data set linked to it. Please remove the API data set before replacing the data."
     );
 
     public static ErrorViewModel GenerateErrorCannotReplaceDataSetWithApiDataSet(string title)
@@ -412,6 +398,20 @@ public static class ValidationMessages
         {
             Code = CannotReplaceDataSetWithApiDataSet.Code,
             Message = string.Format(CannotReplaceDataSetWithApiDataSet.Message, title),
+        };
+    }
+
+    public static readonly LocalizableMessage CannotReplaceDraftApiDataSet = new(
+        Code: nameof(CannotReplaceDraftApiDataSet),
+        Message: "Data set with title '{0}' cannot be replaced as it is targeting an existing draft API data set. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this replacement."
+    );
+
+    public static ErrorViewModel GenerateErrorCannotReplaceDraftApiDataSet(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = CannotReplaceDraftApiDataSet.Code,
+            Message = string.Format(CannotReplaceDraftApiDataSet.Message, title),
         };
     }
 

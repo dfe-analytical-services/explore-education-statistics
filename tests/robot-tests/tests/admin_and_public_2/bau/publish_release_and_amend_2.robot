@@ -250,6 +250,8 @@ Create release amendment
     user clicks link    Home
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
+# TODO: Rewrite (replacement behaviour is now different)
+
 Replace subject data
     user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-title
