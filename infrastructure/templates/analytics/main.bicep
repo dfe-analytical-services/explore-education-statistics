@@ -53,6 +53,7 @@ var resourceNames = {
     keyVault: '${subscription}-kv-ees-01'
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
+    logAnalyticsWorkspace: '${resourcePrefix}-log'
     subnets: {
       analyticsFunctionApp: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-analytics'
       storagePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-anlyt-${abbreviations.privateEndpoints}'
