@@ -34,6 +34,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
+import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
@@ -295,8 +296,9 @@ export default function ReleaseApiDataSetDetailsPage() {
   const errorBody = incompletesFound
     ? 'The data file uploaded has not been able to be fully auto mapped and as a result has incomplete location or filter manual mapping.'
     : 'The data file uploaded has resulted in a major version update which is not allowed in release amendments. Major version type changes can only be made as part of new releases.';
+
   const majorVersionErrorSummary = (
-    <div className="govuk-inset-text InsetText_error__ZDwli" role="alert">
+    <InsetText variant="error">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
         {errorSummaryHeading}
       </h2>
@@ -319,7 +321,7 @@ export default function ReleaseApiDataSetDetailsPage() {
           <li>For further guidance, contact the EES team.</li>
         </ul>
       </div>
-    </div>
+    </InsetText>
   );
   return (
     <>
