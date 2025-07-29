@@ -213,30 +213,23 @@ Change the Release type
     ...    3000-01
     ...    Official statistics in development
 
-# TODO: Rewrite (replacement behaviour is now different)
-
-Navigate to data replacement page
+Upload a replacement data set
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user clicks link    Replace data
+    user uploads subject and waits until complete    Dates test subject    dates-replacement.csv
+    ...    dates-replacement.meta.csv
 
-Upload replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
-    user clicks button    Upload data files
+Confirm data replacement via quick action
+    user waits until page contains element    testid:Data file replacements table
+    user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
+    user checks table cell contains    1    2    17 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
 
-    user waits until page contains element    testid:Replacement Title
-    user checks table column heading contains    1    1    Original file
-    user checks table column heading contains    1    2    Replacement file
-    user checks headed table body row cell contains    Data file import status    2    Complete
-    ...    wait=%{WAIT_DATA_FILE_IMPORT}
-
-Confirm data replacement
-    user waits until page contains    Data blocks: OK
-    user waits until page contains    Footnotes: OK
-    user clicks button    Confirm data replacement
-    user waits until h2 is visible    Data replacement complete
+    user clicks button    Confirm replacement
+    user waits until page contains data uploads table
+    user checks table cell contains    1    1    Dates test subject    testid:Data files table
+    user checks table cell contains    1    2    17 Kb    testid:Data files table
+    user checks table cell contains    1    3    Complete    testid:Data files table
 
 Edit ancillary file and replace data
     [Documentation]    EES-4315
