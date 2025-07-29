@@ -3114,7 +3114,8 @@
       },
       "properties": {
         "Application_Type": "web",
-        "ApplicationId": "[variables('importerAppName')]"
+        "ApplicationId": "[variables('importerAppName')]",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
       }
     },
     {
