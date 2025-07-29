@@ -2962,7 +2962,8 @@
       },
       "properties": {
         "Application_Type": "web",
-        "ApplicationId": "[variables('notificationsAppName')]"
+        "ApplicationId": "[variables('notificationsAppName')]",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
       }
     },
     {
