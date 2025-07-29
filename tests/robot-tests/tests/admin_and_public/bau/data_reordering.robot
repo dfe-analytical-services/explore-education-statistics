@@ -223,19 +223,17 @@ Cancel reordering indicators
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
 
 # TODO: Rewrite (replacement behaviour is now different)
+# Element 'id:dataFileUploadForm-title' not visible after 45 seconds.
 
 Replace subject data
-    user clicks link    Data uploads
-    user waits until page contains data uploads table
-    user clicks link    Replace data
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}grouped-filters-and-indicators-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${FILES_DIR}grouped-filters-and-indicators-replacement.meta.csv
-    user clicks button    Upload data files
+    user uploads subject replacement    ${SUBJECT_NAME}    grouped-filters-and-indicators-replacement.csv
+    ...    grouped-filters-and-indicators-replacement.meta.csv
 
-    user waits until page contains element    testid:Replacement Title
-    user checks table column heading contains    1    1    Original file
-    user checks table column heading contains    1    2    Replacement file
+Confirm data replacement details on replacement page
+    user checks table cell contains    1    1    ${SUBJECT_NAME}    testid:Data file replacements table
+    user checks table cell contains    1    2    13 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user checks headed table body row cell contains    Title    1    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    1    grouped-filters-and-indicators.csv
