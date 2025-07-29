@@ -1760,7 +1760,8 @@
       },
       "properties": {
         "applicationId": "[variables('contentAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
+        "Request_Source": "AzureTfsExtensionAzureProject",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
       }
     },
     {
