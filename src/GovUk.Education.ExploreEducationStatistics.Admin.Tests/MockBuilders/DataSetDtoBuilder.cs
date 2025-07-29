@@ -1,8 +1,8 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 
@@ -14,7 +14,6 @@ public class DataSetDtoBuilder
     private string? _metaFileName;
     private FileDto? _dataFile;
     private FileDto? _metaFile;
-    private Content.Model.File? _replacingFile;
 
     public async Task<DataSetDto> Build()
     {
@@ -65,12 +64,6 @@ public class DataSetDtoBuilder
     public DataSetDtoBuilder WhereTitleIs(string title)
     {
         _title = title;
-        return this;
-    }
-
-    public DataSetDtoBuilder WhereReplacingFileIs(Content.Model.File file)
-    {
-        _replacingFile = file;
         return this;
     }
 
