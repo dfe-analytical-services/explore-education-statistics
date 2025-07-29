@@ -32,6 +32,7 @@ type ResourceNames = {
     acr: string
     acrResourceGroup: string
     coreStorageAccount: string
+    logAnalyticsWorkspace: string
     subnets: {
       dataProcessor: string
       dataProcessorPrivateEndpoints: string

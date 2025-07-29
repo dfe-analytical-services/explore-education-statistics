@@ -7,7 +7,7 @@ param location string
 param appInsightsName string
 
 @description('Resource Id of the log analytics workspace which the data will be ingested to.')
-param logAnalyticsWorkspaceId string?
+param logAnalyticsWorkspaceId string
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
