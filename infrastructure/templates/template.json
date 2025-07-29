@@ -3270,7 +3270,8 @@
       },
       "properties": {
         "Application_Type": "web",
-        "ApplicationId": "[variables('publisherAppName')]"
+        "ApplicationId": "[variables('publisherAppName')]",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
       }
     },
     {
