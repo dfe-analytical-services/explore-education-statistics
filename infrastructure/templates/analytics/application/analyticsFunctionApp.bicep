@@ -56,6 +56,11 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
   parent: vNet
 }
 
+// Shared log analytics workspace. Currently the Public API deployment is responsible for creating this.
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
+  name: resourceNames.existingResources.logAnalyticsWorkspace
+}
+
 var fileShareMountPath = '/data/analytics'
 
 module functionAppModule '../../common/components/functionApp.bicep' = {
@@ -64,6 +69,8 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
+    diagnosticSettingEnabled: true
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-analytics'
     appSettings: [
       {
