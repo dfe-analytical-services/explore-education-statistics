@@ -117,7 +117,6 @@ public class DataSetValidatorTests
         }
     }
 
-    // TODO: Repurpose (action now identifies an auto-replacement, an no errors are generated)
     [Fact]
     public async Task ValidateDataSet_ReplacementFilenameSameAsAnotherDataSetsFilename_IdentifiesDataSetReplacement()
     {
@@ -435,7 +434,6 @@ public class DataSetValidatorTests
         Assert.Equal("test-data.meta.csv", dataSetItem.MetaFileName);
     }
 
-    // TODO: Repurpose (replacement behaviour is now different)
     [Fact]
     public async Task ValidateBulkDataZipIndexFile_ValidWithReplacement_ReturnsIndexFileObject()
     {

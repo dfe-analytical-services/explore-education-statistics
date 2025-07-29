@@ -340,20 +340,6 @@ public static class ValidationMessages
         };
     }
 
-    public static ErrorViewModel GenerateErrorInvalidFileTypeForReplacement(FileType type)
-    {
-        return new ErrorViewModel
-        {
-            Code = InvalidFileTypeForReplacement.Code,
-            Message = string.Format(InvalidFileTypeForReplacement.Message, type.ToString()),
-        };
-    }
-
-    public static readonly LocalizableMessage InvalidFileTypeForReplacement = new(
-        Code: nameof(InvalidFileTypeForReplacement),
-        Message: "Replacing file should be of type '{0}'."
-    );
-
     public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
         Code: nameof(FileSizeMustNotBeZero),
         Message: "File '{0}' either empty or not found."
