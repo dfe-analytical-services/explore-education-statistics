@@ -10,10 +10,10 @@ import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
 export default function mapFullTableMeta(
   subjectMeta: TableDataSubjectMeta,
 ): FullTableMeta {
-  const filters = Object.values(subjectMeta.filters).reduce<
+  const filters = Object.entries(subjectMeta.filters).reduce<
     FullTableMeta['filters']
-  >((acc, category) => {
-    acc[category.legend] = {
+  >((acc, [categoryKey, category]) => {
+    acc[categoryKey] = {
       name: category.name,
       options: Object.values(category.options).flatMap(filterGroup =>
         filterGroup.options.map(
