@@ -63,7 +63,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       </div>
 
       {data.status === 'SubjectRemoved' && (
-        <WarningMessage error testId="permalink-warning">
+        <WarningMessage testId="permalink-warning">
           The data used in this table is no longer valid.
         </WarningMessage>
       )}
@@ -75,7 +75,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         </WarningMessage>
       )}
       {data.status === 'SubjectReplacedOrRemoved' && (
-        <WarningMessage error testId="permalink-warning">
+        <WarningMessage testId="permalink-warning">
           The data used in this table may be invalid as the subject file has
           been amended or removed since its creation.
         </WarningMessage>
