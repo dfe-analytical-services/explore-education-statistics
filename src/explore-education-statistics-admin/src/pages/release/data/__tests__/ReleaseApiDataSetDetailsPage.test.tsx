@@ -963,7 +963,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it has Major changes that are not allowed.',
+          'This API data set can not be published because it has major changes that are not allowed.',
           {
             selector: 'h2',
           },
