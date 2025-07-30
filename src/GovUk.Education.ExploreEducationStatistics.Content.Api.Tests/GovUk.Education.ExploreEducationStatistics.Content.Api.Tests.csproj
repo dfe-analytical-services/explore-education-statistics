@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" /> <!-- Required to execute unit tests in IDE -->
-        <PackageReference Include="MockQueryable.Moq" Version="7.0.3" />
+        <PackageReference Include="MockQueryable.Moq" Version="8.0.0" />
         <PackageReference Include="Testcontainers.Azurite" Version="4.3.0" />
     </ItemGroup>
 
