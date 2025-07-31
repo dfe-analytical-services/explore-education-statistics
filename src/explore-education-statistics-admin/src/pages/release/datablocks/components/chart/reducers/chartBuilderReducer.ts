@@ -250,6 +250,7 @@ function getMapDataSetConfigs({
       groupBy: 'locations',
     },
     data,
+    includeNonNumericData: true,
     meta,
   });
 
