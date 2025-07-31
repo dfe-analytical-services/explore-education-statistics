@@ -15,6 +15,7 @@ export default function mapFullTableMeta(
   >((acc, [categoryKey, category]) => {
     acc[categoryKey] = {
       name: category.name,
+      legend: category.legend,
       options: Object.values(category.options).flatMap(filterGroup =>
         filterGroup.options.map(
           option =>
