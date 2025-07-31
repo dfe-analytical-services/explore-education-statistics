@@ -50,6 +50,7 @@ const inlinePositionOptions: SelectOption[] = legendInlinePositions.map(
 );
 
 interface Props {
+  allowColourSelection?: boolean;
   capabilities: ChartCapabilities;
   position?: LegendPosition;
   onChange: (legend: LegendConfiguration) => void;
@@ -57,6 +58,7 @@ interface Props {
 
 export default function ChartLegendItems({
   capabilities,
+  allowColourSelection,
   position,
   onChange,
 }: Props) {
@@ -112,15 +114,17 @@ export default function ChartLegendItems({
                         showError={false}
                       />
                     </div>
-                    <div className={styles.colourInput}>
-                      <FormFieldColourInput
-                        name={`items.${index}.colour`}
-                        label="Colour"
-                        colours={colours}
-                        formGroup={false}
-                        showError={false}
-                      />
-                    </div>
+                    {allowColourSelection && (
+                      <div className={styles.colourInput}>
+                        <FormFieldColourInput
+                          name={`items.${index}.colour`}
+                          label="Colour"
+                          colours={colours}
+                          formGroup={false}
+                          showError={false}
+                        />
+                      </div>
+                    )}
 
                     {capabilities.hasLineStyle && position === 'inline' && (
                       <div className={styles.configurationInput}>

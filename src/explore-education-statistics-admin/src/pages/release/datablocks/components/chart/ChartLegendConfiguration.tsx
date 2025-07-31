@@ -51,6 +51,7 @@ interface Props {
   buttons?: ReactNode;
   data: TableDataResult[];
   definition: ChartDefinition;
+  allowColourSelection?: boolean;
   legend: LegendConfiguration;
   meta: FullTableMeta;
   showDataLabels?: boolean;
@@ -59,6 +60,7 @@ interface Props {
 }
 
 const ChartLegendConfiguration = ({
+  allowColourSelection = true,
   axisMajor,
   buttons,
   data,
@@ -87,6 +89,7 @@ const ChartLegendConfiguration = ({
         groupBy: definition.axes.major?.constants?.groupBy ?? axisMajor.groupBy,
       },
       data,
+      includeNonNumericData: definition.type === 'map',
       meta,
     });
 
@@ -294,6 +297,7 @@ const ChartLegendConfiguration = ({
 
             <ChartLegendItems
               capabilities={capabilities}
+              allowColourSelection={allowColourSelection}
               position={values.position}
               onChange={onChange}
             />
