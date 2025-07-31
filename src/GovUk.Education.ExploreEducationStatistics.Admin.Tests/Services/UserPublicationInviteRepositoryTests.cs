@@ -303,7 +303,7 @@ public abstract class UserPublicationInviteRepositoryTests
         }
     }
 
-    public class RemoveByUserTests : UserPublicationInviteRepositoryTests
+    public class RemoveByUserEmailTests : UserPublicationInviteRepositoryTests
     {
         [Fact]
         public async Task TargetUserHasInvites_RemovesTargetInvites()
@@ -341,7 +341,7 @@ public abstract class UserPublicationInviteRepositoryTests
 
             var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByUser(targetEmail);
+            await repository.RemoveByUserEmail(targetEmail);
 
             var remainingInvites = await contentDbContext.UserPublicationInvites
                 .ToListAsync();
@@ -386,7 +386,7 @@ public abstract class UserPublicationInviteRepositoryTests
 
             var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByUser(targetEmail);
+            await repository.RemoveByUserEmail(targetEmail);
 
             var remainingInvites = await contentDbContext.UserPublicationInvites
                 .ToListAsync();

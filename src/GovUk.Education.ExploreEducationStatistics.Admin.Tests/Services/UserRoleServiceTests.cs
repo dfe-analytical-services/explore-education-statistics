@@ -2709,7 +2709,7 @@ public class UserRoleServiceTests
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
         userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveManyRolesAndInvites(
+            .Setup(m => m.RemoveRolesAndInvites(
                 It.Is<List<UserReleaseRole>>(l => l.Single().Id == targetUserReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
@@ -2717,7 +2717,7 @@ public class UserRoleServiceTests
 
         var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
         userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveManyRolesAndInvites(
+            .Setup(m => m.RemoveRolesAndInvites(
                 It.Is<List<UserPublicationRole>>(l => l.Single().Id == targetUserPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)

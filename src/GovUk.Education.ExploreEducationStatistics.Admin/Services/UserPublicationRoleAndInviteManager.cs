@@ -16,7 +16,7 @@ public class UserPublicationRoleAndInviteManager(
     ContentDbContext contentDbContext,
     IUserPublicationInviteRepository userPublicationInviteRepository,
     IUserRepository userRepository) : 
-    AbstractUserResourceRoleRepository<UserPublicationRole, Publication, PublicationRole>(contentDbContext), 
+    UserResourceRoleRepositoryBase<UserPublicationRole, Publication, PublicationRole>(contentDbContext, userRepository), 
     IUserPublicationRoleAndInviteManager
 {
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
@@ -33,14 +33,14 @@ public class UserPublicationRoleAndInviteManager(
             .Where(role => publicationIds.Contains(role.PublicationId));
     }
 
-    public Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
+    public async Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
     {
-        return GetDistinctResourceRolesByUser(userId);
+        return await GetDistinctResourceRolesByUser(userId);
     }
 
-    public Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
+    public async Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
     {
-        return GetAllResourceRolesByUserAndResource(userId, publicationId);
+        return await GetAllResourceRolesByUserAndResource(userId, publicationId);
     }
 
     public async Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role)
@@ -48,9 +48,9 @@ public class UserPublicationRoleAndInviteManager(
         return await GetResourceRole(userId, publicationId, role);
     }
 
-    public Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
+    public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
     {
-        return UserHasRoleOnResource(userId, publicationId, role);
+        return await UserHasRoleOnResource(userId, publicationId, role);
     }
 
     public async Task RemoveRoleAndInvite(
@@ -72,27 +72,26 @@ public class UserPublicationRoleAndInviteManager(
         });
     }
 
-    public async Task RemoveManyRolesAndInvites(
+    public async Task RemoveRolesAndInvites(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default)
     {
+        if (!userPublicationRoles.Any())
+        {
+            return;
+        }
+
         var inviteKeys = userPublicationRoles
-            .Select(upr => new
-            {
-                upr.PublicationId,
-                upr.Role,
-                Email = upr.User.Email.ToLower()
-            })
-            .ToList();
+            .Select(upr => (upr.PublicationId, upr.Role, Email: upr.User.Email.ToLower()))
+            .ToHashSet();
 
         var invites = await ContentDbContext.UserPublicationInvites
-            .Where(upi => inviteKeys
-                .Contains(new
-                {
+            .Where(upi => inviteKeys.Contains(
+                new ValueTuple<Guid, PublicationRole, string>(
                     upi.PublicationId,
                     upi.Role,
-                    Email = upi.Email.ToLower()
-                }))
+                    upi.Email.ToLower()
+                )))
             .ToListAsync(cancellationToken);
 
         await ContentDbContext.RequireTransaction(async () =>
@@ -116,17 +115,11 @@ public class UserPublicationRoleAndInviteManager(
 
         await ContentDbContext.RequireTransaction(async () =>
         {
-            await userPublicationInviteRepository.RemoveByUser(
+            await userPublicationInviteRepository.RemoveByUserEmail(
                 email: userEmail,
                 cancellationToken: cancellationToken);
 
             await RemoveMany(userPublicationRoles, cancellationToken);
         });
-    }
-
-    private async Task<string> GetUserEmail(Guid userId, CancellationToken cancellationToken)
-    {
-        return (await userRepository.FindById(userId, cancellationToken))!
-            .Email;
     }
 }

@@ -147,7 +147,7 @@ public class SignInService(
 
     private async Task HandleReleaseInvites(Guid newUserId, string email)
     {
-        var releaseInvites = await userReleaseInviteRepository.ListByEmail(email);
+        var releaseInvites = await userReleaseInviteRepository.GetInvitesByEmail(email);
         await releaseInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(invite => userReleaseRoleAndInviteManager.Create(
@@ -159,7 +159,7 @@ public class SignInService(
 
     private async Task HandlePublicationInvites(Guid newUserId, string email)
     {
-        var publicationInvites = await userPublicationInviteRepository.ListByEmail(email);
+        var publicationInvites = await userPublicationInviteRepository.GetInvitesByEmail(email);
         await publicationInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(invite => userPublicationRoleAndInviteManager.Create(
@@ -175,8 +175,8 @@ public class SignInService(
     {
         await contentDbContext.RequireTransaction(async () =>
         {
-            await userReleaseInviteRepository.RemoveByUser(email);
-            await userPublicationInviteRepository.RemoveByUser(email);
+            await userReleaseInviteRepository.RemoveByUserEmail(email);
+            await userPublicationInviteRepository.RemoveByUserEmail(email);
 
             usersAndRolesDbContext.UserInvites.Remove(inviteToSystem);
             await usersAndRolesDbContext.SaveChangesAsync();

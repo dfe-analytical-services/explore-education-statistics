@@ -270,8 +270,8 @@ public class UserManagementService(
 
                 // Clear out any pre-existing Release or Publication invites prior to adding
                 // new ones.
-                var existingReleaseInvites = await userReleaseInviteRepository.ListByEmail(sanitisedEmail);
-                var existingPublicationInvites = await userPublicationInviteRepository.ListByEmail(sanitisedEmail);
+                var existingReleaseInvites = await userReleaseInviteRepository.GetInvitesByEmail(sanitisedEmail);
+                var existingPublicationInvites = await userPublicationInviteRepository.GetInvitesByEmail(sanitisedEmail);
 
                 await userReleaseInviteRepository.RemoveMany(existingReleaseInvites);
                 await userPublicationInviteRepository.RemoveMany(existingPublicationInvites);
@@ -330,8 +330,8 @@ public class UserManagementService(
             {
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    await userReleaseInviteRepository.RemoveByUser(email);
-                    await userPublicationInviteRepository.RemoveByUser(email);
+                    await userReleaseInviteRepository.RemoveByUserEmail(email);
+                    await userPublicationInviteRepository.RemoveByUserEmail(email);
 
                     usersAndRolesDbContext.UserInvites.Remove(invite);
                     await usersAndRolesDbContext.SaveChangesAsync();

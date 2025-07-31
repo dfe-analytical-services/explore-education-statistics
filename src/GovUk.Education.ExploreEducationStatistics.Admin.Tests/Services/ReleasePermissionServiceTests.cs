@@ -441,7 +441,7 @@ public class ReleasePermissionServiceTests
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
         // User 2's role should be removed
         userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveManyRolesAndInvites(
+            .Setup(m => m.RemoveRolesAndInvites(
                 It.Is<List<UserReleaseRole>>(l => l.Single().Id == user2ReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)

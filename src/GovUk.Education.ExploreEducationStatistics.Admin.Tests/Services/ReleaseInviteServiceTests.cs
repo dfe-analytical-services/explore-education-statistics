@@ -697,7 +697,7 @@ public class ReleaseInviteServiceTests
             contentDbContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
-            userRepository ??= new UserRepository(contentDbContext),
+            userRepository ?? new UserRepository(contentDbContext),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),

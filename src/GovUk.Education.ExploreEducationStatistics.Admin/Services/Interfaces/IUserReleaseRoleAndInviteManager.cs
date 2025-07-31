@@ -52,7 +52,7 @@ public interface IUserReleaseRoleAndInviteManager
         UserReleaseRole userReleaseRole,
         CancellationToken cancellationToken = default);
 
-    Task RemoveManyRolesAndInvites(
+    Task RemoveRolesAndInvites(
         IReadOnlyList<UserReleaseRole> userReleaseRoles,
         CancellationToken cancellationToken = default);
 

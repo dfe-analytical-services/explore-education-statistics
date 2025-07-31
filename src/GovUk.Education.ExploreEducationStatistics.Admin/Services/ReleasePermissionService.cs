@@ -136,7 +136,7 @@ public class ReleasePermissionService(
                     .Where(userId => !releaseContributorReleaseRolesByUserId.ContainsKey(userId))
                     .ToList();
 
-                await userReleaseRoleAndInviteManager.RemoveManyRolesAndInvites(releaseRolesToBeRemoved);
+                await userReleaseRoleAndInviteManager.RemoveRolesAndInvites(releaseRolesToBeRemoved);
 
                 await userReleaseRoleAndInviteManager.CreateManyIfNotExists(
                     userIds: usersToBeAdded,

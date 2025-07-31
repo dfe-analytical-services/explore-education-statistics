@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -11,7 +12,9 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResource, TRoleEnum>(ContentDbContext contentDbContext)
+public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, TRoleEnum>(
+    ContentDbContext contentDbContext,
+    IUserRepository userRepository)
     where TResourceRole : ResourceRole<TRoleEnum, TResource>
     where TResource : class
     where TRoleEnum : Enum
@@ -84,6 +87,12 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
         await ContentDbContext.SaveChangesAsync();
     }
 
+    protected async Task<string> GetUserEmail(Guid userId, CancellationToken cancellationToken)
+    {
+        return (await userRepository.FindById(userId, cancellationToken))!
+            .Email;
+    }
+
     protected async Task Remove(TResourceRole resourceRole, CancellationToken cancellationToken = default)
     {
         ContentDbContext.Remove(resourceRole);
@@ -92,7 +101,7 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
     }
 
     protected async Task RemoveMany(
-        IReadOnlyList<TResourceRole> resourceRoles,
+        IEnumerable<TResourceRole> resourceRoles,
         CancellationToken cancellationToken = default)
     {
         if (!resourceRoles.Any())

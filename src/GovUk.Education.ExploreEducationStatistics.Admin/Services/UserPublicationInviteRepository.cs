@@ -43,7 +43,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         await contentDbContext.SaveChangesAsync();
     }
 
-    public Task<List<UserPublicationInvite>> ListByEmail(string email)
+    public Task<List<UserPublicationInvite>> GetInvitesByEmail(string email)
     {
         return contentDbContext
             .UserPublicationInvites
@@ -63,7 +63,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
                 uri.PublicationId == publicationId
                 && uri.Role == role
                 && uri.Email == email) // DB comparison is case insensitive
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         if (!invites.Any())
         {
@@ -86,7 +86,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemoveByUser(
+    public async Task RemoveByUserEmail(
         string email,
         CancellationToken cancellationToken = default)
     {

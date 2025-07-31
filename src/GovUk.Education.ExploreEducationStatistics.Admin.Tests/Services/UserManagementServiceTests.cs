@@ -262,7 +262,7 @@ public class UserManagementServiceTests
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
         userReleaseInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserReleaseInvites);
         userReleaseInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserReleaseInvites, default))
@@ -295,7 +295,7 @@ public class UserManagementServiceTests
 
         var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
         userPublicationInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserPublicationInvites);
         userPublicationInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserPublicationInvites, default))
@@ -417,7 +417,7 @@ public class UserManagementServiceTests
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
         userReleaseInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserReleaseInvites);
         userReleaseInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserReleaseInvites, default))
@@ -475,7 +475,7 @@ public class UserManagementServiceTests
 
         var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
         userPublicationInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserPublicationInvites);
         userPublicationInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserPublicationInvites, default))
@@ -603,7 +603,7 @@ public class UserManagementServiceTests
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
         userReleaseInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserReleaseInvites);
         userReleaseInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserReleaseInvites, default))
@@ -611,7 +611,7 @@ public class UserManagementServiceTests
 
         var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
         userPublicationInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserPublicationInvites);
         userPublicationInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserPublicationInvites, default))
@@ -810,7 +810,7 @@ public class UserManagementServiceTests
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
         userReleaseInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserReleaseInvites);
         userReleaseInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserReleaseInvites, default))
@@ -843,7 +843,7 @@ public class UserManagementServiceTests
 
         var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
         userPublicationInviteRepository
-            .Setup(mock => mock.ListByEmail(email))
+            .Setup(mock => mock.GetInvitesByEmail(email))
             .ReturnsAsync(existingUserPublicationInvites);
         userPublicationInviteRepository
             .Setup(mock => mock.RemoveMany(existingUserPublicationInvites, default))
@@ -948,13 +948,13 @@ public class UserManagementServiceTests
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
         userReleaseInviteRepository
-            .Setup(mock => mock.RemoveByUser(emailToCancelInvitesFor, default))
+            .Setup(mock => mock.RemoveByUserEmail(emailToCancelInvitesFor, default))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
         var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
         userPublicationInviteRepository
-            .Setup(mock => mock.RemoveByUser(emailToCancelInvitesFor, default))
+            .Setup(mock => mock.RemoveByUserEmail(emailToCancelInvitesFor, default))
             .Returns(Task.CompletedTask)
             .Verifiable();
 

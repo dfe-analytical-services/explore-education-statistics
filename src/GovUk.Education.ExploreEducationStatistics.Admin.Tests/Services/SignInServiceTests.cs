@@ -92,13 +92,13 @@ public class SignInServiceTests
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.ListByEmail(email))
+                .Setup(mock => mock.GetInvitesByEmail(email))
                 .ReturnsAsync(userReleaseInvites)
                 .Verifiable();
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
-                .Setup(mock => mock.ListByEmail(email))
+                .Setup(mock => mock.GetInvitesByEmail(email))
                 .ReturnsAsync(userPublicationInvites)
                 .Verifiable();
 
@@ -223,13 +223,13 @@ public class SignInServiceTests
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUser(email, default))
+                .Setup(mock => mock.RemoveByUserEmail(email, default))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUser(email, default))
+                .Setup(mock => mock.RemoveByUserEmail(email, default))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 

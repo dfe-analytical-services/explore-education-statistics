@@ -455,7 +455,7 @@ public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
 
                         if (userReleaseRoles.Any())
                         {
-                            await userReleaseRoleAndInviteManager.RemoveManyRolesAndInvites(userReleaseRoles);
+                            await userReleaseRoleAndInviteManager.RemoveRolesAndInvites(userReleaseRoles);
                         }
 
                         var userPublicationRoles =
@@ -465,7 +465,7 @@ public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
 
                         if (userPublicationRoles.Any())
                         {
-                            await userPublicationRoleAndInviteManager.RemoveManyRolesAndInvites(userPublicationRoles);
+                            await userPublicationRoleAndInviteManager.RemoveRolesAndInvites(userPublicationRoles);
                         }
 
                         await usersAndRolesPersistenceHelper

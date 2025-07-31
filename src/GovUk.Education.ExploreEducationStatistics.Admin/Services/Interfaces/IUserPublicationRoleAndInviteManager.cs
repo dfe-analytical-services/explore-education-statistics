@@ -34,7 +34,7 @@ public interface IUserPublicationRoleAndInviteManager
         UserPublicationRole userPublicationRole,
         CancellationToken cancellationToken = default);
 
-    Task RemoveManyRolesAndInvites(
+    Task RemoveRolesAndInvites(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default);
 

@@ -16,7 +16,7 @@ public class UserReleaseRoleAndInviteManager(
     ContentDbContext contentDbContext,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserRepository userRepository) :
-    AbstractUserResourceRoleRepository<UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext), 
+    UserResourceRoleRepositoryBase<UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext, userRepository), 
     IUserReleaseRoleAndInviteManager
 {
     protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
@@ -33,21 +33,21 @@ public class UserReleaseRoleAndInviteManager(
             .Where(role => releaseVersionIds.Contains(role.ReleaseVersionId));
     }
 
-    public Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId)
+    public async Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId)
     {
-        return GetDistinctResourceRolesByUser(userId);
+        return await GetDistinctResourceRolesByUser(userId);
     }
 
-    public Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseVersionId)
+    public async Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseVersionId)
     {
-        return GetAllResourceRolesByUserAndResource(userId, releaseVersionId);
+        return await GetAllResourceRolesByUserAndResource(userId, releaseVersionId);
     }
 
-    public Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
+    public async Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
     {
-        return ContentDbContext
+        return await ContentDbContext
             .UserReleaseRoles
-            .Where(role => role.UserId == userId && role.ReleaseVersion.PublicationId == publicationId)
+            .Where(role => role.UserId == userId && role.ReleaseVersion.Release.PublicationId == publicationId)
             .Select(role => role.Role)
             .Distinct()
             .ToListAsync();
@@ -58,19 +58,19 @@ public class UserReleaseRoleAndInviteManager(
         return await GetResourceRole(userId, releaseVersionId, role);
     }
 
-    public Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
+    public async Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
     {
-        return UserHasRoleOnResource(userId, releaseVersionId, role);
+        return await UserHasRoleOnResource(userId, releaseVersionId, role);
     }
 
-    public Task<bool> HasUserReleaseRole(string email, Guid releaseVersionId, ReleaseRole role)
+    public async Task<bool> HasUserReleaseRole(string email, Guid releaseVersionId, ReleaseRole role)
     {
-        return UserHasRoleOnResource(email, releaseVersionId, role);
+        return await UserHasRoleOnResource(email, releaseVersionId, role);
     }
 
-    public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude)
+    public async Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude)
     {
-        return ListResourceRoles(releaseVersionId, rolesToInclude);
+        return await ListResourceRoles(releaseVersionId, rolesToInclude);
     }
 
     public async Task RemoveRoleAndInvite(
@@ -92,27 +92,26 @@ public class UserReleaseRoleAndInviteManager(
         });
     }
 
-    public async Task RemoveManyRolesAndInvites(
+    public async Task RemoveRolesAndInvites(
         IReadOnlyList<UserReleaseRole> userReleaseRoles,
         CancellationToken cancellationToken = default)
     {
+        if (!userReleaseRoles.Any())
+        {
+            return;
+        }
+
         var inviteKeys = userReleaseRoles
-            .Select(urr => new
-            {
-                urr.ReleaseVersionId,
-                urr.Role,
-                Email = urr.User.Email.ToLower()
-            })
-            .ToList();
+            .Select(upr => (upr.ReleaseVersionId, upr.Role, Email: upr.User.Email.ToLower()))
+            .ToHashSet();
 
         var invites = await ContentDbContext.UserReleaseInvites
-            .Where(uri => inviteKeys
-                .Contains(new
-                {
-                    uri.ReleaseVersionId,
-                    uri.Role,
-                    Email = uri.Email.ToLower()
-                }))
+            .Where(upi => inviteKeys.Contains(
+                new ValueTuple<Guid, ReleaseRole, string>(
+                    upi.ReleaseVersionId,
+                    upi.Role,
+                    upi.Email.ToLower()
+                )))
             .ToListAsync(cancellationToken);
 
         await ContentDbContext.RequireTransaction(async () =>
@@ -139,20 +138,12 @@ public class UserReleaseRoleAndInviteManager(
             .Select(rv => rv.Id)
             .ToHashSet();
 
-        var query = ContentDbContext.UserReleaseRoles
-            .Where(urr => allReleaseVersionIds.Contains(urr.ReleaseVersionId));
-
-        if (userId.HasValue)
-        {
-            query = query.Where(urr => urr.UserId == userId);
-        }
-
-        if (rolesToInclude.Any())
-        {
-            query = query.Where(urr => rolesToInclude.Contains(urr.Role));
-        }
-
-        var userReleaseRoles = await query
+        var userReleaseRoles = await ContentDbContext.UserReleaseRoles
+            .Where(urr => allReleaseVersionIds.Contains(urr.ReleaseVersionId))
+            .If(userId.HasValue)
+                .ThenWhere(urr => urr.UserId == userId)
+            .If(rolesToInclude.Any())
+                .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
 
         await ContentDbContext.RequireTransaction(async () =>
@@ -177,20 +168,12 @@ public class UserReleaseRoleAndInviteManager(
             ? await GetUserEmail(userId.Value, cancellationToken)
             : null;
 
-        var query = ContentDbContext.UserReleaseRoles
-            .Where(urr => urr.ReleaseVersionId == releaseVersionId);
-
-        if (userId.HasValue)
-        {
-            query = query.Where(urr => urr.UserId == userId);
-        }
-
-        if (rolesToInclude.Any())
-        {
-            query = query.Where(urr => rolesToInclude.Contains(urr.Role));
-        }
-
-        var userReleaseRoles = await query
+        var userReleaseRoles = await ContentDbContext.UserReleaseRoles
+            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
+            .If(userId.HasValue)
+                .ThenWhere(urr => urr.UserId == userId)
+            .If(rolesToInclude.Any())
+                .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
 
         await ContentDbContext.RequireTransaction(async () =>
@@ -217,17 +200,11 @@ public class UserReleaseRoleAndInviteManager(
 
         await ContentDbContext.RequireTransaction(async () =>
         {
-            await userReleaseInviteRepository.RemoveByUser(
+            await userReleaseInviteRepository.RemoveByUserEmail(
                 email: userEmail,
                 cancellationToken: cancellationToken);
 
             await RemoveMany(userReleaseRoles, cancellationToken);
         });
-    }
-
-    private async Task<string> GetUserEmail(Guid userId, CancellationToken cancellationToken)
-    {
-        return (await userRepository.FindById(userId, cancellationToken))!
-            .Email;
     }
 }
