@@ -3,7 +3,11 @@ import withMethods from '@frontend/middleware/api/withMethods';
 import logger from '@common/services/logger';
 import { PublicationListSummary } from '@common/services/publicationService';
 import { ReleaseType } from '@common/services/types/releaseType';
-import { odata, SearchOptions } from '@azure/search-documents';
+import {
+  odata,
+  SearchOptions,
+  SearchRequestQueryTypeOptions,
+} from '@azure/search-documents';
 import { NextApiRequest, NextApiResponse } from 'next';
 import initialiseAzureSearchClient from '@frontend/modules/api/search/initialiseAzureSearchClient';
 import { ErrorBody } from '@frontend/modules/api/types/error';
@@ -18,6 +22,11 @@ interface Request extends NextApiRequest {
     searchOptions: AzurePublicationListRequest;
   };
 }
+
+type SharedSearchOptionsBase = Partial<
+  SearchOptions<AzurePublicationSearchResult>
+> &
+  SearchRequestQueryTypeOptions;
 
 export default withMethods({
   post: async function searchPublications(
@@ -43,7 +52,7 @@ export default withMethods({
         themeId,
       } = searchOptions;
 
-      const searchOptionsBase = {
+      const searchOptionsBase: SharedSearchOptionsBase = {
         includeTotalCount: true,
         orderBy: orderBy ? [orderBy] : undefined,
         queryType: !orderBy ? 'semantic' : undefined,
@@ -54,16 +63,7 @@ export default withMethods({
         scoringProfile: 'scoring-profile-1',
         skip: page > 1 ? (page - 1) * 10 : 0,
         top: 10,
-      } as Pick<
-        SearchOptions<AzurePublicationSearchResult>,
-        | 'includeTotalCount'
-        | 'orderBy'
-        | ('queryType' & 'semanticSearchOptions')
-        | 'scoringProfile'
-        | 'searchMode'
-        | 'skip'
-        | 'top'
-      >;
+      };
 
       // Get all search results
       const searchResults = await azureSearchClient.search(search, {
