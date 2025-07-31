@@ -107,6 +107,7 @@ export const testTableWithOnlyMergedCellsInHeaders: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter1, category1Group2Filter2],
         order: 0,
@@ -159,6 +160,7 @@ export const testTableWithMergedAndUnMergedCellsInHeaders: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter1, category1Group2Filter1],
         order: 0,
@@ -214,11 +216,13 @@ export const testTableWithOnlyMergedCellsInFirstLevelOfHeaders: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter1, category1Group2Filter2],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Group1Filter1, category2Group1Filter2],
         order: 0,
@@ -293,11 +297,13 @@ export const testTableWithMergedAndUnmergedCellsInFirstLevelOfHeaders: FullTable
       ...testInitialTableSubjectMeta,
       filters: {
         Category1: {
+          legend: 'Category 1',
           name: 'category_1',
           options: [category1Group1Filter1, category1Group2Filter1],
           order: 0,
         },
         Category2: {
+          legend: 'Category 2',
           name: 'category_2',
           options: [category2Group1Filter1, category2Group1Filter2],
           order: 0,
@@ -371,11 +377,13 @@ export const testTableWithOnlyMergedCellsInMiddleLevelOfHeaders: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter1, category1Group2Filter2],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Group1Filter1, category2Group1Filter2],
         order: 1,
@@ -450,6 +458,7 @@ export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfHeaders: FullTabl
       ...testInitialTableSubjectMeta,
       filters: {
         Category1: {
+          legend: 'Category 1',
           name: 'category_1',
           options: [
             category1Group1Filter1,
@@ -459,6 +468,7 @@ export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfHeaders: FullTabl
           order: 0,
         },
         Category2: {
+          legend: 'Category 2',
           name: 'category_2',
           options: [category2Group1Filter1, category2Group1Filter2],
           order: 1,
@@ -552,11 +562,13 @@ export const testTableWithOnlyMergedCellsInLastLevelOfHeaders: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter1, category1Group2Filter2],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Group1Filter1, category2Group1Filter2],
         order: 0,
@@ -631,11 +643,13 @@ export const testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders: FullTable 
       ...testInitialTableSubjectMeta,
       filters: {
         Category1: {
+          legend: 'Category 1',
           name: 'category_1',
           options: [category1Group1Filter1, category1Group2Filter1],
           order: 0,
         },
         Category2: {
+          legend: 'Category 2',
           name: 'category_2',
           options: [category2Group1Filter1, category2Group1Filter2],
           order: 0,
@@ -706,11 +720,13 @@ export const testTableWithMergedCellsAndMissingData: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter1, category1Group2Filter1],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Group1Filter1, category2Group1Filter2],
         order: 0,
@@ -780,11 +796,13 @@ export const testTableWithMergedCellsAndMissingData2: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Group1Filter1, category2Group1Filter2],
         order: 2,
       },
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [
           category1Group1Filter1,
@@ -794,6 +812,7 @@ export const testTableWithMergedCellsAndMissingData2: FullTable = {
         order: 5,
       },
       Category3: {
+        legend: 'Category 3',
         name: 'category_3',
         options: [category3Group1Filter1, category3Group1Filter2],
         order: 6,
