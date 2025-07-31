@@ -119,12 +119,14 @@ const testSubjectMeta1: FullTable['subjectMeta'] = {
   ...testInitialTableSubjectMeta,
   filters: {
     Category1: {
+      legend: 'Category 1',
       name: 'category_1',
       options: [category1GroupTotalFilter1],
       order: 0,
     },
     Category2: {
-      name: 'category_1',
+      legend: 'Category 2',
+      name: 'category_2',
       options: [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
       order: 1,
     },
@@ -289,11 +291,13 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Group1Filter2, category1Group1Filter3],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
         order: 1,

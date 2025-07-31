@@ -62,6 +62,7 @@ describe('getDataSetCategoryConfigs', () => {
     boundaryLevels: [],
     filters: {
       Filter1: {
+        legend: 'Filter 1',
         name: 'filter-1',
         options: [
           testFilterGroup1Item1,

@@ -34,6 +34,7 @@ export const testTable: FullTable = {
   subjectMeta: {
     filters: {
       Date: {
+        legend: 'Date',
         name: 'date',
         options: [
           new CategoryFilter({
