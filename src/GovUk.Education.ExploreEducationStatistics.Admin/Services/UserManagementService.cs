@@ -200,7 +200,7 @@ public class UserManagementService(
                                 .Include(uri => uri.ReleaseVersion)
                                 .ThenInclude(rv => rv.Release)
                                 .ThenInclude(r => r.Publication)
-                                .Where(uri => uri.Email.ToLower().Equals(invite.Email.ToLower()))
+                                .Where(uri => uri.Email == invite.Email)
                                 .ToListAsync();
 
                             var userReleaseRoles = userReleaseInvites
@@ -217,7 +217,7 @@ public class UserManagementService(
                             var userPublicationInvites = await contentDbContext
                                 .UserPublicationInvites
                                 .Include(upi => upi.Publication)
-                                .Where(upi => upi.Email.ToLower().Equals(invite.Email.ToLower()))
+                                .Where(upi => upi.Email == invite.Email)
                                 .ToListAsync();
 
                             var userPublicationRoles = userPublicationInvites
@@ -306,13 +306,13 @@ public class UserManagementService(
                     .Include(uri => uri.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
                     .ThenInclude(r => r.Publication)
-                    .Where(uri => uri.Email.ToLower() == sanitisedEmail)
+                    .Where(uri => uri.Email == sanitisedEmail)
                     .ToListAsync();
 
                 var userPublicationInvites = await contentDbContext
                     .UserPublicationInvites
                     .Include(upi => upi.Publication)
-                    .Where(upi => upi.Email.ToLower() == sanitisedEmail)
+                    .Where(upi => upi.Email == sanitisedEmail)
                     .ToListAsync();
 
                 return emailTemplateService
@@ -367,7 +367,7 @@ public class UserManagementService(
             {
                 var globalInvites = await usersAndRolesDbContext
                     .UserInvites
-                    .Where(invite => invite.Email.ToLower() == email.ToLower())
+                    .Where(invite => invite.Email == email)
                     .ToListAsync();
 
                 await contentDbContext.RequireTransaction(async () =>
@@ -403,14 +403,14 @@ public class UserManagementService(
     {
         return await usersAndRolesDbContext
             .Users
-            .SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+            .SingleOrDefaultAsync(user => user.Email == email);
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
     {
         if (await usersAndRolesDbContext.Users
             .AsQueryable()
-            .AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            .AnyAsync(u => u.Email == email))
         {
             return ValidationActionResult(UserAlreadyExists);
         }
@@ -421,7 +421,7 @@ public class UserManagementService(
     private async Task<Either<ActionResult, UserInvite>> GetPendingUserInvite(string email)
     {
         var invite = await usersAndRolesDbContext.UserInvites
-            .FirstOrDefaultAsync(i => i.Email.ToLower() == email.ToLower());
+            .FirstOrDefaultAsync(i => i.Email == email);
 
         return invite is null
             ? ValidationActionResult(InviteNotFound)

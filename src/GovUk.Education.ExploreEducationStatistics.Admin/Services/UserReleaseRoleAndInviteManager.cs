@@ -102,7 +102,7 @@ public class UserReleaseRoleAndInviteManager(
         }
 
         var inviteKeys = userReleaseRoles
-            .Select(upr => (upr.ReleaseVersionId, upr.Role, Email: upr.User.Email.ToLower()))
+            .Select(upr => (upr.ReleaseVersionId, upr.Role, upr.User.Email))
             .ToHashSet();
 
         var invites = await ContentDbContext.UserReleaseInvites
@@ -110,7 +110,7 @@ public class UserReleaseRoleAndInviteManager(
                 new ValueTuple<Guid, ReleaseRole, string>(
                     upi.ReleaseVersionId,
                     upi.Role,
-                    upi.Email.ToLower()
+                    upi.Email
                 )))
             .ToListAsync(cancellationToken);
 

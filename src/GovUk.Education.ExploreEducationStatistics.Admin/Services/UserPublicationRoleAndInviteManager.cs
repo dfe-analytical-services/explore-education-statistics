@@ -82,7 +82,7 @@ public class UserPublicationRoleAndInviteManager(
         }
 
         var inviteKeys = userPublicationRoles
-            .Select(upr => (upr.PublicationId, upr.Role, Email: upr.User.Email.ToLower()))
+            .Select(upr => (upr.PublicationId, upr.Role, upr.User.Email))
             .ToHashSet();
 
         var invites = await ContentDbContext.UserPublicationInvites
@@ -90,7 +90,7 @@ public class UserPublicationRoleAndInviteManager(
                 new ValueTuple<Guid, PublicationRole, string>(
                     upi.PublicationId,
                     upi.Role,
-                    upi.Email.ToLower()
+                    upi.Email
                 )))
             .ToListAsync(cancellationToken);
 
