@@ -12,6 +12,7 @@ import {
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
+  MapCategoricalDataConfig,
   MapConfig,
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
@@ -70,6 +71,10 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_MAP_DATA_GROUPINGS';
       payload: MapDataGroupingConfig;
+    }
+  | {
+      type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG';
+      payload: MapCategoricalDataConfig[];
     }
   | {
       type: 'UPDATE_CHART_AXIS';
@@ -226,6 +231,7 @@ function getInitialMapState({
       meta,
       options,
     }),
+    categoricalDataConfig: map?.categoricalDataConfig,
   };
 }
 
@@ -250,6 +256,7 @@ function getMapDataSetConfigs({
       groupBy: 'locations',
     },
     data,
+    includeNonNumericData: true,
     meta,
   });
 
@@ -392,6 +399,15 @@ export function chartBuilderReducer(
 
         break;
       }
+      case 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG': {
+        if (!draft.map) {
+          throw new Error('Map config has not been initialised');
+        }
+
+        draft.map.categoricalDataConfig = action.payload;
+
+        break;
+      }
       case 'UPDATE_CHART_OPTIONS': {
         draft.options = {
           ...defaultOptions,
@@ -416,6 +432,7 @@ export function chartBuilderReducer(
             meta,
             options: draft.options,
           });
+          draft.map.categoricalDataConfig = [];
         }
 
         break;
@@ -496,6 +513,16 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
     [dispatch],
   );
 
+  const updateMapCategoricalDataConfig = useCallback(
+    (categoricalDataConfig: MapCategoricalDataConfig[]) => {
+      dispatch({
+        type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG',
+        payload: categoricalDataConfig,
+      });
+    },
+    [dispatch],
+  );
+
   const updateChartAxis = useCallback(
     (axisConfiguration: AxisConfiguration) => {
       dispatch({
@@ -519,6 +546,7 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartLegend,
       updateMapBoundaryLevels,
       updateMapDataGroupings,
+      updateMapCategoricalDataConfig,
       updateChartOptions,
       updateChartAxis,
       resetState,
@@ -529,6 +557,7 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartLegend,
       updateMapBoundaryLevels,
       updateMapDataGroupings,
+      updateMapCategoricalDataConfig,
       updateChartOptions,
       updateChartAxis,
       resetState,

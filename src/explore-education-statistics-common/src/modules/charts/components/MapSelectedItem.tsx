@@ -7,7 +7,7 @@ interface Props {
   heading?: string;
   title: string;
   unit: string;
-  value?: number;
+  value?: number | string;
 }
 
 export default function MapSelectedItem({

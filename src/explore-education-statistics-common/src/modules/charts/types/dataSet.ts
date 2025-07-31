@@ -37,7 +37,7 @@ export interface DataSetCategory {
   filter: Filter;
   dataSets: Dictionary<{
     dataSet: DataSetConfiguration;
-    value: number;
+    value: number | string;
   }>;
 }
 

@@ -15,6 +15,15 @@ export const colours: string[] = [
   '#BFBFBF',
 ];
 
+export const mapCategoricalDataColours: string[] = [
+  '#12436D',
+  '#28A197',
+  '#801650',
+  '#F46A25',
+  '#3D3D3D',
+  '#A285D1',
+];
+
 export const legendPositions: LegendPosition[] = [
   'inline',
   'bottom',

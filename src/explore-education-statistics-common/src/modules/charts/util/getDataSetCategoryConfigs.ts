@@ -82,7 +82,7 @@ function toLegendConfig({
 }: {
   dataSetValue: {
     dataSet: DataSetConfiguration;
-    value: number;
+    value: number | string;
   };
   dataSetKey: string;
   filter?: Filter;

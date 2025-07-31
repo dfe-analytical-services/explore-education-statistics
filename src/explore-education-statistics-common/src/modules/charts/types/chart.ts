@@ -110,7 +110,18 @@ export interface MapDataSetConfig {
   boundaryLevel?: number;
 }
 
+export interface MapCategoricalDataConfig {
+  value: string;
+  colour: string;
+}
+
+export interface MapLegendItem {
+  value: string;
+  colour: string;
+}
+
 export interface MapConfig {
+  categoricalDataConfig?: MapCategoricalDataConfig[];
   dataSetConfigs: MapDataSetConfig[];
 }
 

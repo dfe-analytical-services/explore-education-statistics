@@ -8,13 +8,14 @@ import createMapDataSetCategories, {
   MapDataSetCategory,
 } from '@common/modules/charts/components/utils/createMapDataSetCategories';
 import generateFeaturesAndDataGroups from '@common/modules/charts/components/utils/generateFeaturesAndDataGroups';
-import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
 import {
   AxisConfiguration,
   ChartDefinition,
   ChartProps,
   DataGroupingType,
+  MapCategoricalDataConfig,
   MapConfig,
+  MapLegendItem,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -35,7 +36,7 @@ import generateDataSetKey from '../util/generateDataSetKey';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
-  data: number;
+  data: number | string;
   dataSets: DataSetCategory['dataSets'];
   layer?: Layer & Path & Polyline;
 }
@@ -62,6 +63,9 @@ export interface MapBlockProps extends ChartProps {
   position?: { lat: number; lng: number };
   boundaryLevel: number;
   onBoundaryLevelChange: (boundaryLevel: number) => Promise<void>;
+  onChangeCategoricalDataConfig?: (
+    categoricalDataConfig: MapCategoricalDataConfig[],
+  ) => Promise<void>;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -125,6 +129,7 @@ export default function MapBlock({
   title,
   boundaryLevel,
   onBoundaryLevelChange,
+  onChangeCategoricalDataConfig,
 }: MapBlockProps) {
   const [isBoundaryLevelChanging, toggleBoundaryLevelChanging] =
     useToggle(false);
@@ -190,9 +195,11 @@ export default function MapBlock({
 
   const [features, setFeatures] = useState<MapFeatureCollection>();
 
-  const [legendDataGroups, setLegendDataGroups] = useState<LegendDataGroup[]>(
-    [],
-  );
+  const [legendItems, setLegendItems] = useState<MapLegendItem[]>([]);
+
+  const [categoricalDataGroups, setCategoricalDataGroups] = useState<
+    MapCategoricalDataConfig[] | undefined
+  >([]);
 
   const selectedDataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
 
@@ -202,21 +209,33 @@ export default function MapBlock({
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
     if (dataSetCategories.length && selectedDataSetConfig) {
-      const { features: newFeatures, dataGroups: newDataGroups } =
-        generateFeaturesAndDataGroups({
-          selectedDataSetConfig,
-          dataSetCategories,
-        });
+      const {
+        features: newFeatures,
+        legendItems: newLegendItems,
+        categoricalDataGroups: newCategoricalDataGroups,
+      } = generateFeaturesAndDataGroups({
+        categoricalDataConfig: map?.categoricalDataConfig,
+        selectedDataSetConfig,
+        dataSetCategories,
+      });
 
       setFeatures(newFeatures);
-      setLegendDataGroups(newDataGroups);
+      setLegendItems(newLegendItems);
+      setCategoricalDataGroups(newCategoricalDataGroups);
     }
   }, [
     dataSetCategories,
     dataSetCategoryConfigs,
+    map?.categoricalDataConfig,
     selectedDataSetConfig,
     selectedDataSetKey,
   ]);
+
+  useEffect(() => {
+    if (categoricalDataGroups?.length) {
+      onChangeCategoricalDataConfig?.(categoricalDataGroups);
+    }
+  }, [categoricalDataGroups, onChangeCategoricalDataConfig]);
 
   const handleLocationChange = useCallback(
     (value: string) => {
@@ -328,7 +347,7 @@ export default function MapBlock({
           <div className="govuk-grid-column-one-third">
             <MapLegend
               heading={selectedDataSetConfig?.config?.label}
-              legendDataGroups={legendDataGroups}
+              legendItems={legendItems}
             />
             <MapSelectedItem
               decimalPlaces={
