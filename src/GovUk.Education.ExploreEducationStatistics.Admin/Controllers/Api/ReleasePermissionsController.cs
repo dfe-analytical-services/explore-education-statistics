@@ -56,7 +56,7 @@ public class ReleasePermissionsController : ControllerBase
     {
         return await _releasePermissionService
             .UpdateReleaseContributors(releaseVersionId, request.UserIds)
-            .HandleFailuresOr(result => new AcceptedResult());
+            .HandleFailuresOr(_ => new AcceptedResult());
     }
 
     [HttpDelete("publications/{publicationId:guid}/users/{userId:guid}/contributors")]
@@ -65,6 +65,6 @@ public class ReleasePermissionsController : ControllerBase
     {
         return await _releasePermissionService
             .RemoveAllUserContributorPermissionsForPublication(publicationId, userId)
-            .HandleFailuresOr(result => new AcceptedResult());
+            .HandleFailuresOr(_ => new AcceptedResult());
     }
 }

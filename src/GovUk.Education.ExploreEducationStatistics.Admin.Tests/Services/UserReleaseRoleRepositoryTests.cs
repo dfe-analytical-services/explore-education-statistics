@@ -407,7 +407,7 @@ public class UserReleaseRoleRepositoryTests
                 .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
 
             Assert.NotNull(updatedReleaseRole);
-            Assert.Equal(userReleaseRole.ReleaseVersionId, updatedReleaseRole!.ReleaseVersionId);
+            Assert.Equal(userReleaseRole.ReleaseVersionId, updatedReleaseRole.ReleaseVersionId);
             Assert.Equal(userReleaseRole.Role, updatedReleaseRole.Role);
             updatedReleaseRole.Deleted.AssertUtcNow();
             Assert.Equal(deletedById, updatedReleaseRole.DeletedById);
@@ -871,7 +871,7 @@ public class UserReleaseRoleRepositoryTests
                 Contributor);
 
             Assert.NotNull(result);
-            Assert.Equal(userReleaseRole.UserId, result!.UserId);
+            Assert.Equal(userReleaseRole.UserId, result.UserId);
             Assert.Equal(userReleaseRole.ReleaseVersionId, result.ReleaseVersionId);
             Assert.Equal(userReleaseRole.Role, result.Role);
         }
