@@ -45,7 +45,7 @@ public class DataImport
 
     public Guid? ZipFileId { get; set; }
 
-    public int? TotalRows { get; set; }
+    public int? TotalRows { get; set; } // Must be optional for failed imports
 
     /// <summary>
     /// Note that this means "importable row count" rather than indicating the actual number of rows
