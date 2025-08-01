@@ -18,6 +18,7 @@ interface Props {
   onConfirmReplacement?: () => void;
   onDeleteUpload: (deletedUploadId: string) => void;
   onDataSetImport: (dataSetImportIds: string[]) => void;
+  onReplacementStatusChange: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTable({
@@ -31,6 +32,7 @@ export default function DataFilesReplacementTable({
   onConfirmReplacement,
   onDeleteUpload,
   onDataSetImport,
+  onReplacementStatusChange,
 }: Props) {
   return (
     <table className={styles.table} data-testid={testId}>
@@ -49,16 +51,17 @@ export default function DataFilesReplacementTable({
 
       <tbody>
         {dataFiles.map(dataFile => (
-          <DataFileReplacementTableRow
+          <DataFileReplacementTableRow // These are rows for data sets that have passed the screener and been/being imported
             dataFile={dataFile}
             key={dataFile.title}
             publicationId={publicationId}
             releaseVersionId={releaseVersionId}
             onConfirmAction={onConfirmReplacement}
+            onReplacementStatusChange={onReplacementStatusChange}
           />
         ))}
         {dataSetUploads.map(upload => (
-          <DataFilesTableUploadRow
+          <DataFilesTableUploadRow // These are rows for data sets that have been put through the screener
             canUpdateRelease={canUpdateRelease}
             dataSetUpload={upload}
             key={upload.id}

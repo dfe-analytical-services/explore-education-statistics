@@ -16,6 +16,7 @@ describe('generateTableTitle', () => {
     boundaryLevels: [],
     filters: {
       Characteristic: {
+        legend: 'Characteristic',
         name: 'characteristic',
         options: [
           new CategoryFilter({
@@ -59,6 +60,7 @@ describe('generateTableTitle', () => {
       filters: {
         ...testMeta.filters,
         Characteristic: {
+          legend: 'Characteristic',
           name: 'characteristic',
           options: [
             new CategoryFilter({
@@ -71,6 +73,7 @@ describe('generateTableTitle', () => {
           order: 0,
         },
         'School Type': {
+          legend: 'School Type',
           name: 'school_type',
           options: [
             new CategoryFilter({
@@ -118,6 +121,7 @@ describe('generateTableTitle', () => {
           order: 0,
         },
         'School Type': {
+          legend: 'School Type',
           name: 'school_type',
           options: [
             new CategoryFilter({
@@ -171,6 +175,7 @@ describe('generateTableTitle', () => {
           order: 0,
         },
         'School Type': {
+          legend: 'School Type',
           name: 'school_type',
           options: [
             new CategoryFilter({
@@ -236,6 +241,7 @@ describe('generateTableTitle', () => {
           order: 0,
         },
         'School Type': {
+          legend: 'School Type',
           name: 'school_type',
           options: [
             new CategoryFilter({
@@ -296,6 +302,7 @@ describe('generateTableTitle', () => {
           order: 0,
         },
         'School Type': {
+          legend: 'School type',
           name: 'school_type',
           options: [
             new CategoryFilter({

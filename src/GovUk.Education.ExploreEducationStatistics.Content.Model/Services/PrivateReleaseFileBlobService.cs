@@ -116,7 +116,7 @@ public class PrivateReleaseFileBlobService : IReleaseFileBlobService
         return _privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseFiles,
             path: releaseFile.Path(),
-            stream: stream,
+            sourceStream: stream,
             contentType: contentType
         );
     }

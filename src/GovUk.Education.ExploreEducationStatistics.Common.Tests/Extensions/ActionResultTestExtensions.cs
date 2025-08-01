@@ -10,166 +10,168 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+
+public static class ActionResultTestUtils
 {
-    public static class ActionResultTestUtils
+    public static T AssertOkObjectResult<T>(this IActionResult result, T? expectedValue = null) where T : class
     {
-        public static T AssertOkObjectResult<T>(this IActionResult result, T? expectedValue = null) where T : class
+        var okObjectResult = Assert.IsAssignableFrom<OkObjectResult>(result);
+        var value = Assert.IsAssignableFrom<T>(okObjectResult.Value);
+
+        Assert.NotNull(value);
+
+        if (expectedValue != null)
         {
-            var okObjectResult = Assert.IsAssignableFrom<OkObjectResult>(result);
-            var value = Assert.IsAssignableFrom<T>(okObjectResult.Value);
-
-            Assert.NotNull(value);
-
-            if (expectedValue != null)
-            {
-                Assert.Equal(expectedValue, value);
-            }
-
-            return value;
+            Assert.Equal(expectedValue, value);
         }
 
-        public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null) where T : class
+        return value;
+    }
+
+    public static void AssertOkResult(this ActionResult result) => Assert.IsType<OkResult>(result);
+    
+
+    public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null) where T : class
+    {
+        Assert.IsAssignableFrom<ActionResult<T>>(result);
+        var value = Assert.IsAssignableFrom<T>(result.Value);
+
+        if (expectedValue != null)
         {
-            Assert.IsAssignableFrom<ActionResult<T>>(result);
-            var value = Assert.IsAssignableFrom<T>(result.Value);
-
-            if (expectedValue != null)
-            {
-                Assert.Equal(expectedValue, value);
-            }
-
-            return value;
+            Assert.Equal(expectedValue, value);
         }
 
-        public static T AssertObjectResult<T>(
-            this IActionResult result,
-            HttpStatusCode expectedStatusCode,
-            T? expectedValue = null) where T : class
+        return value;
+    }
+
+    public static T AssertObjectResult<T>(
+        this IActionResult result,
+        HttpStatusCode expectedStatusCode,
+        T? expectedValue = null) where T : class
+    {
+        var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
+        Assert.Equal((int)expectedStatusCode, objectResult.StatusCode);
+        var value = Assert.IsAssignableFrom<T>(objectResult.Value);
+
+        if (expectedValue != null)
         {
-            var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
-            Assert.Equal((int)expectedStatusCode, objectResult.StatusCode);
-            var value = Assert.IsAssignableFrom<T>(objectResult.Value);
-
-            if (expectedValue != null)
-            {
-                Assert.Equal(expectedValue, value);
-            }
-
-            return value;
+            Assert.Equal(expectedValue, value);
         }
 
-        public static void AssertNotFoundResult<T>(this ActionResult<T> result) where T : class
-        {
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-        }
+        return value;
+    }
 
-        public static void AssertNotFoundResult(this IActionResult result)
-        {
-            Assert.IsAssignableFrom<NotFoundResult>(result);
-        }
+    public static void AssertNotFoundResult<T>(this ActionResult<T> result) where T : class
+    {
+        Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+    }
 
-        public static void AssertNoContent(this IActionResult result)
-        {
-            Assert.IsAssignableFrom<NoContentResult>(result);
-        }
+    public static void AssertNotFoundResult(this IActionResult result)
+    {
+        Assert.IsAssignableFrom<NotFoundResult>(result);
+    }
 
-        public static void AssertForbidden(this IActionResult result)
-        {
-            Assert.IsAssignableFrom<ForbidResult>(result);
-        }
+    public static void AssertNoContent(this IActionResult result)
+    {
+        Assert.IsAssignableFrom<NoContentResult>(result);
+    }
 
-        public static void AssertForbidden<T>(this ActionResult<T> result)
-        {
-            Assert.IsAssignableFrom<ForbidResult>(result);
-        }
+    public static void AssertForbidden(this IActionResult result)
+    {
+        Assert.IsAssignableFrom<ForbidResult>(result);
+    }
 
-        public static void AssertAccepted(this IActionResult result)
-        {
-            Assert.IsAssignableFrom<AcceptedResult>(result);
-        }
+    public static void AssertForbidden<T>(this ActionResult<T> result)
+    {
+        Assert.IsAssignableFrom<ForbidResult>(result);
+    }
 
-        public static void AssertInternalServerError(this IActionResult result)
-        {
-            var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
+    public static void AssertAccepted(this IActionResult result)
+    {
+        Assert.IsAssignableFrom<AcceptedResult>(result);
+    }
 
-            Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
-        }
+    public static void AssertInternalServerError(this IActionResult result)
+    {
+        var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
 
-        public static void AssertValidationProblem<T>(this ActionResult<T> result, params Enum[] expectedErrorCodes)
-        {
-            Assert.NotNull(result.Result);
-            AssertBadRequestWithValidationErrors(result.Result, expectedErrorCodes);
-        }
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+    }
 
-        public static void AssertValidationProblem(this IActionResult result, params Enum[] expectedErrorCodes)
-        {
-            AssertBadRequestWithValidationErrors(result, expectedErrorCodes);
-        }
+    public static void AssertValidationProblem<T>(this ActionResult<T> result, params Enum[] expectedErrorCodes)
+    {
+        Assert.NotNull(result.Result);
+        AssertBadRequestWithValidationErrors(result.Result, expectedErrorCodes);
+    }
 
-        public static void AssertValidationProblem(this IActionResult result, string expectedError)
-        {
-            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
-            var error = Assert.IsAssignableFrom<string>(badRequest.Value);
-            Assert.Equal(expectedError, error);
-        }
+    public static void AssertValidationProblem(this IActionResult result, params Enum[] expectedErrorCodes)
+    {
+        AssertBadRequestWithValidationErrors(result, expectedErrorCodes);
+    }
 
-        public static void AssertNotModified<T>(this ActionResult<T> result)
-        {
-            var statusCodeResult = Assert.IsType<StatusCodeResult>(result.Result);
-            Assert.Equal(StatusCodes.Status304NotModified, statusCodeResult.StatusCode);
-        }
+    public static void AssertValidationProblem(this IActionResult result, string expectedError)
+    {
+        var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+        var error = Assert.IsAssignableFrom<string>(badRequest.Value);
+        Assert.Equal(expectedError, error);
+    }
 
-        public static ValidationProblemViewModel AssertBadRequestWithValidationProblem(this IActionResult result)
-        {
-            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
-            var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
-            return validationProblem;
-        }
+    public static void AssertNotModified<T>(this ActionResult<T> result)
+    {
+        var statusCodeResult = Assert.IsType<StatusCodeResult>(result.Result);
+        Assert.Equal(StatusCodes.Status304NotModified, statusCodeResult.StatusCode);
+    }
 
-        public static void AssertBadRequestWithValidationErrors(this IActionResult result,
-            List<ErrorViewModel> expectedErrors)
-        {
-            var validationProblem = result.AssertBadRequestWithValidationProblem();
+    public static ValidationProblemViewModel AssertBadRequestWithValidationProblem(this IActionResult result)
+    {
+        var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+        var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
+        return validationProblem;
+    }
 
-            Assert.NotNull(validationProblem);
+    public static void AssertBadRequestWithValidationErrors(this IActionResult result,
+        List<ErrorViewModel> expectedErrors)
+    {
+        var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasErrors(expectedErrors);
-        }
+        Assert.NotNull(validationProblem);
 
-        public static ValidationProblemViewModel AssertNotFoundWithValidationProblem<TEntity, TId>(
-            this IActionResult result,
-            TId expectedId,
-            string expectedPath)
-        {
-            var notFound = Assert.IsAssignableFrom<NotFoundObjectResult>(result);
-            var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(notFound.Value);
+        validationProblem.AssertHasErrors(expectedErrors);
+    }
 
-            validationProblem.AssertHasError(
-                expectedPath: expectedPath,
-                expectedCode: "NotFound",
-                expectedMessage: $"{typeof(TEntity).Name} not found",
-                expectedDetail: new InvalidErrorDetail<TId>(expectedId));
+    public static ValidationProblemViewModel AssertNotFoundWithValidationProblem<TEntity, TId>(
+        this IActionResult result,
+        TId expectedId,
+        string expectedPath)
+    {
+        var notFound = Assert.IsAssignableFrom<NotFoundObjectResult>(result);
+        var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(notFound.Value);
 
-            return validationProblem;
-        }
+        validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: "NotFound",
+            expectedMessage: $"{typeof(TEntity).Name} not found",
+            expectedDetail: new InvalidErrorDetail<TId>(expectedId));
 
-        private static void AssertBadRequestWithValidationErrors(this IActionResult result,
-            params Enum[] expectedErrorCodes)
-        {
-            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
-            var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
+        return validationProblem;
+    }
 
-            Assert.NotNull(validationProblem);
+    private static void AssertBadRequestWithValidationErrors(this IActionResult result,
+        params Enum[] expectedErrorCodes)
+    {
+        var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+        var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
 
-            var errorCodes = validationProblem.Errors
-                .Select(error => error.Code)
-                .ToList();
+        Assert.NotNull(validationProblem);
 
-            Assert.Equal(expectedErrorCodes.Length, errorCodes.Count);
+        var errorCodes = validationProblem.Errors
+            .Select(error => error.Code)
+            .ToList();
 
-            expectedErrorCodes.ForEach(errorCode =>
-                Assert.Contains(errorCode.ToString(), errorCodes));
-        }
+        Assert.Equal(expectedErrorCodes.Length, errorCodes.Count);
+
+        expectedErrorCodes.ForEach(errorCode =>
+            Assert.Contains(errorCode.ToString(), errorCodes));
     }
 }

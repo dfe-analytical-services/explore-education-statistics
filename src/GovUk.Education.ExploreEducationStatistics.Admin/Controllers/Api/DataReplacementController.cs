@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [Authorize]
 [ApiController]
 public class DataReplacementController(
-    IReplacementService replacementService,
+    IReplacementPlanService replacementPlanService,
     IReplacementBatchService replacementBatchService)
     : ControllerBase
 {
@@ -24,7 +24,7 @@ public class DataReplacementController(
         Guid originalFileId,
         CancellationToken cancellationToken = default)
     {
-        return await replacementService.GetReplacementPlan(
+        return await replacementPlanService.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
                 originalFileId: originalFileId,
                 cancellationToken: cancellationToken

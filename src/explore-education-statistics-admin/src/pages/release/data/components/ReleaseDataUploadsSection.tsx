@@ -18,6 +18,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import dataReplacementService from '@admin/services/dataReplacementService';
 
 interface Props {
   publicationId: string;
@@ -38,12 +39,18 @@ export default function ReleaseDataUploadsSection({
   );
   const [isReordering, toggleReordering] = useToggle(false);
 
+  // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
+  // warnings. At this stage, the data set will be returned from `listUploads`. If the file has no errors from the
+  // screener tests and the user has pressed a button to continue the import, the data set then starts being imported
+  // properly, and will then be returned from `list` instead.
+  //
+  // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
+  // sets that have moved beyond the screener and are now being imported by the Data.Processor
   const {
     data: initialDataFiles,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
-
   const {
     data: initialDataSetUploads,
     isLoading: isLoadingUploads,
@@ -69,52 +76,72 @@ export default function ReleaseDataUploadsSection({
     onDataFilesChange?.(allDataFiles);
   }, [allDataFiles, onDataFilesChange]);
 
-  const replacedDataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => dataFile.replacedBy),
+  const dataFilesExcludingReplacements = useMemo(
+    () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
-  // TODO - EES-6244 bulk confirmation of replacements
-  //  const validReplacedDataFiles = replacedDataFiles.filter(
-  //   file => file.status === 'COMPLETE', // this checks the original file status, not the replacement!
-  // );
-  // const allowBulkConfirm = validReplacedDataFiles.length > 1;
-
-  const dataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
+  const inProgressReplacementDataFiles = useMemo(
+    () => allDataFiles.filter(dataFile => dataFile.replacedByDataFile),
     [allDataFiles],
+  );
+
+  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
+    originalFile =>
+      originalFile.replacedByDataFile?.status === 'COMPLETE' &&
+      originalFile.replacedByDataFile?.hasValidReplacementPlan,
   );
 
   const handleStatusChange = useCallback(
-    async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
-      // EES-5732 UI tests related to data replacement sometimes fail
-      // because of a permission call for the replaced file being called,
-      // probably caused by the speed of the tests.
-      // This prevents this happening.
-      if (status === 'NOT_FOUND') {
-        return;
+    async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
+      try {
+        const permissions = await permissionService.getDataFilePermissions(
+          releaseVersionId,
+          dataFile.id,
+        );
+
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles.map(file =>
+            file.fileName !== dataFile.fileName
+              ? file
+              : {
+                  ...dataFile,
+                  rows: importStatus.totalRows,
+                  status: importStatus.status,
+                  permissions,
+                },
+          ),
+        );
+      } catch {
+        refetchDataFiles();
       }
-
-      const permissions = await permissionService.getDataFilePermissions(
-        releaseVersionId,
-        dataFile.id,
-      );
-
-      setAllDataFiles(currentDataFiles =>
-        currentDataFiles.map(file =>
-          file.fileName !== dataFile.fileName
-            ? file
-            : {
-                ...dataFile,
-                rows: totalRows,
-                status,
-                permissions,
-                replacedBy: file.replacedBy,
-              },
-        ),
-      );
     },
-    [releaseVersionId],
+    [releaseVersionId, setAllDataFiles, refetchDataFiles],
+  );
+
+  const handleReplacementStatusChange = useCallback(
+    async (updatedDataFile: DataFile) => {
+      try {
+        const permissions = await permissionService.getDataFilePermissions(
+          releaseVersionId,
+          updatedDataFile.id,
+        );
+
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles.map(file =>
+            file.fileName !== updatedDataFile.fileName
+              ? file
+              : {
+                  ...updatedDataFile,
+                  permissions,
+                },
+          ),
+        );
+      } catch {
+        refetchDataFiles();
+      }
+    },
+    [releaseVersionId, setAllDataFiles, refetchDataFiles],
   );
 
   const handleDataSetImport = useCallback(
@@ -207,8 +234,14 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, toggleReordering],
   );
 
-  // TODO - EES-6244 bulk confirmation of replacements
-  // const handleConfirmAllReplacements = () => {};
+  const handleConfirmAllReplacements = async () => {
+    await dataReplacementService.replaceData(
+      releaseVersionId,
+      validReplacementDataFiles.map(file => file.id),
+    );
+
+    await refetchDataFiles();
+  };
 
   return (
     <>
@@ -261,12 +294,11 @@ export default function ReleaseDataUploadsSection({
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {/* TODO - EES-6244 bulk confirmation of replacements */}
-                {/* {allowBulkConfirm && (
+                {validReplacementDataFiles.length > 1 && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
                   </Button>
-                )} */}
+                )}
               </div>
             )}
 
@@ -278,12 +310,12 @@ export default function ReleaseDataUploadsSection({
               />
             ) : (
               <>
-                {(replacedDataFiles.length > 0 ||
+                {(inProgressReplacementDataFiles.length > 0 ||
                   uploadsWithReplacements.length > 0) && (
                   <DataFilesReplacementTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data file replacements"
-                    dataFiles={replacedDataFiles}
+                    dataFiles={inProgressReplacementDataFiles}
                     dataSetUploads={uploadsWithReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
@@ -291,15 +323,16 @@ export default function ReleaseDataUploadsSection({
                     onConfirmReplacement={refetchDataFiles}
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
+                    onReplacementStatusChange={handleReplacementStatusChange}
                   />
                 )}
 
-                {(dataFiles.length > 0 ||
+                {(dataFilesExcludingReplacements.length > 0 ||
                   uploadsWithoutReplacements.length > 0) && (
                   <DataFilesTable
                     canUpdateRelease={canUpdateRelease}
                     caption="Data files"
-                    dataFiles={dataFiles}
+                    dataFiles={dataFilesExcludingReplacements}
                     dataSetUploads={uploadsWithoutReplacements}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}

@@ -204,6 +204,7 @@ var resourceNames = {
       storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
       psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
     }
+    logAnalyticsWorkspace: '${commonResourcePrefix}-log'
   }
   sharedResources: {
     appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'

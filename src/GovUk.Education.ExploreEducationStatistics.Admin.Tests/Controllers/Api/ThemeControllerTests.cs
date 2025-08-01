@@ -6,50 +6,49 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
+
+public class ThemeControllerTests
 {
-    public class ThemeControllerTests
+    [Fact]
+    public async Task CreateTheme_Returns_Ok()
     {
-        [Fact]
-        public async Task CreateTheme_Returns_Ok()
+        var request = new ThemeSaveViewModel
         {
-            var request = new ThemeSaveViewModel
-            {
-                Title = "Test theme"
-            };
+            Title = "Test theme"
+        };
 
-            var viewModel = new ThemeViewModel
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var themeService = new Mock<IThemeService>();
-            themeService.Setup(s => s.CreateTheme(request)).ReturnsAsync(viewModel);
-
-            var controller = new ThemeController(themeService.Object);
-
-            var result = await controller.CreateTheme(request);
-            Assert.Equal(viewModel, result.Value);
-        }
-
-        [Fact]
-        public async Task GetThemes_Returns_Ok()
+        var viewModel = new ThemeViewModel
         {
-            var themes = new List<ThemeViewModel>
+            Id = Guid.NewGuid()
+        };
+
+        var themeService = new Mock<IThemeService>();
+        themeService.Setup(s => s.CreateTheme(request)).ReturnsAsync(viewModel);
+
+        var controller = new ThemeController(themeService.Object);
+
+        var result = await controller.CreateTheme(request);
+        Assert.Equal(viewModel, result.Value);
+    }
+
+    [Fact]
+    public async Task GetThemes_Returns_Ok()
+    {
+        var themes = new List<ThemeViewModel>
+        {
+            new ThemeViewModel
             {
-                new ThemeViewModel
-                {
-                    Title = "Theme A",
-                }
-            };
+                Title = "Theme A",
+            }
+        };
 
-            var themeService = new Mock<IThemeService>();
-            themeService.Setup(s => s.GetThemes()).ReturnsAsync(themes);
+        var themeService = new Mock<IThemeService>();
+        themeService.Setup(s => s.GetThemes()).ReturnsAsync(themes);
 
-            var controller = new ThemeController(themeService.Object);
+        var controller = new ThemeController(themeService.Object);
 
-            var result = await controller.GetThemes();
-            Assert.Equal(themes, result.Value);
-        }
+        var result = await controller.GetThemes();
+        Assert.Equal(themes, result.Value);
     }
 }

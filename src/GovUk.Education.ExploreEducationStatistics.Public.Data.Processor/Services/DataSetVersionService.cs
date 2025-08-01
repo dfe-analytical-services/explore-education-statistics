@@ -248,7 +248,10 @@ internal class DataSetVersionService(
         Guid releaseVersionId,
         CancellationToken cancellationToken)
     {
-        return await releaseFileRepository.GetByFileType(releaseVersionId, cancellationToken, FileType.Data);
+        return await releaseFileRepository.GetByFileType(
+            releaseVersionId: releaseVersionId,
+            cancellationToken: cancellationToken,
+            types: FileType.Data);
     }
 
     private async Task UnlinkReleaseFilesFromApiDataSets(

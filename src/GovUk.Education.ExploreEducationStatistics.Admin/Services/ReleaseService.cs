@@ -38,6 +38,7 @@ public partial class ReleaseService(
     IRedirectsCacheService redirectsCacheService,
     IAdminEventRaiser adminEventRaiser,
     IGuidGenerator guidGenerator,
+    IOrganisationsValidator organisationsValidator,
     IReleaseSlugValidator releaseSlugValidator) : IReleaseService
 {
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
@@ -48,10 +49,15 @@ public partial class ReleaseService(
             .OnSuccess(userService.CheckCanCreateReleaseForPublication)
             .OnSuccessDo(async _ =>
                 await releaseSlugValidator.ValidateNewSlug(
-                    newReleaseSlug: request.Slug, 
+                    newReleaseSlug: request.Slug,
                     publicationId: request.PublicationId))
-            .OnSuccess(async publication =>
+            .OnSuccessCombineWith(async _ =>
+                await organisationsValidator.ValidateOrganisations(
+                    organisationIds: request.PublishingOrganisations,
+                    path: nameof(ReleaseCreateRequest.PublishingOrganisations).ToLowerFirst()))
+            .OnSuccess(async publicationAndPublishingOrganisations =>
             {
+                var (publication, publishingOrganisations) = publicationAndPublishingOrganisations;
                 var release = new Release
                 {
                     PublicationId = request.PublicationId,
@@ -68,6 +74,7 @@ public partial class ReleaseService(
                     Type = request.Type!.Value,
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     PublicationId = release.PublicationId,
+                    PublishingOrganisations = [.. publishingOrganisations]
                 };
 
                 if (request.TemplateReleaseId.HasValue)

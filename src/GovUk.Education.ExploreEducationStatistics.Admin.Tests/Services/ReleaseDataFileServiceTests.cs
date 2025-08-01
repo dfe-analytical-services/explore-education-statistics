@@ -36,8 +36,8 @@ using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
     public class ReleaseDataFileServiceTests
     {
         private readonly DataFixture _fixture = new();
@@ -1646,6 +1646,141 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ListAll_WithReplacement()
+        {
+            var releaseVersion = new ReleaseVersion();
+            var originalFileId = Guid.NewGuid();
+            var replacementFileId = Guid.NewGuid();
+            var originalReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                Name = "Test subject 1",
+                PublicApiDataSetId = Guid.NewGuid(),
+                PublicApiDataSetVersion = SemVersion.Parse("1.0.1", SemVersionStyles.Any),
+                File = new File
+                {
+                    Id = originalFileId,
+                    Filename = "test-data-1.csv",
+                    ContentLength = 10240,
+                    Type = FileType.Data,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id,
+                    ReplacedById = replacementFileId,
+                }
+            };
+            var originalMetaReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = new File
+                {
+                    Filename = "test-data-1.meta.csv",
+                    Type = Metadata,
+                }
+            };
+            var replacementReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                Name = "Test subject 1",
+                File = new File
+                {
+                    Id = replacementFileId,
+                    Filename = "test-data-2.csv",
+                    ContentLength = 20480,
+                    Type = FileType.Data,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id,
+                    ReplacingId = originalFileId,
+                }
+            };
+            var replacementMetaReleaseFile = new ReleaseFile
+            {
+                ReleaseVersion = releaseVersion,
+                File = new File
+                {
+                    Filename = "test-data-2.meta.csv",
+                    Type = Metadata,
+                }
+            };
+
+            var dataImports = new List<DataImport>
+            {
+                new()
+                {
+                    File = originalReleaseFile.File,
+                    MetaFile = originalMetaReleaseFile.File,
+                    TotalRows = 200,
+                    Status = COMPLETE
+                },
+                new()
+                {
+                    File = replacementReleaseFile.File,
+                    MetaFile = replacementMetaReleaseFile.File,
+                    TotalRows = 400,
+                    Status = STAGE_2
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(
+                    originalReleaseFile,
+                    originalMetaReleaseFile,
+                    replacementReleaseFile,
+                    replacementMetaReleaseFile);
+                contentDbContext.DataImports.AddRange(dataImports);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+                var result = await service.ListAll(releaseVersion.Id);
+
+                Assert.True(result.IsRight);
+
+                var files = result.Right.ToList();
+
+                var dataFileInfo = Assert.Single(files);
+
+                Assert.Equal(originalReleaseFile.File.Id, dataFileInfo.Id);
+                Assert.Equal("Test subject 1", dataFileInfo.Name);
+                Assert.Equal("test-data-1.csv", dataFileInfo.FileName);
+                Assert.Equal("csv", dataFileInfo.Extension);
+                Assert.Equal(originalMetaReleaseFile.File.Id, dataFileInfo.MetaFileId);
+                Assert.Equal("test-data-1.meta.csv", dataFileInfo.MetaFileName);
+                Assert.Equal(_user.Email, dataFileInfo.UserName);
+                Assert.Equal(200, dataFileInfo.Rows);
+                Assert.Equal("10 Kb", dataFileInfo.Size);
+                Assert.Equal(originalReleaseFile.File.Created, dataFileInfo.Created);
+                Assert.Equal(COMPLETE, dataFileInfo.Status);
+                Assert.Equal(originalReleaseFile.PublicApiDataSetId, dataFileInfo.PublicApiDataSetId);
+                Assert.Equal(originalReleaseFile.PublicApiDataSetVersionString, dataFileInfo.PublicApiDataSetVersion);
+                Assert.Equal(replacementFileId, dataFileInfo.ReplacedBy);
+
+                var replacementDataFileInfo = dataFileInfo.ReplacedByDataFile;
+                Assert.NotNull(replacementDataFileInfo);
+
+                Assert.Equal(replacementReleaseFile.File.Id, replacementDataFileInfo.Id);
+                Assert.Equal("Test subject 1", replacementDataFileInfo.Name);
+                Assert.Equal("test-data-2.csv", replacementDataFileInfo.FileName);
+                Assert.Equal("csv", replacementDataFileInfo.Extension);
+                Assert.Equal(replacementMetaReleaseFile.File.Id, replacementDataFileInfo.MetaFileId);
+                Assert.Equal("test-data-2.meta.csv", replacementDataFileInfo.MetaFileName);
+                Assert.Equal(_user.Email, replacementDataFileInfo.UserName);
+                Assert.Equal(400, replacementDataFileInfo.Rows);
+                Assert.Equal("20 Kb", replacementDataFileInfo.Size);
+                Assert.Equal(replacementReleaseFile.File.Created, replacementDataFileInfo.Created);
+                Assert.Equal(STAGE_2, replacementDataFileInfo.Status);
+                Assert.Null(replacementDataFileInfo.PublicApiDataSetId);
+                Assert.Null(replacementDataFileInfo.PublicApiDataSetVersion);
+                Assert.Null(replacementDataFileInfo.ReplacedBy);
+            }
+        }
+
+        [Fact]
         public async Task ListAll_FiltersCorrectly()
         {
             var release1 = new ReleaseVersion();
@@ -2049,6 +2184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService? dataBlockService = null,
             IFootnoteRepository? footnoteRepository = null,
             IDataSetScreenerClient? dataSetScreenerClient = null,
+            IReplacementPlanService? replacementPlanService = null,
             IMapper? mapper = null)
         {
             contentDbContext.Users.Add(_user);
@@ -2068,8 +2204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(Strict),
+                replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),
                 mapper ?? Mock.Of<IMapper>(Strict)
             );
         }
     }
-}

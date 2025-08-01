@@ -1,8 +1,7 @@
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+
+public enum PublishMethod
 {
-    public enum PublishMethod
-    {
-        Scheduled,
-        Immediate
-    }
+    Scheduled,
+    Immediate
 }

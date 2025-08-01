@@ -92,7 +92,7 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Check latest release is correct
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release
 
 Check latest release contains related dashboards section
     user checks there are x accordion sections    1    id:data-accordion

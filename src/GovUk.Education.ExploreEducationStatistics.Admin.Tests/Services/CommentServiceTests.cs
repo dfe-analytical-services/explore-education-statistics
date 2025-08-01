@@ -14,438 +14,437 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class CommentServiceTests
 {
-    public class CommentServiceTests
+    [Fact]
+    public async Task AddComment()
     {
-        [Fact]
-        public async Task AddComment()
+        var releaseVersion = new ReleaseVersion
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Content = ListOf(
-                    new ContentSection
-                    {
-                        Heading = "New section",
-                        Order = 1,
-                        Content = ListOf<ContentBlock>(
-                            new HtmlBlock
+            Content = ListOf(
+                new ContentSection
+                {
+                    Heading = "New section",
+                    Order = 1,
+                    Content = ListOf<ContentBlock>(
+                        new HtmlBlock
+                        {
+                            Created = new DateTime(2001, 1, 1),
+                            Comments = ListOf(new Comment
                             {
-                                Created = new DateTime(2001, 1, 1),
-                                Comments = ListOf(new Comment
-                                {
-                                    Content = "Existing comment"
-                                })
-                            }
-                        )
-                    }
-                )
-            };
+                                Content = "Existing comment"
+                            })
+                        }
+                    )
+                }
+            )
+        };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupCommentService(contentDbContext: contentDbContext);
-
-                var result = await service.AddComment(
-                    releaseVersion.Id,
-                    releaseVersion.Content[0].Id,
-                    releaseVersion.Content[0].Content[0].Id,
-                    new CommentSaveRequest
-                    {
-                        Content = "New comment"
-                    });
-
-                var viewModel = result.AssertRight();
-                Assert.Equal("New comment", viewModel.Content);
-                Assert.Null(viewModel.Resolved);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Equal(2, comments.Count);
-                Assert.Equal("Existing comment", comments[0].Content);
-                Assert.Equal("New comment", comments[1].Content);
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task AddComment_NoRelease()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupCommentService(contentDbContext: contentDbContext);
+            var service = SetupCommentService(contentDbContext: contentDbContext);
 
-                var result = await service.AddComment(
-                    releaseVersionId: Guid.NewGuid(),
-                    contentSectionId: Guid.NewGuid(),
-                    contentBlockId: Guid.NewGuid(),
-                    new CommentSaveRequest
-                    {
-                        Content = "New comment"
-                    });
+            var result = await service.AddComment(
+                releaseVersion.Id,
+                releaseVersion.Content[0].Id,
+                releaseVersion.Content[0].Content[0].Id,
+                new CommentSaveRequest
+                {
+                    Content = "New comment"
+                });
 
-                result.AssertNotFound();
-            }
+            var viewModel = result.AssertRight();
+            Assert.Equal("New comment", viewModel.Content);
+            Assert.Null(viewModel.Resolved);
         }
 
-        [Fact]
-        public async Task AddComment_NoContentSection()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var releaseVersion = new ReleaseVersion();
+            var comments = contentDbContext.Comment.ToList();
+            Assert.Equal(2, comments.Count);
+            Assert.Equal("Existing comment", comments[0].Content);
+            Assert.Equal("New comment", comments[1].Content);
+        }
+    }
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+    [Fact]
+    public async Task AddComment_NoRelease()
+    {
+        await using (var contentDbContext = InMemoryApplicationDbContext())
+        {
+            var service = SetupCommentService(contentDbContext: contentDbContext);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupCommentService(contentDbContext: contentDbContext);
+            var result = await service.AddComment(
+                releaseVersionId: Guid.NewGuid(),
+                contentSectionId: Guid.NewGuid(),
+                contentBlockId: Guid.NewGuid(),
+                new CommentSaveRequest
+                {
+                    Content = "New comment"
+                });
 
-                var result = await service.AddComment(
-                    releaseVersionId: releaseVersion.Id,
-                    contentSectionId: Guid.NewGuid(),
-                    contentBlockId: Guid.NewGuid(),
-                    new CommentSaveRequest
-                    {
-                        Content = "New comment"
-                    });
+            result.AssertNotFound();
+        }
+    }
 
-                result.AssertNotFound();
-            }
+    [Fact]
+    public async Task AddComment_NoContentSection()
+    {
+        var releaseVersion = new ReleaseVersion();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task AddComment_NoContentBlock()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Content = ListOf(
-                    new ContentSection
-                    {
-                        Heading = "New section",
-                        Order = 1,
-                        Content = ListOf<ContentBlock>()
-                    }
-                )
-            };
+            var service = SetupCommentService(contentDbContext: contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            var result = await service.AddComment(
+                releaseVersionId: releaseVersion.Id,
+                contentSectionId: Guid.NewGuid(),
+                contentBlockId: Guid.NewGuid(),
+                new CommentSaveRequest
+                {
+                    Content = "New comment"
+                });
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupCommentService(contentDbContext: contentDbContext);
+            result.AssertNotFound();
+        }
+    }
 
-                var result = await service.AddComment(
-                    releaseVersionId: releaseVersion.Id,
-                    contentSectionId: releaseVersion.Content[0].Id,
-                    contentBlockId: Guid.NewGuid(),
-                    new CommentSaveRequest
-                    {
-                        Content = "New comment"
-                    });
+    [Fact]
+    public async Task AddComment_NoContentBlock()
+    {
+        var releaseVersion = new ReleaseVersion
+        {
+            Content = ListOf(
+                new ContentSection
+                {
+                    Heading = "New section",
+                    Order = 1,
+                    Content = ListOf<ContentBlock>()
+                }
+            )
+        };
 
-                result.AssertNotFound();
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task SetResolved_Resolve()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var comment = new Comment
-            {
-                Content = "Existing comment",
-                CreatedById = Guid.NewGuid(),
-            };
-            var releaseVersion = new ReleaseVersion
-            {
-                Content = ListOf(
-                    new ContentSection
-                    {
-                        Content = ListOf<ContentBlock>(
-                            new HtmlBlock
-                            {
-                                Comments = ListOf(comment)
-                            }
-                        )
-                    }
-                )
-            };
+            var service = SetupCommentService(contentDbContext: contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            var result = await service.AddComment(
+                releaseVersionId: releaseVersion.Id,
+                contentSectionId: releaseVersion.Content[0].Id,
+                contentBlockId: Guid.NewGuid(),
+                new CommentSaveRequest
+                {
+                    Content = "New comment"
+                });
 
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task SetResolved_Resolve()
+    {
+        var comment = new Comment
+        {
+            Content = "Existing comment",
+            CreatedById = Guid.NewGuid(),
+        };
+        var releaseVersion = new ReleaseVersion
+        {
+            Content = ListOf(
+                new ContentSection
+                {
+                    Content = ListOf<ContentBlock>(
+                        new HtmlBlock
+                        {
+                            Comments = ListOf(comment)
+                        }
+                    )
+                }
+            )
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var userId = Guid.NewGuid();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupCommentService(
+                contentDbContext: contentDbContext,
+                userId: userId);
+            var result = await service.SetResolved(comment.Id, resolve: true);
+
+            var viewModel = result.AssertRight();
+            Assert.Equal("Existing comment", viewModel.Content);
+            viewModel.Resolved.AssertUtcNow();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var comments = contentDbContext.Comment.ToList();
+            Assert.Single(comments);
+            Assert.Equal("Existing comment", comments[0].Content);
+            Assert.Equal(comment.CreatedById, comments[0].CreatedById);
+            Assert.Equal(userId, comments[0].ResolvedById);
+        }
+    }
+
+    [Fact]
+    public async Task SetResolved_Unresolve()
+    {
+        var comment = new Comment
+        {
+            Content = "Existing comment",
+            CreatedById = Guid.NewGuid(),
+            Resolved = DateTime.UtcNow,
+            ResolvedById = Guid.NewGuid(),
+        };
+        var releaseVersion = new ReleaseVersion
+        {
+            Content = ListOf(
+                new ContentSection
+                {
+                    Content = ListOf<ContentBlock>(
+                        new HtmlBlock
+                        {
+                            Comments = ListOf(comment)
+                        }
+                    )
+                }
+            )
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
             var userId = Guid.NewGuid();
+            var service = SetupCommentService(
+                contentDbContext: contentDbContext,
+                userId: userId);
+            var result = await service.SetResolved(comment.Id, resolve: false);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupCommentService(
-                    contentDbContext: contentDbContext,
-                    userId: userId);
-                var result = await service.SetResolved(comment.Id, resolve: true);
-
-                var viewModel = result.AssertRight();
-                Assert.Equal("Existing comment", viewModel.Content);
-                viewModel.Resolved.AssertUtcNow();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Single(comments);
-                Assert.Equal("Existing comment", comments[0].Content);
-                Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                Assert.Equal(userId, comments[0].ResolvedById);
-            }
+            var viewModel = result.AssertRight();
+            Assert.Equal("Existing comment", viewModel.Content);
+            Assert.Null(viewModel.Resolved);
+            Assert.Null(viewModel.ResolvedBy);
         }
 
-        [Fact]
-        public async Task SetResolved_Unresolve()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var comment = new Comment
-            {
-                Content = "Existing comment",
-                CreatedById = Guid.NewGuid(),
-                Resolved = DateTime.UtcNow,
-                ResolvedById = Guid.NewGuid(),
-            };
-            var releaseVersion = new ReleaseVersion
-            {
-                Content = ListOf(
-                    new ContentSection
-                    {
-                        Content = ListOf<ContentBlock>(
-                            new HtmlBlock
-                            {
-                                Comments = ListOf(comment)
-                            }
-                        )
-                    }
-                )
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userId = Guid.NewGuid();
-                var service = SetupCommentService(
-                    contentDbContext: contentDbContext,
-                    userId: userId);
-                var result = await service.SetResolved(comment.Id, resolve: false);
-
-                var viewModel = result.AssertRight();
-                Assert.Equal("Existing comment", viewModel.Content);
-                Assert.Null(viewModel.Resolved);
-                Assert.Null(viewModel.ResolvedBy);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Single(comments);
-                Assert.Equal("Existing comment", comments[0].Content);
-                Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                Assert.Null(comments[0].Resolved);
-                Assert.Null(comments[0].ResolvedById);
-            }
+            var comments = contentDbContext.Comment.ToList();
+            Assert.Single(comments);
+            Assert.Equal("Existing comment", comments[0].Content);
+            Assert.Equal(comment.CreatedById, comments[0].CreatedById);
+            Assert.Null(comments[0].Resolved);
+            Assert.Null(comments[0].ResolvedById);
         }
+    }
 
-        [Fact]
-        public async Task SetResolved_NoComment()
+    [Fact]
+    public async Task SetResolved_NoComment()
+    {
+        await using (var contentDbContext = InMemoryApplicationDbContext())
         {
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupCommentService(contentDbContext: contentDbContext);
-                var result = await service.SetResolved(Guid.NewGuid(), resolve: true);
-                result.AssertNotFound();
-            }
+            var service = SetupCommentService(contentDbContext: contentDbContext);
+            var result = await service.SetResolved(Guid.NewGuid(), resolve: true);
+            result.AssertNotFound();
         }
+    }
 
-        [Fact]
-        public async Task UpdateComment()
+    [Fact]
+    public async Task UpdateComment()
+    {
+        var comment = new Comment
         {
-            var comment = new Comment
-            {
-                Content = "Existing comment",
-                CreatedById = Guid.NewGuid(),
-            };
-            var releaseVersion = new ReleaseVersion
-            {
-                Content = ListOf(
-                    new ContentSection
-                    {
-                        Content = ListOf<ContentBlock>(
-                            new HtmlBlock
-                            {
-                                Comments = ListOf(comment)
-                            }
-                        )
-                    }
-                )
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userId = Guid.NewGuid();
-                var service = SetupCommentService(
-                    contentDbContext: contentDbContext,
-                    userId: userId);
-                var result = await service.UpdateComment(comment.Id,
-                    new CommentSaveRequest
-                    {
-                        Content = "Existing comment updated"
-                    });
-
-                var viewModel = result.AssertRight();
-                Assert.Equal("Existing comment updated", viewModel.Content);
-                viewModel.Updated.AssertUtcNow();
-                Assert.Null(viewModel.Resolved);
-                Assert.Null(viewModel.ResolvedBy);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Single(comments);
-                Assert.Equal("Existing comment updated", comments[0].Content);
-                Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                comments[0].Updated.AssertUtcNow();
-                Assert.Null(comments[0].ResolvedById);
-            }
-        }
-
-        [Fact]
-        public async Task UpdateComment_NoComment()
+            Content = "Existing comment",
+            CreatedById = Guid.NewGuid(),
+        };
+        var releaseVersion = new ReleaseVersion
         {
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupCommentService(contentDbContext: contentDbContext);
-                var result = await service.UpdateComment(Guid.NewGuid(),
-                    new CommentSaveRequest
-                    {
-                        Content = "Existing comment updated"
-                    });
+            Content = ListOf(
+                new ContentSection
+                {
+                    Content = ListOf<ContentBlock>(
+                        new HtmlBlock
+                        {
+                            Comments = ListOf(comment)
+                        }
+                    )
+                }
+            )
+        };
 
-                result.AssertNotFound();
-            }
-        }
-
-        [Fact]
-        public async Task DeleteComment()
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var comment1 = new Comment
-            {
-                Content = "Comment 1",
-                CreatedById = Guid.NewGuid(),
-            };
-            var comment2 = new Comment
-            {
-                Content = "Comment 2",
-                CreatedById = Guid.NewGuid(),
-            };
-            var comment3 = new Comment
-            {
-                Content = "Comment 3",
-                CreatedById = Guid.NewGuid(),
-            };
-            var releaseVersion = new ReleaseVersion
-            {
-                Content = ListOf(
-                    new ContentSection
-                    {
-                        Content = ListOf<ContentBlock>(
-                            new HtmlBlock
-                            {
-                                Comments = ListOf(comment1, comment2, comment3)
-                            }
-                        )
-                    }
-                )
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupCommentService(contentDbContext);
-                var result = await service.DeleteComment(comment2.Id);
-
-                var resultRight = result.AssertRight();
-                Assert.True(resultRight);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var comments = contentDbContext.Comment.ToList();
-                Assert.Equal(2, comments.Count);
-                Assert.Equal("Comment 1", comments[0].Content);
-                Assert.Equal(comment1.CreatedById, comments[0].CreatedById);
-                Assert.Equal("Comment 3", comments[1].Content);
-                Assert.Equal(comment3.CreatedById, comments[1].CreatedById);
-            }
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task DeleteComment_NoComment()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupCommentService(contentDbContext);
-                var result = await service.DeleteComment(Guid.NewGuid());
+            var userId = Guid.NewGuid();
+            var service = SetupCommentService(
+                contentDbContext: contentDbContext,
+                userId: userId);
+            var result = await service.UpdateComment(comment.Id,
+                new CommentSaveRequest
+                {
+                    Content = "Existing comment updated"
+                });
 
-                result.AssertNotFound();
-            }
+            var viewModel = result.AssertRight();
+            Assert.Equal("Existing comment updated", viewModel.Content);
+            viewModel.Updated.AssertUtcNow();
+            Assert.Null(viewModel.Resolved);
+            Assert.Null(viewModel.ResolvedBy);
         }
 
-        private static CommentService SetupCommentService(
-            ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IUserService? userService = null,
-            Guid? userId = null)
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            return new CommentService(
-                contentDbContext,
-                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService(userId).Object,
-                AdminMapper()
-            );
+            var comments = contentDbContext.Comment.ToList();
+            Assert.Single(comments);
+            Assert.Equal("Existing comment updated", comments[0].Content);
+            Assert.Equal(comment.CreatedById, comments[0].CreatedById);
+            comments[0].Updated.AssertUtcNow();
+            Assert.Null(comments[0].ResolvedById);
         }
+    }
+
+    [Fact]
+    public async Task UpdateComment_NoComment()
+    {
+        await using (var contentDbContext = InMemoryApplicationDbContext())
+        {
+            var service = SetupCommentService(contentDbContext: contentDbContext);
+            var result = await service.UpdateComment(Guid.NewGuid(),
+                new CommentSaveRequest
+                {
+                    Content = "Existing comment updated"
+                });
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task DeleteComment()
+    {
+        var comment1 = new Comment
+        {
+            Content = "Comment 1",
+            CreatedById = Guid.NewGuid(),
+        };
+        var comment2 = new Comment
+        {
+            Content = "Comment 2",
+            CreatedById = Guid.NewGuid(),
+        };
+        var comment3 = new Comment
+        {
+            Content = "Comment 3",
+            CreatedById = Guid.NewGuid(),
+        };
+        var releaseVersion = new ReleaseVersion
+        {
+            Content = ListOf(
+                new ContentSection
+                {
+                    Content = ListOf<ContentBlock>(
+                        new HtmlBlock
+                        {
+                            Comments = ListOf(comment1, comment2, comment3)
+                        }
+                    )
+                }
+            )
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupCommentService(contentDbContext);
+            var result = await service.DeleteComment(comment2.Id);
+
+            var resultRight = result.AssertRight();
+            Assert.True(resultRight);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var comments = contentDbContext.Comment.ToList();
+            Assert.Equal(2, comments.Count);
+            Assert.Equal("Comment 1", comments[0].Content);
+            Assert.Equal(comment1.CreatedById, comments[0].CreatedById);
+            Assert.Equal("Comment 3", comments[1].Content);
+            Assert.Equal(comment3.CreatedById, comments[1].CreatedById);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteComment_NoComment()
+    {
+        await using (var contentDbContext = InMemoryApplicationDbContext())
+        {
+            var service = SetupCommentService(contentDbContext);
+            var result = await service.DeleteComment(Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+    }
+
+    private static CommentService SetupCommentService(
+        ContentDbContext contentDbContext,
+        IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IUserService? userService = null,
+        Guid? userId = null)
+    {
+        return new CommentService(
+            contentDbContext,
+            persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+            userService ?? MockUtils.AlwaysTrueUserService(userId).Object,
+            AdminMapper()
+        );
     }
 }

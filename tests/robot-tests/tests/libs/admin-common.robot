@@ -611,7 +611,11 @@ user confirms upload to complete import
     ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
     ${button}=    user gets button element    View details    ${row}
     user clicks element    ${button}
-    user clicks button    Continue import
+
+    # EES-6341 - reinstate "Continue import" button when Screener is re-enabled.
+    # user clicks button    Continue import
+    user clicks button    Close
+
     user waits until data file import is complete    ${SUBJECT_NAME}
 
 user waits until data upload is completed
@@ -656,6 +660,7 @@ user puts release into draft
     ...    ${expected_next_release_date}=Not set
 
     user clicks button    Edit release status
+    user clicks element if exists    xpath=//button[text()="Continue"]
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    In draft
     user enters text into element    id:releaseStatusForm-internalReleaseNote    ${release_note}
@@ -730,12 +735,18 @@ user waits for scheduled release to be published immediately
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
-    [Arguments]    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${RELEASE_TYPE}    ${RELEASE_LABEL}=${EMPTY}
+    [Arguments]
+    ...    ${TIME_PERIOD}
+    ...    ${RELEASE_PERIOD}
+    ...    ${RELEASE_TYPE}
+    ...    ${RELEASE_LABEL}=${EMPTY}
+    ...    ${PUBLISHED_BY}=${EMPTY}
     user waits until h2 is visible    Release summary
     user checks summary list contains    Time period    ${TIME_PERIOD}
     user checks summary list contains    Release period    ${RELEASE_PERIOD}
     user checks summary list contains    Release type    ${RELEASE_TYPE}
     user checks summary list contains    Release label    ${RELEASE_LABEL}
+    user checks summary list contains    Published by    ${PUBLISHED_BY}
 
 user changes methodology status to Approved
     [Arguments]

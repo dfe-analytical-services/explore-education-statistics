@@ -8,59 +8,58 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
 {
-    public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
+}
+
+public class CreateMethodologyForSpecificPublicationAuthorizationHandler
+    : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
+{
+    private readonly ContentDbContext _context;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public CreateMethodologyForSpecificPublicationAuthorizationHandler(
+        ContentDbContext context,
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _context = context;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class CreateMethodologyForSpecificPublicationAuthorizationHandler
-        : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        CreateMethodologyForSpecificPublicationRequirement requirement,
+        Publication publication)
     {
-        private readonly ContentDbContext _context;
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public CreateMethodologyForSpecificPublicationAuthorizationHandler(
-            ContentDbContext context,
-            AuthorizationHandlerService authorizationHandlerService)
+        // No user is allowed to create a new methodology of an archived or to-be-archived publication
+        if (publication.SupersededById.HasValue)
         {
-            _context = context;
-            _authorizationHandlerService = authorizationHandlerService;
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            CreateMethodologyForSpecificPublicationRequirement requirement,
-            Publication publication)
+        // If a publication owns a methodology already, they cannot own another
+        if (await _context
+                .PublicationMethodologies
+                .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
         {
-            // No user is allowed to create a new methodology of an archived or to-be-archived publication
-            if (publication.SupersededById.HasValue)
-            {
-                return;
-            }
+            return;
+        }
 
-            // If a publication owns a methodology already, they cannot own another
-            if (await _context
-                    .PublicationMethodologies
-                    .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
-            {
-                return;
-            }
+        if (SecurityUtils.HasClaim(context.User, CreateAnyMethodology))
+        {
+            context.Succeed(requirement);
+            return;
+        }
 
-            if (SecurityUtils.HasClaim(context.User, CreateAnyMethodology))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        publication.Id,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    publication.Id,
+                    Owner))
+        {
+            context.Succeed(requirement);
         }
     }
 }

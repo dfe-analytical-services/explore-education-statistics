@@ -3,121 +3,120 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.TimeIdentifierUtil;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+
+public static class TimeIdentifierExtensions
 {
-    public static class TimeIdentifierExtensions
+    public static bool IsAlike(this TimeIdentifier timeIdentifier, TimeIdentifier compare)
     {
-        public static bool IsAlike(this TimeIdentifier timeIdentifier, TimeIdentifier compare)
+        if (timeIdentifier.Equals(compare))
         {
-            if (timeIdentifier.Equals(compare))
-            {
-                return true;
-            }
-
-            return IsAcademicQuarter(timeIdentifier) && IsAcademicQuarter(compare) ||
-                   IsCalendarQuarter(timeIdentifier) && IsCalendarQuarter(compare) ||
-                   IsFinancialQuarter(timeIdentifier) && IsFinancialQuarter(compare) ||
-                   IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare) ||
-                   IsMonth(timeIdentifier) && IsMonth(compare) ||
-                   IsWeek(timeIdentifier) && IsWeek(compare) ||
-                   IsTerm(timeIdentifier) && IsTerm(compare) ||
-                   IsFinancialYearPart(timeIdentifier) && IsFinancialYearPart(compare);
+            return true;
         }
 
-        public static bool IsYear(this TimeIdentifier timeIdentifier)
+        return IsAcademicQuarter(timeIdentifier) && IsAcademicQuarter(compare) ||
+               IsCalendarQuarter(timeIdentifier) && IsCalendarQuarter(compare) ||
+               IsFinancialQuarter(timeIdentifier) && IsFinancialQuarter(compare) ||
+               IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare) ||
+               IsMonth(timeIdentifier) && IsMonth(compare) ||
+               IsWeek(timeIdentifier) && IsWeek(compare) ||
+               IsTerm(timeIdentifier) && IsTerm(compare) ||
+               IsFinancialYearPart(timeIdentifier) && IsFinancialYearPart(compare);
+    }
+
+    public static bool IsYear(this TimeIdentifier timeIdentifier)
+    {
+        return GetYears().Contains(timeIdentifier);
+    }
+
+    public static bool IsAcademicQuarter(this TimeIdentifier timeIdentifier)
+    {
+        return GetAcademicQuarters().Contains(timeIdentifier);
+    }
+
+    public static bool IsCalendarQuarter(this TimeIdentifier timeIdentifier)
+    {
+        return GetCalendarQuarters().Contains(timeIdentifier);
+    }
+
+    public static bool IsFinancialQuarter(this TimeIdentifier timeIdentifier)
+    {
+        return GetFinancialQuarters().Contains(timeIdentifier);
+    }
+
+    public static bool IsTaxQuarter(this TimeIdentifier timeIdentifier)
+    {
+        return GetTaxQuarters().Contains(timeIdentifier);
+    }
+
+    public static bool IsMonth(this TimeIdentifier timeIdentifier)
+    {
+        return GetMonths().Contains(timeIdentifier);
+    }
+
+    public static bool IsWeek(this TimeIdentifier timeIdentifier)
+    {
+        return GetWeeks().Contains(timeIdentifier);
+    }
+
+    public static bool IsTerm(this TimeIdentifier timeIdentifier)
+    {
+        return GetTerms().Contains(timeIdentifier);
+    }
+
+    public static bool IsFinancialYearPart(this TimeIdentifier timeIdentifier)
+    {
+        return GetFinancialYearParts().Contains(timeIdentifier);
+    }
+
+    public static bool HasAssociatedRange(this TimeIdentifier timeIdentifier)
+    {
+        return !timeIdentifier.IsYear();
+    }
+
+    public static TimeIdentifier[] GetAssociatedRange(this TimeIdentifier timeIdentifier)
+    {
+        if (timeIdentifier.IsMonth())
         {
-            return GetYears().Contains(timeIdentifier);
+            return GetMonths();
         }
 
-        public static bool IsAcademicQuarter(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsWeek())
         {
-            return GetAcademicQuarters().Contains(timeIdentifier);
+            return GetWeeks();
         }
 
-        public static bool IsCalendarQuarter(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsAcademicQuarter())
         {
-            return GetCalendarQuarters().Contains(timeIdentifier);
+            return GetAcademicQuarters();
         }
 
-        public static bool IsFinancialQuarter(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsCalendarQuarter())
         {
-            return GetFinancialQuarters().Contains(timeIdentifier);
+            return GetCalendarQuarters();
         }
 
-        public static bool IsTaxQuarter(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsFinancialQuarter())
         {
-            return GetTaxQuarters().Contains(timeIdentifier);
+            return GetFinancialQuarters();
         }
 
-        public static bool IsMonth(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsTaxQuarter())
         {
-            return GetMonths().Contains(timeIdentifier);
+            return GetTaxQuarters();
         }
 
-        public static bool IsWeek(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsTerm())
         {
-            return GetWeeks().Contains(timeIdentifier);
+            return GetTerms();
         }
 
-        public static bool IsTerm(this TimeIdentifier timeIdentifier)
+        if (timeIdentifier.IsFinancialYearPart())
         {
-            return GetTerms().Contains(timeIdentifier);
+            return GetFinancialYearParts();
         }
 
-        public static bool IsFinancialYearPart(this TimeIdentifier timeIdentifier)
-        {
-            return GetFinancialYearParts().Contains(timeIdentifier);
-        }
-
-        public static bool HasAssociatedRange(this TimeIdentifier timeIdentifier)
-        {
-            return !timeIdentifier.IsYear();
-        }
-
-        public static TimeIdentifier[] GetAssociatedRange(this TimeIdentifier timeIdentifier)
-        {
-            if (timeIdentifier.IsMonth())
-            {
-                return GetMonths();
-            }
-
-            if (timeIdentifier.IsWeek())
-            {
-                return GetWeeks();
-            }
-
-            if (timeIdentifier.IsAcademicQuarter())
-            {
-                return GetAcademicQuarters();
-            }
-
-            if (timeIdentifier.IsCalendarQuarter())
-            {
-                return GetCalendarQuarters();
-            }
-
-            if (timeIdentifier.IsFinancialQuarter())
-            {
-                return GetFinancialQuarters();
-            }
-
-            if (timeIdentifier.IsTaxQuarter())
-            {
-                return GetTaxQuarters();
-            }
-
-            if (timeIdentifier.IsTerm())
-            {
-                return GetTerms();
-            }
-
-            if (timeIdentifier.IsFinancialYearPart())
-            {
-                return GetFinancialYearParts();
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(timeIdentifier),
-                "The time identifier has no associated range");
-        }
+        throw new ArgumentOutOfRangeException(nameof(timeIdentifier),
+            "The time identifier has no associated range");
     }
 }

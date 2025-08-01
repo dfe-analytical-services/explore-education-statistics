@@ -13,7 +13,7 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 Navigate to Absence in PRUs data set from data catalogue
     user navigates to data catalogue page on public frontend
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user clicks link    Absence in PRUs
+    user clicks link containing text    Absence in PRUs
 
 Validate title
     user waits until h1 is visible    Absence in PRUs    %{WAIT_MEDIUM}

@@ -18,6 +18,8 @@ Validate Related information section and links does not exist
     user checks page does not contain element    css:[aria-labelledby="related-information"]
 
 Validate themes filters exist
+    user waits until page finishes loading
+    user scrolls to element    id:filters-form-theme
     user checks select contains option    id:filters-form-theme    All themes
     user checks selected option label    id:filters-form-theme    All themes
 

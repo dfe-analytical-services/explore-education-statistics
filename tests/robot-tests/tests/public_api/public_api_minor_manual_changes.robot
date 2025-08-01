@@ -184,7 +184,7 @@ Validate the row headings and its contents in the 'Regions' section
     user checks table cell contains    1    3    N/A
 
 User edits location mapping
-    user clicks button in table cell    1    4    Edit
+    user clicks button in table cell    1    4    Map option
 
     ${modal}=    user waits until modal is visible    Map existing location
     user clicks radio    Yorkshire
@@ -238,7 +238,7 @@ Validate the row headings and its contents in the 'filter options' section
     user checks table cell contains    1    3    N/A
 
 User edits filter mapping
-    user clicks button in table cell    1    4    Edit
+    user clicks button in table cell    1    4    Map option
 
     ${modal}=    user waits until modal is visible    Map existing filter option
     user clicks radio    State-funded primary and secondary
@@ -326,7 +326,7 @@ Search for the new API data set version
     user checks page contains link    ${SUBJECT_2_NAME}
 
 User clicks on the new data set version link
-    user clicks link    ${SUBJECT_2_NAME}
+    user clicks link containing text    ${SUBJECT_2_NAME}
     user waits until page finishes loading
     user waits until h1 is visible    ${SUBJECT_2_NAME}
 

@@ -255,6 +255,14 @@ const ReleaseDataFileReplacePage = ({
                 <DataFileUploadForm
                   isDataReplacement
                   onSubmit={values => handleSubmit(dataFile, values)}
+                  onCancel={() =>
+                    history.push(
+                      generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+                        publicationId,
+                        releaseVersionId,
+                      }),
+                    )
+                  }
                 />
               </section>
             ) : (

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -51,7 +52,7 @@ public class AnalyticsWritePublicCsvDownloadStrategyTests
                     DataSetTitle: "data set title 2"),
                 default);
 
-            var files = Directory.GetFiles(pathResolver.PublicCsvDownloadsDirectoryPath())
+            var files = Directory.GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths))
                 .ToList();
 
             Assert.Equal(2, files.Count);

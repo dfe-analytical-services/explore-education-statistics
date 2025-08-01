@@ -8,53 +8,52 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.Authoriza
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class UpdateSpecificMethodologyRequirement : IAuthorizationRequirement
 {
-    public class UpdateSpecificMethodologyRequirement : IAuthorizationRequirement
+}
+
+public class UpdateSpecificMethodologyAuthorizationHandler :
+    AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+{
+    private readonly IMethodologyRepository _methodologyRepository;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public UpdateSpecificMethodologyAuthorizationHandler(
+        IMethodologyRepository methodologyRepository,
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _methodologyRepository = methodologyRepository;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class UpdateSpecificMethodologyAuthorizationHandler :
-        AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        UpdateSpecificMethodologyRequirement requirement,
+        MethodologyVersion methodologyVersion)
     {
-        private readonly IMethodologyRepository _methodologyRepository;
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public UpdateSpecificMethodologyAuthorizationHandler(
-            IMethodologyRepository methodologyRepository,
-            AuthorizationHandlerService authorizationHandlerService)
+        if (methodologyVersion.Approved)
         {
-            _methodologyRepository = methodologyRepository;
-            _authorizationHandlerService = authorizationHandlerService;
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            UpdateSpecificMethodologyRequirement requirement,
-            MethodologyVersion methodologyVersion)
+        if (SecurityUtils.HasClaim(context.User, UpdateAllMethodologies))
         {
-            if (methodologyVersion.Approved)
-            {
-                return;
-            }
+            context.Succeed(requirement);
+            return;
+        }
 
-            if (SecurityUtils.HasClaim(context.User, UpdateAllMethodologies))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-
-            var owningPublication =
-                await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-            
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrAnyReleaseVersion(
-                        context.User.GetUserId(),
-                        owningPublication.Id,
-                        ListOf(PublicationRole.Owner, PublicationRole.Allower),
-                        ReleaseEditorAndApproverRoles))
-            {
-                context.Succeed(requirement);
-            }
+        var owningPublication =
+            await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        
+        if (await _authorizationHandlerService
+                .HasRolesOnPublicationOrAnyReleaseVersion(
+                    context.User.GetUserId(),
+                    owningPublication.Id,
+                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                    ReleaseEditorAndApproverRoles))
+        {
+            context.Succeed(requirement);
         }
     }
 }

@@ -3,25 +3,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
+
+/// <inheritdoc />
+[ExcludeFromCodeCoverage]
+public partial class EES5158_UpdateNationalStatisticsReleaseType : Migration
 {
     /// <inheritdoc />
-    [ExcludeFromCodeCoverage]
-    public partial class EES5158_UpdateNationalStatisticsReleaseType : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(
-                "UPDATE ReleaseVersions SET Type = 'AccreditedOfficialStatistics' WHERE Type = 'NationalStatistics'");
-        }
+        migrationBuilder.Sql(
+            "UPDATE ReleaseVersions SET Type = 'AccreditedOfficialStatistics' WHERE Type = 'NationalStatistics'");
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(
-                "UPDATE ReleaseVersions SET Type = 'NationalStatistics' WHERE Type = 'AccreditedOfficialStatistics'");
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.Sql(
+            "UPDATE ReleaseVersions SET Type = 'NationalStatistics' WHERE Type = 'AccreditedOfficialStatistics'");
 
-        }
     }
 }

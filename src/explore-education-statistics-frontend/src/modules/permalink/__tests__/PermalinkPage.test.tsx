@@ -43,7 +43,7 @@ describe('PermalinkPage', () => {
   test('renders no warning message with permalink status Current', () => {
     render(<PermalinkPage data={testPermalinkSnapshot} />);
 
-    expect(screen.queryByText(/WARNING/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/warning/)).not.toBeInTheDocument();
 
     // Table still renders
     expect(screen.getByRole('table')).toBeInTheDocument();
@@ -61,9 +61,7 @@ describe('PermalinkPage', () => {
     );
 
     expect(
-      screen.getByText(
-        'WARNING - The data used in this table is no longer valid.',
-      ),
+      screen.getByText('The data used in this table is no longer valid.'),
     ).toBeInTheDocument();
 
     // Table still renders
@@ -83,7 +81,7 @@ describe('PermalinkPage', () => {
 
     expect(
       screen.getByText(
-        'WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.',
+        'The data used in this table may be invalid as the subject file has been amended or removed since its creation.',
       ),
     ).toBeInTheDocument();
 
@@ -104,7 +102,7 @@ describe('PermalinkPage', () => {
 
     expect(
       screen.getByText(
-        'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+        'A newer release of this publication is available and may include updated figures.',
       ),
     ).toBeInTheDocument();
 
@@ -125,7 +123,7 @@ describe('PermalinkPage', () => {
 
     expect(
       screen.getByText(
-        'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+        'A newer release of this publication is available and may include updated figures.',
       ),
     ).toBeInTheDocument();
 

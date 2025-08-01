@@ -16,56 +16,55 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+public class UpdateReleaseRoleAuthorizationHandlerTests
 {
-    public class UpdateReleaseRoleAuthorizationHandlerTests
+    [Fact]
+    public async Task CanUpdateReleaseRolesAuthorizationHandler_SucceedsWithClaim()
     {
-        [Fact]
-        public async Task CanUpdateReleaseRolesAuthorizationHandler_SucceedsWithClaim()
-        {
-            await AssertHandlerSucceedsWithCorrectClaims
-                <Tuple<Publication, ReleaseRole>, UpdateReleaseRoleRequirement>(
-                    CreateHandler,
-                    TupleOf(new Publication(), ReleaseRole.PrereleaseViewer),
-                    ManageAnyUser
-                );
-        }
+        await AssertHandlerSucceedsWithCorrectClaims
+            <Tuple<Publication, ReleaseRole>, UpdateReleaseRoleRequirement>(
+                CreateHandler,
+                TupleOf(new Publication(), ReleaseRole.PrereleaseViewer),
+                ManageAnyUser
+            );
+    }
 
-        [Fact]
-        public async Task CanUpdateReleaseRolesAuthorizationHandler_Contributor_SucceedsWithPublicationOwner()
-        {
-            var publication = new Publication { Id = Guid.NewGuid() };
-            var tuple = TupleOf(publication, ReleaseRole.Contributor);
-            await AssertHandlerOnlySucceedsWithPublicationRoles
-                <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
-                    publication.Id,
-                    tuple,
-                    contentDbContext => contentDbContext.Add(publication),
-                    CreateHandler,
-                    PublicationRole.Owner);
-        }
+    [Fact]
+    public async Task CanUpdateReleaseRolesAuthorizationHandler_Contributor_SucceedsWithPublicationOwner()
+    {
+        var publication = new Publication { Id = Guid.NewGuid() };
+        var tuple = TupleOf(publication, ReleaseRole.Contributor);
+        await AssertHandlerOnlySucceedsWithPublicationRoles
+            <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
+                publication.Id,
+                tuple,
+                contentDbContext => contentDbContext.Add(publication),
+                CreateHandler,
+                PublicationRole.Owner);
+    }
 
-        [Fact]
-        public async Task CanUpdateReleaseRolesAuthorizationHandler_NotContributor_FailsWithPublicationOwner()
-        {
-            var publication = new Publication { Id = Guid.NewGuid() };
-            var tuple = TupleOf(publication, ReleaseRole.PrereleaseViewer);
-            await AssertHandlerOnlySucceedsWithPublicationRoles
-                <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
-                    publication.Id,
-                    tuple,
-                    contentDbContext => contentDbContext.Add(publication),
-                    CreateHandler);
-        }
+    [Fact]
+    public async Task CanUpdateReleaseRolesAuthorizationHandler_NotContributor_FailsWithPublicationOwner()
+    {
+        var publication = new Publication { Id = Guid.NewGuid() };
+        var tuple = TupleOf(publication, ReleaseRole.PrereleaseViewer);
+        await AssertHandlerOnlySucceedsWithPublicationRoles
+            <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
+                publication.Id,
+                tuple,
+                contentDbContext => contentDbContext.Add(publication),
+                CreateHandler);
+    }
 
-        private static UpdateReleaseRoleAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-        {
-            return new UpdateReleaseRoleAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(contentDbContext),
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
-        }
+    private static UpdateReleaseRoleAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    {
+        return new UpdateReleaseRoleAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(contentDbContext),
+                Mock.Of<IUserReleaseRoleRepository>(Strict),
+                new UserPublicationRoleRepository(contentDbContext),
+                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

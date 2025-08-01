@@ -9,10 +9,12 @@ describe('PublicationReleasePage', () => {
   test('renders latest data tag', () => {
     render(<PublicationReleasePage releaseVersion={testRelease} />);
 
-    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest release'),
+    ).toBeInTheDocument();
 
     expect(
-      screen.queryByText('This is not the latest data'),
+      screen.queryByText('This is not the latest release'),
     ).not.toBeInTheDocument();
   });
 
@@ -24,7 +26,7 @@ describe('PublicationReleasePage', () => {
     render(<PublicationReleasePage releaseVersion={testReleaseSuperseded} />);
 
     expect(
-      screen.queryByText('This is the latest data'),
+      screen.queryByText('This is the latest release'),
     ).not.toBeInTheDocument();
   });
 
@@ -35,9 +37,11 @@ describe('PublicationReleasePage', () => {
     };
     render(<PublicationReleasePage releaseVersion={testReleaseNotLatest} />);
 
-    expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
     expect(
-      screen.queryByText('This is the latest data'),
+      screen.getByText('This is not the latest release'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest release'),
     ).not.toBeInTheDocument();
 
     expect(
@@ -119,6 +123,42 @@ describe('PublicationReleasePage', () => {
 
     expect(quickLinks[2]).toHaveTextContent('Help and support');
     expect(quickLinks[2]).toHaveAttribute('href', '#help-and-support');
+  });
+
+  test(`renders 'Download all data (zip)' as a link when files present`, async () => {
+    render(
+      <PublicationReleasePage
+        releaseVersion={{
+          ...testRelease,
+          relatedDashboardsSection: undefined,
+          downloadFiles: [
+            {
+              id: 'file-id',
+              extension: 'csv',
+              fileName: 'test-file',
+              name: 'test file',
+              size: '1 MB',
+              type: 'Data',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Quick links' }),
+    ).toBeInTheDocument();
+
+    const quickLinksNav = screen.getByRole('navigation', {
+      name: 'Quick links',
+    });
+
+    const quickLinks = within(quickLinksNav).getAllByRole('link');
+
+    expect(quickLinks).toHaveLength(4);
+
+    expect(quickLinks[0]).toHaveTextContent('Download all data (zip)');
+    expect(quickLinks[0]).toHaveAttribute('href');
   });
 
   test('does not render release contents link when there is no content', async () => {

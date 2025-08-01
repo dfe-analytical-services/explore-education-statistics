@@ -27,6 +27,7 @@ interface Props {
   expanded?: boolean;
   headingTag?: 'h3' | 'h4';
   showLatestDataTag?: boolean;
+  showPublicationTitle?: boolean;
 }
 
 export default function DataSetFileSummary({
@@ -34,6 +35,7 @@ export default function DataSetFileSummary({
   expanded = false,
   headingTag = 'h3',
   showLatestDataTag = true,
+  showPublicationTitle = true,
 }: Props) {
   const {
     id: dataSetFileId,
@@ -89,7 +91,18 @@ export default function DataSetFileSummary({
           className: `govuk-heading-m govuk-!-margin-bottom-2`,
           id: `${id}-heading`,
         },
-        <Link to={`/data-catalogue/data-set/${dataSetFileId}`}>{title}</Link>,
+
+        <Link
+          to={`/data-catalogue/data-set/${dataSetFileId}`}
+          className={styles.heading}
+        >
+          {showPublicationTitle && (
+            <span className="govuk-caption-m govuk-!-font-size-16">
+              {publication.title}
+            </span>
+          )}
+          <span className={styles.title}>{title}</span>
+        </Link>,
       )}
 
       <ContentHtml
@@ -136,9 +149,6 @@ export default function DataSetFileSummary({
         </SummaryListItem>
         <SummaryListItem term="Last updated">
           <FormattedDate format="d MMM yyyy">{lastUpdated}</FormattedDate>
-        </SummaryListItem>
-        <SummaryListItem term="Publication">
-          {publication.title}
         </SummaryListItem>
         <SummaryListItem term="Release">{release.title}</SummaryListItem>
         {numDataFileRows && (

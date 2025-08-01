@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -23,8 +24,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
     public class ReleaseDataFileServicePermissionTests
     {
         private readonly ReleaseVersion _releaseVersion = new()
@@ -196,8 +197,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.Upload(
                             releaseVersionId: _releaseVersion.Id,
-                            dataFormFile: new Mock<IFormFile>().Object,
-                            metaFormFile: new Mock<IFormFile>().Object,
+                            dataFile: new Mock<IManagedStreamFile>().Object,
+                            metaFile: new Mock<IManagedStreamFile>().Object,
                             dataSetTitle: "",
                             replacingFileId: null,
                             cancellationToken: default);
@@ -215,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.UploadFromZip(releaseVersionId: _releaseVersion.Id,
-                            zipFormFile: new Mock<IFormFile>().Object,
+                            zipFile: new Mock<IManagedStreamZipFile>().Object,
                             dataSetTitle: "",
                             replacingFileId: null,
                             cancellationToken: default);
@@ -234,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.UploadFromBulkZip(
                             releaseVersionId: _releaseVersion.Id,
-                            zipFormFile: new Mock<IFormFile>().Object,
+                            zipFile: new Mock<IManagedStreamZipFile>().Object,
                             cancellationToken: default);
                     }
                 );
@@ -271,12 +272,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService? dataBlockService = null,
             IFootnoteRepository? footnoteRepository = null,
             IDataSetScreenerClient? dataSetScreenerClient = null,
+            IReplacementPlanService? replacementPlanService = null,
             IMapper? mapper = null)
         {
-            contentDbContext ??= new Mock<ContentDbContext>().Object;
+            contentDbContext ??= Mock.Of<ContentDbContext>();
 
             return new ReleaseDataFileService(
-                contentDbContext ??= Mock.Of<ContentDbContext>(),
+                contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
                 dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
@@ -289,6 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+                replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
                 mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
             );
         }
@@ -300,4 +303,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return mock;
         }
     }
-}

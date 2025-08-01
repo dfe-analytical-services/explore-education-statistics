@@ -13,6 +13,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class CompressionUtils
 {
+    public static Stream GetCompressionStream(
+        Stream targetStream,
+        string contentEncoding,
+        CompressionMode compressionMode)
+    {
+        switch (contentEncoding)
+        {
+            case ContentEncodings.Gzip:
+                {
+                    return new GZipStream(targetStream, compressionMode, leaveOpen: true);
+                }
+            case ContentEncodings.Zstd:
+                {
+                    switch (compressionMode)
+                    {
+                        case CompressionMode.Compress:
+                            return new CompressionStream(targetStream, level: 11, leaveOpen: true);
+                        case CompressionMode.Decompress:
+                            return new DecompressionStream(targetStream, leaveOpen: true);
+                        default:
+                            throw new ArgumentException($"Unsupported compression mode {compressionMode}");
+                    }
+                }
+            default:
+                throw new NotSupportedException($"Content encoding {contentEncoding} is not supported");
+        }
+    }
+
     public static async Task CompressToStream(
         Stream stream,
         Stream targetStream,
@@ -24,17 +52,18 @@ public static class CompressionUtils
         switch (contentEncoding)
         {
             case ContentEncodings.Gzip:
-            {
-                await using var compressor = new GZipStream(targetStream, CompressionMode.Compress, leaveOpen: true);
-                await stream.CopyToAsync(compressor, cancellationToken);
-                break;
-            }
+                {
+                    await using var compressor =
+                        new GZipStream(targetStream, CompressionMode.Compress, leaveOpen: true);
+                    await stream.CopyToAsync(compressor, cancellationToken);
+                    break;
+                }
             case ContentEncodings.Zstd:
-            {
-                await using var compressor = new CompressionStream(targetStream, level: 11, leaveOpen: true);
-                await stream.CopyToAsync(compressor, cancellationToken);
-                break;
-            }
+                {
+                    await using var compressor = new CompressionStream(targetStream, level: 11, leaveOpen: true);
+                    await stream.CopyToAsync(compressor, cancellationToken);
+                    break;
+                }
             default:
                 throw new NotSupportedException($"Content encoding {contentEncoding} is not supported");
         }

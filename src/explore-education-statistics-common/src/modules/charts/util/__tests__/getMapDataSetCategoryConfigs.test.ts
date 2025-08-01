@@ -52,11 +52,13 @@ describe('getMapDataSetCategoryConfigs', () => {
     boundaryLevels: [],
     filters: {
       Filter1: {
+        legend: 'Filter 1',
         name: 'filter-1',
         options: [testFilterGroupItem],
         order: 0,
       },
       Filter2: {
+        legend: 'Filter 2',
         name: 'filter-2',
         options: [testFilterGroupItem2],
         order: 0,

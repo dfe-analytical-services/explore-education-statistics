@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -151,7 +152,6 @@ public class DataSetFileStorageTestFixture
     /// <param name="metaFileName">Used as mock data</param>
     /// <param name="contentDbContext">Used to save mocked data</param>
     /// <param name="version">Used to mock the version of the api data set</param>
-    /// <param name="replacingId">Mocked ID which replaces data file</param>
     /// <param name="isPublished">Used to signal whether to mock the api data set version as published or not</param>
     /// <returns>Abstracted test fixture which is used by test cases to execute tests</returns>
     public static async Task<DataSetFileStorageTestFixture> CreateBulkZipUploadDataSetTestFixture(
@@ -216,7 +216,7 @@ public class DataSetFileStorageTestFixture
                 .WithFilename(dataFileName[i])
                 .WithCreatedByUser(user)
                 .Generate();
-            releaseFiles[i] = testFixture.ReleaseFile = fixture// set ReleaseFile to one of the itmes so we can verify the releaseVersionId later.
+            releaseFiles[i] = testFixture.ReleaseFile = fixture// set ReleaseFile to one of the items so we can verify the releaseVersionId later.
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(dataFiles[i])
@@ -331,6 +331,7 @@ public class DataSetFileStorageTestFixture
     {
         for (var i = 0; i < fileAndDataSetName.Length; i++)
         {
+            var dataSetName = fileAndDataSetName[i].Item2;
             ReleaseDataFileRepository
                 .Setup(mock => mock.Create(
                     It.IsAny<Guid>(),
@@ -339,7 +340,7 @@ public class DataSetFileStorageTestFixture
                     It.IsAny<long>(),
                     FileType.Data,
                     It.IsAny<Guid>(),
-                    fileAndDataSetName[i].Item2,
+                    It.Is<string>(actual => actual == dataSetName),
                     It.IsAny<File>(),
                     null,
                     It.IsAny<int>()))
@@ -490,7 +491,7 @@ public class DataSetFileStorageTestFixture
                 It.IsAny<string>(),
                 It.IsAny<MemoryStream>(),
                 It.IsAny<string>(),
-                null,
+                ContentEncodings.Gzip,
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -522,19 +523,19 @@ public class DataSetFileStorageTestFixture
             .ReturnsAsync(new DataSetViewModel
             {
                 Title = dataSetName,
-                Summary = null,
+                Summary = "Summary",
                 DraftVersion = new DataSetDraftVersionViewModel
                 {
-                    Id = default,
-                    Version = null,
+                    Id = Guid.NewGuid(),
+                    Version = "1.0",
                     Status = DataSetVersionStatus.Processing,
                     Type = DataSetVersionType.Minor,
-                    File = null,
-                    ReleaseVersion = null,
-                    Notes = null
+                    File = new IdTitleViewModel(),
+                    ReleaseVersion = new IdTitleViewModel(),
+                    Notes = "Some notes."
                 },
                 LatestLiveVersion = null,
-                PreviousReleaseIds = null,
+                PreviousReleaseIds = [],
                 Id = Guid.NewGuid(),
                 Status = DataSetStatus.Draft
             });
@@ -564,8 +565,8 @@ public class DataSetFileStorageTestFixture
                 Version = "2.0.1",
                 Status = DataSetVersionStatus.Processing,
                 Type = DataSetVersionType.Minor,
-                ReleaseVersion = null,
-                File = null
+                ReleaseVersion = new IdTitleViewModel(),
+                File = new IdTitleViewModel()
             });
     }
 
@@ -588,8 +589,8 @@ public class DataSetFileStorageTestFixture
                 Version = "2.0.1",
                 Status = DataSetVersionStatus.Processing,
                 Type = DataSetVersionType.Minor,
-                ReleaseVersion = null,
-                File = null
+                ReleaseVersion = new IdTitleViewModel(),
+                File = new IdTitleViewModel()
             });
     }
 
@@ -618,8 +619,8 @@ public class DataSetFileStorageTestFixture
                     Version = "2.0.1",
                     Status = DataSetVersionStatus.Processing,
                     Type = DataSetVersionType.Minor,
-                    ReleaseVersion = null,
-                    File = null
+                    ReleaseVersion = new IdTitleViewModel(),
+                    File = new IdTitleViewModel()
                 });
         }
     }

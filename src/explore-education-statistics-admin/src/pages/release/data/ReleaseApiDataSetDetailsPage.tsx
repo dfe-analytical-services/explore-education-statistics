@@ -34,6 +34,8 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
+import InsetText from '@common/components/InsetText';
+import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -104,9 +106,11 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const canUpdateRelease = releaseVersion.approvalStatus !== 'Approved';
 
-  const showDraftVersionActions =
-    dataSet?.draftVersion?.status !== 'Processing';
-
+  const showDraftVersionActions = shouldShowDraftActions(
+    isPatch,
+    canUpdateRelease,
+    dataSet,
+  );
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.draftVersion}
@@ -257,7 +261,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     dataSet.draftVersion.mappingStatus.locationsComplete;
 
   const showDraftVersionTasks =
-    showDraftVersionActions &&
+    dataSet?.draftVersion?.status !== 'Processing' &&
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
@@ -276,18 +280,25 @@ export default function ReleaseApiDataSetDetailsPage() {
         replaceRouteParams,
       )}`
     : '';
+
+  const incompletesFound =
+    dataSet?.draftVersion?.mappingStatus &&
+    (!dataSet.draftVersion.mappingStatus.filtersComplete ||
+      !dataSet.draftVersion.mappingStatus.locationsComplete);
+
   const majorVersionErrorSummary = (
-    <div className="govuk-inset-text InsetText_error__ZDwli" role="alert">
+    <InsetText variant="error">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
-        This API data set can not be published because it is either incomplete
-        or has a major version update.
+        {incompletesFound
+          ? 'This API data set can not be published because it has incomplete location or filter manual mapping.'
+          : 'This API data set can not be published because it has major changes that are not allowed.'}
       </h2>
       <div className="govuk-error-summary__body">
         <ul className="govuk-list govuk-error-summary__list">
           <li>
-            The data file uploaded has incomplete sections or has resulted in a
-            major version update which is not allowed in release amendments.
-            Major version type changes can only be made as part of new releases.
+            {incompletesFound
+              ? 'The data file uploaded has not been able to be fully auto mapped and as a result has incomplete location or filter manual mapping.'
+              : 'The data file uploaded has resulted in a major version update which is not allowed in release amendments. Major version type changes can only be made as part of new releases.'}
           </li>
           <li>
             Please select a mapping configuration that does not result in a
@@ -305,7 +316,7 @@ export default function ReleaseApiDataSetDetailsPage() {
           <li>For further guidance, contact the EES team.</li>
         </ul>
       </div>
-    </div>
+    </InsetText>
   );
   return (
     <>

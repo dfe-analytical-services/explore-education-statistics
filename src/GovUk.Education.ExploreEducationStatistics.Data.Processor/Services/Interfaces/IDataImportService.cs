@@ -5,28 +5,27 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+
+public interface IDataImportService
 {
-    public interface IDataImportService
-    {
-        Task FailImport(Guid id, List<DataImportError> errors);
+    Task FailImport(Guid id, List<DataImportError> errors);
 
-        Task FailImport(Guid id, params string[] errors);
+    Task FailImport(Guid id, params string[] errors);
 
-        Task<DataImport> GetImport(Guid id);
+    Task<DataImport> GetImport(Guid id);
 
-        Task<DataImportStatus> GetImportStatus(Guid id);
+    Task<DataImportStatus> GetImportStatus(Guid id);
 
-        Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
+    Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
-        Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int? numDataFileRows);
+    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int? numDataFileRows);
 
-        Task Update(
-            Guid id,
-            int? expectedImportedRows = null,
-            int? totalRows = null,
-            HashSet<GeographicLevel>? geographicLevels = null,
-            int? importedRows = null,
-            int? lastProcessedRowIndex = null);
-    }
+    Task Update(
+        Guid id,
+        int? expectedImportedRows = null,
+        int? totalRows = null,
+        HashSet<GeographicLevel>? geographicLevels = null,
+        int? importedRows = null,
+        int? lastProcessedRowIndex = null);
 }
