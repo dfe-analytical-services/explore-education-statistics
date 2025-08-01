@@ -353,6 +353,9 @@ describe('DataSetFilePage', () => {
           ],
         },
         minorChanges: {},
+        versionNumber: '2.0.0',
+        notes: '',
+        patchHistory: [],
       };
 
       render(
@@ -370,15 +373,57 @@ describe('DataSetFilePage', () => {
         screen.getByRole('navigation', { name: 'On this page' }),
       );
 
-      const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(7);
-      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
-      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
-      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
-      expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[4]).toHaveAttribute('href', '#api');
-      expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
-      expect(navLinks[6]).toHaveAttribute('href', '#apiChangelog');
+      assertNavigationIncludesChangelog(nav);
+    });
+
+    test('renders the page navigation correctly when there is an API patch changelog', async () => {
+      const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
+        majorChanges: {},
+        minorChanges: {},
+        versionNumber: '2.1.2',
+        notes: '',
+        patchHistory: [
+          {
+            majorChanges: {},
+            minorChanges: {
+              filters: [
+                {
+                  previousState: {
+                    id: 'filter-1',
+                    column: 'filter_1',
+                    label: 'Filter 1',
+                    hint: '',
+                  },
+                },
+              ],
+            },
+            versionNumber: '2.1.1',
+            notes: '',
+            patchHistory: [],
+          },
+        ],
+      };
+
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersionChanges={testApiDataSetVersionChanges}
+          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+
+      assertNavigationIncludesChangelog(nav);
+
+      expect(
+        screen.queryByRole('heading', { name: 'API data set changelog' }),
+      ).toBeInTheDocument();
     });
 
     test('renders the API version history section', async () => {
@@ -428,6 +473,9 @@ describe('DataSetFilePage', () => {
           ],
         },
         minorChanges: {},
+        versionNumber: '1.0.0',
+        notes: '',
+        patchHistory: [],
       };
 
       render(
@@ -439,6 +487,50 @@ describe('DataSetFilePage', () => {
           }}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
           dataSetFile={testDataSetFile}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('heading', { name: 'API data set changelog' }),
+      ).toBeInTheDocument();
+    });
+
+    test('renders the API changelog when there is an API patch changelog', async () => {
+      const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
+        majorChanges: {},
+        minorChanges: {},
+        versionNumber: '2.1.2',
+        notes: '',
+        patchHistory: [
+          {
+            majorChanges: {},
+            minorChanges: {
+              filters: [
+                {
+                  previousState: {
+                    id: 'filter-1',
+                    column: 'filter_1',
+                    label: 'Filter 1',
+                    hint: '',
+                  },
+                },
+              ],
+            },
+            versionNumber: '2.1.1',
+            notes: 'test',
+            patchHistory: [],
+          },
+        ],
+      };
+
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          apiDataSetVersionChanges={testApiDataSetVersionChanges}
+          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
         />,
       );
 
@@ -473,6 +565,9 @@ describe('DataSetFilePage', () => {
           apiDataSetVersionChanges={{
             majorChanges: {},
             minorChanges: {},
+            versionNumber: '1.0.0',
+            notes: '',
+            patchHistory: [],
           }}
           dataSetFile={testDataSetFile}
         />,
@@ -486,3 +581,15 @@ describe('DataSetFilePage', () => {
     });
   });
 });
+
+function assertNavigationIncludesChangelog(nav: ReturnType<typeof within>) {
+  const navLinks = nav.getAllByRole('link');
+  expect(navLinks).toHaveLength(7);
+  expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+  expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+  expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+  expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
+  expect(navLinks[4]).toHaveAttribute('href', '#api');
+  expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
+  expect(navLinks[6]).toHaveAttribute('href', '#apiChangelog');
+}

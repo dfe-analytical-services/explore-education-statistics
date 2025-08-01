@@ -5,7 +5,11 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with major and minor changes and public guidance notes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
+          versionNumber: '1.0.0',
+          notes: '',
+          patchHistory: [],
           majorChanges: {
             filters: [
               {
@@ -64,7 +68,11 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with only major changes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
+          versionNumber: '1.0.0',
+          notes: '',
+          patchHistory: [],
           majorChanges: {
             filters: [
               {
@@ -96,7 +104,11 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with only minor changes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
+          versionNumber: '1.0.0',
+          notes: '',
+          patchHistory: [],
           majorChanges: {},
           minorChanges: {
             filters: [
@@ -128,7 +140,11 @@ describe('DataSetFileApiChangelog', () => {
   test('renders correctly with no public data guidance', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
+          versionNumber: '1.0.0',
+          notes: '',
+          patchHistory: [],
           majorChanges: {},
           minorChanges: {
             filters: [
@@ -154,7 +170,11 @@ describe('DataSetFileApiChangelog', () => {
   test('does not render if empty changes', () => {
     render(
       <DataSetFileApiChangelog
+        patchHistory={[]}
         changes={{
+          versionNumber: '1.0.0',
+          notes: '',
+          patchHistory: [],
           majorChanges: {},
           minorChanges: {},
         }}

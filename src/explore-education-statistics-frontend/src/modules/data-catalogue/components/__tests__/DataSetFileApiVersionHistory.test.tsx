@@ -259,44 +259,26 @@ describe('DataSetFileApiVersionHistory', () => {
     const table = within(screen.getByRole('table'));
 
     const rows = table.getAllByRole('row');
-    expect(rows).toHaveLength(6);
+    expect(rows).toHaveLength(4);
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
     const row2Cells = within(rows[2]).getAllByRole('cell');
     const row3Cells = within(rows[3]).getAllByRole('cell');
-    const row4Cells = within(rows[4]).getAllByRole('cell');
-    const row5Cells = within(rows[5]).getAllByRole('cell');
 
     expect(row1Cells[0]).toHaveTextContent('2.0.2 (current)');
     expect(within(row1Cells[0]).queryByRole('link')).not.toBeInTheDocument();
     expect(row1Cells[1]).toHaveTextContent('Release 1 title');
     expect(row1Cells[2]).toHaveTextContent('Published');
 
-    expect(row2Cells[0]).toHaveTextContent('2.0.1');
-    expect(within(row2Cells[0]).queryByRole('link')).not.toBeInTheDocument();
-    expect(row2Cells[1]).toHaveTextContent('Release 1 title');
-    expect(row2Cells[2]).toHaveTextContent('Published');
+    expect(row2Cells[0]).toHaveTextContent('1.1');
+    expect(within(row2Cells[0]).queryByRole('link')).toBeInTheDocument();
+    expect(row2Cells[1]).toHaveTextContent('Release 2 title');
+    expect(row2Cells[2]).toHaveTextContent('Deprecated');
 
-    expect(row3Cells[0]).toHaveTextContent('2.0');
-    expect(within(row3Cells[0]).queryByRole('link')).not.toBeInTheDocument();
-    expect(row3Cells[1]).toHaveTextContent('Release 1 title');
-    expect(row3Cells[2]).toHaveTextContent('Published');
-
-    expect(
-      within(row4Cells[0]).getByRole('link', { name: '1.1' }),
-    ).toHaveAttribute('href', '/data-catalogue/data-set/file-2-id');
-    expect(row4Cells[1]).toHaveTextContent('Release 2 title');
-    expect(row4Cells[2]).toHaveTextContent('Deprecated');
-
-    expect(
-      within(row5Cells[0]).getByRole('link', { name: '1.0' }),
-    ).toHaveAttribute('href', '/data-catalogue/data-set/file-3-id');
-    expect(row5Cells[1]).toHaveTextContent('Release 3 title');
-    expect(row5Cells[2]).toHaveTextContent('Withdrawn');
-
-    expect(
-      screen.queryByRole('navigation', { name: 'Version history pagination' }),
-    ).not.toBeInTheDocument();
+    expect(row3Cells[0]).toHaveTextContent('1.0');
+    expect(within(row3Cells[0]).queryByRole('link')).toBeInTheDocument();
+    expect(row3Cells[1]).toHaveTextContent('Release 3 title');
+    expect(row3Cells[2]).toHaveTextContent('Withdrawn');
   });
 
   function render(ui: ReactElement) {

@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -22,6 +23,7 @@ public class DataSetVersionChangeService(
     public Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetChanges(
         Guid dataSetId,
         string dataSetVersion,
+        bool includePatchHistory,
         CancellationToken cancellationToken = default)
     {
         return publicDataDbContext.DataSetVersions
@@ -37,7 +39,43 @@ public class DataSetVersionChangeService(
                 requestedDataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken))
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
-            .OnSuccess(MapChanges);
+            .OnSuccess(MapChanges)
+            .OnSuccessCombineWith(changes => 
+                includePatchHistory 
+                    ? GetPreviousChanges(dataSetId, changes.VersionNumber, cancellationToken) 
+                    : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangesViewModel>>(new List<DataSetVersionChangesViewModel>()))
+                )
+            .OnSuccess(tuple =>
+            {
+                var (change, history) = tuple;
+                change.PatchHistory = history;
+                return change;
+            });
+    }
+
+    private Task<Either<ActionResult, List<DataSetVersionChangesViewModel>>> GetPreviousChanges(
+        Guid dataSetId,
+        string dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        return publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .GetPreviousPatchVersions(
+                dataSetId: dataSetId,
+                version: dataSetVersion,
+                cancellationToken: cancellationToken)
+            .OnSuccess(version => version
+                .Select(userService.CheckCanViewDataSetVersion)
+                .OnSuccessAll())
+            .OnSuccess(async versions =>
+            {
+                var loadedChanges = new List<DataSetVersionChangesViewModel>();
+                foreach (var version in versions)
+                {
+                    loadedChanges.Add(MapChanges(await LoadChanges(version, cancellationToken)));
+                }
+                return loadedChanges;
+            });
     }
 
     private async Task<DataSetVersion> LoadChanges(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
@@ -85,6 +123,8 @@ public class DataSetVersionChangeService(
 
         return new DataSetVersionChangesViewModel
         {
+            VersionNumber = dataSetVersion.PublicVersion,
+            Notes = dataSetVersion.Notes,
             MajorChanges = new ChangeSetViewModel
             {
                 Filters = filterChanges?.GetValueOrDefault(ChangeType.Major),

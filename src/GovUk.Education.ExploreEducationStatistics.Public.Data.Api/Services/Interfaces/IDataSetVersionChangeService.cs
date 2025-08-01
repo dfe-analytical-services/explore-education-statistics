@@ -9,5 +9,6 @@ public interface IDataSetVersionChangeService
     Task<Either<ActionResult, DataSetVersionChangesViewModel>> GetChanges(
         Guid dataSetId,
         string dataSetVersion,
+        bool includePatchHistory,
         CancellationToken cancellationToken = default);
 }

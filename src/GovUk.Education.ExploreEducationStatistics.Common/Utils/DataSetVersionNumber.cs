@@ -8,14 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
 {
-    public bool IsWildcard { get; init; }
-
     public static bool TryParse(string versionString, [NotNullWhen(true)] out DataSetVersionNumber? version)
     {
         version = null;
-        if (versionString.Contains('*'))
+        if (DataSetVersionWildcardHelper.ContainsWildcard(versionString))
         {
-            return TryParseWildcard(versionString, ref version);
+            return DataSetVersionWildcardHelper.TryParseWildcard(versionString, out version);
         }
 
         var successful = SemVersion.TryParse(
@@ -30,16 +28,21 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
             return false;
         }
         
-        version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch)
-        {
-            IsWildcard = false
-        };
-        
+        version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch);
         return successful;
     }
+}
 
-    private static bool TryParseWildcard(string versionString, [NotNullWhen(true)] ref DataSetVersionNumber? version)
+public static class DataSetVersionWildcardHelper
+{
+    public static bool ContainsWildcard(string versionString)
     {
+        return versionString.Contains('*');
+    }
+
+    public static bool TryParseWildcard(string versionString, [NotNullWhen(true)] out DataSetVersionNumber? version)
+    {
+        version = null;
         int?[] parts;
         try
         {
@@ -51,7 +54,7 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
                 .ToArray();
         }
         catch (FormatException)
-        { //reject invalid characters like '** or numbers with leading/trailing whitespaces
+        {
             return false;
         }
         if (parts.Length > 3)
@@ -65,10 +68,7 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
 
         version = new DataSetVersionNumber(parts[0],
             parts.Length > 1 ? parts[1] : null,
-            parts.Length > 2 ? parts[2] : null)
-        {
-            IsWildcard = true
-        };
+            parts.Length > 2 ? parts[2] : null);
 
         return true;
     }
