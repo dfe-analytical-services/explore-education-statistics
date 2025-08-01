@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     table.PrimaryKey("PK_Dashboards", x => x.Id);
                 });
 
+            // Add Education in numbers parent dashboard
             migrationBuilder.Sql("""
                                  INSERT INTO [dbo].[Dashboards] (
                                      [Id],
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                                      [ParentDashboardId]
                                  )
                                  SELECT
-                                     NEWID(), -- Id
+                                     'C82315D6-C4D8-4433-9512-7C54049681CA', -- Id - hardcode Id so we have the option to directly reference EiN parent dashboard
                                      'Education in numbers', -- Title
                                      'education-in-numbers', -- Slug
                                      'Description for Education in numbers page', -- Description @MarkFix update?

@@ -1,20 +1,19 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class Dashboard
+public class DashboardViewModel : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
     public Guid Id { get; set; }
 
-    [MaxLength(255)] public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
-    [MaxLength(255)]
     public string Slug { get; set; } = string.Empty;
 
-    [MaxLength(2047)] // @MarkFix length ok?
     public string Description { get; set; } = string.Empty;
 
     public int Version { get; set; }
@@ -27,17 +26,13 @@ public class Dashboard
 
     public Guid CreatedById { get; set; }
 
-    public User CreatedBy { get; set; } = null!;
+    public User CreatedBy { get; set; } = null!:
 
     public DateTime? Updated { get; set; }
 
     public Guid? UpdatedById { get; set; }
 
-    public User UpdatedBy { get; set; } = null!;
-
     public Guid? ParentDashboardId { get; set; }
 
-    public Dashboard? ParentDashboard { get; set; } // @MarkFix
-
-    public List<Dashboard> ChildDashboards { get; set; } = new(); // @MarkFix
+    public List<DashboardViewModel> ChildDashboards { get; set; } = new();
 }
