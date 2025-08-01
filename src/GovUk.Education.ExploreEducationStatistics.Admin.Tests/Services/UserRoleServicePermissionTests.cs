@@ -249,7 +249,7 @@ public class UserRoleServicePermissionTests
             usersAndRolesDbContext,
             contentDbContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-            usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
+            usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
             userService ?? Mock.Of<IUserService>(),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),

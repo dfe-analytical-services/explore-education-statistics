@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
@@ -18,7 +17,7 @@ public class PublicApiQueriesProcessor(
     {
         return workflow.Process(new WorkflowActor(
             sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));;
+            reportsDirectory: ReportsDirectory));
     }
 
     private class WorkflowActor(string sourceDirectory, string reportsDirectory) 

@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
 /// <inheritdoc />
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES5091_AddPublicDataProcessorContainedDatabaseUser : Migration
 {
     private const string MigrationId = "20240426105013";

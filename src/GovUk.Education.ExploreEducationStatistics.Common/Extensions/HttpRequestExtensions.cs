@@ -103,7 +103,7 @@ public static class HttpRequestExtensions
         string defaultValue)
     {
         var value = GetRequestParam(httpRequest, paramName);
-        return !value.IsNullOrEmpty() ? value! : defaultValue;
+        return !value.IsNullOrEmpty() ? value : defaultValue;
     }
 
     public static bool GetRequestParamBool(
