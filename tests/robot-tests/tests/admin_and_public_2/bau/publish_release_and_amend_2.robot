@@ -316,7 +316,7 @@ Check new release status history entry is present
 Go to permalink page & check for error element to be present
     user navigates to    ${PERMA_LOCATION_URL}
     user waits until page contains
-    ...    A newer release of this publication is available and may include updated figures.
+    ...    The data used in this table may be invalid as the subject file has been amended or removed since its creation.
 
 Check the table has the same results as original table
     user checks table row heading contains    1    1    Total
