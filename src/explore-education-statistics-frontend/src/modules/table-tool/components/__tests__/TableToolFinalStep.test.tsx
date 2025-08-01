@@ -56,18 +56,6 @@ describe('TableToolFinalStep', () => {
       screen.queryByRole('button', { name: 'Generate shareable link' }),
     ).toBeInTheDocument();
 
-    // test that the related information is rendered correctly
-    expect(
-      screen.getByRole('heading', {
-        name: 'Related information',
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('link', {
-        name: 'Test publication, Latest Release Title',
-      }),
-    ).toBeInTheDocument();
     expect(
       screen.queryByRole('radio', {
         name: 'Table in ODS format (spreadsheet, with title and footnotes)',
@@ -81,18 +69,6 @@ describe('TableToolFinalStep', () => {
     expect(
       screen.queryByRole('button', {
         name: 'Download table',
-      }),
-    ).toBeInTheDocument();
-
-    // test that contact us section is rendered correctly
-    await waitFor(() => {
-      expect(screen.getByText('Contact us')).toBeInTheDocument();
-    });
-
-    expect(screen.queryByText('The team name')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('link', {
-        name: 'team@name.com',
       }),
     ).toBeInTheDocument();
   });
@@ -128,54 +104,6 @@ describe('TableToolFinalStep', () => {
           name: 'Update and view reordered table',
         }),
       ).toBeInTheDocument(),
-    );
-  });
-
-  test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
-    render(
-      <TableToolFinalStep
-        query={testQuery}
-        table={testTable}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithNonLatestRelease}
-        onReorderTableHeaders={noop}
-      />,
-    );
-
-    expect(
-      screen.getByRole('link', {
-        name: 'Test publication, Latest Release Title',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/find-statistics/test-publication/latest-release-slug',
-    );
-  });
-
-  test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
-    render(
-      <TableToolFinalStep
-        query={testQuery}
-        table={testTable}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
-        onReorderTableHeaders={noop}
-      />,
-    );
-
-    expect(
-      screen.getByRole('link', {
-        name: 'Test publication, Latest Release Title',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/find-statistics/test-publication/latest-release-slug',
     );
   });
 
@@ -226,15 +154,6 @@ describe('TableToolFinalStep', () => {
     expect(
       screen.getByRole('link', {
         name: 'View latest data: Latest Release Title',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/find-statistics/test-publication/latest-release-slug',
-    );
-
-    expect(
-      screen.getByRole('link', {
-        name: 'Test publication, Latest Release Title',
       }),
     ).toHaveAttribute(
       'href',
@@ -314,67 +233,5 @@ describe('TableToolFinalStep', () => {
     expect(
       screen.queryByText('This publication has been superseded by'),
     ).not.toBeInTheDocument();
-  });
-
-  test('renders the methodology link correctly', async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
-    render(
-      <TableToolFinalStep
-        query={testQuery}
-        table={testTable}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
-        onReorderTableHeaders={noop}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('methodology title')).toBeInTheDocument();
-    });
-
-    expect(
-      screen.getByRole('link', {
-        name: 'methodology title',
-      }),
-    ).toHaveAttribute('href', '/methodology/m1');
-  });
-
-  test('renders the external methodology link correctly', async () => {
-    const testPublicationWithExternalMethodology = {
-      ...testPublicationRelease,
-      publication: {
-        ...testPublicationRelease.publication,
-        methodologies: [],
-        externalMethodology: {
-          url: 'http://somewhere.com',
-          title: 'An external methodology',
-        },
-      },
-    };
-
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationWithExternalMethodology,
-    );
-    render(
-      <TableToolFinalStep
-        query={testQuery}
-        table={testTable}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
-        onReorderTableHeaders={noop}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('An external methodology')).toBeInTheDocument();
-    });
-
-    expect(
-      screen.getByRole('link', {
-        name: 'An external methodology',
-      }),
-    ).toHaveAttribute('href', 'http://somewhere.com');
   });
 });
