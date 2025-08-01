@@ -509,24 +509,14 @@ Change the Release type
     ...    3000-01
     ...    Official statistics in development
 
-Navigate to data replacement page
-    user clicks link    Data and files
-    user waits until page contains data uploads table
-    user clicks link    Replace data
+Upload a replacement data set
+    user uploads subject replacement    Dates test subject    dates-replacement.csv    dates-replacement.meta.csv
 
-    user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Title    Dates test subject
-    user checks headed table body row contains    Data file    dates.csv
-    user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
-
-Upload replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
-    user clicks button    Upload data files
+Confirm data replacement details on replacement page
+    user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
+    user checks table cell contains    1    2    17 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file

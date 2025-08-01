@@ -94,7 +94,6 @@ Continue the import
     user waits until table cell contains    1    3    Complete    testid:Data files table
     user checks table cell contains    1    4    View details    testid:Data files table
     user checks table cell contains    1    4    Edit title    testid:Data files table
-    user checks table cell contains    1    4    Replace data    testid:Data files table
     user checks table cell contains    1    4    Delete files    testid:Data files table
 
 Change data file title
