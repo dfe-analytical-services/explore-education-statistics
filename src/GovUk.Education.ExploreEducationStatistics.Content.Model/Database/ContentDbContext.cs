@@ -91,6 +91,7 @@ public class ContentDbContext : DbContext
     public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
     public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
+    public virtual DbSet<Dashboard> Dashboards { get; set; }
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -140,6 +141,7 @@ public class ContentDbContext : DbContext
         ConfigureDataBlockVersion(modelBuilder);
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
+        ConfigureDashboards(modelBuilder);
 
         // Apply model configuration for types which implement IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -947,6 +949,15 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.AdditionalFeedback)
             .HasMaxLength(2000);
+    }
+
+    private static void ConfigureDashboards(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Dashboard>() // @MarkFix check this works
+            .HasMany(d => d.ChildDashboards)
+            .WithOne(d => d.ParentDashboard)
+            .HasForeignKey(d => d.ParentDashboardId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
