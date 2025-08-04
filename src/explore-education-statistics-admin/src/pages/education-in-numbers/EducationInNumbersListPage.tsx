@@ -1,7 +1,7 @@
 import React from 'react';
 import ButtonLink from '@admin/components/ButtonLink';
 import Page from '@admin/components/Page';
-import { educationInNumbersCreateRoute } from '@admin/routes/administrationRoutes';
+import { educationInNumbersCreateRoute } from '@admin/routes/routes';
 import ButtonGroup from '@common/components/ButtonGroup';
 import styles from './EducationInNumbersListPage.module.scss';
 

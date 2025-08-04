@@ -98,27 +98,6 @@ export const administrationUserManageRoute: ProtectedRouteProps = {
   protectionAction: permissions => permissions.isBauUser,
 };
 
-export const educationInNumbersListRoute: ProtectedRouteProps = {
-  path: '/education-in-numbers',
-  component: EducationInNumbersListPage,
-  protectionAction: permissions => permissions.isBauUser,
-  exact: true,
-};
-
-export const educationInNumbersCreateRoute: ProtectedRouteProps = {
-  path: '/education-in-numbers/create',
-  component: EducationInNumbersCreatePage,
-  protectionAction: permissions => permissions.isBauUser,
-  exact: true,
-};
-
-export const educationInNumbersRoute: ProtectedRouteProps = {
-  path: '/education-in-numbers/:educationInNumbersPageId',
-  component: EducationInNumbersPage,
-  protectionAction: permissions => permissions.isBauUser,
-  exact: true,
-};
-
 const administrationRoutes = {
   administrationIndexRoute,
   administrationImportsRoute,
@@ -132,9 +111,6 @@ const administrationRoutes = {
   administrationInvitedUsersRoute,
   administrationPreReleaseUsersRoute,
   administrationUserManageRoute,
-  educationInNumbersListRoute,
-  educationInNumbersCreateRoute,
-  educationInNumbersRoute,
 };
 
 export default administrationRoutes;

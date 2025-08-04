@@ -11,6 +11,7 @@ import { ObjectSchema } from 'yup';
 export interface EducationInNumbersSummaryFormValues {
   title: string;
   description: string;
+  slug?: string;
 }
 
 const errorMappings = [
@@ -43,8 +44,18 @@ const EducationInNumbersSummaryForm = ({
     return Yup.object({
       title: Yup.string().required('Enter a title'),
       description: Yup.string().required('Enter a description'),
+      slug: Yup.string().when([], {
+        is: () => isEditForm,
+        then: () =>
+          Yup.string()
+            .required('Enter a slug')
+            .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+              message: 'Slug must be lowercase and can only contain hyphens',
+            }),
+        otherwise: () => Yup.string().notRequired(),
+      }),
     });
-  }, []);
+  }, [isEditForm]);
 
   return (
     <FormProvider
@@ -64,6 +75,12 @@ const EducationInNumbersSummaryForm = ({
             <FormFieldTextInput<EducationInNumbersSummaryFormValues>
               label="Title"
               name="title"
+              className="govuk-!-width-two-thirds"
+            />
+
+            <FormFieldTextInput<EducationInNumbersSummaryFormValues>
+              label="Slug"
+              name="slug"
               className="govuk-!-width-two-thirds"
             />
 

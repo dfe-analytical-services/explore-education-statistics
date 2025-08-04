@@ -50,6 +50,7 @@ const EducationInNumbersSummaryEditPage = ({
         cancelButton={
           <ButtonText onClick={() => history.goBack()}>Cancel</ButtonText>
         }
+        initialValues={educationInNumbersPage}
         isEditForm
         onSubmit={handleSubmit}
       />

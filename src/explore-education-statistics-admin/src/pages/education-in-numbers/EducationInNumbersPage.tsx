@@ -34,8 +34,6 @@ const EducationInNumbersPage = ({
 }: RouteComponentProps<EducationInNumbersRouteParams>) => {
   const { educationInNumbersPageId } = match.params;
 
-  console.log(routes);
-
   const {
     value: educationInNumbersPage,
     setState: setEducationInNumbersPage,

@@ -8,15 +8,16 @@ export interface EducationInNumbersPage {
   slug: string;
 }
 
-interface SaveEducationInNumbersPageRequest {
+export interface CreateEducationInNumbersPageRequest {
   description: string;
   title: string;
 }
 
-export type CreateEducationInNumbersPageRequest =
-  SaveEducationInNumbersPageRequest;
-export type UpdateEducationInNumbersPageRequest =
-  SaveEducationInNumbersPageRequest;
+export interface UpdateEducationInNumbersPageRequest {
+  description: string;
+  title: string;
+  slug?: string;
+}
 
 const educationInNumbersService = {
   getEducationInNumbersPages(): Promise<EducationInNumbersPage[]> {

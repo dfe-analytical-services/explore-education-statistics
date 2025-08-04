@@ -28,6 +28,9 @@ const EducationInNumbersSummaryPage = () => {
             <SummaryListItem term="Slug">
               {educationInNumbersPage.slug}
             </SummaryListItem>
+            <SummaryListItem term="Description">
+              {educationInNumbersPage.description}
+            </SummaryListItem>
             <SummaryListItem term="Published on">
               {educationInNumbersPage.published ? (
                 <FormattedDate>
@@ -39,18 +42,16 @@ const EducationInNumbersSummaryPage = () => {
             </SummaryListItem>
           </SummaryList>
 
-          {!educationInNumbersPage.published && (
-            <ButtonLink
-              to={generatePath<EducationInNumbersRouteParams>(
-                educationInNumbersSummaryEditRoute.path,
-                {
-                  educationInNumbersPageId,
-                },
-              )}
-            >
-              Edit summary
-            </ButtonLink>
-          )}
+          <ButtonLink
+            to={generatePath<EducationInNumbersRouteParams>(
+              educationInNumbersSummaryEditRoute.path,
+              {
+                educationInNumbersPageId,
+              },
+            )}
+          >
+            Edit summary
+          </ButtonLink>
         </>
       ) : (
         <WarningMessage>

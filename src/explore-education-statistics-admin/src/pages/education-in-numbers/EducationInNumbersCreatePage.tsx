@@ -4,7 +4,7 @@ import EducationInNumbersPageForm from '@admin/pages/education-in-numbers/compon
 import {
   educationInNumbersListRoute,
   educationInNumbersRoute,
-} from '@admin/routes/administrationRoutes';
+} from '@admin/routes/routes';
 import { EducationInNumbersRouteParams } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 import appendQuery from '@common/utils/url/appendQuery';
