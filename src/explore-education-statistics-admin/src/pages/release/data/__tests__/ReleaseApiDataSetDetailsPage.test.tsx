@@ -1244,7 +1244,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText(
-          'The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments.',
+          'This API data set can not be published because it has major changes that are not allowed.',
         ),
       ).toThrow('Unable to find an element');
     });
@@ -1301,7 +1301,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(() =>
         screen.getByText(
-          'The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments.',
+          'This API data set can not be published because it has major changes that are not allowed.',
         ),
       ).toThrow('Unable to find an element');
     });
