@@ -28,7 +28,7 @@ export interface DataSetFile {
     name: string;
     size: string;
     meta: {
-      numDataFileRows?: number;
+      numDataFileRows: number;
       geographicLevels: string[];
       timePeriodRange: {
         from: string;
@@ -87,7 +87,7 @@ export interface DataSetFileSummary {
   lastUpdated: string;
   api?: DataSetFileApi;
   meta: {
-    numDataFileRows?: number;
+    numDataFileRows: number;
     geographicLevels: string[];
     timePeriodRange: {
       from: string;

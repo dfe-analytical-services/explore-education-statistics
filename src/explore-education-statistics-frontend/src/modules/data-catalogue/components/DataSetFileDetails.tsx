@@ -81,11 +81,10 @@ export default function DataSetFileDetails({
           </Modal>
         </SummaryListItem>
 
-        {numDataFileRows && (
-          <SummaryListItem term="Number of rows">
-            {formatPretty(numDataFileRows)}
-          </SummaryListItem>
-        )}
+        <SummaryListItem term="Number of rows">
+          {formatPretty(numDataFileRows)}
+        </SummaryListItem>
+
         {geographicLevels && geographicLevels.length > 0 && (
           <SummaryListItem term="Geographic levels">
             {orderBy(geographicLevels).join(', ')}
