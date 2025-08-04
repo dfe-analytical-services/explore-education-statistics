@@ -69,13 +69,14 @@ public class SignInServiceTests
                 .ForIndex(1, s => s.SetRole(PublicationRole.Allower))
                 .GenerateList(2);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
-            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await contentDbContext.SaveChangesAsync();
-
-            usersAndRolesDbContext.UserInvites.Add(userInvite);
-            await usersAndRolesDbContext.SaveChangesAsync();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                usersAndRolesDbContext.UserInvites.Add(userInvite);
+                await usersAndRolesDbContext.SaveChangesAsync();
+            }
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
@@ -128,18 +129,22 @@ public class SignInServiceTests
                     .Verifiable();
             }
 
-            var service = SetupService(
-                contentDbContext: contentDbContext,
-                usersAndRolesDbContext: usersAndRolesDbContext,
-                userService: userService.Object,
-                userManager: userManager.Object,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: usersAndRolesDbContext,
+                    userService: userService.Object,
+                    userManager: userManager.Object,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object,
+                    userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                    userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
 
-            var result = await service.RegisterOrSignIn();
-            result.AssertRight();
+                var result = await service.RegisterOrSignIn();
+                result.AssertRight();
+            }
 
             VerifyAllMocks(
                 userService,
@@ -149,20 +154,24 @@ public class SignInServiceTests
                 userReleaseRoleAndInviteManager,
                 userPublicationRoleAndInviteManager);
 
-            var newIdentityUser = await usersAndRolesDbContext.Users
-                .SingleAsync(u => u.Email == email.ToLower());
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var newIdentityUser = await usersAndRolesDbContext.Users
+                    .SingleAsync(u => u.Email == email.ToLower());
 
-            Assert.Equal(email.ToLower(), newIdentityUser.Email);
-            Assert.Equal(email.ToLower(), newIdentityUser.UserName);
-            Assert.Equal(firstName, newIdentityUser.FirstName);
-            Assert.Equal(lastName, newIdentityUser.LastName);
+                Assert.Equal(email.ToLower(), newIdentityUser.Email);
+                Assert.Equal(email.ToLower(), newIdentityUser.UserName);
+                Assert.Equal(firstName, newIdentityUser.FirstName);
+                Assert.Equal(lastName, newIdentityUser.LastName);
 
-            var newUser = await contentDbContext.Users
-                .SingleAsync(u => u.Email == email.ToLower());
+                var newUser = await contentDbContext.Users
+                    .SingleAsync(u => u.Email == email.ToLower());
 
-            Assert.Equal(email.ToLower(), newUser.Email);
-            Assert.Equal(firstName, newUser.FirstName);
-            Assert.Equal(lastName, newUser.LastName);
+                Assert.Equal(email.ToLower(), newUser.Email);
+                Assert.Equal(firstName, newUser.FirstName);
+                Assert.Equal(lastName, newUser.LastName);
+            }
         }
 
         [Fact]
@@ -203,13 +212,14 @@ public class SignInServiceTests
                 .ForIndex(1, s => s.SetRole(PublicationRole.Allower))
                 .GenerateList(2);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
-            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await contentDbContext.SaveChangesAsync();
-
-            usersAndRolesDbContext.UserInvites.Add(userInvite);
-            await usersAndRolesDbContext.SaveChangesAsync();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                usersAndRolesDbContext.UserInvites.Add(userInvite);
+                await usersAndRolesDbContext.SaveChangesAsync();
+            }
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
@@ -233,16 +243,20 @@ public class SignInServiceTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var service = SetupService(
-                contentDbContext: contentDbContext,
-                usersAndRolesDbContext: usersAndRolesDbContext,
-                userService: userService.Object,
-                userManager: userManager.Object,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: usersAndRolesDbContext,
+                    userService: userService.Object,
+                    userManager: userManager.Object,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
 
-            var result = await service.RegisterOrSignIn();
-            result.AssertRight();
+                var result = await service.RegisterOrSignIn();
+                result.AssertRight();
+            }
 
             VerifyAllMocks(
                 userService,
@@ -250,22 +264,26 @@ public class SignInServiceTests
                 userReleaseInviteRepository,
                 userPublicationInviteRepository);
 
-            var newIdentityUser = await usersAndRolesDbContext.Users
-                .SingleOrDefaultAsync(u => u.Email == email.ToLower());
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var newIdentityUser = await usersAndRolesDbContext.Users
+                    .SingleOrDefaultAsync(u => u.Email == email.ToLower());
 
-            Assert.Null(newIdentityUser);
+                Assert.Null(newIdentityUser);
 
-            var newUser = await contentDbContext.Users
-                .SingleOrDefaultAsync(u => u.Email == email.ToLower());
+                var newUser = await contentDbContext.Users
+                    .SingleOrDefaultAsync(u => u.Email == email.ToLower());
 
-            Assert.Null(newUser);
+                Assert.Null(newUser);
 
-            var updatedUserInvite = usersAndRolesDbContext.UserInvites
-                .IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
-                .Where(i => i.Email.ToLower() == email.ToLower())
-                .SingleOrDefault();
+                var updatedUserInvite = usersAndRolesDbContext.UserInvites
+                    .IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
+                    .Where(i => i.Email.ToLower() == email.ToLower())
+                    .SingleOrDefault();
 
-            Assert.Null(updatedUserInvite);
+                Assert.Null(updatedUserInvite);
+            }
         }
     }
 

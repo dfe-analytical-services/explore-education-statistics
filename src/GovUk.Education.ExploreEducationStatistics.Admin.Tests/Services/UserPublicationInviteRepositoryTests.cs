@@ -130,52 +130,67 @@ public abstract class UserPublicationInviteRepositoryTests
                 .ForIndex(4, s => s.SetRole(otherRole))
                 .GenerateList(5);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.Remove(
-                publicationId: targetPublication.Id,
-                email: targetEmail,
-                role: targetRole);
+                await repository.Remove(
+                    publicationId: targetPublication.Id,
+                    email: targetEmail,
+                    role: targetRole);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
+                    .ToListAsync();
 
-            Assert.Equal(3, remainingInvites.Count);
+                Assert.Equal(3, remainingInvites.Count);
 
-            Assert.Equal(otherPublication.Id, remainingInvites[0].PublicationId);
-            Assert.Equal(targetEmail, remainingInvites[0].Email);
-            Assert.Equal(targetRole, remainingInvites[0].Role);
+                Assert.Equal(otherPublication.Id, remainingInvites[0].PublicationId);
+                Assert.Equal(targetEmail, remainingInvites[0].Email);
+                Assert.Equal(targetRole, remainingInvites[0].Role);
 
-            Assert.Equal(targetPublication.Id, remainingInvites[1].PublicationId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(targetRole, remainingInvites[1].Role);
+                Assert.Equal(targetPublication.Id, remainingInvites[1].PublicationId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(targetRole, remainingInvites[1].Role);
 
-            Assert.Equal(targetPublication.Id, remainingInvites[2].PublicationId);
-            Assert.Equal(targetEmail, remainingInvites[2].Email);
-            Assert.Equal(otherRole, remainingInvites[2].Role);
+                Assert.Equal(targetPublication.Id, remainingInvites[2].PublicationId);
+                Assert.Equal(targetEmail, remainingInvites[2].Email);
+                Assert.Equal(otherRole, remainingInvites[2].Role);
+            }
         }
 
         [Fact]
         public async Task NoInvitesExist_DoesNothing()
         {
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.Remove(
-                publicationId: Guid.NewGuid(),
-                email: "test1@test.com",
-                role: PublicationRole.Owner);
+                await repository.Remove(
+                    publicationId: Guid.NewGuid(),
+                    email: "test1@test.com",
+                    role: PublicationRole.Owner);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
                 .ToListAsync();
 
-            Assert.Empty(remainingInvites);
+                Assert.Empty(remainingInvites);
+            }
         }
     }
 
@@ -221,31 +236,40 @@ public abstract class UserPublicationInviteRepositoryTests
                 userPublicationInvites[1],
             };
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveMany(userPublicationInvitesToRemove);
+                await repository.RemoveMany(userPublicationInvitesToRemove);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
+                    .ToListAsync();
 
-            Assert.Equal(3, remainingInvites.Count);
+                Assert.Equal(3, remainingInvites.Count);
 
-            Assert.Equal(otherPublication.Id, remainingInvites[0].PublicationId);
-            Assert.Equal(targetEmail, remainingInvites[0].Email);
-            Assert.Equal(targetRole, remainingInvites[0].Role);
+                Assert.Equal(otherPublication.Id, remainingInvites[0].PublicationId);
+                Assert.Equal(targetEmail, remainingInvites[0].Email);
+                Assert.Equal(targetRole, remainingInvites[0].Role);
 
-            Assert.Equal(targetPublication.Id, remainingInvites[1].PublicationId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(targetRole, remainingInvites[1].Role);
+                Assert.Equal(targetPublication.Id, remainingInvites[1].PublicationId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(targetRole, remainingInvites[1].Role);
 
-            Assert.Equal(targetPublication.Id, remainingInvites[2].PublicationId);
-            Assert.Equal(targetEmail, remainingInvites[2].Email);
-            Assert.Equal(otherRole, remainingInvites[2].Role);
+                Assert.Equal(targetPublication.Id, remainingInvites[2].PublicationId);
+                Assert.Equal(targetEmail, remainingInvites[2].Email);
+                Assert.Equal(otherRole, remainingInvites[2].Role);
+            }
         }
 
         [Fact]
@@ -263,15 +287,21 @@ public abstract class UserPublicationInviteRepositoryTests
                 .WithRole(PublicationRole.Owner)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationInvites.Add(existingUserPublicationInvite);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationInvites.Add(existingUserPublicationInvite);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
-                await repository.RemoveMany([targetUserPublicationInvite]));
+                await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+                    await repository.RemoveMany([targetUserPublicationInvite]));
+            }
         }
 
         [Fact]
@@ -283,23 +313,32 @@ public abstract class UserPublicationInviteRepositoryTests
                 .WithRole(PublicationRole.Owner)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationInvites.Add(existingUserPublicationInvite);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationInvites.Add(existingUserPublicationInvite);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveMany([]);
+                await repository.RemoveMany([]);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
+                    .ToListAsync();
 
-            var remainingInvite = Assert.Single(remainingInvites);
+                var remainingInvite = Assert.Single(remainingInvites);
 
-            Assert.Equal(existingUserPublicationInvite.PublicationId, remainingInvite.PublicationId);
-            Assert.Equal(existingUserPublicationInvite.Email, remainingInvite.Email);
-            Assert.Equal(existingUserPublicationInvite.Role, remainingInvite.Role);
+                Assert.Equal(existingUserPublicationInvite.PublicationId, remainingInvite.PublicationId);
+                Assert.Equal(existingUserPublicationInvite.Email, remainingInvite.Email);
+                Assert.Equal(existingUserPublicationInvite.Role, remainingInvite.Role);
+            }
         }
     }
 
@@ -334,27 +373,36 @@ public abstract class UserPublicationInviteRepositoryTests
                 .ForIndex(3, s => s.SetRole(role2))
                 .GenerateList(4);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByUserEmail(targetEmail);
+                await repository.RemoveByUserEmail(targetEmail);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingInvites.Count);
+                Assert.Equal(2, remainingInvites.Count);
 
-            Assert.Equal(publication1.Id, remainingInvites[0].PublicationId);
-            Assert.Equal(otherEmail, remainingInvites[0].Email);
-            Assert.Equal(role1, remainingInvites[0].Role);
+                Assert.Equal(publication1.Id, remainingInvites[0].PublicationId);
+                Assert.Equal(otherEmail, remainingInvites[0].Email);
+                Assert.Equal(role1, remainingInvites[0].Role);
 
-            Assert.Equal(publication2.Id, remainingInvites[1].PublicationId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(role2, remainingInvites[1].Role);
+                Assert.Equal(publication2.Id, remainingInvites[1].PublicationId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(role2, remainingInvites[1].Role);
+            }
         }
 
         [Fact]
@@ -379,27 +427,36 @@ public abstract class UserPublicationInviteRepositoryTests
                 .ForIndex(1, s => s.SetRole(role2))
                 .GenerateList(2);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByUserEmail(targetEmail);
+                await repository.RemoveByUserEmail(targetEmail);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingInvites.Count);
+                Assert.Equal(2, remainingInvites.Count);
 
-            Assert.Equal(publication1.Id, remainingInvites[0].PublicationId);
-            Assert.Equal(otherEmail, remainingInvites[0].Email);
-            Assert.Equal(role1, remainingInvites[0].Role);
+                Assert.Equal(publication1.Id, remainingInvites[0].PublicationId);
+                Assert.Equal(otherEmail, remainingInvites[0].Email);
+                Assert.Equal(role1, remainingInvites[0].Role);
 
-            Assert.Equal(publication2.Id, remainingInvites[1].PublicationId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(role2, remainingInvites[1].Role);
+                Assert.Equal(publication2.Id, remainingInvites[1].PublicationId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(role2, remainingInvites[1].Role);
+            }
         }
     }
 

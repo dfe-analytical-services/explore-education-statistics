@@ -55,10 +55,13 @@ public class ReleasePermissionServiceTests
             .WithReleaseVersion(releaseVersion)
             .WithRole(PrereleaseViewer);
 
-        await using var contentDbContext = InMemoryApplicationDbContext();
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
         userReleaseRoleAndInviteManager
@@ -66,26 +69,29 @@ public class ReleasePermissionServiceTests
             .ReturnsAsync([user1ReleaseRole, user2ReleaseRole])
             .Verifiable();
 
-        var service = SetupReleasePermissionService(
-            contentDbContext: contentDbContext,
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(
+                contentDbContext: contentDbContext,
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
 
-        var result = await service.ListReleaseRoles(releaseVersion.Id);
-        var viewModel = result.AssertRight();
+            var result = await service.ListReleaseRoles(releaseVersion.Id);
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Count);
+
+            Assert.Equal(user1ReleaseRole.UserId, viewModel[0].UserId);
+            Assert.Equal(user1ReleaseRole.User.DisplayName, viewModel[0].UserDisplayName);
+            Assert.Equal(user1ReleaseRole.User.Email, viewModel[0].UserEmail);
+            Assert.Equal(user1ReleaseRole.Role, viewModel[0].Role);
+
+            Assert.Equal(user2ReleaseRole.UserId, viewModel[1].UserId);
+            Assert.Equal(user2ReleaseRole.User.DisplayName, viewModel[1].UserDisplayName);
+            Assert.Equal(user2ReleaseRole.User.Email, viewModel[1].UserEmail);
+            Assert.Equal(user2ReleaseRole.Role, viewModel[1].Role);
+        }
 
         MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
-
-        Assert.Equal(2, viewModel.Count);
-
-        Assert.Equal(user1ReleaseRole.UserId, viewModel[0].UserId);
-        Assert.Equal(user1ReleaseRole.User.DisplayName, viewModel[0].UserDisplayName);
-        Assert.Equal(user1ReleaseRole.User.Email, viewModel[0].UserEmail);
-        Assert.Equal(user1ReleaseRole.Role, viewModel[0].Role);
-
-        Assert.Equal(user2ReleaseRole.UserId, viewModel[1].UserId);
-        Assert.Equal(user2ReleaseRole.User.DisplayName, viewModel[1].UserDisplayName);
-        Assert.Equal(user2ReleaseRole.User.Email, viewModel[1].UserEmail);
-        Assert.Equal(user2ReleaseRole.Role, viewModel[1].Role);
     }
 
     [Theory]
@@ -99,10 +105,13 @@ public class ReleasePermissionServiceTests
             .WithRelease(_dataFixture.DefaultRelease()
                 .WithPublication(_dataFixture.DefaultPublication()));
 
-        await using var contentDbContext = InMemoryApplicationDbContext();
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
         userReleaseRoleAndInviteManager
@@ -110,12 +119,15 @@ public class ReleasePermissionServiceTests
             .ReturnsAsync([])
             .Verifiable();
 
-        var service = SetupReleasePermissionService(
-            contentDbContext: contentDbContext,
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(
+                contentDbContext: contentDbContext,
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
 
-        var result = await service.ListReleaseRoles(releaseVersion.Id, rolesToInclude);
-        var viewModel = result.AssertRight();
+            var result = await service.ListReleaseRoles(releaseVersion.Id, rolesToInclude);
+            var viewModel = result.AssertRight();
+        }
 
         MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
     }
@@ -432,11 +444,14 @@ public class ReleasePermissionServiceTests
 
         var user3 = new User { Id = Guid.NewGuid() };
 
-        await using var contentDbContext = InMemoryApplicationDbContext();
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-        contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole, user2ReleaseRole);
-        contentDbContext.Users.Add(user3);
-        await contentDbContext.SaveChangesAsync();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole, user2ReleaseRole);
+            contentDbContext.Users.Add(user3);
+            await contentDbContext.SaveChangesAsync();
+        }
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
         // User 2's role should be removed
@@ -456,14 +471,17 @@ public class ReleasePermissionServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = SetupReleasePermissionService(
-            contentDbContext: contentDbContext,
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(
+                contentDbContext: contentDbContext,
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
 
-        var result =
-            await service.UpdateReleaseContributors(releaseVersion.Id,
-                userIds: [user1ReleaseRole.UserId, user3.Id]);
-        result.AssertRight();
+            var result =
+                await service.UpdateReleaseContributors(releaseVersion.Id,
+                    userIds: [user1ReleaseRole.UserId, user3.Id]);
+            result.AssertRight();
+        }
 
         MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
     }
@@ -475,10 +493,13 @@ public class ReleasePermissionServiceTests
 
         var userId = Guid.NewGuid();
 
-        await using var contentDbContext = InMemoryApplicationDbContext();
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-        contentDbContext.Publications.Add(publication);
-        await contentDbContext.SaveChangesAsync();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+        }
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
         userReleaseRoleAndInviteManager
@@ -490,15 +511,18 @@ public class ReleasePermissionServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = SetupReleasePermissionService(
-            contentDbContext: contentDbContext,
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(
+                contentDbContext: contentDbContext,
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
 
-        var result = await service.RemoveAllUserContributorPermissionsForPublication(
-            publicationId: publication.Id,
-            userId: userId);
+            var result = await service.RemoveAllUserContributorPermissionsForPublication(
+                publicationId: publication.Id,
+                userId: userId);
 
-        result.AssertRight();
+            result.AssertRight();
+        }
 
         MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
     }

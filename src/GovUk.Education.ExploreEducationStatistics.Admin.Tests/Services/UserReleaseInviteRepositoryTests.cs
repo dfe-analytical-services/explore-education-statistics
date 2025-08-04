@@ -273,52 +273,67 @@ public abstract class UserReleaseInviteRepositoryTests
                 .ForIndex(4, s => s.SetRole(otherRole))
                 .GenerateList(5);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.Remove(
-                releaseVersionId: targetReleaseVersion.Id,
-                email: targetEmail,
-                role: targetRole);
+                await repository.Remove(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    email: targetEmail,
+                    role: targetRole);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            Assert.Equal(3, remainingInvites.Count);
+                Assert.Equal(3, remainingInvites.Count);
 
-            Assert.Equal(otherReleaseVersion.Id, remainingInvites[0].ReleaseVersionId);
-            Assert.Equal(targetEmail, remainingInvites[0].Email);
-            Assert.Equal(targetRole, remainingInvites[0].Role);
+                Assert.Equal(otherReleaseVersion.Id, remainingInvites[0].ReleaseVersionId);
+                Assert.Equal(targetEmail, remainingInvites[0].Email);
+                Assert.Equal(targetRole, remainingInvites[0].Role);
 
-            Assert.Equal(targetReleaseVersion.Id, remainingInvites[1].ReleaseVersionId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(targetRole, remainingInvites[1].Role);
+                Assert.Equal(targetReleaseVersion.Id, remainingInvites[1].ReleaseVersionId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(targetRole, remainingInvites[1].Role);
 
-            Assert.Equal(targetReleaseVersion.Id, remainingInvites[2].ReleaseVersionId);
-            Assert.Equal(targetEmail, remainingInvites[2].Email);
-            Assert.Equal(otherRole, remainingInvites[2].Role);
+                Assert.Equal(targetReleaseVersion.Id, remainingInvites[2].ReleaseVersionId);
+                Assert.Equal(targetEmail, remainingInvites[2].Email);
+                Assert.Equal(otherRole, remainingInvites[2].Role);
+            }
         }
 
         [Fact]
         public async Task NoInvitesExist_DoesNothing()
         {
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.Remove(
-                releaseVersionId: Guid.NewGuid(),
-                email: "test1@test.com",
-                role: ReleaseRole.Approver);
+                await repository.Remove(
+                    releaseVersionId: Guid.NewGuid(),
+                    email: "test1@test.com",
+                    role: ReleaseRole.Approver);
+            }
 
-            var remainingInvites = await contentDbContext.UserPublicationInvites
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserPublicationInvites
                 .ToListAsync();
 
-            Assert.Empty(remainingInvites);
+                Assert.Empty(remainingInvites);
+            }
         }
     }
 
@@ -368,31 +383,40 @@ public abstract class UserReleaseInviteRepositoryTests
                 userReleaseInvites[1],
             };
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveMany(userReleaseInvitesToRemove);
+                await repository.RemoveMany(userReleaseInvitesToRemove);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
                 .ToListAsync();
 
-            Assert.Equal(3, remainingInvites.Count);
+                Assert.Equal(3, remainingInvites.Count);
 
-            Assert.Equal(otherReleaseVersion.Id, remainingInvites[0].ReleaseVersionId);
-            Assert.Equal(targetEmail, remainingInvites[0].Email);
-            Assert.Equal(targetRole, remainingInvites[0].Role);
+                Assert.Equal(otherReleaseVersion.Id, remainingInvites[0].ReleaseVersionId);
+                Assert.Equal(targetEmail, remainingInvites[0].Email);
+                Assert.Equal(targetRole, remainingInvites[0].Role);
 
-            Assert.Equal(targetReleaseVersion.Id, remainingInvites[1].ReleaseVersionId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(targetRole, remainingInvites[1].Role);
+                Assert.Equal(targetReleaseVersion.Id, remainingInvites[1].ReleaseVersionId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(targetRole, remainingInvites[1].Role);
 
-            Assert.Equal(targetReleaseVersion.Id, remainingInvites[2].ReleaseVersionId);
-            Assert.Equal(targetEmail, remainingInvites[2].Email);
-            Assert.Equal(otherRole, remainingInvites[2].Role);
+                Assert.Equal(targetReleaseVersion.Id, remainingInvites[2].ReleaseVersionId);
+                Assert.Equal(targetEmail, remainingInvites[2].Email);
+                Assert.Equal(otherRole, remainingInvites[2].Role);
+            }
         }
 
         [Fact]
@@ -414,15 +438,21 @@ public abstract class UserReleaseInviteRepositoryTests
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.Add(existingUserReleaseInvite);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.Add(existingUserReleaseInvite);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
-                await repository.RemoveMany([targetUserReleaseInvite]));
+                await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
+                    await repository.RemoveMany([targetUserReleaseInvite]));
+            }
         }
 
         [Fact]
@@ -436,23 +466,32 @@ public abstract class UserReleaseInviteRepositoryTests
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.Add(existingUserReleaseInvite);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.Add(existingUserReleaseInvite);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveMany([]);
+                await repository.RemoveMany([]);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var remainingInvite = Assert.Single(remainingInvites);
+                var remainingInvite = Assert.Single(remainingInvites);
 
-            Assert.Equal(existingUserReleaseInvite.ReleaseVersionId, remainingInvite.ReleaseVersionId);
-            Assert.Equal(existingUserReleaseInvite.Email, remainingInvite.Email);
-            Assert.Equal(existingUserReleaseInvite.Role, remainingInvite.Role);
+                Assert.Equal(existingUserReleaseInvite.ReleaseVersionId, remainingInvite.ReleaseVersionId);
+                Assert.Equal(existingUserReleaseInvite.Email, remainingInvite.Email);
+                Assert.Equal(existingUserReleaseInvite.Role, remainingInvite.Role);
+            }
         }
     }
 
@@ -528,27 +567,36 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByPublication(publicationId: targetPublication.Id);
+                await repository.RemoveByPublication(publicationId: targetPublication.Id);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = allRoles.Count * 4; // 2 release versions + 2 emails
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = allRoles.Count * 4; // 2 release versions + 2 emails
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -623,29 +671,38 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByPublication(
-                publicationId: targetPublication.Id,
-                email: targetEmail);
+                await repository.RemoveByPublication(
+                    publicationId: targetPublication.Id,
+                    email: targetEmail);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = allRoles.Count * 2; // 2 release versions
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = allRoles.Count * 2; // 2 release versions
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -763,29 +820,38 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByPublication(
-                publicationId: targetPublication.Id,
-                rolesToInclude: targetRolesToInclude);
+                await repository.RemoveByPublication(
+                    publicationId: targetPublication.Id,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 4; // 2 release versions + 2 emails
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 4; // 2 release versions + 2 emails
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -895,30 +961,39 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByPublication(
-                publicationId: targetPublication.Id,
-                email: targetEmail,
-                rolesToInclude: targetRolesToInclude);
+                await repository.RemoveByPublication(
+                    publicationId: targetPublication.Id,
+                    email: targetEmail,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 2; // 2 release versions
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 2; // 2 release versions
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i => 
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -963,19 +1038,28 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByPublication(publicationId: targetPublication.Id);
+                await repository.RemoveByPublication(publicationId: targetPublication.Id);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
+                Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
+            }
         }
     }
 
@@ -1033,27 +1117,36 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+                await repository.RemoveByReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = allRoles.Count * 2; // 2 emails
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = allRoles.Count * 2; // 2 emails
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -1110,29 +1203,38 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByReleaseVersion(
-                releaseVersionId: targetReleaseVersion.Id,
-                email: targetEmail);
+                await repository.RemoveByReleaseVersion(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    email: targetEmail);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = allRoles.Count;
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = allRoles.Count;
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -1222,29 +1324,38 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByReleaseVersion(
-                releaseVersionId: targetReleaseVersion.Id,
-                rolesToInclude: targetRolesToInclude);
+                await repository.RemoveByReleaseVersion(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 2; // 2 emails
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 2; // 2 emails
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -1326,30 +1437,39 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByReleaseVersion(
-                releaseVersionId: targetReleaseVersion.Id,
-                email: targetEmail,
-                rolesToInclude: targetRolesToInclude);
+                await repository.RemoveByReleaseVersion(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    email: targetEmail,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length;
-            var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
-            Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
+                var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length;
+                var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
+                Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-            Assert.DoesNotContain(remainingInvites, invite =>
-                expectedUserReleaseInvitesToRemove.Any(i =>
-                    invite.ReleaseVersionId == i.ReleaseVersionId &&
-                    invite.Email == i.Email &&
-                    invite.Role == i.Role));
+                Assert.DoesNotContain(remainingInvites, invite =>
+                    expectedUserReleaseInvitesToRemove.Any(i =>
+                        invite.ReleaseVersionId == i.ReleaseVersionId &&
+                        invite.Email == i.Email &&
+                        invite.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -1386,19 +1506,28 @@ public abstract class UserReleaseInviteRepositoryTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(allUserReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+                await repository.RemoveByReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
+                Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
+            }
         }
     }
 
@@ -1437,27 +1566,36 @@ public abstract class UserReleaseInviteRepositoryTests
                 .ForIndex(3, s => s.SetRole(role2))
                 .GenerateList(4);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByUserEmail(targetEmail);
+                await repository.RemoveByUserEmail(targetEmail);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingInvites.Count);
+                Assert.Equal(2, remainingInvites.Count);
 
-            Assert.Equal(releaseVersion1.Id, remainingInvites[0].ReleaseVersionId);
-            Assert.Equal(otherEmail, remainingInvites[0].Email);
-            Assert.Equal(role1, remainingInvites[0].Role);
+                Assert.Equal(releaseVersion1.Id, remainingInvites[0].ReleaseVersionId);
+                Assert.Equal(otherEmail, remainingInvites[0].Email);
+                Assert.Equal(role1, remainingInvites[0].Role);
 
-            Assert.Equal(releaseVersion2.Id, remainingInvites[1].ReleaseVersionId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(role2, remainingInvites[1].Role);
+                Assert.Equal(releaseVersion2.Id, remainingInvites[1].ReleaseVersionId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(role2, remainingInvites[1].Role);
+            }
         }
 
         [Fact]
@@ -1486,27 +1624,36 @@ public abstract class UserReleaseInviteRepositoryTests
                 .ForIndex(1, s => s.SetRole(role2))
                 .GenerateList(2);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var repository = CreateRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-            await repository.RemoveByUserEmail(targetEmail);
+                await repository.RemoveByUserEmail(targetEmail);
+            }
 
-            var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingInvites.Count);
+                Assert.Equal(2, remainingInvites.Count);
 
-            Assert.Equal(releaseVersion1.Id, remainingInvites[0].ReleaseVersionId);
-            Assert.Equal(otherEmail, remainingInvites[0].Email);
-            Assert.Equal(role1, remainingInvites[0].Role);
+                Assert.Equal(releaseVersion1.Id, remainingInvites[0].ReleaseVersionId);
+                Assert.Equal(otherEmail, remainingInvites[0].Email);
+                Assert.Equal(role1, remainingInvites[0].Role);
 
-            Assert.Equal(releaseVersion2.Id, remainingInvites[1].ReleaseVersionId);
-            Assert.Equal(otherEmail, remainingInvites[1].Email);
-            Assert.Equal(role2, remainingInvites[1].Role);
+                Assert.Equal(releaseVersion2.Id, remainingInvites[1].ReleaseVersionId);
+                Assert.Equal(otherEmail, remainingInvites[1].Email);
+                Assert.Equal(role2, remainingInvites[1].Role);
+            }
         }
     }
 

@@ -685,10 +685,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.Add(userReleaseRole);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Add(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -700,25 +703,34 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var service = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await service.RemoveRoleAndInvite(userReleaseRole);
+                var userReleaseRoleToRemove = await contentDbContext.UserReleaseRoles
+                    .SingleAsync(urr => urr.Id == userReleaseRole.Id);
+
+                await service.RemoveRoleAndInvite(userReleaseRoleToRemove);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var query = contentDbContext.UserReleaseRoles.AsQueryable();
-
-            if (ignoreQueryFilters)
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                query = query.IgnoreQueryFilters();
+                var query = contentDbContext.UserReleaseRoles.AsQueryable();
+
+                if (ignoreQueryFilters)
+                {
+                    query = query.IgnoreQueryFilters();
+                }
+
+                var updatedReleaseRole = query
+                    .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
+
+                Assert.Null(updatedReleaseRole);
             }
-
-            var updatedReleaseRole = query
-                .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
-
-            Assert.Null(updatedReleaseRole);
         }
     }
 
@@ -777,39 +789,52 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(userReleaseRole1, userReleaseRole2, userReleaseRole3);
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvite1, userReleaseInvite2, userReleaseInvite3);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRole1, userReleaseRole2, userReleaseRole3);
+                contentDbContext.UserReleaseInvites.AddRange(userReleaseInvite1, userReleaseInvite2, userReleaseInvite3);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
                 .Setup(m => m.RemoveMany(
-                    new[] { userReleaseInvite1, userReleaseInvite2 },
+                    It.Is<IReadOnlyList<UserReleaseInvite>>(list =>
+                        list.Count == 2
+                        && (list[0].Id == userReleaseInvite1.Id
+                            ||
+                            list[1].Id == userReleaseInvite2.Id)),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var service = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await service.RemoveRolesAndInvites([userReleaseRole1, userReleaseRole2]);
+                await service.RemoveRolesAndInvites([userReleaseRole1, userReleaseRole2]);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var userReleaseRolesQuery = contentDbContext.UserReleaseRoles.AsQueryable();
-
-            if (ignoreQueryFilters)
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                userReleaseRolesQuery = userReleaseRolesQuery.IgnoreQueryFilters();
+                var userReleaseRolesQuery = contentDbContext.UserReleaseRoles.AsQueryable();
+
+                if (ignoreQueryFilters)
+                {
+                    userReleaseRolesQuery = userReleaseRolesQuery.IgnoreQueryFilters();
+                }
+
+                var userReleaseRole = await userReleaseRolesQuery
+                    .SingleAsync();
+
+                Assert.Equal(userReleaseRole3.Id, userReleaseRole.Id);
             }
-
-            var userReleaseRole = await userReleaseRolesQuery
-                .SingleAsync();
-
-            Assert.Equal(userReleaseRole3.Id, userReleaseRole.Id);
         }
     }
 
@@ -891,10 +916,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -906,26 +934,32 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForPublication(publicationId: targetPublication.Id);
+                await manager.RemoveAllRolesAndInvitesForPublication(publicationId: targetPublication.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = allRoles.Count * 4; // 2 release versions + 2 emails
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = allRoles.Count * 4; // 2 release versions + 2 emails
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -1006,10 +1040,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1021,28 +1058,34 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForPublication(
-                publicationId: targetPublication.Id,
-                userId: targetUser.Id);
+                await manager.RemoveAllRolesAndInvitesForPublication(
+                    publicationId: targetPublication.Id,
+                    userId: targetUser.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = allRoles.Count * 2; // 2 release versions
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = allRoles.Count * 2; // 2 release versions
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -1160,10 +1203,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1175,28 +1221,34 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForPublication(
-                publicationId: targetPublication.Id,
-                rolesToInclude: targetRolesToInclude);
+                await manager.RemoveAllRolesAndInvitesForPublication(
+                    publicationId: targetPublication.Id,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = targetRolesToInclude.Length * 4; // 2 release versions + 2 emails
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = targetRolesToInclude.Length * 4; // 2 release versions + 2 emails
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -1306,10 +1358,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1321,29 +1376,35 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForPublication(
-                publicationId: targetPublication.Id,
-                userId: targetUser.Id,
-                rolesToInclude: targetRolesToInclude);
+                await manager.RemoveAllRolesAndInvitesForPublication(
+                    publicationId: targetPublication.Id,
+                    userId: targetUser.Id,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
                 .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = targetRolesToInclude.Length * 2; // 2 release versions
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = targetRolesToInclude.Length * 2; // 2 release versions
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -1388,10 +1449,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1403,18 +1467,24 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForPublication(publicationId: targetPublication.Id);
+                await manager.RemoveAllRolesAndInvitesForPublication(publicationId: targetPublication.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            Assert.Equal(allUserReleaseRoles.Count, remainingRoles.Count);
+                Assert.Equal(allUserReleaseRoles.Count, remainingRoles.Count);
+            }
         }
     }
 
@@ -1472,10 +1542,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1487,26 +1560,32 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+                await manager.RemoveAllRolesAndInvitesForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = allRoles.Count * 2; // 2 emails
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = allRoles.Count * 2; // 2 emails
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -1563,10 +1642,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1578,28 +1660,34 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForReleaseVersion(
-                releaseVersionId: targetReleaseVersion.Id,
-                userId: targetUser.Id);
+                await manager.RemoveAllRolesAndInvitesForReleaseVersion(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    userId: targetUser.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = allRoles.Count;
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = allRoles.Count;
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -1689,10 +1777,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1704,28 +1795,34 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForReleaseVersion(
-                releaseVersionId: targetReleaseVersion.Id,
-                rolesToInclude: targetRolesToInclude);
+                await manager.RemoveAllRolesAndInvitesForReleaseVersion(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = targetRolesToInclude.Length * 2; // 2 emails
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = targetRolesToInclude.Length * 2; // 2 emails
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Theory]
@@ -1807,10 +1904,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1822,29 +1922,35 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForReleaseVersion(
-                releaseVersionId: targetReleaseVersion.Id,
-                userId: targetUser.Id,
-                rolesToInclude: targetRolesToInclude);
+                await manager.RemoveAllRolesAndInvitesForReleaseVersion(
+                    releaseVersionId: targetReleaseVersion.Id,
+                    userId: targetUser.Id,
+                    rolesToInclude: targetRolesToInclude);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            var expectedNumberOfRolesToRemove = targetRolesToInclude.Length;
-            var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
-            Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
+                var expectedNumberOfRolesToRemove = targetRolesToInclude.Length;
+                var expectedNumberOfRemainingRoles = allUserReleaseRoles.Count - expectedNumberOfRolesToRemove;
+                Assert.Equal(expectedNumberOfRemainingRoles, remainingRoles.Count);
 
-            Assert.DoesNotContain(remainingRoles, role =>
-                expectedUserReleaseRolesToRemove.Any(i =>
-                    role.ReleaseVersionId == i.ReleaseVersionId &&
-                    role.UserId == i.UserId &&
-                    role.Role == i.Role));
+                Assert.DoesNotContain(remainingRoles, role =>
+                    expectedUserReleaseRolesToRemove.Any(i =>
+                        role.ReleaseVersionId == i.ReleaseVersionId &&
+                        role.UserId == i.UserId &&
+                        role.Role == i.Role));
+            }
         }
 
         [Fact]
@@ -1881,10 +1987,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 ]);
             }
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(allUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1896,18 +2005,24 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+                await manager.RemoveAllRolesAndInvitesForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .ToListAsync();
 
-            Assert.Equal(allUserReleaseRoles.Count, remainingRoles.Count);
+                Assert.Equal(allUserReleaseRoles.Count, remainingRoles.Count);
+            }
         }
     }
 
@@ -1946,10 +2061,13 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .ForIndex(3, s => s.SetRole(role2))
                 .GenerateList(4);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -1959,27 +2077,33 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+                await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .Include(urr => urr.User)
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .Include(urr => urr.User)
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingRoles.Count);
+                Assert.Equal(2, remainingRoles.Count);
 
-            Assert.Equal(releaseVersion1.Id, remainingRoles[0].ReleaseVersionId);
-            Assert.Equal(otherUser, remainingRoles[0].User);
-            Assert.Equal(role1, remainingRoles[0].Role);
+                Assert.Equal(releaseVersion1.Id, remainingRoles[0].ReleaseVersionId);
+                Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
+                Assert.Equal(role1, remainingRoles[0].Role);
 
-            Assert.Equal(releaseVersion2.Id, remainingRoles[1].ReleaseVersionId);
-            Assert.Equal(otherUser, remainingRoles[1].User);
-            Assert.Equal(role2, remainingRoles[1].Role);
+                Assert.Equal(releaseVersion2.Id, remainingRoles[1].ReleaseVersionId);
+                Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
+                Assert.Equal(role2, remainingRoles[1].Role);
+            }
         }
 
         [Fact]
@@ -2008,11 +2132,14 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .ForIndex(1, s => s.SetRole(role2))
                 .GenerateList(2);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.Users.AddRange(targetUser, otherUser);
-            contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(targetUser, otherUser);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
             userReleaseInviteRepository
@@ -2022,27 +2149,33 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserReleaseRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+                await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+            }
 
             MockUtils.VerifyAllMocks(userReleaseInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserReleaseRoles
-                .Include(urr => urr.User)
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserReleaseRoles
+                    .Include(urr => urr.User)
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingRoles.Count);
+                Assert.Equal(2, remainingRoles.Count);
 
-            Assert.Equal(releaseVersion1.Id, remainingRoles[0].ReleaseVersionId);
-            Assert.Equal(otherUser, remainingRoles[0].User);
-            Assert.Equal(role1, remainingRoles[0].Role);
+                Assert.Equal(releaseVersion1.Id, remainingRoles[0].ReleaseVersionId);
+                Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
+                Assert.Equal(role1, remainingRoles[0].Role);
 
-            Assert.Equal(releaseVersion2.Id, remainingRoles[1].ReleaseVersionId);
-            Assert.Equal(otherUser, remainingRoles[1].User);
-            Assert.Equal(role2, remainingRoles[1].Role);
+                Assert.Equal(releaseVersion2.Id, remainingRoles[1].ReleaseVersionId);
+                Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
+                Assert.Equal(role2, remainingRoles[1].Role);
+            }
         }
     }
 

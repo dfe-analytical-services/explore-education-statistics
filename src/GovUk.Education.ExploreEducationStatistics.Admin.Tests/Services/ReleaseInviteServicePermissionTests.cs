@@ -110,10 +110,13 @@ public class ReleaseInviteServicePermissionTest
                 .WithPublication(_fixture.DefaultPublication()))
             .Generate();
 
-        await using var contentDbContext = InMemoryApplicationDbContext();
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>();
         userReleaseInviteRepository
@@ -125,16 +128,19 @@ public class ReleaseInviteServicePermissionTest
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = SetupReleaseInviteService(
-            contentDbContext: contentDbContext,
-            userReleaseInviteRepository: userReleaseInviteRepository.Object);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseInviteService(
+                contentDbContext: contentDbContext,
+                userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
-        var result = await service.RemoveByPublication(
-            email,
-            releaseVersion.Release.PublicationId,
-            ReleaseRole.Contributor);
+            var result = await service.RemoveByPublication(
+                email,
+                releaseVersion.Release.PublicationId,
+                ReleaseRole.Contributor);
 
-        result.AssertRight();
+            result.AssertRight();
+        }
 
         VerifyAllMocks(userReleaseInviteRepository);
     }

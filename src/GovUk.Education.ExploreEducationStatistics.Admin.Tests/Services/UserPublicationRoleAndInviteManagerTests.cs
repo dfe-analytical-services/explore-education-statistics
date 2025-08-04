@@ -150,42 +150,47 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .Generate();
 
             var userPublicationRoles = new List<UserPublicationRole> {
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication1)
-                .WithRole(PublicationRole.Owner)
-                .Generate(),
-            // Roles for different publication. One duplicate role.
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication2)
-                .WithRole(PublicationRole.Owner)
-                .Generate(),
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication2)
-                .WithRole(PublicationRole.Allower)
-                .Generate(),
-            // Role for different user
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user2)
-                .WithPublication(publication1)
-                .WithRole(PublicationRole.Owner)
-                .Generate(),
-        };
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+                // Roles for different publication. One duplicate role.
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication2)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication2)
+                    .WithRole(PublicationRole.Allower)
+                    .Generate(),
+                // Role for different user
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user2)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-            await contentDbContext.AddRangeAsync(userPublicationRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
-            var result = await service.GetDistinctRolesByUser(user1.Id);
+                var result = await service.GetDistinctRolesByUser(user1.Id);
 
-            // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
-            Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+                // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
+                Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+            }
         }
 
         // This test will be changed when we start introducing the use of the NEW publication roles in the 
@@ -200,29 +205,34 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .Generate();
 
             var userPublicationRoles = new List<UserPublicationRole> {
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user)
-                .WithPublication(publication)
-                .WithRole(PublicationRole.Approver)
-                .Generate(),
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user)
-                .WithPublication(publication)
-                .WithRole(PublicationRole.Drafter)
-                .Generate(),
-        };
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate(),
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Drafter)
+                    .Generate(),
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-            await contentDbContext.AddRangeAsync(userPublicationRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
-            var result = await service.GetDistinctRolesByUser(user.Id);
+                var result = await service.GetDistinctRolesByUser(user.Id);
 
-            Assert.Empty(result);
+                Assert.Empty(result);
+            }
         }
     }
 
@@ -264,17 +274,24 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                     .Generate(),
             };
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
-            await contentDbContext.AddRangeAsync(userPublicationRoles);
-            await contentDbContext.SaveChangesAsync();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var result = await service.GetAllRolesByUserAndPublication(
-                userId: user1.Id,
-                publicationId: publication1.Id);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
-            Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+                var result = await service.GetAllRolesByUserAndPublication(
+                    userId: user1.Id,
+                    publicationId: publication1.Id);
+
+                Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+            }
         }
 
         // This test will be changed when we start introducing the use of the NEW publication roles in the 
@@ -309,17 +326,24 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                     .Generate(),
             };
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
-            await contentDbContext.AddRangeAsync(userPublicationRoles);
-            await contentDbContext.SaveChangesAsync();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var result = await service.GetAllRolesByUserAndPublication(
-                userId: user.Id,
-                publicationId: publication.Id);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
 
-            Assert.Equal([PublicationRole.Allower], result);
+                var result = await service.GetAllRolesByUserAndPublication(
+                    userId: user.Id,
+                    publicationId: publication.Id);
+
+                Assert.Equal([PublicationRole.Allower], result);
+            }
         }
     }
 
@@ -345,10 +369,13 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .WithRole(publicationRole)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.Add(userPublicationRole);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
             userPublicationInviteRepository
@@ -360,25 +387,35 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var service = SetupUserPublicationRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
 
-            await service.RemoveRoleAndInvite(userPublicationRole);
+                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles
+                    .IgnoreQueryFilters()
+                    .SingleAsync(urr => urr.Id == userPublicationRole.Id);
+
+                await service.RemoveRoleAndInvite(userPublicationRoleToRemove);
+            }
 
             MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
-            var query = contentDbContext.UserPublicationRoles.AsQueryable();
-
-            if (ignoreQueryFilters)
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                query = query.IgnoreQueryFilters();
+                var query = contentDbContext.UserPublicationRoles.AsQueryable();
+
+                if (ignoreQueryFilters)
+                {
+                    query = query.IgnoreQueryFilters();
+                }
+
+                var updatedPublicationRole = query
+                    .SingleOrDefault(urr => urr.Id == userPublicationRole.Id);
+
+                Assert.Null(updatedPublicationRole);
             }
-
-            var updatedPublicationRole = query
-                .SingleOrDefault(urr => urr.Id == userPublicationRole.Id);
-
-            Assert.Null(updatedPublicationRole);
         }
     }
 
@@ -431,39 +468,52 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .WithRole(PublicationRole.Allower)
                 .Generate();
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationRoles.AddRange(userPublicationRole1, userPublicationRole2, userPublicationRole3);
-            contentDbContext.UserPublicationInvites.AddRange(userPublicationInvite1, userPublicationInvite2, userPublicationInvite3);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRole1, userPublicationRole2, userPublicationRole3);
+                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvite1, userPublicationInvite2, userPublicationInvite3);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
             userPublicationInviteRepository
                 .Setup(m => m.RemoveMany(
-                    new[] { userPublicationInvite1, userPublicationInvite2 },
+                    It.Is<IReadOnlyList<UserPublicationInvite>>(list =>
+                        list.Count == 2
+                        && (list[0].Id == userPublicationInvite1.Id
+                            ||
+                            list[1].Id == userPublicationInvite2.Id)),
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var service = SetupUserPublicationRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
 
-            await service.RemoveRolesAndInvites([userPublicationRole1, userPublicationRole2]);
+                await service.RemoveRolesAndInvites([userPublicationRole1, userPublicationRole2]);
+            }
 
             MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
-            var userPublicationRolesQuery = contentDbContext.UserPublicationRoles.AsQueryable();
-
-            if (ignoreQueryFilters)
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                userPublicationRolesQuery = userPublicationRolesQuery.IgnoreQueryFilters();
+                var userPublicationRolesQuery = contentDbContext.UserPublicationRoles.AsQueryable();
+
+                if (ignoreQueryFilters)
+                {
+                    userPublicationRolesQuery = userPublicationRolesQuery.IgnoreQueryFilters();
+                }
+
+                var userPublicationRole = await userPublicationRolesQuery
+                    .SingleAsync();
+
+                Assert.Equal(userPublicationRole3.Id, userPublicationRole.Id);
             }
-
-            var userPublicationRole = await userPublicationRolesQuery
-                .SingleAsync();
-
-            Assert.Equal(userPublicationRole3.Id, userPublicationRole.Id);
         }
     }
 
@@ -498,10 +548,13 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .ForIndex(3, s => s.SetRole(role2))
                 .GenerateList(4);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
             userPublicationInviteRepository
@@ -511,27 +564,33 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserPublicationRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+                await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+            }
 
             MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserPublicationRoles
-                .Include(upr => upr.User)
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserPublicationRoles
+                    .Include(upr => upr.User)
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingRoles.Count);
+                Assert.Equal(2, remainingRoles.Count);
 
-            Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
-            Assert.Equal(otherUser, remainingRoles[0].User);
-            Assert.Equal(role1, remainingRoles[0].Role);
+                Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
+                Assert.Equal(role1, remainingRoles[0].Role);
 
-            Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
-            Assert.Equal(otherUser, remainingRoles[1].User);
-            Assert.Equal(role2, remainingRoles[1].Role);
+                Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
+                Assert.Equal(role2, remainingRoles[1].Role);
+            }
         }
 
         [Fact]
@@ -556,11 +615,14 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .ForIndex(1, s => s.SetRole(role2))
                 .GenerateList(2);
 
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            contentDbContext.Users.AddRange(targetUser, otherUser);
-            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(targetUser, otherUser);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
             userPublicationInviteRepository
@@ -570,27 +632,33 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            var manager = SetupUserPublicationRoleAndInviteManager(
-                contentDbContext: contentDbContext,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = SetupUserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
 
-            await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+                await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+            }
 
             MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
-            var remainingRoles = await contentDbContext.UserPublicationRoles
-                .Include(upr => upr.User)
-                .ToListAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserPublicationRoles
+                    .Include(upr => upr.User)
+                    .ToListAsync();
 
-            Assert.Equal(2, remainingRoles.Count);
+                Assert.Equal(2, remainingRoles.Count);
 
-            Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
-            Assert.Equal(otherUser, remainingRoles[0].User);
-            Assert.Equal(role1, remainingRoles[0].Role);
+                Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
+                Assert.Equal(role1, remainingRoles[0].Role);
 
-            Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
-            Assert.Equal(otherUser, remainingRoles[1].User);
-            Assert.Equal(role2, remainingRoles[1].Role);
+                Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
+                Assert.Equal(role2, remainingRoles[1].Role);
+            }
         }
     }
 
