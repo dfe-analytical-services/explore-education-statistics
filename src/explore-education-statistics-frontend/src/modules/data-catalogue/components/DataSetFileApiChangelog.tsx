@@ -4,6 +4,7 @@ import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChang
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
+import sortVersionChanges from '../utils/sortVersionChanges';
 
 interface Props {
   changes: ApiDataSetVersionChanges;
@@ -46,7 +47,7 @@ export default function DataSetFileApiChangelog({
       {patchHistory.length > 0 && <SectionBreak size="xl" />}
 
       {patchHistory &&
-        patchHistory.map(
+        sortVersionChanges(patchHistory).map(
           (patch, idx) =>
             (Object.keys(patch.majorChanges).length ||
               Object.keys(patch.minorChanges).length ||
