@@ -21,17 +21,17 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
     public class RegistrationTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
         [Theory]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 2", null, null)]
-        [InlineData(null, "VALID-USER@education.gov.uk", "FirstName", "LastName", null, "Role 1", null, null)]
-        [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName LastName", "Role 1", null, null)]
-        [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName MiddleName LastName", "Role 1", null,
+        [InlineData("valid-user@education.gov.uk", null, "FirstName", "LastName", null, "Role 2", null, null)]
+        [InlineData(null, "valid-user@education.gov.uk", "FirstName", "LastName", null, "Role 1", null, null)]
+        [InlineData(null, "valid-user@education.gov.uk", null, null, "FirstName LastName", "Role 1", null, null)]
+        [InlineData(null, "valid-user@education.gov.uk", null, null, "FirstName MiddleName LastName", "Role 1", null,
             null)]
-        [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName", "Role 1", null, null)]
-        [InlineData("VALID-USER@education.gov.uk", "VALID-USER@education.gov.uk", "FirstName", "LastName",
+        [InlineData(null, "valid-user@education.gov.uk", null, null, "FirstName", "Role 1", null, null)]
+        [InlineData("valid-user@education.gov.uk", "valid-user@education.gov.uk", "FirstName", "LastName",
             "FirstName LastName", "Role 1", null, null)]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Approver", null)]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Allower")]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor",
+        [InlineData("valid-user@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Approver", null)]
+        [InlineData("valid-user@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Allower")]
+        [InlineData("valid-user@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor",
             "Allower")]
         public async Task Success(
             string? emailClaimValue,

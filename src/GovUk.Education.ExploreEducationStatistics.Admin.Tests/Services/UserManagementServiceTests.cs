@@ -1120,16 +1120,6 @@ public class UserManagementServiceTests
             .Verifiable();
 
         var userRepository = new Mock<IUserRepository>(Strict);
-        userRepository
-            .Setup(mock => mock.FindByEmail(internalUser.Email))
-            .Returns(async () =>
-            {
-                await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-
-                return await contentDbContext.Users
-                    .SingleAsync(u => u.Email == internalUser.Email);
-            })
-            .Verifiable();
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
         userReleaseRoleAndInviteManager
@@ -1146,6 +1136,11 @@ public class UserManagementServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
+            userRepository
+                .Setup(mock => mock.FindByEmail(internalUser.Email))
+                .ReturnsAsync(() => contentDbContext.Users.Single(u => u.Email == internalUser.Email))
+                .Verifiable();
+
             var service = SetupUserManagementService(
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
