@@ -1644,7 +1644,129 @@ public class ReleaseDataFileServiceTests
             Assert.Null(files[1].PublicApiDataSetVersion);
         }
     }
+    
+    [Fact]
+    public async Task ListAll_WithReplacement_inProgressReplacementsCount0_returns200()
+    {
+        var releaseVersion = new ReleaseVersion();
+        var originalFileId = Guid.NewGuid();
+        var replacementFileId = Guid.NewGuid();
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            Name = "Test subject 1",
+            PublicApiDataSetId = Guid.NewGuid(),
+            PublicApiDataSetVersion = SemVersion.Parse("1.0.1", SemVersionStyles.Any),
+            File = new File
+            {
+                Id = originalFileId,
+                Filename = "test-data-1.csv",
+                ContentLength = 10240,
+                Type = FileType.Data,
+                Created = DateTime.UtcNow,
+                CreatedById = _user.Id,
+                ReplacedById = replacementFileId,
+            }
+        };
+        var originalMetaReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = new File
+            {
+                Filename = "test-data-1.meta.csv",
+                Type = Metadata,
+            }
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            Name = "Test subject 1",
+            File = new File
+            {
+                Id = replacementFileId,
+                Filename = "test-data-2.csv",
+                ContentLength = 20480,
+                Type = FileType.Data,
+                Created = DateTime.UtcNow,
+                CreatedById = _user.Id,
+                ReplacingId = null,
+            }
+        };
+        var replacementMetaReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = new File
+            {
+                Filename = "test-data-2.meta.csv",
+                Type = Metadata,
+            }
+        };
 
+        var dataImports = new List<DataImport>
+        {
+            new()
+            {
+                File = originalReleaseFile.File,
+                MetaFile = originalMetaReleaseFile.File,
+                TotalRows = 200,
+                Status = COMPLETE
+            },
+            new()
+            {
+                File = replacementReleaseFile.File,
+                MetaFile = replacementMetaReleaseFile.File,
+                TotalRows = 400,
+                Status = STAGE_2
+            }
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(
+                originalReleaseFile,
+                originalMetaReleaseFile,
+                replacementReleaseFile,
+                replacementMetaReleaseFile);
+            contentDbContext.DataImports.AddRange(dataImports);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+            var result = await service.ListAll(releaseVersion.Id);
+
+            Assert.True(result.IsRight);
+
+            var files = result.Right.ToList();
+            
+            Assert.Equal(2, files.Count);
+
+            Assert.Equal("Test subject 1", files[0].Name);
+            Assert.Equal("test-data-1.csv", files[0].FileName);
+            Assert.Equal("csv", files[0].Extension);
+            Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
+            Assert.Equal(_user.Email, files[0].UserName);
+            Assert.Equal(200, files[0].Rows);
+            Assert.Equal("10 Kb", files[0].Size);
+            Assert.Equal(COMPLETE, files[0].Status);
+
+            Assert.Equal("Test subject 1", files[1].Name);
+            Assert.Equal("test-data-2.csv", files[1].FileName);
+            Assert.Equal("csv", files[1].Extension);
+            Assert.Equal("test-data-2.meta.csv", files[1].MetaFileName);
+            Assert.Equal(_user.Email, files[1].UserName);
+            Assert.Equal(400, files[1].Rows);
+            Assert.Equal("20 Kb", files[1].Size);
+            Assert.Equal(STAGE_2, files[1].Status);
+            Assert.Null(files[1].PublicApiDataSetId);
+            Assert.Null(files[1].PublicApiDataSetVersion);
+        }
+    }
+    
     [Fact]
     public async Task ListAll_WithReplacement()
     {

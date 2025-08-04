@@ -678,15 +678,15 @@ public class ReleaseDataFileService(
                 file => ValueTask.FromResult(file.Id),
                 async file => await userService.GetDataFilePermissions(file));
 
-        var result = await releaseFiles.SelectAsync(async releaseFile =>
-        {
-            if (inProgressReplacements == null || releaseFile.File.ReplacedById == null)
+            var result = await releaseFiles.SelectAsync(async releaseFile =>
             {
-                return new DataFileInfo(
-                    releaseFile,
-                    dataImportsDict[releaseFile.FileId],
-                    permissionsDict[releaseFile.FileId]);
-            }
+                if (inProgressReplacements == null || inProgressReplacements.Count == 0 || releaseFile.File.ReplacedById == null)
+                {
+                    return new DataFileInfo(
+                        releaseFile,
+                        dataImportsDict[releaseFile.FileId],
+                        permissionsDict[releaseFile.FileId]);
+                }
 
             var replacement = inProgressReplacements.Single(rf =>
                 rf.FileId == releaseFile.File.ReplacedById);
