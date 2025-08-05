@@ -29,4 +29,6 @@ public interface IEducationInNumbersService
 
     Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder(
         List<Guid> newOrder);
+
+    Task<Either<ActionResult, Unit>> Delete(Guid id);
 }
