@@ -1,11 +1,13 @@
 import client from '@admin/services/utils/service';
 
 export interface EducationInNumbersPage {
-  description: string;
   id: string;
-  published?: string;
   title: string;
   slug: string;
+  description: string;
+  version: number;
+  published?: string;
+  previousPageId: string;
 }
 
 export interface CreateEducationInNumbersPageRequest {
@@ -19,23 +21,14 @@ export interface UpdateEducationInNumbersPageRequest {
   slug?: string;
 }
 
+// @MarkFix HERE!!! Test if backend/frontend are working together!
+
 const educationInNumbersService = {
-  getEducationInNumbersPages(): Promise<EducationInNumbersPage[]> {
-    return client.get('/education-in-numbers');
+  getEducationInNumbersPage(id: string): Promise<EducationInNumbersPage> {
+    return client.get(`/education-in-numbers/${id}`);
   },
-  getEducationInNumbersPage(
-    educationInNumbersPageId: string,
-  ): Promise<EducationInNumbersPage> {
-    // return client.get(`/education-in-numbers/${educationInNumbersPageId}`);
-    return new Promise(resolve => {
-      resolve({
-        id: educationInNumbersPageId,
-        title: 'Key Statistics',
-        slug: 'key-statistics',
-        description: 'A summary of key statistics in education.',
-        published: '2023-10-01T00:00:00Z',
-      });
-    });
+  listLatestPages(): Promise<EducationInNumbersPage[]> {
+    return client.get('/education-in-numbers');
   },
   createEducationInNumbersPage(
     page: CreateEducationInNumbersPageRequest,

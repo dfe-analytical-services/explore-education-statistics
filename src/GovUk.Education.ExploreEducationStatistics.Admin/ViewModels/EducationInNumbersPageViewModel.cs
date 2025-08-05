@@ -16,4 +16,6 @@ public class EducationInNumbersPageViewModel
     public int Version { get; set; }
 
     public DateTime? Published { get; set; }
+
+    public Guid? PreviousVersionId { get; set; }
 }

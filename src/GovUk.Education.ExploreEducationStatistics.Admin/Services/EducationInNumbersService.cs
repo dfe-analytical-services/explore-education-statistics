@@ -23,14 +23,10 @@ public class EducationInNumbersService(
     ContentDbContext contentDbContext,
     IUserService userService) : IEducationInNumbersService
 {
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage( // @MarkFix tests?
-        string? slug,
-        bool? published = null)
+    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage(Guid id) // @MarkFix tests?
     {
         return await contentDbContext.EducationInNumbersPages
-            .Where(page =>
-                page.Slug == slug
-                && (published == null || page.Published.HasValue == published ))
+            .Where(page => page.Id == id)
             .OrderByDescending(page => page.Version) // @MarkFix descending correct?
             .FirstOrNotFoundAsync()
             .OnSuccess(page => page.ToViewModel());
@@ -41,22 +37,32 @@ public class EducationInNumbersService(
         return await contentDbContext.EducationInNumbersPages
             .AsNoTracking()
             .GroupBy(page => page.Slug)
-            .Select(group => group
-                .OrderByDescending(p => p.Version)
-                .First())
-            .Select(page => page.ToViewModel()) // @MarkFix might want to be a summary view model
+            .Select(group => new
+            {
+                LatestPage = group
+                    .OrderByDescending(p => p.Version)
+                    .First(),
+                PreviousVersionId = group
+                    .OrderByDescending(p => p.Version)
+                    .Skip(1)
+                    .Select(page => (Guid?)page.Id)
+                    .FirstOrDefault(),
+            })
+            .Select(tuple => tuple.LatestPage.ToViewModel(tuple.PreviousVersionId)) // @MarkFix might want to be a summary view model
             .ToListAsync();
     }
 
     public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage( // @MarkFix tests?
         CreateEducationInNumbersPageRequest request)
     {
+        var slug = NamingUtils.SlugFromTitle(request.Title);
+
         var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages
-            .Any(page => page.Slug == request.Slug);
+            .Any(page => page.Slug == slug);
 
         if (pageWithSlugAlreadyExists)
         {
-            throw new ArgumentException($"Page with slug {request.Slug} already exists"); // @MarkFix should be error
+            throw new ArgumentException($"Page with slug {slug} already exists"); // @MarkFix should be error
         }
 
         var currentMaxOrder = contentDbContext.EducationInNumbersPages
@@ -67,7 +73,7 @@ public class EducationInNumbersService(
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
-            Slug = request.Slug,
+            Slug = slug,
             Description = request.Description,
             Version = 0,
             Order = currentMaxOrder + 1,
