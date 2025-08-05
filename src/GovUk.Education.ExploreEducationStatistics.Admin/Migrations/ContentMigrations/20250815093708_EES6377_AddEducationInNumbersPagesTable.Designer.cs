@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815093708_EES6377_AddEducationInNumbersPagesTable")]
+    partial class EES6377_AddEducationInNumbersPagesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1187,12 +1190,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTime?>("FeedbackReceived")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PublicationTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReleaseTitle")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1433,21 +1430,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("PublicationId", "Email", "Role")
-                        .IsUnique();
+                    b.HasIndex("PublicationId");
 
                     b.ToTable("UserPublicationInvites");
                 });
@@ -1464,6 +1460,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1477,6 +1479,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
 
                     b.HasIndex("PublicationId");
 
@@ -1499,7 +1503,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("EmailSent")
                         .HasColumnType("bit");
@@ -1509,7 +1513,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
@@ -1518,8 +1525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReleaseVersionId", "Email", "Role")
-                        .IsUnique();
+                    b.HasIndex("ReleaseVersionId");
 
                     b.ToTable("UserReleaseInvites");
                 });
@@ -1536,6 +1542,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1543,12 +1555,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
 
                     b.HasIndex("ReleaseVersionId");
 
@@ -1628,10 +1645,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Body")
                         .IsRequired()
+                        .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Body");
 
                     b.HasDiscriminator().HasValue("HtmlBlock");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MarkDownBlock", b =>
+                {
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Body");
+
+                    b.HasDiscriminator().HasValue("MarkDownBlock");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticDataBlock", b =>
@@ -2275,6 +2306,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany()
                         .HasForeignKey("PublicationId")
@@ -2288,6 +2323,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
 
                     b.Navigation("Publication");
 
@@ -2319,6 +2356,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion", "ReleaseVersion")
                         .WithMany()
                         .HasForeignKey("ReleaseVersionId")
@@ -2332,6 +2373,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
 
                     b.Navigation("ReleaseVersion");
 
