@@ -160,7 +160,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder(
+    public async Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder( // @MarkFix tests?
         List<Guid> newOrder)
     {
         var pageList = await contentDbContext.EducationInNumbersPages
@@ -209,5 +209,22 @@ public class EducationInNumbersService(
             .ToList();
     }
 
-    // @MarkFix delete amendment
+    public async Task<Either<ActionResult, Unit>> Delete(Guid id) // @MarkFix tests?
+    {
+        return await contentDbContext.EducationInNumbersPages
+            .SingleOrNotFoundAsync(page => page.Id == id)
+            .OnSuccessVoid(async page =>
+            {
+                if (page.Published != null)
+                {
+                    // we currently only allow the cancellation of unpublished amendments
+                    throw new ArgumentException("Cannot delete published page");
+                }
+
+                contentDbContext.EducationInNumbersPages.Remove(page);
+                await contentDbContext.SaveChangesAsync();
+
+                // @MarkFix refresh cache?
+            });
+    }
 }
