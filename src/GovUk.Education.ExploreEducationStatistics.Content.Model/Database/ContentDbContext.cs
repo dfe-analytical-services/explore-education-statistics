@@ -91,6 +91,7 @@ public class ContentDbContext : DbContext
     public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
     public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
+    public virtual DbSet<EducationInNumbersPage> EducationInNumbersPages { get; set; }
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
