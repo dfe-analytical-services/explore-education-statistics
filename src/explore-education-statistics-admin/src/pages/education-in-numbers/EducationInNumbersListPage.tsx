@@ -3,9 +3,20 @@ import ButtonLink from '@admin/components/ButtonLink';
 import Page from '@admin/components/Page';
 import { educationInNumbersCreateRoute } from '@admin/routes/routes';
 import ButtonGroup from '@common/components/ButtonGroup';
+import { useQuery } from '@tanstack/react-query';
+import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import styles from './EducationInNumbersListPage.module.scss';
 
 const EducationInNumbersListPage = () => {
+  const { data: pages = [], isLoading } = useQuery(
+    educationInNumbersQueries.listLatestPages,
+  );
+
+  if (isLoading) {
+    return <LoadingSpinner loading={isLoading} />;
+  }
+
   return (
     <Page
       title="Education in Numbers pages"
@@ -15,7 +26,7 @@ const EducationInNumbersListPage = () => {
         },
       ]}
     >
-      {'TODO - use fetched pages'.length > 0 ? (
+      {pages.length > 0 ? (
         <table
           className={styles.table}
           data-testid="education-in-numbers-table"
@@ -31,10 +42,7 @@ const EducationInNumbersListPage = () => {
           </thead>
 
           <tbody>
-            {[
-              { title: 'Overview', slug: '', id: 'abc' },
-              { title: 'Key Statistics', slug: 'key-statistics', id: 'xyz' },
-            ].map(page => (
+            {pages.map(page => (
               <tr key={page.title}>
                 <td data-testid="Title" className={styles.title}>
                   {page.title}

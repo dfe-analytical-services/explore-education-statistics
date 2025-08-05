@@ -11,9 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEducationInNumbersService
 {
-    Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage(
-        string? slug,
-        bool? published = null);
+    Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage(Guid id);
 
     Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> ListLatestPages();
 
