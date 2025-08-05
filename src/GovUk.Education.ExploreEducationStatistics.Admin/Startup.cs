@@ -102,7 +102,6 @@ using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
-using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService =
     GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
@@ -470,6 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin;
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
             services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
+            services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentBlockService, ContentBlockService>();
