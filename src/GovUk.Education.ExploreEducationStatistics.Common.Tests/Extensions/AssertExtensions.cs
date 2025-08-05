@@ -6,10 +6,10 @@ using KellermanSoftware.CompareNetObjects;
 using Xunit;
 using Xunit.Sdk;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+
+public static class AssertExtensions
 {
-    public static class AssertExtensions
-    {
         public const int TimeWithinMillis = 10000;
 
         /**
@@ -116,5 +116,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.NotNull(dateTimeOffset);
             dateTimeOffset.Value.AssertEqual(expectedDateTimeOffset: expectedDateTimeOffset, withinMillis: withinMillis);
         }
-    }
 }

@@ -1,16 +1,15 @@
 ﻿using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
-{
-    public class ReleasePublishingStatusLogMessage
-    {
-        public string Message { get; set; }
-        public DateTime On { get; set; }
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
-        public ReleasePublishingStatusLogMessage(string message)
-        {
-            Message = message;
-            On = DateTime.UtcNow;
-        }
+public class ReleasePublishingStatusLogMessage
+{
+    public string Message { get; set; }
+    public DateTime On { get; set; }
+
+    public ReleasePublishingStatusLogMessage(string message)
+    {
+        Message = message;
+        On = DateTime.UtcNow;
     }
 }

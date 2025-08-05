@@ -16,10 +16,11 @@ public static class ProcessorHostBuilder
     public static IHostBuilder ConfigureProcessorHostBuilder(this IHostBuilder hostBuilder)
     {
         return hostBuilder
-            .ConfigureAppConfiguration(builder =>
+            .ConfigureAppConfiguration((context, builder) =>
             {
                 builder
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
                     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables();
             })

@@ -4,60 +4,59 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+
+public class MethodologyNoteRepository : IMethodologyNoteRepository
 {
-    public class MethodologyNoteRepository : IMethodologyNoteRepository
+    private readonly ContentDbContext _contentDbContext;
+
+    public MethodologyNoteRepository(ContentDbContext contentDbContext)
     {
-        private readonly ContentDbContext _contentDbContext;
+        _contentDbContext = contentDbContext;
+    }
 
-        public MethodologyNoteRepository(ContentDbContext contentDbContext)
+    public async Task<MethodologyNote> AddNote(
+        Guid methodologyVersionId,
+        Guid createdByUserId,
+        string content,
+        DateTime displayDate)
+    {
+        var added = (await _contentDbContext.MethodologyNotes.AddAsync(new MethodologyNote
         {
-            _contentDbContext = contentDbContext;
-        }
+            Content = content,
+            Created = DateTime.UtcNow,
+            CreatedById = createdByUserId,
+            DisplayDate = displayDate,
+            MethodologyVersionId = methodologyVersionId
+        })).Entity;
+        await _contentDbContext.SaveChangesAsync();
 
-        public async Task<MethodologyNote> AddNote(
-            Guid methodologyVersionId,
-            Guid createdByUserId,
-            string content,
-            DateTime displayDate)
-        {
-            var added = (await _contentDbContext.MethodologyNotes.AddAsync(new MethodologyNote
-            {
-                Content = content,
-                Created = DateTime.UtcNow,
-                CreatedById = createdByUserId,
-                DisplayDate = displayDate,
-                MethodologyVersionId = methodologyVersionId
-            })).Entity;
-            await _contentDbContext.SaveChangesAsync();
+        return added;
+    }
 
-            return added;
-        }
+    public async Task DeleteNote(Guid methodologyNoteId)
+    {
+        var methodologyNote = await _contentDbContext.MethodologyNotes.FindAsync(methodologyNoteId);
+        _contentDbContext.Remove(methodologyNote);
+        await _contentDbContext.SaveChangesAsync();
+    }
 
-        public async Task DeleteNote(Guid methodologyNoteId)
-        {
-            var methodologyNote = await _contentDbContext.MethodologyNotes.FindAsync(methodologyNoteId);
-            _contentDbContext.Remove(methodologyNote);
-            await _contentDbContext.SaveChangesAsync();
-        }
+    public async Task<MethodologyNote> UpdateNote(
+        Guid methodologyNoteId,
+        Guid updatedByUserId,
+        string content,
+        DateTime displayDate)
+    {
+        var methodologyNote = await _contentDbContext.MethodologyNotes.FindAsync(methodologyNoteId);
+        _contentDbContext.Update(methodologyNote);
 
-        public async Task<MethodologyNote> UpdateNote(
-            Guid methodologyNoteId,
-            Guid updatedByUserId,
-            string content,
-            DateTime displayDate)
-        {
-            var methodologyNote = await _contentDbContext.MethodologyNotes.FindAsync(methodologyNoteId);
-            _contentDbContext.Update(methodologyNote);
+        methodologyNote.Content = content;
+        methodologyNote.DisplayDate = displayDate;
+        methodologyNote.Updated = DateTime.UtcNow;
+        methodologyNote.UpdatedById = updatedByUserId;
 
-            methodologyNote.Content = content;
-            methodologyNote.DisplayDate = displayDate;
-            methodologyNote.Updated = DateTime.UtcNow;
-            methodologyNote.UpdatedById = updatedByUserId;
+        await _contentDbContext.SaveChangesAsync();
 
-            await _contentDbContext.SaveChangesAsync();
-
-            return methodologyNote;
-        }
+        return methodologyNote;
     }
 }

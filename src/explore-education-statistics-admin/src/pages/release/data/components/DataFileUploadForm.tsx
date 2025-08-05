@@ -122,12 +122,14 @@ interface Props {
   dataFiles?: DataFile[];
   isDataReplacement?: boolean;
   onSubmit: (values: DataFileUploadFormValues) => void | Promise<void>;
+  onCancel?: () => void;
 }
 
 export default function DataFileUploadForm({
   dataFiles,
   isDataReplacement = false,
   onSubmit,
+  onCancel,
 }: Props) {
   const [selectedFileType, setSelectedFileType] = useState<FileType>('csv');
 
@@ -317,6 +319,7 @@ export default function DataFileUploadForm({
                   disabled={formState.isSubmitting}
                   onClick={() => {
                     reset();
+                    onCancel?.();
                   }}
                 >
                   Cancel

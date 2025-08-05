@@ -4,16 +4,15 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+
+public interface IFileTypeService
 {
-    public interface IFileTypeService
-    {
-        Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes);
+    Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes);
 
-        bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
+    bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
 
-        Task<bool> HasCsvFileType(Stream stream);
+    Task<bool> HasCsvFileType(Stream stream);
 
-        Task<bool> HasZipFileType(IFormFile zipFile);
-    }
+    Task<bool> HasZipFileType(IFormFile zipFile);
 }

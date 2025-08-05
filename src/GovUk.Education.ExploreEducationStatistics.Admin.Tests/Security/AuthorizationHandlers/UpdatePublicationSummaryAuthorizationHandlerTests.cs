@@ -33,7 +33,8 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
     public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithPublicationOwner()
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
-            CreateHandler, Owner);
+            CreateHandler,
+            Owner);
     }
 
     private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

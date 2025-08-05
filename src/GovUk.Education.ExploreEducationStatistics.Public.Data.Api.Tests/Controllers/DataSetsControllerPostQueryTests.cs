@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
@@ -3882,7 +3883,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             // and could occur slightly after the query result is returned to the user.
             Thread.Sleep(2000);
 
-            var publicApiQueriesPath = _analyticsPathResolver.PublicApiQueriesDirectoryPath();
+            var publicApiQueriesPath = _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths);
             
             // Expect the successful query to have recorded its query for analytics.
             Assert.True(Directory.Exists(publicApiQueriesPath));
@@ -3937,7 +3938,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             await AnalyticsTestAssertions.AssertDataSetVersionQueryAnalyticsCaptured(
                 dataSetVersion: dataSetVersion,
-                expectedAnalyticsPath: _analyticsPathResolver.PublicApiQueriesDirectoryPath(),
+                expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths),
                 expectedRequest: expectedRequest,
                 expectedResultsCount: 1,
                 expectedTotalRows: 4);
@@ -3970,7 +3971,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             
             // Check that the folder for capturing queries for analytics was never created.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
+                _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
         }
         
         [Fact]
@@ -4028,7 +4029,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             // Expect the successful call to have been omitted from analytics because it originates
             // from the Admin App.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
+                _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
         }
         
         [Fact]
@@ -4154,7 +4155,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             // Expect the successful query not to have recorded its query for analytics, as this
             // feature was not enabled via appsettings.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                _analyticsPathResolver.PublicApiQueriesDirectoryPath());
+                _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
         }
     }
     

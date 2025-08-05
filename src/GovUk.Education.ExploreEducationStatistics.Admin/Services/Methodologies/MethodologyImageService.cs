@@ -22,132 +22,131 @@ using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+
+public class MethodologyImageService : IMethodologyImageService
 {
-    public class MethodologyImageService : IMethodologyImageService
+    private readonly ContentDbContext _contentDbContext;
+    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IPrivateBlobStorageService _privateBlobStorageService;
+    private readonly IFileValidatorService _fileValidatorService;
+    private readonly IFileRepository _fileRepository;
+    private readonly IMethodologyFileRepository _methodologyFileRepository;
+    private readonly IUserService _userService;
+
+    public MethodologyImageService(ContentDbContext contentDbContext,
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IPrivateBlobStorageService privateBlobStorageService,
+        IFileValidatorService fileValidatorService,
+        IFileRepository fileRepository,
+        IMethodologyFileRepository methodologyFileRepository,
+        IUserService userService)
     {
-        private readonly ContentDbContext _contentDbContext;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IFileValidatorService _fileValidatorService;
-        private readonly IFileRepository _fileRepository;
-        private readonly IMethodologyFileRepository _methodologyFileRepository;
-        private readonly IUserService _userService;
+        _contentDbContext = contentDbContext;
+        _persistenceHelper = persistenceHelper;
+        _privateBlobStorageService = privateBlobStorageService;
+        _fileValidatorService = fileValidatorService;
+        _fileRepository = fileRepository;
+        _methodologyFileRepository = methodologyFileRepository;
+        _userService = userService;
+    }
 
-        public MethodologyImageService(ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPrivateBlobStorageService privateBlobStorageService,
-            IFileValidatorService fileValidatorService,
-            IFileRepository fileRepository,
-            IMethodologyFileRepository methodologyFileRepository,
-            IUserService userService)
-        {
-            _contentDbContext = contentDbContext;
-            _persistenceHelper = persistenceHelper;
-            _privateBlobStorageService = privateBlobStorageService;
-            _fileValidatorService = fileValidatorService;
-            _fileRepository = fileRepository;
-            _methodologyFileRepository = methodologyFileRepository;
-            _userService = userService;
-        }
+    public async Task<Either<ActionResult, Unit>> DeleteAll(Guid methodologyVersionId,
+        bool forceDelete = false)
+    {
+        var methodologyFiles = await _methodologyFileRepository.GetByFileType(methodologyVersionId, Image);
 
-        public async Task<Either<ActionResult, Unit>> DeleteAll(Guid methodologyVersionId,
-            bool forceDelete = false)
-        {
-            var methodologyFiles = await _methodologyFileRepository.GetByFileType(methodologyVersionId, Image);
+        return await Delete(methodologyVersionId,
+            methodologyFiles.Select(methodologyFile => methodologyFile.FileId),
+            forceDelete);
+    }
 
-            return await Delete(methodologyVersionId,
-                methodologyFiles.Select(methodologyFile => methodologyFile.FileId),
-                forceDelete);
-        }
-
-        public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyVersionId,
-            IEnumerable<Guid> fileIds,
-            bool forceDelete = false)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccess(async methodologyVersion => await _userService.CheckCanUpdateMethodologyVersion(methodologyVersion, forceDelete))
-                .OnSuccess(async _ =>
-                    await fileIds.Select(fileId =>
-                        _methodologyFileRepository.CheckFileExists(methodologyVersionId, fileId, Image)).OnSuccessAll())
-                .OnSuccessVoid(async files =>
-                {
-                    await files
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(async file =>
-                        {
-                            var methodologyLinks = await _methodologyFileRepository.GetByFile(file.Id);
-
-                            await _methodologyFileRepository.Delete(methodologyVersionId, file.Id);
-
-                            // If this methodology version is the only version that is referencing this Blob and File, it
-                            // can be deleted from Blob Storage and the File table. Otherwise preserve them for the other
-                            // versions that are still using them.
-                            if (methodologyLinks.Count == 1 &&
-                                methodologyLinks[0].MethodologyVersionId == methodologyVersionId)
-                            {
-                                await _privateBlobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
-                                await _fileRepository.Delete(file.Id);
-                            }
-                        });
-                });
-        }
-
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<MethodologyFile>(q => q
-                    .Include(mf => mf.File)
-                    .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
-                .OnSuccessCombineWith(mf =>
-                    _privateBlobStorageService.DownloadToStream(PrivateMethodologyFiles, mf.Path(), new MemoryStream()))
-                .OnSuccess(methodologyFileAndStream =>
-                {
-                    var (methodologyFile, stream) = methodologyFileAndStream;
-                    return new FileStreamResult(stream, methodologyFile.File.ContentType)
+    public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyVersionId,
+        IEnumerable<Guid> fileIds,
+        bool forceDelete = false)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+            .OnSuccess(async methodologyVersion => await _userService.CheckCanUpdateMethodologyVersion(methodologyVersion, forceDelete))
+            .OnSuccess(async _ =>
+                await fileIds.Select(fileId =>
+                    _methodologyFileRepository.CheckFileExists(methodologyVersionId, fileId, Image)).OnSuccessAll())
+            .OnSuccessVoid(async files =>
+            {
+                await files
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async file =>
                     {
-                        FileDownloadName = methodologyFile.File.Filename
-                    };
-                });
-        }
+                        var methodologyLinks = await _methodologyFileRepository.GetByFile(file.Id);
 
-        public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyVersionId, IFormFile formFile)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccess(_userService.CheckCanUpdateMethodologyVersion)
-                .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
-                .OnSuccess(async () => await Upload(
-                    methodologyVersionId,
-                    Image,
-                    formFile))
-                .OnSuccess(methodologyFile => new ImageFileViewModel($"/api/methodologies/{methodologyVersionId}/images/{methodologyFile.File.Id}")
+                        await _methodologyFileRepository.Delete(methodologyVersionId, file.Id);
+
+                        // If this methodology version is the only version that is referencing this Blob and File, it
+                        // can be deleted from Blob Storage and the File table. Otherwise preserve them for the other
+                        // versions that are still using them.
+                        if (methodologyLinks.Count == 1 &&
+                            methodologyLinks[0].MethodologyVersionId == methodologyVersionId)
+                        {
+                            await _privateBlobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                            await _fileRepository.Delete(file.Id);
+                        }
+                    });
+            });
+    }
+
+    public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<MethodologyFile>(q => q
+                .Include(mf => mf.File)
+                .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
+            .OnSuccessCombineWith(mf =>
+                _privateBlobStorageService.DownloadToStream(PrivateMethodologyFiles, mf.Path(), new MemoryStream()))
+            .OnSuccess(methodologyFileAndStream =>
+            {
+                var (methodologyFile, stream) = methodologyFileAndStream;
+                return new FileStreamResult(stream, methodologyFile.File.ContentType)
                 {
-                    // TODO EES-1922 Add support for resizing the image
-                });
-        }
+                    FileDownloadName = methodologyFile.File.Filename
+                };
+            });
+    }
 
-        private async Task<Either<ActionResult, MethodologyFile>> Upload(Guid methodologyVersionId,
-            FileType type,
-            IFormFile formFile)
-        {
-            var methodologyFile = await _methodologyFileRepository.Create(
-                methodologyVersionId: methodologyVersionId,
-                filename: formFile.FileName,
-                contentLength: formFile.Length,
-                contentType: formFile.ContentType,
-                type: type,
-                createdById: _userService.GetUserId());
+    public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyVersionId, IFormFile formFile)
+    {
+        return _persistenceHelper
+            .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+            .OnSuccess(_userService.CheckCanUpdateMethodologyVersion)
+            .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
+            .OnSuccess(async () => await Upload(
+                methodologyVersionId,
+                Image,
+                formFile))
+            .OnSuccess(methodologyFile => new ImageFileViewModel($"/api/methodologies/{methodologyVersionId}/images/{methodologyFile.File.Id}")
+            {
+                // TODO EES-1922 Add support for resizing the image
+            });
+    }
 
-            await _contentDbContext.SaveChangesAsync();
+    private async Task<Either<ActionResult, MethodologyFile>> Upload(Guid methodologyVersionId,
+        FileType type,
+        IFormFile formFile)
+    {
+        var methodologyFile = await _methodologyFileRepository.Create(
+            methodologyVersionId: methodologyVersionId,
+            filename: formFile.FileName,
+            contentLength: formFile.Length,
+            contentType: formFile.ContentType,
+            type: type,
+            createdById: _userService.GetUserId());
 
-            await _privateBlobStorageService.UploadFile(
-                containerName: PrivateMethodologyFiles,
-                path: methodologyFile.Path(),
-                file: formFile);
+        await _contentDbContext.SaveChangesAsync();
 
-            return methodologyFile;
-        }
+        await _privateBlobStorageService.UploadFile(
+            containerName: PrivateMethodologyFiles,
+            path: methodologyFile.Path(),
+            file: formFile);
+
+        return methodologyFile;
     }
 }

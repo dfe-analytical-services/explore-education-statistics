@@ -78,6 +78,19 @@ function HomePage() {
             Browse our A to Z list of definitions for terms used across our
             statistics.
           </p>
+
+          <h3 className="govuk-!-margin-bottom-1">
+            <Link
+              to="https://api.education.gov.uk/statistics/docs"
+              onClick={() => logLinkClick('API documentation')}
+            >
+              API documentation
+            </Link>
+          </h3>
+          <p className="govuk-caption-m">
+            Find out how to automate access to statistics and data through our
+            API (application programming interface).
+          </p>
         </div>
       </div>
 

@@ -25,8 +25,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
-{
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
     public class ReplacementService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
@@ -702,4 +702,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return plan.TargetValue;
         }
     }
-}

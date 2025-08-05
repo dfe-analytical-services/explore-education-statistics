@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -36,7 +37,7 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
                 EndTime: DateTime.Parse("2025-02-20T12:00:10.234Z")), default);
 
             var files = Directory
-                .GetFiles(pathResolver.PublicApiQueriesDirectoryPath())
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths))
                 .Order()
                 .ToList();
             
@@ -72,7 +73,7 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
                 EndTime: DateTime.Parse("2025-02-20T12:00:10.234Z")), default);
 
             var files = Directory
-                .GetFiles(pathResolver.PublicApiQueriesDirectoryPath())
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths))
                 .Order()
                 .ToList();
             

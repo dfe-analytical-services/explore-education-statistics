@@ -24,6 +24,7 @@ using IReleaseVersionRepository =
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+
 public class ReleaseInviteService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
@@ -57,7 +58,11 @@ public class ReleaseInviteService(
                     return await CreateNewUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title);
                 }
 
-                return await CreateExistingUserContributorInvite(releaseVersionIds, user.Id, sanitisedEmail, publication.Title);
+                return await CreateExistingUserContributorInvite(
+                    releaseVersionIds,
+                    user.Id,
+                    sanitisedEmail,
+                    publication.Title);
             });
     }
 
@@ -67,15 +72,16 @@ public class ReleaseInviteService(
         ReleaseRole releaseRole)
     {
         return await contentPersistenceHelper
-            .CheckEntityExists<Publication>(publicationId, query => query
-                .Include(p => p.ReleaseVersions))
-            .OnSuccessDo(
-                publication => userService.CheckCanUpdateReleaseRole(publication, releaseRole))
+            .CheckEntityExists<Publication>(
+                publicationId,
+                query => query
+                    .Include(p => p.ReleaseVersions))
+            .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, releaseRole))
             .OnSuccess(async publication =>
             {
                 await userReleaseInviteRepository.RemoveByPublication(
-                    publicationId: publication.Id, 
-                    email: email, 
+                    publicationId: publication.Id,
+                    email: email,
                     rolesToInclude: releaseRole);
                 return Unit.Instance;
             });
@@ -173,7 +179,8 @@ public class ReleaseInviteService(
         var distinctReleaseVersionIds = releaseVersionIds.Distinct().ToList();
         if (distinctReleaseVersionIds.Count != releaseVersionIds.Count)
         {
-            throw new ArgumentException($"{nameof(releaseVersionIds)} should not contain duplicates",
+            throw new ArgumentException(
+                $"{nameof(releaseVersionIds)} should not contain duplicates",
                 nameof(releaseVersionIds));
         }
 
@@ -211,9 +218,7 @@ public class ReleaseInviteService(
 
         var emailValues = new Dictionary<string, dynamic>
         {
-            { "url", url },
-            { "publication name", publicationTitle },
-            { "release list", releaseTitles }
+            { "url", url }, { "publication name", publicationTitle }, { "release list", releaseTitles }
         };
 
         return emailService.SendEmail(email, template, emailValues);

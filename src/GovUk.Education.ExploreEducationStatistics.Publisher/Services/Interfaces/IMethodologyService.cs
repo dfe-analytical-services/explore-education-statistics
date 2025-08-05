@@ -4,19 +4,18 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+
+public interface IMethodologyService
 {
-    public interface IMethodologyService
-    {
-        Task<MethodologyVersion> Get(Guid methodologyVersionId);
+    Task<MethodologyVersion> Get(Guid methodologyVersionId);
 
-        Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion);
+    Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion);
 
-        Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types);
+    Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types);
 
-        Task Publish(MethodologyVersion methodologyVersion);
+    Task Publish(MethodologyVersion methodologyVersion);
 
-        Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion,
-            ReleaseVersion releaseVersion);
-    }
+    Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion,
+        ReleaseVersion releaseVersion);
 }

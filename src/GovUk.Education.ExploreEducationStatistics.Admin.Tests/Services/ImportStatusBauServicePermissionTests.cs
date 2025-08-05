@@ -4,23 +4,22 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ImportStatusBauServiceTests;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ImportStatusBauServicePermissionTests
 {
-    public class ImportStatusBauServicePermissionTests
+    [Fact]
+    public async Task GetAllIncompleteImports()
     {
-        [Fact]
-        public async Task GetAllIncompleteImports()
-        {
-            await PolicyCheckBuilder()
-                .SetupCheck(SecurityPolicies.CanAccessAllImports)
-                .AssertSuccess(
-                    async userService =>
-                    {
-                        var importStatusBauService = BuildImportStatusBauService(
-                            contentDbContext: InMemoryApplicationDbContext(),
-                            userService: userService.Object);
-                        return await importStatusBauService.GetAllIncompleteImports();
-                    });
-        }
+        await PolicyCheckBuilder()
+            .SetupCheck(SecurityPolicies.CanAccessAllImports)
+            .AssertSuccess(
+                async userService =>
+                {
+                    var importStatusBauService = BuildImportStatusBauService(
+                        contentDbContext: InMemoryApplicationDbContext(),
+                        userService: userService.Object);
+                    return await importStatusBauService.GetAllIncompleteImports();
+                });
     }
 }

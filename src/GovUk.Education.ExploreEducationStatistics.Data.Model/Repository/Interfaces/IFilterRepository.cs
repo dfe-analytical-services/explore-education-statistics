@@ -3,10 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+
+public interface IFilterRepository
 {
-    public interface IFilterRepository
-    {
-        Task<List<Filter>> GetFiltersIncludingItems(Guid subjectId);
-    }
+    Task<List<Filter>> GetFiltersIncludingItems(Guid subjectId);
 }

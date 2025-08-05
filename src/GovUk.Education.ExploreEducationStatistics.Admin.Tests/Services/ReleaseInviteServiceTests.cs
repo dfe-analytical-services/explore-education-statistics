@@ -65,7 +65,7 @@ public class ReleaseInviteServiceTests
         var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
             publication.Title, "* Academic year 2000/01\n* Academic year 2001/02");
         emailService.Setup(mock => mock.SendEmail(
-                Email,
+            Email,
                 NotifyContributorTemplateId,
                 expectedTemplateValues
             ))
@@ -146,7 +146,7 @@ public class ReleaseInviteServiceTests
 
         var user = new User
         {
-            Email = Email,
+        Email = Email,
         };
 
         var newReleaseVersionIds = ListOf(
@@ -537,7 +537,7 @@ public class ReleaseInviteServiceTests
                 ), Times.Once
             );
 
-            VerifyAllMocks(emailService);
+             VerifyAllMocks(emailService);
 
             var actionResult = result.AssertLeft();
             Assert.IsType<BadRequestResult>(actionResult);
@@ -671,7 +671,7 @@ public class ReleaseInviteServiceTests
             .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
                 .WithRelease(_dataFixture.DefaultRelease()
                     .WithPublication(_dataFixture.DefaultPublication())))
-            .WithRole(ReleaseRole.Contributor);
+        .WithRole(ReleaseRole.Contributor);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

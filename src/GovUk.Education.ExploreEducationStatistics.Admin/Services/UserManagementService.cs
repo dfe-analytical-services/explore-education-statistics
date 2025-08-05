@@ -24,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+
 public class UserManagementService(
     UsersAndRolesDbContext usersAndRolesDbContext,
     ContentDbContext contentDbContext,
@@ -84,11 +85,7 @@ public class UserManagementService(
         return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () => await contentDbContext.Releases
-                .Select(r => new IdTitleViewModel
-                {
-                    Id = r.Id,
-                    Title = $"{r.Publication.Title} - {r.Title}"
-                })
+                .Select(r => new IdTitleViewModel { Id = r.Id, Title = $"{r.Publication.Title} - {r.Title}" })
                 .ToListAsync());
     }
 
@@ -100,12 +97,7 @@ public class UserManagementService(
             {
                 return await usersAndRolesDbContext.Roles
                     .AsQueryable()
-                    .Select(r => new RoleViewModel
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        NormalizedName = r.NormalizedName
-                    })
+                    .Select(r => new RoleViewModel { Id = r.Id, Name = r.Name, NormalizedName = r.NormalizedName })
                     .OrderBy(x => x.Name)
                     .ToListAsync();
             });
@@ -119,11 +111,7 @@ public class UserManagementService(
                 usersAndRolesDbContext.UserRoles,
                 user => user.Id,
                 userRole => userRole.UserId,
-                (user, userRole) => new
-                {
-                    user,
-                    userRoleId = userRole.RoleId
-                }
+                (user, userRole) => new { user, userRoleId = userRole.RoleId }
             )
             .Join(
                 usersAndRolesDbContext.Roles,
@@ -359,9 +347,9 @@ public class UserManagementService(
             })
             .OnSuccessDo(tuple =>
             {
-                return tuple.identityUser is null && tuple.internalUser is null 
-                ? (Either<ActionResult, Unit>)new NotFoundResult() 
-                : Unit.Instance;
+                return tuple.identityUser is null && tuple.internalUser is null
+                    ? (Either<ActionResult, Unit>)new NotFoundResult()
+                    : Unit.Instance;
             })
             .OnSuccessVoid(async tuple =>
             {
@@ -384,7 +372,8 @@ public class UserManagementService(
                     if (tuple.internalUser is not null)
                     {
                         await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForUser(tuple.internalUser.Id);
-                        await userPublicationRoleAndInviteManager.RemoveAllRolesAndInvitesForUser(tuple.internalUser.Id);
+                        await userPublicationRoleAndInviteManager
+                            .RemoveAllRolesAndInvitesForUser(tuple.internalUser.Id);
                     }
 
                     if (tuple.internalUser is { SoftDeleted: null })
@@ -426,7 +415,7 @@ public class UserManagementService(
         return invite is null
             ? ValidationActionResult(InviteNotFound)
             : invite.Accepted
-            ? ValidationActionResult(InviteAlreadyAccepted)
-            : invite;
+                ? ValidationActionResult(InviteAlreadyAccepted)
+                : invite;
     }
 }

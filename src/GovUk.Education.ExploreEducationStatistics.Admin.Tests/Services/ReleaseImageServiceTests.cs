@@ -25,283 +25,282 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockF
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleaseImageServiceTests
 {
-    public class ReleaseImageServiceTests
+    private readonly User _user = new()
     {
-        private readonly User _user = new()
+        Id = Guid.NewGuid(),
+        Email = "test@test.com"
+    };
+
+    [Fact]
+    public async Task Stream()
+    {
+        var releaseVersion = new ReleaseVersion();
+
+        var releaseFile = new ReleaseFile
         {
-            Id = Guid.NewGuid(),
-            Email = "test@test.com"
+            ReleaseVersion = releaseVersion,
+            File = new File
+            {
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                ContentType = "image/png",
+                Type = Image
+            }
         };
 
-        [Fact]
-        public async Task Stream()
+        var fileData = new byte[] { 0 };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var releaseVersion = new ReleaseVersion();
-
-            var releaseFile = new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "image.png",
-                    ContentType = "image/png",
-                    Type = Image
-                }
-            };
-
-            var fileData = new byte[] { 0 };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.Add(releaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-
-            privateBlobStorageService
-                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    privateBlobStorageService: privateBlobStorageService.Object);
-
-                var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                    fileId: releaseFile.File.Id);
-
-                MockUtils.VerifyAllMocks(privateBlobStorageService);
-
-                var fileStreamResult = result.AssertRight();
-
-                Assert.Equal("image/png", fileStreamResult.ContentType);
-                Assert.Equal("image.png", fileStreamResult.FileDownloadName);
-                Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
-            }
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Stream_ReleaseNotFound()
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
+        privateBlobStorageService
+            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var releaseFile = new ReleaseFile
-            {
-                ReleaseVersion = new ReleaseVersion(),
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "image.png",
-                    Type = Image
-                }
-            };
+            var service = SetupReleaseImageService(contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
+                fileId: releaseFile.File.Id);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            MockUtils.VerifyAllMocks(privateBlobStorageService);
+
+            var fileStreamResult = result.AssertRight();
+
+            Assert.Equal("image/png", fileStreamResult.ContentType);
+            Assert.Equal("image.png", fileStreamResult.FileDownloadName);
+            Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
+        }
+    }
+
+    [Fact]
+    public async Task Stream_ReleaseNotFound()
+    {
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = new ReleaseVersion(),
+            File = new File
             {
-                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
-                await contentDbContext.SaveChangesAsync();
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                Type = Image
             }
+        };
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseImageService(contentDbContext: contentDbContext);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-                var result = await service.Stream(Guid.NewGuid(), releaseFile.File.Id);
-
-                result.AssertNotFound();
-            }
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Stream_ReleaseFileNotFound()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var releaseVersion = new ReleaseVersion();
+            var service = SetupReleaseImageService(contentDbContext: contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var result = await service.Stream(Guid.NewGuid(), releaseFile.File.Id);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            result.AssertNotFound();
+        }
+    }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseImageService(contentDbContext: contentDbContext);
+    [Fact]
+    public async Task Stream_ReleaseFileNotFound()
+    {
+        var releaseVersion = new ReleaseVersion();
 
-                var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                    fileId: Guid.NewGuid());
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-                result.AssertNotFound();
-            }
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Stream_BlobDoesNotExist()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var releaseVersion = new ReleaseVersion();
+            var service = SetupReleaseImageService(contentDbContext: contentDbContext);
 
-            var releaseFile = new ReleaseFile
+            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
+                fileId: Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task Stream_BlobDoesNotExist()
+    {
+        var releaseVersion = new ReleaseVersion();
+
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = new File
             {
-                ReleaseVersion = releaseVersion,
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "image.png",
-                    ContentType = "image/png",
-                    Type = Image
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.Add(releaseFile);
-                await contentDbContext.SaveChangesAsync();
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                ContentType = "image/png",
+                Type = Image
             }
+        };
 
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-            privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    privateBlobStorageService: privateBlobStorageService.Object);
-
-                var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                    fileId: releaseFile.File.Id);
-
-                MockUtils.VerifyAllMocks(privateBlobStorageService);
-
-                result.AssertNotFound();
-            }
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Upload()
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
+        privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            const string filename = "image.png";
+            var service = SetupReleaseImageService(contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object);
 
-            var releaseVersion = new ReleaseVersion();
+            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
+                fileId: releaseFile.File.Id);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            result.AssertNotFound();
+        }
+    }
 
-            var formFile = CreateFormFileMock(filename, "image/png").Object;
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
+    [Fact]
+    public async Task Upload()
+    {
+        const string filename = "image.png";
 
-            privateBlobStorageService.Setup(mock =>
+        var releaseVersion = new ReleaseVersion();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var formFile = CreateFormFileMock(filename, "image/png").Object;
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var fileValidatorService = new Mock<IFileValidatorService>(Strict);
+
+        privateBlobStorageService.Setup(mock =>
+            mock.UploadFile(PrivateReleaseFiles,
+                It.Is<string>(path =>
+                    path.Contains(FilesPath(releaseVersion.Id, Image))),
+                formFile
+            )).Returns(Task.CompletedTask);
+
+        fileValidatorService.Setup(mock =>
+                mock.ValidateFileForUpload(formFile, Image))
+            .ReturnsAsync(Unit.Instance);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseImageService(contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                fileValidatorService: fileValidatorService.Object);
+
+            var result = await service.Upload(releaseVersion.Id, formFile);
+
+            MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
+
+            Assert.True(result.IsRight);
+
+            fileValidatorService.Verify(mock =>
+                mock.ValidateFileForUpload(formFile, Image), Times.Once);
+
+            privateBlobStorageService.Verify(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(releaseVersion.Id, Image))),
                     formFile
-                )).Returns(Task.CompletedTask);
+                ), Times.Once);
 
-            fileValidatorService.Setup(mock =>
-                    mock.ValidateFileForUpload(formFile, Image))
-                .ReturnsAsync(Unit.Instance);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    privateBlobStorageService: privateBlobStorageService.Object,
-                    fileValidatorService: fileValidatorService.Object);
-
-                var result = await service.Upload(releaseVersion.Id, formFile);
-
-                MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
-
-                Assert.True(result.IsRight);
-
-                fileValidatorService.Verify(mock =>
-                    mock.ValidateFileForUpload(formFile, Image), Times.Once);
-
-                privateBlobStorageService.Verify(mock =>
-                    mock.UploadFile(PrivateReleaseFiles,
-                        It.Is<string>(path =>
-                            path.Contains(FilesPath(releaseVersion.Id, Image))),
-                        formFile
-                    ), Times.Once);
-
-                Assert.True(result.Right.ContainsKey("default"));
-                Assert.Contains($"/api/releases/{releaseVersion.Id}/images/", result.Right["default"]);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var releaseFile = await contentDbContext.ReleaseFiles
-                    .Include(mf => mf.File)
-                    .SingleOrDefaultAsync(mf =>
-                        mf.ReleaseVersionId == releaseVersion.Id
-                        && mf.File.Filename == filename
-                        && mf.File.Type == Image
-                    );
-
-                Assert.NotNull(releaseFile);
-                var file = releaseFile.File;
-
-                Assert.Equal(10240, file.ContentLength);
-                Assert.Equal("image/png", file.ContentType);
-                file.Created.AssertUtcNow();
-                Assert.Equal(_user.Id, file.CreatedById);
-            }
+            Assert.True(result.Right.ContainsKey("default"));
+            Assert.Contains($"/api/releases/{releaseVersion.Id}/images/", result.Right["default"]);
         }
 
-        [Fact]
-        public async Task Upload_ReleaseNotFound()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var formFile = CreateFormFileMock("image.png", "image/png").Object;
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-            var fileValidatorService = new Mock<IFileValidatorService>(Strict);
+            var releaseFile = await contentDbContext.ReleaseFiles
+                .Include(mf => mf.File)
+                .SingleOrDefaultAsync(mf =>
+                    mf.ReleaseVersionId == releaseVersion.Id
+                    && mf.File.Filename == filename
+                    && mf.File.Type == Image
+                );
 
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    privateBlobStorageService: privateBlobStorageService.Object,
-                    fileValidatorService: fileValidatorService.Object);
+            Assert.NotNull(releaseFile);
+            var file = releaseFile.File;
 
-                var result = await service.Upload(Guid.NewGuid(), formFile);
-
-                result.AssertNotFound();
-            }
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
+            Assert.Equal(10240, file.ContentLength);
+            Assert.Equal("image/png", file.ContentType);
+            file.Created.AssertUtcNow();
+            Assert.Equal(_user.Id, file.CreatedById);
         }
+    }
 
-        private ReleaseImageService SetupReleaseImageService(
-            ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IPrivateBlobStorageService? privateBlobStorageService = null,
-            IFileValidatorService? fileValidatorService = null,
-            IReleaseFileRepository? releaseFileRepository = null,
-            IUserService? userService = null)
+    [Fact]
+    public async Task Upload_ReleaseNotFound()
+    {
+        var formFile = CreateFormFileMock("image.png", "image/png").Object;
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var fileValidatorService = new Mock<IFileValidatorService>(Strict);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext())
         {
-            contentDbContext.Users.Add(_user);
-            contentDbContext.SaveChanges();
+            var service = SetupReleaseImageService(contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                fileValidatorService: fileValidatorService.Object);
 
-            return new ReleaseImageService(
-                contentDbContext,
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(Strict).Object,
-                fileValidatorService ?? new Mock<IFileValidatorService>(Strict).Object,
-                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
-            );
+            var result = await service.Upload(Guid.NewGuid(), formFile);
+
+            result.AssertNotFound();
         }
+
+        MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
+    }
+
+    private ReleaseImageService SetupReleaseImageService(
+        ContentDbContext contentDbContext,
+        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+        IPrivateBlobStorageService? privateBlobStorageService = null,
+        IFileValidatorService? fileValidatorService = null,
+        IReleaseFileRepository? releaseFileRepository = null,
+        IUserService? userService = null)
+    {
+        contentDbContext.Users.Add(_user);
+        contentDbContext.SaveChanges();
+
+        return new ReleaseImageService(
+            contentDbContext,
+            contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+            privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(Strict).Object,
+            fileValidatorService ?? new Mock<IFileValidatorService>(Strict).Object,
+            releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+            userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
+        );
     }
 }

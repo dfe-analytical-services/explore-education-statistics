@@ -19,10 +19,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class PreReleaseUserServicePermissionTests
 {
-    public class PreReleaseUserServicePermissionTests
-    {
         private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
@@ -128,5 +128,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
             );
         }
-    }
 }

@@ -27,6 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
+using JetBrains.Annotations;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -332,6 +333,7 @@ public class DataSetFileStorageTests
                     releaseVersionId,
                     existingDataSetUpload.Id,
                     It.IsAny<CancellationToken>()))
+                // ReSharper disable once AccessToDisposedClosure - Note: this call (and hence the reference to contentDbContext) only happens in the Act phase below, before disposal. 
                 .Callback(() => contentDbContext.DataSetUploads.Remove(existingDataSetUpload))
                 .ReturnsAsync(Unit.Instance);
 
@@ -422,8 +424,6 @@ public class DataSetFileStorageTests
                     break;
                 case TestResult.FAIL:
                     Assert.Equal(DataSetUploadStatus.FAILED_SCREENING, updatedDataSetUpload.Status);
-                    break;
-                default:
                     break;
             }
 
@@ -870,8 +870,6 @@ public class DataSetFileStorageTests
         var metaFileName = "test-data.meta.csv";
         var contentDbContextId = Guid.NewGuid();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId.ToString());
-        var dataSetFile = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaSetFile = await new DataSetFileBuilder().Build(FileType.Metadata);
         
         var testFixture = await DataSetFileStorageTestFixture
             .CreateZipUploadDataSetTestFixture(
@@ -978,7 +976,8 @@ public class DataSetFileStorageTests
         Assert.Equal(testFixture.ReleaseFile.ReleaseVersionId, uploadSummaries[0].ReleaseVersionId);
         Assert.Equal(dataFileNames, uploadSummaries.Select(x => x.File.Filename));
     }
-  
+
+    [UsedImplicitly]
     private static void AssertUploadSummary(
         DataFileInfo uploadSummary,
         string dataSetName,
