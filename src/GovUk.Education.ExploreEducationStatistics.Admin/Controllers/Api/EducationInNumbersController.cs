@@ -65,4 +65,11 @@ public class EducationInNumbersController(
         return await einService.UpdatePage(id, request)
             .HandleFailuresOrOk();
     }
+
+    [HttpPut("education-in-numbers/order")]
+    public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> Reorder([FromQuery] List<Guid> pageIds)
+    {
+        return await einService.Reorder(pageIds)
+            .HandleFailuresOrOk();
+    }
 }
