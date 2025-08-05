@@ -1646,7 +1646,7 @@ public class ReleaseDataFileServiceTests
     }
     
     [Fact]
-    public async Task ListAll_WithReplacement_inProgressReplacementsCount0_returns200()
+    public async Task ListAll_WithReplacementFiles_EmptyInProgressReplacements_ReturnsAllFile()
     {
         var releaseVersion = new ReleaseVersion();
         var originalFileId = Guid.NewGuid();
@@ -1689,7 +1689,6 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
-                ReplacingId = null,
             }
         };
         var replacementMetaReleaseFile = new ReleaseFile
