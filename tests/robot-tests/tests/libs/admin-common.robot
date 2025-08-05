@@ -735,12 +735,18 @@ user waits for scheduled release to be published immediately
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
-    [Arguments]    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${RELEASE_TYPE}    ${RELEASE_LABEL}=${EMPTY}
+    [Arguments]
+    ...    ${TIME_PERIOD}
+    ...    ${RELEASE_PERIOD}
+    ...    ${RELEASE_TYPE}
+    ...    ${RELEASE_LABEL}=${EMPTY}
+    ...    ${PUBLISHED_BY}=${EMPTY}
     user waits until h2 is visible    Release summary
     user checks summary list contains    Time period    ${TIME_PERIOD}
     user checks summary list contains    Release period    ${RELEASE_PERIOD}
     user checks summary list contains    Release type    ${RELEASE_TYPE}
     user checks summary list contains    Release label    ${RELEASE_LABEL}
+    user checks summary list contains    Published by    ${PUBLISHED_BY}
 
 user changes methodology status to Approved
     [Arguments]

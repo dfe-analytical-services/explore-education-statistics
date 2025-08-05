@@ -28,6 +28,8 @@ public record ReleaseCreateRequest
     [MaxLength(20)]
     public string? Label { get; init; }
 
+    public Guid[]? PublishingOrganisations { get; init; }
+
     public Guid? TemplateReleaseId { get; init; }
 }
 

@@ -147,17 +147,17 @@ const ChartDataSetsConfiguration = ({
           <div className={styles.formSelectRow}>
             {orderBy(Object.entries(meta.filters), ([_, value]) => value.order)
               .filter(([, filters]) => filters.options.length > 1)
-              .map(([categoryName, filters]) => (
+              .map(([categoryKey, category]) => (
                 <FormFieldSelect
-                  key={categoryName}
-                  name={`filters.${categoryName}`}
-                  label={categoryName}
+                  key={categoryKey}
+                  name={`filters.${categoryKey}`}
+                  label={category.legend}
                   formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
                   placeholder={
-                    filters.options.length > 1 ? 'All options' : undefined
+                    category.options.length > 1 ? 'All options' : undefined
                   }
-                  options={filters.options}
+                  options={category.options}
                   order={FormSelect.unordered}
                 />
               ))}

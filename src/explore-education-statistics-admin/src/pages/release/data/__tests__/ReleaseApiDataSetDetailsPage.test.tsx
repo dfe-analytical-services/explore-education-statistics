@@ -941,7 +941,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
-  test('renders error summary when draft version has a major version update and feature flag for replacement is turned on', async () => {
+  test('renders error summary for when draft version has a major version update and feature flag for replacement is turned on', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: {
@@ -951,6 +951,47 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
+          filtersHaveMajorChange: true,
+          locationsHaveMajorChange: true,
+        },
+      },
+    });
+
+    const options = { enableReplacementOfPublicApiDataSets: true };
+    renderPage(options);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          'This API data set can not be published because it has major changes that are not allowed.',
+          {
+            selector: 'h2',
+          },
+        ),
+      ).toBeInTheDocument();
+
+      expect(() =>
+        screen.getByText('Draft API data set version is ready to be published'),
+      ).toThrow('Unable to find an element');
+
+      expect(() =>
+        screen.getByText(
+          'This API data set can not be published because it has incomplete location or filter manual mapping.',
+        ),
+      ).toThrow('Unable to find an element');
+    });
+  });
+
+  test('renders error summary for incomplete when draft version doesnt have major version update but is incomplete and feature flag for replacement is turned on', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '2.0.1',
+        mappingStatus: {
+          isMajorVersionUpdate: true,
+          locationsComplete: false,
+          filtersComplete: false,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: false,
         },
@@ -963,7 +1004,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it is either incomplete or has a major version update.',
+          'This API data set can not be published because it has incomplete location or filter manual mapping.',
           {
             selector: 'h2',
           },
@@ -972,6 +1013,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText('Draft API data set version is ready to be published'),
+      ).toThrow('Unable to find an element');
+
+      expect(() =>
+        screen.getByText(
+          'This API data set can not be published because it has Major changes that are not allowed',
+        ),
       ).toThrow('Unable to find an element');
     });
   });
@@ -998,7 +1045,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it is either incomplete or has a major version update.',
+          'This API data set can not be published because it has incomplete location or filter manual mapping.',
           {
             selector: 'h2',
           },
@@ -1047,7 +1094,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it is either incomplete or has a major version update.',
+          'This API data set can not be published because it has incomplete location or filter manual mapping.',
           {
             selector: 'h2',
           },
@@ -1197,7 +1244,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText(
-          'The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments.',
+          'This API data set can not be published because it has major changes that are not allowed.',
         ),
       ).toThrow('Unable to find an element');
     });
@@ -1254,9 +1301,74 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(() =>
         screen.getByText(
-          'The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments.',
+          'This API data set can not be published because it has major changes that are not allowed.',
         ),
       ).toThrow('Unable to find an element');
+    });
+  });
+
+  test('renders cancel replacement link with correct releaseVersionId in replaceTabRoute when draftVersion.originalFileId is present', async () => {
+    const testOriginalFileId = 'original-file-123';
+    const testDraftVersionWithOriginalFileId = {
+      ...testDraftVersion,
+      originalFileId: testOriginalFileId,
+      version: '2.0.1',
+      mappingStatus: {
+        isMajorVersionUpdate: true,
+        locationsComplete: true,
+        filtersComplete: true,
+        filtersHaveMajorChange: true,
+        locationsHaveMajorChange: true,
+      },
+    };
+
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersionWithOriginalFileId,
+    });
+
+    const options = { enableReplacementOfPublicApiDataSets: true };
+    renderPage(options);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /This API data set can not be published because it has major changes that are not allowed./,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: 'cancel the ongoing replacement',
+        }),
+      ).toHaveAttribute(
+        'href',
+        `/publication/publication-1/release/${testDraftVersionWithOriginalFileId.releaseVersion.id}/data/${testOriginalFileId}/replace`,
+      );
+    });
+  });
+
+  test('does not render cancel replacement link when draftVersion.originalFileId is not present', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        mappingStatus: {
+          isMajorVersionUpdate: true,
+          locationsComplete: true,
+          filtersComplete: true,
+          filtersHaveMajorChange: true,
+          locationsHaveMajorChange: true,
+        },
+        // no originalFileId
+      },
+    });
+
+    const options = { enableReplacementOfPublicApiDataSets: true };
+    renderPage(options);
+    await waitFor(() => {
+      expect(
+        screen.queryByText('cancel the ongoing replacement'),
+      ).not.toBeInTheDocument();
     });
   });
 
