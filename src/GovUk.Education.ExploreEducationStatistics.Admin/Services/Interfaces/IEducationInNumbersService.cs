@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -18,4 +19,8 @@ public interface IEducationInNumbersService
 
     Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request);
+
+    Task<Either<ActionResult, EducationInNumbersPageViewModel>> UpdatePage(
+        Guid id,
+        UpdateEducationInNumbersPageRequest request);
 }

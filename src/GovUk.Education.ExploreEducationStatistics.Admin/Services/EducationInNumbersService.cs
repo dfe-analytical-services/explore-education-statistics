@@ -46,7 +46,7 @@ public class EducationInNumbersService(
             .ToListAsync();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage(
+    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage( // @MarkFix tests?
         CreateEducationInNumbersPageRequest request)
     {
         var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages
@@ -81,5 +81,35 @@ public class EducationInNumbersService(
         await contentDbContext.SaveChangesAsync();
 
         return newPage.ToViewModel();
+    }
+
+    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> UpdatePage( // @MarkFix tests?
+        Guid id,
+        UpdateEducationInNumbersPageRequest request)
+    {
+        return await contentDbContext.EducationInNumbersPages
+            .FirstOrNotFoundAsync(page => page.Id == id)
+            .OnSuccess(async page =>
+            {
+                if (page.Published != null)
+                {
+                    throw new ArgumentException("Cannot update already published EiN page"); // @MarkFix exception fine?
+                }
+
+                page.Title = request.Title ?? page.Title;
+                page.Slug = request.Slug ?? page.Slug;
+                page.Description = request.Description ?? page.Description;
+
+                if (request.Publish == true)
+                {
+                    page.Published = DateTime.UtcNow;
+                }
+
+                await contentDbContext.SaveChangesAsync();
+
+                // @MarkFix refresh cache here?
+
+                return page.ToViewModel();
+            });
     }
 }
