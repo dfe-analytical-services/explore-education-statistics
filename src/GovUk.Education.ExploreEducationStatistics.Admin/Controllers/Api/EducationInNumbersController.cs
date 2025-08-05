@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -36,6 +37,14 @@ public class EducationInNumbersController(
     public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> ListLatestPages()
     {
         return await einService.ListLatestPages()
+            .HandleFailuresOrOk();
+    }
+
+    [HttpPost("education-in-numbers")]
+    public async Task<ActionResult<EducationInNumbersPageViewModel>> CreateEducationInNumbersPage(
+        [FromQuery] CreateEducationInNumbersPageRequest request)
+    {
+        return await einService.CreatePage(request)
             .HandleFailuresOrOk();
     }
 }
