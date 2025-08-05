@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -28,6 +29,13 @@ public class EducationInNumbersController(
         [FromRoute] string? slug)
     {
         return await einService.GetPage(slug, published: true)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpGet("education-in-numbers")]
+    public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> ListLatestPages()
+    {
+        return await einService.ListLatestPages()
             .HandleFailuresOrOk();
     }
 }
