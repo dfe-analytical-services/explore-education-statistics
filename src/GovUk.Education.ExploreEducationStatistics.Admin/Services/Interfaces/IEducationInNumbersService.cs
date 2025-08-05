@@ -26,4 +26,7 @@ public interface IEducationInNumbersService
     Task<Either<ActionResult, EducationInNumbersPageViewModel>> UpdatePage(
         Guid id,
         UpdateEducationInNumbersPageRequest request);
+
+    Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder(
+        List<Guid> newOrder);
 }
