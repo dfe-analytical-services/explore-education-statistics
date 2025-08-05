@@ -105,14 +105,37 @@ public class UserReleaseRoleAndInviteManager(
             .Select(upr => (upr.ReleaseVersionId, upr.Role, upr.User.Email))
             .ToHashSet();
 
-        var invites = await ContentDbContext.UserReleaseInvites
-            .Where(upi => inviteKeys.Contains(
-                new ValueTuple<Guid, ReleaseRole, string>(
-                    upi.ReleaseVersionId,
-                    upi.Role,
-                    upi.Email
-                )))
+        var allReleaseVersionIds = inviteKeys
+            .Select(k => k.ReleaseVersionId)
+            .ToHashSet();
+
+        var allEmails = inviteKeys
+            .Select(k => k.Email)
+            .ToHashSet();
+
+        var allRoles = inviteKeys
+            .Select(k => k.Role)
+            .ToHashSet();
+
+        // Step 1: Fetch only the broadly matching invites from the database
+        // We filter by ReleaseVersionId, Role and Email (simple scalar fields)
+        // so that we pull back the smallest candidate set possible.
+        var inviteCandidates = await ContentDbContext.UserReleaseInvites
+            .Where(upi => allReleaseVersionIds.Contains(upi.ReleaseVersionId))
+            .Where(upi => allEmails.Contains(upi.Email))
+            .Where(upi => allRoles.Contains(upi.Role))
             .ToListAsync(cancellationToken);
+
+        // Step 2: Perform the precise composite‐key match in memory
+        // Now that we have a small candidate list, we can safely
+        // use our HashSet<(ReleaseVersionId, Role, Email)> to finish
+        // the exact tuple comparison without hitting EF translation limits.
+        var invites = inviteCandidates
+            .Where(upi => inviteKeys.Contains((
+                upi.ReleaseVersionId,
+                upi.Role,
+                upi.Email)))
+            .ToList();
 
         await ContentDbContext.RequireTransaction(async () =>
         {
