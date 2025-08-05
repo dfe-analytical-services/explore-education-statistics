@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -67,9 +68,18 @@ public class EducationInNumbersController(
     }
 
     [HttpPut("education-in-numbers/order")]
-    public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> Reorder([FromQuery] List<Guid> pageIds)
+    public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> Reorder(
+        [FromQuery] List<Guid> pageIds)
     {
         return await einService.Reorder(pageIds)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpDelete("education-in-numbers/{id:guid}")]
+    public async Task<ActionResult<Unit>> Delete(
+        [FromRoute] Guid id)
+    {
+        return await einService.Delete(id)
             .HandleFailuresOrOk();
     }
 }
