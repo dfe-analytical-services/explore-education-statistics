@@ -1,12 +1,16 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +18,8 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EducationInNumbersService(
-    ContentDbContext contentDbContext) : IEducationInNumbersService
+    ContentDbContext contentDbContext,
+    IUserService userService) : IEducationInNumbersService
 {
     public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage( // @MarkFix tests?
         string? slug,
@@ -39,5 +44,42 @@ public class EducationInNumbersService(
                 .First())
             .Select(page => page.ToViewModel()) // @MarkFix might want to be a summary view model
             .ToListAsync();
+    }
+
+    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage(
+        CreateEducationInNumbersPageRequest request)
+    {
+        var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages
+            .Any(page => page.Slug == request.Slug);
+
+        if (pageWithSlugAlreadyExists)
+        {
+            // @MarkFix return error
+
+        }
+
+        var currentMaxOrder = contentDbContext.EducationInNumbersPages
+            .Select(page => page.Order)
+            .Max();
+
+        var newPage = new EducationInNumbersPage
+        {
+            Id = Guid.NewGuid(),
+            Title = request.Title,
+            Slug = request.Slug,
+            Description = request.Description,
+            Version = 0,
+            Order = currentMaxOrder + 1,
+            Published = null,
+            Created = DateTime.UtcNow(),
+            CreatedById = userService.GetUserId(),
+            Updated = null,
+            UpdatedById = null,
+        };
+
+        contentDbContext.EducationInNumbersPages.Add(newPage);
+        await contentDbContext.SaveChangesAsync();
+
+        return newPage.ToViewModel();
     }
 }
