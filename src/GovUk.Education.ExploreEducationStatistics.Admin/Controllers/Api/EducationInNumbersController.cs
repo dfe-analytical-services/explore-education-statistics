@@ -19,19 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 public class EducationInNumbersController(
     IEducationInNumbersService einService) : ControllerBase
 {
-    [HttpGet("education-in-numbers/{slug}/latest")]
+    [HttpGet("education-in-numbers/{id:guid}")]
     public async Task<ActionResult<EducationInNumbersPageViewModel>> GetLatestPage(
-        [FromRoute] string? slug)
+        [FromRoute] Guid id)
     {
-        return await einService.GetPage(slug)
-            .HandleFailuresOrOk();
-    }
-
-    [HttpGet("education-in-numbers/{slug}/published")]
-    public async Task<ActionResult<EducationInNumbersPageViewModel>> GetLatestPublishedPage(
-        [FromRoute] string? slug)
-    {
-        return await einService.GetPage(slug, published: true)
+        return await einService.GetPage(id)
             .HandleFailuresOrOk();
     }
 
