@@ -61,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public abstract class ReleaseVersionServiceTests
 {
     private readonly DataFixture _dataFixture = new();
+    private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
     private static readonly User User = new() { Id = Guid.NewGuid() };
 
     public class GetDeleteDataFilePlanTests : ReleaseVersionServiceTests
@@ -849,11 +850,15 @@ public abstract class ReleaseVersionServiceTests
                             Year = release.Year,
                             TimePeriodCoverage = release.TimePeriodCoverage,
                             PreReleaseAccessList = "New access list",
-                            Label = newLabel
+                            Label = newLabel,
+                            PublishingOrganisations = null
                         }
                     );
 
                 VerifyAllMocks(dataSetVersionService);
+                _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
+                    expectedOrganisationIds: null,
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
 
                 var viewModel = result.AssertRight();
 
@@ -875,6 +880,7 @@ public abstract class ReleaseVersionServiceTests
                 var actualReleaseVersion = await context.ReleaseVersions
                     .Include(rv => rv.Release)
                     .Include(rv => rv.ReleaseStatuses)
+                    .Include(rv => rv.PublishingOrganisations)
                     .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
                 var actualRelease = actualReleaseVersion.Release;
@@ -889,6 +895,282 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal("New access list", actualReleaseVersion.PreReleaseAccessList);
 
                 Assert.Empty(actualReleaseVersion.ReleaseStatuses);
+                Assert.Empty(actualReleaseVersion.PublishingOrganisations);
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublishingOrganisationsHasValidationErrors_ReturnsValidationErrors()
+        {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            ErrorViewModel[] expectedValidationErrors =
+            [
+                new() { Message = "Validation error 1" },
+                new() { Message = "Validation error 2" }
+            ];
+
+            _organisationsValidator.WhereHasValidationErrors(expectedValidationErrors);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: context);
+
+                var result = await releaseVersionService
+                    .UpdateReleaseVersion(
+                        releaseVersion.Id,
+                        new ReleaseVersionUpdateRequest
+                        {
+                            Type = releaseVersion.Type,
+                            Year = releaseVersion.Release.Year,
+                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                            PublishingOrganisations = [Guid.NewGuid(), Guid.NewGuid()]
+                        }
+                    );
+
+                _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+                validationProblem.AssertHasErrors(expectedValidationErrors.ToList());
+            }
+        }
+
+        [Fact]
+        public async Task
+            GivenReleaseVersionHasPublishingOrganisations_WhenRequestHasPublishingOrganisations_UpdatesOrganisations()
+        {
+            var updatedOrganisations = _dataFixture.DefaultOrganisation()
+                .GenerateArray(2);
+            var updatedOrganisationIds = updatedOrganisations.Select(o => o.Id).ToArray();
+
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ =>
+                [
+                    _dataFixture.DefaultRelease()
+                        .WithVersions(_ =>
+                        [
+                            _dataFixture.DefaultReleaseVersion()
+                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
+                                    .Generate(2))
+                        ])
+                ]);
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            _organisationsValidator.WhereHasOrganisations(updatedOrganisations);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Organisations.AddRange(updatedOrganisations);
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
+                    releaseVersion.Id,
+                    releaseVersion.Release.Slug,
+                    releaseVersion.Release.Title,
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    dataSetVersionService: dataSetVersionService.Object);
+
+                var result = await releaseVersionService
+                    .UpdateReleaseVersion(
+                        releaseVersion.Id,
+                        new ReleaseVersionUpdateRequest
+                        {
+                            Type = releaseVersion.Type,
+                            Year = releaseVersion.Release.Year,
+                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                            PublishingOrganisations = updatedOrganisationIds
+                        }
+                    );
+
+                _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
+                    expectedOrganisationIds: updatedOrganisationIds,
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(updatedOrganisations.Length, viewModel.PublishingOrganisations.Count);
+                Assert.All(updatedOrganisations,
+                    expectedOrganisation => Assert.Contains(viewModel.PublishingOrganisations,
+                        ovm => expectedOrganisation.Id == ovm.Id));
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actualReleaseVersion = await context.ReleaseVersions
+                    .Include(rv => rv.PublishingOrganisations)
+                    .FirstAsync(rv => rv.Id == releaseVersion.Id);
+
+                Assert.Equal(updatedOrganisations.Length, actualReleaseVersion.PublishingOrganisations.Count);
+                Assert.All(updatedOrganisations,
+                    expectedOrganisation => Assert.Contains(actualReleaseVersion.PublishingOrganisations,
+                        o => expectedOrganisation.Id == o.Id));
+            }
+        }
+
+        [Fact]
+        public async Task
+            GivenReleaseVersionHasNoPublishingOrganisations_WhenRequestHasPublishingOrganisations_UpdatesOrganisations()
+        {
+            var updatedOrganisations = _dataFixture.DefaultOrganisation()
+                .GenerateArray(2);
+            var updatedOrganisationIds = updatedOrganisations.Select(o => o.Id).ToArray();
+
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            _organisationsValidator.WhereHasOrganisations(updatedOrganisations);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Organisations.AddRange(updatedOrganisations);
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
+                    releaseVersion.Id,
+                    releaseVersion.Release.Slug,
+                    releaseVersion.Release.Title,
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    dataSetVersionService: dataSetVersionService.Object);
+
+                var result = await releaseVersionService
+                    .UpdateReleaseVersion(
+                        releaseVersion.Id,
+                        new ReleaseVersionUpdateRequest
+                        {
+                            Type = releaseVersion.Type,
+                            Year = releaseVersion.Release.Year,
+                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                            PublishingOrganisations = updatedOrganisationIds
+                        }
+                    );
+
+                _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
+                    expectedOrganisationIds: updatedOrganisationIds,
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(updatedOrganisations.Length, viewModel.PublishingOrganisations.Count);
+                Assert.All(updatedOrganisations,
+                    expectedOrganisation => Assert.Contains(viewModel.PublishingOrganisations,
+                        ovm => expectedOrganisation.Id == ovm.Id));
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actualReleaseVersion = await context.ReleaseVersions
+                    .Include(rv => rv.PublishingOrganisations)
+                    .FirstAsync(rv => rv.Id == releaseVersion.Id);
+
+                Assert.Equal(updatedOrganisations.Length, actualReleaseVersion.PublishingOrganisations.Count);
+                Assert.All(updatedOrganisations,
+                    expectedOrganisation => Assert.Contains(actualReleaseVersion.PublishingOrganisations,
+                        o => expectedOrganisation.Id == o.Id));
+            }
+        }
+
+        [Fact]
+        public async Task
+            GivenReleaseVersionHasPublishingOrganisations_WhenRequestHasNoPublishingOrganisations_RemovesOrganisations()
+        {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ =>
+                [
+                    _dataFixture.DefaultRelease()
+                        .WithVersions(_ =>
+                        [
+                            _dataFixture.DefaultReleaseVersion()
+                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
+                                    .Generate(2))
+                        ])
+                ]);
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
+            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
+                    releaseVersion.Id,
+                    releaseVersion.Release.Slug,
+                    releaseVersion.Release.Title,
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    dataSetVersionService: dataSetVersionService.Object);
+
+                var result = await releaseVersionService
+                    .UpdateReleaseVersion(
+                        releaseVersion.Id,
+                        new ReleaseVersionUpdateRequest
+                        {
+                            Type = releaseVersion.Type,
+                            Year = releaseVersion.Release.Year,
+                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                            PublishingOrganisations = null
+                        }
+                    );
+
+                _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
+                    expectedOrganisationIds: null,
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel.PublishingOrganisations);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actualReleaseVersion = await context.ReleaseVersions
+                    .Include(rv => rv.PublishingOrganisations)
+                    .FirstAsync(rv => rv.Id == releaseVersion.Id);
+
+                Assert.Empty(actualReleaseVersion.PublishingOrganisations);
             }
         }
 
@@ -2482,7 +2764,7 @@ public abstract class ReleaseVersionServiceTests
         }
     }
 
-    private static ReleaseVersionService BuildService(
+    private ReleaseVersionService BuildService(
         ContentDbContext contentDbContext,
         StatisticsDbContext? statisticsDbContext = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
@@ -2528,9 +2810,10 @@ public abstract class ReleaseVersionServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            _organisationsValidator.Build(),
             userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
             releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
-            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
+            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
             {
                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
             }),

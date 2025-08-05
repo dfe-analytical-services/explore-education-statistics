@@ -155,7 +155,7 @@ User generates a permanent link
     user waits until page contains testid    permalink-generated-url    %{WAIT_MEDIUM}
     user checks generated permalink is valid
 
-User validates permanent link works correctly
+User validates permalink works correctly
     user clicks link    View share link
     user waits until h1 is visible
     ...    'Exclusions by geographic level' from '${EXCLUSIONS_PUBLICATION_TITLE}'

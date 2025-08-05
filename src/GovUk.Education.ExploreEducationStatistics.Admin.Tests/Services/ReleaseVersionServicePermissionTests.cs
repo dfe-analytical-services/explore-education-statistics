@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -385,6 +386,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IDataSetVersionService>(),
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),
+            new OrganisationsValidatorMockBuilder().Build(),
             Mock.Of< IUserReleaseRoleAndInviteManager>(),
             Mock.Of<IReleaseSlugValidator>(),
              featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()

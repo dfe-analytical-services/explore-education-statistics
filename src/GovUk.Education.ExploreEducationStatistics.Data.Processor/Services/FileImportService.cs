@@ -105,7 +105,7 @@ public class FileImportService : IFileImportService
 
             if (import.Status == COMPLETE)
             {
-                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows);
+                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
             }
 
             return;
@@ -139,7 +139,7 @@ public class FileImportService : IFileImportService
             if (import.Errors.Count == 0)
             {
                 await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
-                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows);
+                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
             }
             else
             {

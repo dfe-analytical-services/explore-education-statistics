@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -196,8 +197,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.Upload(
                             releaseVersionId: _releaseVersion.Id,
-                            dataFormFile: new Mock<IFormFile>().Object,
-                            metaFormFile: new Mock<IFormFile>().Object,
+                            dataFile: new Mock<IManagedStreamFile>().Object,
+                            metaFile: new Mock<IManagedStreamFile>().Object,
                             dataSetTitle: "",
                             replacingFileId: null,
                             cancellationToken: default);
@@ -215,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.UploadFromZip(releaseVersionId: _releaseVersion.Id,
-                            zipFormFile: new Mock<IFormFile>().Object,
+                            zipFile: new Mock<IManagedStreamZipFile>().Object,
                             dataSetTitle: "",
                             replacingFileId: null,
                             cancellationToken: default);
@@ -234,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.UploadFromBulkZip(
                             releaseVersionId: _releaseVersion.Id,
-                            zipFormFile: new Mock<IFormFile>().Object,
+                            zipFile: new Mock<IManagedStreamZipFile>().Object,
                             cancellationToken: default);
                     }
                 );

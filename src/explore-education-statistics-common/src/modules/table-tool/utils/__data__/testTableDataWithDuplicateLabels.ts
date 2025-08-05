@@ -116,11 +116,13 @@ export const testTableWithDuplicateFilterLabels: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Filter1, category1Filter2],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Filter1, category2Filter2],
         order: 0,
@@ -177,11 +179,13 @@ export const testTableWithDuplicateFilterLabelsAndMissingData: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category1: {
+        legend: 'Category 1',
         name: 'category_1',
         options: [category1Filter1, category1Filter2],
         order: 0,
       },
       Category2: {
+        legend: 'Category 2',
         name: 'category_2',
         options: [category2Filter1, category2Filter2],
         order: 0,
@@ -240,11 +244,13 @@ export const testTableWithMultipleGroupsWithSameLabels: FullTable = {
     ...testInitialTableSubjectMeta,
     filters: {
       Category3: {
+        legend: 'Category 3',
         name: 'category_3',
         options: [category3Group1Filter1, category3Group2Filter1],
         order: 1,
       },
       Category4: {
+        legend: 'Category 4',
         name: 'category_4',
         options: [category4Group1Filter1, category4Group2Filter1],
         order: 0,

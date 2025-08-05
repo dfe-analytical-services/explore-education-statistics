@@ -1,13 +1,12 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
@@ -39,37 +38,37 @@ public interface IReleaseDataFileService
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
         Guid releaseVersionId,
-        IFormFile dataFormFile,
-        IFormFile metaFormFile,
+        IManagedStreamFile dataFile,
+        IManagedStreamFile metaFile,
         string dataSetTitle,
         Guid? replacingFileId,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
         Guid releaseVersionId,
-        IFormFile dataFormFile,
-        IFormFile metaFormFile,
+        IManagedStreamFile dataFile,
+        IManagedStreamFile metaFile,
         string dataSetTitle,
         Guid? replacingFileId,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
         Guid releaseVersionId,
-        IFormFile zipFormFile,
+        IManagedStreamZipFile zipFile,
         string dataSetTitle,
         Guid? replacingFileId,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
         Guid releaseVersionId,
-        IFormFile zipFormFile,
+        IManagedStreamZipFile zipFormFile,
         string dataSetTitle,
         Guid? replacingFileId,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(
         Guid releaseVersionId,
-        IFormFile zipFormFile,
+        IManagedStreamZipFile zipFormFile,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(

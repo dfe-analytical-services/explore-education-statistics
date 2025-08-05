@@ -136,8 +136,8 @@ Validate first release has latest release status in publication release order
 Navigate to first published release on public frontend
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
-Validate first published release on public frontend is the latest data
-    user checks page contains    This is the latest data
+Validate first published release on public frontend is the latest release
+    user checks page contains    This is the latest release
 
 Validate other releases section of first published release includes legacy releases
     user checks number of other releases is correct    2
@@ -235,8 +235,8 @@ Validate reordered publication releases
 Navigate to first published release on public frontend after reordering
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
-Validate first published release is the latest data after reordering
-    user checks page contains    This is the latest data
+Validate first published release is the latest release after reordering
+    user checks page contains    This is the latest release
 
 Validate other releases section of first published release contains updated legacy release in expected order
     user checks number of other releases is correct    2
@@ -326,8 +326,8 @@ Validate second release has latest release status in publication release order
 Navigate to second published release on public frontend
     user navigates to    ${PUBLIC_RELEASE_2_URL}
 
-Validate second published release is the latest data
-    user checks page contains    This is the latest data
+Validate second published release is the latest release
+    user checks page contains    This is the latest release
 
 Validate other releases section of second published release includes first release with expected order
     user checks number of other releases is correct    3
@@ -454,12 +454,12 @@ Validate first release has latest release status in publication release order af
 Navigate to first published release on public frontend after changing the latest release
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
-Validate first published release is the latest data after changing the latest release
-    user checks page contains    This is the latest data
+Validate first published release is the latest release after changing the latest release
+    user checks page contains    This is the latest release
 
 Navigate to second published release on public frontend after changing the latest release
     user navigates to    ${PUBLIC_RELEASE_2_URL}
 
-Validate second published release is not the latest data after changing the latest release
-    user checks page contains    This is not the latest data
+Validate second published release is not the latest release after changing the latest release
+    user checks page contains    This is not the latest release
     user waits until page contains link    View latest data: ${RELEASE_1_NAME}

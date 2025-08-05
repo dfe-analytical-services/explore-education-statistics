@@ -9,6 +9,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 describe('getSelectedDataSets', () => {
   const testOneFilterMeta: FullTableMeta['filters'] = {
     'School type': {
+      legend: 'School type',
       name: 'School type',
       options: [
         {
@@ -31,6 +32,7 @@ describe('getSelectedDataSets', () => {
   const testTwoFilterMeta: FullTableMeta['filters'] = {
     ...testOneFilterMeta,
     'Another category1': {
+      legend: 'Another category1',
       name: 'Another category1',
       options: [
         {
@@ -49,6 +51,7 @@ describe('getSelectedDataSets', () => {
   const testThreeFilterMeta: FullTableMeta['filters'] = {
     ...testTwoFilterMeta,
     'Another category2': {
+      legend: 'Another category2',
       name: 'Another category2',
       options: [
         {

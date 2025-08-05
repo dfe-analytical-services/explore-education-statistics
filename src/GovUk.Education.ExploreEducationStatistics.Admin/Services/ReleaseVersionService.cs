@@ -63,6 +63,7 @@ public class ReleaseVersionService(
     IDataSetVersionService dataSetVersionService,
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
+    IOrganisationsValidator organisationsValidator,
     IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
     IReleaseSlugValidator releaseSlugValidator,
     IOptions<FeatureFlagsOptions> featureFlags,
@@ -365,6 +366,7 @@ public class ReleaseVersionService(
         return await ReleaseVersionUpdateRequestValidator.Validate(request)
             .OnSuccess(async () => await context.ReleaseVersions
                 .Include(rv => rv.Release)
+                .Include(rv => rv.PublishingOrganisations)
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccessDo(releaseVersion => ValidateUpdateRequest(releaseVersion, request))
@@ -373,11 +375,17 @@ public class ReleaseVersionService(
                     newReleaseSlug: request.Slug,
                     publicationId: releaseVersion.Release.PublicationId,
                     releaseId: releaseVersion.ReleaseId))
-            .OnSuccessDo(async releaseVersion =>
-                await context.RequireTransaction(() =>
-                    UpdateReleaseAndVersion(request, releaseVersion)
-                        .OnSuccessDo(async () => await UpdateApiDataSetVersions(releaseVersion)))
-            )
+            .OnSuccessCombineWith(async _ =>
+                await organisationsValidator.ValidateOrganisations(
+                    organisationIds: request.PublishingOrganisations,
+                    path: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst()))
+            .OnSuccessDo(async releaseVersionAndPublishingOrganisations =>
+            {
+                var (releaseVersion, publishingOrganisations) = releaseVersionAndPublishingOrganisations;
+                return await context.RequireTransaction(() =>
+                    UpdateReleaseAndVersion(request, releaseVersion, publishingOrganisations)
+                        .OnSuccessDo(async () => await UpdateApiDataSetVersions(releaseVersion)));
+            })
             .OnSuccess(async () => await GetRelease(releaseVersionId));
     }
 
@@ -709,13 +717,17 @@ public class ReleaseVersionService(
             : Unit.Instance;
     }
 
-    private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(ReleaseVersionUpdateRequest request, ReleaseVersion releaseVersion)
+    private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(
+        ReleaseVersionUpdateRequest request,
+        ReleaseVersion releaseVersion,
+        Organisation[] publishingOrganisations)
     {
         releaseVersion.Release.Year = request.Year;
         releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;
         releaseVersion.Release.Slug = request.Slug;
         releaseVersion.Release.Label = string.IsNullOrWhiteSpace(request.Label) ? null : request.Label.Trim();
 
+        releaseVersion.PublishingOrganisations = [.. publishingOrganisations];
         releaseVersion.Type = request.Type!.Value;
         releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
 

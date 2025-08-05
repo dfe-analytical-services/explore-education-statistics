@@ -63,21 +63,21 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       </div>
 
       {data.status === 'SubjectRemoved' && (
-        <WarningMessage error testId="permalink-warning">
-          WARNING - The data used in this table is no longer valid.
+        <WarningMessage testId="permalink-warning">
+          The data used in this table is no longer valid.
         </WarningMessage>
       )}
       {(data.status === 'NotForLatestRelease' ||
         data.status === 'PublicationSuperseded') && (
-        <WarningMessage error testId="permalink-warning">
-          WARNING - The data used in this table may now be out-of-date as a new
-          release has been published since its creation.
+        <WarningMessage testId="permalink-warning">
+          A newer release of this publication is available and may include
+          updated figures.
         </WarningMessage>
       )}
       {data.status === 'SubjectReplacedOrRemoved' && (
-        <WarningMessage error testId="permalink-warning">
-          WARNING - The data used in this table may be invalid as the subject
-          file has been amended or removed since its creation.
+        <WarningMessage testId="permalink-warning">
+          The data used in this table may be invalid as the subject file has
+          been amended or removed since its creation.
         </WarningMessage>
       )}
 

@@ -198,18 +198,18 @@ Get public third release link
     ${PUBLIC_RELEASE_3_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_3_LINK}
 
-Check that second release does not contains the latest data
+Check that second release does not contains the latest release
     user navigates to public release page
     ...    ${PUBLIC_RELEASE_2_LINK}
     ...    ${PUBLICATION_NAME_UPDATED}
     ...    ${RELEASE_2_NAME}
-    user checks page does not contain    This is the latest data
-    user checks page contains    This is not the latest data
+    user checks page does not contain    This is the latest release
+    user checks page contains    This is not the latest release
 
-Check that third release contains the latest data
+Check that third release contains the latest release
     user navigates to public release page
     ...    ${PUBLIC_RELEASE_3_LINK}
     ...    ${PUBLICATION_NAME_UPDATED}
     ...    ${RELEASE_3_NAME}
-    user checks page does not contain    This is not the latest data
-    user checks page contains    This is the latest data
+    user checks page does not contain    This is not the latest release
+    user checks page contains    This is the latest release

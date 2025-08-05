@@ -1,14 +1,6 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .container {
-  background: govuk-colour('light-grey');
-  padding: govuk-spacing(2) 0;
-  width: 100%;
-
-  > div > p {
-    margin: 0;
-  }
-
   @media print {
     display: none;
   }

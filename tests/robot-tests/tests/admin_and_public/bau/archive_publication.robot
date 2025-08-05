@@ -107,7 +107,7 @@ Verify that archive-publication is publicly accessible
     ...    ${PUBLICATION_URL_ARCHIVE}
     ...    ${PUBLICATION_NAME_ARCHIVE}
     ...    ${RELEASE_NAME_ARCHIVE}
-    user waits until page contains    This is the latest data
+    user waits until page contains    This is the latest release
 
 Check that archive-publication subject appears correctly on Data tables page
     user navigates to data tables page on public frontend
@@ -235,14 +235,14 @@ Check public superseding-publication release page displays correctly
     ...    ${PUBLICATION_URL_SUPERSEDE}
     ...    ${PUBLICATION_NAME_SUPERSEDE}
     ...    ${RELEASE_NAME_SUPERSEDE}
-    user waits until page contains    This is the latest data
+    user waits until page contains    This is the latest release
 
 Check public archive-publication release page displays correctly
     user waits for caches to expire
 
     user navigates to    ${PUBLICATION_URL_ARCHIVE}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
-    user checks page does not contain    This is the latest data
+    user checks page does not contain    This is the latest release
 
 Check public archive-publication release page displays superseded warning
     user checks page contains element    testid:superseded-warning
@@ -255,7 +255,7 @@ Check superseded warning link takes user to superseding-publication release page
     user clicks element    testid:superseded-by-link
 
     user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
-    user checks page contains    This is the latest data
+    user checks page contains    This is the latest release
 
     user checks page does not contain element    testid:superseded-warning
     user checks page does not contain element    testid:superseded-by-link
@@ -312,7 +312,7 @@ Check data catalogue page contains archive and superseding publication subjects
     user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
 
 Check data set page shows 'Not the latest data' for archived publication subject
-    user clicks link    ${SUBJECT_NAME_ARCHIVE}
+    user clicks link containing text    ${SUBJECT_NAME_ARCHIVE}
     user waits until page contains    Data set from ${PUBLICATION_NAME_ARCHIVE}
     user checks page contains    Not the latest data
 
@@ -326,7 +326,7 @@ Check archive-publication permalink has out-of-date warning
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
     user waits until page contains
-    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+    ...    A newer release of this publication is available and may include updated figures.
 
 Set archive-publication to be no longer be superseded
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
@@ -438,4 +438,4 @@ Check archive-publication permalink no longer has out-of-date warning after arch
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
     user checks page does not contain
-    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+    ...    A newer release of this publication is available and may include updated figures.

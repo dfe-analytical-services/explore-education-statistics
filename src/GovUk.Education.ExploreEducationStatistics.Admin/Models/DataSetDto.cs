@@ -1,10 +1,10 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using System;
-using System.Collections.Generic;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -66,7 +66,7 @@ public record DataSet
     public File? ReplacingFile { get; init; }
 }
 
-public record DataSetIndex()
+public record DataSetIndex
 {
     public required Guid ReleaseVersionId { get; init; }
 

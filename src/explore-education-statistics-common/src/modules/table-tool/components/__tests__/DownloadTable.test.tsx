@@ -33,6 +33,7 @@ describe('DownloadTable', () => {
     boundaryLevels: [],
     filters: {
       Characteristic: {
+        legend: 'Characteristic',
         name: 'characteristic',
         options: [
           new CategoryFilter({
