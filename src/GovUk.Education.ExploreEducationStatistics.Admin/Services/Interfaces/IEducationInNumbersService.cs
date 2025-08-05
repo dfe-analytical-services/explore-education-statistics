@@ -20,6 +20,9 @@ public interface IEducationInNumbersService
     Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request);
 
+    Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreateAmendment(
+        Guid id);
+
     Task<Either<ActionResult, EducationInNumbersPageViewModel>> UpdatePage(
         Guid id,
         UpdateEducationInNumbersPageRequest request);
