@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -158,7 +160,54 @@ public class EducationInNumbersService(
             });
     }
 
-    // @MarkFix reorder
+    public async Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder(
+        List<Guid> newOrder)
+    {
+        var pageList = await contentDbContext.EducationInNumbersPages
+            .AsNoTracking()
+            .GroupBy(page => page.Slug)
+            .Select(group => group
+                .OrderByDescending(p => p.Version)
+                .First())
+            .ToListAsync();
+
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                newOrder, pageList.Select(page => page.Id)))
+        {
+            return new Either<ActionResult, List<EducationInNumbersPageViewModel>>(
+                ValidationUtils.ValidationActionResult(
+                    ValidationErrorMessages.ProvidedPageIdsDifferFromActualPageIds));
+        }
+
+        var updatingUserId = userService.GetUserId();
+
+        newOrder.ForEach((pageId, order) =>
+        {
+            var matchingPage = pageList.Single(page => page.Id == pageId);
+            matchingPage.Order = order;
+            matchingPage.Updated = DateTime.UtcNow;
+            matchingPage.UpdatedById = updatingUserId;
+
+            if (matchingPage is { Version: > 0, Published: null })
+            {
+                // It is an unpublished amendment, so we must also update the original in case the amendment is cancelled
+                var originalPage = contentDbContext.EducationInNumbersPages
+                    .Single(page => page.Slug == matchingPage.Slug
+                                    && page.Version + 1 == matchingPage.Version);
+                originalPage.Order = order;
+                originalPage.Updated = DateTime.UtcNow;
+                originalPage.UpdatedById = updatingUserId;
+            }
+        });
+
+        await contentDbContext.SaveChangesAsync();
+
+        // @MarkFix refresh cache here
+
+        return pageList
+            .Select(page => page.ToViewModel())
+            .ToList();
+    }
 
     // @MarkFix delete amendment
 }
