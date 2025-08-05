@@ -122,4 +122,7 @@ public enum ValidationErrorMessages
     // Featured tables
     DataBlockAlreadyHasFeaturedTable,
     ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
+
+    // Education in numbers
+    ProvidedPageIdsDifferFromActualPageIds,
 }
