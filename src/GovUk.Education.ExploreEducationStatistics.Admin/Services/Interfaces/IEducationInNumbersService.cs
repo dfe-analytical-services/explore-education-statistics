@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -14,4 +15,7 @@ public interface IEducationInNumbersService
         bool? published = null);
 
     Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> ListLatestPages();
+
+    Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage(
+        CreateEducationInNumbersPageRequest request);
 }
