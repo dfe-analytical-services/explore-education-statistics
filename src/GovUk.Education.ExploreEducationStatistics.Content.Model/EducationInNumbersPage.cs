@@ -26,7 +26,11 @@ public class EducationInNumbersPage
 
     public Guid CreatedById { get; set; }
 
+    public User? CreatedBy { get; set; } // @MarkFix rerun migration cause this was added?
+
     public DateTime? Updated { get; set; }
 
     public Guid? UpdatedById { get; set; }
+
+    public User? UpdatedBy { get; set; }
 }
