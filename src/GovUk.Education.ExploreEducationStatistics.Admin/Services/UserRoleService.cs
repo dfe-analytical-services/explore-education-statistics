@@ -98,7 +98,7 @@ public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
                 releaseVersionId: rv!.Id,
                 role))
             .OnSuccessCombineWith(_ => usersAndRolesDbContext.Users
-                    .SingleOrNotFoundAsync(u => u.Id == userId.ToString()))
+                .SingleOrNotFoundAsync(u => u.Id == userId.ToString()))
             .OnSuccess(async tuple =>
             {
                 var (releaseVersion, user) = tuple;
@@ -261,31 +261,31 @@ public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
     public async Task<Either<ActionResult, Dictionary<string, List<string>>>> GetAllResourceRoles()
     {
         return await userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(_ =>
-                {
-                    // This will be changed when we start introducing the use of the NEW publication roles in the 
-                    // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
-                    // filter out any usage of the NEW roles.
-                    HashSet<string> publicationRolesNamesToFilter = [nameof(PublicationRole.Approver), nameof(PublicationRole.Drafter)];
+            .CheckCanManageAllUsers()
+            .OnSuccess(_ =>
+            {
+                // This will be changed when we start introducing the use of the NEW publication roles in the 
+                // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+                // filter out any usage of the NEW roles.
+                HashSet<string> publicationRolesNamesToFilter = [nameof(PublicationRole.Approver), nameof(PublicationRole.Drafter)];
 
-                    return new Dictionary<string, List<string>>
+                return new Dictionary<string, List<string>>
+                {
                     {
-                        {
-                            "Publication",
-                            Enum.GetNames(typeof(PublicationRole))
-                                .Where(name => !publicationRolesNamesToFilter.Contains(name))
-                                .OrderBy(name => name)
-                                .ToList()
-                        },
-                        {
-                            "Release",
-                            Enum.GetNames(typeof(ReleaseRole))
-                                .OrderBy(name => name)
-                                .ToList()
-                        }
-                    };
-                });
+                        "Publication",
+                        Enum.GetNames(typeof(PublicationRole))
+                            .Where(name => !publicationRolesNamesToFilter.Contains(name))
+                            .OrderBy(name => name)
+                            .ToList()
+                    },
+                    {
+                        "Release",
+                        Enum.GetNames(typeof(ReleaseRole))
+                            .OrderBy(name => name)
+                            .ToList()
+                    }
+                };
+            });
     }
 
     public async Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRoles(string userId)

@@ -44,32 +44,32 @@ public class PreReleaseUserService(ContentDbContext context,
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
-                .OnSuccess(
-                    async _ =>
-                    {
-                        var emailsFromRoles = await context
-                            .UserReleaseRoles
-                            .Include(r => r.User)
-                            .Where(r => r.Role == ReleaseRole.PrereleaseViewer && r.ReleaseVersionId == releaseVersionId)
-                            .Select(r => r.User.Email.ToLower())
-                            .Distinct()
-                            .ToListAsync();
+            .OnSuccess(
+                async _ =>
+                {
+                    var emailsFromRoles = await context
+                        .UserReleaseRoles
+                        .Include(r => r.User)
+                        .Where(r => r.Role == ReleaseRole.PrereleaseViewer && r.ReleaseVersionId == releaseVersionId)
+                        .Select(r => r.User.Email.ToLower())
+                        .Distinct()
+                        .ToListAsync();
 
-                        var emailsFromInvites = await context
-                            .UserReleaseInvites
-                            .Where(i => i.Role == ReleaseRole.PrereleaseViewer && i.ReleaseVersionId == releaseVersionId)
-                            .Select(i => i.Email.ToLower())
-                            .Distinct()
-                            .ToListAsync();
+                    var emailsFromInvites = await context
+                        .UserReleaseInvites
+                        .Where(i => i.Role == ReleaseRole.PrereleaseViewer && i.ReleaseVersionId == releaseVersionId)
+                        .Select(i => i.Email.ToLower())
+                        .Distinct()
+                        .ToListAsync();
 
-                        return emailsFromRoles
-                            .Concat(emailsFromInvites)
-                            .Distinct()
-                            .Select(email => new PreReleaseUserViewModel(email))
-                            .OrderBy(model => model.Email)
-                            .ToList();
-                    }
-                );
+                    return emailsFromRoles
+                        .Concat(emailsFromInvites)
+                        .Distinct()
+                        .Select(email => new PreReleaseUserViewModel(email))
+                        .OrderBy(model => model.Email)
+                        .ToList();
+                }
+            );
     }
 
     public async Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
@@ -284,43 +284,43 @@ public class PreReleaseUserService(ContentDbContext context,
         bool isNewUser)
     {
         return await context.ReleaseVersions
-                .Include(rv => rv.Release)
-                .ThenInclude(r => r.Publication)
-                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccess(releaseVersion =>
+            .Include(rv => rv.Release)
+            .ThenInclude(r => r.Publication)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .OnSuccess(releaseVersion =>
+            {
+                var url = appOptions.Value.Url;
+                var template = notifyOptions.Value.PreReleaseTemplateId;
+
+                var prereleaseUrl =
+                    $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
+
+                var preReleaseWindow = preReleaseService.GetPreReleaseWindow(releaseVersion);
+                var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
+                var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
+
+                // TODO EES-828 This time should depend on the Publisher schedule
+                var publishScheduledTime = new TimeSpan(9, 30, 0);
+
+                var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
+                var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
+                var publishDay = FormatDayForEmail(publishScheduled);
+                var publishTime = FormatTimeForEmail(publishScheduledTime);
+
+                var emailValues = new Dictionary<string, dynamic>
                 {
-                    var url = appOptions.Value.Url;
-                    var template = notifyOptions.Value.PreReleaseTemplateId;
+                    { "newUser", isNewUser ? "yes" : "no" },
+                    { "release name", releaseVersion.Release.Title },
+                    { "publication name", releaseVersion.Release.Publication.Title },
+                    { "prerelease link", prereleaseUrl },
+                    { "prerelease day", preReleaseDay },
+                    { "prerelease time", preReleaseTime },
+                    { "publish day", publishDay },
+                    { "publish time", publishTime }
+                };
 
-                    var prereleaseUrl =
-                        $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
-
-                    var preReleaseWindow = preReleaseService.GetPreReleaseWindow(releaseVersion);
-                    var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
-                    var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
-
-                    // TODO EES-828 This time should depend on the Publisher schedule
-                    var publishScheduledTime = new TimeSpan(9, 30, 0);
-
-                    var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
-                    var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
-                    var publishDay = FormatDayForEmail(publishScheduled);
-                    var publishTime = FormatTimeForEmail(publishScheduledTime);
-
-                    var emailValues = new Dictionary<string, dynamic>
-                    {
-                        { "newUser", isNewUser ? "yes" : "no" },
-                        { "release name", releaseVersion.Release.Title },
-                        { "publication name", releaseVersion.Release.Publication.Title },
-                        { "prerelease link", prereleaseUrl },
-                        { "prerelease day", preReleaseDay },
-                        { "prerelease time", preReleaseTime },
-                        { "publish day", publishDay },
-                        { "publish time", publishTime }
-                    };
-
-                    return emailService.SendEmail(email, template, emailValues);
-                });
+                return emailService.SendEmail(email, template, emailValues);
+            });
     }
 
     public async Task MarkInviteEmailAsSent(UserReleaseInvite invite)

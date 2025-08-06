@@ -72,11 +72,11 @@ public class PermissionsController(
             .OnSuccess(async releaseVersion =>
             {
                 var canMarkDraft = await userService
-                        .CheckCanMarkReleaseVersionAsDraft(releaseVersion);
+                    .CheckCanMarkReleaseVersionAsDraft(releaseVersion);
                 var canMarkHigherReview = await userService
-                        .CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
+                    .CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
                 var canMarkApproved = await userService
-                        .CheckCanApproveReleaseVersion(releaseVersion);
+                    .CheckCanApproveReleaseVersion(releaseVersion);
 
                 return new ReleaseStatusPermissionsViewModel(
                     CanMarkDraft: canMarkDraft.IsRight,
@@ -97,7 +97,7 @@ public class PermissionsController(
                 fileId: fileId,
                 FileType.Data)
             .OnSuccess(userService.GetDataFilePermissions)
-                .HandleFailuresOrOk();
+            .HandleFailuresOrOk();
     }
 
     [HttpGet("permissions/release/{releaseVersionId:guid}/amend")]
@@ -113,7 +113,7 @@ public class PermissionsController(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanViewPreReleaseSummary)
             .OnSuccess(releaseVersion => preReleaseService.GetPreReleaseWindowStatus(releaseVersion, UtcNow))
-                .HandleFailuresOrOk();
+            .HandleFailuresOrOk();
     }
 
     [HttpGet("permissions/methodology/{methodologyId:guid}/update")]
@@ -134,11 +134,11 @@ public class PermissionsController(
             .OnSuccess(async methodologyVersion =>
             {
                 var canMarkDraft = await userService
-                        .CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
+                    .CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
                 var canMarkHigherLevelReview = await userService
-                        .CheckCanSubmitMethodologyForHigherReview(methodologyVersion);
+                    .CheckCanSubmitMethodologyForHigherReview(methodologyVersion);
                 var canMarkApproved = await userService
-                        .CheckCanApproveMethodologyVersion(methodologyVersion);
+                    .CheckCanApproveMethodologyVersion(methodologyVersion);
 
                 return new MethodologyApprovalStatusPermissions
                 (
