@@ -680,7 +680,7 @@ public class ReleaseDataFileService(
 
             var result = await releaseFiles.SelectAsync(async releaseFile =>
             {
-                if (inProgressReplacements == null || inProgressReplacements.Count == 0 || releaseFile.File.ReplacedById == null)
+                if (inProgressReplacements?.Count == 0 || releaseFile.File.ReplacedById == null)
                 {
                     return new DataFileInfo(
                         releaseFile,
