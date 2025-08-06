@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
-    public interface IReplacementService
-    {
-        Task<Either<ActionResult, Unit>> Replace(
-            Guid releaseVersionId,
-            Guid originalFileId,
-            CancellationToken cancellationToken = default);
-    }
+public interface IReplacementService
+{
+    Task<Either<ActionResult, Unit>> Replace(
+        Guid releaseVersionId,
+        Guid originalFileId,
+        CancellationToken cancellationToken = default);
+}
