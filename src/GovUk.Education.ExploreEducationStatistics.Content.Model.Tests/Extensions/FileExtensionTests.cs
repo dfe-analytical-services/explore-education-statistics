@@ -1,6 +1,7 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions.FileExtensions;
@@ -163,5 +164,70 @@ public class FileExtensionTests
         string expectedDisplaySize)
     {
         Assert.Equal(expectedDisplaySize, contentLength.DisplaySize());
+    }
+
+    [Theory]
+    [InlineData("data", ".csv")]
+    [InlineData("data123", ".csv")]
+    [InlineData("datasetfile", ".jpeg")]
+    [InlineData("data-set-file", ".csv")]
+    [InlineData("", "")]
+    public void ZipFileEntryName_DataFile_ReturnsExpectedFileName(
+        string fileNamePart,
+        string extensionPart)
+    {
+        // Arrange
+        var file = new File
+        {
+            Type = Data,
+            Filename = fileNamePart + extensionPart,
+        };
+
+        // Act
+        var newFileName = file.ZipFileEntryName();
+
+        // Assert
+        var pathPrefix = "data/";
+
+        var timestampStartIndex = pathPrefix.Length + fileNamePart.Length;
+        var timestampLength = newFileName.Length - pathPrefix.Length - fileNamePart.Length - extensionPart.Length;
+        var timestamp = newFileName.Substring(timestampStartIndex, timestampLength);
+
+        Assert.StartsWith($"{pathPrefix}{fileNamePart}", newFileName);
+        Assert.True(long.TryParse(timestamp, out _));
+        Assert.EndsWith(extensionPart, newFileName);
+    }
+
+    [Fact]
+    public void ZipFileEntryName_AncillaryFile_ReturnsExpectedFileName()
+    {
+        // Arrange
+        var file = new File
+        {
+            Type = Ancillary,
+            Filename = "test.jpg",
+        };
+
+        // Act
+        var fileName = file.ZipFileEntryName();
+
+        // Assert
+        Assert.Equal("supporting-files/test.jpg", fileName);
+    }
+
+    [Fact]
+    public void ZipFileEntryName_InvalidType_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var file = new File
+        {
+            Type = Chart,
+            Filename = "chart.png",
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(file.ZipFileEntryName);
+
+        Assert.Equal("Unexpected file type (Parameter 'Type')", exception.Message);
     }
 }
