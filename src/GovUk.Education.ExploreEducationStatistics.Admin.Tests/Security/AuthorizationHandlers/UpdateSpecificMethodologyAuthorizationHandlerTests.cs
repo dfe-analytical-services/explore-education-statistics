@@ -23,151 +23,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class UpdateSpecificMethodologyAuthorizationHandlerTests
 {
-        private static readonly Guid UserId = Guid.NewGuid();
+    private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly MethodologyVersion MethodologyVersion = new()
+    private static readonly MethodologyVersion MethodologyVersion = new()
+    {
+        Id = Guid.NewGuid(),
+        MethodologyId = Guid.NewGuid()
+    };
+
+    private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
+
+    private static readonly DataFixture DataFixture = new();
+
+    public class ClaimsTests
+    {
+        [Fact]
+        public async Task NoClaimsAllowUpdatingApprovedMethodology()
         {
-            Id = Guid.NewGuid(),
-            MethodologyId = Guid.NewGuid()
-        };
-
-        private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
-
-        private static readonly DataFixture DataFixture = new();
-
-        public class ClaimsTests
-        {
-            [Fact]
-            public async Task NoClaimsAllowUpdatingApprovedMethodology()
+            var methodologyVersion = new MethodologyVersion
             {
-                var methodologyVersion = new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Status = Approved
-                };
+                Id = Guid.NewGuid(),
+                Status = Approved
+            };
 
-                await ForEachSecurityClaimAsync(async claim =>
-                {
-                    var (
-                        handler,
-                        _,
-                        _,
-                        _) = CreateHandlerAndDependencies();
+            await ForEachSecurityClaimAsync(async claim =>
+            {
+                var (
+                    handler,
+                    _,
+                    _,
+                    _) = CreateHandlerAndDependencies();
 
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
 
-                    var authContext =
-                        CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                            (user, methodologyVersion);
+                var authContext =
+                    CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+                        (user, methodologyVersion);
 
-                    await handler.HandleAsync(authContext);
+                await handler.HandleAsync(authContext);
 
-                    Assert.False(authContext.HasSucceeded);
-                });
-            }
+                Assert.False(authContext.HasSucceeded);
+            });
         }
+    }
 
-        public class PublicationRoleTests
+    public class PublicationRoleTests
+    {
+        [Fact]
+        public async Task PublicationOwnersAndApproversCanUpdateMethodology()
         {
-            [Fact]
-            public async Task PublicationOwnersAndApproversCanUpdateMethodology()
+            await ForEachPublicationRoleAsync(async publicationRole =>
             {
-                await ForEachPublicationRoleAsync(async publicationRole =>
+                var (
+                    handler,
+                    methodologyRepository,
+                    userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager
+                    ) = CreateHandlerAndDependencies();
+
+                methodologyRepository.Setup(s =>
+                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    .ReturnsAsync(OwningPublication);
+
+                userPublicationRoleAndInviteManager
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .ReturnsAsync(ListOf(publicationRole));
+
+                var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
+                    .Contains(publicationRole);
+
+                if (!expectedToPassByRole)
                 {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleAndInviteManager,
-                        userReleaseRoleAndInviteManager
-                        ) = CreateHandlerAndDependencies();
-
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
-
-                    userPublicationRoleAndInviteManager
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(ListOf(publicationRole));
-
-                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
-                        .Contains(publicationRole);
-
-                    if (!expectedToPassByRole)
-                    {
-                        userReleaseRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                            .ReturnsAsync(new List<ReleaseRole>());
-                    }
-
-                    var user = DataFixture.AuthenticatedUser(userId: UserId);
-
-                    var authContext =
-                        CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                            (user, MethodologyVersion);
-
-                    await handler.HandleAsync(authContext);
-
-                    VerifyAllMocks(
-                        methodologyRepository,
-                        userReleaseRoleAndInviteManager,
-                        userPublicationRoleAndInviteManager);
-
-                    Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
-                });
-            }
-        }
-
-        public class ReleaseRoleTests
-        {
-            [Fact]
-            public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
-            {
-                var expectedReleaseRolesToPass =
-                    ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
-
-                await ForEachReleaseRoleAsync(async releaseRole =>
-                {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleAndInviteManager,
-                        userReleaseRoleAndInviteManager
-                        ) = CreateHandlerAndDependencies();
-
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
-
-                    userPublicationRoleAndInviteManager
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
-
                     userReleaseRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(ListOf(releaseRole));
+                        .ReturnsAsync(new List<ReleaseRole>());
+                }
 
-                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                    var authContext =
-                        CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                            (user, MethodologyVersion);
+                var authContext =
+                    CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+                        (user, MethodologyVersion);
 
-                    await handler.HandleAsync(authContext);
+                await handler.HandleAsync(authContext);
 
-                    VerifyAllMocks(
-                        methodologyRepository,
-                        userPublicationRoleAndInviteManager,
-                        userReleaseRoleAndInviteManager,
-                        userReleaseRoleAndInviteManager);
+                VerifyAllMocks(
+                    methodologyRepository,
+                    userReleaseRoleAndInviteManager,
+                    userPublicationRoleAndInviteManager);
 
-                    Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
-                });
-            }
+                Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
+            });
+        }
+    }
 
-            [Fact]
-            public async Task NoReleaseRolesOnOwningPublicationReleasesSoUsersCannotUpdateMethodology()
+    public class ReleaseRoleTests
+    {
+        [Fact]
+        public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
+        {
+            var expectedReleaseRolesToPass =
+                ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
+
+            await ForEachReleaseRoleAsync(async releaseRole =>
             {
                 var (
                     handler,
@@ -186,7 +146,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 userReleaseRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<ReleaseRole>());
+                    .ReturnsAsync(ListOf(releaseRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
@@ -199,38 +159,78 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleAndInviteManager,
+                    userReleaseRoleAndInviteManager,
                     userReleaseRoleAndInviteManager);
 
-                Assert.False(authContext.HasSucceeded);
-            }
+                Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
+            });
         }
 
-        private static (
-            UpdateSpecificMethodologyAuthorizationHandler,
-            Mock<IMethodologyRepository>,
-            Mock<IUserPublicationRoleAndInviteManager>,
-            Mock<IUserReleaseRoleAndInviteManager>
-            )
-            CreateHandlerAndDependencies()
+        [Fact]
+        public async Task NoReleaseRolesOnOwningPublicationReleasesSoUsersCannotUpdateMethodology()
         {
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-            var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-
-            var handler = new UpdateSpecificMethodologyAuthorizationHandler(
-                methodologyRepository.Object,
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    userReleaseRoleAndInviteManager.Object,
-                    userPublicationRoleAndInviteManager.Object,
-                    Mock.Of<IPreReleaseService>(Strict))
-            );
-
-            return (
+            var (
                 handler,
                 methodologyRepository,
                 userPublicationRoleAndInviteManager,
                 userReleaseRoleAndInviteManager
-            );
+                ) = CreateHandlerAndDependencies();
+
+            methodologyRepository.Setup(s =>
+                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                .ReturnsAsync(OwningPublication);
+
+            userPublicationRoleAndInviteManager
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .ReturnsAsync(new List<PublicationRole>());
+
+            userReleaseRoleAndInviteManager
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .ReturnsAsync(new List<ReleaseRole>());
+
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+
+            var authContext =
+                CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+                    (user, MethodologyVersion);
+
+            await handler.HandleAsync(authContext);
+
+            VerifyAllMocks(
+                methodologyRepository,
+                userPublicationRoleAndInviteManager,
+                userReleaseRoleAndInviteManager);
+
+            Assert.False(authContext.HasSucceeded);
         }
+    }
+
+    private static (
+        UpdateSpecificMethodologyAuthorizationHandler,
+        Mock<IMethodologyRepository>,
+        Mock<IUserPublicationRoleAndInviteManager>,
+        Mock<IUserReleaseRoleAndInviteManager>
+        )
+        CreateHandlerAndDependencies()
+    {
+        var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+
+        var handler = new UpdateSpecificMethodologyAuthorizationHandler(
+            methodologyRepository.Object,
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
+                userReleaseRoleAndInviteManager.Object,
+                userPublicationRoleAndInviteManager.Object,
+                Mock.Of<IPreReleaseService>(Strict))
+        );
+
+        return (
+            handler,
+            methodologyRepository,
+            userPublicationRoleAndInviteManager,
+            userReleaseRoleAndInviteManager
+        );
+    }
 }

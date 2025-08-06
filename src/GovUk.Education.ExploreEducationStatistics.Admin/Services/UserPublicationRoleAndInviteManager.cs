@@ -15,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class UserPublicationRoleAndInviteManager(
     ContentDbContext contentDbContext,
     IUserPublicationInviteRepository userPublicationInviteRepository,
-    IUserRepository userRepository) : 
-    UserResourceRoleRepositoryBase<UserPublicationRole, Publication, PublicationRole>(contentDbContext, userRepository), 
+    IUserRepository userRepository) :
+    UserResourceRoleRepositoryBase<UserPublicationRole, Publication, PublicationRole>(contentDbContext, userRepository),
     IUserPublicationRoleAndInviteManager
 {
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)

@@ -46,7 +46,7 @@ public class AuthorizationHandlerService(
         return HasRolesOnPublicationOrReleaseVersion(
             userId,
             publicationId,
-            () => Task.FromResult((Guid?) releaseVersionId),
+            () => Task.FromResult((Guid?)releaseVersionId),
             publicationRoles,
             releaseRoles);
     }

@@ -146,7 +146,7 @@ public class ReleaseInviteServiceTests
 
         var user = new User
         {
-        Email = Email,
+            Email = Email,
         };
 
         var newReleaseVersionIds = ListOf(
@@ -537,7 +537,7 @@ public class ReleaseInviteServiceTests
                 ), Times.Once
             );
 
-             VerifyAllMocks(emailService);
+            VerifyAllMocks(emailService);
 
             var actionResult = result.AssertLeft();
             Assert.IsType<BadRequestResult>(actionResult);

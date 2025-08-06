@@ -27,7 +27,7 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
 
         await ContentDbContext.Set<TResourceRole>().AddAsync(newResourceRole);
         await ContentDbContext.SaveChangesAsync();
-        
+
         return newResourceRole;
     }
 
@@ -44,8 +44,8 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
     }
 
     public async Task CreateManyIfNotExists(
-        List<Guid> userIds, 
-        Guid resourceId, 
+        List<Guid> userIds,
+        Guid resourceId,
         TRoleEnum role,
         Guid createdById)
     {
@@ -65,12 +65,12 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
     }
 
     public async Task CreateManyIfNotExists(
-        Guid userId, 
-        List<Guid> resourceIds, 
+        Guid userId,
+        List<Guid> resourceIds,
         TRoleEnum role,
         Guid createdById)
     {
-        var alreadyExistingReleaseIds = await 
+        var alreadyExistingReleaseIds = await
             GetResourceRolesQueryByResourceIds(resourceIds)
             .Where(urr =>
                 urr.UserId == userId
@@ -116,7 +116,7 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
 
     protected async Task<List<TRoleEnum>> GetDistinctResourceRolesByUser(Guid userId)
     {
-        return await 
+        return await
             ContentDbContext
             .Set<TResourceRole>()
             .AsQueryable()
@@ -128,7 +128,7 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
 
     protected async Task<List<TRoleEnum>> GetAllResourceRolesByUserAndResource(Guid userId, Guid resourceId)
     {
-        return await 
+        return await
             GetResourceRolesQueryByResourceId(resourceId)
             .Where(r => r.UserId == userId)
             .Select(r => r.Role)
@@ -138,7 +138,7 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
 
     protected async Task<TResourceRole?> GetResourceRole(Guid userId, Guid resourceId, TRoleEnum role)
     {
-        return await 
+        return await
             GetResourceRolesQueryByResourceId(resourceId)
             .SingleOrDefaultAsync(r =>
                 r.UserId == userId &&
@@ -146,12 +146,12 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
     }
 
     protected async Task<List<TResourceRole>> ListResourceRoles(
-        Guid resourceId, 
+        Guid resourceId,
         TRoleEnum[]? rolesToInclude)
     {
         var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<TRoleEnum>();
-        
-        return await 
+
+        return await
             GetResourceRolesQueryByResourceId(resourceId)
             .Include(urr => urr.User)
             .Where(urr => rolesToCheck.Contains(urr.Role))
@@ -160,16 +160,16 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
 
     protected async Task<bool> UserHasRoleOnResource(Guid userId, Guid resourceId, TRoleEnum role)
     {
-        return await 
+        return await
             GetResourceRolesQueryByResourceId(resourceId)
             .AnyAsync(r =>
                 r.UserId == userId &&
                 r.Role.Equals(role));
-    }        
-        
+    }
+
     protected async Task<bool> UserHasRoleOnResource(string email, Guid resourceId, TRoleEnum role)
     {
-        return await 
+        return await
             GetResourceRolesQueryByResourceId(resourceId)
             .AnyAsync(r =>
                 r.User.Email.ToLower().Equals(email.ToLower()) &&
@@ -188,6 +188,6 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
     }
 
     protected abstract IQueryable<TResourceRole> GetResourceRolesQueryByResourceId(Guid resourceId);
-    
+
     protected abstract IQueryable<TResourceRole> GetResourceRolesQueryByResourceIds(List<Guid> resourceIds);
 }

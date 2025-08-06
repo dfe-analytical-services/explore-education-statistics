@@ -175,7 +175,7 @@ public class ReleasePermissionServicePermissionTests
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
             releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
             userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
-            userService:userService
+            userService: userService
         );
     }
 }

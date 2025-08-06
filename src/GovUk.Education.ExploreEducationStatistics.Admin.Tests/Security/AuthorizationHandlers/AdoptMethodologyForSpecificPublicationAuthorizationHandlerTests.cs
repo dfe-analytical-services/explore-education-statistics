@@ -23,91 +23,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 {
-        private static readonly Guid UserId = Guid.NewGuid();
+    private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
+    private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
 
-        private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture DataFixture = new();
 
-        public class ClaimsTests
+    public class ClaimsTests
+    {
+        [Fact]
+        public async Task UserWithCorrectClaimCanAdoptAnyMethodology()
         {
-            [Fact]
-            public async Task UserWithCorrectClaimCanAdoptAnyMethodology()
+            await ForEachSecurityClaimAsync(async claim =>
             {
-                await ForEachSecurityClaimAsync(async claim =>
+                var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+
+                var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
+
+                // Only the AdoptAnyMethodology claim should allow adopting a methodology for a publication.
+                var expectedToPassByClaimAlone = claim == AdoptAnyMethodology;
+
+                if (!expectedToPassByClaimAlone)
                 {
-                    var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-
-                    var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
-
-                    // Only the AdoptAnyMethodology claim should allow adopting a methodology for a publication.
-                    var expectedToPassByClaimAlone = claim == AdoptAnyMethodology;
-
-                    if (!expectedToPassByClaimAlone)
-                    {
-                        userPublicationRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                            .ReturnsAsync(new List<PublicationRole>());
-                    }
-
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
-
-                    var authContext =
-                        CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
-                                Publication>
-                            (user, Publication);
-
-                    await handler.HandleAsync(authContext);
-
-                    VerifyAllMocks(userPublicationRoleAndInviteManager);
-
-                    Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-                });
-            }
-        }
-
-        public class PublicationRoleTests
-        {
-            [Fact]
-            public async Task PublicationOwnerCanAdoptAnyMethodology()
-            {
-                await ForEachPublicationRoleAsync(async publicationRole =>
-                {
-                    var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-
-                    var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
-
                     userPublicationRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                        .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
+                        .ReturnsAsync(new List<PublicationRole>());
+                }
 
-                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
 
-                    var authContext =
-                        CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
-                            Publication>(user, Publication);
+                var authContext =
+                    CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
+                    Publication>(user, Publication);
 
-                    await handler.HandleAsync(authContext);
+                await handler.HandleAsync(authContext);
 
-                    VerifyAllMocks(userPublicationRoleAndInviteManager);
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
 
-                    // As the user has Publication Owner role on the Publication they are allowed to adopt any methodology
-                    Assert.Equal(publicationRole == Owner, authContext.HasSucceeded);
-                });
-            }
+                Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
+            });
         }
+    }
 
-        private static AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
-            IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null
-        )
+    public class PublicationRoleTests
+    {
+        [Fact]
+        public async Task PublicationOwnerCanAdoptAnyMethodology()
         {
-            return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                    userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
-                    Mock.Of<IPreReleaseService>(Strict)));
+            await ForEachPublicationRoleAsync(async publicationRole =>
+            {
+                var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+
+                var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
+
+                userPublicationRoleAndInviteManager
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                    .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
+
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
+
+                var authContext =
+                    CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
+                        Publication>(user, Publication);
+
+                await handler.HandleAsync(authContext);
+
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
+
+                // As the user has Publication Owner role on the Publication they are allowed to adopt any methodology
+                Assert.Equal(publicationRole == Owner, authContext.HasSucceeded);
+            });
         }
+    }
+
+    private static AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
+        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null
+    )
+    {
+        return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
+                Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
+                Mock.Of<IPreReleaseService>(Strict)));
+    }
 }

@@ -134,8 +134,8 @@ public abstract class UserReleaseInviteRepositoryTests
         {
             var invite = new UserReleaseInvite
             {
-                Email = "test@test.com", 
-                ReleaseVersionId = Guid.NewGuid(), 
+                Email = "test@test.com",
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor,
             };
 
@@ -171,15 +171,15 @@ public abstract class UserReleaseInviteRepositoryTests
         {
             var invite1 = new UserReleaseInvite
             {
-                Email = "test@test.com", 
-                ReleaseVersionId = Guid.NewGuid(), 
+                Email = "test@test.com",
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor,
             };
 
             var invite2 = new UserReleaseInvite
             {
-                Email = "test@test.com", 
-                ReleaseVersionId = Guid.NewGuid(), 
+                Email = "test@test.com",
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor,
             };
 
@@ -206,15 +206,15 @@ public abstract class UserReleaseInviteRepositoryTests
         {
             var invite1 = new UserReleaseInvite
             {
-                Email = "test@test.com", 
-                ReleaseVersionId = Guid.NewGuid(), 
+                Email = "test@test.com",
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor,
             };
 
             var invite2 = new UserReleaseInvite
             {
-                Email = "test@test.com", 
-                ReleaseVersionId = Guid.NewGuid(), 
+                Email = "test@test.com",
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor,
             };
 

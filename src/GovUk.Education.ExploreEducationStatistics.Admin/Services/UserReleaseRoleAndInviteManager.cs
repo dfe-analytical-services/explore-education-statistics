@@ -16,7 +16,7 @@ public class UserReleaseRoleAndInviteManager(
     ContentDbContext contentDbContext,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserRepository userRepository) :
-    UserResourceRoleRepositoryBase<UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext, userRepository), 
+    UserResourceRoleRepositoryBase<UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext, userRepository),
     IUserReleaseRoleAndInviteManager
 {
     protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
@@ -152,7 +152,7 @@ public class UserReleaseRoleAndInviteManager(
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
     {
-        var userEmail = userId.HasValue 
+        var userEmail = userId.HasValue
             ? await GetUserEmail(userId.Value, cancellationToken)
             : null;
 

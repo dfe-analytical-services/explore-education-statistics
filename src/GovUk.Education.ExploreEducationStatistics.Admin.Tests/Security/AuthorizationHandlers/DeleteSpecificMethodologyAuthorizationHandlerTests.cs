@@ -29,243 +29,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DeleteSpecificMethodologyAuthorizationHandlerTests
 {
-        private static readonly Guid UserId = Guid.NewGuid();
+    private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly MethodologyVersion DraftFirstVersion = new()
+    private static readonly MethodologyVersion DraftFirstVersion = new()
+    {
+        Id = Guid.NewGuid(),
+        MethodologyId = Guid.NewGuid(),
+        Status = Draft
+    };
+
+    private static readonly MethodologyVersion ApprovedFirstVersion = new()
+    {
+        Id = Guid.NewGuid(),
+        MethodologyId = Guid.NewGuid(),
+        Status = Approved
+    };
+
+    private static readonly MethodologyVersion DraftAmendmentVersion = new()
+    {
+        Id = Guid.NewGuid(),
+        MethodologyId = Guid.NewGuid(),
+        Status = Draft,
+        PreviousVersionId = new Guid(),
+        Version = 0
+    };
+
+    private static readonly MethodologyVersion ApprovedAmendmentVersion = new()
+    {
+        Id = Guid.NewGuid(),
+        MethodologyId = Guid.NewGuid(),
+        Status = Approved,
+        PreviousVersionId = new Guid(),
+        Version = 1
+    };
+
+    private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
+
+    private static readonly DataFixture DataFixture = new();
+
+    public class ClaimTests
+    {
+        [Fact]
+        public async Task UserWithCorrectClaimCanDeleteDraftMethodology()
         {
-            Id = Guid.NewGuid(),
-            MethodologyId = Guid.NewGuid(),
-            Status = Draft
-        };
-
-        private static readonly MethodologyVersion ApprovedFirstVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            MethodologyId = Guid.NewGuid(),
-            Status = Approved
-        };
-
-        private static readonly MethodologyVersion DraftAmendmentVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            MethodologyId = Guid.NewGuid(),
-            Status = Draft,
-            PreviousVersionId = new Guid(),
-            Version = 0
-        };
-
-        private static readonly MethodologyVersion ApprovedAmendmentVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            MethodologyId = Guid.NewGuid(),
-            Status = Approved,
-            PreviousVersionId = new Guid(),
-            Version = 1
-        };
-
-        private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
-
-        private static readonly DataFixture DataFixture = new();
-
-        public class ClaimTests
-        {
-            [Fact]
-            public async Task UserWithCorrectClaimCanDeleteDraftMethodology()
+            await ForEachSecurityClaimAsync(async claim =>
             {
-                await ForEachSecurityClaimAsync(async claim =>
-                {
-                    var expectClaimToSucceed = claim == DeleteAllMethodologies;
+                var expectClaimToSucceed = claim == DeleteAllMethodologies;
 
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleAndInviteManager
-                        ) = CreateHandlerAndDependencies();
-
-                    // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
-                    // the user's Publication Roles.
-                    if (!expectClaimToSucceed)
-                    {
-                        methodologyRepository.Setup(s =>
-                                s.GetOwningPublication(DraftFirstVersion.MethodologyId))
-                            .ReturnsAsync(OwningPublication);
-
-                        userPublicationRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                            .ReturnsAsync(new List<PublicationRole>());
-                    }
-
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
-
-                    var authContext = CreateAuthContext(user, DraftFirstVersion);
-
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
-
-                    // Verify that the presence of the "DeleteAllMethodologies" Claim and no other will pass the handler test
-                    Assert.Equal(expectClaimToSucceed, authContext.HasSucceeded);
-                });
-            }
-
-            [Fact]
-            public async Task UserWithCorrectClaimCannotDeleteApprovedMethodology()
-            {
-                await ForEachSecurityClaimAsync(async claim =>
-                {
-                    var (
-                        handler,
-                        _,
-                        userPublicationRoleAndInviteManager
-                        ) = CreateHandlerAndDependencies();
-
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
-
-                    var authContext = CreateAuthContext(user, ApprovedFirstVersion);
-
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(userPublicationRoleAndInviteManager);
-
-                    // Verify that the presence of the "DeleteAllMethodologies" Claim still doesn't allow the user to
-                    // do this with an approved version.
-                    Assert.False(authContext.HasSucceeded);
-                });
-            }
-
-            [Fact]
-            public async Task UserWithCorrectClaimCanDeleteDraftMethodologyAmendment()
-            {
-                await ForEachSecurityClaimAsync(async claim =>
-                {
-                    var expectClaimToSucceed = claim == DeleteAllMethodologies;
-
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleAndInviteManager
-                        ) = CreateHandlerAndDependencies();
-
-                    // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
-                    // the user's Publication Roles.
-                    if (!expectClaimToSucceed)
-                    {
-                        methodologyRepository.Setup(s =>
-                                s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
-                            .ReturnsAsync(OwningPublication);
-
-                        userPublicationRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                            .ReturnsAsync(new List<PublicationRole>());
-                    }
-
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
-
-                    var authContext = CreateAuthContext(user, DraftAmendmentVersion);
-
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
-
-                    // Verify that the presence of the "DeleteAllMethodologies" Claim and no other will pass the handler test
-                    Assert.Equal(expectClaimToSucceed, authContext.HasSucceeded);
-                });
-            }
-
-            [Fact]
-            public async Task UserWithCorrectClaimCannotDeleteApprovedMethodologyAmendment()
-            {
-                await ForEachSecurityClaimAsync(async claim =>
-                {
-                    var (
-                        handler,
-                        _,
-                        userPublicationRoleAndInviteManager
-                        ) = CreateHandlerAndDependencies();
-
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
-
-                    var authContext = CreateAuthContext(user, ApprovedAmendmentVersion);
-
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(userPublicationRoleAndInviteManager);
-
-                    // Verify that the presence of the "DeleteAllMethodologies" Claim still doesn't allow the user to
-                    // do this with an approved version.
-                    Assert.False(authContext.HasSucceeded);
-                });
-            }
-        }
-
-        public class PublicationRoleTests
-        {
-            [Fact]
-            public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodology()
-            {
-                await GetEnums<PublicationRole>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(async role =>
-                    {
-                        var (
-                            handler,
-                            methodologyRepository,
-                            userPublicationRoleAndInviteManager
-                            ) = CreateHandlerAndDependencies();
-
-                        methodologyRepository.Setup(s =>
-                                s.GetOwningPublication(DraftFirstVersion.MethodologyId))
-                            .ReturnsAsync(OwningPublication);
-
-                        userPublicationRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                            .ReturnsAsync(ListOf(role));
-
-                        var user = DataFixture.AuthenticatedUser(userId: UserId);
-                        var authContext = CreateAuthContext(user, DraftFirstVersion);
-
-                        await handler.HandleAsync(authContext);
-                        VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
-
-                        // Verify that the presence of a Publication Owner role for this user that is related to a
-                        // Publication that uses this Methodology will pass the handler test
-                        Assert.Equal(role == Owner, authContext.HasSucceeded);
-                    });
-            }
-
-            [Fact]
-            public async Task UserWithNoPublicationRolesCannotDeleteDraftMethodology()
-            {
                 var (
                     handler,
                     methodologyRepository,
                     userPublicationRoleAndInviteManager
                     ) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(DraftFirstVersion.MethodologyId))
-                    .ReturnsAsync(OwningPublication);
+                // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
+                // the user's Publication Roles.
+                if (!expectClaimToSucceed)
+                {
+                    methodologyRepository.Setup(s =>
+                            s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+                        .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    userPublicationRoleAndInviteManager
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(new List<PublicationRole>());
+                }
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext = CreateAuthContext(user, DraftFirstVersion);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
 
-                // Verify that the user cannot perform this action if they have no Publication Roles.
-                Assert.False(authContext.HasSucceeded);
-            }
+                // Verify that the presence of the "DeleteAllMethodologies" Claim and no other will pass the handler test
+                Assert.Equal(expectClaimToSucceed, authContext.HasSucceeded);
+            });
+        }
 
-            [Fact]
-            public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodology()
+        [Fact]
+        public async Task UserWithCorrectClaimCannotDeleteApprovedMethodology()
+        {
+            await ForEachSecurityClaimAsync(async claim =>
             {
                 var (
                     handler,
@@ -273,52 +120,65 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                     userPublicationRoleAndInviteManager
                     ) = CreateHandlerAndDependencies();
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext = CreateAuthContext(user, ApprovedFirstVersion);
 
                 await handler.HandleAsync(authContext);
-
-                // Verify that the fact that the version is approved doesn't even need to check the
-                // users' Publication Roles to determine whether or not they can do this.
                 VerifyAllMocks(userPublicationRoleAndInviteManager);
+
+                // Verify that the presence of the "DeleteAllMethodologies" Claim still doesn't allow the user to
+                // do this with an approved version.
                 Assert.False(authContext.HasSucceeded);
-            }
+            });
+        }
 
-            [Fact]
-            public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodologyAmendment()
+        [Fact]
+        public async Task UserWithCorrectClaimCanDeleteDraftMethodologyAmendment()
+        {
+            await ForEachSecurityClaimAsync(async claim =>
             {
-                await GetEnums<PublicationRole>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(async role =>
-                    {
-                        var (
-                            handler,
-                            methodologyRepository,
-                            userPublicationRoleAndInviteManager
-                            ) = CreateHandlerAndDependencies();
+                var expectClaimToSucceed = claim == DeleteAllMethodologies;
 
-                        methodologyRepository.Setup(s =>
-                                s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
-                            .ReturnsAsync(OwningPublication);
+                var (
+                    handler,
+                    methodologyRepository,
+                    userPublicationRoleAndInviteManager
+                    ) = CreateHandlerAndDependencies();
 
-                        userPublicationRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                            .ReturnsAsync(ListOf(role));
+                // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
+                // the user's Publication Roles.
+                if (!expectClaimToSucceed)
+                {
+                    methodologyRepository.Setup(s =>
+                            s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
+                        .ReturnsAsync(OwningPublication);
 
-                        var user = DataFixture.AuthenticatedUser(userId: UserId);
-                        var authContext = CreateAuthContext(user, DraftAmendmentVersion);
+                    userPublicationRoleAndInviteManager
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(new List<PublicationRole>());
+                }
 
-                        await handler.HandleAsync(authContext);
-                        VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
 
-                        // Verify that the presence of a Publication Owner role for this user that is related to a
-                        // Publication that uses this Methodology will pass the handler test
-                        Assert.Equal(role == Owner, authContext.HasSucceeded);
-                    });
-            }
+                var authContext = CreateAuthContext(user, DraftAmendmentVersion);
 
-            [Fact]
-            public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodologyAmendment()
+                await handler.HandleAsync(authContext);
+                VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
+
+                // Verify that the presence of the "DeleteAllMethodologies" Claim and no other will pass the handler test
+                Assert.Equal(expectClaimToSucceed, authContext.HasSucceeded);
+            });
+        }
+
+        [Fact]
+        public async Task UserWithCorrectClaimCannotDeleteApprovedMethodologyAmendment()
+        {
+            await ForEachSecurityClaimAsync(async claim =>
             {
                 var (
                     handler,
@@ -326,42 +186,182 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                     userPublicationRoleAndInviteManager
                     ) = CreateHandlerAndDependencies();
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext = CreateAuthContext(user, ApprovedAmendmentVersion);
 
                 await handler.HandleAsync(authContext);
-
-                // Verify that the fact that the version is approved doesn't even need to check the
-                // users' Publication Roles to determine whether or not they can do this.
                 VerifyAllMocks(userPublicationRoleAndInviteManager);
+
+                // Verify that the presence of the "DeleteAllMethodologies" Claim still doesn't allow the user to
+                // do this with an approved version.
                 Assert.False(authContext.HasSucceeded);
-            }
+            });
         }
+    }
 
-        private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user,
-            MethodologyVersion methodologyVersion)
+    public class PublicationRoleTests
+    {
+        [Fact]
+        public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodology()
         {
-            return CreateAuthorizationHandlerContext<DeleteSpecificMethodologyRequirement, MethodologyVersion>
-                (user, methodologyVersion);
+            await GetEnums<PublicationRole>()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async role =>
+                {
+                    var (
+                        handler,
+                        methodologyRepository,
+                        userPublicationRoleAndInviteManager
+                        ) = CreateHandlerAndDependencies();
+
+                    methodologyRepository.Setup(s =>
+                            s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+                        .ReturnsAsync(OwningPublication);
+
+                    userPublicationRoleAndInviteManager
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(ListOf(role));
+
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+                    var authContext = CreateAuthContext(user, DraftFirstVersion);
+
+                    await handler.HandleAsync(authContext);
+                    VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
+
+                    // Verify that the presence of a Publication Owner role for this user that is related to a
+                    // Publication that uses this Methodology will pass the handler test
+                    Assert.Equal(role == Owner, authContext.HasSucceeded);
+                });
         }
 
-        private static (
-            DeleteSpecificMethodologyAuthorizationHandler,
-            Mock<IMethodologyRepository>,
-            Mock<IUserPublicationRoleAndInviteManager>)
-            CreateHandlerAndDependencies()
+        [Fact]
+        public async Task UserWithNoPublicationRolesCannotDeleteDraftMethodology()
         {
-            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var (
+                handler,
+                methodologyRepository,
+                userPublicationRoleAndInviteManager
+                ) = CreateHandlerAndDependencies();
 
-            var handler = new DeleteSpecificMethodologyAuthorizationHandler(
-                methodologyRepository.Object,
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                    userPublicationRoleAndInviteManager.Object,
-                    Mock.Of<IPreReleaseService>(Strict)));
+            methodologyRepository.Setup(s =>
+                    s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+                .ReturnsAsync(OwningPublication);
 
-            return (handler, methodologyRepository, userPublicationRoleAndInviteManager);
+            userPublicationRoleAndInviteManager
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .ReturnsAsync(new List<PublicationRole>());
+
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            var authContext = CreateAuthContext(user, DraftFirstVersion);
+
+            await handler.HandleAsync(authContext);
+            VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
+
+            // Verify that the user cannot perform this action if they have no Publication Roles.
+            Assert.False(authContext.HasSucceeded);
         }
+
+        [Fact]
+        public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodology()
+        {
+            var (
+                handler,
+                _,
+                userPublicationRoleAndInviteManager
+                ) = CreateHandlerAndDependencies();
+
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            var authContext = CreateAuthContext(user, ApprovedFirstVersion);
+
+            await handler.HandleAsync(authContext);
+
+            // Verify that the fact that the version is approved doesn't even need to check the
+            // users' Publication Roles to determine whether or not they can do this.
+            VerifyAllMocks(userPublicationRoleAndInviteManager);
+            Assert.False(authContext.HasSucceeded);
+        }
+
+        [Fact]
+        public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodologyAmendment()
+        {
+            await GetEnums<PublicationRole>()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async role =>
+                {
+                    var (
+                        handler,
+                        methodologyRepository,
+                        userPublicationRoleAndInviteManager
+                        ) = CreateHandlerAndDependencies();
+
+                    methodologyRepository.Setup(s =>
+                            s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
+                        .ReturnsAsync(OwningPublication);
+
+                    userPublicationRoleAndInviteManager
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(ListOf(role));
+
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
+                    var authContext = CreateAuthContext(user, DraftAmendmentVersion);
+
+                    await handler.HandleAsync(authContext);
+                    VerifyAllMocks(methodologyRepository, userPublicationRoleAndInviteManager);
+
+                    // Verify that the presence of a Publication Owner role for this user that is related to a
+                    // Publication that uses this Methodology will pass the handler test
+                    Assert.Equal(role == Owner, authContext.HasSucceeded);
+                });
+        }
+
+        [Fact]
+        public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodologyAmendment()
+        {
+            var (
+                handler,
+                _,
+                userPublicationRoleAndInviteManager
+                ) = CreateHandlerAndDependencies();
+
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            var authContext = CreateAuthContext(user, ApprovedAmendmentVersion);
+
+            await handler.HandleAsync(authContext);
+
+            // Verify that the fact that the version is approved doesn't even need to check the
+            // users' Publication Roles to determine whether or not they can do this.
+            VerifyAllMocks(userPublicationRoleAndInviteManager);
+            Assert.False(authContext.HasSucceeded);
+        }
+    }
+
+    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user,
+        MethodologyVersion methodologyVersion)
+    {
+        return CreateAuthorizationHandlerContext<DeleteSpecificMethodologyRequirement, MethodologyVersion>
+            (user, methodologyVersion);
+    }
+
+    private static (
+        DeleteSpecificMethodologyAuthorizationHandler,
+        Mock<IMethodologyRepository>,
+        Mock<IUserPublicationRoleAndInviteManager>)
+        CreateHandlerAndDependencies()
+    {
+        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+        var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+        var handler = new DeleteSpecificMethodologyAuthorizationHandler(
+            methodologyRepository.Object,
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
+                Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager.Object,
+                Mock.Of<IPreReleaseService>(Strict)));
+
+        return (handler, methodologyRepository, userPublicationRoleAndInviteManager);
+    }
 }

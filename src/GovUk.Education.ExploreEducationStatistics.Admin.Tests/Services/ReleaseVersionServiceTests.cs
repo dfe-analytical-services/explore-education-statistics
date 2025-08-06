@@ -137,11 +137,11 @@ public abstract class ReleaseVersionServiceTests
             }
         }
 
-        [Theory] 
-        [InlineData(DataSetVersionStatus.Mapping, true, true)] 
-        [InlineData(DataSetVersionStatus.Draft, true, true)] 
+        [Theory]
+        [InlineData(DataSetVersionStatus.Mapping, true, true)]
+        [InlineData(DataSetVersionStatus.Draft, true, true)]
         [InlineData(DataSetVersionStatus.Mapping, false, false)]
-        [InlineData(DataSetVersionStatus.Published, true, false)] 
+        [InlineData(DataSetVersionStatus.Published, true, false)]
         [InlineData(DataSetVersionStatus.Published, false, false)]
         [InlineData(DataSetVersionStatus.Draft, false, false)]
         [InlineData(DataSetVersionStatus.Processing, true, true)]
@@ -155,7 +155,7 @@ public abstract class ReleaseVersionServiceTests
         [InlineData(DataSetVersionStatus.Withdrawn, false, false)]
         [InlineData(DataSetVersionStatus.Cancelled, false, false)]
         public async Task FileIsLinkedToPublicApiDataSet_DataSetVersionStatusCondition_PlanValidity(
-            DataSetVersionStatus dataSetVersionStatus, 
+            DataSetVersionStatus dataSetVersionStatus,
             bool enableReplacementOfPublicApiDataSets,
             bool expectedValidValue)
         {
@@ -601,10 +601,10 @@ public abstract class ReleaseVersionServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
             var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedThrows404VersionException(
-                _dataFixture, 
+                _dataFixture,
                 DataSetVersionStatus.Draft,
                 statisticsDbContext, contentDbContext);
-            
+
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
@@ -613,17 +613,17 @@ public abstract class ReleaseVersionServiceTests
                 logger: testFixture.Logger.Object);
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => 
+                async () =>
                     await releaseVersionService.RemoveDataFiles(
                         releaseVersionId: testFixture.ReleaseVersion.Id,
                         fileId: testFixture.File.Id));
 
             // Verify the exception message
             Assert.Contains(
-                "Failed to find the data set version expected to be linked to the release file that is being deleted", 
+                "Failed to find the data set version expected to be linked to the release file that is being deleted",
                 exception.Message);
         }
-        
+
         [Fact]
         public async Task FileLinkedToPublicApiDataSetAndIsReplaced_ValidationProblem()
         {
@@ -632,20 +632,20 @@ public abstract class ReleaseVersionServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
             var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
-                _dataFixture, 
+                _dataFixture,
                 DataSetVersionStatus.Published,
                 statisticsDbContext,
                 contentDbContext,
                 replacedById: Guid.NewGuid(),
                 replacingId: null,
                 releaseVersionPublished: false);
-            
+
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
                 enableReplacementOfPublicApiDataSets: true);
-            
+
             var result = await releaseVersionService.RemoveDataFiles(
                         releaseVersionId: testFixture.ReleaseVersion.Id,
                         fileId: testFixture.File.Id);
@@ -655,7 +655,7 @@ public abstract class ReleaseVersionServiceTests
                 expectedPath: null,
                 expectedCode: ValidationMessages.ReleaseFileMustBeOriginal.Code);
         }
-        
+
         [Fact]
         public async Task FileLinkedToPublishedReleaseAndIsReplacing_ThrowsException()
         {
@@ -664,32 +664,32 @@ public abstract class ReleaseVersionServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
             var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
-                _dataFixture, 
+                _dataFixture,
                 DataSetVersionStatus.Published,
                 statisticsDbContext,
                 contentDbContext,
                 replacedById: null,
                 replacingId: Guid.NewGuid(),
                 releaseVersionPublished: true);
-            
+
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
                 enableReplacementOfPublicApiDataSets: true);
-            
+
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => 
+                async () =>
                     await releaseVersionService.RemoveDataFiles(
                         releaseVersionId: testFixture.ReleaseVersion.Id,
                         fileId: testFixture.File.Id));
 
             // Verify the exception message
             Assert.Contains(
-                "A replacement file for a DRAFT release version cannot also be a PUBLISHED file.", 
+                "A replacement file for a DRAFT release version cannot also be a PUBLISHED file.",
                 exception.Message);
         }
-        
+
         [Fact]
         public async Task FileLinkedToDraftReleaseAndPublishedPublicApiDataSet_ThrowsException()
         {
@@ -698,32 +698,32 @@ public abstract class ReleaseVersionServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
             var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
-                _dataFixture, 
+                _dataFixture,
                 DataSetVersionStatus.Published,
                 statisticsDbContext,
                 contentDbContext,
                 replacedById: null,
                 replacingId: null,
                 releaseVersionPublished: false);
-            
+
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
                 enableReplacementOfPublicApiDataSets: true);
-            
+
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => 
+                async () =>
                     await releaseVersionService.RemoveDataFiles(
                         releaseVersionId: testFixture.ReleaseVersion.Id,
                         fileId: testFixture.File.Id));
 
             // Verify the exception message
             Assert.Contains(
-                "A DRAFT release version's file cannot be linked to a PUBLISHED API.", 
+                "A DRAFT release version's file cannot be linked to a PUBLISHED API.",
                 exception.Message);
         }
-        
+
         [Theory]
         [InlineData(DataSetVersionStatus.Draft, true, false, true)]
         [InlineData(DataSetVersionStatus.Draft, false, true, false)]
@@ -736,9 +736,9 @@ public abstract class ReleaseVersionServiceTests
         [InlineData(DataSetVersionStatus.Deprecated, false, true, false)]
         [InlineData(DataSetVersionStatus.Deprecated, true, false, false)]
         public async Task FileIsLinkedToPublicApiDataSet_ValidationProblem(
-            DataSetVersionStatus dataSetVersionStatus, 
-            bool enableReplacementOfPublicApiDataSets, 
-            bool expectingValidationProblem, 
+            DataSetVersionStatus dataSetVersionStatus,
+            bool enableReplacementOfPublicApiDataSets,
+            bool expectingValidationProblem,
             bool expectingApiDeletion)
         {
             var contextId = Guid.NewGuid().ToString();
@@ -746,21 +746,21 @@ public abstract class ReleaseVersionServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
             var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedValidationError(
-                _dataFixture, 
-                dataSetVersionStatus, 
+                _dataFixture,
+                dataSetVersionStatus,
                 statisticsDbContext,
                 contentDbContext);
-                
+
             if (enableReplacementOfPublicApiDataSets)
             {
                 testFixture.SetUpMocksForCheckApiLinkedServices();
 
-                if(expectingApiDeletion)
+                if (expectingApiDeletion)
                 {
                     testFixture.SetUpMocksForDeleteApiLinkedServices();
-                }     
+                }
             }
-                
+
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
@@ -1196,15 +1196,15 @@ public abstract class ReleaseVersionServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var expectedUpdatedReleaseSlug = NamingUtils.CreateReleaseSlug(
-                    year: otherRelease.Year, 
-                    timePeriodCoverage: otherRelease.TimePeriodCoverage, 
+                    year: otherRelease.Year,
+                    timePeriodCoverage: otherRelease.TimePeriodCoverage,
                     label: null);
 
                 var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder()
                     .SetValidationToFail(
-                        validationErrorMessage: SlugNotUnique, 
-                        releaseSlug: expectedUpdatedReleaseSlug, 
-                        publicationId: publication.Id, 
+                        validationErrorMessage: SlugNotUnique,
+                        releaseSlug: expectedUpdatedReleaseSlug,
+                        publicationId: publication.Id,
                         releaseId: releaseVersion.ReleaseId);
 
                 var releaseVersionService = BuildService(
@@ -2274,7 +2274,7 @@ public abstract class ReleaseVersionServiceTests
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-            
+
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,

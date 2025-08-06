@@ -30,7 +30,7 @@ public static class UserPublicationInviteGeneratorExtensions
     }
 
     public static Generator<UserPublicationInvite> WithEmail(
-        this Generator<UserPublicationInvite> generator, 
+        this Generator<UserPublicationInvite> generator,
         string email)
         => generator.ForInstance(s => s.SetEmail(email));
 

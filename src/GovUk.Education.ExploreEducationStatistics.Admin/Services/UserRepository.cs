@@ -18,13 +18,13 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
                 u.Id == userId
                 && u.SoftDeleted == null,
                 cancellationToken);
-        }
+    }
 
-        public async Task<User?> FindByEmail(string email)
-        {
+    public async Task<User?> FindByEmail(string email)
+    {
         return await contentDbContext.Users
                 .SingleOrDefaultAsync(u =>
                     u.Email.ToLower().Equals(email.ToLower())
                     && u.SoftDeleted == null);
-        }
     }
+}

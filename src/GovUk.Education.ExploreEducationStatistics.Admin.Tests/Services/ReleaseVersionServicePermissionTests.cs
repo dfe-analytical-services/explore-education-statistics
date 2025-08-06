@@ -387,7 +387,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),
             new OrganisationsValidatorMockBuilder().Build(),
-            Mock.Of< IUserReleaseRoleAndInviteManager>(),
+            Mock.Of<IUserReleaseRoleAndInviteManager>(),
             Mock.Of<IReleaseSlugValidator>(),
              featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
              {

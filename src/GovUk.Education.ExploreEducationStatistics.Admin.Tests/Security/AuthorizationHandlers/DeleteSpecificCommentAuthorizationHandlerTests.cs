@@ -64,4 +64,4 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
                 userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
-}    
+}

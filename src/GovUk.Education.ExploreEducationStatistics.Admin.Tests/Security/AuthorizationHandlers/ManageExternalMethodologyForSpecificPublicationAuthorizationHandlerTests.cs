@@ -25,112 +25,112 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandlerTests
 {
-        private static readonly Guid UserId = Guid.NewGuid();
+    private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
+    private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
 
-        private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture DataFixture = new();
 
-        public class ClaimTests
+    public class ClaimTests
+    {
+        [Fact]
+        public async Task UserWithCorrectClaimCanManageExternalMethodologyForAnyPublication()
         {
-            [Fact]
-            public async Task UserWithCorrectClaimCanManageExternalMethodologyForAnyPublication()
+            await ForEachSecurityClaimAsync(async claim =>
             {
-                await ForEachSecurityClaimAsync(async claim =>
+                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
+
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
+                var authContext = CreateAuthContext(user, Publication);
+
+                var expectedToPassByClaimAlone = claim == CreateAnyMethodology;
+
+                if (!expectedToPassByClaimAlone)
                 {
-                    var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
-
-                    var user = DataFixture
-                        .AuthenticatedUser(userId: UserId)
-                        .WithClaim(claim.ToString());
-
-                    var authContext = CreateAuthContext(user, Publication);
-
-                    var expectedToPassByClaimAlone = claim == CreateAnyMethodology;
-
-                    if (!expectedToPassByClaimAlone)
-                    {
-                        userPublicationRoleAndInviteManager
-                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                            .ReturnsAsync(new List<PublicationRole>());
-                    }
-
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(userPublicationRoleAndInviteManager);
-
-                    // Verify that the presence of the "CreateAnyMethodology" Claim will pass the handler test, without
-                    // the need for a specific Publication to be provided
-                    Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-                });
-            }
-        }
-
-        public class PublicationRoleTests
-        {
-            [Fact]
-            public async Task UserCanManageExternalMethodologyForPublicationWithPublicationOwnerRole()
-            {
-                await using var context = InMemoryApplicationDbContext();
-                context.Attach(Publication);
-
-                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
-                var authContext = CreateAuthContext(user, Publication);
-
-                userPublicationRoleAndInviteManager
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                    .ReturnsAsync(CollectionUtils.ListOf(Owner));
+                    userPublicationRoleAndInviteManager
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                        .ReturnsAsync(new List<PublicationRole>());
+                }
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(userPublicationRoleAndInviteManager);
 
-                // Verify that the user can create a Methodology for this Publication by virtue of having a Publication
-                // Owner role on the Publication
-                Assert.True(authContext.HasSucceeded);
-            }
-
-            [Fact]
-            public async Task UserCannotManageExternalMethodologyForPublicationWithoutPublicationOwnerRole()
-            {
-                var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
-                var authContext = CreateAuthContext(user, Publication);
-
-                userPublicationRoleAndInviteManager
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(userPublicationRoleAndInviteManager);
-
-                // Verify that the user can't create a Methodology for this Publication because they don't have
-                // Publication Owner role on it
-                Assert.False(authContext.HasSucceeded);
-            }
+                // Verify that the presence of the "CreateAnyMethodology" Claim will pass the handler test, without
+                // the need for a specific Publication to be provided
+                Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
+            });
         }
+    }
 
-        private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Publication publication)
+    public class PublicationRoleTests
+    {
+        [Fact]
+        public async Task UserCanManageExternalMethodologyForPublicationWithPublicationOwnerRole()
         {
-            return CreateAuthorizationHandlerContext<ManageExternalMethodologyForSpecificPublicationRequirement,
-                    Publication>
-                (user, publication);
+            await using var context = InMemoryApplicationDbContext();
+            context.Attach(Publication);
+
+            var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
+
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            var authContext = CreateAuthContext(user, Publication);
+
+            userPublicationRoleAndInviteManager
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                .ReturnsAsync(CollectionUtils.ListOf(Owner));
+
+            await handler.HandleAsync(authContext);
+            VerifyAllMocks(userPublicationRoleAndInviteManager);
+
+            // Verify that the user can create a Methodology for this Publication by virtue of having a Publication
+            // Owner role on the Publication
+            Assert.True(authContext.HasSucceeded);
         }
 
-        private static (ManageExternalMethodologyForSpecificPublicationAuthorizationHandler,
-            Mock<IUserPublicationRoleAndInviteManager>)
-            CreateHandlerAndDependencies()
+        [Fact]
+        public async Task UserCannotManageExternalMethodologyForPublicationWithoutPublicationOwnerRole()
         {
-            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var (handler, userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
 
-            var handler = new ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
-                new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                    Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                    userPublicationRoleAndInviteManager.Object,
-                    Mock.Of<IPreReleaseService>(Strict)));
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            var authContext = CreateAuthContext(user, Publication);
 
-            return (handler, userPublicationRoleAndInviteManager);
+            userPublicationRoleAndInviteManager
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                .ReturnsAsync(new List<PublicationRole>());
+
+            await handler.HandleAsync(authContext);
+            VerifyAllMocks(userPublicationRoleAndInviteManager);
+
+            // Verify that the user can't create a Methodology for this Publication because they don't have
+            // Publication Owner role on it
+            Assert.False(authContext.HasSucceeded);
         }
+    }
+
+    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Publication publication)
+    {
+        return CreateAuthorizationHandlerContext<ManageExternalMethodologyForSpecificPublicationRequirement,
+                Publication>
+            (user, publication);
+    }
+
+    private static (ManageExternalMethodologyForSpecificPublicationAuthorizationHandler,
+        Mock<IUserPublicationRoleAndInviteManager>)
+        CreateHandlerAndDependencies()
+    {
+        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+
+        var handler = new ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
+            new AuthorizationHandlerService(
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
+                Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager.Object,
+                Mock.Of<IPreReleaseService>(Strict)));
+
+        return (handler, userPublicationRoleAndInviteManager);
+    }
 }

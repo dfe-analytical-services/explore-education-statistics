@@ -21,7 +21,7 @@ public interface IUserPublicationRoleAndInviteManager
         Guid publicationId);
 
     Task<UserPublicationRole?> GetUserPublicationRole(
-        Guid userId, 
+        Guid userId,
         Guid publicationId,
         PublicationRole role);
 
