@@ -667,8 +667,8 @@ public class ReleaseDataFileService(
         List<ReleaseFile> inProgressReplacementsInCurrentReleaseVersion)
     {
         var files = releaseFiles
-            .Concat(inProgressReplacementsInCurrentReleaseVersion ?? [])
-            .Select(rf => rf?.File)
+            .Concat(inProgressReplacementsInCurrentReleaseVersion)
+            .Select(rf => rf.File)
             .ToList();
 
     var dataImportsDict = await contentDbContext.DataImports
@@ -692,8 +692,8 @@ public class ReleaseDataFileService(
         var result = await releaseFiles.SelectAsync(async releaseFile =>
         {
             var fileHasReplacementInCurrentReleaseVersion = releaseFile.File.ReplacedById.HasValue &&
-                                                     inProgressReplacementsInCurrentReleaseVersion!
-                                                     .Any(rf => rf?.FileId == releaseFile.File.ReplacedById);
+                                                     inProgressReplacementsInCurrentReleaseVersion
+                                                     .Any(rf => rf.FileId == releaseFile.File.ReplacedById);
             if (!fileHasReplacementInCurrentReleaseVersion)
             {
                 return new DataFileInfo(
@@ -701,11 +701,11 @@ public class ReleaseDataFileService(
                     dataImportsDict[releaseFile.FileId],
                     permissionsDict[releaseFile.FileId]);
             }
-            var replacement = inProgressReplacementsInCurrentReleaseVersion!.Single(rf =>
+            var replacement = inProgressReplacementsInCurrentReleaseVersion.Single(rf =>
                 rf!.FileId == releaseFile.File.ReplacedById);
 
             var hasValidReplacementPlan = false;
-            if (dataImportsDict[replacement!.FileId].Status == DataImportStatus.COMPLETE)
+            if (dataImportsDict[replacement.FileId].Status == DataImportStatus.COMPLETE)
             {
                 hasValidReplacementPlan = await replacementPlanService.HasValidReplacementPlan(
                     releaseFile, replacement);
