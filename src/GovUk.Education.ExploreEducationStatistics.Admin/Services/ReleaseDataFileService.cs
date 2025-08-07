@@ -686,8 +686,8 @@ public class ReleaseDataFileService(
         var permissionsDict = await files
             .ToAsyncEnumerable()
             .ToDictionaryAwaitAsync(
-                file => ValueTask.FromResult(file!.Id),
-                async file => await userService.GetDataFilePermissions(file!));
+                file => ValueTask.FromResult(file.Id),
+                async file => await userService.GetDataFilePermissions(file));
 
         var result = await releaseFiles.SelectAsync(async releaseFile =>
         {
@@ -702,7 +702,7 @@ public class ReleaseDataFileService(
                     permissionsDict[releaseFile.FileId]);
             }
             var replacement = inProgressReplacementsInCurrentReleaseVersion.Single(rf =>
-                rf!.FileId == releaseFile.File.ReplacedById);
+                rf.FileId == releaseFile.File.ReplacedById);
 
             var hasValidReplacementPlan = false;
             if (dataImportsDict[replacement.FileId].Status == DataImportStatus.COMPLETE)

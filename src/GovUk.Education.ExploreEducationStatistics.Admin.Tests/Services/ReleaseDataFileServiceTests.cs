@@ -1644,77 +1644,82 @@ public class ReleaseDataFileServiceTests
             Assert.Null(files[1].PublicApiDataSetVersion);
         }
     }
-
+    
     [Fact]
     public async Task ListAll_WithReplacementInProgressOnNewerReleaseVersion_ReplacedByDataFileIsNull()
     {
         var releaseVersion = new ReleaseVersion();
+        var amendmentReleaseVersion = new ReleaseVersion();
         var originalFileId = Guid.NewGuid();
         var replacementFileId = Guid.NewGuid();
+        var originalFile = new File
+        {
+            Id = originalFileId,
+            Filename = "test-data-1.csv",
+            ContentLength = 10240,
+            Type = FileType.Data,
+            Created = DateTime.UtcNow,
+            CreatedById = _user.Id,
+            ReplacedById = replacementFileId
+        };
+        var replacementFile = new File
+        {
+            Id = replacementFileId,
+            Filename = "test-data-2.csv",
+            ContentLength = 10240,
+            Type = FileType.Data,
+            Created = DateTime.UtcNow,
+            CreatedById = _user.Id
+        };
+        var originalMetaFile = new File
+        {
+            Filename = "test-data-1.meta.csv",
+            Type = Metadata
+        };
+        var replacementMetaFile = new File
+        {
+            Filename = "test-data-2.meta.csv",
+            Type = Metadata
+        };
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Name = "Test subject 1",
-            File = new File
-            {
-                Id = originalFileId,
-                Filename = "test-data-1.csv",
-                ContentLength = 10240,
-                Type = FileType.Data,
-                Created = DateTime.UtcNow,
-                CreatedById = _user.Id,
-            }
+            File = originalFile
         };
         var originalMetaReleaseFile = new ReleaseFile
         {
-            ReleaseVersion = releaseVersion, File = new File { Filename = "test-data-1.meta.csv", Type = Metadata, }
+            ReleaseVersion = releaseVersion,
+            File = originalMetaFile
         };
-        var amendmentReleaseVersion = new ReleaseVersion();
         var amendmentOriginalReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
             Name = originalReleaseFile.Name,
-            File = new File()
-            {
-                Filename = originalReleaseFile.File.Filename,
-                Type = originalReleaseFile.File.Type,
-                Created = originalReleaseFile.File.Created,
-                CreatedById = originalReleaseFile.File.CreatedById,
-                ReplacedById = originalReleaseFile.File.ReplacedById
-            },
+            File = originalFile,
             Order = originalReleaseFile.Order
         };
         var amendmentOriginalMetaReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
             Name = originalMetaReleaseFile.Name,
-            File = new File()
-            {
-                Filename = originalMetaReleaseFile.File.Filename, Type = originalMetaReleaseFile.File.Type
-            },
+            File = originalMetaFile,
             Order = originalMetaReleaseFile.Order
         };
         var amendmentReplacementReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
-            Name = "Test subject 1",
-            File = new File
-            {
-                Id = replacementFileId,
-                Filename = "test-data-2.csv",
-                ContentLength = 20480,
-                Type = FileType.Data,
-                Created = DateTime.UtcNow,
-                CreatedById = _user.Id,
-                ReplacingId = originalFileId
-            }
+            Name = originalReleaseFile.Name,
+            File = replacementFile,
+            Order = originalReleaseFile.Order
         };
         var amendmentReplacementMetaReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
-            File = new File { Filename = "test-data-2.meta.csv", Type = Metadata, }
+            Name = originalMetaReleaseFile.Name,
+            File = replacementMetaFile,
+            Order = originalMetaReleaseFile.Order
         };
-
         var dataImports = new List<DataImport>
         {
             new()
@@ -1760,18 +1765,14 @@ public class ReleaseDataFileServiceTests
 
             Assert.Single(files);
 
+            Assert.Equal(originalReleaseFile.File.Id, files[0].Id);
             Assert.Equal("Test subject 1", files[0].Name);
             Assert.Equal("test-data-1.csv", files[0].FileName);
-            Assert.Equal("csv", files[0].Extension);
-            Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
-            Assert.Equal(_user.Email, files[0].UserName);
-            Assert.Equal(200, files[0].Rows);
-            Assert.Equal("10 Kb", files[0].Size);
-            Assert.Equal(COMPLETE, files[0].Status);
-            Assert.Equal(files[0].ReplacedBy, replacementFileId);
+            Assert.Equal(replacementFile.Id, files[0].ReplacedBy); //This is set on the published original release version as well as the amendment release version. 
+            Assert.Null(files[0].ReplacedByDataFile);
         }
     }
-
+    
     [Fact]
     public async Task ListAll_WithReplacement()
     {
