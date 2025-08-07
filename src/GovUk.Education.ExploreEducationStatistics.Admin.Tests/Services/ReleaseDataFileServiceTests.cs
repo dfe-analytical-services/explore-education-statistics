@@ -1779,8 +1779,9 @@ public class ReleaseDataFileServiceTests
             Assert.Equal(200, files[0].Rows);
             Assert.Equal("10 Kb", files[0].Size);
             Assert.Equal(COMPLETE, files[0].Status);
+            Assert.Equal(files[0].ReplacedBy, replacementFileId);
         }
-    }
+}
     
     [Fact]
     public async Task ListAll_WithReplacement()
