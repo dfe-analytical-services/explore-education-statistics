@@ -2612,6 +2612,44 @@
         ],
         "type": "string"
       },
+      "DataSetVersionChangeSets": {
+        "required": [
+          "majorChanges",
+          "minorChanges",
+          "versionNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Guideline notes that are associated with the data set version.",
+            "nullable": true
+          },
+          "versionNumber": {
+            "type": "string",
+            "description": "The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor), 2.1.1 (patch).",
+            "example": "1.0"
+          },
+          "majorChanges": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ChangeSetViewModel"
+              }
+            ],
+            "description": "Any major changes that were made to the data set."
+          },
+          "minorChanges": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ChangeSetViewModel"
+              }
+            ],
+            "description": "Any minor changes that were made to the data set."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A set of changes made to a data set version."
+      },
       "DataSetVersionChangesViewModel": {
         "required": [
           "majorChanges",
@@ -2622,10 +2660,13 @@
         "properties": {
           "notes": {
             "type": "string",
+            "description": "Guideline notes that are associated with the data set version.",
             "nullable": true
           },
           "versionNumber": {
-            "type": "string"
+            "type": "string",
+            "description": "The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor), 2.1.1 (patch).",
+            "example": "1.0"
           },
           "majorChanges": {
             "allOf": [
@@ -2646,14 +2687,14 @@
           "patchHistory": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DataSetVersionChangesViewModel"
+              "$ref": "#/components/schemas/DataSetVersionChangeSets"
             },
             "description": "Change logs for any patch versions associated with this change log",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "A set of changes made to a data set version."
+        "description": "A set of changes made to a data set version, can include any patch change sets associated with the data set version if it has patch version history."
       },
       "DataSetVersionFileViewModel": {
         "required": [
@@ -2773,7 +2814,7 @@
         "properties": {
           "version": {
             "type": "string",
-            "description": "The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).",
+            "description": "The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor), 2.1.1 (patch).",
             "example": "1.0"
           },
           "type": {

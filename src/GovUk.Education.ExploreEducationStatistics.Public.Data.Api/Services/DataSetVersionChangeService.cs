@@ -42,18 +42,24 @@ public class DataSetVersionChangeService(
             .OnSuccess(MapChanges)
             .OnSuccessCombineWith(changes => 
                 includePatchHistory 
-                    ? GetPreviousChanges(dataSetId, changes.VersionNumber, cancellationToken) 
-                    : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangesViewModel>>(new List<DataSetVersionChangesViewModel>()))
+                    ? GetPreviousChanges(dataSetId, changes!.VersionNumber, cancellationToken) 
+                    : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangeSets>>([]))
                 )
             .OnSuccess(tuple =>
             {
                 var (change, history) = tuple;
-                change.PatchHistory = history;
-                return change;
+                return new DataSetVersionChangesViewModel
+                {
+                    VersionNumber = change!.VersionNumber,
+                    Notes = change.Notes,
+                    MajorChanges = change.MajorChanges,
+                    MinorChanges = change.MinorChanges,
+                    PatchHistory = history
+                };
             });
     }
 
-    private Task<Either<ActionResult, List<DataSetVersionChangesViewModel>>> GetPreviousChanges(
+    private Task<Either<ActionResult, List<DataSetVersionChangeSets>>> GetPreviousChanges(
         Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default)
@@ -69,7 +75,7 @@ public class DataSetVersionChangeService(
                 .OnSuccessAll())
             .OnSuccess(async versions =>
             {
-                var loadedChanges = new List<DataSetVersionChangesViewModel>();
+                var loadedChanges = new List<DataSetVersionChangeSets>();
                 foreach (var version in versions)
                 {
                     loadedChanges.Add(MapChanges(await LoadChanges(version, cancellationToken)));
@@ -104,7 +110,7 @@ public class DataSetVersionChangeService(
         return loadedDataSetVersion;
     }
 
-    private static DataSetVersionChangesViewModel MapChanges(DataSetVersion dataSetVersion)
+    private static DataSetVersionChangeSets MapChanges(DataSetVersion dataSetVersion)
     {
         var filterChanges =
             GetFilterChanges(dataSetVersion.FilterMetaChanges);
@@ -121,7 +127,7 @@ public class DataSetVersionChangeService(
         var timePeriodChanges =
             GetTimePeriodChanges(dataSetVersion.TimePeriodMetaChanges);
 
-        return new DataSetVersionChangesViewModel
+        return new DataSetVersionChangeSets
         {
             VersionNumber = dataSetVersion.PublicVersion,
             Notes = dataSetVersion.Notes,

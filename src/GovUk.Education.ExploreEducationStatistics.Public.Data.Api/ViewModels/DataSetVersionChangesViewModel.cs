@@ -5,10 +5,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 /// <summary>
 /// A set of changes made to a data set version.
 /// </summary>
-public record DataSetVersionChangesViewModel
+public record DataSetVersionChangeSets
 {
+    /// <summary>
+    /// Guideline notes that are associated with the data set version. 
+    /// </summary>
     public string? Notes { get; set; }
-    
+
+    /// <summary>
+    /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor), 2.1.1 (patch).
+    /// </summary>
+    /// <example>1.0</example>
     public required string VersionNumber { get; set; }
     /// <summary>
     /// Any major changes that were made to the data set.
@@ -19,11 +26,17 @@ public record DataSetVersionChangesViewModel
     /// Any minor changes that were made to the data set.
     /// </summary>
     public required ChangeSetViewModel MinorChanges { get; init; }
+}
 
+/// <summary>
+/// A set of changes made to a data set version, can include any patch change sets associated with the data set version if it has patch version history.
+/// </summary>
+public record DataSetVersionChangesViewModel : DataSetVersionChangeSets
+{
     /// <summary>
     /// Change logs for any patch versions associated with this change log
     /// </summary>
-    public List<DataSetVersionChangesViewModel>? PatchHistory { get; set; }
+    public List<DataSetVersionChangeSets>? PatchHistory { get; set; }
 }
 
 /// <summary>
