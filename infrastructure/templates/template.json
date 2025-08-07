@@ -2232,9 +2232,9 @@
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
-        "AZURE_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName')), variables('userAssignedIdentitiesApiVersion')).clientId]",
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
+        "AZURE_SEARCH_MANAGED_IDENTITY_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName')), variables('userAssignedIdentitiesApiVersion')).clientId]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
