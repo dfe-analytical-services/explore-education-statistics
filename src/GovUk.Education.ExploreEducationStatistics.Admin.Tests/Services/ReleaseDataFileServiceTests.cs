@@ -1644,7 +1644,7 @@ public class ReleaseDataFileServiceTests
             Assert.Null(files[1].PublicApiDataSetVersion);
         }
     }
-    
+
     [Fact]
     public async Task ListAll_WithReplacementInProgressOnNewerReleaseVersion_ReplacedByDataFileIsNull()
     {
@@ -1663,17 +1663,11 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
-                ReplacedById = replacementFileId,
             }
         };
         var originalMetaReleaseFile = new ReleaseFile
         {
-            ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                Filename = "test-data-1.meta.csv",
-                Type = Metadata,
-            }
+            ReleaseVersion = releaseVersion, File = new File { Filename = "test-data-1.meta.csv", Type = Metadata, }
         };
         var amendmentReleaseVersion = new ReleaseVersion();
         var amendmentOriginalReleaseFile = new ReleaseFile
@@ -1696,8 +1690,7 @@ public class ReleaseDataFileServiceTests
             Name = originalMetaReleaseFile.Name,
             File = new File()
             {
-                Filename = originalMetaReleaseFile.File.Filename,
-                Type = originalMetaReleaseFile.File.Type
+                Filename = originalMetaReleaseFile.File.Filename, Type = originalMetaReleaseFile.File.Type
             },
             Order = originalMetaReleaseFile.Order
         };
@@ -1719,11 +1712,7 @@ public class ReleaseDataFileServiceTests
         var amendmentReplacementMetaReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
-            File = new File
-            {
-                Filename = "test-data-2.meta.csv",
-                Type = Metadata,
-            }
+            File = new File { Filename = "test-data-2.meta.csv", Type = Metadata, }
         };
 
         var dataImports = new List<DataImport>
@@ -1768,7 +1757,7 @@ public class ReleaseDataFileServiceTests
             Assert.True(result.IsRight);
 
             var files = result.Right.ToList();
-            
+
             Assert.Single(files);
 
             Assert.Equal("Test subject 1", files[0].Name);
@@ -1781,8 +1770,8 @@ public class ReleaseDataFileServiceTests
             Assert.Equal(COMPLETE, files[0].Status);
             Assert.Equal(files[0].ReplacedBy, replacementFileId);
         }
-}
-    
+    }
+
     [Fact]
     public async Task ListAll_WithReplacement()
     {
