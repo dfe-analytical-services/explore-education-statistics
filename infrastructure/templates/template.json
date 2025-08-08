@@ -1390,6 +1390,7 @@
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "20.19.2",
+        "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
@@ -1397,8 +1398,30 @@
         "PublicApp__BasicAuth": "[parameters('publicAppBasicAuth')]",
         "PublicApp__BasicAuthUsername": "[parameters('publicAppBasicAuthUsername')]",
         "PublicApp__BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
+        "Analytics__Enabled": "[parameters('analyticsEnabled')]",
+        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]",
         "RequestTimeouts__TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
+      }
+    },
+    {
+      "condition": "[parameters('analyticsEnabled')]",
+      "name": "[concat(variables('dataAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]"
+      ],
+      "properties": {
+        "[variables('analyticsFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('analyticsStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('analyticsStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('analyticsFileShareName')]",
+          "mountPath": "[parameters('analyticsFileShareMountPath')]",
+          "protocol": "Smb"
+        }
       }
     },
     {
