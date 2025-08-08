@@ -243,7 +243,7 @@ User edits filter mapping
     ${modal}=    user waits until modal is visible    Map existing filter option
     user clicks radio    State-funded primary and secondary
     user clicks button    Update filter option mapping
-    user waits until modal is not visible    Map existing location
+    user waits until modal is not visible    Map existing filter option
 
 Verify filter mapping changes
     user waits until element contains    css:[data-testid="mappable-table-schoolType"] caption
