@@ -15,11 +15,9 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    Public API - minor manual changes %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Public API - patch manual changes %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=      Financial year 3000-01
-${RELEASE_2_NAME}=      Academic year 3010/11
 ${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
-${SUBJECT_2_NAME}=      ${PUBLICATION_NAME} - Subject 2
 
 
 *** Test Cases ***
@@ -80,7 +78,7 @@ Check modal that blocks replacing a draft patch data set version is displayed
     user clicks button    Replace data    testId:Actions
     ${modal}=    user waits until modal is visible    Cannot replace data
     user clicks button    Close
-    user waits until modal is not visible    Create a new API data set
+    user waits until modal is not visible    Cannot replace data
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -286,7 +284,7 @@ Navigate to 'Content' page for amendment
     user clicks link    Back
     user navigates to content page    ${PUBLICATION_NAME}
 
-Update free text key stat
+Add release note for amendment
     User clicks button    Add note    id:release-notes
     user enters text into element    id:create-release-note-form-reason    Test release note
     user clicks button    Save note
