@@ -213,25 +213,36 @@ public class ReleaseDataFileService(
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async () =>
             {
-                var files = await releaseFileRepository.GetByFileType(
+                var releaseFiles = await releaseFileRepository.GetByFileType(
                     releaseVersionId: releaseVersionId,
                     types: FileType.Data);
+                var releaseFilesByFileId = releaseFiles
+                    .ToDictionary(rf => rf.File.Id);
 
                 // An in-progress data set replacement has two release files associated with it: the original and
                 // the replacement. The frontend doesn't want to display two files for the in-progress replacement,
                 // so we exclude the replacement file and keep the original file.
-                var filesExcludingReplacements = files
+                var filesExcludingReplacements = releaseFiles
                     .Where(releaseFile => !releaseFile.File.ReplacingId.HasValue)
                     .OrderBy(releaseFile => releaseFile.Order)
                     .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
                     .ToList();
 
                 // But we still want the in-progress replacement files for generating view models
-                var inProgressReplacements = files
-                    .Where(releaseFile => releaseFile.File.ReplacingId.HasValue)
+                // Get the replacing file in-progress if they're in this release version.
+                // ReplacedById can be set if a replacement is in progress on a newer release version. Ignore those replacements here.
+                var inProgressReplacementsInCurrentReleaseVersion = releaseFiles
+                    .Where(rf => rf.File.ReplacedById.HasValue)
+                    .Select(rf =>
+                        releaseFilesByFileId.TryGetValue(rf.File.ReplacedById!.Value,
+                            out var replacementReleaseFile)
+                            ? replacementReleaseFile
+                            : null
+                    )
+                    .WhereNotNull()
                     .ToList();
 
-                return await BuildDataFileViewModels(filesExcludingReplacements, inProgressReplacements);
+                return await BuildDataFileViewModels(filesExcludingReplacements, inProgressReplacementsInCurrentReleaseVersion);
             });
     }
 
@@ -653,21 +664,21 @@ public class ReleaseDataFileService(
 
     private async Task<List<DataFileInfo>> BuildDataFileViewModels(
         List<ReleaseFile> releaseFiles,
-        List<ReleaseFile>? inProgressReplacements = null)
+        List<ReleaseFile> inProgressReplacementsInCurrentReleaseVersion)
     {
         var files = releaseFiles
-            .Concat(inProgressReplacements ?? [])
+            .Concat(inProgressReplacementsInCurrentReleaseVersion)
             .Select(rf => rf.File)
             .ToList();
 
-        var dataImportsDict = await contentDbContext.DataImports
-            .AsSplitQuery()
-            .Include(di => di.File.CreatedBy)
-            .Include(di => di.MetaFile)
-            .Where(di => files
-                .Select(f => f.Id)
-                .Contains(di.FileId))
-            .ToDictionaryAsync(di => di.FileId);
+    var dataImportsDict = await contentDbContext.DataImports
+        .AsSplitQuery()
+        .Include(di => di.File.CreatedBy)
+        .Include(di => di.MetaFile)
+        .Where(di => files
+            .Select(f => f.Id)
+            .Contains(di.FileId))
+        .ToDictionaryAsync(di => di.FileId);
 
         // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
         // Work out if the user has permission to cancel any import which Bau users can.
@@ -680,15 +691,17 @@ public class ReleaseDataFileService(
 
         var result = await releaseFiles.SelectAsync(async releaseFile =>
         {
-            if (inProgressReplacements == null || releaseFile.File.ReplacedById == null)
+            var fileHasReplacementInCurrentReleaseVersion = releaseFile.File.ReplacedById.HasValue &&
+                                                     inProgressReplacementsInCurrentReleaseVersion
+                                                     .Any(rf => rf.FileId == releaseFile.File.ReplacedById);
+            if (!fileHasReplacementInCurrentReleaseVersion)
             {
                 return new DataFileInfo(
                     releaseFile,
                     dataImportsDict[releaseFile.FileId],
                     permissionsDict[releaseFile.FileId]);
             }
-
-            var replacement = inProgressReplacements.Single(rf =>
+            var replacement = inProgressReplacementsInCurrentReleaseVersion.Single(rf =>
                 rf.FileId == releaseFile.File.ReplacedById);
 
             var hasValidReplacementPlan = false;
@@ -699,20 +712,20 @@ public class ReleaseDataFileService(
             }
 
             return new DataFileInfo(
-                releaseFile,
-                dataImportsDict[releaseFile.FileId],
-                permissionsDict[releaseFile.FileId])
-            {
-                ReplacedByDataFile = new ReplacementDataFileInfo(
-                    replacement,
-                    dataImportsDict[replacement.FileId],
-                    permissionsDict[replacement.FileId],
-                    hasValidReplacementPlan),
-            };
-        });
+            releaseFile,
+            dataImportsDict[releaseFile.FileId],
+            permissionsDict[releaseFile.FileId])
+        {
+            ReplacedByDataFile = new ReplacementDataFileInfo(
+                replacement,
+                dataImportsDict[replacement.FileId],
+                permissionsDict[replacement.FileId],
+                hasValidReplacementPlan),
+        };
+    });
 
-        return result.ToList();
-    }
+    return result.ToList();
+}
 
     /// <summary>
     /// Determine the title which should be used for a data set.
