@@ -6,11 +6,12 @@ import Pagination from '@frontend/components/Pagination';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import { pageApiSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
+import { ApiDataSetVersion } from '@frontend/services/apiDataSetService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
-import showCurrentNextToVersion from '../utils/showCurrentNextToVersion';
+import filterHighestPatchVersions from '../utils/filterHighestPatchVersions';
 
 const sectionId = 'apiVersionHistory';
 
@@ -36,19 +37,10 @@ export default function DataSetFileApiVersionHistory({
   const currentVersionFileId = data?.results.find(
     version => version.version === currentVersion,
   )?.file.id;
-  const patchVersionHighestPatchDictionary = data?.results.reduce<
-    Record<string, number>
-  >((acc, version) => {
-    const [major, minor, patch] = version.version.split('.').map(Number);
-    if (patch === undefined) {
-      return acc;
-    }
-    const key = `${major}.${minor}`;
-    if (!acc[key] || patch > acc[key]) {
-      acc[key] = patch;
-    }
-    return acc;
-  }, {});
+
+  const filteredVersions = filterHighestPatchVersions(
+    data?.results?.map((version: ApiDataSetVersion) => version.version) ?? [],
+  );
 
   return (
     <DataSetFilePageSection heading={pageApiSections[sectionId]} id={sectionId}>
@@ -64,40 +56,37 @@ export default function DataSetFileApiVersionHistory({
                 </tr>
               </thead>
               <tbody>
-                {data?.results.map(version => (
-                  <tr key={version.version}>
-                    <td>
-                      {version.version !== currentVersion &&
-                      version.file.id !== currentVersionFileId ? (
-                        <Link
-                          to={`/data-catalogue/data-set/${version.file.id}`}
+                {data.results
+                  .filter(version => filteredVersions.includes(version.version))
+                  .map(version => (
+                    <tr key={version.version}>
+                      <td>
+                        {version.version !== currentVersion &&
+                        version.file.id !== currentVersionFileId ? (
+                          <Link
+                            to={`/data-catalogue/data-set/${version.file.id}`}
+                          >
+                            {version.version}
+                          </Link>
+                        ) : (
+                          <strong>
+                            {version.version}
+                            {' (current)'}
+                          </strong>
+                        )}
+                      </td>
+                      <td>{version.release.title}</td>
+                      <td>
+                        <Tag
+                          colour={
+                            version.status !== 'Published' ? 'orange' : 'blue'
+                          }
                         >
-                          {version.version}
-                        </Link>
-                      ) : (
-                        <strong>
-                          {version.version}{' '}
-                          {showCurrentNextToVersion(
-                            version.version,
-                            patchVersionHighestPatchDictionary,
-                          )
-                            ? '(current)'
-                            : ''}
-                        </strong>
-                      )}
-                    </td>
-                    <td>{version.release.title}</td>
-                    <td>
-                      <Tag
-                        colour={
-                          version.status !== 'Published' ? 'orange' : 'blue'
-                        }
-                      >
-                        {version.status}
-                      </Tag>
-                    </td>
-                  </tr>
-                ))}
+                          {version.status}
+                        </Tag>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
 
