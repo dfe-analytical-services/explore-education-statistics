@@ -230,6 +230,7 @@ public class ReleaseDataFileService(
 
                 // But we still want the in-progress replacement files for generating view models
                 // Get the replacing file in-progress if they're in this release version.
+                // ReplacedById can be set if a replacement is in progress on a newer release version. Ignore those replacements here.
                 var inProgressReplacementsInCurrentReleaseVersion = releaseFiles
                     .Where(rf => rf.File.ReplacedById.HasValue)
                     .Select(rf =>
@@ -238,8 +239,7 @@ public class ReleaseDataFileService(
                             ? replacementReleaseFile
                             : null
                     )
-                    .Where(rf => rf != null)
-                    .Cast<ReleaseFile>()
+                    .WhereNotNull()
                     .ToList();
 
                 return await BuildDataFileViewModels(filesExcludingReplacements, inProgressReplacementsInCurrentReleaseVersion);
