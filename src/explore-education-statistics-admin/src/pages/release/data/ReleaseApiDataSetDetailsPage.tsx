@@ -270,7 +270,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const replaceRouteParams = dataSet?.draftVersion?.originalFileId
     ? {
         publicationId: releaseVersion.publicationId,
-        releaseVersionId: releaseVersion.id,
+        releaseVersionId: dataSet?.draftVersion?.releaseVersion.id,
         fileId: dataSet?.draftVersion?.originalFileId as string,
       }
     : undefined;

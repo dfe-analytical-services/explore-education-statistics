@@ -151,7 +151,7 @@ public class DataImportService : IDataImportService
         await context.SaveChangesAsync();
     }
 
-    public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int? numDataFileRows)
+    public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows)
     {
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
         await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();

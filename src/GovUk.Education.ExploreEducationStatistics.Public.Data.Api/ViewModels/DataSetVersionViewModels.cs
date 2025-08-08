@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 public class DataSetVersionViewModel
 {
     /// <summary>
-    /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).
+    /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor), 2.1.1 (patch).
     /// </summary>
     /// <example>1.0</example>
     public required string Version { get; init; }

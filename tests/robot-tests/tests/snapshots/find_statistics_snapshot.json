@@ -534,14 +534,14 @@
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "20 Mar 2025",
+    "published": "7 Aug 2025",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "24 Jul 2025",
+    "published": "7 Aug 2025",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -630,15 +630,8 @@
     "theme": "Children's social care"
   },
   {
-    "publication_summary": "Statistics on Skills Bootcamps participants in England. Data includes completions and outcomes.",
-    "publication_title": "Skills Bootcamps Completions and Outcomes",
-    "published": "14 Nov 2024",
-    "release_type": "Management information",
-    "theme": "Further education"
-  },
-  {
-    "publication_summary": "Provider-reported Skills Bootcamps starts between April 2021 and March 2022 (in FY 2021-22). National level estimates of the number of Skills Bootcamps starts.",
-    "publication_title": "Skills Bootcamps starts",
+    "publication_summary": "Statistics on Skills Bootcamps participants in England, including starts, completions and outcomes.",
+    "publication_title": "Skills bootcamps starts, completions and outcomes",
     "published": "14 Nov 2024",
     "release_type": "Management information",
     "theme": "Further education"
