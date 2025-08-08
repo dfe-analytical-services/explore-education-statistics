@@ -29,4 +29,4 @@ param publicApiContainerAppWorkloadProfiles = [{
 param enableThemeDeletion = true
 param enableSwagger = true
 
-param enableReplacementOfPublicApiDataSets = false
+param enableReplacementOfPublicApiDataSets = true
