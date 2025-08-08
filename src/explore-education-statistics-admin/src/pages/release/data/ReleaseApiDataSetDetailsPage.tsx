@@ -306,7 +306,7 @@ export default function ReleaseApiDataSetDetailsPage() {
           </li>
           <li>
             Alternatively{' '}
-            <Link to={replaceTabRoute} test-id="cancel-replacement-link">
+            <Link to={replaceTabRoute} data-testid="cancel-replacement-link">
               {' '}
               cancel the ongoing replacement
             </Link>{' '}
