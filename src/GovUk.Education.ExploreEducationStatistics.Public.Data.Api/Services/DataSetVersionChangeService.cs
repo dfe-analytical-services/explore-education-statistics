@@ -43,7 +43,7 @@ public class DataSetVersionChangeService(
             .OnSuccessCombineWith(changes => 
                 includePatchHistory 
                     ? GetPreviousChanges(dataSetId, changes!.VersionNumber, cancellationToken) 
-                    : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangeSets>>([]))
+                    : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangeSet>>([]))
                 )
             .OnSuccess(tuple =>
             {
@@ -59,7 +59,7 @@ public class DataSetVersionChangeService(
             });
     }
 
-    private Task<Either<ActionResult, List<DataSetVersionChangeSets>>> GetPreviousChanges(
+    private Task<Either<ActionResult, List<DataSetVersionChangeSet>>> GetPreviousChanges(
         Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ public class DataSetVersionChangeService(
                 .OnSuccessAll())
             .OnSuccess(async versions =>
             {
-                var loadedChanges = new List<DataSetVersionChangeSets>();
+                var loadedChanges = new List<DataSetVersionChangeSet>();
                 foreach (var version in versions)
                 {
                     loadedChanges.Add(MapChanges(await LoadChanges(version, cancellationToken)));
@@ -110,7 +110,7 @@ public class DataSetVersionChangeService(
         return loadedDataSetVersion;
     }
 
-    private static DataSetVersionChangeSets MapChanges(DataSetVersion dataSetVersion)
+    private static DataSetVersionChangeSet MapChanges(DataSetVersion dataSetVersion)
     {
         var filterChanges =
             GetFilterChanges(dataSetVersion.FilterMetaChanges);
@@ -127,7 +127,7 @@ public class DataSetVersionChangeService(
         var timePeriodChanges =
             GetTimePeriodChanges(dataSetVersion.TimePeriodMetaChanges);
 
-        return new DataSetVersionChangeSets
+        return new DataSetVersionChangeSet
         {
             VersionNumber = dataSetVersion.PublicVersion,
             Notes = dataSetVersion.Notes,

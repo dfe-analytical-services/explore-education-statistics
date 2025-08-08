@@ -1,11 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
 /// A set of changes made to a data set version.
 /// </summary>
-public record DataSetVersionChangeSets
+public record DataSetVersionChangeSet
 {
     /// <summary>
     /// Guideline notes that are associated with the data set version. 
@@ -29,14 +27,14 @@ public record DataSetVersionChangeSets
 }
 
 /// <summary>
-/// A set of changes made to a data set version, can include any patch change sets associated with the data set version if it has patch version history.
+/// A set of changes made to a data set version that can optionally include any patch change sets associated with the data set version if it has patch version history.
 /// </summary>
-public record DataSetVersionChangesViewModel : DataSetVersionChangeSets
+public record DataSetVersionChangesViewModel : DataSetVersionChangeSet
 {
     /// <summary>
     /// Change logs for any patch versions associated with this change log
     /// </summary>
-    public List<DataSetVersionChangeSets>? PatchHistory { get; set; }
+    public List<DataSetVersionChangeSet>? PatchHistory { get; set; }
 }
 
 /// <summary>

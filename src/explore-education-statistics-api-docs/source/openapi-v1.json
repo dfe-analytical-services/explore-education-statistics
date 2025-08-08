@@ -2612,7 +2612,7 @@
         ],
         "type": "string"
       },
-      "DataSetVersionChangeSets": {
+      "DataSetVersionChangeSet": {
         "required": [
           "majorChanges",
           "minorChanges",
@@ -2687,14 +2687,14 @@
           "patchHistory": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DataSetVersionChangeSets"
+              "$ref": "#/components/schemas/DataSetVersionChangeSet"
             },
             "description": "Change logs for any patch versions associated with this change log",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "A set of changes made to a data set version, can include any patch change sets associated with the data set version if it has patch version history."
+        "description": "A set of changes made to a data set version that can optionally include any patch change sets associated with the data set version if it has patch version history."
       },
       "DataSetVersionFileViewModel": {
         "required": [
