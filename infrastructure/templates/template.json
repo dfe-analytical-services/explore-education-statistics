@@ -1287,7 +1287,9 @@
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
-    "searchServiceApiVersion": "2025-02-01-preview"
+    "searchReaderManagedIdentityName": "[concat(parameters('subscription'), '-', parameters('environment'), '-id-srch-reader')]",
+    "searchServiceApiVersion": "2025-02-01-preview",
+    "userAssignedIdentitiesApiVersion": "2024-11-30"
   },
   "resources": [
     {
@@ -2173,7 +2175,10 @@
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "identity": {
-        "type": "SystemAssigned"
+        "type": "SystemAssigned, UserAssigned",
+        "userAssignedIdentities": {
+          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName'))]": {}
+        }
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2229,7 +2234,7 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
-        "AZURE_SEARCH_QUERY_KEY": "[listQueryKeys(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).value[0].key]",
+        "AZURE_SEARCH_MANAGED_IDENTITY_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName')), variables('userAssignedIdentitiesApiVersion')).clientId]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
