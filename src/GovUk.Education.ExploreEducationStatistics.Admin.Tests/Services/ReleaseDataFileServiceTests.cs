@@ -1669,7 +1669,8 @@ public class ReleaseDataFileServiceTests
             ContentLength = 10240,
             Type = FileType.Data,
             Created = DateTime.UtcNow,
-            CreatedById = _user.Id
+            CreatedById = _user.Id,
+            ReplacingId = originalFileId
         };
         var originalMetaFile = new File
         {
@@ -1697,28 +1698,24 @@ public class ReleaseDataFileServiceTests
             ReleaseVersion = amendmentReleaseVersion,
             Name = originalReleaseFile.Name,
             File = originalFile,
-            Order = originalReleaseFile.Order
         };
         var amendmentOriginalMetaReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
             Name = originalMetaReleaseFile.Name,
             File = originalMetaFile,
-            Order = originalMetaReleaseFile.Order
         };
         var amendmentReplacementReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
             Name = originalReleaseFile.Name,
             File = replacementFile,
-            Order = originalReleaseFile.Order
         };
         var amendmentReplacementMetaReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
             Name = originalMetaReleaseFile.Name,
             File = replacementMetaFile,
-            Order = originalMetaReleaseFile.Order
         };
         var dataImports = new List<DataImport>
         {
