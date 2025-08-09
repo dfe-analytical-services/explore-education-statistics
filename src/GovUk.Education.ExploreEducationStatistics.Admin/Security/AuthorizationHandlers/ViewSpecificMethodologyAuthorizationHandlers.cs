@@ -19,29 +19,14 @@ public class ViewSpecificMethodologyRequirement : IAuthorizationRequirement
 {
 }
 
-public class ViewSpecificMethodologyAuthorizationHandler :
+public class ViewSpecificMethodologyAuthorizationHandler(
+    IMethodologyRepository methodologyRepository,
+    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IPreReleaseService preReleaseService,
+    IReleaseVersionRepository releaseVersionRepository,
+    AuthorizationHandlerService authorizationHandlerService) :
     AuthorizationHandler<ViewSpecificMethodologyRequirement, MethodologyVersion>
 {
-    private readonly IMethodologyRepository _methodologyRepository;
-    private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
-    private readonly IPreReleaseService _preReleaseService;
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public ViewSpecificMethodologyAuthorizationHandler(
-        IMethodologyRepository methodologyRepository,
-        IUserReleaseRoleRepository userReleaseRoleRepository,
-        IPreReleaseService preReleaseService,
-        IReleaseVersionRepository releaseVersionRepository,
-        AuthorizationHandlerService authorizationHandlerService)
-    {
-        _methodologyRepository = methodologyRepository;
-        _userReleaseRoleRepository = userReleaseRoleRepository;
-        _preReleaseService = preReleaseService;
-        _releaseVersionRepository = releaseVersionRepository;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
         ViewSpecificMethodologyRequirement requirement,
         MethodologyVersion methodologyVersion)
@@ -54,12 +39,12 @@ public class ViewSpecificMethodologyAuthorizationHandler :
         }
 
         var owningPublication =
-            await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        await methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
         // view it.  Additionally, if the user is a Contributor or an Approver of any
         // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
-        if (await _authorizationHandlerService
+        if (await authorizationHandlerService
                 .HasRolesOnPublicationOrAnyReleaseVersion(
                     context.User.GetUserId(),
                     owningPublication.Id,
@@ -76,12 +61,12 @@ public class ViewSpecificMethodologyAuthorizationHandler :
         // publication, approved but unpublished, and within the prerelease window.
         if (methodologyVersion.Approved)
         {
-            var publicationIds = await _methodologyRepository
-                .GetAllPublicationIds(methodologyVersion.MethodologyId);
+            var publicationIds = await methodologyRepository
+                    .GetAllPublicationIds(methodologyVersion.MethodologyId);
 
             foreach (var publicationId in publicationIds)
             {
-                var latestReleaseVersion = await _releaseVersionRepository.GetLatestReleaseVersion(publicationId);
+                var latestReleaseVersion = await releaseVersionRepository.GetLatestReleaseVersion(publicationId);
 
                 // The publication may have no releases
                 if (latestReleaseVersion == null)
@@ -101,12 +86,12 @@ public class ViewSpecificMethodologyAuthorizationHandler :
                     continue;
                 }
 
-                if (await _userReleaseRoleRepository.HasUserReleaseRole(
+                if (await userReleaseRoleAndInviteManager.HasUserReleaseRole(
                         context.User.GetUserId(),
                         latestReleaseVersion.Id,
                         ReleaseRole.PrereleaseViewer))
                 {
-                    if (_preReleaseService
+                    if (preReleaseService
                             .GetPreReleaseWindowStatus(latestReleaseVersion, DateTime.UtcNow)
                             .Access == PreReleaseAccess.Within)
                     {

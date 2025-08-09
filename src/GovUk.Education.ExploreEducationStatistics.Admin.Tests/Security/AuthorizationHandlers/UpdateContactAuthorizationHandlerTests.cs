@@ -33,16 +33,20 @@ public class UpdateContactAuthorizationHandlerTests
     public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
-            CreateHandler, Owner);
+            CreateHandler,
+            Owner);
     }
 
     private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
         return new UpdateContactAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict)));
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                    userRepository: new UserRepository(contentDbContext)),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

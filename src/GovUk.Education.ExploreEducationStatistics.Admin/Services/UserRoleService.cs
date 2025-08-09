@@ -21,60 +21,32 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserRoleService : IUserRoleService
+
+public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
+    ContentDbContext contentDbContext,
+    IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+    IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
+    IEmailTemplateService emailTemplateService,
+    IUserService userService,
+    IReleaseVersionRepository releaseVersionRepository,
+    IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
+    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    UserManager<ApplicationUser> identityUserManager
+) : IUserRoleService
 {
-    private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-    private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
-    private readonly IEmailTemplateService _emailTemplateService;
-    private readonly IUserService _userService;
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
-    private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
-    private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
-    private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
-    private readonly UserManager<ApplicationUser> _identityUserManager;
-
-    public UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
-        ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-        IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
-        IEmailTemplateService emailTemplateService,
-        IUserService userService,
-        IReleaseVersionRepository releaseVersionRepository,
-        IUserPublicationRoleRepository userPublicationRoleRepository,
-        IUserReleaseRoleRepository userReleaseRoleRepository,
-        IUserReleaseInviteRepository userReleaseInviteRepository,
-        UserManager<ApplicationUser> identityUserManager
-    )
-    {
-        _usersAndRolesDbContext = usersAndRolesDbContext;
-        _contentDbContext = contentDbContext;
-        _contentPersistenceHelper = contentPersistenceHelper;
-        _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
-        _emailTemplateService = emailTemplateService;
-        _userService = userService;
-        _releaseVersionRepository = releaseVersionRepository;
-        _userPublicationRoleRepository = userPublicationRoleRepository;
-        _userReleaseRoleRepository = userReleaseRoleRepository;
-        _userReleaseInviteRepository = userReleaseInviteRepository;
-        _identityUserManager = identityUserManager;
-    }
-
     public async Task<Either<ActionResult, Unit>> SetGlobalRole(string userId, string roleId)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await _usersAndRolesPersistenceHelper
+                return await usersAndRolesPersistenceHelper
                     .CheckEntityExists<ApplicationUser, string>(userId)
-                    .OnSuccessCombineWith(_ => _usersAndRolesPersistenceHelper
+                    .OnSuccessCombineWith(_ => usersAndRolesPersistenceHelper
                         .CheckEntityExists<IdentityRole, string>(roleId))
                     .OnSuccessVoid(async tuple =>
                     {
@@ -86,27 +58,27 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await _usersAndRolesPersistenceHelper
+                return await usersAndRolesPersistenceHelper
                     .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-                    .OnSuccessCombineWith(_ => _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
+                    .OnSuccessCombineWith(_ => contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
                     .OnSuccessDo(_ => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
                     .OnSuccess(async tuple =>
                     {
                         var (user, publication) = tuple;
 
-                        await _userPublicationRoleRepository.Create(
+                        await userPublicationRoleAndInviteManager.Create(
                             userId: userId,
                             publicationId: publication.Id,
                             role: role,
-                            createdById: _userService.GetUserId());
+                            createdById: userService.GetUserId());
 
                         await UpgradeToGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);
 
-                        return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
+                        return emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                     });
             });
     }
@@ -116,47 +88,47 @@ public class UserRoleService : IUserRoleService
         Guid releaseId,
         ReleaseRole role)
     {
-        return await _contentDbContext.ReleaseVersions
+        return await contentDbContext.ReleaseVersions
             .Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .LatestReleaseVersion(releaseId: releaseId)
             .SingleOrNotFoundAsync()
-            .OnSuccessDo(rv => _userService.CheckCanUpdateReleaseRole(rv!.Release.Publication, role))
+            .OnSuccessDo(rv => userService.CheckCanUpdateReleaseRole(rv!.Release.Publication, role))
             .OnSuccessDo(rv => ValidateReleaseRoleCanBeAdded(userId: userId,
                 releaseVersionId: rv!.Id,
                 role))
-            .OnSuccessCombineWith(_ => _usersAndRolesDbContext.Users
+            .OnSuccessCombineWith(_ => usersAndRolesDbContext.Users
                 .SingleOrNotFoundAsync(u => u.Id == userId.ToString()))
             .OnSuccess(async tuple =>
             {
                 var (releaseVersion, user) = tuple;
-                await _userReleaseRoleRepository.Create(
+                await userReleaseRoleAndInviteManager.Create(
                     userId: userId,
                     releaseVersionId: releaseVersion!.Id,
                     role,
-                    createdById: _userService.GetUserId());
+                    createdById: userService.GetUserId());
 
                 var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
                 await UpgradeToGlobalRoleIfRequired(globalRole, user);
 
-                return _emailTemplateService.SendReleaseRoleEmail(user.Email!, releaseVersion, role);
+                return emailTemplateService.SendReleaseRoleEmail(user.Email!, releaseVersion, role);
             });
     }
 
     private async Task SetExclusiveGlobalRole(string? globalRoleNameToSet, ApplicationUser user)
     {
-        var existingRoleNames = await _identityUserManager
+        var existingRoleNames = await identityUserManager
             .GetRolesAsync(user) ?? new List<string>();
 
         if (globalRoleNameToSet == null)
         {
-            await _identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
+            await identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
             return;
         }
 
         if (!existingRoleNames.Contains(globalRoleNameToSet))
         {
-            await _identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
+            await identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
         }
 
         var rolesToRemove = existingRoleNames
@@ -165,20 +137,20 @@ public class UserRoleService : IUserRoleService
 
         if (rolesToRemove.Count > 0)
         {
-            await _identityUserManager.RemoveFromRolesAsync(user, rolesToRemove);
+            await identityUserManager.RemoveFromRolesAsync(user, rolesToRemove);
         }
     }
 
     public async Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId)
     {
-        return await _usersAndRolesPersistenceHelper
+        return await usersAndRolesPersistenceHelper
             .CheckEntityExists<ApplicationUser, string>(userId.ToString())
             .OnSuccessVoid(user => UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, user));
     }
 
     private async Task UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, ApplicationUser user)
     {
-        var existingRoleNames = await _identityUserManager
+        var existingRoleNames = await identityUserManager
             .GetRolesAsync(user) ?? new List<string>();
 
         var userAlreadyAssignedToRole = existingRoleNames.Contains(globalRoleNameToSet);
@@ -189,7 +161,7 @@ public class UserRoleService : IUserRoleService
 
         if (!userAlreadyAssignedToRole && !higherRoleAlreadyAssigned)
         {
-            await _identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
+            await identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
         }
 
         var lowerRolesToRemove = GetLowerRoles(globalRoleNameToSet)
@@ -198,13 +170,13 @@ public class UserRoleService : IUserRoleService
 
         if (lowerRolesToRemove.Count > 0)
         {
-            await _identityUserManager.RemoveFromRolesAsync(user, lowerRolesToRemove);
+            await identityUserManager.RemoveFromRolesAsync(user, lowerRolesToRemove);
         }
     }
 
     private async Task DowngradeFromGlobalRoleIfRequired(ApplicationUser user, string globalRoleNameToDowngradeFrom)
     {
-        var existingGlobalRoleNames = await _identityUserManager
+        var existingGlobalRoleNames = await identityUserManager
             .GetRolesAsync(user) ?? new List<string>();
 
         var higherPrecedenceExistingGlobalRoleNames = existingGlobalRoleNames
@@ -224,8 +196,8 @@ public class UserRoleService : IUserRoleService
 
     private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
     {
-        var releaseRoles = await _userReleaseRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
-        var publicationRoles = await _userPublicationRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
+        var releaseRoles = await userReleaseRoleAndInviteManager.GetDistinctRolesByUser(Guid.Parse(user.Id));
+        var publicationRoles = await userPublicationRoleAndInviteManager.GetDistinctRolesByUser(Guid.Parse(user.Id));
         var requiredGlobalRoleNames =
             releaseRoles
                 .Select(GetAssociatedGlobalRoleNameForReleaseRole)
@@ -239,10 +211,10 @@ public class UserRoleService : IUserRoleService
     {
         switch (role)
         {
-            case Contributor:
-            case Approver:
+            case ReleaseRole.Contributor:
+            case ReleaseRole.Approver:
                 return RoleNames.Analyst;
-            case PrereleaseViewer:
+            case ReleaseRole.PrereleaseViewer:
                 return RoleNames.PrereleaseUser;
             default:
                 throw new ArgumentOutOfRangeException(
@@ -269,11 +241,11 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles()
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await _usersAndRolesDbContext.Roles
+                return await usersAndRolesDbContext.Roles
                     .AsQueryable()
                     .Select(r => new RoleViewModel
                     {
@@ -288,7 +260,7 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, Dictionary<string, List<string>>>> GetAllResourceRoles()
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(_ =>
             {
@@ -318,18 +290,18 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRoles(string userId)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => _usersAndRolesPersistenceHelper.CheckEntityExists<ApplicationUser, string>(userId))
+            .OnSuccess(_ => usersAndRolesPersistenceHelper.CheckEntityExists<ApplicationUser, string>(userId))
             .OnSuccess(async () =>
             {
-                var roleIds = await _usersAndRolesDbContext.UserRoles
+                var roleIds = await usersAndRolesDbContext.UserRoles
                     .AsQueryable()
                     .Where(r => r.UserId == userId)
                     .Select(r => r.RoleId)
                     .ToListAsync();
 
-                return await _usersAndRolesDbContext.Roles
+                return await usersAndRolesDbContext.Roles
                     .AsQueryable()
                     .Where(r => roleIds.Contains(r.Id))
                     .OrderBy(r => r.Name)
@@ -345,12 +317,12 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => _contentPersistenceHelper.CheckEntityExists<User>(userId))
+            .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
             .OnSuccess(async () =>
             {
-                return await _contentDbContext.UserPublicationRoles
+                return await contentDbContext.UserPublicationRoles
                     .Include(userPublicationRole => userPublicationRole.Publication)
                     .Include(userPublicationRole => userPublicationRole.User)
                     .Where(userPublicationRole => userPublicationRole.UserId == userId)
@@ -369,12 +341,12 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(Guid publicationId)
     {
-        return await _contentPersistenceHelper
+        return await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccess(_userService.CheckCanViewPublication)
+            .OnSuccess(userService.CheckCanViewPublication)
             .OnSuccess(async () =>
             {
-                return (await _contentDbContext
+                return (await contentDbContext
                     .UserPublicationRoles
                     .Include(userPublicationRole => userPublicationRole.Publication)
                     .Include(userPublicationRole => userPublicationRole.User)
@@ -395,12 +367,12 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => _contentPersistenceHelper.CheckEntityExists<User>(userId))
+            .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
             .OnSuccess(async () =>
             {
-                var allReleaseRoles = await _contentDbContext.UserReleaseRoles
+                var allReleaseRoles = await contentDbContext.UserReleaseRoles
                     .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
                     .ThenInclude(releaseVersion => releaseVersion.Release)
                     .ThenInclude(release => release.Publication)
@@ -410,7 +382,7 @@ public class UserRoleService : IUserRoleService
                 var latestReleaseRoles = await allReleaseRoles
                     .ToAsyncEnumerable()
                     .WhereAwait(async userReleaseRole =>
-                        await _releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
+                    await releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
                     .OrderBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Title)
                     .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Year)
                     .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.TimePeriodCoverage)
@@ -429,17 +401,16 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
+            .OnSuccess(() => contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
             .OnSuccessVoid(async role =>
             {
-                _contentDbContext.Remove(role);
-                await _contentDbContext.SaveChangesAsync();
+                await userPublicationRoleAndInviteManager.RemoveRoleAndInvite(role);
 
                 var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForPublicationRole(role.Role);
 
-                await _usersAndRolesPersistenceHelper
+                await usersAndRolesPersistenceHelper
                     .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
                     .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
             });
@@ -447,7 +418,7 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
     {
-        return await _contentPersistenceHelper
+        return await contentPersistenceHelper
             .CheckEntityExists<UserReleaseRole>(userReleaseRoleId, query => query
                 .Include(userReleaseRole => userReleaseRole.User)
                 .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
@@ -455,19 +426,15 @@ public class UserRoleService : IUserRoleService
                 .ThenInclude(release => release.Publication))
             .OnSuccess(async userReleaseRole =>
             {
-                return await _userService
+                return await userService
                     .CheckCanUpdateReleaseRole(userReleaseRole.ReleaseVersion.Release.Publication, userReleaseRole.Role)
                     .OnSuccessVoid(async () =>
                     {
-                        await _userReleaseInviteRepository.Remove(
-                            userReleaseRole.ReleaseVersion.Id, userReleaseRole.User.Email, userReleaseRole.Role);
-
-                        await _userReleaseRoleRepository.Remove(userReleaseRole,
-                            deletedById: _userService.GetUserId());
+                        await userReleaseRoleAndInviteManager.RemoveRoleAndInvite(userReleaseRole);
 
                         var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
 
-                        await _usersAndRolesPersistenceHelper
+                        await usersAndRolesPersistenceHelper
                             .CheckEntityExists<ApplicationUser, string>(userReleaseRole.UserId.ToString())
                             .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
                     });
@@ -476,45 +443,39 @@ public class UserRoleService : IUserRoleService
 
     public async Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId)
     {
-        return await _userService.CheckCanManageAllUsers()
+        return await userService.CheckCanManageAllUsers()
             .OnSuccess(async _ =>
             {
-                return await _contentPersistenceHelper
+                return await contentPersistenceHelper
                     .CheckEntityExists<User>(userId)
                     .OnSuccess(async _ =>
                     {
                         var userReleaseRoles =
-                            await _contentDbContext.UserReleaseRoles.Where(urr => urr.UserId == userId)
-                                .ToListAsync();
+                        await contentDbContext.UserReleaseRoles.Where(urr => urr.UserId == userId)
+                            .ToListAsync();
 
                         if (userReleaseRoles.Any())
                         {
-                            await _userReleaseRoleRepository.RemoveMany(
-                                userReleaseRoles,
-                                deletedById: _userService.GetUserId()
-                            );
+                            await userReleaseRoleAndInviteManager.RemoveRolesAndInvites(userReleaseRoles);
                         }
 
                         var userPublicationRoles =
-                            await _contentDbContext.UserPublicationRoles
-                                .Where(upr => upr.UserId == userId)
-                                .ToListAsync();
+                        await contentDbContext.UserPublicationRoles
+                            .Where(upr => upr.UserId == userId)
+                            .ToListAsync();
 
                         if (userPublicationRoles.Any())
                         {
-                            await _userPublicationRoleRepository.RemoveMany(
-                                userPublicationRoles,
-                                deletedById: _userService.GetUserId()
-                            );
+                            await userPublicationRoleAndInviteManager.RemoveRolesAndInvites(userPublicationRoles);
                         }
 
-                        await _usersAndRolesPersistenceHelper
+                        await usersAndRolesPersistenceHelper
                             .CheckEntityExists<ApplicationUser, string>(userId.ToString())
                             .OnSuccessDo(async user =>
                             {
-                                var existingRoleNames = await _identityUserManager.GetRolesAsync(user) ?? new List<string>();
+                                var existingRoleNames = await identityUserManager.GetRolesAsync(user) ?? new List<string>();
 
-                                await _identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
+                                await identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
                             });
 
                         return Unit.Instance;
@@ -526,7 +487,7 @@ public class UserRoleService : IUserRoleService
         Guid publicationId,
         PublicationRole role)
     {
-        if (await _userPublicationRoleRepository.UserHasRoleOnPublication(userId, publicationId, role))
+        if (await userPublicationRoleAndInviteManager.UserHasRoleOnPublication(userId, publicationId, role))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }
@@ -539,7 +500,7 @@ public class UserRoleService : IUserRoleService
         Guid releaseVersionId,
         ReleaseRole role)
     {
-        if (await _userReleaseRoleRepository.HasUserReleaseRole(userId, releaseVersionId, role))
+        if (await userReleaseRoleAndInviteManager.HasUserReleaseRole(userId, releaseVersionId, role))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }

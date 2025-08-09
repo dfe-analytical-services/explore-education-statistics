@@ -185,12 +185,20 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         ContentDbContext contentDbContext,
         IPreReleaseService? preReleaseService = null)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         return new ViewSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserPublicationRoleRepository(contentDbContext),
-                preReleaseService ?? new PreReleaseService(
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
+                    userRepository: userRepository),
+                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                    userRepository: userRepository),
+                preReleaseService: preReleaseService ?? new PreReleaseService(
                     new PreReleaseAccessOptions
                     {
                         AccessWindow = new AccessWindowOptions

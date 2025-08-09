@@ -29,11 +29,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             // Assert that no users can delete the first version of a release
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    Version = 0
-                });
+                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 0 });
         }
 
         [Fact]
@@ -42,11 +38,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             // Assert that no users can delete an amendment release version that is approved
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    Version = 1
-                });
+                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Approved, Version = 1 });
         }
 
         [Fact]
@@ -55,11 +47,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release version that is not yet approved
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    Version = 1
-                },
+                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 1 },
                 DeleteAllReleaseAmendments);
         }
     }
@@ -71,10 +59,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             var releaseVersion = new ReleaseVersion
             {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                },
+                Publication = new Publication { Id = Guid.NewGuid() },
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Version = 0
             };
@@ -90,10 +75,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             var releaseVersion = new ReleaseVersion
             {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                },
+                Publication = new Publication { Id = Guid.NewGuid() },
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
                 Version = 1
             };
@@ -109,10 +91,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             var releaseVersion = new ReleaseVersion
             {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                },
+                Publication = new Publication { Id = Guid.NewGuid() },
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Version = 1
             };
@@ -141,10 +120,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                 CreateHandler,
                 new ReleaseVersion
                 {
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    },
+                    Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     Version = 0
                 });
@@ -158,10 +134,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                 CreateHandler,
                 new ReleaseVersion
                 {
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    },
+                    Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     Version = 1
                 });
@@ -175,10 +148,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                 CreateHandler,
                 new ReleaseVersion
                 {
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    },
+                    Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     Version = 1
                 });
@@ -187,11 +157,23 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
 
     private static DeleteSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
+        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+            contentDbContext,
+            new UserReleaseInviteRepository(contentDbContext),
+            userRepository);
+
+        var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
+            contentDbContext,
+            new UserPublicationInviteRepository(contentDbContext),
+            userRepository);
+
         return new DeleteSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict)));
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

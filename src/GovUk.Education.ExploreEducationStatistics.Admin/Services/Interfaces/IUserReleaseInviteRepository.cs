@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -22,10 +23,6 @@ public interface IUserReleaseInviteRepository
         Guid createdById,
         DateTime? createdDate = null);
 
-    Task Remove(Guid releaseVersionId,
-        string email,
-        ReleaseRole role);
-
     Task<bool> UserHasInvite(Guid releaseVersionId,
         string email,
         ReleaseRole role);
@@ -34,9 +31,31 @@ public interface IUserReleaseInviteRepository
         string email,
         ReleaseRole role);
 
-    Task RemoveByPublication(Publication publication,
-        string email,
-        ReleaseRole role);
+    Task<List<UserReleaseInvite>> GetInvitesByEmail(string email);
 
-    Task<List<UserReleaseInvite>> ListByEmail(string email);
+    Task Remove(
+        Guid releaseVersionId,
+        string email,
+        ReleaseRole role,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveMany(
+        IReadOnlyList<UserReleaseInvite> userReleaseInvites,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveByPublication(
+        Guid publicationId,
+        string? email = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveByReleaseVersion(
+        Guid releaseVersionId,
+        string? email = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveByUserEmail(
+        string email,
+        CancellationToken cancellationToken = default);
 }

@@ -148,12 +148,24 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 
     private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
+        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+            contentDbContext,
+            new UserReleaseInviteRepository(contentDbContext),
+            userRepository);
+
+        var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
+            contentDbContext,
+            new UserPublicationInviteRepository(contentDbContext),
+            userRepository);
+
         return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict))
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict))
         );
     }
 }

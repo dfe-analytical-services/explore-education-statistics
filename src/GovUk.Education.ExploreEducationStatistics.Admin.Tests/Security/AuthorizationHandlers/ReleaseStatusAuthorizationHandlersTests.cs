@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -12,12 +8,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseVersionAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
@@ -35,7 +34,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task ClaimSuccess_MarkAllReleasesAsDraft_ReleaseUnpublished()
         {
             await AssertClaimSucceedsWhenReleaseUnpublished<MarkReleaseAsDraftRequirement>(
-                BuildMarkReleaseAsDraftHandler,
+            CreateHandler,
                 MarkAllReleasesAsDraft
             );
         }
@@ -44,7 +43,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllClaimsFail_ReleasePublishing()
         {
             await AssertAllClaimsFailWhenReleasePublishing<MarkReleaseAsDraftRequirement>(
-                BuildMarkReleaseAsDraftHandler
+            CreateHandler
             );
         }
 
@@ -52,7 +51,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllClaimsFail_ReleasePublished()
         {
             await AssertAllClaimsFailWhenReleasePublished<MarkReleaseAsDraftRequirement>(
-                BuildMarkReleaseAsDraftHandler
+            CreateHandler
             );
         }
 
@@ -93,7 +92,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 ReleaseRole.Contributor,
@@ -111,7 +110,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 ReleaseRole.Approver
@@ -158,7 +157,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 Owner,
@@ -177,7 +176,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 Allower
@@ -191,7 +190,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllRolesFail_ReleasePublishing()
         {
             await AssertAllRolesFailWhenReleasePublishing<MarkReleaseAsDraftRequirement>(
-                BuildMarkReleaseAsDraftHandler
+            CreateHandler
             );
         }
 
@@ -199,18 +198,29 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllRolesFail_ReleasePublished()
         {
             await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsDraftRequirement>(
-                BuildMarkReleaseAsDraftHandler
+            CreateHandler
             );
         }
 
         private static MarkReleaseAsDraftAuthorizationHandler CreateHandler(
-            Mock<IReleasePublishingStatusRepository> releaseStatusRepository,
-            ContentDbContext context)
+        ContentDbContext context,
+        IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
-            return BuildMarkReleaseAsDraftHandler(
-                releaseStatusRepository.Object,
-                new UserPublicationRoleRepository(context),
-                new UserReleaseRoleRepository(context));
+            var userRepository = new UserRepository(context);
+
+            return new MarkReleaseAsDraftAuthorizationHandler(
+                releasePublishingStatusRepository: releasePublishingStatusRepository,
+                new AuthorizationHandlerService(
+                    releaseVersionRepository: new ReleaseVersionRepository(context),
+                    userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                        contentDbContext: context,
+                        userPublicationInviteRepository: new UserPublicationInviteRepository(context),
+                        userRepository: userRepository),
+                    userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                        contentDbContext: context,
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                        userRepository: userRepository),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 
@@ -220,7 +230,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task ClaimSuccess_SubmitAllReleasesToHigherReview_ReleaseUnpublished()
         {
             await AssertClaimSucceedsWhenReleaseUnpublished<MarkReleaseAsHigherLevelReviewRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler,
+            CreateHandler,
                 SubmitAllReleasesToHigherReview
             );
         }
@@ -229,7 +239,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllClaimsFail_ReleasePublishing()
         {
             await AssertAllClaimsFailWhenReleasePublishing<MarkReleaseAsHigherLevelReviewRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler
+            CreateHandler
             );
         }
 
@@ -237,7 +247,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllClaimsFail_ReleasePublished()
         {
             await AssertAllClaimsFailWhenReleasePublished<MarkReleaseAsHigherLevelReviewRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler
+            CreateHandler
             );
         }
 
@@ -278,7 +288,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 ReleaseRole.Contributor,
@@ -296,7 +306,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 ReleaseRole.Approver
@@ -343,7 +353,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 Owner,
@@ -361,7 +371,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                     context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
-                                    return CreateHandler(releaseStatusRepository, context);
+                                    return CreateHandler(context, releaseStatusRepository.Object);
                                 },
                                 releaseVersion,
                                 Allower
@@ -375,7 +385,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllRolesFail_ReleasePublishing()
         {
             await AssertAllRolesFailWhenReleasePublishing<MarkReleaseAsHigherLevelReviewRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler
+            CreateHandler
             );
         }
 
@@ -383,18 +393,29 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllRolesFail_ReleasePublished()
         {
             await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsHigherLevelReviewRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler
+            CreateHandler
             );
         }
 
         private static MarkReleaseAsHigherLevelReviewAuthorizationHandler CreateHandler(
-            Mock<IReleasePublishingStatusRepository> releaseStatusRepository,
-            ContentDbContext context)
+        ContentDbContext context,
+        IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
-            return BuildMarkReleaseAsHigherLevelReviewHandler(
-                releaseStatusRepository.Object,
-                new UserPublicationRoleRepository(context),
-                new UserReleaseRoleRepository(context));
+            var userRepository = new UserRepository(context);
+
+            return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
+                releasePublishingStatusRepository: releasePublishingStatusRepository,
+                new AuthorizationHandlerService(
+                    releaseVersionRepository: new ReleaseVersionRepository(context),
+                    userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                        contentDbContext: context,
+                        userPublicationInviteRepository: new UserPublicationInviteRepository(context),
+                        userRepository: userRepository),
+                    userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                        contentDbContext: context,
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                        userRepository: userRepository),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 
@@ -404,7 +425,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task ClaimSuccess_ApproveAllReleases_ReleaseUnpublished()
         {
             await AssertClaimSucceedsWhenReleaseUnpublished<MarkReleaseAsApprovedRequirement>(
-                BuildMarkReleaseAsApprovedHandler,
+            CreateHandler,
                 ApproveAllReleases
             );
         }
@@ -413,7 +434,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllClaimsFail_ReleasePublishing()
         {
             await AssertAllClaimsFailWhenReleasePublishing<MarkReleaseAsApprovedRequirement>(
-                BuildMarkReleaseAsApprovedHandler
+            CreateHandler
             );
         }
 
@@ -421,7 +442,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllClaimsFail_ReleasePublished()
         {
             await AssertAllClaimsFailWhenReleasePublished<MarkReleaseAsApprovedRequirement>(
-                BuildMarkReleaseAsApprovedHandler
+            CreateHandler
             );
         }
 
@@ -459,7 +480,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
-                                return CreateHandler(releaseStatusRepository, context);
+                                return CreateHandler(context, releaseStatusRepository.Object);
                             },
                             releaseVersion,
                             ReleaseRole.Approver
@@ -503,7 +524,9 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
-                                return CreateHandler(releaseStatusRepository, context);
+                                var userRepository = new UserRepository(context);
+
+                                return CreateHandler(context, releaseStatusRepository.Object);
                             },
                             releaseVersion,
                             Allower
@@ -516,7 +539,7 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllRolesFail_ReleasePublishing()
         {
             await AssertAllRolesFailWhenReleasePublishing<MarkReleaseAsApprovedRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler
+            CreateHandler
             );
         }
 
@@ -524,25 +547,34 @@ public class ReleaseStatusAuthorizationHandlersTests
         public async Task AllRolesFail_ReleasePublished()
         {
             await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsApprovedRequirement>(
-                BuildMarkReleaseAsHigherLevelReviewHandler
+            CreateHandler
             );
         }
 
         private static MarkReleaseAsApprovedAuthorizationHandler CreateHandler(
-            Mock<IReleasePublishingStatusRepository> releaseStatusRepository,
-            ContentDbContext context)
+        ContentDbContext context,
+        IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
-            return BuildMarkReleaseAsApprovedHandler(
-                releaseStatusRepository.Object,
-                new UserPublicationRoleRepository(context),
-                new UserReleaseRoleRepository(context)
-            );
+            var userRepository = new UserRepository(context);
+
+            return new MarkReleaseAsApprovedAuthorizationHandler(
+                releasePublishingStatusRepository: releasePublishingStatusRepository,
+                new AuthorizationHandlerService(
+                    releaseVersionRepository: new ReleaseVersionRepository(context),
+                    userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                        contentDbContext: context,
+                        userPublicationInviteRepository: new UserPublicationInviteRepository(context),
+                        userRepository: userRepository),
+                    userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                        contentDbContext: context,
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                        userRepository: userRepository),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 
     private static async Task AssertClaimSucceedsWhenReleaseUnpublished<TRequirement>(
-        Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
-            IAuthorizationHandler> authorizationHandler,
+    Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier,
         params SecurityClaimTypes[] claims)
         where TRequirement : IAuthorizationRequirement
     {
@@ -576,9 +608,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion,
                         claims
@@ -588,8 +618,7 @@ public class ReleaseStatusAuthorizationHandlersTests
     }
 
     private static async Task AssertAllClaimsFailWhenReleasePublishing<TRequirement>(
-        Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
-            IAuthorizationHandler> authorizationHandler)
+    Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier)
         where TRequirement : IAuthorizationRequirement
     {
         await GetEnums<ReleaseApprovalStatus>()
@@ -623,9 +652,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion
                     );
@@ -634,8 +661,7 @@ public class ReleaseStatusAuthorizationHandlersTests
     }
 
     private static async Task AssertAllClaimsFailWhenReleasePublished<TRequirement>(
-        Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
-            IAuthorizationHandler> authorizationHandler)
+    Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier)
         where TRequirement : IAuthorizationRequirement
     {
         await GetEnums<ReleaseApprovalStatus>()
@@ -668,9 +694,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion
                     );
@@ -679,8 +703,7 @@ public class ReleaseStatusAuthorizationHandlersTests
     }
 
     private static async Task AssertAllRolesFailWhenReleasePublishing<TRequirement>(
-        Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
-            IAuthorizationHandler> authorizationHandler)
+    Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier)
         where TRequirement : IAuthorizationRequirement
     {
         await GetEnums<ReleaseApprovalStatus>()
@@ -714,9 +737,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion
                     );
@@ -727,9 +748,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion
                     );
@@ -738,8 +757,7 @@ public class ReleaseStatusAuthorizationHandlersTests
     }
 
     private static async Task AssertAllRolesFailWhenReleasePublished<TRequirement>(
-        Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
-            IAuthorizationHandler> authorizationHandler)
+    Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier)
         where TRequirement : IAuthorizationRequirement
     {
         await GetEnums<ReleaseApprovalStatus>()
@@ -772,9 +790,9 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            var userRepository = new UserRepository(context);
+
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion
                     );
@@ -785,55 +803,13 @@ public class ReleaseStatusAuthorizationHandlersTests
                             context.ReleaseVersions.Add(releaseVersion);
                             context.SaveChanges();
 
-                            return authorizationHandler(releaseStatusRepository.Object,
-                                new UserPublicationRoleRepository(context),
-                                new UserReleaseRoleRepository(context));
+                            var userRepository = new UserRepository(context);
+
+                            return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
                         },
                         releaseVersion
                     );
                 }
             );
-    }
-
-    private static MarkReleaseAsDraftAuthorizationHandler BuildMarkReleaseAsDraftHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        IUserPublicationRoleRepository userPublicationRoleRepository,
-        IUserReleaseRoleRepository userReleaseRoleRepository)
-    {
-        return new MarkReleaseAsDraftAuthorizationHandler(
-            releasePublishingStatusRepository,
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleRepository,
-                userPublicationRoleRepository,
-                Mock.Of<IPreReleaseService>(Strict)));
-    }
-
-    private static MarkReleaseAsHigherLevelReviewAuthorizationHandler BuildMarkReleaseAsHigherLevelReviewHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        IUserPublicationRoleRepository userPublicationRoleRepository,
-        IUserReleaseRoleRepository userReleaseRoleRepository)
-    {
-        return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-            releasePublishingStatusRepository,
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleRepository,
-                userPublicationRoleRepository,
-                Mock.Of<IPreReleaseService>(Strict)));
-    }
-
-    private static MarkReleaseAsApprovedAuthorizationHandler BuildMarkReleaseAsApprovedHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        IUserPublicationRoleRepository userPublicationRoleRepository,
-        IUserReleaseRoleRepository userReleaseRoleRepository)
-    {
-        return new MarkReleaseAsApprovedAuthorizationHandler(
-            releasePublishingStatusRepository,
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleRepository,
-                userPublicationRoleRepository,
-                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

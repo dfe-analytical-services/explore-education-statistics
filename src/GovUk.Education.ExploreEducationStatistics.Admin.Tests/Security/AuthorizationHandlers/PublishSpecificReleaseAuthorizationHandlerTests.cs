@@ -30,11 +30,7 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
             // Assert that no claims will allow a draft release version to be published
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    ApprovalStatus = Draft
-                }
+                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Draft }
             );
         }
 
@@ -44,11 +40,7 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
             // Assert that the PublishAllReleases claim will allow an approved release version to be published
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    ApprovalStatus = Approved
-                },
+                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Approved },
                 PublishAllReleases
             );
         }
@@ -62,11 +54,7 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
             // Assert that no User Release roles will allow a draft release version to be published
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    ApprovalStatus = Draft
-                }
+                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Draft }
             );
         }
 
@@ -76,22 +64,30 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
             // Assert that only the Approver User Release role will allow an approved release version to be published
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    ApprovalStatus = Approved
-                },
+                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Approved },
                 Approver);
         }
     }
 
     private static PublishSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
+        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+            contentDbContext,
+            new UserReleaseInviteRepository(contentDbContext),
+            userRepository);
+
+        var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
+            contentDbContext,
+            new UserPublicationInviteRepository(contentDbContext),
+            userRepository);
+
         return new PublishSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict)));
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

@@ -163,13 +163,19 @@ public class ReleasePermissionServicePermissionTests
         ContentDbContext contentDbContext,
         IUserService userService)
     {
-        return new(
+        var userRepository = new UserRepository(contentDbContext);
+
+        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
             contentDbContext,
-            new PersistenceHelper<ContentDbContext>(contentDbContext),
-            new ReleaseVersionRepository(contentDbContext),
-            new UserReleaseRoleRepository(contentDbContext),
             new UserReleaseInviteRepository(contentDbContext),
-            userService
+            userRepository);
+
+        return new(
+            contentDbContext: contentDbContext,
+            persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
+            releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+            userService: userService
         );
     }
 }

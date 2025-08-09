@@ -62,9 +62,12 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
     {
         return new UpdateReleaseRoleAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict)));
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                    userRepository: new UserRepository(contentDbContext)),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

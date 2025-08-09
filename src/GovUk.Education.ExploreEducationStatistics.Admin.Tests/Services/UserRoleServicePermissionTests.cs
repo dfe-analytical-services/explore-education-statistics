@@ -236,9 +236,8 @@ public class UserRoleServicePermissionTests
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IEmailTemplateService? emailTemplateService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
+        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null)
     {
@@ -253,9 +252,8 @@ public class UserRoleServicePermissionTests
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
             userService ?? Mock.Of<IUserService>(),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
-            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
+            userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(),
+            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(),
             userManager ?? MockUserManager().Object);
     }
 }

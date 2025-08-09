@@ -153,14 +153,28 @@ public class UserManagementServicePermissionTests
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IEmailTemplateService? emailTemplateService = null,
         IUserRoleService? userRoleService = null,
+        IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserInviteRepository? userInviteRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserPublicationInviteRepository? userPublicationInviteRepository = null,
+        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
         UserManager<ApplicationUser>? userManager = null)
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+        userRepository ??= new UserRepository(contentDbContext);
+
+        userReleaseRoleAndInviteManager ??= new UserReleaseRoleAndInviteManager(
+            contentDbContext,
+            new UserReleaseInviteRepository(contentDbContext),
+            userRepository);
+
+        userPublicationRoleAndInviteManager ??= new UserPublicationRoleAndInviteManager(
+            contentDbContext,
+            new UserPublicationInviteRepository(contentDbContext),
+            userRepository);
 
         return new UserManagementService(
             usersAndRolesDbContext,
@@ -168,10 +182,13 @@ public class UserManagementServicePermissionTests
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
+            userRepository,
             userService ?? AlwaysTrueUserService().Object,
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
             userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
             userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
+            userReleaseRoleAndInviteManager,
+            userPublicationRoleAndInviteManager,
             userManager ?? MockUserManager().Object
         );
     }

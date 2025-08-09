@@ -51,10 +51,7 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         {
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseStatusHistoryRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Publication = new Publication()
-                },
+                new ReleaseVersion { Publication = new Publication() },
                 PublicationRole.Owner,
                 PublicationRole.Allower
             );
@@ -63,11 +60,19 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
 
     private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         return new ViewReleaseStatusHistoryAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict)));
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
+                    userRepository: userRepository),
+                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                    userRepository: userRepository),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }
