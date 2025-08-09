@@ -7,7 +7,6 @@ import TableHeadersForm from '@common/modules/table-tool/components/TableHeaders
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import TableToolShare from '@frontend/modules/table-tool/components/TableToolShare';
-import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import publicationService from '@common/services/publicationService';
@@ -16,7 +15,7 @@ import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React, { memo, ReactNode, useRef } from 'react';
+import React, { memo, useRef } from 'react';
 
 interface TableToolFinalStepProps {
   query: ReleaseTableDataQuery;
@@ -43,27 +42,6 @@ const TableToolFinalStep = ({
   );
 
   const publication = fullPublication?.publication;
-
-  const getMethodologyLinks = () => {
-    const links: ReactNode[] =
-      publication?.methodologies?.map(methodology => (
-        <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
-          {methodology.title}
-        </Link>
-      )) ?? [];
-
-    if (publication?.externalMethodology) {
-      links.push(
-        <Link
-          key={publication.externalMethodology.url}
-          to={publication.externalMethodology.url}
-        >
-          {publication.externalMethodology.title}
-        </Link>,
-      );
-    }
-    return links;
-  };
 
   return (
     <div
@@ -184,19 +162,6 @@ const TableToolFinalStep = ({
           />
         </>
       )}
-
-      <TableToolInfo
-        contactDetails={publication?.contact}
-        methodologyLinks={getMethodologyLinks()}
-        releaseLink={
-          <Link
-            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
-          >
-            {`${selectedPublication.title}, ${selectedPublication.latestRelease.title}`}
-          </Link>
-        }
-        releaseType={selectedPublication.selectedRelease.type}
-      />
     </div>
   );
 };

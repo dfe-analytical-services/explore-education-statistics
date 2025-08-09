@@ -12,15 +12,20 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import publicationService, { Theme } from '@common/services/publicationService';
+import publicationService, {
+  ReleaseVersion,
+  Theme,
+} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
+import PublicTableToolInfo from './components/PublicTableToolInfo';
 
 const defaultPageTitle = 'Create your own tables';
 
@@ -32,6 +37,7 @@ export interface TableToolPageProps {
   fastTrack?: FastTrackTable;
   featuredTables?: FeaturedTable[];
   selectedPublication?: SelectedPublication;
+  fullPublication?: ReleaseVersion;
   selectedSubjectId?: string;
   subjects?: Subject[];
   subjectMeta?: SubjectMeta;
@@ -42,6 +48,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   fastTrack,
   featuredTables = [],
   selectedPublication,
+  fullPublication,
   selectedSubjectId,
   subjects,
   subjectMeta,
@@ -155,6 +162,47 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
     selectedPublication,
   ]);
 
+  const tableToolInfo: ReactNode = useMemo(() => {
+    if (!selectedPublication || !fullPublication) return null;
+
+    const { publication } = fullPublication;
+    const getMethodologyLinks = () => {
+      const links: ReactNode[] =
+        publication?.methodologies?.map(methodology => (
+          <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
+            {methodology.title}
+          </Link>
+        )) ?? [];
+
+      if (publication?.externalMethodology) {
+        links.push(
+          <Link
+            key={publication.externalMethodology.url}
+            to={publication.externalMethodology.url}
+          >
+            {publication.externalMethodology.title}
+          </Link>,
+        );
+      }
+      return links;
+    };
+
+    return (
+      <TableToolInfo
+        contactDetails={publication?.contact}
+        methodologyLinks={getMethodologyLinks()}
+        releaseLink={
+          <Link
+            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
+          >
+            {`${selectedPublication.title}, ${selectedPublication.latestRelease.title}`}
+          </Link>
+        }
+        releaseType={selectedPublication.selectedRelease.type}
+      />
+    );
+  }, [fullPublication, selectedPublication]);
+
   return (
     <Page
       // Don't include the default meta title after intitial step to prevent too much screen reader noise.
@@ -199,6 +247,12 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {featuredTable.name}
           </Link>
         )}
+        afterStep={
+          <PublicTableToolInfo
+            selectedPublication={selectedPublication}
+            fullPublication={fullPublication}
+          />
+        }
         currentStep={currentStep}
         finalStep={({
           query,
@@ -343,9 +397,10 @@ export const getServerSideProps: GetServerSideProps<
           releaseSlug,
         );
 
-  const [subjects, featuredTables] = await Promise.all([
+  const [subjects, featuredTables, fullPublication] = await Promise.all([
     tableBuilderService.listReleaseSubjects(selectedRelease.id),
     tableBuilderService.listReleaseFeaturedTables(selectedRelease.id),
+    publicationService.getLatestPublicationRelease(publicationSlug),
   ]);
 
   if (subjectId && subjects.some(subject => subject.id === subjectId)) {
@@ -357,7 +412,7 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         featuredTables,
-
+        fullPublication,
         selectedPublication: {
           ...selectedPublication,
           selectedRelease: {
@@ -383,6 +438,7 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       themeMeta,
+      fullPublication,
       selectedPublication: {
         ...selectedPublication,
         selectedRelease: {
