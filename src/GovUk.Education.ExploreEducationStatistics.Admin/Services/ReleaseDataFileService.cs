@@ -439,11 +439,9 @@ public class ReleaseDataFileService(
             MetaFile = metaFile,
         };
 
-        var validationResult = await dataSetValidator.ValidateDataSet(dataSet);
-
-        return validationResult.IsLeft
-            ? ValidationUtils.ValidationResult(validationResult.Left)
-            : validationResult.Right;
+        return (await dataSetValidator.ValidateDataSet(dataSet))
+            .OnFailure<ActionResult>(errors => ValidationUtils.ValidationResult(errors))
+            .OnSuccess(ds => ds);
     }
 
     private async Task<Either<ActionResult, List<DataSet>>> ValidateBulkDataSetZip(

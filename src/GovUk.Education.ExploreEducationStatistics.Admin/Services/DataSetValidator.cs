@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -179,6 +178,10 @@ public class DataSetValidator(
         return errors;
     }
 
+    /// <summary>
+    /// Retrieve a replacement <see cref="File" /> for the specified release version and data set name, if it exists.
+    /// </summary>
+    /// <returns>The replacement <see cref="File" /> if present, or an error model if multiple results were found. The latter indicates a replacement is currently in progress and should halt further processing.</returns>
     private async Task<Either<ErrorViewModel, File?>> GetReplacingFileIfExists(
         Guid releaseVersionId,
         string dataSetName)
