@@ -25,6 +25,4 @@ public class UserReleaseInvite : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     public User CreatedBy { get; set; } = null!;
 
     public Guid CreatedById { get; set; }
-
-    public bool SoftDeleted { get; set; }
 }

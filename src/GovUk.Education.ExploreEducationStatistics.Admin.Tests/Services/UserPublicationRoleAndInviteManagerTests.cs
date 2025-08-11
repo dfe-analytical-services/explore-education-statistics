@@ -352,12 +352,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
     {
         [Theory]
         // Valid roles
-        [InlineData(PublicationRole.Allower, true)]
-        [InlineData(PublicationRole.Allower, false)]
+        [InlineData(PublicationRole.Allower)]
+        [InlineData(PublicationRole.Owner)]
         // Invalid roles
-        [InlineData(PublicationRole.Approver, true)]
-        [InlineData(PublicationRole.Approver, false)]
-        public async Task Success(PublicationRole publicationRole, bool ignoreQueryFilters)
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task Success(PublicationRole publicationRole)
         {
             var email = "test@test.com";
 
@@ -407,11 +407,6 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             {
                 var query = contentDbContext.UserPublicationRoles.AsQueryable();
 
-                if (ignoreQueryFilters)
-                {
-                    query = query.IgnoreQueryFilters();
-                }
-
                 var updatedPublicationRole = query
                     .SingleOrDefault(urr => urr.Id == userPublicationRole.Id);
 
@@ -422,10 +417,8 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
     public class RemoveRolesAndInvitesTests : UserPublicationRoleAndInviteManagerTests
     {
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task Success(bool ignoreQueryFilters)
+        [Fact]
+        public async Task Success()
         {
             var user1 = new User { Email = "test1@test.com" };
             var publication1 = _fixture.DefaultPublication()
@@ -504,11 +497,6 @@ public abstract class UserPublicationRoleAndInviteManagerTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var userPublicationRolesQuery = contentDbContext.UserPublicationRoles.AsQueryable();
-
-                if (ignoreQueryFilters)
-                {
-                    userPublicationRolesQuery = userPublicationRolesQuery.IgnoreQueryFilters();
-                }
 
                 var userPublicationRole = await userPublicationRolesQuery
                     .SingleAsync();

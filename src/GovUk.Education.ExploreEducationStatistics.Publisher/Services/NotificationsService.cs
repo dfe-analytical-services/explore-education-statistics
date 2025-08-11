@@ -52,9 +52,7 @@ public class NotificationsService(
                 var publicationRoles = await context
                     .UserPublicationRoles
                     .Include(upr => upr.User)
-                    .Where(upr =>
-                        upr.PublicationId == releaseVersion.Release.PublicationId
-                        && upr.Deleted == null)
+                    .Where(upr => upr.PublicationId == releaseVersion.Release.PublicationId)
                     .ToListAsync();
 
                 return publicationRoles

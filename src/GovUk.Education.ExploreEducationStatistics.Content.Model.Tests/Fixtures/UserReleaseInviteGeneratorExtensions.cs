@@ -39,11 +39,6 @@ public static class UserReleaseInviteGeneratorExtensions
         bool emailSent)
         => generator.ForInstance(s => s.SetEmailSent(emailSent));
 
-    public static Generator<UserReleaseInvite> WithSoftDeleted(
-        this Generator<UserReleaseInvite> generator,
-        bool softDeleted)
-        => generator.ForInstance(s => s.SetSoftDeleted(softDeleted));
-
     public static Generator<UserReleaseInvite> WithCreatedById(
         this Generator<UserReleaseInvite> generator,
         Guid createdById)
@@ -80,11 +75,6 @@ public static class UserReleaseInviteGeneratorExtensions
         this InstanceSetters<UserReleaseInvite> setters,
         bool emailSent)
         => setters.Set(uri => uri.EmailSent, emailSent);
-
-    public static InstanceSetters<UserReleaseInvite> SetSoftDeleted(
-        this InstanceSetters<UserReleaseInvite> setters,
-        bool softDeleted)
-        => setters.Set(uri => uri.SoftDeleted, softDeleted);
 
     public static InstanceSetters<UserReleaseInvite> SetCreatedById(
         this InstanceSetters<UserReleaseInvite> setters,

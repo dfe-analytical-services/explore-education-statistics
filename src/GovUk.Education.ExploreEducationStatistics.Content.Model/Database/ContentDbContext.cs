@@ -729,7 +729,7 @@ public class ContentDbContext : DbContext
         };
 
         modelBuilder.Entity<UserPublicationRole>()
-            .HasQueryFilter(upr => upr.Deleted == null && !unusedRoles.Contains(upr.Role));
+            .HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)
@@ -743,11 +743,6 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<UserReleaseRole>()
             .Property(r => r.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder.Entity<UserReleaseRole>()
-            .HasQueryFilter(r =>
-                !r.SoftDeleted
-                && r.Deleted == null);
     }
 
     private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
@@ -755,9 +750,6 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<UserReleaseInvite>()
             .Property(r => r.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder.Entity<UserReleaseInvite>()
-            .HasQueryFilter(r => !r.SoftDeleted);
 
         modelBuilder.Entity<UserReleaseInvite>()
             .Property(invite => invite.Created)

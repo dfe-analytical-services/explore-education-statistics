@@ -348,20 +348,11 @@ public abstract class NotificationsServiceTests
                     .Generate(1))
                 .Generate();
 
-            var publicationOwner = _dataFixture
-                .DefaultUserPublicationRole()
-                .WithPublication(publication)
-                .WithRole(PublicationRole.Owner)
-                .WithUser(new User { Email = "publication-owner@example.com" })
-                .WithDeleted(DateTime.UtcNow)
-                .Generate();
-
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.AddRange(publication);
-                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
                 await contentDbContext.SaveChangesAsync();
             }
 

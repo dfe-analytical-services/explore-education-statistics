@@ -329,7 +329,6 @@ public class ReleasePermissionServiceTests
             User = user3,
             ReleaseVersion = release2.Versions[0],
             Role = Contributor,
-            Deleted = DateTime.UtcNow,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
