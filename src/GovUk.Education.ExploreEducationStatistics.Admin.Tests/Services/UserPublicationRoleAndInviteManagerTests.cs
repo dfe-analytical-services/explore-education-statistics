@@ -405,10 +405,8 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var query = contentDbContext.UserPublicationRoles.AsQueryable();
-
-                var updatedPublicationRole = query
-                    .SingleOrDefault(urr => urr.Id == userPublicationRole.Id);
+                var updatedPublicationRole = await contentDbContext.UserPublicationRoles
+                    .SingleOrDefaultAsync(urr => urr.Id == userPublicationRole.Id);
 
                 Assert.Null(updatedPublicationRole);
             }
@@ -496,9 +494,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRolesQuery = contentDbContext.UserPublicationRoles.AsQueryable();
-
-                var userPublicationRole = await userPublicationRolesQuery
+                var userPublicationRole = await contentDbContext.UserPublicationRoles
                     .SingleAsync();
 
                 Assert.Equal(userPublicationRole3.Id, userPublicationRole.Id);

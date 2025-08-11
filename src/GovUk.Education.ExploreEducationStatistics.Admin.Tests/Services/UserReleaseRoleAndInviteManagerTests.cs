@@ -718,10 +718,8 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var query = contentDbContext.UserReleaseRoles.AsQueryable();
-
-                var updatedReleaseRole = query
-                    .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
+                var updatedReleaseRole = await contentDbContext.UserReleaseRoles
+                    .SingleOrDefaultAsync(urr => urr.Id == userReleaseRole.Id);
 
                 Assert.Null(updatedReleaseRole);
             }
@@ -815,9 +813,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRolesQuery = contentDbContext.UserReleaseRoles.AsQueryable();
-
-                var userReleaseRole = await userReleaseRolesQuery
+                var userReleaseRole = await contentDbContext.UserReleaseRoles
                     .SingleAsync();
 
                 Assert.Equal(userReleaseRole3.Id, userReleaseRole.Id);
