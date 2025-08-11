@@ -20,7 +20,8 @@ public static class DuckDbConnectionExtensions
             INSERT INTO {tableName} BY NAME (
                 SELECT *
                 FROM read_json('{jsonFilePath}', 
-                    format='unstructured'
+                    format='unstructured',
+                    union_by_name='true'
                 )
              )
         ");
