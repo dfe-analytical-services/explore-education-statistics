@@ -6,6 +6,8 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { useQuery } from '@tanstack/react-query';
 import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import FormattedDate from '@common/components/FormattedDate';
+import { EducationInNumbersPage } from '@admin/services/educationInNumbersService';
 import styles from './EducationInNumbersListPage.module.scss';
 
 const EducationInNumbersListPage = () => {
@@ -35,8 +37,9 @@ const EducationInNumbersListPage = () => {
             <tr>
               <th scope="col">Title</th>
               <th scope="col">Slug</th>
+              <th scope="col">Status</th>
               <th scope="col">Published</th>
-              <th scope="col">Updated</th>
+              <th scope="col">Version</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -47,11 +50,27 @@ const EducationInNumbersListPage = () => {
                 <td data-testid="Title" className={styles.title}>
                   {page.title}
                 </td>
-                <td data-testid="Slug">{page.slug}</td>
-                <td data-testid="Published">published</td>
-                <td data-testid="Updated">updated</td>
+                <td data-testid="Slug">{page.slug ?? 'N/A'}</td>
+                <td data-testid="Status">
+                  {GetEducationInNumbersPageStatus(page)}
+                </td>
+                <td data-testid="Published">
+                  {page.published ? (
+                    <FormattedDate>{page.published}</FormattedDate>
+                  ) : (
+                    'Not yet published'
+                  )}
+                </td>
+                <td data-testid="Version">{page.version}</td>
                 <td data-testid="Actions">
                   <ButtonGroup className={styles.actions}>
+                    {page.published === undefined && page.version > 0 && (
+                      <ButtonLink
+                        to={`/education-in-numbers/${page.previousPageId}/summary`}
+                      >
+                        View currently published page
+                      </ButtonLink>
+                    )}
                     <ButtonLink to={`/education-in-numbers/${page.id}/summary`}>
                       Edit
                     </ButtonLink>
@@ -71,5 +90,12 @@ const EducationInNumbersListPage = () => {
     </Page>
   );
 };
+
+export function GetEducationInNumbersPageStatus(page: EducationInNumbersPage) {
+  if (page.published === undefined) {
+    return page.version === 0 ? 'Draft' : 'Draft amendment';
+  }
+  return 'Published';
+}
 
 export default EducationInNumbersListPage;

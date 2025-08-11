@@ -2,6 +2,7 @@ import EducationInNumbersContentPage from '@admin/pages/education-in-numbers/con
 import EducationInNumbersSummaryEditPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryEditPage';
 import EducationInNumbersSummaryPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryPage';
 import { RouteProps } from 'react-router';
+import EducationInNumbersSignOffPage from '@admin/pages/education-in-numbers/sign-off/EducationInNumbersSignOffPage';
 
 export interface EducationInNumbersRouteProps extends RouteProps {
   path: string;
@@ -29,4 +30,10 @@ export const educationInNumbersContentRoute: EducationInNumbersRouteProps = {
   path: '/education-in-numbers/:educationInNumbersPageId/content',
   title: 'Manage content',
   component: EducationInNumbersContentPage,
+};
+
+export const educationInNumbersSignOffRoute: EducationInNumbersRouteProps = {
+  path: '/education-in-numbers/:educationInNumbersPageId/sign-off',
+  title: 'Sign off',
+  component: EducationInNumbersSignOffPage,
 };

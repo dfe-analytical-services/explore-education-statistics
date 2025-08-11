@@ -168,6 +168,7 @@ public class EducationInNumbersService(
                 page.Updated = DateTime.UtcNow;
                 page.UpdatedById = userService.GetUserId();
 
+                contentDbContext.EducationInNumbersPages.Update(page);
                 await contentDbContext.SaveChangesAsync();
 
                 // @MarkFix refresh cache here?
