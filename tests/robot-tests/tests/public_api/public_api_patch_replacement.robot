@@ -71,9 +71,9 @@ User waits until the initial API data set version's status changes to "Ready"
     user waits until draft API data set status contains    Ready
 
 Check modal that blocks replacing a draft patch data set version is displayed
-    user clicks link    Back to API data sets
-    user clicks link    Data uploads
-    user reloads page
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_1_NAME}
+    user clicks link    Data and files
     user waits until page contains data uploads table
     user clicks button    Replace data    testId:Actions
     ${modal}=    user waits until modal is visible    Cannot replace data
@@ -95,6 +95,42 @@ Navigate to data replacement page
     user clicks link    Data and files
     user waits until page contains data uploads table
     user clicks link    Replace data    testId:Actions
+
+Upload replacement data that result in major API version
+    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
+    user chooses file    id:dataFileUploadForm-dataFile    ${PUBLIC_API_FILES_DIR}absence_school_major_auto.csv
+    user chooses file    id:dataFileUploadForm-metadataFile
+    ...    ${PUBLIC_API_FILES_DIR}absence_school_major_auto.meta.csv
+    user clicks button    Upload data files
+
+    user waits until page contains element    testid:Replacement Title
+    user checks table column heading contains    1    1    Original file
+    user checks table column heading contains    1    2    Replacement file
+    user checks headed table body row cell contains    Data file import status    2    Complete
+    user checks headed table body row cell contains    API data set status    2    Action required
+    ...    wait=%{WAIT_DATA_FILE_IMPORT}
+
+Verify the pending data replacement summary results in errors
+    user waits until h3 is visible    API data set Locations: OK
+    user waits until h3 is visible    API data set Filters: ERROR
+    user waits until h3 is visible    API data set has to be finalized: ERROR
+    user waits until parent contains element    id:main-content    text:Cancel data replacement
+
+Validate error summary for major versions is displayed on Api Data Set Details page
+    user clicks link    go to the API data sets tab
+    user waits until h2 is visible
+    ...    This API data set can not be published because it has major changes that are not allowed.
+    user checks element is visible    testid:cancel-replacement-link
+
+Cancel data replacement which results in major API version
+    user clicks link    Data and files
+    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
+    user clicks link    View details    testId:Actions
+    user waits until h2 is visible    Pending data replacement    %{WAIT_MEDIUM}
+    user clicks button    Cancel data replacement
+    ${modal}=    user waits until modal is visible    Cancel data replacement and remove draft API
+    user clicks button    Confirm
+    user waits until modal is not visible    Cancel data replacement and remove draft API
 
 Upload replacement data
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
@@ -119,7 +155,7 @@ Verify the pending data replacement summary
 Validate error summary is displayed on Api Data Set Details page
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
-    ...    This API data set can not be published because it has incomplete location or filter manual mapping.
+    ...    This API data set can not be published because location or filter mappings are not yet complete.
     user checks element is visible    testid:cancel-replacement-link
 
 Validate the summary contents inside the 'Latest live version details' table
@@ -269,7 +305,7 @@ Confirm finalization of this API data set version
     user waits until h2 is visible    Mappings finalised
     user waits until page contains    Draft API data set version is ready to be published
 
-Complete replacement by verifying and confirming the PUBLICATION_NAME
+Verify that API summary tags have status OK and then press 'confirm data replacement'
     user clicks link    Back to API data sets
     user clicks link    Data uploads
     user clicks link    View details    testId:Actions
@@ -279,6 +315,7 @@ Complete replacement by verifying and confirming the PUBLICATION_NAME
     user waits until parent contains element    id:main-content    text:Cancel data replacement
     user waits until parent contains element    id:main-content    text:Confirm data replacement
     user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete
 
 Navigate to 'Content' page for amendment
     user clicks link    Back

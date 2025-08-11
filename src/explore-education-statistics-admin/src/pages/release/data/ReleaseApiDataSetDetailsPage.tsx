@@ -290,7 +290,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <InsetText variant="error">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
         {incompletesFound
-          ? 'This API data set can not be published because it has incomplete location or filter manual mapping.'
+          ? 'This API data set can not be published because location or filter mappings are not yet complete.'
           : 'This API data set can not be published because it has major changes that are not allowed.'}
       </h2>
       <div className="govuk-error-summary__body">
