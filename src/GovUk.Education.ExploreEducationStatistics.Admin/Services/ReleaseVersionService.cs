@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -34,6 +29,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -262,7 +262,10 @@ public class ReleaseVersionService(
         }
 
         // We suspect this is only necessary for the unit tests, as the in-memory database doesn't perform a cascade delete
-        await DeleteRolesAndInvites(releaseVersion.Id, cancellationToken);
+        // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
+        await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersion(
+            releaseVersionId: releaseVersion.Id,
+            cancellationToken: cancellationToken);
     }
 
     private async Task SoftDeleteReleaseVersion(
@@ -272,16 +275,9 @@ public class ReleaseVersionService(
         releaseVersion.SoftDeleted = true;
         context.ReleaseVersions.Update(releaseVersion);
 
-        await DeleteRolesAndInvites(releaseVersion.Id, cancellationToken);
-    }
-
-    // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-    private async Task DeleteRolesAndInvites(
-        Guid releaseVersionId,
-        CancellationToken cancellationToken)
-    {
+        // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
         await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersion(
-            releaseVersionId: releaseVersionId,
+            releaseVersionId: releaseVersion.Id,
             cancellationToken: cancellationToken);
     }
 

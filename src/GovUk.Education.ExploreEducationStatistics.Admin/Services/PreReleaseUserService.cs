@@ -153,13 +153,12 @@ public class PreReleaseUserService(ContentDbContext context,
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
+            .OnSuccess(async () => await FindUserByEmail(email))
             .OnSuccessVoid(
-                async () =>
+                async user =>
                 {
-                    var user = await userRepository.FindByEmail(email);
-
                     await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersion(
-                        userId: user!.Id,
+                        userId: user.Id,
                         releaseVersionId: releaseVersionId,
                         rolesToInclude: ReleaseRole.PrereleaseViewer);
 
@@ -189,6 +188,15 @@ public class PreReleaseUserService(ContentDbContext context,
                     }
                 }
             );
+    }
+
+    private async Task<Either<ActionResult, User>> FindUserByEmail(string email)
+    {
+        var user = await userRepository.FindByEmail(email);
+
+        return user is null 
+            ? new NotFoundResult() 
+            : user;
     }
 
     private async Task<Either<ActionResult, PreReleaseUserViewModel>> InvitePreReleaseUser(

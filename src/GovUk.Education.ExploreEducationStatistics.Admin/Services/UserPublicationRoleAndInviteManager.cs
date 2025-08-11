@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class UserPublicationRoleAndInviteManager(
     ContentDbContext contentDbContext,
     IUserPublicationInviteRepository userPublicationInviteRepository,
-    IUserRepository userRepository) :
-    UserResourceRoleRepositoryBase<UserPublicationRole, Publication, PublicationRole>(contentDbContext, userRepository),
+    IUserRepository userRepository,
+    ILogger<UserPublicationRoleAndInviteManager> logger) :
+    UserResourceRoleRepositoryBase<UserPublicationRoleAndInviteManager, UserPublicationRole, Publication, PublicationRole>(contentDbContext, userRepository, logger),
     IUserPublicationRoleAndInviteManager
 {
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)

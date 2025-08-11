@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,10 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, TRoleEnum>(
+public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TResource, TRoleEnum>(
     ContentDbContext contentDbContext,
-    IUserRepository userRepository)
+    IUserRepository userRepository,
+    ILogger<TParent> logger)
     where TResourceRole : ResourceRole<TRoleEnum, TResource>
     where TResource : class
     where TRoleEnum : Enum
@@ -89,8 +91,14 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
 
     protected async Task<string> GetUserEmail(Guid userId, CancellationToken cancellationToken)
     {
-        return (await userRepository.FindById(userId, cancellationToken))!
-            .Email;
+        var user = await userRepository.FindById(userId, cancellationToken);
+
+        if (user is null)
+        {
+            logger.LogError($"User with ID '{userId}' was not found.");
+        }
+            
+        return user!.Email;
     }
 
     protected async Task Remove(TResourceRole resourceRole, CancellationToken cancellationToken = default)
@@ -101,7 +109,7 @@ public abstract class UserResourceRoleRepositoryBase<TResourceRole, TResource, T
     }
 
     protected async Task RemoveMany(
-        IEnumerable<TResourceRole> resourceRoles,
+        IReadOnlyList<TResourceRole> resourceRoles,
         CancellationToken cancellationToken = default)
     {
         if (!resourceRoles.Any())

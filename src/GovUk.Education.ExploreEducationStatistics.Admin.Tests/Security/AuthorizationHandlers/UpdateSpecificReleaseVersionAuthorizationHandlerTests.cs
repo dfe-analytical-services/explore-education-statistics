@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -10,7 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
@@ -216,11 +217,13 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
                     userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
                         contentDbContext: contentDbContext,
                         userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
-                        userRepository: userRepository),
+                        userRepository: userRepository,
+                        logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                     userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
                         contentDbContext: contentDbContext,
                         userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
-                        userRepository: userRepository),
+                        userRepository: userRepository,
+                        logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         };
     }

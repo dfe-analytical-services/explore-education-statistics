@@ -66,11 +66,6 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
                 && uri.Email == email) // DB comparison is case insensitive
             .ToListAsync(cancellationToken);
 
-        if (!invites.Any())
-        {
-            return;
-        }
-
         await RemoveMany(invites, cancellationToken);
     }
 

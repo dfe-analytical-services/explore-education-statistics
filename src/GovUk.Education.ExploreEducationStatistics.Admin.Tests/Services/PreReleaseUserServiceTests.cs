@@ -379,7 +379,7 @@ public class PreReleaseUserServiceTests
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupPreReleaseUserService(
-                context: contentDbContext,
+                contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object);
@@ -617,7 +617,7 @@ public class PreReleaseUserServiceTests
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupPreReleaseUserService(
-                context: contentDbContext,
+                contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object);
@@ -1176,6 +1176,34 @@ public class PreReleaseUserServiceTests
     }
 
     [Fact]
+    public async Task RemovePreReleaseUser_UserDoesNotExist()
+    {
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()));
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
+        {
+            var service = SetupPreReleaseUserService(
+                contentDbContext: context, 
+                usersAndRolesDbContext: userAndRolesDbContext);
+
+            var result = await service.RemovePreReleaseUser(releaseVersion.Id, "test@test.com");
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
     public async Task RemovePreReleaseUser_NoRemainingReleaseInvites_AcceptedInvite()
     {
         var user = new User
@@ -1463,7 +1491,7 @@ public class PreReleaseUserServiceTests
     }
 
     private static PreReleaseUserService SetupPreReleaseUserService(
-        ContentDbContext context,
+        ContentDbContext contentDbContext,
         UsersAndRolesDbContext usersAndRolesDbContext,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
@@ -1476,17 +1504,17 @@ public class PreReleaseUserServiceTests
         IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null)
     {
-        userRepository ??= new UserRepository(context);
-        userReleaseInviteRepository ??= new UserReleaseInviteRepository(context);
+        userRepository ??= new UserRepository(contentDbContext);
+        userReleaseInviteRepository ??= new UserReleaseInviteRepository(contentDbContext);
 
         return new(
-            context,
+            contentDbContext,
             usersAndRolesDbContext,
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             appOptions ?? DefaultAppOptions(),
             notifyOptions ?? DefaultNotifyOptions(),
             preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
-            persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
+            persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             userService ?? AlwaysTrueUserService(_userId).Object,
             userRepository,
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),

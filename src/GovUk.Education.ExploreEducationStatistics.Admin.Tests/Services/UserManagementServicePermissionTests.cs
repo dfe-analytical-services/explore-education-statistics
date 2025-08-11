@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -12,7 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
@@ -169,12 +170,14 @@ public class UserManagementServicePermissionTests
         userReleaseRoleAndInviteManager ??= new UserReleaseRoleAndInviteManager(
             contentDbContext,
             new UserReleaseInviteRepository(contentDbContext),
-            userRepository);
+            userRepository,
+            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
 
         userPublicationRoleAndInviteManager ??= new UserPublicationRoleAndInviteManager(
             contentDbContext,
             new UserPublicationInviteRepository(contentDbContext),
-            userRepository);
+            userRepository,
+            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
 
         return new UserManagementService(
             usersAndRolesDbContext,

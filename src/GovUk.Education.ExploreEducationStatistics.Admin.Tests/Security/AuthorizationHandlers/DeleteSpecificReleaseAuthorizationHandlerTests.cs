@@ -1,12 +1,13 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
@@ -162,12 +163,14 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
             contentDbContext,
             new UserReleaseInviteRepository(contentDbContext),
-            userRepository);
+            userRepository,
+            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
 
         var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
             contentDbContext,
             new UserPublicationInviteRepository(contentDbContext),
-            userRepository);
+            userRepository,
+            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
 
         return new DeleteSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(

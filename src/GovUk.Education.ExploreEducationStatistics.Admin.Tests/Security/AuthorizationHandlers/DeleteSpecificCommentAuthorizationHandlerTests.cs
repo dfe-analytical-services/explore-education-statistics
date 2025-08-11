@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -49,12 +50,14 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
         var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
             contentDbContext,
             new UserReleaseInviteRepository(contentDbContext),
-            userRepository);
+            userRepository,
+            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
 
         var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
             contentDbContext,
             new UserPublicationInviteRepository(contentDbContext),
-            userRepository);
+            userRepository,
+            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
 
         return new DeleteSpecificCommentAuthorizationHandler(
             contentDbContext,

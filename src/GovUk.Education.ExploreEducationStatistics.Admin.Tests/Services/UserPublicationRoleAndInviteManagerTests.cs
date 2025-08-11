@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -669,6 +670,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         return new(
             contentDbContext: contentDbContext,
             userPublicationInviteRepository: userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(),
-            userRepository: new UserRepository(contentDbContext));
+            userRepository: new UserRepository(contentDbContext),
+            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
     }
 }

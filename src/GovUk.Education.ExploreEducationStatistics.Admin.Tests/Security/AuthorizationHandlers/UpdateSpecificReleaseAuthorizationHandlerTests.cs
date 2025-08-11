@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
@@ -70,11 +71,13 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
                     userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
                         contentDbContext: contentDbContext,
                         userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
-                        userRepository: userRepository),
+                        userRepository: userRepository,
+                        logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                     userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
                         contentDbContext: contentDbContext,
                         userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
-                        userRepository: userRepository),
+                        userRepository: userRepository,
+                        logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         };
     }

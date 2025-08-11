@@ -120,11 +120,6 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
                 && uri.Email == email) // DB comparison is case insensitive
             .ToListAsync(cancellationToken);
 
-        if (!invites.Any())
-        {
-            return;
-        }
-
         await RemoveMany(invites, cancellationToken);
     }
 

@@ -30,8 +30,7 @@ public class ReleasePermissionService(
     {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                query =>
-                    query.Include(rv => rv.Publication))
+                query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
             {
@@ -57,8 +56,7 @@ public class ReleasePermissionService(
 
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                query =>
-                    query.Include(rv => rv.Publication))
+                query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
             {
@@ -92,9 +90,8 @@ public class ReleasePermissionService(
                     .Include(releaseRole => releaseRole.User)
                     .Where(userReleaseRole =>
                         releaseVersionIds.Contains(userReleaseRole.ReleaseVersionId)
-                    && userReleaseRole.Role == ReleaseRole.Contributor)
-                    .Select(userReleaseRole =>
-                        userReleaseRole.User)
+                        && userReleaseRole.Role == ReleaseRole.Contributor)
+                    .Select(userReleaseRole => userReleaseRole.User)
                     .Distinct()
                     .ToListAsync();
 
@@ -104,7 +101,8 @@ public class ReleasePermissionService(
                             user.Id,
                             user.DisplayName,
                             user.Email,
-                        ReleaseRole.Contributor))
+                            ReleaseRole.Contributor
+                        ))
                     .OrderBy(model => model.UserDisplayName)
                     .ToList();
             });

@@ -1,12 +1,13 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
@@ -67,7 +68,8 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
                 userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
                     contentDbContext: contentDbContext,
                     userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
-                    userRepository: new UserRepository(contentDbContext)),
+                    userRepository: new UserRepository(contentDbContext),
+                    logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }
