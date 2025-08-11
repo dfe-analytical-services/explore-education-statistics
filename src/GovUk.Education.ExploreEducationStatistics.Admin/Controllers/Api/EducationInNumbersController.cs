@@ -36,7 +36,7 @@ public class EducationInNumbersController(
 
     [HttpPost("education-in-numbers")]
     public async Task<ActionResult<EducationInNumbersPageViewModel>> CreateEducationInNumbersPage(
-        [FromQuery] CreateEducationInNumbersPageRequest request)
+        [FromBody] CreateEducationInNumbersPageRequest request)
     {
         return await einService.CreatePage(request)
             .HandleFailuresOrOk();
@@ -53,7 +53,7 @@ public class EducationInNumbersController(
     [HttpPut("education-in-numbers/{id:Guid}")]
     public async Task<ActionResult<EducationInNumbersPageViewModel>> UpdatePage(
         [FromRoute] Guid id,
-        [FromQuery] UpdateEducationInNumbersPageRequest request)
+        [FromBody] UpdateEducationInNumbersPageRequest request)
     {
         return await einService.UpdatePage(id, request)
             .HandleFailuresOrOk();
@@ -61,7 +61,7 @@ public class EducationInNumbersController(
 
     [HttpPut("education-in-numbers/order")]
     public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> Reorder(
-        [FromQuery] List<Guid> pageIds)
+        [FromBody] List<Guid> pageIds)
     {
         return await einService.Reorder(pageIds)
             .HandleFailuresOrOk();

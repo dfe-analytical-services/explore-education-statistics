@@ -1,24 +1,27 @@
 import React from 'react';
 import { generatePath } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import { useEducationInNumbersPageContext } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import {
-  educationInNumbersSummaryEditRoute,
   EducationInNumbersRouteParams,
+  educationInNumbersSummaryRoute,
 } from '@admin/routes/educationInNumbersRoutes';
 import WarningMessage from '@common/components/WarningMessage';
-import ButtonLink from '@admin/components/ButtonLink';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { GetEducationInNumbersPageStatus } from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
+import Button from '@common/components/Button';
+import educationInNumbersService from '@admin/services/educationInNumbersService';
 
-const EducationInNumbersSummaryPage = () => {
+const EducationInNumbersSignOffPage = () => {
   const { educationInNumbersPageId, educationInNumbersPage } =
     useEducationInNumbersPageContext();
 
+  const history = useHistory();
+
   return (
     <>
-      <h2>Page summary</h2>
+      <h2>Sign off</h2>
 
       {educationInNumbersPage ? (
         <>
@@ -32,12 +35,9 @@ const EducationInNumbersSummaryPage = () => {
             <SummaryListItem term="Description">
               {educationInNumbersPage.description}
             </SummaryListItem>
-            <SummaryListItem term="Status">
-              {GetEducationInNumbersPageStatus(educationInNumbersPage)}
-            </SummaryListItem>
             <SummaryListItem term="Published on">
               {educationInNumbersPage.published ? (
-                // @MarkFix it's utc when it should be gmt
+                // @MarkFix it's utc time when it should be gmt
                 <FormattedDate format="HH:MM:ss - d MMMM yyyy">
                   {educationInNumbersPage.published}
                 </FormattedDate>
@@ -47,16 +47,27 @@ const EducationInNumbersSummaryPage = () => {
             </SummaryListItem>
           </SummaryList>
 
-          <ButtonLink
-            to={generatePath<EducationInNumbersRouteParams>(
-              educationInNumbersSummaryEditRoute.path,
-              {
-                educationInNumbersPageId,
-              },
-            )}
-          >
-            Edit summary
-          </ButtonLink>
+          {educationInNumbersPage.published === undefined && (
+            <Button
+              onClick={async () => {
+                // @MarkFix are you sure you want to publish modal
+                await educationInNumbersService.updateEducationInNumbersPage(
+                  educationInNumbersPage.id,
+                  { publish: true },
+                );
+                history.push(
+                  generatePath<EducationInNumbersRouteParams>(
+                    educationInNumbersSummaryRoute.path,
+                    {
+                      educationInNumbersPageId,
+                    },
+                  ),
+                );
+              }}
+            >
+              Publish
+            </Button>
+          )}
         </>
       ) : (
         <WarningMessage>
@@ -67,4 +78,4 @@ const EducationInNumbersSummaryPage = () => {
   );
 };
 
-export default EducationInNumbersSummaryPage;
+export default EducationInNumbersSignOffPage;

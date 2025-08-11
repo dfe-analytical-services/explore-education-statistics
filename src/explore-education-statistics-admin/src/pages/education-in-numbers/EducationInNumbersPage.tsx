@@ -12,6 +12,7 @@ import {
   educationInNumbersContentRoute,
   EducationInNumbersRouteParams,
   EducationInNumbersRouteProps,
+  educationInNumbersSignOffRoute,
   educationInNumbersSummaryEditRoute,
   educationInNumbersSummaryRoute,
 } from '@admin/routes/educationInNumbersRoutes';
@@ -21,6 +22,7 @@ import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in
 const navRoutes: EducationInNumbersRouteProps[] = [
   educationInNumbersSummaryRoute,
   educationInNumbersContentRoute,
+  educationInNumbersSignOffRoute,
 ];
 
 const routes: EducationInNumbersRouteProps[] = [
@@ -90,7 +92,7 @@ const EducationInNumbersPage = ({
               <div className="govuk-grid-column-two-thirds">
                 <PageTitle
                   title={educationInNumbersPage.title}
-                  caption="Edit Page"
+                  caption="Edit Education in numbers Page"
                 />
               </div>
             </div>

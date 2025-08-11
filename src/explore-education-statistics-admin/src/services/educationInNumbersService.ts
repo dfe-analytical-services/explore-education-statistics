@@ -16,12 +16,11 @@ export interface CreateEducationInNumbersPageRequest {
 }
 
 export interface UpdateEducationInNumbersPageRequest {
-  description: string;
-  title: string;
+  title?: string;
   slug?: string;
+  description?: string;
+  publish?: boolean;
 }
-
-// @MarkFix HERE!!! Test if backend/frontend are working together!
 
 const educationInNumbersService = {
   getEducationInNumbersPage(id: string): Promise<EducationInNumbersPage> {
