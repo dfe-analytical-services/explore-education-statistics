@@ -14,17 +14,9 @@ public record ReleasePublishingFeedback : ICreatedTimestamp<DateTime>
 
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
-    /// <summary>
-    /// This field is optional until a manual migration populates the fields.
-    /// EES-6416 will handle making them non-nullable when all rows are migrated.
-    /// </summary>
-    public string? PublicationTitle { get; set; }
+    public required string PublicationTitle { get; set; }
 
-    /// <summary>
-    /// This field is optional until a manual migration populates the fields.
-    /// EES-6416 will handle making them non-nullable when all rows are migrated.
-    /// </summary>
-    public string? ReleaseTitle { get; set; }
+    public required string ReleaseTitle { get; set; }
 
     public required PublicationRole UserPublicationRole { get; set; }
     

@@ -46,7 +46,9 @@ public class ReleasePublishingFeedbackFunctionTests
             Id = Guid.NewGuid(),
             EmailToken = Guid.NewGuid().ToString(),
             UserPublicationRole = role,
-            ReleaseVersionId = releaseVersion.Id
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseTitle = "Academic year 2022",
+            PublicationTitle = "Publication title"
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -104,7 +106,9 @@ public class ReleasePublishingFeedbackFunctionTests
             Id = Guid.NewGuid(),
             EmailToken = Guid.NewGuid().ToString(),
             UserPublicationRole = role,
-            ReleaseVersionId = releaseVersion.Id
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseTitle = "Academic year 2022",
+            PublicationTitle = "Publication title"
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
