@@ -71,9 +71,10 @@ User waits until the initial API data set version's status changes to "Ready"
     user waits until draft API data set status contains    Ready
 
 Check modal that blocks replacing a draft patch data set version is displayed
-    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_1_NAME}
-    user clicks link    Data and files
+    user clicks link    Back to API data sets
+    user clicks link    Data uploads
+    # TODO: EES-6418 removes this 'user reloads page' workaround after fixing related frontend bug.
+    user reloads page
     user waits until page contains data uploads table
     user clicks button    Replace data    testId:Actions
     ${modal}=    user waits until modal is visible    Cannot replace data
