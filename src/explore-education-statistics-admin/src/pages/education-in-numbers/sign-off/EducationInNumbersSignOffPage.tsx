@@ -21,6 +21,8 @@ const EducationInNumbersSignOffPage = () => {
 
   const isEditable = educationInNumbersPage.published === undefined;
 
+  // @MarkFix add link to its public page here? or maybe elsewhere
+
   return (
     <>
       <h2>Sign off</h2>
@@ -53,19 +55,18 @@ const EducationInNumbersSignOffPage = () => {
             <Button
               onClick={async () => {
                 // @MarkFix add "are you sure you want to publish?" modal?
-                const updatedPage =
-                  await educationInNumbersService.updateEducationInNumbersPage(
+                const publishedPage =
+                  await educationInNumbersService.publishEducationInNumbersPage(
                     educationInNumbersPage.id,
-                    { publish: true },
                   );
 
-                onEducationInNumbersPageChange(updatedPage);
+                onEducationInNumbersPageChange(publishedPage);
 
                 history.push(
                   generatePath<EducationInNumbersRouteParams>(
                     educationInNumbersSummaryRoute.path,
                     {
-                      educationInNumbersPageId: updatedPage.id,
+                      educationInNumbersPageId: publishedPage.id,
                     },
                   ),
                 );

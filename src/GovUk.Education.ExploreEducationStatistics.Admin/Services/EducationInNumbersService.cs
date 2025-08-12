@@ -59,7 +59,9 @@ public class EducationInNumbersService(
             viewModels.Add(viewModel);
         }
 
-        return viewModels;
+        return viewModels
+            .OrderBy(vm => vm.Order)
+            .ToList();
     }
 
     public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage( // @MarkFix tests?
@@ -153,12 +155,19 @@ public class EducationInNumbersService(
             {
                 if (page.Published != null)
                 {
-                    throw new ArgumentException("Cannot update already published EiN page"); // @MarkFix exception fine?
+                    throw new ArgumentException("Cannot update details of already published page"); // @MarkFix exception fine?
+                }
+
+                if (page.Version > 0)
+                {
+                    // To prevent slug from being changed by an amendment, as we have no redirects
+                    throw new Exception(
+                        "Cannot update details for a page that has a previous version published"); // @MarkFix exception fine?
                 }
 
                 // If the title is being updated, we also update the slug
                 string? newSlug = null;
-                if (request.Title != null)
+                if (request.Title != null && request.Title != page.Title)
                 {
                     newSlug = NamingUtils.SlugFromTitle(request.Title);
                     var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages
@@ -173,18 +182,35 @@ public class EducationInNumbersService(
                 page.Slug = newSlug ?? page.Slug;
                 page.Description = request.Description ?? page.Description;
 
-                if (request.Publish == true)
+                page.Updated = DateTime.UtcNow;
+                page.UpdatedById = userService.GetUserId();
+
+                await contentDbContext.SaveChangesAsync();
+
+                // @MarkFix refresh cache here?
+
+                return page.ToViewModel();
+            });
+    }
+
+    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> PublishPage( // @MarkFix tests?
+        Guid id)
+    {
+        return await contentDbContext.EducationInNumbersPages
+            .FirstOrNotFoundAsync(page => page.Id == id)
+            .OnSuccess(async page =>
+            {
+                if (page.Published != null)
                 {
-                    page.Published = DateTime.UtcNow;
+                    throw new ArgumentException("Cannot publish already published page"); // @MarkFix exception fine?
                 }
+
+                page.Published = DateTime.UtcNow;
 
                 page.Updated = DateTime.UtcNow;
                 page.UpdatedById = userService.GetUserId();
 
-                contentDbContext.EducationInNumbersPages.Update(page);
                 await contentDbContext.SaveChangesAsync();
-
-                // @MarkFix refresh cache here?
 
                 return page.ToViewModel();
             });
@@ -232,7 +258,7 @@ public class EducationInNumbersService(
 
         await contentDbContext.SaveChangesAsync();
 
-        // @MarkFix refresh cache here
+        // @MarkFix refresh cache here?
 
         return pageList
             .Select(page => page.ToViewModel())
@@ -253,8 +279,6 @@ public class EducationInNumbersService(
 
                 contentDbContext.EducationInNumbersPages.Remove(page);
                 await contentDbContext.SaveChangesAsync();
-
-                // @MarkFix refresh cache?
             });
     }
 }

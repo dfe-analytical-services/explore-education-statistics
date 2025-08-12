@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -16,6 +17,9 @@ public class EducationInNumbersPageViewModel
     public int Version { get; set; }
 
     public DateTime? Published { get; set; }
+
+    [JsonIgnore]
+    public int Order { get; set; }
 
     public Guid? PreviousVersionId { get; set; }
 }

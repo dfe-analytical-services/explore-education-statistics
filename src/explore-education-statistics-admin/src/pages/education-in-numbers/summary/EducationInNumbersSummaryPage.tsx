@@ -13,34 +13,30 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import { GetEducationInNumbersPageStatus } from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
 
 const EducationInNumbersSummaryPage = () => {
-  const { educationInNumbersPage } = useEducationInNumbersPageContext();
+  const { educationInNumbersPage: page } = useEducationInNumbersPageContext();
 
-  const isEditable = educationInNumbersPage.published === undefined;
+  const isEditable = page.published === undefined && page.version === 0; // editing amendments is not allowed because no redirects
 
   return (
     <>
       <h2>Page summary</h2>
 
-      {educationInNumbersPage ? (
+      {page ? (
         <>
           <SummaryList>
-            <SummaryListItem term="Title">
-              {educationInNumbersPage.title}
-            </SummaryListItem>
-            <SummaryListItem term="Slug">
-              {educationInNumbersPage.slug ?? 'N/A'}
-            </SummaryListItem>
+            <SummaryListItem term="Title">{page.title}</SummaryListItem>
+            <SummaryListItem term="Slug">{page.slug ?? 'N/A'}</SummaryListItem>
             <SummaryListItem term="Description">
-              {educationInNumbersPage.description}
+              {page.description}
             </SummaryListItem>
             <SummaryListItem term="Status">
-              {GetEducationInNumbersPageStatus(educationInNumbersPage)}
+              {GetEducationInNumbersPageStatus(page)}
             </SummaryListItem>
             <SummaryListItem term="Published on">
-              {educationInNumbersPage.published ? (
+              {page.published ? (
                 // @MarkFix it's utc when it should be gmt
                 <FormattedDate format="HH:mm:ss - d MMMM yyyy">
-                  {educationInNumbersPage.published}
+                  {page.published}
                 </FormattedDate>
               ) : (
                 'Not yet published'
@@ -53,7 +49,7 @@ const EducationInNumbersSummaryPage = () => {
               to={generatePath<EducationInNumbersRouteParams>(
                 educationInNumbersSummaryEditRoute.path,
                 {
-                  educationInNumbersPageId: educationInNumbersPage.id,
+                  educationInNumbersPageId: page.id,
                 },
               )}
             >

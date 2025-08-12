@@ -59,6 +59,14 @@ public class EducationInNumbersController(
             .HandleFailuresOrOk();
     }
 
+    [HttpPatch("education-in-numbers/{id:Guid}/publish")]
+    public async Task<ActionResult<EducationInNumbersPageViewModel>> PublishPage(
+        [FromRoute] Guid id)
+    {
+        return await einService.PublishPage(id)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPut("education-in-numbers/order")]
     public async Task<ActionResult<List<EducationInNumbersPageViewModel>>> Reorder(
         [FromBody] List<Guid> pageIds)
