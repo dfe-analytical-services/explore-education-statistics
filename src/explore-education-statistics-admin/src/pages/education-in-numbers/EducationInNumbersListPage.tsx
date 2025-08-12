@@ -22,9 +22,11 @@ import styles from './EducationInNumbersListPage.module.scss';
 const EducationInNumbersListPage = () => {
   const history = useHistory();
 
-  const { data: pages = [], isLoading } = useQuery(
-    educationInNumbersQueries.listLatestPages,
-  );
+  const {
+    data: pages = [],
+    isLoading,
+    refetch: refetchPages,
+  } = useQuery(educationInNumbersQueries.listLatestPages);
 
   if (isLoading) {
     return <LoadingSpinner loading={isLoading} />;
@@ -103,6 +105,19 @@ const EducationInNumbersListPage = () => {
                         }}
                       >
                         Create amendment
+                      </Button>
+                    )}
+                    {page.published === undefined && ( // @MarkFix add "are you sure you want to delete/cancel this?" modal?
+                      <Button
+                        onClick={async () => {
+                          await educationInNumbersService.deleteEducationInNumbersPage(
+                            page.id,
+                          );
+
+                          await refetchPages();
+                        }}
+                      >
+                        {page.version === 0 ? 'Delete' : 'Cancel amendment'}
                       </Button>
                     )}
                   </ButtonGroup>

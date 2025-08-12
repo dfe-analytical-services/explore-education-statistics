@@ -84,7 +84,13 @@ const EducationInNumbersPage = ({
     : undefined;
 
   return (
-    <Page wide breadcrumbs={[{ name: 'Edit Education in Numbers page' }]}>
+    <Page
+      wide
+      breadcrumbs={[
+        { name: 'Manage Education in Numbers', link: '/education-in-numbers' },
+        { name: 'Edit Education in Numbers page' },
+      ]}
+    >
       <LoadingSpinner loading={isLoading}>
         {educationInNumbersPage ? (
           <>

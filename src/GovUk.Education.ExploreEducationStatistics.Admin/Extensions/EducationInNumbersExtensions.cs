@@ -18,7 +18,8 @@ public static class EducationInNumbersExtensions
             Description = page.Description,
             Version = page.Version,
             Published = page.Published,
-            PreviousVersionId =  previousVersionId,
+            Order = page.Order,
+            PreviousVersionId = previousVersionId,
         };
     }
 }

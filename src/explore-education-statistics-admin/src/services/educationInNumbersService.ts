@@ -19,7 +19,6 @@ export interface UpdateEducationInNumbersPageRequest {
   title?: string;
   slug?: string;
   description?: string;
-  publish?: boolean;
 }
 
 const educationInNumbersService = {
@@ -43,10 +42,16 @@ const educationInNumbersService = {
       page,
     );
   },
+  publishEducationInNumbersPage(id: string): Promise<EducationInNumbersPage> {
+    return client.patch(`education-in-numbers/${id}/publish`);
+  },
   createEducationInNumbersPageAmendment(
     id: string,
   ): Promise<EducationInNumbersPage> {
     return client.post(`/education-in-numbers/${id}/amendment`);
+  },
+  deleteEducationInNumbersPage(id: string): Promise<void> {
+    return client.delete(`education-in-numbers/${id}`);
   },
 };
 
