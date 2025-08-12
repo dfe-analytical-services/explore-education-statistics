@@ -48,7 +48,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
     {
         return contentDbContext
             .UserPublicationInvites
-            .Where(invite => invite.Email == email)
+            .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
             .ToListAsync();
     }
 
@@ -87,7 +87,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         CancellationToken cancellationToken = default)
     {
         var invites = await contentDbContext.UserPublicationInvites
-            .Where(i => i.Email == email)
+            .Where(i => i.Email.ToLower().Equals(email.ToLower()))
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);
@@ -103,6 +103,6 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
             .AnyAsync(i =>
                 i.PublicationId == publicationId
                 && i.Role == role
-                && i.Email == email);
+                && i.Email.ToLower().Equals(email.ToLower()));
     }
 }

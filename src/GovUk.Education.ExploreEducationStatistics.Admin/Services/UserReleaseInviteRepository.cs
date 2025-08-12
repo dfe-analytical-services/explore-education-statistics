@@ -78,7 +78,7 @@ public class UserReleaseInviteRepository(
             .AsQueryable()
             .AnyAsync(i =>
                 i.ReleaseVersionId == releaseVersionId
-                && i.Email == email
+                && i.Email.ToLower().Equals(email.ToLower())
                 && i.Role == role);
     }
 
@@ -92,7 +92,7 @@ public class UserReleaseInviteRepository(
             .AsQueryable()
             .Where(i =>
                 releaseVersionIds.Contains(i.ReleaseVersionId)
-                && i.Email == email
+                && i.Email.ToLower().Equals(email.ToLower())
                 && i.Role == role)
             .Select(i => i.ReleaseVersionId)
             .ToListAsync();
@@ -104,7 +104,7 @@ public class UserReleaseInviteRepository(
     {
         return await contentDbContext
             .UserReleaseInvites
-            .Where(invite => invite.Email == email)
+            .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
             .ToListAsync();
     }
 
@@ -211,7 +211,7 @@ public class UserReleaseInviteRepository(
         CancellationToken cancellationToken = default)
     {
         var invites = await contentDbContext.UserReleaseInvites
-            .Where(i => i.Email == email)
+            .Where(i => i.Email.ToLower().Equals(email.ToLower()))
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);
@@ -231,7 +231,7 @@ public class UserReleaseInviteRepository(
         var invites = await contentDbContext.UserReleaseInvites
             .Where(i => releaseVersionIds.Contains(i.ReleaseVersionId))
             .If(!string.IsNullOrEmpty(email))
-                .ThenWhere(i => i.Email == email)
+                .ThenWhere(i => i.Email.ToLower().Equals(email!.ToLower()))
             .If(rolesToInclude.Any())
                 .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
@@ -248,7 +248,7 @@ public class UserReleaseInviteRepository(
         var invites = await contentDbContext.UserReleaseInvites
             .Where(i => i.ReleaseVersionId == releaseVersionId)
             .If(!string.IsNullOrEmpty(email))
-                .ThenWhere(i => i.Email == email)
+                .ThenWhere(i => i.Email.ToLower().Equals(email!.ToLower()))
             .If(rolesToInclude.Any())
                 .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
