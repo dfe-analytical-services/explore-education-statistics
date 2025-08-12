@@ -250,16 +250,10 @@ Create release amendment
     user clicks link    Home
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-# TODO: Rewrite (replacement behaviour is now different)
-
 Replace subject data
-    user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-title
-    user waits until page contains data uploads table
-    user clicks link    Replace data
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates.csv
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates.meta.csv
-    user clicks button    Upload data files
+    user uploads subject replacement    ${SUBJECT_NAME}    dates.csv    dates.meta.csv
+
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains    Footnotes: ERROR    %{WAIT_MEDIUM}
     user opens details dropdown    Footnote 2 ${SUBJECT_NAME}
