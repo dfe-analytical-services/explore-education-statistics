@@ -14,12 +14,12 @@ import Button from '@common/components/Button';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 
 const EducationInNumbersSignOffPage = () => {
-  const { educationInNumbersPageId, educationInNumbersPage } =
+  const { educationInNumbersPage, onEducationInNumbersPageChange } =
     useEducationInNumbersPageContext();
 
   const history = useHistory();
 
-  const isEditable = educationInNumbersPage.published !== undefined;
+  const isEditable = educationInNumbersPage.published === undefined;
 
   return (
     <>
@@ -52,16 +52,20 @@ const EducationInNumbersSignOffPage = () => {
           {isEditable && (
             <Button
               onClick={async () => {
-                // @MarkFix are you sure you want to publish modal
-                await educationInNumbersService.updateEducationInNumbersPage(
-                  educationInNumbersPage.id,
-                  { publish: true },
-                );
+                // @MarkFix add "are you sure you want to publish?" modal?
+                const updatedPage =
+                  await educationInNumbersService.updateEducationInNumbersPage(
+                    educationInNumbersPage.id,
+                    { publish: true },
+                  );
+
+                onEducationInNumbersPageChange(updatedPage);
+
                 history.push(
                   generatePath<EducationInNumbersRouteParams>(
                     educationInNumbersSummaryRoute.path,
                     {
-                      educationInNumbersPageId,
+                      educationInNumbersPageId: updatedPage.id,
                     },
                   ),
                 );

@@ -1,15 +1,15 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import EducationInNumbersPageForm from '@admin/pages/education-in-numbers/components/EducationInNumbersSummaryForm';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
 import {
-  educationInNumbersListRoute,
-  educationInNumbersRoute,
-} from '@admin/routes/routes';
-import { EducationInNumbersRouteParams } from '@admin/routes/educationInNumbersRoutes';
+  EducationInNumbersRouteParams,
+  educationInNumbersSummaryRoute,
+} from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
-import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router-dom';
 
 const EducationInNumbersCreatePage = ({
   history,
@@ -38,8 +38,8 @@ const EducationInNumbersCreatePage = ({
             );
 
           history.push(
-            appendQuery<EducationInNumbersRouteParams>(
-              educationInNumbersRoute.path,
+            generatePath<EducationInNumbersRouteParams>(
+              educationInNumbersSummaryRoute.path,
               {
                 educationInNumbersPageId: newPage.id,
               },
