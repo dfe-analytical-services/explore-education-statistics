@@ -114,15 +114,21 @@ public class UserReleaseInviteRepository(
         ReleaseRole role,
         CancellationToken cancellationToken = default)
     {
-        var invites = await contentDbContext.UserReleaseInvites
+        var invite = await contentDbContext.UserReleaseInvites
             .AsQueryable()
             .Where(uri =>
                 uri.ReleaseVersionId == releaseVersionId
                 && uri.Role == role
                 && uri.Email.ToLower().Equals(email!.ToLower()))
-            .ToListAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
 
-        await RemoveMany(invites, cancellationToken);
+        if (invite is null)
+        {
+            return;
+        }
+
+        contentDbContext.UserReleaseInvites.Remove(invite);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveMany(

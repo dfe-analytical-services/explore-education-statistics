@@ -242,7 +242,7 @@ public abstract class UserReleaseInviteRepositoryTests
     public class RemoveTests : UserReleaseInviteRepositoryTests
     {
         [Fact]
-        public async Task TargetInvitesExist_RemovesTargetedInvites()
+        public async Task TargetInviteExists_RemovesTargetedInvites()
         {
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
@@ -260,26 +260,23 @@ public abstract class UserReleaseInviteRepositoryTests
                 .Generate();
 
             var userReleaseInvites = _fixture.DefaultUserReleaseInvite()
-                // These 2 invites should be removed
+                // This invite should be removed
                 .ForIndex(0, s => s.SetReleaseVersion(targetReleaseVersion))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
                 .ForIndex(0, s => s.SetRole(targetRole))
-                .ForIndex(1, s => s.SetReleaseVersion(targetReleaseVersion))
+                // This invite is for a different release version and should not be removed
+                .ForIndex(1, s => s.SetReleaseVersion(otherReleaseVersion))
                 .ForIndex(1, s => s.SetEmail(targetEmail))
                 .ForIndex(1, s => s.SetRole(targetRole))
-                // This invite is for a different release version and should not be removed
-                .ForIndex(2, s => s.SetReleaseVersion(otherReleaseVersion))
-                .ForIndex(2, s => s.SetEmail(targetEmail))
-                .ForIndex(2, s => s.SetRole(targetRole))
                 // This invite is for a different email and should not be removed
-                .ForIndex(3, s => s.SetReleaseVersion(targetReleaseVersion))
-                .ForIndex(3, s => s.SetEmail(otherEmail))
-                .ForIndex(3, s => s.SetRole(targetRole))
+                .ForIndex(2, s => s.SetReleaseVersion(targetReleaseVersion))
+                .ForIndex(2, s => s.SetEmail(otherEmail))
+                .ForIndex(2, s => s.SetRole(targetRole))
                 // This invite is for a different role and should not be removed
-                .ForIndex(4, s => s.SetReleaseVersion(targetReleaseVersion))
-                .ForIndex(4, s => s.SetEmail(targetEmail))
-                .ForIndex(4, s => s.SetRole(otherRole))
-                .GenerateList(5);
+                .ForIndex(3, s => s.SetReleaseVersion(targetReleaseVersion))
+                .ForIndex(3, s => s.SetEmail(targetEmail))
+                .ForIndex(3, s => s.SetRole(otherRole))
+                .GenerateList(4);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -321,7 +318,7 @@ public abstract class UserReleaseInviteRepositoryTests
         }
 
         [Fact]
-        public async Task NoInvitesExist_DoesNothing()
+        public async Task InviteDoesNotExist_DoesNothing()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 

@@ -58,15 +58,21 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         PublicationRole role,
         CancellationToken cancellationToken = default)
     {
-        var invites = await contentDbContext.UserPublicationInvites
+        var invite = await contentDbContext.UserPublicationInvites
             .AsQueryable()
-            .Where(upi =>
-                upi.PublicationId == publicationId
-                && upi.Role == role
-                && upi.Email.ToLower().Equals(email!.ToLower()))
-            .ToListAsync(cancellationToken);
+            .Where(uri =>
+                uri.PublicationId == publicationId
+                && uri.Role == role
+                && uri.Email.ToLower().Equals(email!.ToLower())) // DB comparison is case insensitive
+            .SingleOrDefaultAsync(cancellationToken);
 
-        await RemoveMany(invites, cancellationToken);
+        if (invite is null)
+        {
+            return;
+        }
+
+        contentDbContext.UserPublicationInvites.Remove(invite);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveMany(
