@@ -13,10 +13,9 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import { GetEducationInNumbersPageStatus } from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
 
 const EducationInNumbersSummaryPage = () => {
-  const { educationInNumbersPageId, educationInNumbersPage } =
-    useEducationInNumbersPageContext();
+  const { educationInNumbersPage } = useEducationInNumbersPageContext();
 
-  const isEditable = educationInNumbersPage.published !== undefined;
+  const isEditable = educationInNumbersPage.published === undefined;
 
   return (
     <>
@@ -54,7 +53,7 @@ const EducationInNumbersSummaryPage = () => {
               to={generatePath<EducationInNumbersRouteParams>(
                 educationInNumbersSummaryEditRoute.path,
                 {
-                  educationInNumbersPageId,
+                  educationInNumbersPageId: educationInNumbersPage.id,
                 },
               )}
             >

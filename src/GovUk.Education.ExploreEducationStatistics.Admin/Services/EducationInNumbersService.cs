@@ -156,10 +156,21 @@ public class EducationInNumbersService(
                     throw new ArgumentException("Cannot update already published EiN page"); // @MarkFix exception fine?
                 }
 
-                // @MarkFix if the title has changed, check the slug is unique
+                // If the title is being updated, we also update the slug
+                string? newSlug = null;
+                if (request.Title != null)
+                {
+                    newSlug = NamingUtils.SlugFromTitle(request.Title);
+                    var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages
+                        .Any(p => p.Slug == newSlug);
+                    if (newSlugIsNotUnique)
+                    {
+                        throw new Exception("Generated slug is not unique"); // @MarkFix maybe should be an error?
+                    }
+                }
 
                 page.Title = request.Title ?? page.Title;
-                page.Slug = request.Slug ?? page.Slug;
+                page.Slug = newSlug ?? page.Slug;
                 page.Description = request.Description ?? page.Description;
 
                 if (request.Publish == true)
