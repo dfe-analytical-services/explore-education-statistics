@@ -7,7 +7,7 @@ export interface EducationInNumbersPage {
   description: string;
   version: number;
   published?: string;
-  previousPageId: string;
+  previousVersionId: string;
 }
 
 export interface CreateEducationInNumbersPageRequest {
@@ -42,6 +42,11 @@ const educationInNumbersService = {
       `/education-in-numbers/${educationInNumbersPageId}`,
       page,
     );
+  },
+  createEducationInNumbersPageAmendment(
+    id: string,
+  ): Promise<EducationInNumbersPage> {
+    return client.post(`/education-in-numbers/${id}/amendment`);
   },
 };
 

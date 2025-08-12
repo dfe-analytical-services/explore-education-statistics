@@ -7,10 +7,21 @@ import { useQuery } from '@tanstack/react-query';
 import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import FormattedDate from '@common/components/FormattedDate';
-import { EducationInNumbersPage } from '@admin/services/educationInNumbersService';
+import educationInNumbersService, {
+  EducationInNumbersPage,
+} from '@admin/services/educationInNumbersService';
+import Button from '@common/components/Button';
+import { generatePath } from 'react-router';
+import {
+  EducationInNumbersRouteParams,
+  educationInNumbersSummaryRoute,
+} from '@admin/routes/educationInNumbersRoutes';
+import { useHistory } from 'react-router-dom';
 import styles from './EducationInNumbersListPage.module.scss';
 
 const EducationInNumbersListPage = () => {
+  const history = useHistory();
+
   const { data: pages = [], isLoading } = useQuery(
     educationInNumbersQueries.listLatestPages,
   );
@@ -66,14 +77,34 @@ const EducationInNumbersListPage = () => {
                   <ButtonGroup className={styles.actions}>
                     {page.published === undefined && page.version > 0 && (
                       <ButtonLink
-                        to={`/education-in-numbers/${page.previousPageId}/summary`}
+                        to={`/education-in-numbers/${page.previousVersionId}/summary`}
                       >
                         View currently published page
                       </ButtonLink>
                     )}
                     <ButtonLink to={`/education-in-numbers/${page.id}/summary`}>
-                      Edit
+                      {page.published === undefined ? 'Edit' : 'View'}
                     </ButtonLink>
+                    {page.published !== undefined && (
+                      <Button
+                        onClick={async () => {
+                          const newPage =
+                            await educationInNumbersService.createEducationInNumbersPageAmendment(
+                              page.id,
+                            );
+                          history.push(
+                            generatePath<EducationInNumbersRouteParams>(
+                              educationInNumbersSummaryRoute.path,
+                              {
+                                educationInNumbersPageId: newPage.id,
+                              },
+                            ),
+                          );
+                        }}
+                      >
+                        Create amendment
+                      </Button>
+                    )}
                   </ButtonGroup>
                 </td>
               </tr>

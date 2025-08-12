@@ -19,6 +19,8 @@ const EducationInNumbersSignOffPage = () => {
 
   const history = useHistory();
 
+  const isEditable = educationInNumbersPage.published !== undefined;
+
   return (
     <>
       <h2>Sign off</h2>
@@ -38,7 +40,7 @@ const EducationInNumbersSignOffPage = () => {
             <SummaryListItem term="Published on">
               {educationInNumbersPage.published ? (
                 // @MarkFix it's utc time when it should be gmt
-                <FormattedDate format="HH:MM:ss - d MMMM yyyy">
+                <FormattedDate format="HH:mm:ss - d MMMM yyyy">
                   {educationInNumbersPage.published}
                 </FormattedDate>
               ) : (
@@ -47,7 +49,7 @@ const EducationInNumbersSignOffPage = () => {
             </SummaryListItem>
           </SummaryList>
 
-          {educationInNumbersPage.published === undefined && (
+          {isEditable && (
             <Button
               onClick={async () => {
                 // @MarkFix are you sure you want to publish modal

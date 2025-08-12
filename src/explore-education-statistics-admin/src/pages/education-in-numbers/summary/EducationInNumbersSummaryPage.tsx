@@ -16,6 +16,8 @@ const EducationInNumbersSummaryPage = () => {
   const { educationInNumbersPageId, educationInNumbersPage } =
     useEducationInNumbersPageContext();
 
+  const isEditable = educationInNumbersPage.published !== undefined;
+
   return (
     <>
       <h2>Page summary</h2>
@@ -38,7 +40,7 @@ const EducationInNumbersSummaryPage = () => {
             <SummaryListItem term="Published on">
               {educationInNumbersPage.published ? (
                 // @MarkFix it's utc when it should be gmt
-                <FormattedDate format="HH:MM:ss - d MMMM yyyy">
+                <FormattedDate format="HH:mm:ss - d MMMM yyyy">
                   {educationInNumbersPage.published}
                 </FormattedDate>
               ) : (
@@ -47,16 +49,18 @@ const EducationInNumbersSummaryPage = () => {
             </SummaryListItem>
           </SummaryList>
 
-          <ButtonLink
-            to={generatePath<EducationInNumbersRouteParams>(
-              educationInNumbersSummaryEditRoute.path,
-              {
-                educationInNumbersPageId,
-              },
-            )}
-          >
-            Edit summary
-          </ButtonLink>
+          {isEditable && (
+            <ButtonLink
+              to={generatePath<EducationInNumbersRouteParams>(
+                educationInNumbersSummaryEditRoute.path,
+                {
+                  educationInNumbersPageId,
+                },
+              )}
+            >
+              Edit summary
+            </ButtonLink>
+          )}
         </>
       ) : (
         <WarningMessage>
