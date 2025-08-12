@@ -14,7 +14,7 @@ public record UpdateEducationInNumbersPageRequest
 {
     [MaxLength(255)] public string? Title { get; set; }
 
-    [MaxLength(255)] public string? Slug { get; set; }
+    [MaxLength(255)] public string? Slug { get; set; } // @MarkFix remove
 
     [MaxLength(2047)] public string? Description { get; set; }
 

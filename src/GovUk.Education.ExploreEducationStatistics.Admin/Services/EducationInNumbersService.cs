@@ -156,6 +156,8 @@ public class EducationInNumbersService(
                     throw new ArgumentException("Cannot update already published EiN page"); // @MarkFix exception fine?
                 }
 
+                // @MarkFix if the title has changed, check the slug is unique
+
                 page.Title = request.Title ?? page.Title;
                 page.Slug = request.Slug ?? page.Slug;
                 page.Description = request.Description ?? page.Description;
