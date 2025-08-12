@@ -273,6 +273,13 @@ export default function ReleaseDataUploadsSection({
             </a>
           </li>
         </ul>
+
+        <p>
+          Files are expected to have a unique "Title", any files that are
+          uploaded with a "Title" that matches an existing "Title" will provide
+          an option to start a data replacement instead of importing as a
+          separate file.
+        </p>
       </InsetText>
       {canUpdateRelease ? (
         <DataFileUploadForm onSubmit={handleSubmit} />
