@@ -55,6 +55,7 @@ const fileErrorMappings = {
   FileNameMustEndDotCsv: 'FileNameMustEndDotCsv',
   MetaFileNameMustEndDotMetaDotCsv: 'MetaFileNameMustEndDotMetaDotCsv',
   FileNameLengthInvalid: 'FileNameLengthInvalid',
+  FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',

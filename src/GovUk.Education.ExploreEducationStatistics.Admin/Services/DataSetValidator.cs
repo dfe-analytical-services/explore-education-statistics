@@ -49,6 +49,9 @@ public class DataSetValidator(
             }));
         }
 
+        var isReplacement = DataSetNameExists(dataSet.ReleaseVersionId, dataSet.Title);
+        errors.AddRange(ValidateDataFileNames(dataSet.ReleaseVersionId, dataFile.FileName, isReplacement));
+
         var fileToBeReplaced = (File?)null;
 
         await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title)
@@ -256,4 +259,42 @@ public class DataSetValidator(
 
         return [];
     }
+
+    private bool DataSetNameExists(Guid releaseVersionId, string title)
+        => contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .Any(rf =>
+                rf.ReleaseVersionId == releaseVersionId &&
+                rf.File.Type == FileType.Data &&
+                rf.Name == title);
+
+    private bool FileExists(
+        Guid releaseVersionId,
+        FileType type,
+        string filename)
+    {
+        return contentDbContext
+            .ReleaseFiles
+            .Include(rf => rf.File)
+            .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == type)
+            .AsEnumerable()
+            .Any(rf => string.Equals(rf.File.Filename, filename, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// An original uploads' data file name is not unique if a <see cref="ReleaseFile"/> exists with the same file name.
+    /// With replacement uploads, we can ignore a pre-existing <see cref="ReleaseFile"/> if it is the file being replaced -
+    /// we only care if the pre-existing duplicate <see cref="ReleaseFile"/> name isn't the file being replaced.
+    /// </summary>
+    /// <remarks>
+    /// We allow duplicate meta file names - meta files aren't included in publicly downloadable zip archives, 
+    /// so meta files won't be included in the same directory by file name and therefore cannot clash.
+    /// </remarks>
+    private List<ErrorViewModel> ValidateDataFileNames(
+        Guid releaseVersionId,
+        string dataFileName,
+        bool isReplacement)
+            => FileExists(releaseVersionId, FileType.Data, dataFileName) && !isReplacement
+                ? [ValidationMessages.GenerateErrorFileNameNotUnique(dataFileName, FileType.Data)]
+                : [];
 }

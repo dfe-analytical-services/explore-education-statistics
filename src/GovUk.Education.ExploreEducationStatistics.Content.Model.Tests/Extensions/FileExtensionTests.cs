@@ -166,36 +166,21 @@ public class FileExtensionTests
         Assert.Equal(expectedDisplaySize, contentLength.DisplaySize());
     }
 
-    [Theory]
-    [InlineData("data", ".csv")]
-    [InlineData("data123", ".csv")]
-    [InlineData("datasetfile", ".jpeg")]
-    [InlineData("data-set-file", ".csv")]
-    [InlineData("", "")]
-    public void ZipFileEntryName_DataFile_ReturnsExpectedFileName(
-        string fileNamePart,
-        string extensionPart)
+    [Fact]
+    public void ZipFileEntryName_DataFile_ReturnsExpectedFileName()
     {
         // Arrange
         var file = new File
         {
             Type = Data,
-            Filename = fileNamePart + extensionPart,
+            Filename = "data.csv",
         };
 
         // Act
-        var newFileName = file.ZipFileEntryName();
+        var fileName = file.ZipFileEntryName();
 
         // Assert
-        var pathPrefix = "data/";
-
-        var timestampStartIndex = pathPrefix.Length + fileNamePart.Length;
-        var timestampLength = newFileName.Length - pathPrefix.Length - fileNamePart.Length - extensionPart.Length;
-        var timestamp = newFileName.Substring(timestampStartIndex, timestampLength);
-
-        Assert.StartsWith($"{pathPrefix}{fileNamePart}", newFileName);
-        Assert.True(long.TryParse(timestamp, out _));
-        Assert.EndsWith(extensionPart, newFileName);
+        Assert.Equal($"data/{file.Filename}", fileName);
     }
 
     [Fact]
@@ -212,7 +197,7 @@ public class FileExtensionTests
         var fileName = file.ZipFileEntryName();
 
         // Assert
-        Assert.Equal("supporting-files/test.jpg", fileName);
+        Assert.Equal($"supporting-files/{file.Filename}", fileName);
     }
 
     [Fact]

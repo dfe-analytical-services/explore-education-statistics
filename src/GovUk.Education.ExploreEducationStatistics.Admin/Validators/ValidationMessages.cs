@@ -340,6 +340,20 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage FileNameNotUnique = new(
+        Code: nameof(FileNameNotUnique),
+        Message: "File name '{0}' of type {1} isn't unique to this release."
+    );
+
+    public static ErrorViewModel GenerateErrorFileNameNotUnique(string fileName, FileType type)
+    {
+        return new ErrorViewModel
+        {
+            Code = FileNameNotUnique.Code,
+            Message = string.Format(FileNameNotUnique.Message, fileName, type.ToString()),
+        };
+    }
+
     public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
         Code: nameof(FileSizeMustNotBeZero),
         Message: "File '{0}' either empty or not found."

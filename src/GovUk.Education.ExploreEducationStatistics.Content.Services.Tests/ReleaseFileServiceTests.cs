@@ -287,8 +287,7 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(3, zip.Entries.Count);
-            Assert.StartsWith("data/data", zip.Entries[0].FullName);
-            Assert.EndsWith(".csv", zip.Entries[0].FullName);
+            Assert.Equal("data/data.csv", zip.Entries[0].FullName);
             Assert.Equal("Test data blob", zip.Entries[0].Open().ReadToEnd());
 
             Assert.Equal("supporting-files/ancillary.pdf", zip.Entries[1].FullName);
@@ -391,8 +390,7 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(2, zip.Entries.Count);
-            Assert.StartsWith("data/data", zip.Entries[0].FullName);
-            Assert.EndsWith(".csv", zip.Entries[0].FullName);
+            Assert.Equal("data/data-1.csv", zip.Entries[0].FullName);
             Assert.Equal("Test data 1 blob", zip.Entries[0].Open().ReadToEnd());
 
             // Data guidance is generated if there is at least one data file
@@ -944,8 +942,7 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Entries are sorted alphabetically
             Assert.Equal(3, zip.Entries.Count);
-            Assert.StartsWith("data/data", zip.Entries[0].FullName);
-            Assert.EndsWith(".csv", zip.Entries[0].FullName);
+            Assert.Equal("data/data.csv", zip.Entries[0].FullName);
             Assert.Equal("Test data blob", zip.Entries[0].Open().ReadToEnd());
 
             Assert.Equal("supporting-files/ancillary.pdf", zip.Entries[1].FullName);
