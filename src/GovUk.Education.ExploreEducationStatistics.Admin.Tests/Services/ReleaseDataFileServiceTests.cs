@@ -1644,7 +1644,132 @@ public class ReleaseDataFileServiceTests
             Assert.Null(files[1].PublicApiDataSetVersion);
         }
     }
+    
+    [Fact]
+    public async Task ListAll_WithReplacementInProgressOnNewerReleaseVersion_ReplacedByDataFileIsNull()
+    {
+        var releaseVersion = new ReleaseVersion();
+        var amendmentReleaseVersion = new ReleaseVersion();
+        var originalFileId = Guid.NewGuid();
+        var replacementFileId = Guid.NewGuid();
+        var originalFile = new File
+        {
+            Id = originalFileId,
+            Filename = "test-data-1.csv",
+            ContentLength = 10240,
+            Type = FileType.Data,
+            Created = DateTime.UtcNow,
+            CreatedById = _user.Id,
+            ReplacedById = replacementFileId
+        };
+        var replacementFile = new File
+        {
+            Id = replacementFileId,
+            Filename = "test-data-2.csv",
+            ContentLength = 10240,
+            Type = FileType.Data,
+            Created = DateTime.UtcNow,
+            CreatedById = _user.Id,
+            ReplacingId = originalFileId
+        };
+        var originalMetaFile = new File
+        {
+            Filename = "test-data-1.meta.csv",
+            Type = Metadata
+        };
+        var replacementMetaFile = new File
+        {
+            Filename = "test-data-2.meta.csv",
+            Type = Metadata
+        };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            Name = "Test subject 1",
+            File = originalFile
+        };
+        var originalMetaReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = originalMetaFile
+        };
+        var amendmentOriginalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            Name = originalReleaseFile.Name,
+            File = originalFile,
+        };
+        var amendmentOriginalMetaReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            Name = originalMetaReleaseFile.Name,
+            File = originalMetaFile,
+        };
+        var amendmentReplacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            Name = originalReleaseFile.Name,
+            File = replacementFile,
+        };
+        var amendmentReplacementMetaReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            Name = originalMetaReleaseFile.Name,
+            File = replacementMetaFile,
+        };
+        var dataImports = new List<DataImport>
+        {
+            new()
+            {
+                File = originalReleaseFile.File,
+                MetaFile = originalMetaReleaseFile.File,
+                TotalRows = 200,
+                Status = COMPLETE
+            },
+            new()
+            {
+                File = amendmentReplacementReleaseFile.File,
+                MetaFile = amendmentReplacementMetaReleaseFile.File,
+                TotalRows = 400,
+                Status = COMPLETE
+            }
+        };
 
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentReleaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(
+                originalReleaseFile,
+                originalMetaReleaseFile,
+                amendmentOriginalReleaseFile,
+                amendmentOriginalMetaReleaseFile,
+                amendmentReplacementReleaseFile,
+                amendmentReplacementMetaReleaseFile);
+            contentDbContext.DataImports.AddRange(dataImports);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+            var result = await service.ListAll(releaseVersion.Id);
+
+            Assert.True(result.IsRight);
+
+            var files = result.Right.ToList();
+
+            Assert.Single(files);
+
+            Assert.Equal(originalReleaseFile.File.Id, files[0].Id);
+            Assert.Equal("Test subject 1", files[0].Name);
+            Assert.Equal("test-data-1.csv", files[0].FileName);
+            Assert.Equal(replacementFile.Id, files[0].ReplacedBy); //This is set on the published original release version as well as the amendment release version. 
+            Assert.Null(files[0].ReplacedByDataFile);
+        }
+    }
+    
     [Fact]
     public async Task ListAll_WithReplacement()
     {

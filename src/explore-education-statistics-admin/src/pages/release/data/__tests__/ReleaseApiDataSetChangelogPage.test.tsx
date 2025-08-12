@@ -134,6 +134,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     renderPage('data-set-version-3-0');
@@ -176,6 +179,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     renderPage('data-set-version-4-0');
@@ -219,6 +225,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: {},
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     renderPage('data-set-version-2-0');
@@ -257,6 +266,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: {},
       minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     renderPage('data-set-version-1-1');
@@ -295,6 +307,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     const { user } = renderPage('data-set-version-4-0');
@@ -333,6 +348,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     renderPage('data-set-version-4-0');
@@ -352,6 +370,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     apiDataSetVersionService.getChanges.mockResolvedValue({
       majorChanges: majorChangeSet,
       minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
     });
 
     renderPage('data-set-version-4-0');

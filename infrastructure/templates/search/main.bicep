@@ -165,6 +165,16 @@ module searchServiceModule 'application/searchService.bicep' = {
   }
 }
 
+module searchReaderManagedIdentity 'application/searchReaderManagedIdentity.bicep' = {
+  name: 'searchReaderManagedIdentityDeploy'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    searchServiceName: searchServiceModule.outputs.searchServiceName
+    tagValues: tagValues
+  }
+}
+
 output searchableDocumentsContainerName string = searchServiceModule.outputs.searchableDocumentsContainerName
 output searchDocsFunctionAppUrl string = searchDocsFunctionAppModule.outputs.functionAppUrl
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint

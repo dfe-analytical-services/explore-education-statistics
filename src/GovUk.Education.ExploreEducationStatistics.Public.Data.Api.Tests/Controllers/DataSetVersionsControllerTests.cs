@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
@@ -1112,6 +1113,324 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.Single(viewModel.MinorChanges.LocationOptions!);
             Assert.Single(viewModel.MinorChanges.TimePeriods!);
         }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetChanges_PatchHistory_Returns200_AllChanges(bool includePatchHistory)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var (firstDataSetVersion, oldDataSetVersion, dataSetVersion) = DataFixture
+                .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .ForIndex(0, s => s.SetVersionNumber(2, 1))
+                .ForIndex(0, s => s.SetGeographicLevelMeta())
+                .ForIndex(0, s => s.SetLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, ss => ss.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, ss => ss.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, ss => ss.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList))
+                .ForIndex(1, s => s.SetVersionNumber(2, 1, 1))
+                .ForIndex(1, s => s.SetGeographicLevelMeta())
+                .ForIndex(1, s => s.SetLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, ss => ss.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, ss => ss.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, ss => ss.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList))
+                .ForIndex(2, s => s.SetVersionNumber(2, 1, 2))
+                .ForIndex(2, s => s.SetGeographicLevelMeta())
+                .ForIndex(2, s => s.SetLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, ss => ss.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, ss => ss.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, ss => ss.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList))
+                .GenerateTuple3();
+
+            await SetUpHistoryPatchData(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                includePatchHistory: includePatchHistory);
+
+            var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
+            
+            Assert.NotNull(viewModel.PatchHistory);
+            
+            if (!includePatchHistory)
+            {
+                Assert.Empty(viewModel.PatchHistory);
+                return;
+            }
+
+            Assert.Equal(2, viewModel.PatchHistory.Count);
+
+            Assert.Equal("2.1", viewModel.PatchHistory[0].VersionNumber);
+            Assert.Equal("2.1.1", viewModel.PatchHistory[1].VersionNumber);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationGroups!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.LocationOptions!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.LocationOptions!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.Filters!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.Filters!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.FilterOptions!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.FilterOptions!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.Indicators!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.Indicators!);
+            Assert.Single(viewModel.PatchHistory[0].MinorChanges.TimePeriods!);
+            Assert.Single(viewModel.PatchHistory[1].MinorChanges.TimePeriods!);
+        }
+
+        [Fact]
+        public async Task GetChanges_PatchHistory_Returns403_UnViewableDataSetVersion()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion firstDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
+                .WithVersionNumber(2, 1)
+                .WithDataSetId(dataSet.Id)
+                .WithStatusPublished()
+                .WithLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, s => s.SetLevel(GeographicLevel.LocalAuthorityDistrict))
+                    .GenerateList)
+                .WithGeographicLevelMeta();
+
+            DataSetVersion oldDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
+                .WithVersionNumber(2, 1, 1)
+                .WithDataSetId(dataSet.Id)
+                .WithStatusFailed() // set this version to an unviewable dataSetVersion based on `ViewDataSetVersionAuthorizationHandler` to break authorization
+                .WithLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, s => s.SetLevel(GeographicLevel.LocalAuthorityDistrict))
+                    .GenerateList)
+                .WithGeographicLevelMeta();
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 3, indicators: 4, locations: 0, timePeriods: 3)
+                .WithVersionNumber(2, 1, 2)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id)
+                .WithLocationMetas(DataFixture.DefaultLocationMeta(options: 3)
+                    .ForIndex(0, s => s.SetLevel(GeographicLevel.Country))
+                    .ForIndex(1, s => s.SetLevel(GeographicLevel.Region))
+                    .ForIndex(2, s => s.SetLevel(GeographicLevel.OpportunityArea))
+                    .GenerateList)
+                .WithGeographicLevelMeta();
+            
+            await SetUpHistoryPatchData(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
+
+            var response = await GetDataSetVersionChanges(
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.PublicVersion,
+                includePatchHistory: true);
+
+            response.AssertForbidden();
+        }
+        
+        private async Task SetUpHistoryPatchData(
+            DataSetVersion firstDataSetVersion,
+            DataSetVersion oldDataSetVersion,
+            DataSetVersion dataSetVersion)
+        {
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
+            });
+
+            var filterMetaChanges = DataFixture
+                .DefaultFilterMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.FilterMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.FilterMetas[0].Id))
+                .GenerateList();
+            filterMetaChanges.AddRange(DataFixture
+                .DefaultFilterMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.FilterMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.FilterMetas[0].Id))
+                .GenerateList());
+            filterMetaChanges.AddRange(DataFixture
+                .DefaultFilterMetaChange()
+                .WithDataSetVersionId(oldDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.FilterMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.FilterMetas[0].Id))
+                .GenerateList());
+
+            var filterOptionMetaChanges = DataFixture
+                .DefaultFilterOptionMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousState(oldDataSetVersion.FilterMetas[0].OptionLinks[0]))
+                .ForIndex(1, s => s
+                    .SetCurrentState(dataSetVersion.FilterMetas[0].OptionLinks[0]))
+                .GenerateList();
+            filterOptionMetaChanges.AddRange(DataFixture
+                .DefaultFilterOptionMetaChange()
+                .WithDataSetVersionId(oldDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousState(oldDataSetVersion.FilterMetas[0].OptionLinks[0]))
+                .ForIndex(1, s => s
+                    .SetCurrentState(dataSetVersion.FilterMetas[0].OptionLinks[0]))
+                .GenerateList());
+            filterOptionMetaChanges.AddRange(DataFixture
+                .DefaultFilterOptionMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousState(oldDataSetVersion.FilterMetas[0].OptionLinks[0]))
+                .ForIndex(1, s => s
+                    .SetCurrentState(dataSetVersion.FilterMetas[0].OptionLinks[0]))
+                .GenerateList());
+
+            var geographicLevelMetaChanges = DataFixture
+                .DefaultGeographicLevelMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .WithPreviousStateId(oldDataSetVersion.GeographicLevelMeta!.Id)
+                .WithCurrentStateId(dataSetVersion.GeographicLevelMeta!.Id)
+                .GenerateList(1);
+            geographicLevelMetaChanges.AddRange(DataFixture
+                .DefaultGeographicLevelMetaChange()
+                .WithDataSetVersionId(oldDataSetVersion.Id)
+                .WithPreviousStateId(oldDataSetVersion.GeographicLevelMeta!.Id)
+                .WithCurrentStateId(dataSetVersion.GeographicLevelMeta!.Id)
+                .GenerateList(1));
+            geographicLevelMetaChanges.AddRange(DataFixture
+                .DefaultGeographicLevelMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .WithPreviousStateId(oldDataSetVersion.GeographicLevelMeta!.Id)
+                .WithCurrentStateId(dataSetVersion.GeographicLevelMeta!.Id)
+                .GenerateList(1));
+            
+            var indicatorMetaChanges = DataFixture
+                .DefaultIndicatorMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.IndicatorMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.IndicatorMetas[0].Id))
+                .GenerateList();
+            indicatorMetaChanges.AddRange(DataFixture
+                .DefaultIndicatorMetaChange()
+                .WithDataSetVersionId(oldDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.IndicatorMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.IndicatorMetas[0].Id))
+                .GenerateList());
+            indicatorMetaChanges.AddRange(DataFixture
+                .DefaultIndicatorMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.IndicatorMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.IndicatorMetas[0].Id))
+                .GenerateList());
+            
+            var locationMetaChanges = DataFixture
+                .DefaultLocationMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.LocationMetas[2].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.LocationMetas[2].Id))
+                .GenerateList();
+            locationMetaChanges.Add(DataFixture
+                .DefaultLocationMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(firstDataSetVersion.LocationMetas[1].Id)
+                    .SetCurrentStateId(oldDataSetVersion.LocationMetas[1].Id))
+                .Generate()
+            );
+            locationMetaChanges.Add(DataFixture
+                .DefaultLocationMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(firstDataSetVersion.LocationMetas[1].Id)
+                    .SetCurrentStateId(oldDataSetVersion.LocationMetas[1].Id))
+                .Generate()
+            );
+            
+            var locationOptionMetaChanges = DataFixture
+                .DefaultLocationOptionMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousState(oldDataSetVersion.LocationMetas[1].OptionLinks[0]))
+                .ForIndex(1, s => s
+                    .SetCurrentState(dataSetVersion.LocationMetas[1].OptionLinks[0]))
+                .GenerateList();
+            locationOptionMetaChanges.AddRange(DataFixture
+                .DefaultLocationOptionMetaChange()
+                .WithDataSetVersionId(oldDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousState(oldDataSetVersion.LocationMetas[1].OptionLinks[0]))
+                .ForIndex(1, s => s
+                    .SetCurrentState(dataSetVersion.LocationMetas[1].OptionLinks[0]))
+                .GenerateList());
+            locationOptionMetaChanges.AddRange(DataFixture
+                .DefaultLocationOptionMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousState(oldDataSetVersion.LocationMetas[1].OptionLinks[0]))
+                .ForIndex(1, s => s
+                    .SetCurrentState(dataSetVersion.LocationMetas[1].OptionLinks[0]))
+                .GenerateList());
+            
+            var timePeriodMetaChanges = DataFixture
+                .DefaultTimePeriodMetaChange()
+                .WithDataSetVersionId(dataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.TimePeriodMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.TimePeriodMetas[0].Id))
+                .GenerateList();
+            timePeriodMetaChanges.AddRange(DataFixture
+                .DefaultTimePeriodMetaChange()
+                .WithDataSetVersionId(oldDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.TimePeriodMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.TimePeriodMetas[0].Id))
+                .GenerateList());
+            timePeriodMetaChanges.AddRange(DataFixture
+                .DefaultTimePeriodMetaChange()
+                .WithDataSetVersionId(firstDataSetVersion.Id)
+                .ForIndex(0, s => s
+                    .SetPreviousStateId(oldDataSetVersion.TimePeriodMetas[0].Id))
+                .ForIndex(1, s => s
+                    .SetCurrentStateId(dataSetVersion.TimePeriodMetas[0].Id))
+                .GenerateList());
+            
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.FilterMetaChanges.AddRange(filterMetaChanges);
+                context.FilterOptionMetaChanges.AddRange(filterOptionMetaChanges);
+                context.GeographicLevelMetaChanges.AddRange(geographicLevelMetaChanges);
+                context.IndicatorMetaChanges.AddRange(indicatorMetaChanges);
+                context.LocationMetaChanges.AddRange(locationMetaChanges);
+                context.LocationOptionMetaChanges.AddRange(locationOptionMetaChanges);
+                context.TimePeriodMetaChanges.AddRange(timePeriodMetaChanges);
+            });
+        }
 
         [Fact]
         public async Task OnlyFilterChanges_Returns200()
@@ -2162,7 +2481,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             IContentApiClient? contentApiClient = null,
             Guid? previewTokenId = null,
             ClaimsPrincipal? user = null,
-            string? requestSource = null)
+            string? requestSource = null,
+            bool includePatchHistory = false)
         {
             var client = BuildApp(contentApiClient)
                 .WithUser(user)
@@ -2170,7 +2490,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithPreviewTokenHeader(previewTokenId)
                 .WithRequestSourceHeader(requestSource);
 
-            var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes", UriKind.Relative);
+            var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}/changes?includePatchHistory={includePatchHistory}", UriKind.Relative);
 
             return await client.GetAsync(uri);
         }

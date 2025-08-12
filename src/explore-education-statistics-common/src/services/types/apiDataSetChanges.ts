@@ -9,8 +9,11 @@ import {
 } from '@common/services/types/apiDataSetMeta';
 
 export interface ApiDataSetVersionChanges {
+  versionNumber: string;
   majorChanges: ChangeSet;
   minorChanges: ChangeSet;
+  notes?: string;
+  patchHistory: ApiDataSetVersionChanges[];
 }
 
 export interface ChangeSet {

@@ -406,6 +406,8 @@ describe('DataReplacementPlan', () => {
   };
 
   describe('feature flagged enableReplacementOfPublicApiDataSets section renders as expected ', () => {
+    const noAccessApiDetailsMessage =
+      /Please contact the EES team for support at explore.statistics@education.gov.uk. Your user account does not have the role required access to the API details page which can help resolve this issue./;
     test('renders the API errors section when the feature flag enableReplacementOfPublicApiDataSets is turned on', async () => {
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
@@ -439,19 +441,16 @@ describe('DataReplacementPlan', () => {
 
         expect(locationsHeading).toBeInTheDocument();
         expect(locationsParagraph).toBeInTheDocument();
-        expect(locationsParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
-        );
+
+        expect(locationsParagraph).toHaveTextContent(noAccessApiDetailsMessage);
 
         expect(filtersHeading).toBeInTheDocument();
         expect(filtersParagraph).toBeInTheDocument();
-        expect(filtersParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
-        );
+        expect(filtersParagraph).toHaveTextContent(noAccessApiDetailsMessage);
         expect(finalizationHeading).toBeInTheDocument();
         expect(finalizationParagraph).toBeInTheDocument();
         expect(finalizationParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+          noAccessApiDetailsMessage,
         );
       });
     });
@@ -596,13 +595,11 @@ describe('DataReplacementPlan', () => {
 
         expect(filtersHeading).toBeInTheDocument();
         expect(filtersParagraph).toBeInTheDocument();
-        expect(filtersParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
-        );
+        expect(filtersParagraph).toHaveTextContent(noAccessApiDetailsMessage);
         expect(finalizationHeading).toBeInTheDocument();
         expect(finalizationParagraph).toBeInTheDocument();
         expect(finalizationParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+          noAccessApiDetailsMessage,
         );
       });
     });
@@ -656,9 +653,7 @@ describe('DataReplacementPlan', () => {
 
         expect(locationsHeading).toBeInTheDocument();
         expect(locationsParagraph).toBeInTheDocument();
-        expect(locationsParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
-        );
+        expect(locationsParagraph).toHaveTextContent(noAccessApiDetailsMessage);
 
         expect(filtersHeading).toBeInTheDocument();
         expect(filtersParagraph).toBeInTheDocument();
@@ -668,7 +663,7 @@ describe('DataReplacementPlan', () => {
         expect(finalizationHeading).toBeInTheDocument();
         expect(finalizationParagraph).toBeInTheDocument();
         expect(finalizationParagraph).toHaveTextContent(
-          /Please contact the EES team for support\. Your user account does not have the role required access to the API details page which can help resolve this issue\./,
+          noAccessApiDetailsMessage,
         );
       });
     });
