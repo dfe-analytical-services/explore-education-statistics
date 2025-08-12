@@ -120,7 +120,7 @@ public class ReleaseInviteServicePermissionTest
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>();
         userReleaseInviteRepository
-            .Setup(m => m.RemoveByPublication(
+            .Setup(m => m.RemoveByPublicationAndEmail(
                 releaseVersion.Release.PublicationId,
                 email,
                 default,

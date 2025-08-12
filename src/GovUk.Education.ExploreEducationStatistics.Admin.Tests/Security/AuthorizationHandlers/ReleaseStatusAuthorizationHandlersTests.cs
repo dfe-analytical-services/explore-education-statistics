@@ -220,7 +220,9 @@ public class ReleaseStatusAuthorizationHandlersTests
                         logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
                     userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
                         contentDbContext: context,
-                        userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(
+                            contentDbContext: context,
+                            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
                         userRepository: userRepository,
                         logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
@@ -417,7 +419,9 @@ public class ReleaseStatusAuthorizationHandlersTests
                         logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
                     userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
                         contentDbContext: context,
-                        userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(
+                            contentDbContext: context, 
+                            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
                         userRepository: userRepository,
                         logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
@@ -573,7 +577,9 @@ public class ReleaseStatusAuthorizationHandlersTests
                         logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
                     userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
                         contentDbContext: context,
-                        userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                        userReleaseInviteRepository: new UserReleaseInviteRepository(
+                            contentDbContext: context, 
+                            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
                         userRepository: userRepository,
                         logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));

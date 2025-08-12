@@ -45,13 +45,23 @@ public interface IUserReleaseInviteRepository
 
     Task RemoveByPublication(
         Guid publicationId,
-        string? email = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveByPublicationAndEmail(
+        Guid publicationId,
+        string email,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude);
 
     Task RemoveByReleaseVersion(
         Guid releaseVersionId,
-        string? email = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveByReleaseVersionAndEmail(
+        Guid releaseVersionId,
+        string email,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude);
 

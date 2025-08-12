@@ -639,7 +639,7 @@ public class ReleaseInviteServiceTests
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
         userReleaseInviteRepository
-            .Setup(mock => mock.RemoveByPublication(
+            .Setup(mock => mock.RemoveByPublicationAndEmail(
                 publication.Id,
                 Email,
                 default,

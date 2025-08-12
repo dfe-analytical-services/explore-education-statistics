@@ -154,7 +154,7 @@ public class ReleasePermissionService(
                 .CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
             .OnSuccessVoid(async publication =>
             {
-                await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForPublication(
+                await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForPublicationAndUser(
                     userId: userId,
                     publicationId: publicationId,
                     rolesToInclude: ReleaseRole.Contributor);

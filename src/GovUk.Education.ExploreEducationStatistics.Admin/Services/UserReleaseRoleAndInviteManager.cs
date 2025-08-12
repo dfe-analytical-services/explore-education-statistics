@@ -150,66 +150,107 @@ public class UserReleaseRoleAndInviteManager(
 
     public async Task RemoveAllRolesAndInvitesForPublication(
         Guid publicationId,
-        Guid? userId = null,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
     {
-        var userEmail = userId.HasValue
-            ? await GetUserEmail(userId.Value, cancellationToken)
-            : null;
-
-        var allReleaseVersionIds = ContentDbContext.ReleaseVersions
-            .Where(rv => rv.Release.PublicationId == publicationId)
-            .Select(rv => rv.Id)
-            .ToHashSet();
-
-        var userReleaseRoles = await ContentDbContext.UserReleaseRoles
-            .Where(urr => allReleaseVersionIds.Contains(urr.ReleaseVersionId))
-            .If(userId.HasValue)
-                .ThenWhere(urr => urr.UserId == userId)
-            .If(rolesToInclude.Any())
-                .ThenWhere(i => rolesToInclude.Contains(i.Role))
-            .ToListAsync(cancellationToken);
-
         await ContentDbContext.RequireTransaction(async () =>
         {
             await userReleaseInviteRepository.RemoveByPublication(
+                publicationId: publicationId,
+                cancellationToken: cancellationToken,
+                rolesToInclude: rolesToInclude);
+
+            await RemoveAllRolesForPublication(
+                publicationId: publicationId,
+                userId: null,
+                cancellationToken: cancellationToken,
+                rolesToInclude: rolesToInclude);
+        });
+    }
+
+    public async Task RemoveAllRolesAndInvitesForPublicationAndUser(
+        Guid publicationId,
+        Guid userId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        if (userId == Guid.Empty)
+        {
+            logger.LogError(
+                "Trying to remove roles/invites for a publication and user combination, " +
+                $"but the supplied '{nameof(userId)}' is EMPTY. '{nameof(userId)}' must not be EMPTY.");
+
+            throw new ArgumentException($"{nameof(userId)} must not be EMPTY.", nameof(userId));
+        }
+
+        var userEmail = await GetUserEmail(userId, cancellationToken);
+
+        await ContentDbContext.RequireTransaction(async () =>
+        {
+            await userReleaseInviteRepository.RemoveByPublicationAndEmail(
                 publicationId: publicationId,
                 email: userEmail,
                 cancellationToken: cancellationToken,
                 rolesToInclude: rolesToInclude);
 
-            await RemoveMany(userReleaseRoles, cancellationToken);
+            await RemoveAllRolesForPublication(
+                publicationId: publicationId,
+                userId: userId,
+                cancellationToken: cancellationToken,
+                rolesToInclude: rolesToInclude);
         });
     }
 
     public async Task RemoveAllRolesAndInvitesForReleaseVersion(
         Guid releaseVersionId,
-        Guid? userId = null,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
     {
-        var userEmail = userId.HasValue
-            ? await GetUserEmail(userId.Value, cancellationToken)
-            : null;
-
-        var userReleaseRoles = await ContentDbContext.UserReleaseRoles
-            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
-            .If(userId.HasValue)
-                .ThenWhere(urr => urr.UserId == userId)
-            .If(rolesToInclude.Any())
-                .ThenWhere(i => rolesToInclude.Contains(i.Role))
-            .ToListAsync(cancellationToken);
-
         await ContentDbContext.RequireTransaction(async () =>
         {
             await userReleaseInviteRepository.RemoveByReleaseVersion(
+                releaseVersionId: releaseVersionId,
+                cancellationToken: cancellationToken,
+                rolesToInclude: rolesToInclude);
+
+            await RemoveAllRolesAndInvitesForReleaseVersion(
+                releaseVersionId: releaseVersionId,
+                userId: null,
+                cancellationToken: cancellationToken,
+                rolesToInclude: rolesToInclude);
+        });
+    }
+
+    public async Task RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+        Guid releaseVersionId,
+        Guid userId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        if (userId == Guid.Empty)
+        {
+            logger.LogError(
+                "Trying to remove roles/invites for a release version and user combination, " +
+                $"but the supplied '{nameof(userId)}' is EMPTY. '{nameof(userId)}' must not be EMPTY.");
+
+            throw new ArgumentException($"{nameof(userId)} must not be EMPTY.", nameof(userId));
+        }
+
+        var userEmail = await GetUserEmail(userId, cancellationToken);
+
+        await ContentDbContext.RequireTransaction(async () =>
+        {
+            await userReleaseInviteRepository.RemoveByReleaseVersionAndEmail(
                 releaseVersionId: releaseVersionId,
                 email: userEmail,
                 cancellationToken: cancellationToken,
                 rolesToInclude: rolesToInclude);
 
-            await RemoveMany(userReleaseRoles, cancellationToken);
+            await RemoveAllRolesAndInvitesForReleaseVersion(
+                releaseVersionId: releaseVersionId,
+                userId: userId,
+                cancellationToken: cancellationToken,
+                rolesToInclude: rolesToInclude);
         });
     }
 
@@ -231,5 +272,44 @@ public class UserReleaseRoleAndInviteManager(
 
             await RemoveMany(userReleaseRoles, cancellationToken);
         });
+    }
+
+    private async Task RemoveAllRolesForPublication(
+        Guid publicationId,
+        Guid? userId = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        var allReleaseVersionIds = ContentDbContext.ReleaseVersions
+            .Where(rv => rv.Release.PublicationId == publicationId)
+            .Select(rv => rv.Id)
+            .ToHashSet();
+
+        var userReleaseRoles = await ContentDbContext.UserReleaseRoles
+            .Where(urr => allReleaseVersionIds.Contains(urr.ReleaseVersionId))
+            .If(userId.HasValue)
+                .ThenWhere(urr => urr.UserId == userId)
+            .If(rolesToInclude.Any())
+                .ThenWhere(i => rolesToInclude.Contains(i.Role))
+            .ToListAsync(cancellationToken);
+
+        await RemoveMany(userReleaseRoles, cancellationToken);
+    }
+
+    private async Task RemoveAllRolesAndInvitesForReleaseVersion(
+        Guid releaseVersionId,
+        Guid? userId = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        var userReleaseRoles = await ContentDbContext.UserReleaseRoles
+            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
+            .If(userId.HasValue)
+                .ThenWhere(urr => urr.UserId == userId)
+            .If(rolesToInclude.Any())
+                .ThenWhere(i => rolesToInclude.Contains(i.Role))
+            .ToListAsync(cancellationToken);
+
+        await RemoveMany(userReleaseRoles, cancellationToken);
     }
 }

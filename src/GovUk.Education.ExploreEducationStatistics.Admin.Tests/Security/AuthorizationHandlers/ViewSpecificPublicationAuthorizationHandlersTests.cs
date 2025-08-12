@@ -138,7 +138,9 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 userReleaseRoleAndInviteManager ?? new UserReleaseRoleAndInviteManager(
                     contentDbContext: context,
-                    userReleaseInviteRepository: new UserReleaseInviteRepository(context),
+                    userReleaseInviteRepository: new UserReleaseInviteRepository(
+                        contentDbContext: context, 
+                        logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
                     userRepository: userRepository,
                     logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                 userPublicationRoleAndInviteManager ?? new UserPublicationRoleAndInviteManager(

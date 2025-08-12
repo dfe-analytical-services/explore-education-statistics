@@ -79,7 +79,7 @@ public class ReleaseInviteService(
             .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, releaseRole))
             .OnSuccess(async publication =>
             {
-                await userReleaseInviteRepository.RemoveByPublication(
+                await userReleaseInviteRepository.RemoveByPublicationAndEmail(
                     publicationId: publication.Id,
                     email: email,
                     rolesToInclude: releaseRole);

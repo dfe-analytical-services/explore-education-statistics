@@ -157,7 +157,7 @@ public class PreReleaseUserService(ContentDbContext context,
             .OnSuccessVoid(
                 async user =>
                 {
-                    await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersion(
+                    await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
                         userId: user.Id,
                         releaseVersionId: releaseVersionId,
                         rolesToInclude: ReleaseRole.PrereleaseViewer);

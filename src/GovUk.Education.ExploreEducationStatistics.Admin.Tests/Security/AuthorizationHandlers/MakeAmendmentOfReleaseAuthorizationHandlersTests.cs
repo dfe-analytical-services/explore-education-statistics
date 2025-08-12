@@ -396,7 +396,9 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
         var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
             contentDbContext,
-            new UserReleaseInviteRepository(contentDbContext),
+            new UserReleaseInviteRepository(
+                contentDbContext: contentDbContext,
+                logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
             userRepository,
             logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
 

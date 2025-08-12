@@ -1744,7 +1744,6 @@ public abstract class ReleaseVersionServiceTests
 
             userReleaseRoleAndInviteManager.Setup(mock => mock.RemoveAllRolesAndInvitesForReleaseVersion(
                     releaseVersion.Id,
-                    null,
                     default))
                 .Returns(Task.CompletedTask);
 
@@ -2106,9 +2105,8 @@ public abstract class ReleaseVersionServiceTests
                 .ReturnsAsync(Unit.Instance);
 
             userReleaseRoleAndInviteManager.Setup(mock => mock.RemoveAllRolesAndInvitesForReleaseVersion(
-                releaseVersion.Id,
-                null,
-                default))
+                    releaseVersion.Id,
+                    default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);

@@ -73,7 +73,9 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
                     contentDbContext: contentDbContext,
-                    userReleaseInviteRepository: new UserReleaseInviteRepository(contentDbContext),
+                    userReleaseInviteRepository: new UserReleaseInviteRepository(
+                        contentDbContext: contentDbContext,
+                        logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
                     userRepository: userRepository,
                     logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
                 userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(

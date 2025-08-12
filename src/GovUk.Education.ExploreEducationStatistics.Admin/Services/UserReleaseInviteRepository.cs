@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,9 @@ using Guid = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-
-public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IUserReleaseInviteRepository
+public class UserReleaseInviteRepository(
+    ContentDbContext contentDbContext,
+    ILogger<UserReleaseInviteRepository> logger) : IUserReleaseInviteRepository
 {
     public async Task Create(
         Guid releaseVersionId,
@@ -138,6 +140,85 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
 
     public async Task RemoveByPublication(
         Guid publicationId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        await RemoveByPublication(
+            publicationId: publicationId,
+            email: null,
+            cancellationToken: cancellationToken,
+            rolesToInclude:rolesToInclude);
+    }
+
+    public async Task RemoveByPublicationAndEmail(
+        Guid publicationId,
+        string email,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        if (email is null)
+        {
+            logger.LogError(
+                "Trying to remove invites for a publication and email combination, " +
+                $"but the supplied '{nameof(email)}' is NULL. '{nameof(email)}' must not be NULL.");
+
+            throw new ArgumentNullException(nameof(email), $"{nameof(email)} must not be NULL.");
+        }
+
+        await RemoveByPublication(
+            publicationId: publicationId,
+            email: email,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
+    }
+
+    public async Task RemoveByReleaseVersion(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        await RemoveByReleaseVersion(
+            releaseVersionId: releaseVersionId,
+            email: null,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
+    }
+
+    public async Task RemoveByReleaseVersionAndEmail(
+        Guid releaseVersionId,
+        string email,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude)
+    {
+        if (email is null)
+        {
+            logger.LogError(
+                "Trying to remove invites for a release version and email combination, " +
+                $"but the supplied '{nameof(email)}' is NULL. '{nameof(email)}' must not be NULL.");
+
+            throw new ArgumentNullException(nameof(email), $"{nameof(email)} must not be NULL.");
+        }
+
+        await RemoveByReleaseVersion(
+            releaseVersionId: releaseVersionId,
+            email: email,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
+    }
+
+    public async Task RemoveByUserEmail(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        var invites = await contentDbContext.UserReleaseInvites
+            .Where(i => i.Email == email)
+            .ToListAsync(cancellationToken);
+
+        await RemoveMany(invites, cancellationToken);
+    }
+
+    private async Task RemoveByPublication(
+        Guid publicationId,
         string? email = null,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
@@ -158,7 +239,7 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
         await RemoveMany(invites, cancellationToken);
     }
 
-    public async Task RemoveByReleaseVersion(
+    private async Task RemoveByReleaseVersion(
         Guid releaseVersionId,
         string? email = null,
         CancellationToken cancellationToken = default,
@@ -170,17 +251,6 @@ public class UserReleaseInviteRepository(ContentDbContext contentDbContext) : IU
                 .ThenWhere(i => i.Email == email)
             .If(rolesToInclude.Any())
                 .ThenWhere(i => rolesToInclude.Contains(i.Role))
-            .ToListAsync(cancellationToken);
-
-        await RemoveMany(invites, cancellationToken);
-    }
-
-    public async Task RemoveByUserEmail(
-        string email,
-        CancellationToken cancellationToken = default)
-    {
-        var invites = await contentDbContext.UserReleaseInvites
-            .Where(i => i.Email == email)
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);

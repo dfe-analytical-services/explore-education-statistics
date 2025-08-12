@@ -503,7 +503,7 @@ public class ReleasePermissionServiceTests
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
         userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForPublication(
+            .Setup(m => m.RemoveAllRolesAndInvitesForPublicationAndUser(
                 publication.Id,
                 userId,
                 default,

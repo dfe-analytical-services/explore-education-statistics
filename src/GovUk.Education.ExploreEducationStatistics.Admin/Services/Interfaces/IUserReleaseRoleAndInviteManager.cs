@@ -58,13 +58,23 @@ public interface IUserReleaseRoleAndInviteManager
 
     Task RemoveAllRolesAndInvitesForPublication(
         Guid publicationId,
-        Guid? userId = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveAllRolesAndInvitesForPublicationAndUser(
+        Guid publicationId,
+        Guid userId,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude);
 
     Task RemoveAllRolesAndInvitesForReleaseVersion(
         Guid releaseVersionId,
-        Guid? userId = null,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+        Guid releaseVersionId,
+        Guid userId,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude);
 

@@ -96,9 +96,11 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
         if (user is null)
         {
             logger.LogError($"User with ID '{userId}' was not found.");
+
+            throw new KeyNotFoundException($"User with ID '{userId}' was not found.");
         }
             
-        return user!.Email;
+        return user.Email;
     }
 
     protected async Task Remove(TResourceRole resourceRole, CancellationToken cancellationToken = default)

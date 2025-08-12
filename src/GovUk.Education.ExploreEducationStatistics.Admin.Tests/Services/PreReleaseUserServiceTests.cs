@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
@@ -1242,7 +1243,7 @@ public class PreReleaseUserServiceTests
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
         userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersion(
+            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
                 releaseVersion.Id,
                 user.Id,
                 default,
@@ -1329,7 +1330,7 @@ public class PreReleaseUserServiceTests
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
         userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersion(
+            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
                 releaseVersion.Id,
                 user.Id,
                 default,
@@ -1409,7 +1410,7 @@ public class PreReleaseUserServiceTests
 
         var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
         userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersion(
+            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
                 releaseVersion.Id,
                 user.Id,
                 default,
@@ -1505,7 +1506,9 @@ public class PreReleaseUserServiceTests
         IUserReleaseInviteRepository? userReleaseInviteRepository = null)
     {
         userRepository ??= new UserRepository(contentDbContext);
-        userReleaseInviteRepository ??= new UserReleaseInviteRepository(contentDbContext);
+        userReleaseInviteRepository ??= new UserReleaseInviteRepository(
+            contentDbContext: contentDbContext,
+            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>());
 
         return new(
             contentDbContext,
