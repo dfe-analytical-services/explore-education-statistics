@@ -38,6 +38,7 @@ public static class ProcessorHostBuilder
             {
                 builder
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false)
                     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables();
             })
