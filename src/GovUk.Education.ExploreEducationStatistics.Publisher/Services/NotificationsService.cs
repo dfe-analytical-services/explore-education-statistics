@@ -65,6 +65,8 @@ public class NotificationsService(
                         {
                             ReleaseVersion = releaseVersion,
                             ReleaseVersionId = releaseVersion.Id,
+                            ReleaseTitle = releaseVersion.Release.Title,
+                            PublicationTitle = releaseVersion.Release.Publication.Title,
                             UserPublicationRole = upr.Role,
                             EmailToken = Guid.NewGuid().ToString()
                         };
