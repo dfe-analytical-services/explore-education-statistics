@@ -1,0 +1,9 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+enrolments,Indicator,Enrolments,Headline absence fields,,0,,
+sess_possible,Indicator,Number of possible sessions,Headline absence fields,,0,,
+sess_authorised,Indicator,Number of authorised sessions,Headline absence fields,,0,,
+sess_unauthorised,Indicator,Number of unauthorised sessions,Headline absence fields,,0,,
+sess_unauthorised_percent,Indicator,Percentage of unauthorised sessions,Headline absence fields,%,2,,
+school_type,Filter,School type,,,,,
+academy_type,Filter,Academy type,,,,"Only applicable for academies, otherwise no value",
+ncyear,Filter,National Curriculum year,,,,Ranges from years 1 to 11,
