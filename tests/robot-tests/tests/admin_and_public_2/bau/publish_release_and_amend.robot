@@ -191,7 +191,7 @@ Add embedded dashboard to third accordion section
 
     user updates embedded URL details in modal
     ...    Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics
+    ...    https://dfe-analytical-services.github.io/analysts-guide
 
     user presses keys    TAB
     user waits until page does not contain    URL must be on a permitted domain
@@ -200,7 +200,7 @@ Add embedded dashboard to third accordion section
 
     user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
 
 User navigates to Data blocks page to edit block
@@ -488,7 +488,7 @@ Verify embedded dashboard accordion section contains dashboard
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
 
 Return to Admin and create first amendment
@@ -724,7 +724,7 @@ Update embedded dashboard title and url
 
     user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    https://dfe-analytical-services.github.io/dfeshiny
     ...    Edit embedded URL
 
     user presses keys    TAB
@@ -734,7 +734,7 @@ Update embedded dashboard title and url
 
     user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
+    user waits until h1 is visible    dfeshiny    %{WAIT_SMALL}
     unselect frame
 
     user closes accordion section    Test embedded dashboard section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}

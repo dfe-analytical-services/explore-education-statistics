@@ -139,14 +139,14 @@ Add embedded dashboard to third accordion section
 
     ${modal}=    user updates embedded URL details in modal
     ...    Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics
+    ...    https://dfe-analytical-services.github.io/analysts-guide
 
     user clicks button    Save    ${modal}
     user waits until modal is not visible    Embed a URL
 
     user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
 
 Add public prerelease access list
@@ -355,7 +355,7 @@ Update embedded dashboard title
 
     ${modal}=    user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    https://dfe-analytical-services.github.io/dfeshiny
     ...    Edit embedded URL
 
     user clicks button    Save    ${modal}
@@ -363,7 +363,7 @@ Update embedded dashboard title
 
     user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
+    user waits until h1 is visible    dfeshiny    %{WAIT_SMALL}
     unselect frame
 
 Cancel the release amendment
@@ -491,5 +491,5 @@ Verify that the Embedded URL accordion section is unchanged
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
