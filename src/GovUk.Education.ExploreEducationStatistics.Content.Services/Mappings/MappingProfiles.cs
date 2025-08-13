@@ -91,7 +91,5 @@ public class MappingProfiles : CommonMappingProfile
                     embedBlockLink.EmbedBlock.Url));
 
         CreateMap<HtmlBlock, HtmlBlockViewModel>();
-
-        CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
     }
 }

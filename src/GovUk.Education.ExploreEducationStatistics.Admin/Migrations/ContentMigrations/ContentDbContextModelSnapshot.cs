@@ -1602,24 +1602,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Body")
                         .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Body");
 
                     b.HasDiscriminator().HasValue("HtmlBlock");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MarkDownBlock", b =>
-                {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Body");
-
-                    b.HasDiscriminator().HasValue("MarkDownBlock");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticDataBlock", b =>

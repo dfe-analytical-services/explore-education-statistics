@@ -160,21 +160,11 @@ public class ReleaseAmendmentServiceTests
                                 },
                             },
                         })))
-                .ForIndex(1, s => s
-                    .SetContentBlocks(ListOf<ContentBlock>(
-                        new MarkDownBlock
-                        {
-                            Id = Guid.NewGuid(),
-                            Body = "Text",
-                            Comments = new List<Comment>
-                            {
-                                new()
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Inset Comment 1 Text"
-                                }
-                            }
-                        })))
+                .ForIndex(1,
+                    s => s
+                        .SetContentBlocks(ListOf<ContentBlock>(_fixture
+                            .DefaultHtmlBlock()
+                            .WithBody("<div></div>"))))
                 .ForIndex(2, s => s
                     .SetType(ContentSectionType.RelatedDashboards)
                     .SetContentBlocks(_fixture

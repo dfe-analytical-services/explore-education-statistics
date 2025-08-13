@@ -273,7 +273,6 @@ public class ContentService : IContentService
 
                 return blockToUpdate switch
                 {
-                    MarkDownBlock markDownBlock => await UpdateMarkDownBlock(markDownBlock, request.Body),
                     HtmlBlock htmlBlock => await UpdateHtmlBlock(htmlBlock, request.Body),
                     DataBlock _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
                     _ => throw new ArgumentOutOfRangeException()
@@ -349,23 +348,6 @@ public class ContentService : IContentService
         }
 
         return 1;
-    }
-
-    private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateMarkDownBlock(MarkDownBlock markDownBlock,
-        string body)
-    {
-        var htmlBlock = new HtmlBlock
-        {
-            Body = body,
-            Comments = markDownBlock.Comments,
-            Order = markDownBlock.Order,
-            ContentSectionId = markDownBlock.ContentSectionId
-        };
-
-        var added = (await _context.ContentBlocks.AddAsync(htmlBlock)).Entity;
-        _context.ContentBlocks.Remove(markDownBlock);
-        await _context.SaveChangesAsync();
-        return _mapper.Map<HtmlBlockViewModel>(added);
     }
 
     private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateHtmlBlock(HtmlBlock blockToUpdate,

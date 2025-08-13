@@ -138,10 +138,6 @@ public class ReleaseService : IReleaseService
             case HtmlBlockViewModel htmlBlock:
                 htmlBlock.Body = CommentsRegex.Replace(htmlBlock.Body, string.Empty);
                 break;
-
-            case MarkDownBlockViewModel markdownBlock:
-                markdownBlock.Body = CommentsRegex.Replace(markdownBlock.Body, string.Empty);
-                break;
         }
     }
 
