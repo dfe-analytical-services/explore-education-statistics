@@ -108,8 +108,7 @@ const PrototypeReleaseEditableBlock = ({
           </CommentsWrapper>
         );
       }
-      case 'HtmlBlock':
-      case 'MarkDownBlock': {
+      case 'HtmlBlock': {
         return (
           <EditableContentBlock
             allowComments={allowComments}
@@ -119,7 +118,6 @@ const PrototypeReleaseEditableBlock = ({
             label="Content block"
             toolbarConfig={releaseToolbarConfigFull}
             transformImageAttributes={transformImageAttributes}
-            useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
             onActive={noop}
             onAutoSave={noop}
