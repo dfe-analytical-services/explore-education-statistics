@@ -63,7 +63,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
             .Where(uri =>
                 uri.PublicationId == publicationId
                 && uri.Role == role
-                && uri.Email.ToLower().Equals(email!.ToLower())) // DB comparison is case insensitive
+                && uri.Email.ToLower().Equals(email!.ToLower()))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (invite is null)
