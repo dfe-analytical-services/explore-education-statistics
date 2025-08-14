@@ -12,6 +12,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Button from '@common/components/Button';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
+import ModalConfirm from '@common/components/ModalConfirm';
 
 const EducationInNumbersSignOffPage = () => {
   const { educationInNumbersPage, onEducationInNumbersPageChange } =
@@ -52,9 +53,10 @@ const EducationInNumbersSignOffPage = () => {
           </SummaryList>
 
           {isEditable && (
-            <Button
-              onClick={async () => {
-                // @MarkFix add "are you sure you want to publish?" modal?
+            <ModalConfirm
+              title={`Are you sure you want to publish the ${educationInNumbersPage.title} page?`}
+              triggerButton={<Button>Publish</Button>}
+              onConfirm={async () => {
                 const publishedPage =
                   await educationInNumbersService.publishEducationInNumbersPage(
                     educationInNumbersPage.id,
@@ -72,8 +74,11 @@ const EducationInNumbersSignOffPage = () => {
                 );
               }}
             >
-              Publish
-            </Button>
+              <p>
+                Once published, this Education In Numbers page will be live
+                immediately.
+              </p>
+            </ModalConfirm>
           )}
         </>
       ) : (
