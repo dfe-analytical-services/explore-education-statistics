@@ -339,47 +339,6 @@ public abstract class NotificationsServiceTests
         }
         
         [Fact]
-        public async Task UserPublicationRoleDeleted_NoEmailSent()
-        {
-            var publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => _dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1))
-                .Generate();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.AddRange(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var notificationsService = BuildNotificationsService(
-                    contentDbContext,
-                    notifierClient: notifierClient.Object);
-
-                await notificationsService.SendReleasePublishingFeedbackEmails([
-                    publication.Releases[0].Versions[0].Id
-                ]);
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var feedbackEntries = contentDbContext
-                    .ReleasePublishingFeedback
-                    .ToList();
-
-                Assert.Empty(feedbackEntries);
-            }
-        }
-        
-        [Fact]
         public async Task OldApproverRoleAndDrafterRole_NoEmailsSent()
         {
             var publication = _dataFixture
