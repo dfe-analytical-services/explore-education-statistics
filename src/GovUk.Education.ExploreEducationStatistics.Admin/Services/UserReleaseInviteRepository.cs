@@ -119,7 +119,7 @@ public class UserReleaseInviteRepository(
             .Where(uri =>
                 uri.ReleaseVersionId == releaseVersionId
                 && uri.Role == role
-                && uri.Email == email) // DB comparison is case insensitive
+                && uri.Email.ToLower().Equals(email!.ToLower()))
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);

@@ -60,10 +60,10 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
     {
         var invites = await contentDbContext.UserPublicationInvites
             .AsQueryable()
-            .Where(uri =>
-                uri.PublicationId == publicationId
-                && uri.Role == role
-                && uri.Email == email) // DB comparison is case insensitive
+            .Where(upi =>
+                upi.PublicationId == publicationId
+                && upi.Role == role
+                && upi.Email.ToLower().Equals(email!.ToLower()))
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);
