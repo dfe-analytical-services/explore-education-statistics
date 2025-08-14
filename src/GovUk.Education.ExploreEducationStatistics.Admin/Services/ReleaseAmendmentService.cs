@@ -389,23 +389,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                     };
                 }
 
-                if (originalContentBlock is MarkDownBlock originalMarkDownBlock)
-                {
-                    return new MarkDownBlock
-                    {
-                        // Assign a new Id.
-                        Id = Guid.NewGuid(),
-
-                        // Assign the MarkDownBlock to the new Release amendment and the new ContentSection amendment.
-                        ReleaseVersionId = amendmentReleaseVersionId,
-                        ContentSectionId = contentSectionAmendmentId,
-
-                        // Copy certain fields from the original MarkDownBlock.
-                        Body = originalMarkDownBlock.Body,
-                        Order = originalMarkDownBlock.Order,
-                    };
-                }
-
                 throw new ArgumentException(
                     $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment");
             })

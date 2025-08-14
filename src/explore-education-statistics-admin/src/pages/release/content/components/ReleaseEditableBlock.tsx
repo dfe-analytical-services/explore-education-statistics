@@ -388,8 +388,7 @@ const ReleaseEditableBlock = ({
           </CommentsWrapper>
         );
       }
-      case 'HtmlBlock':
-      case 'MarkDownBlock': {
+      case 'HtmlBlock': {
         return (
           <EditableContentBlock
             actionThrottle={lockThrottle}
@@ -404,7 +403,6 @@ const ReleaseEditableBlock = ({
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             toolbarConfig={releaseToolbarConfigFull}
             transformImageAttributes={transformImageAttributes}
-            useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
             onActive={refreshLock}
             onAutoSave={handleSave}

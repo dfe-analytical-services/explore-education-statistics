@@ -9,12 +9,6 @@ import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 
 describe('EditableContentBlock', () => {
-  const testMarkdown = `
-## Test heading
-    
-Test paragraph
-`;
-
   const testOrphanedCommentHtml = `
 <p>
   Test <comment-start name="comment-1"></comment-start>unresolved<comment-end name="comment-1"></comment-end> and 
@@ -72,29 +66,6 @@ Test paragraph
     `);
   });
 
-  test('renders editable version with markdown content correctly', () => {
-    render(
-      <EditableContentBlock
-        id="test-id"
-        label="Block content"
-        value={testMarkdown}
-        useMarkdown
-        onEditing={noop}
-        onCancel={noop}
-        onSubmit={noop}
-        onDelete={noop}
-      />,
-    );
-
-    expect(
-      screen.getByText('Test heading', { selector: 'h2' }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('Test paragraph', { selector: 'p' }),
-    ).toBeInTheDocument();
-  });
-
   test('renders non-editable version correctly', () => {
     render(
       <EditableContentBlock
@@ -128,7 +99,6 @@ Test paragraph
         label="Block content"
         value={testOrphanedCommentHtml}
         editable={false}
-        useMarkdown
         onEditing={noop}
         onCancel={noop}
         onSubmit={noop}
@@ -193,30 +163,6 @@ Test paragraph
     );
 
     expect(screen.getByText('Jane Doe is editing')).toBeInTheDocument();
-  });
-
-  test('renders non-editable version with markdown content correctly', () => {
-    render(
-      <EditableContentBlock
-        id="test-id"
-        label="Block content"
-        value={testMarkdown}
-        editable={false}
-        useMarkdown
-        onEditing={noop}
-        onCancel={noop}
-        onSubmit={noop}
-        onDelete={noop}
-      />,
-    );
-
-    expect(
-      screen.getByText('Test heading', { selector: 'h2' }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('Test paragraph', { selector: 'p' }),
-    ).toBeInTheDocument();
   });
 
   test('clicking `Edit block` button calls `onEditing` handler', async () => {

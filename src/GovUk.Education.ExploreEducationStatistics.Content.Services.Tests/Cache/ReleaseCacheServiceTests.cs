@@ -56,8 +56,6 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                 [
                     new HtmlBlockViewModel { Id = Guid.NewGuid() },
 
-                    new MarkDownBlockViewModel { Id = Guid.NewGuid() },
-
                     new DataBlockViewModel
                     {
                         Id = Guid.NewGuid(),

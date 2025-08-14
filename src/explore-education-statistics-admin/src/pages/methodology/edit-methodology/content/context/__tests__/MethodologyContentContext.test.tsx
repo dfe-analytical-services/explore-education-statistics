@@ -22,15 +22,15 @@ const basicMethodology: MethodologyContent = {
       content: [
         {
           id: 'content-section-0-content-0',
-          body: '',
-          type: 'MarkDownBlock',
+          body: '<p></p>',
+          type: 'HtmlBlock',
           order: 0,
           comments: [],
         },
         {
           id: 'content-section-0-content-1',
-          body: 'Part 2',
-          type: 'MarkDownBlock',
+          body: '<p>Part 2</p>',
+          type: 'HtmlBlock',
           order: 0,
           comments: [],
         },
@@ -53,8 +53,8 @@ const basicMethodology: MethodologyContent = {
       content: [
         {
           id: 'annex-section-0-content-0',
-          body: 'annex text',
-          type: 'MarkDownBlock',
+          body: '<p>annex text</p>',
+          type: 'HtmlBlock',
           order: 0,
           comments: [],
         },
@@ -221,9 +221,9 @@ describe('MethodologyContext', () => {
     const newBlock: EditableContentBlock = {
       id: '123',
       order: 1,
-      body: 'This section is empty...',
+      body: '<p>This section is empty...</p>',
       comments: [],
-      type: 'MarkDownBlock',
+      type: 'HtmlBlock',
     };
 
     const originalLength = section.content?.length || 0;
@@ -262,9 +262,9 @@ describe('MethodologyContext', () => {
     const newBlock: EditableContentBlock = {
       id: '123',
       order: 0,
-      body: 'This section is empty...',
+      body: '<p>This section is empty...</p>',
       comments: [],
-      type: 'MarkDownBlock',
+      type: 'HtmlBlock',
     };
 
     const originalLength = section.content?.length || 0;

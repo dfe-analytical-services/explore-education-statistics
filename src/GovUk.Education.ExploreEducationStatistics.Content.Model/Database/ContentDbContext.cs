@@ -70,7 +70,6 @@ public class ContentDbContext : DbContext
     public virtual DbSet<DataImport> DataImports { get; set; }
     public virtual DbSet<DataImportError> DataImportErrors { get; set; }
     public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
-    public virtual DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
     public virtual DbSet<EmbedBlock> EmbedBlocks { get; set; }
     public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
     public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
@@ -125,7 +124,6 @@ public class ContentDbContext : DbContext
         ConfigureDataBlock(modelBuilder);
         ConfigureHtmlBlock(modelBuilder);
         ConfigureEmbedBlockLink(modelBuilder);
-        ConfigureMarkdownBlock(modelBuilder);
         ConfigureFeaturedTable(modelBuilder);
         ConfigurePermalink(modelBuilder);
         ConfigureUser(modelBuilder);
@@ -654,13 +652,6 @@ public class ContentDbContext : DbContext
             .HasOne(eb => eb.EmbedBlock)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
-    }
-
-    private static void ConfigureMarkdownBlock(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<MarkDownBlock>()
-            .Property(block => block.Body)
-            .HasColumnName("Body");
     }
 
     private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
