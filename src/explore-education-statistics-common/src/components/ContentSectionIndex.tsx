@@ -183,6 +183,8 @@ const ContentSectionIndex = ({
         <div
           ref={ref}
           style={{
+            maxHeight: '100vh',
+            overflowY: 'auto',
             width: width === 0 ? '100%' : width,
             ...getStyle(),
           }}
