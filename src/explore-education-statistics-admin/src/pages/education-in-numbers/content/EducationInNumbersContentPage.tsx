@@ -54,7 +54,10 @@ const EducationInNumbersContentPage = ({
     //     <WarningMessage>Could not load page content</WarningMessage>
     //   )}
     // </LoadingSpinner>
-    <p>Page content - {educationInNumbersPageId}</p>
+    <>
+      <p>Under construction!</p>
+      <p>Page content for {educationInNumbersPageId}</p>
+    </>
   );
 };
 

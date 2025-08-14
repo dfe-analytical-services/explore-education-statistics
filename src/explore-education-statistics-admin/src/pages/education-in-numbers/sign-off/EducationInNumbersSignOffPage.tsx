@@ -17,14 +17,14 @@ import UrlContainer from '@common/components/UrlContainer';
 import { useConfig } from '@admin/contexts/ConfigContext';
 
 const EducationInNumbersSignOffPage = () => {
-  const { educationInNumbersPage, onEducationInNumbersPageChange } =
+  const { educationInNumbersPage: page, onEducationInNumbersPageChange } =
     useEducationInNumbersPageContext();
 
   const history = useHistory();
 
   const { publicAppUrl } = useConfig();
 
-  const isEditable = educationInNumbersPage.published === undefined;
+  const isEditable = page.published === undefined;
 
   return (
     <>
@@ -36,29 +36,23 @@ const EducationInNumbersSignOffPage = () => {
         className="govuk-!-margin-bottom-4"
         id="public-page-url"
         url={`${publicAppUrl}/education-in-numbers/${
-          educationInNumbersPage.slug !== undefined
-            ? educationInNumbersPage.slug
-            : ''
+          page.slug !== undefined ? page.slug : ''
         }`}
       />
 
-      {educationInNumbersPage ? (
+      {page ? (
         <>
           <SummaryList>
-            <SummaryListItem term="Title">
-              {educationInNumbersPage.title}
-            </SummaryListItem>
-            <SummaryListItem term="Slug">
-              {educationInNumbersPage.slug ?? 'N/A'}
-            </SummaryListItem>
+            <SummaryListItem term="Title">{page.title}</SummaryListItem>
+            <SummaryListItem term="Slug">{page.slug ?? 'N/A'}</SummaryListItem>
             <SummaryListItem term="Description">
-              {educationInNumbersPage.description}
+              {page.description}
             </SummaryListItem>
             <SummaryListItem term="Published on">
-              {educationInNumbersPage.published ? (
+              {page.published ? (
                 // @MarkFix it's utc time when it should be gmt
                 <FormattedDate format="HH:mm:ss - d MMMM yyyy">
-                  {educationInNumbersPage.published}
+                  {page.published}
                 </FormattedDate>
               ) : (
                 'Not yet published'
@@ -68,12 +62,12 @@ const EducationInNumbersSignOffPage = () => {
 
           {isEditable && (
             <ModalConfirm
-              title={`Are you sure you want to publish the ${educationInNumbersPage.title} page?`}
+              title={`Are you sure you want to publish ${page.title}?`}
               triggerButton={<Button>Publish</Button>}
               onConfirm={async () => {
                 const publishedPage =
                   await educationInNumbersService.publishEducationInNumbersPage(
-                    educationInNumbersPage.id,
+                    page.id,
                   );
 
                 onEducationInNumbersPageChange(publishedPage);

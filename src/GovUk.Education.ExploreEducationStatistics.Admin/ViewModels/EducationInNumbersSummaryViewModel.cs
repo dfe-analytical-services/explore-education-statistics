@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class EducationInNumbersPageViewModel
+public class EducationInNumbersSummaryViewModel
 {
     public Guid Id { get; set; }
 
@@ -16,7 +16,7 @@ public class EducationInNumbersPageViewModel
 
     public int Version { get; set; }
 
-    public DateTime? Published { get; set; }
+    public DateTimeOffset? Published { get; set; }
 
     [JsonIgnore]
     public int Order { get; set; }

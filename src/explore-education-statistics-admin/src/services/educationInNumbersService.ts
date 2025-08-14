@@ -1,6 +1,6 @@
 import client from '@admin/services/utils/service';
 
-export interface EducationInNumbersPage {
+export interface EducationInNumbersSummary {
   id: string;
   title: string;
   slug: string;
@@ -22,32 +22,34 @@ export interface UpdateEducationInNumbersPageRequest {
 }
 
 const educationInNumbersService = {
-  getEducationInNumbersPage(id: string): Promise<EducationInNumbersPage> {
+  getEducationInNumbersPage(id: string): Promise<EducationInNumbersSummary> {
     return client.get(`/education-in-numbers/${id}`);
   },
-  listLatestPages(): Promise<EducationInNumbersPage[]> {
+  listLatestPages(): Promise<EducationInNumbersSummary[]> {
     return client.get('/education-in-numbers');
   },
   createEducationInNumbersPage(
     page: CreateEducationInNumbersPageRequest,
-  ): Promise<EducationInNumbersPage> {
+  ): Promise<EducationInNumbersSummary> {
     return client.post('/education-in-numbers', page);
   },
   updateEducationInNumbersPage(
     educationInNumbersPageId: string,
     page: UpdateEducationInNumbersPageRequest,
-  ): Promise<EducationInNumbersPage> {
+  ): Promise<EducationInNumbersSummary> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}`,
       page,
     );
   },
-  publishEducationInNumbersPage(id: string): Promise<EducationInNumbersPage> {
+  publishEducationInNumbersPage(
+    id: string,
+  ): Promise<EducationInNumbersSummary> {
     return client.patch(`education-in-numbers/${id}/publish`);
   },
   createEducationInNumbersPageAmendment(
     id: string,
-  ): Promise<EducationInNumbersPage> {
+  ): Promise<EducationInNumbersSummary> {
     return client.post(`/education-in-numbers/${id}/amendment`);
   },
   deleteEducationInNumbersPage(id: string): Promise<void> {
