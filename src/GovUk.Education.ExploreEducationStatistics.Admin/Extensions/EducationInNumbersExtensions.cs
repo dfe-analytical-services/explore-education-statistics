@@ -6,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class EducationInNumbersExtensions
 {
-    public static EducationInNumbersPageViewModel ToViewModel(
+    public static EducationInNumbersSummaryViewModel ToViewModel(
         this EducationInNumbersPage page,
         Guid? previousVersionId = null)
     {
-        return new EducationInNumbersPageViewModel
+        return new EducationInNumbersSummaryViewModel
         {
             Id = page.Id,
             Title = page.Title,

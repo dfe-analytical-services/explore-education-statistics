@@ -11,24 +11,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEducationInNumbersService
 {
-    Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage(Guid id);
+    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id);
 
-    Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> ListLatestPages();
+    Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> ListLatestPages();
 
-    Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage(
+    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreateAmendment(
+    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment(
         Guid id);
 
-    Task<Either<ActionResult, EducationInNumbersPageViewModel>> UpdatePage(
+    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> UpdatePage(
         Guid id,
         UpdateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EducationInNumbersPageViewModel>> PublishPage(
+    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> PublishPage(
         Guid id);
 
-    Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder(
+    Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> Reorder(
         List<Guid> newOrder);
 
     Task<Either<ActionResult, Unit>> Delete(Guid id);

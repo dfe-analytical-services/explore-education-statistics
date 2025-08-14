@@ -16,7 +16,9 @@ import {
   educationInNumbersSummaryEditRoute,
   educationInNumbersSummaryRoute,
 } from '@admin/routes/educationInNumbersRoutes';
-import educationInNumbersService from '@admin/services/educationInNumbersService';
+import educationInNumbersService, {
+  EducationInNumbersSummary,
+} from '@admin/services/educationInNumbersService';
 import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 
 const navRoutes: EducationInNumbersRouteProps[] = [
@@ -103,7 +105,7 @@ const EducationInNumbersPage = ({
               </div>
             </div>
 
-            <Tag>TODO - status</Tag>
+            {GetStatusTag(educationInNumbersPage)}
 
             <NavBar
               routes={navRoutes.map(route => ({
@@ -149,5 +151,13 @@ const EducationInNumbersPage = ({
     </Page>
   );
 };
+
+function GetStatusTag({ published, version }: EducationInNumbersSummary) {
+  if (published === undefined) {
+    return version === 0 ? <Tag>Draft</Tag> : <Tag>Draft amendment</Tag>;
+  }
+
+  return <Tag>Published</Tag>;
+}
 
 export default EducationInNumbersPage;

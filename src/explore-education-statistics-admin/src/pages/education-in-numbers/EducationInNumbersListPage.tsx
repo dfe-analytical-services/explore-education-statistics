@@ -8,9 +8,8 @@ import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries'
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import FormattedDate from '@common/components/FormattedDate';
 import educationInNumbersService, {
-  EducationInNumbersPage,
+  EducationInNumbersSummary,
 } from '@admin/services/educationInNumbersService';
-import Button from '@common/components/Button';
 import { generatePath } from 'react-router';
 import {
   EducationInNumbersRouteParams,
@@ -18,6 +17,8 @@ import {
 } from '@admin/routes/educationInNumbersRoutes';
 import { useHistory } from 'react-router-dom';
 import ModalConfirm from '@common/components/ModalConfirm';
+import ButtonText from '@common/components/ButtonText';
+import Link from '@admin/components/Link';
 import styles from './EducationInNumbersListPage.module.scss';
 
 const EducationInNumbersListPage = () => {
@@ -32,6 +33,8 @@ const EducationInNumbersListPage = () => {
   if (isLoading) {
     return <LoadingSpinner loading={isLoading} />;
   }
+
+  // @MarkFix button text
 
   return (
     <Page
@@ -79,17 +82,17 @@ const EducationInNumbersListPage = () => {
                 <td data-testid="Actions">
                   <ButtonGroup className={styles.actions}>
                     {page.published === undefined && page.version > 0 && (
-                      <ButtonLink
+                      <Link
                         to={`/education-in-numbers/${page.previousVersionId}/summary`}
                       >
                         View currently published page
-                      </ButtonLink>
+                      </Link>
                     )}
-                    <ButtonLink to={`/education-in-numbers/${page.id}/summary`}>
+                    <Link to={`/education-in-numbers/${page.id}/summary`}>
                       {page.published === undefined ? 'Edit' : 'View'}
-                    </ButtonLink>
+                    </Link>
                     {page.published !== undefined && (
-                      <Button
+                      <ButtonText
                         onClick={async () => {
                           const newPage =
                             await educationInNumbersService.createEducationInNumbersPageAmendment(
@@ -106,19 +109,19 @@ const EducationInNumbersListPage = () => {
                         }}
                       >
                         Create amendment
-                      </Button>
+                      </ButtonText>
                     )}
                     {page.published === undefined && (
                       <ModalConfirm
                         title={
                           page.version === 0
-                            ? `Are you sure you want to delete draft page ${page.title}?`
+                            ? `Are you sure you want to delete ${page.title}?`
                             : `Are you sure you want to cancel the amendment to ${page.title}?`
                         }
                         triggerButton={
-                          <Button>
+                          <ButtonText>
                             {page.version === 0 ? 'Delete' : 'Cancel amendment'}
-                          </Button>
+                          </ButtonText>
                         }
                         onConfirm={async () => {
                           await educationInNumbersService.deleteEducationInNumbersPage(
@@ -130,7 +133,7 @@ const EducationInNumbersListPage = () => {
                       >
                         <p>
                           {page.version === 0
-                            ? "By removing this draft, you will lose all changes you've made to this page."
+                            ? "This will remove updates you've made to this page."
                             : "By cancelling this amendment, you will lose all changes you've made to the amendment. The latest published version of this page will remain live and be unaffected."}
                         </p>
                       </ModalConfirm>
@@ -152,7 +155,9 @@ const EducationInNumbersListPage = () => {
   );
 };
 
-export function GetEducationInNumbersPageStatus(page: EducationInNumbersPage) {
+export function GetEducationInNumbersPageStatus(
+  page: EducationInNumbersSummary,
+) {
   if (page.published === undefined) {
     return page.version === 0 ? 'Draft' : 'Draft amendment';
   }

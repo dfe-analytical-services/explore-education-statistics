@@ -24,7 +24,7 @@ public class EducationInNumbersService(
     ContentDbContext contentDbContext,
     IUserService userService) : IEducationInNumbersService
 {
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> GetPage(Guid id) // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id) // @MarkFix tests?
     {
         return await contentDbContext.EducationInNumbersPages
             .Where(page => page.Id == id)
@@ -33,14 +33,14 @@ public class EducationInNumbersService(
             .OnSuccess(page => page.ToViewModel());
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> ListLatestPages() // @MarkFix tests?
+    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> ListLatestPages() // @MarkFix tests?
     {
         var uniqueSlugs = await contentDbContext.EducationInNumbersPages
             .Select(p => p.Slug)
             .Distinct()
             .ToListAsync();
 
-        var viewModels = new List<EducationInNumbersPageViewModel>();
+        var viewModels = new List<EducationInNumbersSummaryViewModel>();
 
         foreach (var slug in uniqueSlugs)
         {
@@ -65,14 +65,14 @@ public class EducationInNumbersService(
             .ToList();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage( // @MarkFix tests?
         CreateEducationInNumbersPageRequest request)
     {
         var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
             .Any(page => page.Title == request.Title);
         if (pageWithTitleAlreadyExists)
         {
-            return new Either<ActionResult, EducationInNumbersPageViewModel>(
+            return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
                 ValidationResult(ValidationErrorMessages.TitleNotUnique));
         }
 
@@ -81,7 +81,7 @@ public class EducationInNumbersService(
             .Any(page => page.Slug == slug );
         if (pageWithSlugAlreadyExists)
         {
-            return new Either<ActionResult, EducationInNumbersPageViewModel>(
+            return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
                 ValidationResult(ValidationErrorMessages.SlugNotUnique));
         }
 
@@ -110,7 +110,7 @@ public class EducationInNumbersService(
         return newPage.ToViewModel();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreateAmendment( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment( // @MarkFix tests?
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -128,7 +128,7 @@ public class EducationInNumbersService(
                         && amendment.Version == page.Version + 1);
                 if (amendmentAlreadyExists)
                 {
-                    throw new ArgumentException($"Amendment already exists for page {page.Id}"); // @MarkFix should be error?
+                    throw new ArgumentException($"Amendment already exists for page {page.Id}");
                 }
 
                 var amendment = new EducationInNumbersPage
@@ -149,11 +149,11 @@ public class EducationInNumbersService(
                 contentDbContext.EducationInNumbersPages.Add(amendment);
                 await contentDbContext.SaveChangesAsync();
 
-                return new Either<ActionResult, EducationInNumbersPageViewModel>(amendment.ToViewModel());
+                return new Either<ActionResult, EducationInNumbersSummaryViewModel>(amendment.ToViewModel());
             });
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> UpdatePage( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> UpdatePage( // @MarkFix tests?
         Guid id,
         UpdateEducationInNumbersPageRequest request)
     {
@@ -163,14 +163,14 @@ public class EducationInNumbersService(
             {
                 if (page.Published != null)
                 {
-                    throw new ArgumentException("Cannot update details of already published page"); // @MarkFix exception fine?
+                    throw new ArgumentException("Cannot update details of already published page");
                 }
 
                 if (page.Version > 0)
                 {
                     // To prevent slug from being changed by an amendment, as we have no redirects
                     throw new Exception(
-                        "Cannot update details for a page that has a previous version published"); // @MarkFix exception fine?
+                        "Cannot update details for a page that has a previous version published");
                 }
 
                 // If the title is being updated, we also update the slug
@@ -181,7 +181,7 @@ public class EducationInNumbersService(
                         .Any(p => p.Title == request.Title);
                     if (pageWithTitleAlreadyExists)
                     {
-                        return new Either<ActionResult, EducationInNumbersPageViewModel>(
+                        return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
                             ValidationResult(ValidationErrorMessages.TitleNotUnique));
                     }
 
@@ -190,7 +190,7 @@ public class EducationInNumbersService(
                         .Any(p => p.Slug == newSlug);
                     if (newSlugIsNotUnique)
                     {
-                        return new Either<ActionResult, EducationInNumbersPageViewModel>(
+                        return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
                             ValidationResult(ValidationErrorMessages.SlugNotUnique));
                     }
                 }
@@ -206,11 +206,11 @@ public class EducationInNumbersService(
 
                 // @MarkFix refresh cache here?
 
-                return new Either<ActionResult, EducationInNumbersPageViewModel>(page.ToViewModel());
+                return new Either<ActionResult, EducationInNumbersSummaryViewModel>(page.ToViewModel());
             });
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> PublishPage( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> PublishPage( // @MarkFix tests?
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -219,7 +219,7 @@ public class EducationInNumbersService(
             {
                 if (page.Published != null)
                 {
-                    throw new ArgumentException("Cannot publish already published page"); // @MarkFix exception fine?
+                    throw new ArgumentException("Cannot publish already published page");
                 }
 
                 page.Published = DateTime.UtcNow;
@@ -233,7 +233,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersPageViewModel>>> Reorder( // @MarkFix tests?
+    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> Reorder( // @MarkFix tests?
         List<Guid> newOrder)
     {
         var pageList = await contentDbContext.EducationInNumbersPages
@@ -247,7 +247,7 @@ public class EducationInNumbersService(
         if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
                 newOrder, pageList.Select(page => page.Id)))
         {
-            return new Either<ActionResult, List<EducationInNumbersPageViewModel>>(
+            return new Either<ActionResult, List<EducationInNumbersSummaryViewModel>>(
                 ValidationUtils.ValidationActionResult(
                     ValidationErrorMessages.ProvidedPageIdsDifferFromActualPageIds));
         }
@@ -264,12 +264,12 @@ public class EducationInNumbersService(
             if (matchingPage is { Version: > 0, Published: null })
             {
                 // It is an unpublished amendment, so we must also update the original in case the amendment is cancelled
-                var originalPage = contentDbContext.EducationInNumbersPages
+                var previousPageVersion = contentDbContext.EducationInNumbersPages
                     .Single(page => page.Slug == matchingPage.Slug
                                     && page.Version + 1 == matchingPage.Version);
-                originalPage.Order = order;
-                originalPage.Updated = DateTime.UtcNow;
-                originalPage.UpdatedById = updatingUserId;
+                previousPageVersion.Order = order;
+                previousPageVersion.Updated = DateTime.UtcNow;
+                previousPageVersion.UpdatedById = updatingUserId;
             }
         });
 

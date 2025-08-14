@@ -17,7 +17,8 @@ const errorMappings = [
   mapFieldErrors<EducationInNumbersSummaryFormValues>({
     target: 'title',
     messages: {
-      SlugNotUnique: 'Enter a unique title',
+      TitleNotUnique: 'Title is not unique',
+      SlugNotUnique: 'Slug generated from title is not unique',
     },
   }),
 ];
