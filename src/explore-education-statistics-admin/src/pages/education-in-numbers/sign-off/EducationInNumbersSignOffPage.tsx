@@ -13,6 +13,8 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Button from '@common/components/Button';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 import ModalConfirm from '@common/components/ModalConfirm';
+import UrlContainer from '@common/components/UrlContainer';
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 const EducationInNumbersSignOffPage = () => {
   const { educationInNumbersPage, onEducationInNumbersPageChange } =
@@ -20,13 +22,25 @@ const EducationInNumbersSignOffPage = () => {
 
   const history = useHistory();
 
-  const isEditable = educationInNumbersPage.published === undefined;
+  const { publicAppUrl } = useConfig();
 
-  // @MarkFix add link to its public page here? or maybe elsewhere
+  const isEditable = educationInNumbersPage.published === undefined;
 
   return (
     <>
       <h2>Sign off</h2>
+
+      <p>The page will be accessible at:</p>
+
+      <UrlContainer
+        className="govuk-!-margin-bottom-4"
+        id="public-page-url"
+        url={`${publicAppUrl}/education-in-numbers/${
+          educationInNumbersPage.slug !== undefined
+            ? educationInNumbersPage.slug
+            : ''
+        }`}
+      />
 
       {educationInNumbersPage ? (
         <>
