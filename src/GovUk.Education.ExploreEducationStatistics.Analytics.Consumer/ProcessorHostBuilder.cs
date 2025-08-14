@@ -50,6 +50,8 @@ public static class ProcessorHostBuilder
                     .AddTransient<IRequestFileProcessor, PublicApiQueriesProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicZipDownloadsProcessor>()
                     .AddTransient<IRequestFileProcessor, PublicCsvDownloadsProcessor>()
+                    .AddTransient<IRequestFileProcessor, TableToolDownloadsProcessor>()
+                    .AddTransient<IRequestFileProcessor, PermalinksTableDownloadsProcessor>()
                     .AddTransient<IProcessRequestFilesWorkflow, ProcessRequestFilesWorkflow>()
                     .AddTransient<IFileAccessor, FilesystemFileAccessor>()
                     .AddTransient<DateTimeProvider>()
