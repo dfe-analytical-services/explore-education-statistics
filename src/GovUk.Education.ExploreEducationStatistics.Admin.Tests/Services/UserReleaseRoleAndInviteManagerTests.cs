@@ -668,10 +668,8 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
     public class RemoveRoleAndInviteTests : UserReleaseRoleAndInviteManagerTests
     {
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task Success(bool ignoreQueryFilters)
+        [Fact]
+        public async Task Success()
         {
             var email = "test@test.com";
 
@@ -720,15 +718,8 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var query = contentDbContext.UserReleaseRoles.AsQueryable();
-
-                if (ignoreQueryFilters)
-                {
-                    query = query.IgnoreQueryFilters();
-                }
-
-                var updatedReleaseRole = query
-                    .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
+                var updatedReleaseRole = await contentDbContext.UserReleaseRoles
+                    .SingleOrDefaultAsync(urr => urr.Id == userReleaseRole.Id);
 
                 Assert.Null(updatedReleaseRole);
             }
@@ -737,10 +728,8 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
     public class RemoveRolesAndInvitesTests : UserReleaseRoleAndInviteManagerTests
     {
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task Success(bool ignoreQueryFilters)
+        [Fact]
+        public async Task Success()
         {
             var user1 = new User { Email = "test1@test.com" };
             var releaseVersion1 = _fixture.DefaultReleaseVersion()
@@ -824,14 +813,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRolesQuery = contentDbContext.UserReleaseRoles.AsQueryable();
-
-                if (ignoreQueryFilters)
-                {
-                    userReleaseRolesQuery = userReleaseRolesQuery.IgnoreQueryFilters();
-                }
-
-                var userReleaseRole = await userReleaseRolesQuery
+                var userReleaseRole = await contentDbContext.UserReleaseRoles
                     .SingleAsync();
 
                 Assert.Equal(userReleaseRole3.Id, userReleaseRole.Id);

@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250807151944_EES6294_RemoveSoftDeletedColumnsForRolesAndInvites")]
+    partial class EES6294_RemoveSoftDeletedColumnsForRolesAndInvites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1140,12 +1143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<DateTime?>("FeedbackReceived")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("PublicationTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReleaseTitle")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");

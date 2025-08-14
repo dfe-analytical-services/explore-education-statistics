@@ -561,7 +561,6 @@ public class ReleaseAmendmentServiceTests
 
             var amendmentReleaseRoles = contentDbContext
                 .UserReleaseRoles
-                .IgnoreQueryFilters() // See if deletedAmendmentRole is also copied
                 .Where(r => r.ReleaseVersionId == amendment.Id)
                 .ToList();
 
@@ -1163,8 +1162,6 @@ public class ReleaseAmendmentServiceTests
         Assert.Equal(originalReleaseRole.Role, amendedReleaseRole.Role);
         amendedReleaseRole.Created.AssertUtcNow();
         Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
-        Assert.Equal(originalReleaseRole.Deleted, amendedReleaseRole.Deleted);
-        Assert.Equal(originalReleaseRole.DeletedById, amendedReleaseRole.DeletedById);
     }
 
     private static void AssertAmendedReleaseFileCorrect(

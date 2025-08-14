@@ -50,14 +50,7 @@ public class UserReleaseRoleServiceTests
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Approver,
         };
-        var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
-        {
-            User = new User { Id = Guid.NewGuid() },
-            ReleaseVersion = publication.ReleaseVersions[0],
-            Role = Contributor,
-            Deleted = DateTime.UtcNow,
-        };
-        var userReleaseRoleIgnored3 = new UserReleaseRole // Ignored due to release under different publication
+        var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored due to release under different publication
         {
             User = new User { Id = Guid.NewGuid() },
             ReleaseVersion = publicationIgnored.ReleaseVersions[0],
@@ -70,7 +63,7 @@ public class UserReleaseRoleServiceTests
             contentDbContext.Publications.AddRange(publication, publicationIgnored);
             contentDbContext.UserReleaseRoles.AddRange(
                 userReleaseRole1, userReleaseRole2, userReleaseRole3,
-                userReleaseRoleIgnored1, userReleaseRoleIgnored2, userReleaseRoleIgnored3);
+                userReleaseRoleIgnored1, userReleaseRoleIgnored2);
             await contentDbContext.SaveChangesAsync();
         }
 
