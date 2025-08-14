@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -739,7 +740,7 @@ public class ContentDbContext : DbContext
     private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserReleaseInvite>()
-            .Property(r => r.Role)
+            .Property(uri => uri.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
         modelBuilder.Entity<UserReleaseInvite>()
@@ -753,12 +754,21 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+        modelBuilder.Entity<UserReleaseInvite>()
+            .HasIndex(uri => new
+            {
+                uri.ReleaseVersionId,
+                uri.Email,
+                uri.Role
+            })
+            .IsUnique();
     }
 
     private static void ConfigureUserPublicationInvite(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserPublicationInvite>()
-            .Property(r => r.Role)
+            .Property(upi => upi.Role)
             .HasConversion(new EnumToStringConverter<PublicationRole>());
 
         modelBuilder.Entity<UserPublicationInvite>()
@@ -766,6 +776,15 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<UserPublicationInvite>()
+            .HasIndex(upi => new
+                {
+                    upi.PublicationId,
+                    upi.Email,
+                    upi.Role
+                })
+            .IsUnique();
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)
