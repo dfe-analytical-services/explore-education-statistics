@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -67,14 +68,21 @@ public class EducationInNumbersService(
     public async Task<Either<ActionResult, EducationInNumbersPageViewModel>> CreatePage( // @MarkFix tests?
         CreateEducationInNumbersPageRequest request)
     {
+        var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
+            .Any(page => page.Title == request.Title);
+        if (pageWithTitleAlreadyExists)
+        {
+            return new Either<ActionResult, EducationInNumbersPageViewModel>(
+                ValidationResult(ValidationErrorMessages.TitleNotUnique));
+        }
+
         var slug = NamingUtils.SlugFromTitle(request.Title);
-
         var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages
-            .Any(page => page.Slug == slug);
-
+            .Any(page => page.Slug == slug );
         if (pageWithSlugAlreadyExists)
         {
-            throw new ArgumentException($"Page with slug {slug} already exists"); // @MarkFix should be error
+            return new Either<ActionResult, EducationInNumbersPageViewModel>(
+                ValidationResult(ValidationErrorMessages.SlugNotUnique));
         }
 
         var currentMaxOrder = contentDbContext.EducationInNumbersPages
@@ -169,12 +177,21 @@ public class EducationInNumbersService(
                 string? newSlug = null;
                 if (request.Title != null && request.Title != page.Title)
                 {
+                    var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
+                        .Any(p => p.Title == request.Title);
+                    if (pageWithTitleAlreadyExists)
+                    {
+                        return new Either<ActionResult, EducationInNumbersPageViewModel>(
+                            ValidationResult(ValidationErrorMessages.TitleNotUnique));
+                    }
+
                     newSlug = NamingUtils.SlugFromTitle(request.Title);
                     var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages
                         .Any(p => p.Slug == newSlug);
                     if (newSlugIsNotUnique)
                     {
-                        throw new Exception("Generated slug is not unique"); // @MarkFix maybe should be an error?
+                        return new Either<ActionResult, EducationInNumbersPageViewModel>(
+                            ValidationResult(ValidationErrorMessages.SlugNotUnique));
                     }
                 }
 
@@ -189,7 +206,7 @@ public class EducationInNumbersService(
 
                 // @MarkFix refresh cache here?
 
-                return page.ToViewModel();
+                return new Either<ActionResult, EducationInNumbersPageViewModel>(page.ToViewModel());
             });
     }
 
