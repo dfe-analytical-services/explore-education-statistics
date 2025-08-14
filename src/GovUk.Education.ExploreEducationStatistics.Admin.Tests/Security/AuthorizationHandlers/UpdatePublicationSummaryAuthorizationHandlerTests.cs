@@ -1,11 +1,12 @@
 #nullable enable
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Logging;
 using Moq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
@@ -33,16 +34,21 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
     public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithPublicationOwner()
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
-            CreateHandler, Owner);
+            CreateHandler,
+            Owner);
     }
 
     private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
         return new UpdatePublicationSummaryAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPreReleaseService>(Strict)));
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                    userRepository: new UserRepository(contentDbContext),
+                    logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

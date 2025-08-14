@@ -536,10 +536,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         // Copy all current roles apart from Prerelease Users to the Release amendment.
         var newRoles = _context
             .UserReleaseRoles
-            // For auditing purposes, we also want to migrate release roles that have Deleted set (when a role is
-            // manually removed from a Release as opposed to SoftDeleted, which is only set when a Release itself
-            // is deleted)
-            .IgnoreQueryFilters()
             .Where(releaseRole => releaseRole.ReleaseVersionId == originalReleaseId
                                   && releaseRole.Role != ReleaseRole.PrereleaseViewer)
             .Select(originalReleaseRole => new UserReleaseRole
@@ -553,8 +549,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 // Copy certain fields from the original.
                 Role = originalReleaseRole.Role,
                 UserId = originalReleaseRole.UserId,
-                Deleted = originalReleaseRole.Deleted,
-                DeletedById = originalReleaseRole.DeletedById,
 
                 // Assign the new created date.
                 Created = createdDate,

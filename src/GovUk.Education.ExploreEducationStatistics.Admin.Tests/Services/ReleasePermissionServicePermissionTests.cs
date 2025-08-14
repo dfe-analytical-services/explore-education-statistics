@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -9,6 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -163,13 +165,22 @@ public class ReleasePermissionServicePermissionTests
         ContentDbContext contentDbContext,
         IUserService userService)
     {
-        return new(
+        var userRepository = new UserRepository(contentDbContext);
+
+        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
             contentDbContext,
-            new PersistenceHelper<ContentDbContext>(contentDbContext),
-            new ReleaseVersionRepository(contentDbContext),
-            new UserReleaseRoleRepository(contentDbContext),
-            new UserReleaseInviteRepository(contentDbContext),
-            userService
+            new UserReleaseInviteRepository(
+                contentDbContext: contentDbContext,
+                logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
+            userRepository,
+            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
+
+        return new(
+            contentDbContext: contentDbContext,
+            persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
+            releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+            userService: userService
         );
     }
 }

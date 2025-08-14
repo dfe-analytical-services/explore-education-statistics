@@ -110,7 +110,7 @@ public class PreReleaseUserServicePermissionTests
         IUserService? userService = null,
         IUserRepository? userRepository = null,
         IUserInviteRepository? userInviteRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null)
     {
         return new(
@@ -124,7 +124,7 @@ public class PreReleaseUserServicePermissionTests
             userService ?? Mock.Of<IUserService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
         );
     }

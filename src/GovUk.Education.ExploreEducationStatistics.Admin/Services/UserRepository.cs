@@ -1,4 +1,6 @@
-﻿#nullable enable
+#nullable enable
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -7,21 +9,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserRepository : IUserRepository
+public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 {
-    private readonly ContentDbContext _contentDbContext;
-
-    public UserRepository(ContentDbContext contentDbContext)
+    public async Task<User?> FindById(Guid userId, CancellationToken cancellationToken = default)
     {
-        _contentDbContext = contentDbContext;
+        return await contentDbContext.Users
+            .SingleOrDefaultAsync(u =>
+                u.Id == userId
+                && u.SoftDeleted == null,
+                cancellationToken);
     }
 
     public async Task<User?> FindByEmail(string email)
     {
-        return await _contentDbContext.Users
-            .AsQueryable()
-            .SingleOrDefaultAsync(u =>
-                u.Email.ToLower().Equals(email.ToLower())
-                && u.SoftDeleted == null);
+        return await contentDbContext.Users
+                .SingleOrDefaultAsync(u =>
+                    u.Email.ToLower().Equals(email.ToLower())
+                    && u.SoftDeleted == null);
     }
 }

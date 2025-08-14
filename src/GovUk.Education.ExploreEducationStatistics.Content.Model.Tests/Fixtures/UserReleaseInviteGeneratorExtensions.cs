@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -29,7 +30,7 @@ public static class UserReleaseInviteGeneratorExtensions
     }
 
     public static Generator<UserReleaseInvite> WithEmail(
-        this Generator<UserReleaseInvite> generator, 
+        this Generator<UserReleaseInvite> generator,
         string email)
         => generator.ForInstance(s => s.SetEmail(email));
 
@@ -42,6 +43,11 @@ public static class UserReleaseInviteGeneratorExtensions
         this Generator<UserReleaseInvite> generator,
         bool softDeleted)
         => generator.ForInstance(s => s.SetSoftDeleted(softDeleted));
+
+    public static Generator<UserReleaseInvite> WithCreatedById(
+        this Generator<UserReleaseInvite> generator,
+        Guid createdById)
+        => generator.ForInstance(s => s.SetCreatedById(createdById));
 
     public static InstanceSetters<UserReleaseInvite> SetDefaults(this InstanceSetters<UserReleaseInvite> setters)
         => setters
@@ -79,4 +85,9 @@ public static class UserReleaseInviteGeneratorExtensions
         this InstanceSetters<UserReleaseInvite> setters,
         bool softDeleted)
         => setters.Set(uri => uri.SoftDeleted, softDeleted);
+
+    public static InstanceSetters<UserReleaseInvite> SetCreatedById(
+        this InstanceSetters<UserReleaseInvite> setters,
+        Guid createdById)
+        => setters.Set(uri => uri.CreatedById, createdById);
 }
