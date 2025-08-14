@@ -17,6 +17,7 @@ import {
   educationInNumbersSummaryRoute,
 } from '@admin/routes/educationInNumbersRoutes';
 import { useHistory } from 'react-router-dom';
+import ModalConfirm from '@common/components/ModalConfirm';
 import styles from './EducationInNumbersListPage.module.scss';
 
 const EducationInNumbersListPage = () => {
@@ -107,9 +108,19 @@ const EducationInNumbersListPage = () => {
                         Create amendment
                       </Button>
                     )}
-                    {page.published === undefined && ( // @MarkFix add "are you sure you want to delete/cancel this?" modal?
-                      <Button
-                        onClick={async () => {
+                    {page.published === undefined && (
+                      <ModalConfirm
+                        title={
+                          page.version === 0
+                            ? `Are you sure you want to delete draft page ${page.title}?`
+                            : `Are you sure you want to cancel the amendment to ${page.title}?`
+                        }
+                        triggerButton={
+                          <Button>
+                            {page.version === 0 ? 'Delete' : 'Cancel amendment'}
+                          </Button>
+                        }
+                        onConfirm={async () => {
                           await educationInNumbersService.deleteEducationInNumbersPage(
                             page.id,
                           );
@@ -117,8 +128,12 @@ const EducationInNumbersListPage = () => {
                           await refetchPages();
                         }}
                       >
-                        {page.version === 0 ? 'Delete' : 'Cancel amendment'}
-                      </Button>
+                        <p>
+                          {page.version === 0
+                            ? "By removing this draft, you will lose all changes you've made to this page."
+                            : "By cancelling this amendment, you will lose all changes you've made to the amendment. The latest published version of this page will remain live and be unaffected."}
+                        </p>
+                      </ModalConfirm>
                     )}
                   </ButtonGroup>
                 </td>
