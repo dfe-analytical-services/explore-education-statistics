@@ -15,7 +15,10 @@ import { GetEducationInNumbersPageStatus } from '@admin/pages/education-in-numbe
 const EducationInNumbersSummaryPage = () => {
   const { educationInNumbersPage: page } = useEducationInNumbersPageContext();
 
-  const isEditable = page.published === undefined && page.version === 0; // editing amendments is not allowed because no redirects
+  const isEditable =
+    page.published === undefined &&
+    page.version === 0 && // editing amendments is not allowed because no redirects
+    page.slug !== undefined; // prevent editing title/slug of root Education in numbers page
 
   return (
     <>

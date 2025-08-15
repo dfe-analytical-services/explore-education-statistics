@@ -111,33 +111,36 @@ const EducationInNumbersListPage = () => {
                         Create amendment
                       </ButtonText>
                     )}
-                    {page.published === undefined && (
-                      <ModalConfirm
-                        title={
-                          page.version === 0
-                            ? `Are you sure you want to delete ${page.title}?`
-                            : `Are you sure you want to cancel the amendment to ${page.title}?`
-                        }
-                        triggerButton={
-                          <ButtonText>
-                            {page.version === 0 ? 'Delete' : 'Cancel amendment'}
-                          </ButtonText>
-                        }
-                        onConfirm={async () => {
-                          await educationInNumbersService.deleteEducationInNumbersPage(
-                            page.id,
-                          );
+                    {page.published === undefined &&
+                      page.slug !== undefined && ( // prevent removal of root Education in numbers page
+                        <ModalConfirm
+                          title={
+                            page.version === 0
+                              ? `Are you sure you want to delete ${page.title}?`
+                              : `Are you sure you want to cancel the amendment to ${page.title}?`
+                          }
+                          triggerButton={
+                            <ButtonText>
+                              {page.version === 0
+                                ? 'Delete'
+                                : 'Cancel amendment'}
+                            </ButtonText>
+                          }
+                          onConfirm={async () => {
+                            await educationInNumbersService.deleteEducationInNumbersPage(
+                              page.id,
+                            );
 
-                          await refetchPages();
-                        }}
-                      >
-                        <p>
-                          {page.version === 0
-                            ? "This will remove updates you've made to this page."
-                            : "By cancelling this amendment, you will lose all changes you've made to the amendment. The latest published version of this page will remain live and be unaffected."}
-                        </p>
-                      </ModalConfirm>
-                    )}
+                            await refetchPages();
+                          }}
+                        >
+                          <p>
+                            {page.version === 0
+                              ? "This will remove updates you've made to this page."
+                              : "By cancelling this amendment, you will lose all changes you've made to the amendment. The latest published version of this page will remain live and be unaffected."}
+                          </p>
+                        </ModalConfirm>
+                      )}
                   </ButtonGroup>
                 </td>
               </tr>
