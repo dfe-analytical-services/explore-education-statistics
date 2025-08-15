@@ -24,7 +24,7 @@ public class EducationInNumbersService(
     ContentDbContext contentDbContext,
     IUserService userService) : IEducationInNumbersService
 {
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id) // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
             .Where(page => page.Id == id)
@@ -33,7 +33,7 @@ public class EducationInNumbersService(
             .OnSuccess(page => page.ToViewModel());
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> ListLatestPages() // @MarkFix tests?
+    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> ListLatestPages()
     {
         var uniqueSlugs = await contentDbContext.EducationInNumbersPages
             .Select(p => p.Slug)
@@ -65,7 +65,7 @@ public class EducationInNumbersService(
             .ToList();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request)
     {
         var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
@@ -153,7 +153,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> UpdatePage( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> UpdatePage(
         Guid id,
         UpdateEducationInNumbersPageRequest request)
     {
@@ -170,7 +170,7 @@ public class EducationInNumbersService(
                 {
                     // To prevent slug from being changed by an amendment, as we have no redirects
                     throw new Exception(
-                        "Cannot update details for a page that has a previous version published");
+                        "Cannot update details for a page amendment");
                 }
 
                 // If the title is being updated, we also update the slug
@@ -210,7 +210,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> PublishPage( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> PublishPage(
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -233,11 +233,10 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> Reorder( // @MarkFix tests?
+    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> Reorder(
         List<Guid> newOrder)
     {
         var pageList = await contentDbContext.EducationInNumbersPages
-            .AsNoTracking()
             .GroupBy(page => page.Slug)
             .Select(group => group
                 .OrderByDescending(p => p.Version)
@@ -282,7 +281,7 @@ public class EducationInNumbersService(
             .ToList();
     }
 
-    public async Task<Either<ActionResult, Unit>> Delete(Guid id) // @MarkFix tests?
+    public async Task<Either<ActionResult, Unit>> Delete(Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
             .SingleOrNotFoundAsync(page => page.Id == id)

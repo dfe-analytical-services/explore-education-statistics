@@ -34,8 +34,6 @@ const EducationInNumbersListPage = () => {
     return <LoadingSpinner loading={isLoading} />;
   }
 
-  // @MarkFix button text
-
   return (
     <Page
       title="Education in Numbers pages"

@@ -47,10 +47,6 @@ const EducationInNumbersSummaryForm = ({
     });
   }, [isEditForm]);
 
-  // @MarkFix draft amendment's shouldn't change the slug, because no redirects
-  // how to handle this? form not to show field for amendments (or different form for amendments)?
-  // or just let the backend error if title (and therefore slug) change is attempted
-
   return (
     <FormProvider
       enableReinitialize

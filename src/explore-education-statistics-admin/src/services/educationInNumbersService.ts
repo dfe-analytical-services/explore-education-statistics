@@ -7,7 +7,7 @@ export interface EducationInNumbersSummary {
   description: string;
   version: number;
   published?: string;
-  previousVersionId: string;
+  previousVersionId?: string; // only returned with listLatestPages
 }
 
 export interface CreateEducationInNumbersPageRequest {
