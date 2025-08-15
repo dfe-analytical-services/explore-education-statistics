@@ -106,14 +106,38 @@ public interface IBlobStorageService
         string path,
         CancellationToken cancellationToken = default);
     
-    Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
-        BlobDownloadToken token,
-        CancellationToken cancellationToken);
-    
+    /// <summary>
+    /// Obtain a secure,short-lived download token for use with <see cref="StreamWithToken"/>.
+    /// Any relevant permission checks for the current business process situation should be
+    /// carried out prior to obtaining this token.
+    /// </summary>
+    /// <param name="container">The blob container</param>
+    /// <param name="filename">The requested filename for the download token to include,
+    /// for use when performing the actual download with <see cref="StreamWithToken"/>
+    /// </param>
+    /// <param name="path">Path to the blob within the container</param>
+    /// <param name="cancellationToken">Token to cancel the request</param>
+    /// <returns>
+    /// A <see cref="BlobDownloadToken"/> that can be used with <see cref="StreamWithToken"/>
+    /// to stream a file securely from Blob Storage using SAS.
+    /// </returns>
     Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
         IBlobContainer container,
         string filename,
         string path,
+        CancellationToken cancellationToken);
+    
+    /// <summary>
+    /// Use a secure, short-lived <see cref="BlobDownloadToken"/> obtained from
+    /// <see cref="GetBlobDownloadToken"/> to stream a Blob from storage.
+    /// </summary>
+    /// <param name="token">
+    /// A secure, short-lived <see cref="BlobDownloadToken"/> obtained from <see cref="GetBlobDownloadToken"/>
+    /// </param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
+        BlobDownloadToken token,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, string>> DownloadBlobText(
