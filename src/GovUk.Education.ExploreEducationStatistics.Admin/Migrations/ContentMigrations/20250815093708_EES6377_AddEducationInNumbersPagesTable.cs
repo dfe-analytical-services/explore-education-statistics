@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                                     'C82315D6-C4D8-4433-9512-7C54049681CA', -- Id - hardcoded Id so can directly reference it
                                     'Education in numbers', -- Title
                                     NULL, -- Slug - NULL for main page
-                                    'Description for Education in numbers page', -- Description @MarkFix update?
+                                    'Description for Education in numbers page', -- Description - to be manually updated later
                                     0, -- Version
                                     0, -- Order
                                     NULL, -- Published

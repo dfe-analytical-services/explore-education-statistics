@@ -8,12 +8,10 @@ import {
 } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useHistory } from 'react-router-dom';
 
-const EducationInNumbersCreatePage = ({
-  history,
-}: RouteComponentProps<EducationInNumbersRouteParams>) => {
+const EducationInNumbersCreatePage = () => {
+  const history = useHistory();
   return (
     <Page
       title="Create a new Education in Numbers page"

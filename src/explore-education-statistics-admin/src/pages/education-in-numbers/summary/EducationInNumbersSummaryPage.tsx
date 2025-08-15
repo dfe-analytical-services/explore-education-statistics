@@ -7,7 +7,7 @@ import {
 } from '@admin/routes/educationInNumbersRoutes';
 import WarningMessage from '@common/components/WarningMessage';
 import ButtonLink from '@admin/components/ButtonLink';
-import FormattedDate from '@common/components/FormattedDate';
+import { formatInTimeZone } from 'date-fns-tz';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { GetEducationInNumbersPageStatus } from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
@@ -26,7 +26,7 @@ const EducationInNumbersSummaryPage = () => {
 
       {page ? (
         <>
-          <SummaryList>
+          <SummaryList testId="summary-list">
             <SummaryListItem term="Title">{page.title}</SummaryListItem>
             <SummaryListItem term="Slug">{page.slug ?? 'N/A'}</SummaryListItem>
             <SummaryListItem term="Description">
@@ -36,14 +36,13 @@ const EducationInNumbersSummaryPage = () => {
               {GetEducationInNumbersPageStatus(page)}
             </SummaryListItem>
             <SummaryListItem term="Published on">
-              {page.published ? (
-                // @MarkFix it's utc when it should be gmt
-                <FormattedDate format="HH:mm:ss - d MMMM yyyy">
-                  {page.published}
-                </FormattedDate>
-              ) : (
-                'Not yet published'
-              )}
+              {page.published
+                ? formatInTimeZone(
+                    page.published,
+                    'Europe/London',
+                    'HH:mm:ss - d MMMM yyyy',
+                  )
+                : 'Not yet published'}
             </SummaryListItem>
           </SummaryList>
 

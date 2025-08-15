@@ -1,5 +1,5 @@
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import { useEducationInNumbersPageContext } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import EducationInNumbersSummaryForm, {
   EducationInNumbersSummaryFormValues,
@@ -10,10 +10,11 @@ import {
 } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 import ButtonText from '@common/components/ButtonText';
+import { useHistory } from 'react-router-dom';
 
-const EducationInNumbersSummaryEditPage = ({
-  history,
-}: RouteComponentProps<EducationInNumbersRouteParams>) => {
+const EducationInNumbersSummaryEditPage = () => {
+  const history = useHistory();
+
   const {
     educationInNumbersPageId,
     educationInNumbersPage,
@@ -28,7 +29,7 @@ const EducationInNumbersSummaryEditPage = ({
     const nextPage =
       await educationInNumbersService.updateEducationInNumbersPage(
         educationInNumbersPageId,
-        values,
+        { title: values.title, description: values.description },
       );
 
     onEducationInNumbersPageChange(nextPage);

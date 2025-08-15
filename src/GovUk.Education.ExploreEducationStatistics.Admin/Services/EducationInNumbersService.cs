@@ -28,7 +28,7 @@ public class EducationInNumbersService(
     {
         return await contentDbContext.EducationInNumbersPages
             .Where(page => page.Id == id)
-            .OrderByDescending(page => page.Version) // @MarkFix descending correct?
+            .OrderByDescending(page => page.Version)
             .FirstOrNotFoundAsync()
             .OnSuccess(page => page.ToViewModel());
     }
@@ -110,7 +110,7 @@ public class EducationInNumbersService(
         return newPage.ToViewModel();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment( // @MarkFix tests?
+    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment(
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -204,8 +204,6 @@ public class EducationInNumbersService(
 
                 await contentDbContext.SaveChangesAsync();
 
-                // @MarkFix refresh cache here?
-
                 return new Either<ActionResult, EducationInNumbersSummaryViewModel>(page.ToViewModel());
             });
     }
@@ -273,8 +271,6 @@ public class EducationInNumbersService(
         });
 
         await contentDbContext.SaveChangesAsync();
-
-        // @MarkFix refresh cache here?
 
         return pageList
             .Select(page => page.ToViewModel())

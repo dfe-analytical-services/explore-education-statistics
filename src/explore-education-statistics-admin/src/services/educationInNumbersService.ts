@@ -3,7 +3,7 @@ import client from '@admin/services/utils/service';
 export interface EducationInNumbersSummary {
   id: string;
   title: string;
-  slug: string;
+  slug?: string;
   description: string;
   version: number;
   published?: string;
@@ -17,7 +17,6 @@ export interface CreateEducationInNumbersPageRequest {
 
 export interface UpdateEducationInNumbersPageRequest {
   title?: string;
-  slug?: string;
   description?: string;
 }
 

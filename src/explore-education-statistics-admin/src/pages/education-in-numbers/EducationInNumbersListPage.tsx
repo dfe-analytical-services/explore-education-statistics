@@ -6,7 +6,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { useQuery } from '@tanstack/react-query';
 import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import FormattedDate from '@common/components/FormattedDate';
+import { formatInTimeZone } from 'date-fns-tz';
 import educationInNumbersService, {
   EducationInNumbersSummary,
 } from '@admin/services/educationInNumbersService';
@@ -70,11 +70,13 @@ const EducationInNumbersListPage = () => {
                   {GetEducationInNumbersPageStatus(page)}
                 </td>
                 <td data-testid="Published">
-                  {page.published ? (
-                    <FormattedDate>{page.published}</FormattedDate>
-                  ) : (
-                    'Not yet published'
-                  )}
+                  {page.published
+                    ? formatInTimeZone(
+                        page.published,
+                        'Europe/London',
+                        'HH:mm:ss - d MMMM yyyy',
+                      )
+                    : 'Not yet published'}
                 </td>
                 <td data-testid="Version">{page.version}</td>
                 <td data-testid="Actions">
