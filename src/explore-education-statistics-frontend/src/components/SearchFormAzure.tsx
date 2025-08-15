@@ -2,6 +2,7 @@ import SearchIcon from '@common/components/SearchIcon';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import styles from '@common/components/form/FormSearchBar.module.scss';
 import logger from '@common/services/logger';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { createAzurePublicationSuggestRequest } from '@frontend/modules/find-statistics/utils/createAzurePublicationListRequest';
 import azurePublicationService, {
   AzurePublicationSuggestResult,
@@ -84,10 +85,9 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
     // The result has a `highlightedMatch` property with HTML tags which could
     // either be from the `title` or the `summary`. So we will strip out the HTML
     // tags to be able to check which field it is from, and use accordingly.
-    const highlightMatchWithoutTags = result.highlightedMatch.replaceAll(
-      /<[^>]*>/g,
-      '',
-    );
+    const highlightMatchWithoutTags = sanitizeHtml(result.highlightedMatch, {
+      allowedTags: [],
+    });
 
     // We also need to find out which term was highlighted in order to manually
     // add highlights to the other field.
