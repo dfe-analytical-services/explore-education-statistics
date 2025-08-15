@@ -91,7 +91,7 @@ public static class ProcessorHostBuilder
                     .AddScoped<ILocationMetaRepository, LocationMetaRepository>()
                     .AddScoped<ITimePeriodMetaRepository, TimePeriodMetaRepository>()
                     .AddScoped<IParquetService, ParquetService>()
-                    .AddScoped<IBlobSasService, BlobSasService>()
+                    .AddSingleton<IBlobSasService, BlobSasService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                         new PrivateBlobStorageService(
                             connectionString: provider
@@ -100,6 +100,7 @@ public static class ProcessorHostBuilder
                                 .PrivateStorageConnectionString,
                             logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
                             sasService: provider.GetRequiredService<IBlobSasService>()))
+                    .AddSingleton<DateTimeProvider>()
                     .Configure<AppOptions>(
                         hostBuilderContext.Configuration.GetSection(AppOptions.Section))
                     .Configure<FeatureFlagsOptions>(

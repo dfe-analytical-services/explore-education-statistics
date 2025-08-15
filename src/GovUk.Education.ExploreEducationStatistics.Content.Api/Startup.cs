@@ -121,7 +121,7 @@ public class Startup(
             .Bind(configuration.GetSection(AnalyticsOptions.Section));
 
         // Services
-        services.AddTransient<IBlobSasService, BlobSasService>();
+        services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
             new PublicBlobStorageService(
                 connectionString: configuration.GetRequiredValue("PublicStorage"),

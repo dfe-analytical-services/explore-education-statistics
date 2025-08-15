@@ -92,7 +92,7 @@ public static class PublisherHostBuilderExtensions
                         new FileStorageService(
                             provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
                     .AddScoped<IPublishingService, PublishingService>()
-                    .AddScoped<IBlobSasService, BlobSasService>()
+                    .AddSingleton<IBlobSasService, BlobSasService>()
                     .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                         new PublicBlobStorageService(
                             connectionString: provider
@@ -149,6 +149,7 @@ public static class PublisherHostBuilderExtensions
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
+                    .AddSingleton<DateTimeProvider>()
                     .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.

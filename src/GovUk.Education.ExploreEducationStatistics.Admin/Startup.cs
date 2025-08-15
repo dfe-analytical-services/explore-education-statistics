@@ -625,7 +625,7 @@ public class Startup(
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-        services.AddTransient<IBlobSasService, BlobSasService>();
+        services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
             new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                 provider.GetRequiredService<ILogger<IBlobStorageService>>(),
@@ -641,7 +641,7 @@ public class Startup(
         AddPersistenceHelper<StatisticsDbContext>(services);
         AddPersistenceHelper<UsersAndRolesDbContext>(services);
         services.AddTransient<AuthorizationHandlerService>();
-        services.AddScoped<DateTimeProvider>();
+        services.AddSingleton<DateTimeProvider>();
 
         // This service allows a set of users to be pre-invited to the service on startup.
         if (hostEnvironment.IsDevelopment())
