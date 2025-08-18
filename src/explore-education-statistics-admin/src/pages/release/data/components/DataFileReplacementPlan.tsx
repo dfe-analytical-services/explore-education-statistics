@@ -166,6 +166,9 @@ const DataFileReplacementPlan = ({
     </Link>
   );
 
+  const missingPermissions =
+    !user?.permissions.isBauUser && !!plan?.apiDataSetVersionPlan;
+
   const linkNotAvailableToNonBauText = (
     <p>
       Please contact the EES team for support at{' '}
@@ -578,7 +581,7 @@ const DataFileReplacementPlan = ({
           {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
 
           <ButtonGroup className="govuk-!-margin-top-8">
-            {plan.valid && (
+            {plan.valid && hasDataSetVersionPlan && !missingPermissions && (
               <Button
                 disabled={isSubmitting}
                 onClick={async () => {

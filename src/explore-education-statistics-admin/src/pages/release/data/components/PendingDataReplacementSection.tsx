@@ -36,45 +36,6 @@ const PendingDataReplacementSection: React.FC<{
   const missingPermissionsForCancelbutton =
     !user?.permissions.isBauUser && publicApiDataSetId !== undefined;
 
-  const apiCancelBodyText = missingPermissionsForCancelbutton ? (
-    <>
-      <p>
-        You do not have permission to cancel this data replacement. This is
-        because it is linked to an API data set version which can only be
-        modified by BAU users.
-      </p>
-      <p>
-        Please contact the EES team for support at{' '}
-        <a href="mailto:explore.statistics@education.gov.uk">
-          explore.statistics@education.gov.uk
-        </a>
-        . Your user account does not have the role required access to the API
-        details page which can help resolve this issue.
-      </p>
-    </>
-  ) : (
-    <>
-      <p>
-        Are you sure you want to cancel this data replacement and remove the
-        attached draft API version?
-      </p>
-      <p>
-        Note that this data replacement has an associated draft API data set
-        version update. The API data set update will also be cancelled and
-        removed by this action.
-      </p>
-    </>
-  );
-  const cancelBodyText =
-    publicApiDataSetId !== undefined ? (
-      <>{apiCancelBodyText}</>
-    ) : (
-      <>
-        By cancelling this replacement you will delete the replacement file.
-        This action cannot be reversed.
-      </>
-    );
-
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
       return null;
@@ -134,7 +95,12 @@ const PendingDataReplacementSection: React.FC<{
         fetchDataFile();
       }}
     >
-      <p>{cancelBodyText}</p>
+      <p>
+        {getApiCancelBodyText(
+          publicApiDataSetId !== undefined,
+          missingPermissionsForCancelbutton,
+        )}
+      </p>
     </ModalConfirm>
   );
 
@@ -168,5 +134,61 @@ const PendingDataReplacementSection: React.FC<{
     </section>
   );
 };
+
+function getApiCancelBodyText(
+  hasPublicApiLinked: boolean,
+  missingPermissionsForCancelbutton: boolean,
+) {
+  if (missingPermissionsForCancelbutton) {
+    return (
+      <>
+        <p>
+          You do not have permission to cancel this data replacement. This is
+          because it is linked to an API data set version which can only be
+          modified by BAU users.
+        </p>
+        <p>
+          Please contact the EES team for support at{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>
+          . Your user account does not have the role required access to the API
+          details page which can help resolve this issue.
+        </p>
+      </>
+    );
+  }
+  if (!hasPublicApiLinked) {
+    return (
+      <p>
+        By cancelling this replacement you will delete the replacement file.
+        This action cannot be reversed.
+      </p>
+    );
+  }
+  return (
+    <div>
+      {hasPublicApiLinked && (
+        <p>
+          <strong>
+            Are you sure you want to cancel this data replacement and remove the
+            attached draft API version?
+          </strong>
+        </p>
+      )}
+      <p>
+        By cancelling this replacement you will delete the replacement file.
+        This action cannot be reversed.
+      </p>
+      {hasPublicApiLinked && (
+        <p>
+          Note that this data replacement has an associated draft API data set
+          version update. The API data set update will also be cancelled and
+          removed by this action.
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default PendingDataReplacementSection;

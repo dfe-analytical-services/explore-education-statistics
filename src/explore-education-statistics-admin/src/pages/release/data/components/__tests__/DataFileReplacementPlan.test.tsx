@@ -8,9 +8,8 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import { AuthContext } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { GlobalPermissions } from 'src/services/authService';
-import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
@@ -456,28 +455,20 @@ describe('DataReplacementPlan', () => {
     });
 
     test('renders the API errors section with links to API details page when a BAU user is viewing the page', async () => {
-      const bauUser: User = {
-        id: 'user-id',
-        name: 'BAU',
-        permissions: {
-          isBauUser: true,
-        } as GlobalPermissions,
-      };
       dataReplacementService.getReplacementPlan.mockResolvedValue(
         testReplacementPlan,
       );
       renderWithTestConfig(
         <MemoryRouter>
-          <AuthContextTestProvider user={bauUser}>
-            <DataFileReplacementPlan
-              cancelButton={<button type="button">Cancel</button>}
-              publicationId="publication-1"
-              releaseVersionId="release-1"
-              fileId="file-1"
-              replacementFileId="file-2"
-            />
-          </AuthContextTestProvider>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
         </MemoryRouter>,
+        true,
         true,
       );
       await waitFor(() => {
@@ -958,6 +949,8 @@ describe('DataReplacementPlan', () => {
           replacementFileId="file-2"
         />
       </MemoryRouter>,
+      true,
+      true,
     );
 
     await waitFor(() => {
@@ -1029,6 +1022,62 @@ describe('DataReplacementPlan', () => {
     ).toBeInTheDocument();
   });
 
+  test('does not render confirm button when user is not bau and replacement is linked to an API', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+      true,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByText('Confirm data replacement'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders confirm button when user is bau and replacement is linked to an API', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+      true,
+      true,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Confirm data replacement')).toBeInTheDocument();
+  });
+
   test('renders correctly with valid empty plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testValidReplacementPlan,
@@ -1046,6 +1095,8 @@ describe('DataReplacementPlan', () => {
           replacementFileId="file-2"
         />
       </MemoryRouter>,
+      true,
+      true,
     );
 
     await waitFor(() => {
@@ -1490,6 +1541,7 @@ describe('DataReplacementPlan', () => {
   function renderWithTestConfig(
     children: React.ReactNode,
     enableReplacementFeatureFlag: boolean = false,
+    bauUser: boolean = false,
   ) {
     const defaultTestConfig = {
       appInsightsKey: '',
@@ -1513,6 +1565,22 @@ describe('DataReplacementPlan', () => {
         },
       },
     };
+    const defaultPermissions = {
+      isBauUser: bauUser,
+      canAccessSystem: true,
+      canAccessPrereleasePages: true,
+      canAccessAnalystPages: true,
+      canAccessAllImports: true,
+      canManageAllTaxonomy: true,
+      isApprover: true,
+    };
+
+    const user = {
+      id: 'user-1',
+      name: 'Test User',
+      permissions: defaultPermissions,
+    };
+
     return render(
       <TestConfigContextProvider
         config={{
@@ -1520,7 +1588,7 @@ describe('DataReplacementPlan', () => {
           enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
         }}
       >
-        {children}
+        <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
       </TestConfigContextProvider>,
     );
   }
