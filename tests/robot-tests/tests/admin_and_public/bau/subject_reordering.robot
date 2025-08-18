@@ -102,11 +102,12 @@ Validate new order is preserved after refresh
     user checks table cell contains    4    1    Three    testid:Data files table
 
 Start replacing last subject in order
-    user clicks link in table cell    4    4    Replace data    testid:Data files table
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}ordering-test-3-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${FILES_DIR}ordering-test-3-replacement.meta.csv
-    user clicks button    Upload data files
+    user uploads subject replacement    Three    ordering-test-3-replacement.csv
+    ...    ordering-test-3-replacement.meta.csv
+
+    user checks table cell contains    1    1    Three    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks headed table body row cell contains    Title    1    Three

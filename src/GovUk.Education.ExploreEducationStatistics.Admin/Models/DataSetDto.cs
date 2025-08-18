@@ -22,8 +22,6 @@ public record DataSetDto
 
     public FileDto? MetaFile { get; init; }
 
-    public File? ReplacingFile { get; init; }
-
     public class Validator : AbstractValidator<DataSetDto>
     {
         public Validator()
@@ -44,10 +42,6 @@ public record DataSetDto
 
             RuleFor(dto => dto.MetaFile)
                 .MustBeValidMetaFile();
-
-            RuleFor(dto => dto.ReplacingFile)
-                .Must(file => file is null || file.Type == FileType.Data)
-                    .WithMessage(ValidationMessages.InvalidFileTypeForReplacement, FileType.Data.ToString());
         }
     }
 }
@@ -80,6 +74,4 @@ public record DataSetIndexItem
     public required string DataFileName { get; init; }
 
     public required string MetaFileName { get; init; }
-
-    public File? ReplacingFile { get; init; }
 }

@@ -1,4 +1,3 @@
-import { DataFile } from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -60,6 +59,7 @@ const fileErrorMappings = {
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
   CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
+  CannotReplaceDraftApiDataSet: 'CannotReplaceDraftApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
   DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
 };
@@ -119,14 +119,12 @@ function baseErrorMappings(
 }
 
 interface Props {
-  dataFiles?: DataFile[];
   isDataReplacement?: boolean;
   onSubmit: (values: DataFileUploadFormValues) => void | Promise<void>;
   onCancel?: () => void;
 }
 
 export default function DataFileUploadForm({
-  dataFiles,
   isDataReplacement = false,
   onSubmit,
   onCancel,
@@ -159,7 +157,17 @@ export default function DataFileUploadForm({
             .minSize(0, 'Choose a metadata file that is not empty'),
         otherwise: s => s.nullable(),
       }),
-      title: Yup.string(),
+      title: Yup.string().when('uploadType', {
+        is: (uploadType: FileType) =>
+          uploadType === 'csv' || uploadType === 'zip',
+        then: s =>
+          s
+            .required('Enter a title')
+            .max(
+              titleMaxLength,
+              `Title must be ${titleMaxLength} characters or fewer`,
+            ),
+      }),
       uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
       zipFile: Yup.file().when('uploadType', {
         is: 'zip',
@@ -179,39 +187,8 @@ export default function DataFileUploadForm({
       }),
     });
 
-    if (!isDataReplacement) {
-      return schema.shape({
-        title: Yup.string().when('uploadType', {
-          is: (uploadType: FileType) =>
-            uploadType === 'csv' || uploadType === 'zip',
-          then: s =>
-            s
-              .required('Enter a title')
-              .test({
-                name: 'unique',
-                message: 'Enter a unique title',
-                test(value: string) {
-                  if (!value) {
-                    return true;
-                  }
-
-                  return (
-                    dataFiles?.find(
-                      f => f.title.toUpperCase() === value.toUpperCase(),
-                    ) === undefined
-                  );
-                },
-              })
-              .max(
-                titleMaxLength,
-                `Title must be ${titleMaxLength} characters or fewer`,
-              ),
-        }),
-      });
-    }
-
     return schema;
-  }, [dataFiles, isDataReplacement]);
+  }, []);
 
   const defaultInitialValues: DataFileUploadFormValues = {
     uploadType: 'csv',

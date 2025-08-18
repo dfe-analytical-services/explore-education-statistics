@@ -1,9 +1,6 @@
 import Link from '@admin/components/Link';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
-import DataFileUploadForm, {
-  DataFileUploadFormValues,
-} from '@admin/pages/release/data/components/DataFileUploadForm';
 import {
   releaseDataFileReplacementCompleteRoute,
   ReleaseDataFileReplaceRouteParams,
@@ -90,50 +87,6 @@ const ReleaseDataFileReplacePage = ({
     });
   };
 
-  const handleSubmit = async (
-    currentFile: DataFile,
-    values: DataFileUploadFormValues,
-  ) => {
-    let file: DataFile;
-
-    if (values.uploadType === 'csv') {
-      file = await releaseDataFileService.uploadDataSetFilePairForReplacement(
-        releaseVersionId,
-        {
-          title: values.title ?? dataFile!.title,
-          replacingFileId: currentFile.id,
-          dataFile: values.dataFile as File,
-          metadataFile: values.metadataFile as File,
-        },
-      );
-    } else {
-      file =
-        await releaseDataFileService.uploadZippedDataSetFilePairForReplacement(
-          releaseVersionId,
-          {
-            title: values.title ?? dataFile!.title,
-            replacingFileId: currentFile.id,
-            zipFile: values.zipFile as File,
-          },
-        );
-    }
-
-    setDataFile({
-      value: {
-        ...currentFile,
-        replacedBy: file.id,
-      },
-    });
-    setReplacementDataFile({
-      value: {
-        ...file,
-        permissions: await permissionService.getDataFilePermissions(
-          releaseVersionId,
-          file.id,
-        ),
-      },
-    });
-  };
   const cancelBodyText = dataFile?.publicApiDataSetId ? (
     <>
       <p>
@@ -247,53 +200,33 @@ const ReleaseDataFileReplacePage = ({
                 onReplacementStatusChange={handleReplacementStatusChange}
               />
             </section>
+            <section>
+              <h2>Pending data replacement</h2>
 
-            {!dataFile.replacedBy ? (
-              <section>
-                <h2>Upload replacement data</h2>
+              {getReplacementPlanMessage()}
 
-                <DataFileUploadForm
-                  isDataReplacement
-                  onSubmit={values => handleSubmit(dataFile, values)}
-                  onCancel={() =>
+              {replacementDataFile?.status === 'COMPLETE' && (
+                <DataFileReplacementPlan
+                  cancelButton={replacementCancelButton}
+                  publicationId={publicationId}
+                  releaseVersionId={releaseVersionId}
+                  fileId={dataFile.id}
+                  replacementFileId={replacementDataFile.id}
+                  onReplacement={() => {
                     history.push(
-                      generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
-                        publicationId,
-                        releaseVersionId,
-                      }),
-                    )
-                  }
+                      generatePath<ReleaseDataFileReplaceRouteParams>(
+                        releaseDataFileReplacementCompleteRoute.path,
+                        {
+                          publicationId,
+                          releaseVersionId,
+                          fileId: replacementDataFile.id,
+                        },
+                      ),
+                    );
+                  }}
                 />
-              </section>
-            ) : (
-              <section>
-                <h2>Pending data replacement</h2>
-
-                {getReplacementPlanMessage()}
-
-                {replacementDataFile?.status === 'COMPLETE' && (
-                  <DataFileReplacementPlan
-                    cancelButton={replacementCancelButton}
-                    publicationId={publicationId}
-                    releaseVersionId={releaseVersionId}
-                    fileId={dataFile.id}
-                    replacementFileId={replacementDataFile.id}
-                    onReplacement={() => {
-                      history.push(
-                        generatePath<ReleaseDataFileReplaceRouteParams>(
-                          releaseDataFileReplacementCompleteRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            fileId: replacementDataFile.id,
-                          },
-                        ),
-                      );
-                    }}
-                  />
-                )}
-              </section>
-            )}
+              )}
+            </section>
           </>
         )}
       </LoadingSpinner>
