@@ -427,14 +427,13 @@
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Week",
+            "frequency": "Day",
             "interval": 1,
             "startTime": "2020-11-23T19:00:00",
             "timeZone": "GMT Standard Time",
             "schedule": {
               "hours": [19],
-              "minutes": [0],
-              "weekDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+              "minutes": [0]
             }
           }
         }
