@@ -62,6 +62,8 @@ const fileErrorMappings = {
   CannotReplaceDraftApiDataSet: 'CannotReplaceDraftApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
   DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
+  DataReplacementAlreadyInProgress: 'DataReplacementAlreadyInProgress',
+  DataSetImportInProgress: 'DataSetImportInProgress',
 };
 
 function baseErrorMappings(
@@ -85,8 +87,6 @@ function baseErrorMappings(
             'DataSetNamesCsvFileNamesShouldBeUnique',
           FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
-          DataReplacementAlreadyInProgress:
-            'Data replacement already in progress',
           DataSetTitleTooLong: 'DataSetTitleTooLong',
         },
       }),
