@@ -123,9 +123,12 @@ describe('PendingDataReplacementSection', () => {
 
   test('cancelling as an bau when there is a public API linked to the data file is not possible', async () => {
     renderWithAuth({ ...defaultProps }, bau);
-    await userEvent.click(
-      screen.getByRole('button', { name: /cancel data replacement/i }),
-    );
+    await waitFor(async () => {
+      await userEvent.click(
+        screen.getByRole('button', { name: /cancel data replacement/i }),
+      );
+    });
+
     expect(
       screen.queryByText(/explore.statistics@education.gov.uk/i),
     ).not.toBeInTheDocument();

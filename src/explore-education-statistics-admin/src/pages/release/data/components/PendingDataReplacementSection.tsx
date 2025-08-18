@@ -33,9 +33,6 @@ const PendingDataReplacementSection: React.FC<{
   fetchDataFile,
 }) => {
   const { user } = useAuthContext();
-  const missingPermissionsForCancelbutton =
-    !user?.permissions.isBauUser && publicApiDataSetId !== undefined;
-
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
       return null;
@@ -80,7 +77,9 @@ const PendingDataReplacementSection: React.FC<{
           ? 'Cancel data replacement and remove draft API'
           : 'Cancel data replacement'
       }
-      hideConfirm={missingPermissionsForCancelbutton}
+      hideConfirm={
+        !user?.permissions.isBauUser && publicApiDataSetId !== undefined
+      }
       triggerButton={
         <Button variant="secondary">Cancel data replacement</Button>
       }
@@ -96,9 +95,9 @@ const PendingDataReplacementSection: React.FC<{
       }}
     >
       <p>
-        {getApiCancelBodyText(
+        {getCancelBodyText(
           publicApiDataSetId !== undefined,
-          missingPermissionsForCancelbutton,
+          !!user?.permissions.isBauUser,
         )}
       </p>
     </ModalConfirm>
@@ -135,11 +134,8 @@ const PendingDataReplacementSection: React.FC<{
   );
 };
 
-function getApiCancelBodyText(
-  hasPublicApiLinked: boolean,
-  missingPermissionsForCancelbutton: boolean,
-) {
-  if (missingPermissionsForCancelbutton) {
+function getCancelBodyText(hasApiDataSetLinked: boolean, isBauUser: boolean) {
+  if (!isBauUser && hasApiDataSetLinked) {
     return (
       <>
         <p>
@@ -158,17 +154,9 @@ function getApiCancelBodyText(
       </>
     );
   }
-  if (!hasPublicApiLinked) {
-    return (
-      <p>
-        By cancelling this replacement you will delete the replacement file.
-        This action cannot be reversed.
-      </p>
-    );
-  }
   return (
     <div>
-      {hasPublicApiLinked && (
+      {hasApiDataSetLinked && (
         <p>
           <strong>
             Are you sure you want to cancel this data replacement and remove the
@@ -180,7 +168,7 @@ function getApiCancelBodyText(
         By cancelling this replacement you will delete the replacement file.
         This action cannot be reversed.
       </p>
-      {hasPublicApiLinked && (
+      {hasApiDataSetLinked && (
         <p>
           Note that this data replacement has an associated draft API data set
           version update. The API data set update will also be cancelled and
