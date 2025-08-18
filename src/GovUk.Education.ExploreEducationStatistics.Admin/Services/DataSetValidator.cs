@@ -49,14 +49,17 @@ public class DataSetValidator(
             }));
         }
 
-        var isReplacement = DataSetNameExists(dataSet.ReleaseVersionId, dataSet.Title);
-        errors.AddRange(ValidateDataFileNames(dataSet.ReleaseVersionId, dataFile.FileName, isReplacement));
-
         var fileToBeReplaced = (File?)null;
 
-        await GetReplacingFileIfExists(dataSet.ReleaseVersionId, dataSet.Title)
+        await GetFileToBeReplacedIfExists(dataSet.ReleaseVersionId, dataSet.Title)
             .OnFailureDo(errors.Add)
-            .OnSuccessDo(file => fileToBeReplaced = file)
+            .OnSuccessDo(file =>
+            {
+                fileToBeReplaced = file;
+
+                var isReplacement = fileToBeReplaced != null;
+                errors.AddRange(ValidateDataFileNames(dataSet.ReleaseVersionId, dataSet.Title, dataFile.FileName, isReplacement));
+            })
             .OnSuccessVoid();
 
         if (fileToBeReplaced is not null)
@@ -129,7 +132,7 @@ public class DataSetValidator(
             var dataSetName = row[datasetNameIndex].Trim();
             var dataFileName = row[fileNameIndex].Replace(".csv", ""); // File names should exclude extensions, but better to replace than return an error
 
-            await GetReplacingFileIfExists(releaseVersionId, dataSetName)
+            await GetFileToBeReplacedIfExists(releaseVersionId, dataSetName)
                 .OnFailureDo(errors.Add)
                 .OnSuccessDo(_ =>
                 {
@@ -182,10 +185,10 @@ public class DataSetValidator(
     }
 
     /// <summary>
-    /// Retrieve a replacement <see cref="File" /> for the specified release version and data set name, if it exists.
+    /// Retrieve the original <see cref="File" /> being replaced for the specified release version and data set name, if it exists.
     /// </summary>
-    /// <returns>The replacement <see cref="File" /> if present, or an error model if multiple results were found. The latter indicates a replacement is currently in progress and should halt further processing.</returns>
-    private async Task<Either<ErrorViewModel, File?>> GetReplacingFileIfExists(
+    /// <returns>The original <see cref="File" /> if present, or an error model if multiple results were found. The latter indicates a replacement is currently in progress and should halt further processing.</returns>
+    private async Task<Either<ErrorViewModel, File?>> GetFileToBeReplacedIfExists(
         Guid releaseVersionId,
         string dataSetName)
     {
@@ -260,41 +263,46 @@ public class DataSetValidator(
         return [];
     }
 
-    private bool DataSetNameExists(Guid releaseVersionId, string title)
-        => contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .Any(rf =>
-                rf.ReleaseVersionId == releaseVersionId &&
-                rf.File.Type == FileType.Data &&
-                rf.Name == title);
-
-    private bool FileExists(
-        Guid releaseVersionId,
-        FileType type,
-        string filename)
-    {
-        return contentDbContext
-            .ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == type)
-            .AsEnumerable()
-            .Any(rf => string.Equals(rf.File.Filename, filename, StringComparison.CurrentCultureIgnoreCase));
-    }
-
     /// <summary>
+    /// Check for duplicate data file names within a specified release.
+    /// </summary>
+    /// <remarks>
+    /// <para>
     /// An original uploads' data file name is not unique if a <see cref="ReleaseFile"/> exists with the same file name.
     /// With replacement uploads, we can ignore a pre-existing <see cref="ReleaseFile"/> if it is the file being replaced -
     /// we only care if the pre-existing duplicate <see cref="ReleaseFile"/> name isn't the file being replaced.
-    /// </summary>
-    /// <remarks>
+    /// </para>
+    /// <para>
     /// We allow duplicate meta file names - meta files aren't included in publicly downloadable zip archives, 
     /// so meta files won't be included in the same directory by file name and therefore cannot clash.
+    /// </para>
     /// </remarks>
     private List<ErrorViewModel> ValidateDataFileNames(
         Guid releaseVersionId,
+        string dataSetTitle,
         string dataFileName,
         bool isReplacement)
-            => FileExists(releaseVersionId, FileType.Data, dataFileName) && !isReplacement
-                ? [ValidationMessages.GenerateErrorFileNameNotUnique(dataFileName, FileType.Data)]
-                : [];
+    {
+        var dataReleaseFiles = contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId &&
+                rf.File.Type == FileType.Data)
+            .ToList();
+
+        if (isReplacement)
+        {
+            var originalFile = dataReleaseFiles.Single(rf => rf.Name == dataSetTitle);
+
+            // It's ok to have the same data file name as the file we're replacing,
+            // so this can be removed before performing the duplicate check.
+            dataReleaseFiles.Remove(originalFile);
+        }
+
+        var duplicateDataFileNameExists = dataReleaseFiles.Any(rf => rf.File.Filename == dataFileName);
+
+        return duplicateDataFileNameExists
+            ? [ValidationMessages.GenerateErrorFileNameNotUnique(dataFileName, FileType.Data)]
+            : [];
+    }
 }

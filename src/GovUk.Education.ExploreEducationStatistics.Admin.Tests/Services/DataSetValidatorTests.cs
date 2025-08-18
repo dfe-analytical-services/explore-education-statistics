@@ -118,7 +118,7 @@ public class DataSetValidatorTests
     }
 
     [Fact]
-    public async Task ValidateDataSet_ReplacementFilenameSameAsAnotherDataSetsFilename_IdentifiesDataSetReplacement()
+    public async Task ValidateDataSet_ReplacementFileNameMatchesAnotherDataSetsFileName_ReturnsErrorDetails()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion
@@ -144,26 +144,24 @@ public class DataSetValidatorTests
                 .WithFilename("test-data.meta.csv"))
             .Generate();
 
-        // This data set has the same filename as the file that is being chosen as
-        // a replacement for a different data set. 
-        var otherExistingDataReleaseFile = _fixture
+        var existingReleaseFileWithMatchingDataFileName = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
             .WithName("Other data set title")
             .WithFile(_fixture.DefaultFile()
                 .WithType(FileType.Data)
-                .WithFilename("other-data-filename.csv"))
+                .WithFilename("test-data-replacement.csv"))
             .Generate();
 
-        var dataFile = await new DataSetFileBuilder().WhereFileNameIs("test-data-replacement.csv").Build(FileType.Data);
-        var metaFile = await new DataSetFileBuilder().WhereFileNameIs("test-data-replacement.meta.csv").Build(FileType.Metadata);
+        var replacementDataFile = await new DataSetFileBuilder().WhereFileNameIs("test-data-replacement.csv").Build(FileType.Data);
+        var replacementMetaFile = await new DataSetFileBuilder().WhereFileNameIs("test-data-replacement.meta.csv").Build(FileType.Metadata);
 
         var dataSetDto = new DataSetDto
         {
             ReleaseVersionId = releaseVersion.Id,
             Title = dataSetTitle,
-            DataFile = dataFile,
-            MetaFile = metaFile,
+            DataFile = replacementDataFile,
+            MetaFile = replacementMetaFile,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -172,7 +170,7 @@ public class DataSetValidatorTests
             context.ReleaseFiles.AddRange(
                 toBeReplacedDataReleaseFile,
                 toBeReplacedMetaReleaseFile,
-                otherExistingDataReleaseFile);
+                existingReleaseFileWithMatchingDataFileName);
 
             await context.SaveChangesAsync();
         }
@@ -185,12 +183,9 @@ public class DataSetValidatorTests
             var result = await sut.ValidateDataSet(dataSetDto);
 
             // Assert
-            var dataSet = result.AssertRight();
-            Assert.Equal("Data set title", dataSet.Title);
-            Assert.Equal("test-data-replacement.csv", dataSet.DataFile.FileName);
-            Assert.Equal("test-data-replacement.meta.csv", dataSet.MetaFile.FileName);
-            Assert.NotNull(dataSet.ReplacingFile);
-            Assert.Equal("test-data.csv", dataSet.ReplacingFile.Filename);
+            var errors = result.AssertLeft();
+            Assert.Single(errors);
+            Assert.Equal(ValidationMessages.FileNameNotUnique.Code, errors[0].Code);
         }
     }
 
