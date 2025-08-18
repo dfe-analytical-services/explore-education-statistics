@@ -28,8 +28,8 @@
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "20000000",
-    "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
-    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000"
+    "removeSoftDeletedSubjectsObservationCommitBatchSize": "500000",
+    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "500000"
   },
   "resources": [
     {
