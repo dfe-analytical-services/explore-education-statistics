@@ -160,21 +160,11 @@ public class ReleaseAmendmentServiceTests
                                 },
                             },
                         })))
-                .ForIndex(1, s => s
-                    .SetContentBlocks(ListOf<ContentBlock>(
-                        new MarkDownBlock
-                        {
-                            Id = Guid.NewGuid(),
-                            Body = "Text",
-                            Comments = new List<Comment>
-                            {
-                                new()
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Inset Comment 1 Text"
-                                }
-                            }
-                        })))
+                .ForIndex(1,
+                    s => s
+                        .SetContentBlocks(ListOf<ContentBlock>(_fixture
+                            .DefaultHtmlBlock()
+                            .WithBody("<div></div>"))))
                 .ForIndex(2, s => s
                     .SetType(ContentSectionType.RelatedDashboards)
                     .SetContentBlocks(_fixture
@@ -253,17 +243,6 @@ public class ReleaseAmendmentServiceTests
             ReleaseVersionId = originalReleaseVersion.Id
         };
 
-        var deletedReleaseRole = new UserReleaseRole
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Role = ReleaseRole.Contributor,
-            ReleaseVersion = originalReleaseVersion,
-            ReleaseVersionId = originalReleaseVersion.Id,
-            Deleted = DateTime.UtcNow,
-            DeletedById = Guid.NewGuid(),
-        };
-
         var prereleaseReleaseRole = new UserReleaseRole
         {
             Id = Guid.NewGuid(),
@@ -271,15 +250,12 @@ public class ReleaseAmendmentServiceTests
             Role = ReleaseRole.PrereleaseViewer,
             ReleaseVersion = originalReleaseVersion,
             ReleaseVersionId = originalReleaseVersion.Id,
-            Deleted = DateTime.UtcNow,
-            DeletedById = Guid.NewGuid(),
         };
 
         var userReleaseRoles = new List<UserReleaseRole>
         {
             approverReleaseRole,
             contributorReleaseRole,
-            deletedReleaseRole,
             prereleaseReleaseRole
         };
 
@@ -575,8 +551,6 @@ public class ReleaseAmendmentServiceTests
 
             var amendmentReleaseRoles = contentDbContext
                 .UserReleaseRoles
-                .AsQueryable()
-                .IgnoreQueryFilters() // See if deletedAmendmentRole is also copied
                 .Where(r => r.ReleaseVersionId == amendment.Id)
                 .ToList();
 
@@ -585,13 +559,9 @@ public class ReleaseAmendmentServiceTests
             var approverAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Approver);
             AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
 
-            var contributorAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Contributor && r.Deleted == null);
+            var contributorAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Contributor);
             Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
             AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
-
-            var deletedAmendmentRole = amendmentReleaseRoles.Single(r => r.Deleted != null);
-            Assert.NotEqual(deletedReleaseRole.Id, deletedAmendmentRole.Id);
-            AssertAmendedReleaseRoleCorrect(deletedReleaseRole, deletedAmendmentRole, amendment);
 
             var amendmentDataFiles = contentDbContext
                 .ReleaseFiles
@@ -1182,8 +1152,6 @@ public class ReleaseAmendmentServiceTests
         Assert.Equal(originalReleaseRole.Role, amendedReleaseRole.Role);
         amendedReleaseRole.Created.AssertUtcNow();
         Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
-        Assert.Equal(originalReleaseRole.Deleted, amendedReleaseRole.Deleted);
-        Assert.Equal(originalReleaseRole.DeletedById, amendedReleaseRole.DeletedById);
     }
 
     private static void AssertAmendedReleaseFileCorrect(

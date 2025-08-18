@@ -51,7 +51,6 @@ const MethodologyEditableBlock = ({
 
   switch (block.type) {
     case 'HtmlBlock':
-    case 'MarkDownBlock':
       return (
         <EditableContentBlock
           editable={editable && !isBrowser('IE')}
@@ -60,7 +59,6 @@ const MethodologyEditableBlock = ({
           label="Content block"
           hideLabel
           value={block.body}
-          useMarkdown={block.type === 'MarkDownBlock'}
           toolbarConfig={methodologyToolbarConfigFull}
           transformImageAttributes={transformImageAttributes}
           onCancel={toggleEditing.off}

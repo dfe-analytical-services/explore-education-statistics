@@ -16,6 +16,4 @@ public class UserReleaseRole : ResourceRole<ReleaseRole, ReleaseVersion>
         get => ResourceId;
         set => ResourceId = value;
     }
-
-    public bool SoftDeleted { get; set; }
 }

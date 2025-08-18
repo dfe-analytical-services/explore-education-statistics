@@ -36,16 +36,16 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
+                var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
 
                 // Only the AdoptAnyMethodology claim should allow adopting a methodology for a publication.
                 var expectedToPassByClaimAlone = claim == AdoptAnyMethodology;
 
                 if (!expectedToPassByClaimAlone)
                 {
-                    userPublicationRoleRepository
+                    userPublicationRoleAndInviteManager
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
@@ -56,12 +56,11 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var authContext =
                     CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
-                            Publication>
-                        (user, Publication);
+                    Publication>(user, Publication);
 
                 await handler.HandleAsync(authContext);
 
-                VerifyAllMocks(userPublicationRoleRepository);
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -75,11 +74,11 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
         {
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
 
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
+                var handler = SetupHandler(userPublicationRoleAndInviteManager.Object);
 
-                userPublicationRoleRepository
+                userPublicationRoleAndInviteManager
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                     .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
@@ -91,7 +90,7 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 await handler.HandleAsync(authContext);
 
-                VerifyAllMocks(userPublicationRoleRepository);
+                VerifyAllMocks(userPublicationRoleAndInviteManager);
 
                 // As the user has Publication Owner role on the Publication they are allowed to adopt any methodology
                 Assert.Equal(publicationRole == Owner, authContext.HasSucceeded);
@@ -100,14 +99,14 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
     }
 
     private static AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null
     )
     {
         return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+                userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
                 Mock.Of<IPreReleaseService>(Strict)));
     }
 }

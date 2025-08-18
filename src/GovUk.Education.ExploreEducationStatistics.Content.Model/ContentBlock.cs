@@ -17,7 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 [JsonConverter(typeof(JsonKnownTypesConverter<ContentBlock>))]
 [JsonDiscriminator(Name = "Type")]
-[KnownType(typeof(MarkDownBlock))]
 [KnownType(typeof(DataBlock))]
 [KnownType(typeof(HtmlBlock))]
 [KnownType(typeof(EmbedBlockLink))]
@@ -55,15 +54,6 @@ public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTi
 
     [ConcurrencyCheck]
     public Guid? LockedById { get; set; }
-}
-
-public class MarkDownBlock : ContentBlock
-{
-    public MarkDownBlock()
-    {
-    }
-
-    public string Body { get; set; }
 }
 
 public class HtmlBlock : ContentBlock

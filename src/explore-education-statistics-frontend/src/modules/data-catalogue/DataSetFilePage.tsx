@@ -28,13 +28,14 @@ import {
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
-import downloadService from '@frontend/services/downloadService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
-import omit from 'lodash/omit';
 import { GetServerSideProps } from 'next';
+import isPatchVersion from '@common/utils/isPatchVersion';
 import React, { useEffect, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
+import downloadService from '@frontend/services/downloadService';
 import getDataSetFileMetaCSVW from './utils/getDataSetFileMetaCSVW';
 
 export const pageBaseSections = {
@@ -130,11 +131,19 @@ export default function DataSetFilePage({
       sections = omit(sections, 'dataSetFootnotes');
     }
 
-    if (
+    const hasNoApiChangelog =
       !apiDataSetVersionChanges ||
       (!Object.keys(apiDataSetVersionChanges.majorChanges).length &&
-        !Object.keys(apiDataSetVersionChanges.minorChanges).length)
-    ) {
+        !Object.keys(apiDataSetVersionChanges.minorChanges).length);
+
+    const hasNoPatchApiChangelog =
+      !apiDataSetVersionChanges ||
+      !apiDataSetVersionChanges.patchHistory ||
+      apiDataSetVersionChanges.patchHistory.every(
+        change => !change || !Object.keys(change.minorChanges).length,
+      );
+
+    if (hasNoApiChangelog && hasNoPatchApiChangelog) {
       sections = omit(sections, 'apiChangelog');
     }
 
@@ -275,6 +284,7 @@ export default function DataSetFilePage({
                       changes={apiDataSetVersionChanges}
                       guidanceNotes={apiDataSetVersion.notes}
                       version={apiDataSetVersion.version}
+                      patchHistory={apiDataSetVersionChanges.patchHistory || []}
                     />
                   )}
                 </>
@@ -324,6 +334,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
                 apiDataSetQueries.getDataSetVersionChanges(
                   dataSetFile.api.id,
                   dataSetFile.api.version,
+                  isPatchVersion(dataSetFile.api.version),
                 ),
               )
             : null,

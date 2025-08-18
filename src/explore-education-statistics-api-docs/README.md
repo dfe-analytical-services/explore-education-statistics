@@ -3,7 +3,31 @@
 This repository is used to generate the documentation website for the Explore education statistics API.
 It is based on the GOV.UK [Technical Documentation Template](https://tdt-documentation.london.cloudapps.digital/)
 
-## Pre-requisites
+## Building and running with Docker
+
+### Building
+
+To build the API docs, run:
+
+```shell
+pnpm api-docs:build
+```
+
+### Building and running for development
+
+To build and run the API docs using the Middleman development server and LiveReload, run:
+
+```shell
+pnpm api-docs:run
+```
+
+This will start the Middleman development server on [https://localhost:4567](https://localhost:4567).
+
+**Optional** - To automatically refresh the browser upon code changes, install the [LiveReload browser extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en).
+
+## Manually building and running without Docker
+
+### Pre-requisites
 
 The following pre-requisite dependencies are required to get started:
 
@@ -13,7 +37,7 @@ The following pre-requisite dependencies are required to get started:
 As always, it's advisable to install any versions using a version manager to make it easier to upgrade 
 and keep aligned with the project.
 
-### Ubuntu
+#### Ubuntu
 
 If you are using Ubuntu, you may need to install the following dependencies before you can install
 Ruby and its required gems:
@@ -22,7 +46,13 @@ Ruby and its required gems:
 sudo apt install build-essential zlib1g-dev libssl-dev libyaml-dev
 ```
 
-## Getting started
+You may also require the Ruby development package in order to compile Gems:
+
+```shell
+sudo apt install ruby-dev
+```
+
+### Getting started
 
 Once the pre-requisites have been installed, follow these steps:
 

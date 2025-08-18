@@ -27,10 +27,4 @@ public abstract class ResourceRole<TRoleEnum, TResource>
     public User? CreatedBy { get; set; }
 
     public DateTime? Created { get; set; }
-
-    public Guid? DeletedById { get; set; }
-
-    public User? DeletedBy { get; set; }
-
-    public DateTime? Deleted { get; set; }
 }

@@ -24,7 +24,6 @@ using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.
 using KeyStatisticDataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticDataBlockViewModel;
 using KeyStatisticTextViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticTextViewModel;
 using KeyStatisticViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticViewModel;
-using MarkDownBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MarkDownBlockViewModel;
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
@@ -299,7 +298,5 @@ public class MappingProfiles : CommonMappingProfile
                     embedBlockLink.EmbedBlock.Url));
 
         CreateMap<HtmlBlock, HtmlBlockViewModel>();
-
-        CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
     }
 }

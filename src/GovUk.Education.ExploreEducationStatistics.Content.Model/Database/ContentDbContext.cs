@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -70,7 +71,6 @@ public class ContentDbContext : DbContext
     public virtual DbSet<DataImport> DataImports { get; set; }
     public virtual DbSet<DataImportError> DataImportErrors { get; set; }
     public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
-    public virtual DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
     public virtual DbSet<EmbedBlock> EmbedBlocks { get; set; }
     public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
     public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
@@ -125,7 +125,6 @@ public class ContentDbContext : DbContext
         ConfigureDataBlock(modelBuilder);
         ConfigureHtmlBlock(modelBuilder);
         ConfigureEmbedBlockLink(modelBuilder);
-        ConfigureMarkdownBlock(modelBuilder);
         ConfigureFeaturedTable(modelBuilder);
         ConfigurePermalink(modelBuilder);
         ConfigureUser(modelBuilder);
@@ -656,13 +655,6 @@ public class ContentDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
     }
 
-    private static void ConfigureMarkdownBlock(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<MarkDownBlock>()
-            .Property(block => block.Body)
-            .HasColumnName("Body");
-    }
-
     private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FeaturedTable>()
@@ -729,7 +721,7 @@ public class ContentDbContext : DbContext
         };
 
         modelBuilder.Entity<UserPublicationRole>()
-            .HasQueryFilter(upr => upr.Deleted == null && !unusedRoles.Contains(upr.Role));
+            .HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)
@@ -743,21 +735,13 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<UserReleaseRole>()
             .Property(r => r.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder.Entity<UserReleaseRole>()
-            .HasQueryFilter(r =>
-                !r.SoftDeleted
-                && r.Deleted == null);
     }
 
     private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserReleaseInvite>()
-            .Property(r => r.Role)
+            .Property(uri => uri.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder.Entity<UserReleaseInvite>()
-            .HasQueryFilter(r => !r.SoftDeleted);
 
         modelBuilder.Entity<UserReleaseInvite>()
             .Property(invite => invite.Created)
@@ -770,12 +754,21 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+        modelBuilder.Entity<UserReleaseInvite>()
+            .HasIndex(uri => new
+            {
+                uri.ReleaseVersionId,
+                uri.Email,
+                uri.Role
+            })
+            .IsUnique();
     }
 
     private static void ConfigureUserPublicationInvite(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserPublicationInvite>()
-            .Property(r => r.Role)
+            .Property(upi => upi.Role)
             .HasConversion(new EnumToStringConverter<PublicationRole>());
 
         modelBuilder.Entity<UserPublicationInvite>()
@@ -783,6 +776,15 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<UserPublicationInvite>()
+            .HasIndex(upi => new
+                {
+                    upi.PublicationId,
+                    upi.Email,
+                    upi.Role
+                })
+            .IsUnique();
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)

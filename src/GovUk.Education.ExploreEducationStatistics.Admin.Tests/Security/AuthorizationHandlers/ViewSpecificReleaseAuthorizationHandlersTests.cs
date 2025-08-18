@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -14,14 +10,19 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
+using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseVersionAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
@@ -185,12 +186,24 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         ContentDbContext contentDbContext,
         IPreReleaseService? preReleaseService = null)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         return new ViewSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserPublicationRoleRepository(contentDbContext),
-                preReleaseService ?? new PreReleaseService(
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userReleaseInviteRepository: new UserReleaseInviteRepository(
+                        contentDbContext: contentDbContext,
+                        logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
+                    userRepository: userRepository,
+                    logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
+                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                    contentDbContext: contentDbContext,
+                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
+                    userRepository: userRepository,
+                    logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
+                preReleaseService: preReleaseService ?? new PreReleaseService(
                     new PreReleaseAccessOptions
                     {
                         AccessWindow = new AccessWindowOptions

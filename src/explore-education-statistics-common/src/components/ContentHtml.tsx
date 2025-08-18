@@ -7,6 +7,7 @@ import sanitizeHtml, {
   SanitizeHtmlOptions,
   defaultSanitizeOptions,
 } from '@common/utils/sanitizeHtml';
+import allowedHosts from '@common/utils/url/allowedHosts';
 import classNames from 'classnames';
 import { Element } from 'domhandler/lib/node';
 import parseHtmlString, {
@@ -83,18 +84,24 @@ export default function ContentHtml({
       }
 
       if (formatLinks && node.name === 'a') {
-        const url = formatContentLink(node.attribs.href);
-        const text = domToReact(node.children);
+        const urlString = formatContentLink(node.attribs.href);
 
-        return !url?.includes('explore-education-statistics.service.gov.uk') &&
-          !url?.startsWith('mailto:') &&
-          typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {text} (opens in a new tab)
-          </a>
-        ) : (
-          <a href={url}>{text}</a>
-        );
+        try {
+          const url = new URL(urlString);
+          const text = domToReact(node.children);
+
+          return !allowedHosts.includes(url.host) &&
+            (url.protocol === 'http:' || url.protocol === 'https:') &&
+            typeof node.attribs['data-featured-table'] === 'undefined' ? (
+            <a href={urlString} target="_blank" rel="noopener noreferrer">
+              {text} (opens in a new tab)
+            </a>
+          ) : (
+            <a href={urlString}>{text}</a>
+          );
+        } catch {
+          return false;
+        }
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {

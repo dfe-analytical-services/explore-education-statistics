@@ -1,12 +1,13 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
-public interface IUserReleaseRoleRepository
+public interface IUserReleaseRoleAndInviteManager
 {
     Task<UserReleaseRole> Create(Guid userId,
         Guid releaseVersionId,
@@ -28,14 +29,6 @@ public interface IUserReleaseRoleRepository
         ReleaseRole role,
         Guid createdById);
 
-    Task Remove(UserReleaseRole userReleaseRole, Guid deletedById);
-
-    Task RemoveMany(List<UserReleaseRole> userReleaseRoles, Guid deletedById);
-
-    Task RemoveAllForPublication(
-        Guid userId, Publication publication,
-        ReleaseRole role, Guid deletedById);
-
     Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
 
     Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId,
@@ -54,4 +47,38 @@ public interface IUserReleaseRoleRepository
     Task<bool> HasUserReleaseRole(string email,
         Guid releaseVersionId,
         ReleaseRole role);
+
+    Task RemoveRoleAndInvite(
+        UserReleaseRole userReleaseRole,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveRolesAndInvites(
+        IReadOnlyList<UserReleaseRole> userReleaseRoles,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveAllRolesAndInvitesForPublication(
+        Guid publicationId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveAllRolesAndInvitesForPublicationAndUser(
+        Guid publicationId,
+        Guid userId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveAllRolesAndInvitesForReleaseVersion(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+        Guid releaseVersionId,
+        Guid userId,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude);
+
+    Task RemoveAllRolesAndInvitesForUser(
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

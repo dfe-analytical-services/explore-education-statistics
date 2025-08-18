@@ -389,23 +389,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                     };
                 }
 
-                if (originalContentBlock is MarkDownBlock originalMarkDownBlock)
-                {
-                    return new MarkDownBlock
-                    {
-                        // Assign a new Id.
-                        Id = Guid.NewGuid(),
-
-                        // Assign the MarkDownBlock to the new Release amendment and the new ContentSection amendment.
-                        ReleaseVersionId = amendmentReleaseVersionId,
-                        ContentSectionId = contentSectionAmendmentId,
-
-                        // Copy certain fields from the original MarkDownBlock.
-                        Body = originalMarkDownBlock.Body,
-                        Order = originalMarkDownBlock.Order,
-                    };
-                }
-
                 throw new ArgumentException(
                     $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment");
             })
@@ -536,10 +519,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         // Copy all current roles apart from Prerelease Users to the Release amendment.
         var newRoles = _context
             .UserReleaseRoles
-            // For auditing purposes, we also want to migrate release roles that have Deleted set (when a role is
-            // manually removed from a Release as opposed to SoftDeleted, which is only set when a Release itself
-            // is deleted)
-            .IgnoreQueryFilters()
             .Where(releaseRole => releaseRole.ReleaseVersionId == originalReleaseId
                                   && releaseRole.Role != ReleaseRole.PrereleaseViewer)
             .Select(originalReleaseRole => new UserReleaseRole
@@ -553,8 +532,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 // Copy certain fields from the original.
                 Role = originalReleaseRole.Role,
                 UserId = originalReleaseRole.UserId,
-                Deleted = originalReleaseRole.Deleted,
-                DeletedById = originalReleaseRole.DeletedById,
 
                 // Assign the new created date.
                 Created = createdDate,

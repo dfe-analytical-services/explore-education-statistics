@@ -6,7 +6,6 @@ import {
   SanitizeHtmlOptions,
 } from '@common/utils/sanitizeHtml';
 import React, { useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { GlossaryEntry } from '@common/services/types/glossary';
 
 interface Props {
@@ -45,16 +44,6 @@ const ContentBlockRenderer = ({
   }, [transformImageAttributes]);
 
   switch (type) {
-    case 'MarkDownBlock':
-      return (
-        <ReactMarkdown
-          className="dfe-content"
-          allowedElements={defaultSanitizeOptions.allowedTags}
-          unwrapDisallowed
-        >
-          {body}
-        </ReactMarkdown>
-      );
     case 'HtmlBlock':
       return (
         <ContentHtml
