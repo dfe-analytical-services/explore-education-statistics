@@ -52,16 +52,9 @@ public class DataSetValidator(
 
         var fileToBeReplaced = (File?)null;
 
-        await GetFileToBeReplacedIfExists(dataSet.ReleaseVersionId, dataSet.Title)
-            .OnFailureDo(errors.Add)
-            .OnSuccessDo(file =>
-            {
-                fileToBeReplaced = file;
-
-                var isReplacement = fileToBeReplaced != null;
-                errors.AddRange(ValidateDataFileNames(dataSet.ReleaseVersionId, dataSet.Title, dataFile.FileName, isReplacement));
-            })
-            .OnSuccessVoid();
+        await GetFileToBeReplacedIfExists(dataSet.ReleaseVersionId, dataSet.Title, dataFile.FileName)
+            .OnFailureDo(errors.AddRange)
+            .OnSuccessDo(file => fileToBeReplaced = file);
 
         if (fileToBeReplaced is not null)
         {
@@ -152,8 +145,8 @@ public class DataSetValidator(
             var dataSetName = row[datasetNameIndex].Trim();
             var dataFileName = row[fileNameIndex].Replace(".csv", ""); // File names should exclude extensions, but better to replace than return an error
 
-            await GetFileToBeReplacedIfExists(releaseVersionId, dataSetName)
-                .OnFailureDo(errors.Add)
+            await GetFileToBeReplacedIfExists(releaseVersionId, dataSetName, dataFileName)
+                .OnFailureDo(errors.AddRange)
                 .OnSuccessDo(_ =>
                 {
                     dataSetIndex.DataSetIndexItems.Add(new()
@@ -207,13 +200,15 @@ public class DataSetValidator(
     /// <summary>
     /// Retrieve the original <see cref="File" /> being replaced for the specified release version and data set name, if it exists.
     /// </summary>
-    /// <returns>The original <see cref="File" /> if present, or an error model if multiple results were found. The latter indicates a replacement is currently in progress and should halt further processing.</returns>
-    private async Task<Either<ErrorViewModel, File?>> GetFileToBeReplacedIfExists(
+    /// <remarks>This method also performs several replacement-based validation checks.</remarks>
+    /// <returns>The original <see cref="File" /> if present, null if no <see cref="File" /> was found, or a collection of validation errors if there is a problem with the proposed replacement.</returns>
+    private async Task<Either<List<ErrorViewModel>, File?>> GetFileToBeReplacedIfExists(
         Guid releaseVersionId,
-        string dataSetName)
+        string dataSetName,
+        string replacementDataFileName)
     {
         // We replace files with the same title. If there is no ReleaseFile with the same title, it's a new data set.
-        var releaseFileToBeReplaced = await contentDbContext.ReleaseFiles
+        var releaseFilesToBeReplaced = await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)
             .Where(rf =>
                 rf.ReleaseVersionId == releaseVersionId &&
@@ -221,9 +216,28 @@ public class DataSetValidator(
                 rf.Name == dataSetName)
             .ToListAsync();
 
-        return releaseFileToBeReplaced.Count > 1
-            ? ValidationMessages.GenerateErrorDataReplacementAlreadyInProgress()
-            : releaseFileToBeReplaced.SingleOrDefault()?.File;
+        if (releaseFilesToBeReplaced.Count == 0)
+        {
+            return (File?)null;
+        }
+
+        var errors = new List<ErrorViewModel>();
+
+        if (releaseFilesToBeReplaced.Count > 1)
+        {
+            errors.Add(ValidationMessages.GenerateErrorDataReplacementAlreadyInProgress());
+        }
+
+        var fileToBeReplaced = releaseFilesToBeReplaced.First(f => f.File.ReplacedBy is null).File;
+        var isReplacement = fileToBeReplaced != null;
+
+        if (isReplacement)
+        {
+            errors.AddRange(await ToBeReplacedFileHasNoIncompleteImports(fileToBeReplaced!));
+            errors.AddRange(ValidateDataFileNames(releaseVersionId, dataSetName, replacementDataFileName, isReplacement));
+        }
+
+        return errors.Count != 0 ? errors : fileToBeReplaced;
     }
 
     private async Task<ReleaseFile?> GetReplacingFileWithApiDataSetIfExists(
@@ -312,7 +326,9 @@ public class DataSetValidator(
 
         if (isReplacement)
         {
-            var originalFile = dataReleaseFiles.Single(rf => rf.Name == dataSetTitle);
+            var originalFile = dataReleaseFiles.Single(rf =>
+                rf.Name == dataSetTitle &&
+                rf.File.ReplacedBy is null);
 
             // It's ok to have the same data file name as the file we're replacing,
             // so this can be removed before performing the duplicate check.
@@ -323,6 +339,17 @@ public class DataSetValidator(
 
         return duplicateDataFileNameExists
             ? [ValidationMessages.GenerateErrorFileNameNotUnique(dataFileName, FileType.Data)]
+            : [];
+    }
+
+    private async Task<List<ErrorViewModel>> ToBeReplacedFileHasNoIncompleteImports(File file)
+    {
+        var releaseFileHasIncompleteImport = await contentDbContext.DataImports.AnyAsync(di =>
+            di.FileId == file.Id &&
+            DataImportStatusExtensions.IncompleteStatuses.Contains(di.Status));
+
+        return releaseFileHasIncompleteImport
+            ? [ValidationMessages.GenerateErrorDataSetImportInProgress(file.Filename)]
             : [];
     }
 }

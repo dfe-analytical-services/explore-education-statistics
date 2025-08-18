@@ -352,6 +352,20 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage DataSetImportInProgress = new(
+        Code: nameof(DataSetImportInProgress),
+        Message: "File '{0}' cannot be replaced until the current import is complete."
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetImportInProgress(string fileName)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetImportInProgress.Code,
+            Message = string.Format(DataSetImportInProgress.Message, fileName),
+        };
+    }
+
     public static readonly LocalizableMessage FileSizeMustNotBeZero = new(
         Code: nameof(FileSizeMustNotBeZero),
         Message: "File '{0}' either empty or not found."
