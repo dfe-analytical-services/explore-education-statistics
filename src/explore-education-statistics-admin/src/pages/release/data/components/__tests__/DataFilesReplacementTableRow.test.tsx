@@ -1,3 +1,4 @@
+import { AuthContext } from '@admin/contexts/AuthContext';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
@@ -57,6 +58,22 @@ describe('DataFilesReplacementTableRow', () => {
       readyToPublish: false,
     },
     valid: true,
+  };
+
+  const defaultPermissions = {
+    isBauUser: true,
+    canAccessSystem: true,
+    canAccessPrereleasePages: true,
+    canAccessAnalystPages: true,
+    canAccessAllImports: true,
+    canManageAllTaxonomy: true,
+    isApprover: true,
+  };
+
+  const user = {
+    id: 'user-1',
+    name: 'Test User',
+    permissions: defaultPermissions,
   };
 
   test('renders with a valid replacement', async () => {
@@ -175,5 +192,163 @@ describe('DataFilesReplacementTableRow', () => {
     expect(
       within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('does not show confirm and cancel buttons when user has no permission to edit (not BAU user and data file is linked to API)', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValue({
+      ...testReplacementDataFile,
+      status: 'COMPLETE',
+      publicApiDataSetId: 'api-dataset-id',
+    });
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testDataReplacementPlan,
+      valid: true,
+    });
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider
+          value={{
+            user: {
+              ...user,
+              permissions: { ...defaultPermissions, isBauUser: false },
+            },
+          }}
+        >
+          <DataFilesReplacementTableRow
+            dataFile={{
+              ...testDataFile,
+              publicApiDataSetId: 'api-dataset-id',
+            }}
+            publicationId="test-publication"
+            releaseVersionId="test-release-version"
+            onReplacementStatusChange={() => {}}
+          />
+        </AuthContext.Provider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('Test File')).toBeInTheDocument();
+    expect(await screen.findByText('Ready')).toBeInTheDocument();
+
+    const cells = screen.getAllByRole('cell');
+    expect(cells[0]).toHaveTextContent('Test File');
+    expect(cells[1]).toHaveTextContent('1,000 B');
+    expect(cells[2]).toHaveTextContent('Ready');
+    expect(
+      within(cells[3]).getByRole('link', { name: 'View details' }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('show confirm and cancel buttons when user analyst but the data file has no API linked', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValue({
+      ...testReplacementDataFile,
+      status: 'COMPLETE',
+      publicApiDataSetId: undefined,
+    });
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testDataReplacementPlan,
+      valid: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider
+          value={{
+            user: {
+              ...user,
+              permissions: { ...defaultPermissions, isBauUser: false },
+            },
+          }}
+        >
+          <DataFilesReplacementTableRow
+            dataFile={{
+              ...testDataFile,
+              publicApiDataSetId: undefined,
+            }}
+            publicationId="test-publication"
+            releaseVersionId="test-release-version"
+            onReplacementStatusChange={() => {}}
+          />
+        </AuthContext.Provider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('Test File')).toBeInTheDocument();
+    expect(await screen.findByText('Ready')).toBeInTheDocument();
+
+    const cells = screen.getAllByRole('cell');
+    expect(cells[0]).toHaveTextContent('Test File');
+    expect(cells[1]).toHaveTextContent('1,000 B');
+    expect(cells[2]).toHaveTextContent('Ready');
+    expect(
+      within(cells[3]).getByRole('link', { name: 'View details' }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
+    ).toBeInTheDocument();
+  });
+
+  test('shows confirm and cancel buttons when user has permission to edit (is BAU user)', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValue({
+      ...testReplacementDataFile,
+      status: 'COMPLETE',
+      publicApiDataSetId: 'api-dataset-id',
+    });
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testDataReplacementPlan,
+      valid: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <AuthContext.Provider
+          value={{
+            user: {
+              ...user,
+              permissions: { ...defaultPermissions, isBauUser: true },
+            },
+          }}
+        >
+          <DataFilesReplacementTableRow
+            dataFile={{
+              ...testDataFile,
+              publicApiDataSetId: 'api-dataset-id',
+            }}
+            publicationId="test-publication"
+            releaseVersionId="test-release-version"
+            onReplacementStatusChange={() => {}}
+          />
+        </AuthContext.Provider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('Test File')).toBeInTheDocument();
+    expect(await screen.findByText('Ready')).toBeInTheDocument();
+
+    const cells = screen.getAllByRole('cell');
+    expect(cells[0]).toHaveTextContent('Test File');
+    expect(cells[1]).toHaveTextContent('1,000 B');
+    expect(cells[2]).toHaveTextContent('Ready');
+    expect(
+      within(cells[3]).getByRole('link', { name: 'View details' }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).getByRole('button', { name: 'Cancel replacement' }),
+    ).toBeInTheDocument();
   });
 });
