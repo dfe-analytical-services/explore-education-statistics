@@ -1,5 +1,5 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
-import { toolbarConfigSimple } from '@admin/config/ckEditorConfig';
+import { educationInNumbersToolbarConfig } from '@admin/config/ckEditorConfig';
 import { EditableContentBlock as EditableContentBlockType } from '@admin/services/types/content';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
@@ -45,7 +45,7 @@ const EducationInNumbersEditableBlock = ({
           label="Content block"
           hideLabel
           value={block.body}
-          toolbarConfig={toolbarConfigSimple}
+          toolbarConfig={educationInNumbersToolbarConfig}
           onCancel={toggleEditing.off}
           onEditing={toggleEditing.on}
           onSubmit={handleSave}
