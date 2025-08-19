@@ -365,7 +365,7 @@ public class DataSetValidatorTests
         // Assert
         var errors = result.AssertLeft();
         Assert.Single(errors);
-        Assert.Equal(ValidationMessages.CannotReplaceDraftApiDataSet.Code, errors[0].Code);
+        Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
     }
 
     [Fact]
