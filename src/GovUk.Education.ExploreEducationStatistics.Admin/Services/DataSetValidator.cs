@@ -5,10 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -21,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class DataSetValidator(
     ContentDbContext contentDbContext,
+    IUserService userService,
     IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
 {
     public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(DataSetDto dataSet)
@@ -72,6 +75,13 @@ public class DataSetValidator(
                 {
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
                     return errors;
+                }
+
+                var isBauUser = await userService.CheckIsBauUser().IsRight();
+
+                if (!isBauUser)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorAnalystCannotReplaceApiDataSet(dataSet.Title));
                 }
 
                 if (!releaseFileWithApiDataSet.ReleaseVersion.Amendment)

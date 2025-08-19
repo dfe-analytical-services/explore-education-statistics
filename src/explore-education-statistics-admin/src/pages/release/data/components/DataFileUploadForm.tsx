@@ -62,6 +62,7 @@ const fileErrorMappings = {
   CannotReplaceDraftApiDataSet: 'CannotReplaceDraftApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
   DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
+  AnalystCannotReplaceApiDataSet: 'AnalystCannotReplaceApiDataSet',
 };
 
 function baseErrorMappings(

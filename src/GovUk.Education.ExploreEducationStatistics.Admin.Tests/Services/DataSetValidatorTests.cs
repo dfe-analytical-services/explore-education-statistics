@@ -2,17 +2,20 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.Extensions.Options;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -367,6 +370,92 @@ public class DataSetValidatorTests
         Assert.Single(errors);
         Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
     }
+    
+    [Fact]
+    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
+        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2};
+
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
+
+        var dataSetTitle = "Data set title";
+
+        var existingDataReleaseFile = _fixture.DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename(dataFile.FileName))
+            .WithPublicApiDataSetId(Guid.NewGuid())
+            .Generate();
+
+        var existingMetaReleaseFile = _fixture.DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Metadata)
+                .WithFilename(metaFile.FileName))
+            .Generate();
+
+        var replacementDataReleaseFile = _fixture.DefaultReleaseFile()
+            .WithReleaseVersion(amendmentReleaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename(dataFile.FileName))
+            .WithPublicApiDataSetId(Guid.NewGuid())
+            .Generate();
+
+        var replacementMetaReleaseFile = _fixture.DefaultReleaseFile()
+            .WithReleaseVersion(amendmentReleaseVersion)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Metadata)
+                .WithFilename(metaFile.FileName))
+            .Generate();
+
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            Title = dataSetTitle,
+            DataFile = dataFile,
+            MetaFile = metaFile
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryContentDbContext(contentDbContextId);
+
+        context.ReleaseFiles.AddRange(
+            existingDataReleaseFile, 
+            existingMetaReleaseFile, 
+            replacementDataReleaseFile, 
+            replacementMetaReleaseFile);
+        await context.SaveChangesAsync();
+
+        var userService = new Mock<IUserService>(MockBehavior.Strict);
+        userService
+            .Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser))
+            .ReturnsAsync(false);
+
+        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
+        {
+            EnableReplacementOfPublicApiDataSets = true
+        });
+
+        var sut = BuildService(
+            context,
+            featureFlagOptions,
+            userService.Object);
+
+        // Act
+        var result = await sut.ValidateDataSet(dataSetDto);
+
+        // Assert
+        var errors = result.AssertLeft();
+        Assert.Single(errors);
+        Assert.Equal(ValidationMessages.AnalystCannotReplaceApiDataSet.Code, errors[0].Code);
+    }
 
     [Fact]
     public async Task ValidateBulkDataZipIndexFile_Valid_ReturnsIndexFileObject()
@@ -650,10 +739,12 @@ public class DataSetValidatorTests
 
     private static DataSetValidator BuildService(
         ContentDbContext? contentDbContext = null,
-        IOptions<FeatureFlagsOptions>? featureFlags = null)
+        IOptions<FeatureFlagsOptions>? featureFlags = null,
+        IUserService? userService = null)
     {
         return new DataSetValidator(
             contentDbContext!,
+            userService!,
             featureFlags!);
     }
 }
