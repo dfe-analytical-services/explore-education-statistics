@@ -81,17 +81,15 @@ Approve first release
 Create amendment for patch replacement
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
-Navigate to data replacement page
+Upload patch replacement data
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user clicks link    Replace data    testId:Actions
+    user uploads subject replacement    ${SUBJECT_1_NAME}
+    ...    absence_school_minor_manual.csv    absence_school_minor_manual.meta.csv
+    ...    ${PUBLIC_API_FILES_DIR}
 
-Upload replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${PUBLIC_API_FILES_DIR}absence_school_minor_manual.csv
-    user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${PUBLIC_API_FILES_DIR}absence_school_minor_manual.meta.csv
-    user clicks button    Upload data files
+    user waits until page contains element    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
@@ -198,17 +196,14 @@ Approve amendment release
 Create second amendment for patch replacement
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
-Navigate to data replacement page to create second patch replacement
+Upload second patch replacement data
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user clicks link    Replace data    testId:Actions
-
-Upload second patch replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${PUBLIC_API_FILES_DIR}absence_school_patch_manual.csv
-    user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${PUBLIC_API_FILES_DIR}absence_school_patch_manual.meta.csv
-    user clicks button    Upload data files
+    user uploads subject replacement    ${SUBJECT_1_NAME}
+    ...    absence_school_patch_manual.csv    absence_school_patch_manual.meta.csv
+    ...    ${PUBLIC_API_FILES_DIR}
+    user waits until page contains element    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
