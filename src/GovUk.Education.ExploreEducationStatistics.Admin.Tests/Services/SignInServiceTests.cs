@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
@@ -93,20 +94,20 @@ public class SignInServiceTests
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.GetInvitesByEmail(email))
+                .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userReleaseInvites)
                 .Verifiable();
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
-                .Setup(mock => mock.GetInvitesByEmail(email))
+                .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationInvites)
                 .Verifiable();
 
-            var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             foreach (var userReleaseInvite in userReleaseInvites)
             {
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                     .Setup(mock => mock.Create(
                         It.IsAny<Guid>(),
                         userReleaseInvite.ReleaseVersionId,
@@ -116,10 +117,10 @@ public class SignInServiceTests
                     .Verifiable();
             }
 
-            var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             foreach (var userPublicationInvite in userPublicationInvites)
             {
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(mock => mock.Create(
                         It.IsAny<Guid>(),
                         userPublicationInvite.PublicationId,
@@ -139,8 +140,8 @@ public class SignInServiceTests
                     userManager: userManager.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userPublicationInviteRepository: userPublicationInviteRepository.Object,
-                    userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
-                    userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
                 var result = await service.RegisterOrSignIn();
                 result.AssertRight();
@@ -151,8 +152,8 @@ public class SignInServiceTests
                 userManager,
                 userReleaseInviteRepository,
                 userPublicationInviteRepository,
-                userReleaseRoleAndInviteManager,
-                userPublicationRoleAndInviteManager);
+                userReleaseRoleRepository,
+                userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -292,8 +293,8 @@ public class SignInServiceTests
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         UserManager<ApplicationUser>? userManager = null,
         ContentDbContext? contentDbContext = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
-        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserPublicationInviteRepository? userPublicationInviteRepository = null)
     {
@@ -306,8 +307,8 @@ public class SignInServiceTests
             usersAndRolesDbContext: usersAndRolesDbContext,
             userManager: userManager ?? MockUserManager().Object,
             contentDbContext: contentDbContext,
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(),
-            userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(),
+            userReleaseRoleRepository: userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
+            userPublicationRoleRepository: userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
             userReleaseInviteRepository: userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
             userPublicationInviteRepository: userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>()
         );

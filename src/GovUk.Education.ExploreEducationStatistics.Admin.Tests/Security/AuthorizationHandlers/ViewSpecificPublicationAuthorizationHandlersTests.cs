@@ -126,8 +126,8 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
     private static ViewSpecificPublicationAuthorizationHandler CreateHandler(
         ContentDbContext context,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
-        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IPreReleaseService? preReleaseService = null)
     {
         var userRepository = new UserRepository(context);
@@ -136,18 +136,14 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
             context,
             new AuthorizationHandlerService(
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
-                userReleaseRoleAndInviteManager ?? new UserReleaseRoleAndInviteManager(
+                userReleaseRoleRepository ?? new UserReleaseRoleRepository(
                     contentDbContext: context,
-                    userReleaseInviteRepository: new UserReleaseInviteRepository(
-                        contentDbContext: context, 
-                        logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
                     userRepository: userRepository,
-                    logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
-                userPublicationRoleAndInviteManager ?? new UserPublicationRoleAndInviteManager(
+                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                userPublicationRoleRepository ?? new UserPublicationRoleRepository(
                     contentDbContext: context,
-                    userPublicationInviteRepository: new UserPublicationInviteRepository(context),
                     userRepository: userRepository,
-                    logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
+                    logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)));
     }
 }

@@ -63,8 +63,8 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(m => m.ListUserReleaseRoles(releaseVersion.Id, null))
             .ReturnsAsync([user1ReleaseRole, user2ReleaseRole])
             .Verifiable();
@@ -73,7 +73,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.ListReleaseRoles(releaseVersion.Id);
             var viewModel = result.AssertRight();
@@ -91,7 +91,7 @@ public class ReleasePermissionServiceTests
             Assert.Equal(user2ReleaseRole.Role, viewModel[1].Role);
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
+        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
     }
 
     [Theory]
@@ -113,8 +113,8 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(m => m.ListUserReleaseRoles(releaseVersion.Id, rolesToInclude))
             .ReturnsAsync([])
             .Verifiable();
@@ -123,13 +123,13 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.ListReleaseRoles(releaseVersion.Id, rolesToInclude);
             var viewModel = result.AssertRight();
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
+        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
     }
 
     [Fact]
@@ -452,16 +452,16 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
         // User 2's role should be removed
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRolesAndInvites(
+        userReleaseRoleRepository
+            .Setup(m => m.RemoveMany(
                 It.Is<List<UserReleaseRole>>(l => l.Single().Id == user2ReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
         // User 3's role should be created
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.CreateManyIfNotExists(
                 It.Is<List<Guid>>(l => l.Single() == user3.Id),
                 releaseVersion.Id,
@@ -474,7 +474,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result =
                 await service.UpdateReleaseContributors(releaseVersion.Id,
@@ -482,7 +482,7 @@ public class ReleasePermissionServiceTests
             result.AssertRight();
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
+        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
     }
 
     [Fact]
@@ -500,9 +500,9 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForPublicationAndUser(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(m => m.RemoveForPublicationAndUser(
                 publication.Id,
                 userId,
                 default,
@@ -514,7 +514,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveAllUserContributorPermissionsForPublication(
                 publicationId: publication.Id,
@@ -523,19 +523,19 @@ public class ReleasePermissionServiceTests
             result.AssertRight();
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleAndInviteManager);
+        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
     }
 
     private static ReleasePermissionService SetupReleasePermissionService(
         ContentDbContext contentDbContext,
         IUserService? userService = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null)
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null)
     {
         return new(
             contentDbContext: contentDbContext,
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
             releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict),
+            userReleaseRoleRepository: userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
             userService: userService ?? MockUtils.AlwaysTrueUserService(UserId).Object
         );
     }

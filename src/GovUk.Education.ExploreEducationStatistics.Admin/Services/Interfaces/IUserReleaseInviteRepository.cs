@@ -31,7 +31,9 @@ public interface IUserReleaseInviteRepository
         string email,
         ReleaseRole role);
 
-    Task<List<UserReleaseInvite>> GetInvitesByEmail(string email);
+    Task<List<UserReleaseInvite>> GetInvitesByEmail(
+        string email,
+        CancellationToken cancellationToken = default);
 
     Task Remove(
         Guid releaseVersionId,

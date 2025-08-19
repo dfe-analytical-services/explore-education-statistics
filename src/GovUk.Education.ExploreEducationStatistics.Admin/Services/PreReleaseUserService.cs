@@ -36,7 +36,7 @@ public class PreReleaseUserService(ContentDbContext context,
     IUserService userService,
     IUserRepository userRepository,
     IUserInviteRepository userInviteRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository) : IPreReleaseUserService
 {
     public async Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
@@ -86,7 +86,7 @@ public class PreReleaseUserService(ContentDbContext context,
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async email =>
                     {
-                        if (await userReleaseRoleAndInviteManager
+                        if (await userReleaseRoleRepository
                                 .HasUserReleaseRole(email, releaseVersionId, ReleaseRole.PrereleaseViewer))
                         {
                             plan.AlreadyAccepted.Add(email);
@@ -157,8 +157,13 @@ public class PreReleaseUserService(ContentDbContext context,
             .OnSuccessVoid(
                 async user =>
                 {
-                    await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+                    await userReleaseRoleRepository.RemoveForReleaseVersionAndUser(
                         userId: user.Id,
+                        releaseVersionId: releaseVersionId,
+                        rolesToInclude: ReleaseRole.PrereleaseViewer);
+
+                    await userReleaseInviteRepository.RemoveByReleaseVersionAndEmail(
+                        email: email,
                         releaseVersionId: releaseVersionId,
                         rolesToInclude: ReleaseRole.PrereleaseViewer);
 
@@ -276,7 +281,7 @@ public class PreReleaseUserService(ContentDbContext context,
                     createdById: userService.GetUserId());
             }
 
-            await userReleaseRoleAndInviteManager.CreateIfNotExists(
+            await userReleaseRoleRepository.CreateIfNotExists(
                 userId: user.Id,
                 releaseVersionId: releaseVersion.Id,
                 role: ReleaseRole.PrereleaseViewer,

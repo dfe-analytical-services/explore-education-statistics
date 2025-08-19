@@ -167,19 +167,16 @@ public class ReleasePermissionServicePermissionTests
     {
         var userRepository = new UserRepository(contentDbContext);
 
-        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            new UserReleaseInviteRepository(
-                contentDbContext: contentDbContext,
-                logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
             userRepository,
-            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         return new(
             contentDbContext: contentDbContext,
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
             releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository: userReleaseRoleRepository,
             userService: userService
         );
     }

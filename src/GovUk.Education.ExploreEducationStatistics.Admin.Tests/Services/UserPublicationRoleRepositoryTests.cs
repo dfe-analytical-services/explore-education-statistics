@@ -45,7 +45,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 var result = await service.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
 
@@ -94,7 +94,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 Assert.True(await service.UserHasRoleOnPublication(
                     userPublicationRole.UserId,
@@ -127,7 +127,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 Assert.False(await service.UserHasRoleOnPublication(
                     userPublicationRoleOtherPublication.UserId,
@@ -185,7 +185,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 var result = await service.GetDistinctRolesByUser(user1.Id);
 
@@ -228,7 +228,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 var result = await service.GetDistinctRolesByUser(user.Id);
 
@@ -285,7 +285,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 var result = await service.GetAllRolesByUserAndPublication(
                     userId: user1.Id,
@@ -337,7 +337,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(contentDbContext);
+                var service = CreateRepository(contentDbContext);
 
                 var result = await service.GetAllRolesByUserAndPublication(
                     userId: user.Id,
@@ -348,7 +348,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveRoleAndInviteTests : UserPublicationRoleAndInviteManagerTests
+    public class RemoveTests : UserPublicationRoleAndInviteManagerTests
     {
         [Theory]
         // Valid roles
@@ -378,30 +378,16 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
-            userPublicationInviteRepository
-                .Setup(m => m.Remove(
-                    userPublicationRole.PublicationId,
-                    email,
-                    userPublicationRole.Role,
-                    It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                var service = CreateRepository(contentDbContext);
 
                 var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles
                     .IgnoreQueryFilters()
                     .SingleAsync(urr => urr.Id == userPublicationRole.Id);
 
-                await service.RemoveRoleAndInvite(userPublicationRoleToRemove);
+                await service.Remove(userPublicationRoleToRemove);
             }
-
-            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -413,7 +399,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveRolesAndInvitesTests : UserPublicationRoleAndInviteManagerTests
+    public class RemoveManyTests : UserPublicationRoleAndInviteManagerTests
     {
         [Fact]
         public async Task Success()
@@ -469,28 +455,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
-            userPublicationInviteRepository
-                .Setup(m => m.RemoveMany(
-                    It.Is<IReadOnlyList<UserPublicationInvite>>(list =>
-                        list.Count == 2
-                        && (list[0].Id == userPublicationInvite1.Id
-                            ||
-                            list[1].Id == userPublicationInvite2.Id)),
-                    It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserPublicationRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                var service = CreateRepository(contentDbContext);
 
-                await service.RemoveRolesAndInvites([userPublicationRole1, userPublicationRole2]);
+                await service.RemoveMany([userPublicationRole1, userPublicationRole2]);
             }
-
-            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -502,7 +472,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveAllRolesAndInvitesForUserTests : UserPublicationRoleAndInviteManagerTests
+    public class RemoveForUserTests : UserPublicationRoleAndInviteManagerTests
     {
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
@@ -541,24 +511,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
-            userPublicationInviteRepository
-                .Setup(m => m.RemoveByUserEmail(
-                    targetUser.Email,
-                    It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = SetupUserPublicationRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                var manager = CreateRepository(contentDbContext);
 
-                await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+                await manager.RemoveForUser(targetUser.Id);
             }
-
-            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -609,24 +567,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(MockBehavior.Strict);
-            userPublicationInviteRepository
-                .Setup(m => m.RemoveByUserEmail(
-                    targetUser.Email,
-                    It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = SetupUserPublicationRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                var manager = CreateRepository(contentDbContext);
 
-                await manager.RemoveAllRolesAndInvitesForUser(targetUser.Id);
+                await manager.RemoveForUser(targetUser.Id);
             }
-
-            MockUtils.VerifyAllMocks(userPublicationInviteRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -647,14 +593,12 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    private static UserPublicationRoleAndInviteManager SetupUserPublicationRoleAndInviteManager(
-        ContentDbContext contentDbContext,
-        IUserPublicationInviteRepository? userPublicationInviteRepository = null)
+    private static UserPublicationRoleRepository CreateRepository(
+        ContentDbContext contentDbContext)
     {
         return new(
             contentDbContext: contentDbContext,
-            userPublicationInviteRepository: userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(),
             userRepository: new UserRepository(contentDbContext),
-            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
+            logger: Mock.Of<ILogger<UserPublicationRoleRepository>>());
     }
 }

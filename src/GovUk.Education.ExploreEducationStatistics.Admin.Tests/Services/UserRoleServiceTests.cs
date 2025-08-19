@@ -316,15 +316,15 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(user)))
             .ReturnsAsync(ListOf(RoleNames.Analyst));
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(mock => mock.UserHasRoleOnPublication(
                 _user.Id,
                 publication.Id,
                 PublicationRole.Owner))
             .ReturnsAsync(false)
             .Verifiable();
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Setup(s => s.Create(
                 _user.Id,
                 publication.Id,
@@ -341,7 +341,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Owner);
 
@@ -351,7 +351,7 @@ public class UserRoleServiceTests
         VerifyAllMocks(
             emailTemplateService,
             userManager,
-            userPublicationRoleAndInviteManager);
+            userPublicationRoleRepository);
     }
 
     [Fact]
@@ -380,7 +380,7 @@ public class UserRoleServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userPublicationRoleAndInviteManager = Mock.Of<IUserPublicationRoleAndInviteManager>();
+        var userPublicationRoleRepository = Mock.Of<IUserPublicationRoleRepository>();
 
         var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
@@ -410,7 +410,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager);
+                userPublicationRoleRepository: userPublicationRoleRepository);
 
             var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Owner);
 
@@ -461,7 +461,7 @@ public class UserRoleServiceTests
             .Returns(Unit.Instance)
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = Mock.Of<IUserPublicationRoleAndInviteManager>();
+        var userPublicationRoleRepository = Mock.Of<IUserPublicationRoleRepository>();
 
         var userManager = MockUserManager();
 
@@ -479,7 +479,7 @@ public class UserRoleServiceTests
                 usersAndRolesDbContext: userAndRolesDbContext,
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
+                userPublicationRoleRepository: userPublicationRoleRepository,
                 userManager: userManager.Object);
 
             var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Owner);
@@ -526,7 +526,7 @@ public class UserRoleServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userPublicationRoleAndInviteManager = Mock.Of<IUserPublicationRoleAndInviteManager>();
+        var userPublicationRoleRepository = Mock.Of<IUserPublicationRoleRepository>();
 
         var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
@@ -564,7 +564,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager);
+                userPublicationRoleRepository: userPublicationRoleRepository);
 
             var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Owner);
 
@@ -606,8 +606,8 @@ public class UserRoleServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(mock => mock.UserHasRoleOnPublication(
                 _user.Id,
                 publication.Id,
@@ -621,16 +621,16 @@ public class UserRoleServiceTests
             var service = SetupUserRoleService(
                 usersAndRolesDbContext: userAndRolesDbContext,
                 contentDbContext: contentDbContext,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Owner);
 
             result.AssertBadRequest(UserAlreadyHasResourceRole);
         }
 
-        VerifyAllMocks(userPublicationRoleAndInviteManager);
+        VerifyAllMocks(userPublicationRoleRepository);
 
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Verify(s => s.Create(
                 It.IsAny<Guid>(),
                 It.IsAny<Guid>(),
@@ -758,15 +758,15 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(user)))
             .ReturnsAsync([RoleNames.Analyst]);
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 _user.Id,
                 releaseVersion.Id,
                 ReleaseRole.Contributor))
             .ReturnsAsync(false)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(s => s.Create(
                 _user.Id,
                 releaseVersion.Id,
@@ -783,7 +783,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.AddReleaseRole(
                 userId: _user.Id,
@@ -796,7 +796,7 @@ public class UserRoleServiceTests
         VerifyAllMocks(
             emailTemplateService,
             userManager,
-            userReleaseRoleAndInviteManager);
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -838,8 +838,8 @@ public class UserRoleServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                  _user.Id,
                 release.Versions[0].Id,
@@ -853,7 +853,7 @@ public class UserRoleServiceTests
             var service = SetupUserRoleService(
                 usersAndRolesDbContext: userAndRolesDbContext,
                 contentDbContext: contentDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.AddReleaseRole(
                 userId: _user.Id,
@@ -863,7 +863,7 @@ public class UserRoleServiceTests
             result.AssertBadRequest(UserAlreadyHasResourceRole);
         }
 
-        VerifyAllMocks(userReleaseRoleAndInviteManager);
+        VerifyAllMocks(userReleaseRoleRepository);
     }
 
     [Fact]
@@ -883,8 +883,8 @@ public class UserRoleServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                  _user.Id,
                 release.Versions[0].Id,
@@ -897,7 +897,7 @@ public class UserRoleServiceTests
             var service = SetupUserRoleService(
             usersAndRolesDbContext: userAndRolesDbContext,
             contentDbContext: contentDbContext,
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+            userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.AddReleaseRole(
                 userId: _user.Id,
@@ -1010,7 +1010,7 @@ public class UserRoleServiceTests
             .ReturnsAsync(new IdentityResult())
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = Mock.Of<IUserReleaseRoleAndInviteManager>();
+        var userReleaseRoleRepository = Mock.Of<IUserReleaseRoleRepository>();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1020,7 +1020,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager);
+                userReleaseRoleRepository: userReleaseRoleRepository);
 
             var result = await service.AddReleaseRole(
                 userId: _user.Id,
@@ -1091,7 +1091,7 @@ public class UserRoleServiceTests
             .ReturnsAsync(new IdentityResult())
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = Mock.Of<IUserReleaseRoleAndInviteManager>();
+        var userReleaseRoleRepository = Mock.Of<IUserReleaseRoleRepository>();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1101,7 +1101,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager);
+                userReleaseRoleRepository: userReleaseRoleRepository);
 
             var result = await service.AddReleaseRole(
                 userId: _user.Id,
@@ -1161,7 +1161,7 @@ public class UserRoleServiceTests
             .ReturnsAsync(ListOf(RoleNames.BauUser))
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = Mock.Of<IUserReleaseRoleAndInviteManager>();
+        var userReleaseRoleRepository = Mock.Of<IUserReleaseRoleRepository>();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1171,7 +1171,7 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 emailTemplateService: emailTemplateService.Object,
                 userManager: userManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager);
+                userReleaseRoleRepository: userReleaseRoleRepository);
 
             var result = await service.AddReleaseRole(
                 userId: _user.Id,
@@ -1859,20 +1859,20 @@ public class UserRoleServiceTests
                 ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
             .ReturnsAsync(new IdentityResult());
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
@@ -1884,8 +1884,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
@@ -1894,7 +1894,7 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager);
+            userPublicationRoleRepository);
     }
 
     [Fact]
@@ -1951,20 +1951,20 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
             .ReturnsAsync(ListOf(RoleNames.BauUser));
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>();
-        userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
@@ -1976,8 +1976,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
@@ -1986,8 +1986,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2041,20 +2041,20 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
             .ReturnsAsync(ListOf(RoleNames.Analyst));
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>();
-        userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([PublicationRole.Owner])
             .Verifiable();
@@ -2066,8 +2066,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
@@ -2076,8 +2076,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2130,20 +2130,20 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
             .ReturnsAsync(ListOf(RoleNames.Analyst));
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([ReleaseRole.Approver])
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>();
-        userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
@@ -2155,8 +2155,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
@@ -2165,8 +2165,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2228,20 +2228,20 @@ public class UserRoleServiceTests
             .Setup(s => s.AddToRoleAsync(ItIsUser(identityUser), RoleNames.PrereleaseUser))
             .ReturnsAsync(new IdentityResult());
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([ReleaseRole.PrereleaseViewer])
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>();
-        userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userPublicationRoleAndInviteManager
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
@@ -2253,8 +2253,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
@@ -2263,8 +2263,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2317,20 +2317,20 @@ public class UserRoleServiceTests
                 ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
             .ReturnsAsync(new IdentityResult());
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
@@ -2342,8 +2342,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
@@ -2352,7 +2352,7 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager);
+            userPublicationRoleRepository);
     }
 
     [Fact]
@@ -2413,20 +2413,20 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
             .ReturnsAsync(ListOf(RoleNames.BauUser));
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
@@ -2438,8 +2438,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
@@ -2448,8 +2448,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2506,20 +2506,20 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
             .ReturnsAsync(ListOf(RoleNames.Analyst));
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([ReleaseRole.Approver])
             .Verifiable();
@@ -2531,8 +2531,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
@@ -2541,8 +2541,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2613,20 +2613,20 @@ public class UserRoleServiceTests
             .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
             .ReturnsAsync(ListOf(RoleNames.Analyst));
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>();
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>();
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([PublicationRole.Owner])
             .Verifiable();
@@ -2638,8 +2638,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
@@ -2648,8 +2648,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userReleaseRoleAndInviteManager,
-            userPublicationRoleAndInviteManager);
+            userReleaseRoleRepository,
+            userPublicationRoleRepository);
 
         await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
@@ -2730,20 +2730,20 @@ public class UserRoleServiceTests
             .Setup(s => s.AddToRoleAsync(ItIsUser(identityUser), RoleNames.PrereleaseUser))
             .ReturnsAsync(new IdentityResult());
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([ReleaseRole.PrereleaseViewer])
             .Verifiable();
@@ -2755,8 +2755,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
@@ -2765,8 +2765,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2817,20 +2817,20 @@ public class UserRoleServiceTests
 
         var userManager = MockUserManager();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([])
             .Verifiable();
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRoleAndInvite(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.Remove(
                 It.Is<UserReleaseRole>(urr => urr.Id == prereleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(m => m.GetDistinctRolesByUser(user.Id))
             .ReturnsAsync([ReleaseRole.Approver])
             .Verifiable();
@@ -2848,8 +2848,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.RemoveUserReleaseRole(prereleaseRole.Id);
 
@@ -2858,8 +2858,8 @@ public class UserRoleServiceTests
 
         VerifyAllMocks(
             userManager,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager);
+            userPublicationRoleRepository,
+            userReleaseRoleRepository);
     }
 
     [Fact]
@@ -2935,17 +2935,17 @@ public class UserRoleServiceTests
             await userAndRolesDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveRolesAndInvites(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.RemoveMany(
                 It.Is<List<UserReleaseRole>>(l => l.Single().Id == targetUserReleaseRole.Id),
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        userPublicationRoleAndInviteManager
-            .Setup(m => m.RemoveRolesAndInvites(
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        userPublicationRoleRepository
+            .Setup(m => m.RemoveMany(
                 It.Is<List<UserPublicationRole>>(l => l.Single().Id == targetUserPublicationRole.Id),
                 default))
             .Returns(Task.CompletedTask)
@@ -2958,8 +2958,8 @@ public class UserRoleServiceTests
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userManager: userManager.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.RemoveAllUserResourceRoles(targetUser.Id);
 
@@ -2976,8 +2976,8 @@ public class UserRoleServiceTests
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IEmailTemplateService? emailTemplateService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null)
     {
@@ -2995,8 +2995,8 @@ public class UserRoleServiceTests
             emailTemplateService ?? new Mock<IEmailTemplateService>(Strict).Object,
             userService ?? AlwaysTrueUserService(_user.Id).Object,
             releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
-            userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(Strict),
-            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             userManager ?? MockUserManager().Object);
     }
 }

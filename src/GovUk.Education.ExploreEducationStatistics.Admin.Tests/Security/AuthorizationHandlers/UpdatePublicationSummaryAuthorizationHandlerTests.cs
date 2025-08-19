@@ -43,12 +43,11 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
         return new UpdatePublicationSummaryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleAndInviteManager: Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
+                userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
+                userPublicationRoleRepository: new UserPublicationRoleRepository(
                     contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
                     userRepository: new UserRepository(contentDbContext),
-                    logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
+                    logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

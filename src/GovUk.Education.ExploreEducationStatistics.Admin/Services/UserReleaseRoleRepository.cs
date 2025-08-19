@@ -13,13 +13,12 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserReleaseRoleAndInviteManager(
+public class UserReleaseRoleRepository(
     ContentDbContext contentDbContext,
-    IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserRepository userRepository,
-    ILogger<UserReleaseRoleAndInviteManager> logger) :
-    UserResourceRoleRepositoryBase<UserReleaseRoleAndInviteManager, UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext, userRepository, logger),
-    IUserReleaseRoleAndInviteManager
+    ILogger<UserReleaseRoleRepository> logger) :
+    UserResourceRoleRepositoryBase<UserReleaseRoleRepository, UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext, userRepository, logger),
+    IUserReleaseRoleRepository
 {
     protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
     {
@@ -75,100 +74,33 @@ public class UserReleaseRoleAndInviteManager(
         return await ListResourceRoles(releaseVersionId, rolesToInclude);
     }
 
-    public async Task RemoveRoleAndInvite(
+    public new async Task Remove(
         UserReleaseRole userReleaseRole,
         CancellationToken cancellationToken = default)
     {
-        var userEmail = await GetUserEmail(userReleaseRole.UserId, cancellationToken);
-
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            // Remove the associated invites if there are any
-            await userReleaseInviteRepository.Remove(
-                releaseVersionId: userReleaseRole.ReleaseVersionId,
-                email: userEmail,
-                role: userReleaseRole.Role,
-                cancellationToken: cancellationToken);
-
-            await Remove(userReleaseRole, cancellationToken);
-        });
+        await base.Remove(userReleaseRole, cancellationToken);
     }
 
-    public async Task RemoveRolesAndInvites(
+    public new async Task RemoveMany(
         IReadOnlyList<UserReleaseRole> userReleaseRoles,
         CancellationToken cancellationToken = default)
     {
-        if (!userReleaseRoles.Any())
-        {
-            return;
-        }
-
-        var inviteKeys = userReleaseRoles
-            .Select(upr => (upr.ReleaseVersionId, upr.Role, upr.User.Email))
-            .ToHashSet();
-
-        var allReleaseVersionIds = inviteKeys
-            .Select(k => k.ReleaseVersionId)
-            .ToHashSet();
-
-        var allEmails = inviteKeys
-            .Select(k => k.Email)
-            .ToHashSet();
-
-        var allRoles = inviteKeys
-            .Select(k => k.Role)
-            .ToHashSet();
-
-        // Step 1: Fetch only the broadly matching invites from the database
-        // We filter by ReleaseVersionId, Role and Email (simple scalar fields)
-        // so that we pull back the smallest candidate set possible.
-        var inviteCandidates = await ContentDbContext.UserReleaseInvites
-            .Where(upi => allReleaseVersionIds.Contains(upi.ReleaseVersionId))
-            .Where(upi => allEmails.Contains(upi.Email))
-            .Where(upi => allRoles.Contains(upi.Role))
-            .ToListAsync(cancellationToken);
-
-        // Step 2: Perform the precise composite‐key match in memory
-        // Now that we have a small candidate list, we can safely
-        // use our HashSet<(ReleaseVersionId, Role, Email)> to finish
-        // the exact tuple comparison without hitting EF translation limits.
-        var invites = inviteCandidates
-            .Where(upi => inviteKeys.Contains((
-                upi.ReleaseVersionId,
-                upi.Role,
-                upi.Email)))
-            .ToList();
-
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            // Remove all of the associated invites if there are any
-            await userReleaseInviteRepository.RemoveMany(invites, cancellationToken);
-
-            await RemoveMany(userReleaseRoles, cancellationToken);
-        });
+        await base.RemoveMany(userReleaseRoles, cancellationToken);
     }
 
-    public async Task RemoveAllRolesAndInvitesForPublication(
+    public async Task RemoveForPublication(
         Guid publicationId,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
     {
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            await userReleaseInviteRepository.RemoveByPublication(
-                publicationId: publicationId,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-
-            await RemoveAllRolesForPublication(
-                publicationId: publicationId,
-                userId: null,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-        });
+        await RemoveForPublication(
+            publicationId: publicationId,
+            userId: null,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
     }
 
-    public async Task RemoveAllRolesAndInvitesForPublicationAndUser(
+    public async Task RemoveForPublicationAndUser(
         Guid publicationId,
         Guid userId,
         CancellationToken cancellationToken = default,
@@ -183,45 +115,26 @@ public class UserReleaseRoleAndInviteManager(
             throw new ArgumentException($"{nameof(userId)} must not be EMPTY.", nameof(userId));
         }
 
-        var userEmail = await GetUserEmail(userId, cancellationToken);
-
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            await userReleaseInviteRepository.RemoveByPublicationAndEmail(
-                publicationId: publicationId,
-                email: userEmail,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-
-            await RemoveAllRolesForPublication(
-                publicationId: publicationId,
-                userId: userId,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-        });
+        await RemoveForPublication(
+            publicationId: publicationId,
+            userId: userId,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
     }
 
-    public async Task RemoveAllRolesAndInvitesForReleaseVersion(
+    public async Task RemoveForReleaseVersion(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
     {
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            await userReleaseInviteRepository.RemoveByReleaseVersion(
-                releaseVersionId: releaseVersionId,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-
-            await RemoveAllRolesAndInvitesForReleaseVersion(
-                releaseVersionId: releaseVersionId,
-                userId: null,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-        });
+        await RemoveForReleaseVersion(
+            releaseVersionId: releaseVersionId,
+            userId: null,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
     }
 
-    public async Task RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+    public async Task RemoveForReleaseVersionAndUser(
         Guid releaseVersionId,
         Guid userId,
         CancellationToken cancellationToken = default,
@@ -236,45 +149,25 @@ public class UserReleaseRoleAndInviteManager(
             throw new ArgumentException($"{nameof(userId)} must not be EMPTY.", nameof(userId));
         }
 
-        var userEmail = await GetUserEmail(userId, cancellationToken);
-
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            await userReleaseInviteRepository.RemoveByReleaseVersionAndEmail(
-                releaseVersionId: releaseVersionId,
-                email: userEmail,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-
-            await RemoveAllRolesAndInvitesForReleaseVersion(
-                releaseVersionId: releaseVersionId,
-                userId: userId,
-                cancellationToken: cancellationToken,
-                rolesToInclude: rolesToInclude);
-        });
+        await RemoveForReleaseVersion(
+            releaseVersionId: releaseVersionId,
+            userId: userId,
+            cancellationToken: cancellationToken,
+            rolesToInclude: rolesToInclude);
     }
 
-    public async Task RemoveAllRolesAndInvitesForUser(
+    public async Task RemoveForUser(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var userEmail = await GetUserEmail(userId, cancellationToken);
-
         var userReleaseRoles = await ContentDbContext.UserReleaseRoles
             .Where(urr => urr.UserId == userId)
             .ToListAsync(cancellationToken);
 
-        await ContentDbContext.RequireTransaction(async () =>
-        {
-            await userReleaseInviteRepository.RemoveByUserEmail(
-                email: userEmail,
-                cancellationToken: cancellationToken);
-
-            await RemoveMany(userReleaseRoles, cancellationToken);
-        });
+        await base.RemoveMany(userReleaseRoles, cancellationToken);
     }
 
-    private async Task RemoveAllRolesForPublication(
+    private async Task RemoveForPublication(
         Guid publicationId,
         Guid? userId = null,
         CancellationToken cancellationToken = default,
@@ -293,10 +186,10 @@ public class UserReleaseRoleAndInviteManager(
                 .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
 
-        await RemoveMany(userReleaseRoles, cancellationToken);
+        await base.RemoveMany(userReleaseRoles, cancellationToken);
     }
 
-    private async Task RemoveAllRolesAndInvitesForReleaseVersion(
+    private async Task RemoveForReleaseVersion(
         Guid releaseVersionId,
         Guid? userId = null,
         CancellationToken cancellationToken = default,
@@ -310,6 +203,6 @@ public class UserReleaseRoleAndInviteManager(
                 .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
 
-        await RemoveMany(userReleaseRoles, cancellationToken);
+        await base.RemoveMany(userReleaseRoles, cancellationToken);
     }
 }

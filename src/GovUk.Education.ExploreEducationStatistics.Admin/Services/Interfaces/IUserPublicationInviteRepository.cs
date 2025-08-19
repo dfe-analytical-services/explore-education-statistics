@@ -16,7 +16,9 @@ public interface IUserPublicationInviteRepository
         Guid createdById,
         DateTime? createdDate = null);
 
-    Task<List<UserPublicationInvite>> GetInvitesByEmail(string email);
+    Task<List<UserPublicationInvite>> GetInvitesByEmail(
+        string email,
+        CancellationToken cancellationToken = default);
 
     Task Remove(
         Guid publicationId,

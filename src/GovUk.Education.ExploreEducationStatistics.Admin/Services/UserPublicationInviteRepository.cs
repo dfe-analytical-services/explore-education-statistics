@@ -44,12 +44,14 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         await contentDbContext.SaveChangesAsync();
     }
 
-    public Task<List<UserPublicationInvite>> GetInvitesByEmail(string email)
+    public Task<List<UserPublicationInvite>> GetInvitesByEmail(
+        string email,
+        CancellationToken cancellationToken = default)
     {
         return contentDbContext
             .UserPublicationInvites
             .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     public async Task Remove(
@@ -92,9 +94,7 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         string email,
         CancellationToken cancellationToken = default)
     {
-        var invites = await contentDbContext.UserPublicationInvites
-            .Where(i => i.Email.ToLower().Equals(email.ToLower()))
-            .ToListAsync(cancellationToken);
+        var invites = await GetInvitesByEmail(email, cancellationToken);
 
         await RemoveMany(invites, cancellationToken);
     }

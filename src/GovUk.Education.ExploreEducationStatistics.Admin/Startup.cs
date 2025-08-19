@@ -485,8 +485,8 @@ public class Startup(
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
-        services.AddTransient<IUserPublicationRoleAndInviteManager, UserPublicationRoleAndInviteManager>();
-        services.AddTransient<IUserReleaseRoleAndInviteManager, UserReleaseRoleAndInviteManager>();
+        services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
+        services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
         services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
         services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();

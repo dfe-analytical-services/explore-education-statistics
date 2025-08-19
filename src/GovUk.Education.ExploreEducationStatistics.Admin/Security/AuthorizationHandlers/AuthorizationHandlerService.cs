@@ -16,8 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class AuthorizationHandlerService(
     IReleaseVersionRepository releaseVersionRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
-    IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     IPreReleaseService preReleaseService)
 {
     private static readonly ReleaseRole[] ReleaseEditorRoles =
@@ -58,7 +58,7 @@ public class AuthorizationHandlerService(
         IEnumerable<PublicationRole> publicationRoles,
         IEnumerable<ReleaseRole> releaseRoles)
     {
-        var usersPublicationRoles = await userPublicationRoleAndInviteManager
+        var usersPublicationRoles = await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         if (usersPublicationRoles.Any(publicationRoles.Contains))
@@ -73,7 +73,7 @@ public class AuthorizationHandlerService(
             return false;
         }
 
-        var usersReleaseRoles = await userReleaseRoleAndInviteManager
+        var usersReleaseRoles = await userReleaseRoleRepository
             .GetAllRolesByUserAndRelease(userId: userId,
                 releaseVersionId: releaseVersionId.Value);
 
@@ -86,7 +86,7 @@ public class AuthorizationHandlerService(
         IEnumerable<PublicationRole> publicationRoles,
         IEnumerable<ReleaseRole> releaseRoles)
     {
-        var usersPublicationRoles = await userPublicationRoleAndInviteManager
+        var usersPublicationRoles = await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         if (usersPublicationRoles.Any(publicationRoles.Contains))
@@ -94,7 +94,7 @@ public class AuthorizationHandlerService(
             return true;
         }
 
-        var usersReleaseRoles = await userReleaseRoleAndInviteManager
+        var usersReleaseRoles = await userReleaseRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
@@ -105,7 +105,7 @@ public class AuthorizationHandlerService(
         Guid publicationId,
         params PublicationRole[] publicationRoles)
     {
-        var usersPublicationRoles = await userPublicationRoleAndInviteManager
+        var usersPublicationRoles = await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         return usersPublicationRoles.Any(publicationRoles.Contains);
@@ -116,7 +116,7 @@ public class AuthorizationHandlerService(
         Guid releaseVersionId,
         params ReleaseRole[] releaseRoles)
     {
-        var usersReleaseRoles = await userReleaseRoleAndInviteManager
+        var usersReleaseRoles = await userReleaseRoleRepository
             .GetAllRolesByUserAndRelease(userId: userId,
                 releaseVersionId: releaseVersionId);
 
