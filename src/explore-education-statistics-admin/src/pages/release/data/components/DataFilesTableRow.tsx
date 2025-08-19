@@ -21,7 +21,6 @@ import React from 'react';
 import { generatePath } from 'react-router';
 import styles from './DataFilesTable.module.scss';
 import DeleteDataFileModal from './DeleteDataFileModal';
-import ReplaceDataButtonOrModal from './ReplaceDataButtonOrModal';
 
 interface Props {
   canUpdateRelease?: boolean;
