@@ -5,16 +5,17 @@ import {
 } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
+import { HtmlBlock } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 
-type ContentSectionViewModel = ContentSection<EditableContentBlock>;
+type ContentSectionViewModel = ContentSection<HtmlBlock>;
 
 export interface EducationInNumbersPageContent {
   id: string;
   title: string;
   slug: string;
   published?: string;
-  content: ContentSection<EditableContentBlock>[];
+  content: ContentSection<HtmlBlock>[];
 }
 
 const educationInNumbersContentService = {
@@ -22,7 +23,6 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string,
   ): Promise<EducationInNumbersPageContent> {
     // return client.get(`/education-in-numbers/${educationInNumbersPageId}/content`);
-    // TODO return dummy data
     return new Promise(resolve => {
       resolve({
         id: educationInNumbersPageId,
@@ -40,7 +40,6 @@ const educationInNumbersContentService = {
                 order: 1,
                 body: '<p>This is the first block of content in section 1.</p>',
                 type: 'HtmlBlock',
-                comments: [],
               },
             ],
           },
