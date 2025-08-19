@@ -66,18 +66,19 @@ public class DataSetValidator(
         {
             var releaseFileWithApiDataSet = await GetReplacingFileWithApiDataSetIfExists(dataSet.ReleaseVersionId, dataSet.Title);
 
-            if (releaseFileWithApiDataSet != null && !featureFlags.Value.EnableReplacementOfPublicApiDataSets)
+            if (releaseFileWithApiDataSet != null)
             {
+                if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
+                    return errors;
+                }
+
                 if (!releaseFileWithApiDataSet.ReleaseVersion.Amendment)
                 {
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDraftApiDataSet(dataSet.Title));
+                    return errors;
                 }
-                else
-                {
-                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
-                }
-
-                return errors;
             }
         }
 

@@ -227,6 +227,7 @@ Replace subject data
     user waits until page contains data uploads table
     user uploads subject replacement    ${SUBJECT_NAME}    grouped-filters-and-indicators-replacement.csv
     ...    grouped-filters-and-indicators-replacement.meta.csv
+    user waits until page contains element    testid:Data file replacements table
 
 Confirm data replacement details on replacement page
     user checks table cell contains    1    1    ${SUBJECT_NAME}    testid:Data file replacements table

@@ -70,16 +70,15 @@ User waits until the initial API data set version's status changes to "Ready"
     user waits until h3 is visible    Draft version details
     user waits until draft API data set status contains    Ready
 
-Check modal that blocks replacing a draft patch data set version is displayed
+Check error that blocks replacing a draft patch data set version is displayed
     user clicks link    Back to API data sets
     user clicks link    Data uploads
     # TODO: EES-6418 removes this 'user reloads page' workaround after fixing related frontend bug.
     user reloads page
     user waits until page contains data uploads table
-    user clicks button    Replace data    testId:Actions
-    ${modal}=    user waits until modal is visible    Cannot replace data
-    user clicks button    Close
-    user waits until modal is not visible    Cannot replace data
+    user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school.csv    absence_school.meta.csv
+    ...    ${PUBLIC_API_FILES_DIR}
+    user waits until element is visible    testid:errorSummary    %{WAIT_SMALL}
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -92,17 +91,11 @@ Approve first release
 Create amendment for patch replacement
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
-Navigate to data replacement page
-    user clicks link    Data and files
-    user waits until page contains data uploads table
-    user clicks link    Replace data    testId:Actions
-
 Upload replacement data that result in major API version
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${PUBLIC_API_FILES_DIR}absence_school_major_auto.csv
-    user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${PUBLIC_API_FILES_DIR}absence_school_major_auto.meta.csv
-    user clicks button    Upload data files
+    user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school_major_auto.csv
+    ...    absence_school_major_auto.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user waits until page contains element    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
@@ -134,11 +127,10 @@ Cancel data replacement which results in major API version
     user waits until modal is not visible    Cancel data replacement and remove draft API
 
 Upload replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${PUBLIC_API_FILES_DIR}absence_school_minor_manual.csv
-    user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${PUBLIC_API_FILES_DIR}absence_school_minor_manual.meta.csv
-    user clicks button    Upload data files
+    user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school_minor_manual.csv
+    ...    absence_school_minor_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user waits until page contains element    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
