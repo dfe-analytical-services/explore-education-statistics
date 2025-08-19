@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +11,8 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(
-    ContentDbContext contentDbContext,
-    IUserRepository userRepository,
-    ILogger<UserPublicationRoleRepository> logger) :
-    UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(contentDbContext, userRepository, logger),
+public class UserPublicationRoleRepository(ContentDbContext contentDbContext) :
+    UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(contentDbContext),
     IUserPublicationRoleRepository
 {
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)

@@ -596,9 +596,6 @@ public abstract class UserPublicationRoleAndInviteManagerTests
     private static UserPublicationRoleRepository CreateRepository(
         ContentDbContext contentDbContext)
     {
-        return new(
-            contentDbContext: contentDbContext,
-            userRepository: new UserRepository(contentDbContext),
-            logger: Mock.Of<ILogger<UserPublicationRoleRepository>>());
+        return new(contentDbContext);
     }
 }

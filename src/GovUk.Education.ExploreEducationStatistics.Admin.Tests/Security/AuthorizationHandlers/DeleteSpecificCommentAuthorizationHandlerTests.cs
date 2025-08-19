@@ -45,17 +45,12 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
 
     private static DeleteSpecificCommentAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            userRepository,
             logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext,
-            userRepository,
-            logger: Mock.Of<ILogger<UserPublicationRoleRepository>>());
+            contentDbContext);
 
         return new DeleteSpecificCommentAuthorizationHandler(
             contentDbContext,

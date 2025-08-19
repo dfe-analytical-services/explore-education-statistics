@@ -1252,12 +1252,24 @@ public class PreReleaseUserServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(m => m.RemoveByReleaseVersionAndEmail(
+                releaseVersion.Id,
+                user.Email,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
+                userReleaseInviteRepository: userReleaseInviteRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
@@ -1269,13 +1281,15 @@ public class PreReleaseUserServiceTests
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(
+            userReleaseRoleRepository,
+            userReleaseInviteRepository);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             // The UserInvite should not have been removed
             var remainingUserInvites = await usersAndRolesDbContext.UserInvites
-            .ToListAsync();
+                .ToListAsync();
 
             var remainingUserInvite = Assert.Single(remainingUserInvites);
 
@@ -1339,12 +1353,34 @@ public class PreReleaseUserServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(m => m.RemoveByReleaseVersionAndEmail(
+                releaseVersion.Id,
+                user.Email,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Callback(async () =>
+            {
+                await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+                var releaseInvite = await contentDbContext.UserReleaseInvites
+                    .SingleAsync(uri => uri.Id == userReleaseInvite.Id);
+
+                contentDbContext.Remove(releaseInvite);
+                await contentDbContext.SaveChangesAsync();
+            })
+            .Verifiable();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
+                userReleaseInviteRepository: userReleaseInviteRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
@@ -1356,19 +1392,17 @@ public class PreReleaseUserServiceTests
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(
+            userReleaseRoleRepository,
+            userReleaseInviteRepository);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
-            // The UserInvite should not have been removed
+            // The UserInvite should have been removed
             var remainingUserInvites = await usersAndRolesDbContext.UserInvites
-            .ToListAsync();
+                .ToListAsync();
 
-            var remainingUserInvite = Assert.Single(remainingUserInvites);
-
-            Assert.Equal(user.Email, remainingUserInvite.Email);
-            Assert.False(remainingUserInvite.Accepted);
-            Assert.Equal(Role.PrereleaseUser.GetEnumValue(), remainingUserInvite.RoleId);
+            Assert.Empty(remainingUserInvites);
         }
     }
 
@@ -1419,12 +1453,24 @@ public class PreReleaseUserServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(m => m.RemoveByReleaseVersionAndEmail(
+                releaseVersion.Id,
+                user.Email,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
+                userReleaseInviteRepository: userReleaseInviteRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
@@ -1436,13 +1482,15 @@ public class PreReleaseUserServiceTests
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(
+            userReleaseRoleRepository,
+            userReleaseInviteRepository);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             // The unaccepted UserInvite should have been removed
             var remainingUserInvites = await usersAndRolesDbContext.UserInvites
-            .ToListAsync();
+                .ToListAsync();
 
             Assert.Empty(remainingUserInvites);
         }

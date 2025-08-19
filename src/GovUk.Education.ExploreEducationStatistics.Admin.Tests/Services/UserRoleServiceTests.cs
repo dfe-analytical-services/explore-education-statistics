@@ -2865,10 +2865,6 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveAllUserResourceRoles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
-
         var targetUser = new User
         {
             Id = Guid.NewGuid(),
@@ -2878,16 +2874,6 @@ public class UserRoleServiceTests
         {
             Id = targetUser.Id.ToString()
         };
-        var targetUserReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(targetUser)
-            .WithReleaseVersion(releaseVersion)
-            .WithRole(ReleaseRole.Approver)
-            .Generate();
-        var targetUserPublicationRole = _dataFixture.DefaultUserPublicationRole()
-            .WithUser(targetUser)
-            .WithPublication(releaseVersion.Release.Publication)
-            .WithRole(PublicationRole.Allower)
-            .Generate();
 
         var otherUser = new User
         {
@@ -2898,16 +2884,6 @@ public class UserRoleServiceTests
         {
             Id = otherUser.Id.ToString()
         };
-        var otherUserReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(otherUser)
-            .WithReleaseVersion(releaseVersion)
-            .WithRole(ReleaseRole.Approver)
-            .Generate();
-        var otherUserPublicationRole = _dataFixture.DefaultUserPublicationRole()
-            .WithUser(otherUser)
-            .WithPublication(releaseVersion.Release.Publication)
-            .WithRole(PublicationRole.Allower)
-            .Generate();
 
         var userManager = MockUserManager();
 
@@ -2924,8 +2900,7 @@ public class UserRoleServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.UserReleaseRoles.AddRange(targetUserReleaseRole, otherUserReleaseRole);
-            contentDbContext.UserPublicationRoles.AddRange(targetUserPublicationRole, otherUserPublicationRole);
+            contentDbContext.Users.AddRange(targetUser, otherUser);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2937,16 +2912,16 @@ public class UserRoleServiceTests
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
         userReleaseRoleRepository
-            .Setup(m => m.RemoveMany(
-                It.Is<List<UserReleaseRole>>(l => l.Single().Id == targetUserReleaseRole.Id),
+            .Setup(m => m.RemoveForUser(
+                targetUser.Id,
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
         userPublicationRoleRepository
-            .Setup(m => m.RemoveMany(
-                It.Is<List<UserPublicationRole>>(l => l.Single().Id == targetUserPublicationRole.Id),
+            .Setup(m => m.RemoveForUser(
+                targetUser.Id,
                 default))
             .Returns(Task.CompletedTask)
             .Verifiable();

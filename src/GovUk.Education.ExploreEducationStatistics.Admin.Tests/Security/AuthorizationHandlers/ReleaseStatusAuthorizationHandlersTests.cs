@@ -207,19 +207,14 @@ public class ReleaseStatusAuthorizationHandlersTests
         ContentDbContext context,
         IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
-            var userRepository = new UserRepository(context);
-
             return new MarkReleaseAsDraftAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: context,
-                        userRepository: userRepository,
-                        logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
+                        contentDbContext: context),
                     userReleaseRoleRepository: new UserReleaseRoleRepository(
                         contentDbContext: context,
-                        userRepository: userRepository,
                         logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
@@ -402,19 +397,14 @@ public class ReleaseStatusAuthorizationHandlersTests
         ContentDbContext context,
         IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
-            var userRepository = new UserRepository(context);
-
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: context,
-                        userRepository: userRepository,
-                        logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
+                        contentDbContext: context),
                     userReleaseRoleRepository: new UserReleaseRoleRepository(
                         contentDbContext: context,
-                        userRepository: userRepository,
                         logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
@@ -556,19 +546,14 @@ public class ReleaseStatusAuthorizationHandlersTests
         ContentDbContext context,
         IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
-            var userRepository = new UserRepository(context);
-
             return new MarkReleaseAsApprovedAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: context,
-                        userRepository: userRepository,
-                        logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
+                        contentDbContext: context),
                     userReleaseRoleRepository: new UserReleaseRoleRepository(
                         contentDbContext: context,
-                        userRepository: userRepository,
                         logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }

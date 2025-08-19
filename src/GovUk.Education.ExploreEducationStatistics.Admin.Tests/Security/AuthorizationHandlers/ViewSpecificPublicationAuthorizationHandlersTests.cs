@@ -130,20 +130,15 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IPreReleaseService? preReleaseService = null)
     {
-        var userRepository = new UserRepository(context);
-
         return new ViewSpecificPublicationAuthorizationHandler(
             context,
             new AuthorizationHandlerService(
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(
                     contentDbContext: context,
-                    userRepository: userRepository,
                     logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
                 userPublicationRoleRepository ?? new UserPublicationRoleRepository(
-                    contentDbContext: context,
-                    userRepository: userRepository,
-                    logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
+                    contentDbContext: context),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)));
     }
 }

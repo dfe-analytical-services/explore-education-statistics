@@ -382,19 +382,20 @@ public class UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
                 var latestReleaseRoles = await allReleaseRoles
                     .ToAsyncEnumerable()
                     .WhereAwait(async userReleaseRole =>
-                    await releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
+                        await releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
                     .OrderBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Title)
                     .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Year)
                     .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.TimePeriodCoverage)
                     .ToListAsync();
 
-                return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel
-                {
-                    Id = userReleaseRole.Id,
-                    Publication = userReleaseRole.ReleaseVersion.Release.Publication.Title,
-                    Release = userReleaseRole.ReleaseVersion.Release.Title,
-                    Role = userReleaseRole.Role
-                })
+                return latestReleaseRoles
+                    .Select(userReleaseRole => new UserReleaseRoleViewModel
+                    {
+                        Id = userReleaseRole.Id,
+                        Publication = userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                        Release = userReleaseRole.ReleaseVersion.Release.Title,
+                        Role = userReleaseRole.Role
+                    })
                     .ToList();
             });
     }

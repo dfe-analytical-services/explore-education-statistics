@@ -1450,20 +1450,6 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                     publicationId: Guid.NewGuid(),
                     userId: Guid.Empty));
         }
-
-        [Fact]
-        public async Task UserDoesNotExist_ThrowsException()
-        {
-            await using var contentDbContext = InMemoryApplicationDbContext();
-
-            var manager = CreateRepository(
-                contentDbContext: contentDbContext);
-
-            await Assert.ThrowsAsync<KeyNotFoundException>(
-                async () => await manager.RemoveForPublicationAndUser(
-                    publicationId: Guid.NewGuid(),
-                    userId: Guid.NewGuid()));
-        }
     }
 
     public class RemoveForReleaseVersionTests : UserReleaseRoleAndInviteManagerTests
@@ -2005,20 +1991,6 @@ public abstract class UserReleaseRoleAndInviteManagerTests
                     releaseVersionId: Guid.NewGuid(),
                     userId: Guid.Empty));
         }
-
-        [Fact]
-        public async Task UserDoesNotExist_ThrowsException()
-        {
-            await using var contentDbContext = InMemoryApplicationDbContext();
-
-            var manager = CreateRepository(
-                contentDbContext: contentDbContext);
-
-            await Assert.ThrowsAsync<KeyNotFoundException>(
-                async () => await manager.RemoveForReleaseVersionAndUser(
-                    releaseVersionId: Guid.NewGuid(),
-                    userId: Guid.NewGuid()));
-        }
     }
 
     public class RemoveForUserTests : UserReleaseRoleAndInviteManagerTests
@@ -2155,7 +2127,6 @@ public abstract class UserReleaseRoleAndInviteManagerTests
     {
         return new(
             contentDbContext: contentDbContext,
-            userRepository: new UserRepository(contentDbContext),
             logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
     }
 }

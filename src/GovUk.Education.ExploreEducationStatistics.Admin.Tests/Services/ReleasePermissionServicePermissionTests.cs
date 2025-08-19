@@ -165,11 +165,8 @@ public class ReleasePermissionServicePermissionTests
         ContentDbContext contentDbContext,
         IUserService userService)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            userRepository,
             logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         return new(

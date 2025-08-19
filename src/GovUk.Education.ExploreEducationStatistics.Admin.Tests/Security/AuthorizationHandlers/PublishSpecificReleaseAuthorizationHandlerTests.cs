@@ -72,17 +72,12 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
 
     private static PublishSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            userRepository,
             logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext,
-            userRepository,
-            logger: Mock.Of<ILogger<UserPublicationRoleRepository>>());
+            contentDbContext);
 
         return new PublishSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(

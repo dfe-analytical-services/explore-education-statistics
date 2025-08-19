@@ -15,9 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserReleaseRoleRepository(
     ContentDbContext contentDbContext,
-    IUserRepository userRepository,
     ILogger<UserReleaseRoleRepository> logger) :
-    UserResourceRoleRepositoryBase<UserReleaseRoleRepository, UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext, userRepository, logger),
+    UserResourceRoleRepositoryBase<UserReleaseRoleRepository, UserReleaseRole, ReleaseVersion, ReleaseRole>(contentDbContext),
     IUserReleaseRoleRepository
 {
     protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)

@@ -97,11 +97,19 @@ public class SignInServiceTests
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userReleaseInvites)
                 .Verifiable();
+            userReleaseInviteRepository
+                .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationInvites)
+                .Verifiable();
+            userPublicationInviteRepository
+                .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask)
                 .Verifiable();
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);

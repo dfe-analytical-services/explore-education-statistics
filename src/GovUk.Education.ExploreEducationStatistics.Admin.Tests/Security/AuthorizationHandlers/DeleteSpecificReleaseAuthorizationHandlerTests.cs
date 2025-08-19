@@ -158,17 +158,12 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
 
     private static DeleteSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            userRepository,
             logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext,
-            userRepository,
-            logger: Mock.Of<ILogger<UserPublicationRoleRepository>>());
+            contentDbContext);
 
         return new DeleteSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(

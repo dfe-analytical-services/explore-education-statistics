@@ -169,13 +169,10 @@ public class UserManagementServicePermissionTests
 
         userReleaseRoleRepository ??= new UserReleaseRoleRepository(
             contentDbContext,
-            userRepository,
             logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         userPublicationRoleRepository ??= new UserPublicationRoleRepository(
-            contentDbContext,
-            userRepository,
-            logger: Mock.Of<ILogger<UserPublicationRoleRepository>>());
+            contentDbContext);
 
         return new UserManagementService(
             usersAndRolesDbContext,

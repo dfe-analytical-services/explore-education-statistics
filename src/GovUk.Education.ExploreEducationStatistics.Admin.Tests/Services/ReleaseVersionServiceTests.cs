@@ -1717,6 +1717,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
+            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
 
             var forceDeleteRelatedData = false;
@@ -1742,6 +1743,11 @@ public abstract class ReleaseVersionServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            userReleaseInviteRepository.Setup(mock => mock.RemoveByReleaseVersion(
+                    releaseVersion.Id,
+                    default))
+                .Returns(Task.CompletedTask);
+
             userReleaseRoleRepository.Setup(mock => mock.RemoveForReleaseVersion(
                     releaseVersion.Id,
                     default))
@@ -1758,6 +1764,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
                 // Act
@@ -1779,7 +1786,9 @@ public abstract class ReleaseVersionServiceTests
                 VerifyAllMocks(privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
-                    processorClient
+                    processorClient,
+                    userReleaseInviteRepository,
+                    userReleaseRoleRepository
                 );
 
                 result.AssertRight();
@@ -2075,6 +2084,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
+            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
 
             var forceDeleteRelatedData = true;
@@ -2104,6 +2114,11 @@ public abstract class ReleaseVersionServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            userReleaseInviteRepository.Setup(mock => mock.RemoveByReleaseVersion(
+                    releaseVersion.Id,
+                    default))
+                .Returns(Task.CompletedTask);
+
             userReleaseRoleRepository.Setup(mock => mock.RemoveForReleaseVersion(
                     releaseVersion.Id,
                     default))
@@ -2121,6 +2136,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
                 // Act
@@ -2144,7 +2160,9 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFilesService,
                     releaseFileService,
                     processorClient,
-                    releasePublishingStatusRepository
+                    releasePublishingStatusRepository,
+                    userReleaseInviteRepository,
+                    userReleaseRoleRepository
                 );
 
                 result.AssertRight();

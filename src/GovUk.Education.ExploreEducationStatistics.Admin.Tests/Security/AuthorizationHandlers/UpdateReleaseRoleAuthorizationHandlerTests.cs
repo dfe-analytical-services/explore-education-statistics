@@ -66,9 +66,7 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext,
-                    userRepository: new UserRepository(contentDbContext),
-                    logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
+                    contentDbContext: contentDbContext),
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

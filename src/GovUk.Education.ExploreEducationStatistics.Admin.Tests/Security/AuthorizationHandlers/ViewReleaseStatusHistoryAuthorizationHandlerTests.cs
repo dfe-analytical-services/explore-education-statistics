@@ -61,19 +61,14 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
 
     private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
         return new ViewReleaseStatusHistoryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: new UserReleaseRoleRepository(
                     contentDbContext: contentDbContext,
-                    userRepository: userRepository,
                     logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext,
-                    userRepository: userRepository,
-                    logger: Mock.Of<ILogger<UserPublicationRoleRepository>>()),
+                    contentDbContext: contentDbContext),
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }
