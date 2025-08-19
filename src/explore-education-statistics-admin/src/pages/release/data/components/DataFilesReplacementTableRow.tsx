@@ -42,9 +42,6 @@ export default function DataFilesReplacementTableRow({
   const [canCancel, toggleCanCancel] = useToggle(false);
   const { user } = useAuthContext();
 
-  const noPermissionToEdit =
-    !user?.permissions.isBauUser && dataFile.publicApiDataSetId !== undefined;
-
   const { data: replacementDataFile, isLoading } = useQuery({
     ...releaseDataFileQueries.getDataFile(
       releaseVersionId,
@@ -154,7 +151,8 @@ export default function DataFilesReplacementTableRow({
           </Link>
           <>
             {(canCancel || replacementDataFile.status === 'COMPLETE') &&
-              !noPermissionToEdit && (
+              (dataFile.publicApiDataSetId === undefined ||
+                user?.permissions.isBauUser) && (
                 <ModalConfirm
                   title="Cancel data replacement"
                   triggerButton={
@@ -176,19 +174,21 @@ export default function DataFilesReplacementTableRow({
                   </p>
                 </ModalConfirm>
               )}
-            {plan?.valid && !noPermissionToEdit && (
-              <ButtonText
-                onClick={async () => {
-                  await dataReplacementService.replaceData(releaseVersionId, [
-                    dataFile.id,
-                  ]);
+            {plan?.valid &&
+              (dataFile.publicApiDataSetId === undefined ||
+                user?.permissions.isBauUser) && (
+                <ButtonText
+                  onClick={async () => {
+                    await dataReplacementService.replaceData(releaseVersionId, [
+                      dataFile.id,
+                    ]);
 
-                  onConfirmAction?.();
-                }}
-              >
-                Confirm replacement
-              </ButtonText>
-            )}
+                    onConfirmAction?.();
+                  }}
+                >
+                  Confirm replacement
+                </ButtonText>
+              )}
           </>
         </ButtonGroup>
       </td>
