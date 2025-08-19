@@ -352,7 +352,7 @@ public class DataSetValidatorTests
 
         var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
         {
-            EnableReplacementOfPublicApiDataSets = false
+            EnableReplacementOfPublicApiDataSets = true
         });
 
         var sut = BuildService(
