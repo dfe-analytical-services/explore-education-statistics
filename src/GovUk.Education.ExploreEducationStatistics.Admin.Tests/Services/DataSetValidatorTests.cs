@@ -312,11 +312,13 @@ public class DataSetValidatorTests
         Assert.Equal(ValidationMessages.DataSetFileNamesShouldMatchConvention.Code, errors[0].Code);
     }
 
-    [Fact]
-    public async Task ValidateDataSet_ReplacementHasApiDataSet_ReturnsErrorDetails()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ValidateDataSet_ReplacementHasApiDataSet_ReturnsErrorDetails(bool enableFeatureFlagPatchReplacements)
     {
         // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2};
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -339,6 +341,11 @@ public class DataSetValidatorTests
                 .WithFilename(metaFile.FileName))
             .Generate();
 
+        var userService = new Mock<IUserService>(MockBehavior.Strict);
+        userService
+            .Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser))
+            .ReturnsAsync(true);
+
         var dataSetDto = new DataSetDto
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -355,20 +362,28 @@ public class DataSetValidatorTests
 
         var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
         {
-            EnableReplacementOfPublicApiDataSets = true
+            EnableReplacementOfPublicApiDataSets = enableFeatureFlagPatchReplacements
         });
 
         var sut = BuildService(
             context,
-            featureFlagOptions);
+            featureFlagOptions,
+            userService.Object);
 
         // Act
         var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
-        var errors = result.AssertLeft();
-        Assert.Single(errors);
-        Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
+        if (enableFeatureFlagPatchReplacements)
+        {
+            result.AssertRight();
+        }
+        else
+        {
+            var errors = result.AssertLeft();
+            Assert.Single(errors);
+            Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
+        }
     }
     
     [Fact]
