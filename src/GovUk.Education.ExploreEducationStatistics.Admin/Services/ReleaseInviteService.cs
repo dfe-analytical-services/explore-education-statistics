@@ -34,7 +34,7 @@ public class ReleaseInviteService(
     IUserRoleService userRoleService,
     IUserInviteRepository userInviteRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
     IOptions<NotifyOptions> notifyOptions) : IReleaseInviteService
@@ -160,7 +160,7 @@ public class ReleaseInviteService(
             return emailResult;
         }
 
-        await userReleaseRoleAndInviteManager.CreateManyIfNotExists(
+        await userReleaseRoleRepository.CreateManyIfNotExists(
             userId: userId,
             releaseVersionIds: missingReleaseRoleReleaseVersionIds,
             role: Contributor,

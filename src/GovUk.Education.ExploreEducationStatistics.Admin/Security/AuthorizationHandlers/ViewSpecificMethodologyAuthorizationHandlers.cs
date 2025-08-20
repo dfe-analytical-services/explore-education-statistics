@@ -21,7 +21,7 @@ public class ViewSpecificMethodologyRequirement : IAuthorizationRequirement
 
 public class ViewSpecificMethodologyAuthorizationHandler(
     IMethodologyRepository methodologyRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IPreReleaseService preReleaseService,
     IReleaseVersionRepository releaseVersionRepository,
     AuthorizationHandlerService authorizationHandlerService) :
@@ -86,7 +86,7 @@ public class ViewSpecificMethodologyAuthorizationHandler(
                     continue;
                 }
 
-                if (await userReleaseRoleAndInviteManager.HasUserReleaseRole(
+                if (await userReleaseRoleRepository.HasUserReleaseRole(
                         context.User.GetUserId(),
                         latestReleaseVersion.Id,
                         ReleaseRole.PrereleaseViewer))

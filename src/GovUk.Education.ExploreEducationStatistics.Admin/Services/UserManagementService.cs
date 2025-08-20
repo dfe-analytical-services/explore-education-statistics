@@ -36,8 +36,8 @@ public class UserManagementService(
     IUserInviteRepository userInviteRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserPublicationInviteRepository userPublicationInviteRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
-    IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     UserManager<ApplicationUser> userManager) : IUserManagementService
 {
     public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -258,11 +258,8 @@ public class UserManagementService(
 
                 // Clear out any pre-existing Release or Publication invites prior to adding
                 // new ones.
-                var existingReleaseInvites = await userReleaseInviteRepository.GetInvitesByEmail(sanitisedEmail);
-                var existingPublicationInvites = await userPublicationInviteRepository.GetInvitesByEmail(sanitisedEmail);
-
-                await userReleaseInviteRepository.RemoveMany(existingReleaseInvites);
-                await userPublicationInviteRepository.RemoveMany(existingPublicationInvites);
+                await userReleaseInviteRepository.RemoveByUserEmail(sanitisedEmail);
+                await userPublicationInviteRepository.RemoveByUserEmail(sanitisedEmail);
 
                 foreach (var userReleaseRole in request.UserReleaseRoles)
                 {
@@ -371,9 +368,10 @@ public class UserManagementService(
 
                     if (tuple.internalUser is not null)
                     {
-                        await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForUser(tuple.internalUser.Id);
-                        await userPublicationRoleAndInviteManager
-                            .RemoveAllRolesAndInvitesForUser(tuple.internalUser.Id);
+                        await userPublicationInviteRepository.RemoveByUserEmail(email);
+                        await userReleaseInviteRepository.RemoveByUserEmail(email);
+                        await userReleaseRoleRepository.RemoveForUser(tuple.internalUser.Id);
+                        await userPublicationRoleRepository.RemoveForUser(tuple.internalUser.Id);
                     }
 
                     if (tuple.internalUser is { SoftDeleted: null })

@@ -63,23 +63,14 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
             contentDbContext.Releases.Add(release);
             contentDbContext.SaveChanges();
 
-            var userRepository = new UserRepository(contentDbContext);
-
             return new UpdateSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                    userReleaseRoleAndInviteManager: new UserReleaseRoleAndInviteManager(
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(
                         contentDbContext: contentDbContext,
-                        userReleaseInviteRepository: new UserReleaseInviteRepository(
-                            contentDbContext: contentDbContext, 
-                            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
-                        userRepository: userRepository,
-                        logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>()),
-                    userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
-                        contentDbContext: contentDbContext,
-                        userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
-                        userRepository: userRepository,
-                        logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
+                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                    userPublicationRoleRepository: new UserPublicationRoleRepository(
+                        contentDbContext: contentDbContext),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         };
     }

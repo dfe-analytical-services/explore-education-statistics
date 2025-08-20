@@ -42,27 +42,18 @@ public class PublicationReleaseSeriesAuthorizationHandlersTests
 
         private static ManagePublicationReleaseSeriesAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
-            var userRepository = new UserRepository(contentDbContext);
-
-            var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+            var userReleaseRoleRepository = new UserReleaseRoleRepository(
                 contentDbContext,
-                new UserReleaseInviteRepository(
-                    contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
-                userRepository,
-                logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
+                logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
-            var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
-                contentDbContext,
-                new UserPublicationInviteRepository(contentDbContext),
-                userRepository,
-                logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
+            var userPublicationRoleRepository = new UserPublicationRoleRepository(
+                contentDbContext);
 
             return new ManagePublicationReleaseSeriesAuthorizationHandler(
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                    userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
+                    userReleaseRoleRepository: userReleaseRoleRepository,
+                    userPublicationRoleRepository: userPublicationRoleRepository,
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         }
     }

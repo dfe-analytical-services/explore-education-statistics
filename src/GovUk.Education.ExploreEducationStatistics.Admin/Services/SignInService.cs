@@ -23,8 +23,8 @@ public class SignInService(
     UsersAndRolesDbContext usersAndRolesDbContext,
     UserManager<ApplicationUser> userManager,
     ContentDbContext contentDbContext,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
-    IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserPublicationInviteRepository userPublicationInviteRepository) : ISignInService
 {
@@ -148,25 +148,31 @@ public class SignInService(
     private async Task HandleReleaseInvites(Guid newUserId, string email)
     {
         var releaseInvites = await userReleaseInviteRepository.GetInvitesByEmail(email);
+
         await releaseInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userReleaseRoleAndInviteManager.Create(
+            .ForEachAwaitAsync(invite => userReleaseRoleRepository.Create(
                 userId: newUserId,
                 releaseVersionId: invite.ReleaseVersionId,
                 role: invite.Role,
                 createdById: invite.CreatedById));
+
+        await userReleaseInviteRepository.RemoveByUserEmail(email);
     }
 
     private async Task HandlePublicationInvites(Guid newUserId, string email)
     {
         var publicationInvites = await userPublicationInviteRepository.GetInvitesByEmail(email);
+
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userPublicationRoleAndInviteManager.Create(
+            .ForEachAwaitAsync(invite => userPublicationRoleRepository.Create(
                 userId: newUserId,
                 publicationId: invite.PublicationId,
                 role: invite.Role,
                 createdById: invite.CreatedById));
+
+        await userPublicationInviteRepository.RemoveByUserEmail(email);
     }
 
     private async Task HandleExpiredInvite(

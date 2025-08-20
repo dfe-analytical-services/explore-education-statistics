@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
-public interface IUserPublicationRoleAndInviteManager
+public interface IUserPublicationRoleRepository
 {
     Task<UserPublicationRole> Create(Guid userId,
         Guid publicationId,
@@ -30,15 +30,15 @@ public interface IUserPublicationRoleAndInviteManager
         Guid publicationId,
         PublicationRole role);
 
-    Task RemoveRoleAndInvite(
+    Task Remove(
         UserPublicationRole userPublicationRole,
         CancellationToken cancellationToken = default);
 
-    Task RemoveRolesAndInvites(
+    Task RemoveMany(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default);
 
-    Task RemoveAllRolesAndInvitesForUser(
+    Task RemoveForUser(
         Guid userId,
         CancellationToken cancellationToken = default);
 }

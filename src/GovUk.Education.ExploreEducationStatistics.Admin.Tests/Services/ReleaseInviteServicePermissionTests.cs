@@ -155,7 +155,7 @@ public class ReleaseInviteServicePermissionTest
         IUserRoleService? userRoleService = null,
         IUserInviteRepository? userInviteRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
         IOptions<NotifyOptions>? notifyOptions = null)
@@ -173,7 +173,7 @@ public class ReleaseInviteServicePermissionTest
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
-            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             emailService ?? Mock.Of<IEmailService>(Strict),
             appOptions ?? Mock.Of<IOptions<AppOptions>>(),
             notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>()

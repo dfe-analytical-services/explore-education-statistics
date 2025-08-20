@@ -53,7 +53,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userPublicationRoleAndInviteManager
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -70,7 +70,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                             mock.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
-                    userPublicationRoleAndInviteManager
+                    userPublicationRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
@@ -83,7 +83,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                    userPublicationRoleAndInviteManager);
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -98,7 +98,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                     handler,
                     _,
                     methodologyVersionRepository,
-                    userPublicationRoleAndInviteManager
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -112,7 +112,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 var authContext = CreateAuthContext(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyVersionRepository, userPublicationRoleAndInviteManager);
+                VerifyAllMocks(methodologyVersionRepository, userPublicationRoleRepository);
 
                 // Verify that no Claims can allow a user to create an Amendment of a non-publicly-accessible
                 // Methodology.
@@ -135,7 +135,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                         handler,
                         methodologyRepository,
                         methodologyVersionRepository,
-                        userPublicationRoleAndInviteManager
+                        userPublicationRoleRepository
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
@@ -146,7 +146,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                             s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
-                    userPublicationRoleAndInviteManager
+                    userPublicationRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(role));
 
@@ -155,7 +155,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        userPublicationRoleAndInviteManager);
+                        userPublicationRoleRepository);
 
                     // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
                     // that uses this Methodology.
@@ -171,7 +171,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 handler,
                 methodologyRepository,
                 methodologyVersionRepository,
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                 ) = CreateHandlerAndDependencies();
 
             methodologyVersionRepository.Setup(mock =>
@@ -182,7 +182,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                     s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
-            userPublicationRoleAndInviteManager
+            userPublicationRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<PublicationRole>());
 
@@ -190,7 +190,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
             var authContext = CreateAuthContext(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
-            VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userPublicationRoleAndInviteManager);
+            VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
 
             // Verify that the user cannot create an Amendment, as they don't have a Publication Owner role on a
             // Publication that uses this Methodology.
@@ -205,7 +205,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 handler,
                 _,
                 methodologyVersionRepository,
-                userPublicationRoleAndInviteManager) = CreateHandlerAndDependencies();
+                userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
             methodologyVersionRepository.Setup(mock =>
                     mock.IsLatestPublishedVersion(MethodologyVersion))
@@ -215,7 +215,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
             var authContext = CreateAuthContext(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
-            VerifyAllMocks(methodologyVersionRepository, userPublicationRoleAndInviteManager);
+            VerifyAllMocks(methodologyVersionRepository, userPublicationRoleRepository);
 
             // Verify that the user cannot create an Amendment, as even though they have the Publication Owner role
             // on one of the Publications that use this Methodology, this Methodology is not yet publicly
@@ -234,22 +234,22 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
     private static (MakeAmendmentOfSpecificMethodologyAuthorizationHandler,
         Mock<IMethodologyRepository>,
         Mock<IMethodologyVersionRepository>,
-        Mock<IUserPublicationRoleAndInviteManager>)
+        Mock<IUserPublicationRoleRepository>)
         CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
         var handler = new MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
             methodologyVersionRepository.Object,
             methodologyRepository.Object,
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                userPublicationRoleAndInviteManager.Object,
+                Mock.Of<IUserReleaseRoleRepository>(Strict),
+                userPublicationRoleRepository.Object,
                 Mock.Of<IPreReleaseService>(Strict)));
 
-        return (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleAndInviteManager);
+        return (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
     }
 }

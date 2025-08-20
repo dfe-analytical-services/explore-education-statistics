@@ -64,7 +64,8 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseInviteRepository userReleaseInviteRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<ReleaseVersionService> logger) : IReleaseVersionService
@@ -261,11 +262,7 @@ public class ReleaseVersionService(
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        // We suspect this is only necessary for the unit tests, as the in-memory database doesn't perform a cascade delete
-        // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-        await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersion(
-            releaseVersionId: releaseVersion.Id,
-            cancellationToken: cancellationToken);
+        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
     }
 
     private async Task SoftDeleteReleaseVersion(
@@ -275,8 +272,17 @@ public class ReleaseVersionService(
         releaseVersion.SoftDeleted = true;
         context.ReleaseVersions.Update(releaseVersion);
 
+        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
+    }
+
+    private async Task RemoveRolesAndInvites(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
+    {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-        await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForReleaseVersion(
+        await userReleaseRoleRepository.RemoveForReleaseVersion(
+            releaseVersionId: releaseVersion.Id,
+            cancellationToken: cancellationToken);
+
+        await userReleaseInviteRepository.RemoveByReleaseVersion(
             releaseVersionId: releaseVersion.Id,
             cancellationToken: cancellationToken);
     }

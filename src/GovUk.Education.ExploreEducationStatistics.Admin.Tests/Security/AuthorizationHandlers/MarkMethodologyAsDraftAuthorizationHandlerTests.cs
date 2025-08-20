@@ -89,8 +89,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -107,11 +107,11 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                             s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
-                    userPublicationRoleAndInviteManager
+                    userPublicationRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
 
-                    userReleaseRoleAndInviteManager
+                    userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
@@ -128,8 +128,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -150,8 +150,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -162,14 +162,14 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         mock.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(mock =>
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
-                    userReleaseRoleAndInviteManager
+                    userReleaseRoleRepository
                         .Setup(mock =>
                             mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
@@ -187,8 +187,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
             });
@@ -206,8 +206,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -218,14 +218,14 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         mock.GetOwningPublication(ApprovedMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(mock =>
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
-                    userReleaseRoleAndInviteManager
+                    userReleaseRoleRepository
                         .Setup(mock =>
                             mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
@@ -243,8 +243,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
             });
@@ -265,8 +265,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -277,11 +277,11 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
@@ -297,8 +297,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
             });
@@ -315,8 +315,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -327,12 +327,12 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         mock.GetOwningPublication(ApprovedMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(mock =>
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                     .Setup(mock =>
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
@@ -349,8 +349,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
             });
@@ -363,8 +363,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 handler,
                 methodologyRepository,
                 methodologyVersionRepository,
-                userReleaseRoleAndInviteManager,
-                userPublicationRoleAndInviteManager
+                userReleaseRoleRepository,
+                userPublicationRoleRepository
                 ) = CreateHandlerAndDependencies();
 
             methodologyVersionRepository.Setup(mock =>
@@ -375,11 +375,11 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
-            userPublicationRoleAndInviteManager
+            userPublicationRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<PublicationRole>());
 
-            userReleaseRoleAndInviteManager
+            userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
@@ -393,8 +393,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
             VerifyAllMocks(
                 methodologyRepository,
                 methodologyVersionRepository,
-                userReleaseRoleAndInviteManager,
-                userPublicationRoleAndInviteManager);
+                userReleaseRoleRepository,
+                userPublicationRoleRepository);
 
             // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
             Assert.False(authContext.HasSucceeded);
@@ -405,23 +405,23 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
         MarkMethodologyAsDraftAuthorizationHandler,
         Mock<IMethodologyRepository>,
         Mock<IMethodologyVersionRepository>,
-        Mock<IUserReleaseRoleAndInviteManager>,
-        Mock<IUserPublicationRoleAndInviteManager>
+        Mock<IUserReleaseRoleRepository>,
+        Mock<IUserPublicationRoleRepository>
         )
         CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
         var handler = new MarkMethodologyAsDraftAuthorizationHandler(
             methodologyVersionRepository.Object,
             methodologyRepository.Object,
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleAndInviteManager.Object,
-                userPublicationRoleAndInviteManager.Object,
+                userReleaseRoleRepository.Object,
+                userPublicationRoleRepository.Object,
                 Mock.Of<IPreReleaseService>(Strict))
         );
 
@@ -429,8 +429,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
             handler,
             methodologyRepository,
             methodologyVersionRepository,
-            userReleaseRoleAndInviteManager,
-            userPublicationRoleAndInviteManager
+            userReleaseRoleRepository,
+            userPublicationRoleRepository
         );
     }
 }

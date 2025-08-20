@@ -159,27 +159,20 @@ public class UserManagementServicePermissionTests
         IUserInviteRepository? userInviteRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserPublicationInviteRepository? userPublicationInviteRepository = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
-        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         UserManager<ApplicationUser>? userManager = null)
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
         userRepository ??= new UserRepository(contentDbContext);
 
-        userReleaseRoleAndInviteManager ??= new UserReleaseRoleAndInviteManager(
+        userReleaseRoleRepository ??= new UserReleaseRoleRepository(
             contentDbContext,
-            new UserReleaseInviteRepository(
-                contentDbContext: contentDbContext,
-                logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
-            userRepository,
-            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
-        userPublicationRoleAndInviteManager ??= new UserPublicationRoleAndInviteManager(
-            contentDbContext,
-            new UserPublicationInviteRepository(contentDbContext),
-            userRepository,
-            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
+        userPublicationRoleRepository ??= new UserPublicationRoleRepository(
+            contentDbContext);
 
         return new UserManagementService(
             usersAndRolesDbContext,
@@ -194,8 +187,8 @@ public class UserManagementServicePermissionTests
                 contentDbContext: contentDbContext,
                 logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
             userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
-            userReleaseRoleAndInviteManager,
-            userPublicationRoleAndInviteManager,
+            userReleaseRoleRepository,
+            userPublicationRoleRepository,
             userManager ?? MockUserManager().Object
         );
     }
