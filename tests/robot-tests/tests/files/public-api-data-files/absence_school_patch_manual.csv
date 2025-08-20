@@ -1,0 +1,217 @@
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_urn,school_laestab,school_name,school_type,academy_type,ncyear,enrolments,sess_possible,sess_authorised,sess_unauthorised,sess_unauthorised_percent
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 4,930365,8380405,4410042,36349,10.0359
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 6,390233,2895910,2734525,418548,12.8344
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 8,966035,3669102,4767788,12507,9.4158
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 10,687704,8880914,3426082,16844,10.9951
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary,,Year 4,233870,4666313,1794452,164845,7.9822
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary,,Year 6,510682,608287,3047386,276594,7.806
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded secondary,,Year 8,114560,1018241,4071886,105461,3.6011
+202021,Academic year,National,E92000001,England,,,,,,,,,State-funded secondary,,Year 10,496128,8738376,3932498,276495,10.7961
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 4,748965,7281611,394560,254132,6.2354
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 6,819402,4571123,292963,79165,14.8326
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 8,999598,2688774,953422,202885,2.5727
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 10,863196,5417065,516529,70706,7.8286
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary,,Year 4,960185,6838156,460125,452731,2.9259
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary,,Year 6,415706,2949928,2711122,443827,1.7428
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded secondary,,Year 8,498680,7171811,3213217,134325,4.1664
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded secondary,,Year 10,706374,5427979,2488176,248703,0.9058
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 4,643309,2783829,442519,360329,9.0429
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 6,406128,3922516,529884,228791,9.5496
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 8,954008,2510684,1058785,159578,10.3886
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 10,890581,4446119,4096651,6031,5.4532
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary,,Year 4,863407,6514957,4870020,470418,2.8281
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary,,Year 6,134998,1099421,351548,206551,12.3929
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded secondary,,Year 8,881018,9926047,4934983,417201,5.3926
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded secondary,,Year 10,939893,502110,2088017,401671,14.2018
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,141973,3702039,Hoyland Springwood Primary School,State-funded primary,Primary sponsor led academy,Year 4,296352,7368540,1002108,285622,3.9876
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,141973,3702039,Hoyland Springwood Primary School,State-funded primary,Primary sponsor led academy,Year 6,222884,6082113,360617,103563,6.2636
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,106653,3704027,Penistone Grammar School,State-funded secondary,,Year 8,661641,1779059,1354689,125448,3.8439
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,106653,3704027,Penistone Grammar School,State-funded secondary,,Year 10,206716,3239290,4648058,389642,12.3234
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 4,996491,8002818,4635376,213122,1.6915
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 6,846370,2152920,2828812,338402,7.6658
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 8,122971,2345267,4613665,214274,12.1115
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 10,219610,545275,1728142,129069,13.2427
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary,,Year 4,338336,8025420,3599138,249791,8.2206
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary,,Year 6,12515,3001050,3315415,239804,9.0924
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded secondary,,Year 8,454021,802504,3520216,373236,3.111
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded secondary,,Year 10,48297,4774788,1558126,88665,4.0493
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,State-funded primary,,Year 4,193938,3822743,699491,21990,1.2297
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,State-funded primary,,Year 6,420838,646484,3226295,252707,2.5504
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,State-funded secondary,Secondary sponsor led academy,Year 8,425445,6702005,3926588,19445,2.0738
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,State-funded secondary,Secondary sponsor led academy,Year 10,178144,1389676,4679175,151593,5.4475
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 4,636969,3414663,3283314,318214,1.2402
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 6,17520,5494804,366873,266062,7.4774
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 8,817310,4511712,2233435,43576,7.9209
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 10,46096,4687214,862914,43010,10.8394
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary,,Year 4,794394,1963532,564394,90260,8.1949
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary,,Year 6,200199,1526080,2819473,407340,11.3028
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded secondary,,Year 8,454627,8951304,1559449,327305,4.3795
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded secondary,,Year 10,933426,2761869,1918148,185997,5.1204
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 4,991280,5127375,1163515,388622,2.175
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 6,436370,4420177,1343905,412913,7.4523
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 8,224856,47538,1958476,337417,11.5369
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 10,906144,3803424,864910,168235,4.6508
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary,,Year 4,435305,3679657,2183483,176088,3.8776
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary,,Year 6,742448,3740647,2876036,96880,8.604
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded secondary,,Year 8,941614,1936128,3212126,57332,14.045
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded secondary,,Year 10,969606,5896296,526533,236361,8.2235
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,101269,3022014,Colindale Primary School,State-funded primary,,Year 4,10329,5168495,4252690,162288,4.9802
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,101269,3022014,Colindale Primary School,State-funded primary,,Year 6,900808,3281802,4018891,402870,2.0455
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,135507,3026906,Wren Academy Finchley,State-funded secondary,Secondary sponsor led academy,Year 8,655344,6237122,3417277,99042,3.7976
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,135507,3026906,Wren Academy Finchley,State-funded secondary,Secondary sponsor led academy,Year 10,789368,5583863,4304947,456541,5.7804
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 4,500911,9586188,578180,21607,3.3617
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 6,477675,9610295,3190487,392393,12.0798
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 8,216141,5952523,4784805,486676,12.6185
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 10,423972,61023,2440931,332898,8.5528
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary,,Year 4,154631,5934750,716423,263603,0.8892
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary,,Year 6,48296,3079505,4666548,373958,10.2297
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded secondary,,Year 8,708802,8694392,3370782,109291,13.5185
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded secondary,,Year 10,498079,7008979,406947,380686,6.9813
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,102579,3142032,King Athelstan Primary School,State-funded primary,,Year 4,924172,5229817,461921,255056,10.6752
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,102579,3142032,King Athelstan Primary School,State-funded primary,,Year 6,828609,7613912,3268057,168198,5.1854
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,141862,3144001,The Kingston Academy,State-funded secondary,Secondary free school,Year 8,485419,3294823,313667,408852,13.7387
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,141862,3144001,The Kingston Academy,State-funded secondary,Secondary free school,Year 10,948391,8779565,2607975,135041,12.8666
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 4,263424,8721586,4167742,383478,5.0415
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 6,198408,5264285,2710311,494993,5.0129
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 8,484230,1614115,3534379,87050,6.8986
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 10,155301,4190557,3231686,207486,5.8223
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded primary,,Year 4,611553,9635683,786941,477230,14.2482
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded primary,,Year 6,752711,3936811,752220,157318,14.1615
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded secondary,,Year 8,1072,3365122,3565402,328941,0.7839
+202122,Academic year,National,E92000001,England,,,,,,,,,State-funded secondary,,Year 10,408184,8799602,22441,236508,6.3432
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 4,610330,7640992,3720172,167078,12.0133
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 6,890478,5184289,26656,197176,6.2351
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 8,649107,4218939,3217805,343102,13.4956
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 10,63988,3357225,4901965,332298,8.693
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary,,Year 4,343528,6477506,3420795,94339,9.0596
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary,,Year 6,974891,3272204,3420489,457219,1.7708
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded secondary,,Year 8,809181,8606505,3497757,284217,4.8312
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded secondary,,Year 10,267865,3977718,4007129,279593,14.0394
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 4,375793,5942431,186830,124526,9.5212
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 6,732072,1971603,4584099,297972,7.3678
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 8,262655,7628392,370082,207129,5.1999
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 10,683791,569658,2478482,281011,4.9364
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary,,Year 4,977317,9595365,1839374,414659,12.3688
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary,,Year 6,211650,5928607,1691306,386536,13.4202
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded secondary,,Year 8,163986,9675857,661047,250482,1.0812
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded secondary,,Year 10,130938,1788491,1248863,40642,0.505
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,141973,3702039,Hoyland Springwood Primary School,State-funded primary,Primary sponsor led academy,Year 4,291660,4552605,1441830,421128,11.8714
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,141973,3702039,Hoyland Springwood Primary School,State-funded primary,Primary sponsor led academy,Year 6,691504,8180301,3458032,11936,7.1623
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,106653,3704027,Penistone Grammar School,State-funded secondary,,Year 8,87349,6608543,1831731,38458,2.2866
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,106653,3704027,Penistone Grammar School,State-funded secondary,,Year 10,335593,4145901,430493,219634,3.8077
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 4,65626,8941189,2778792,40825,12.4985
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 6,446000,8180991,4241359,160601,4.396
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 8,672736,2069839,1789330,25253,13.106
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 10,710863,4131441,412250,234342,12.7331
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary,,Year 4,735373,1481670,3320679,249061,7.5083
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary,,Year 6,315922,1657744,1998333,182112,12.0564
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded secondary,,Year 8,322703,7598586,4782452,34528,4.1753
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded secondary,,Year 10,807678,777312,2469553,493181,6.233
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,State-funded primary,,Year 4,389695,1193807,3889011,292288,10.5549
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,State-funded primary,,Year 6,298947,3650745,4370595,53048,14.3211
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,State-funded secondary,Secondary sponsor led academy,Year 8,29393,2940163,460442,337613,7.0733
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,State-funded secondary,Secondary sponsor led academy,Year 10,752009,5840033,262396,356628,7.901
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 4,934820,1670483,4183571,467206,7.207
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 6,10142,7126488,1679362,418191,14.0816
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 8,444973,5610555,4967515,359239,9.3129
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 10,855721,8989241,2794631,444771,3.8782
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary,,Year 4,38547,1265455,4454444,127033,5.9484
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary,,Year 6,217205,4114641,824011,477351,7.0324
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded secondary,,Year 8,474073,9860956,4416348,426962,13.956
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded secondary,,Year 10,38647,8375228,700134,343753,0.4792
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 4,165477,3982999,2881117,494074,5.1466
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 6,322047,7661435,4262799,97475,12.4722
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 8,18416,6851799,2025239,270083,7.1532
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 10,940546,4035799,1299367,17693,14.8835
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary,,Year 4,27697,9793497,4056200,22348,11.8263
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary,,Year 6,967464,8034305,1390806,421037,4.7727
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded secondary,,Year 8,932041,2054142,4961909,486625,8.1061
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded secondary,,Year 10,200464,8732143,2099505,150975,2.4462
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,101269,3022014,Colindale Primary School,State-funded primary,,Year 4,466618,4331684,2336745,474374,3.2321
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,101269,3022014,Colindale Primary School,State-funded primary,,Year 6,51873,7318963,4091886,382787,3.9492
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,135507,3026906,Wren Academy Finchley,State-funded secondary,Secondary sponsor led academy,Year 8,324513,9629567,2090853,165020,13.2842
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,135507,3026906,Wren Academy Finchley,State-funded secondary,Secondary sponsor led academy,Year 10,12135,418821,3617819,471557,1.9472
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 4,429828,2541098,4189699,191836,4.6809
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 6,800267,821476,4743561,380527,5.9484
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 8,277672,1725609,1984888,476621,3.1818
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 10,938510,8382254,4570224,373427,5.9204
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary,,Year 4,563379,9886857,211791,138796,8.1423
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary,,Year 6,262520,5231953,1946565,190296,4.8397
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded secondary,,Year 8,319358,3860000,2182522,407747,11.8051
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded secondary,,Year 10,958386,9724817,3819718,327783,11.8484
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,102579,3142032,King Athelstan Primary School,State-funded primary,,Year 4,825224,8846588,1975540,131067,5.4658
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,102579,3142032,King Athelstan Primary School,State-funded primary,,Year 6,922630,6219569,737030,39992,3.7797
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,141862,3144001,The Kingston Academy,State-funded secondary,Secondary free school,Year 8,887815,8905360,511940,110254,8.985
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,141862,3144001,The Kingston Academy,State-funded secondary,Secondary free school,Year 10,826025,3168076,1954888,14999,3.7619
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 4,219863,1211324,2461223,227036,6.8479
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 6,326899,9400873,3596596,84154,6.4159
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 8,714610,561356,2907605,433541,5.2496
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 10,383602,1803285,287864,2883,0.4685
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded primary,,Year 4,654884,3220663,4379854,207878,4.939
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded primary,,Year 6,235647,9247378,3142734,451761,3.1564
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded secondary,,Year 8,625982,1024199,387768,48184,1.1214
+202223,Academic year,National,E92000001,England,,,,,,,,,State-funded secondary,,Year 10,703403,7341429,3350111,90245,6.689
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 4,356747,6400821,178815,353079,7.2406
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 6,478301,6941924,3385453,137969,14.2775
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 8,634983,9628460,3931328,65536,3.7371
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary and secondary,,Year 10,540587,6663635,2179562,323178,1.3373
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary,,Year 4,783767,9416803,3342067,61772,10.9315
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded primary,,Year 6,818474,6521510,3326180,148818,10.1909
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded secondary,,Year 8,935461,7564846,874297,88073,9.912
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire,,,,,,,State-funded secondary,,Year 10,340526,2628965,2973134,435451,2.0839
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 4,362381,1027328,577798,217717,12.313
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 6,448489,2859195,602823,176301,3.8162
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 8,654686,7414000,339649,162343,11.753
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary and secondary,,Year 10,540640,9354927,2039373,98018,14.8837
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary,,Year 4,316064,4874652,2347907,416236,5.8798
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded primary,,Year 6,314436,3348975,886840,62684,9.9694
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded secondary,,Year 8,634778,1878275,2963673,212801,14.4038
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,,,,State-funded secondary,,Year 10,198910,6941070,4072452,296754,7.803
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,141973,3702039,Hoyland Springwood Primary School,State-funded primary,Primary sponsor led academy,Year 4,294564,6547062,4745554,25788,4.6605
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,141973,3702039,Hoyland Springwood Primary School,State-funded primary,Primary sponsor led academy,Year 6,123104,7290192,4578941,19677,5.1375
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,106653,3704027,Penistone Grammar School,State-funded secondary,,Year 8,628305,7084823,3811123,453695,8.4844
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,370,E08000016,Hull,106653,3704027,Penistone Grammar School,State-funded secondary,,Year 10,659044,2634214,4070198,97405,0.2416
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 4,357353,1739000,4425257,285842,12.5505
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 6,724898,1043207,389401,473394,14.1792
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 8,216117,7168883,4215280,78439,13.679
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary and secondary,,Year 10,957960,9934276,1638073,147204,10.8101
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary,,Year 4,563389,9121298,3303786,403465,10.987
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded primary,,Year 6,624827,2354255,3052199,48720,12.3966
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded secondary,,Year 8,228238,7828108,2950344,452062,3.2874
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,,,,State-funded secondary,,Year 10,467375,9278504,422419,244619,11.617
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,State-funded primary,,Year 4,296027,2759449,4467649,78337,7.2387
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,State-funded primary,,Year 6,98921,9008990,2602662,484586,6.1155
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,State-funded secondary,Secondary sponsor led academy,Year 8,929132,182167,4080556,483888,8.1479
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,State-funded secondary,Secondary sponsor led academy,Year 10,751028,1449807,175843,263574,9.6395
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 4,577746,7493602,1377020,315021,7.8505
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 6,720401,3593781,3441828,186132,12.8428
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 8,470788,4851295,1733986,360850,5.5305
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary and secondary,,Year 10,903536,8331786,1760720,215307,10.8352
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary,,Year 4,834635,2581506,2352884,153955,13.0697
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded primary,,Year 6,854011,18306,4206838,121002,13.2874
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded secondary,,Year 8,304325,2900642,690657,217905,1.9265
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,State-funded secondary,,Year 10,965673,3633069,1760280,40032,1.8564
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 4,288238,9847925,4084552,444552,11.8302
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 6,775782,7953739,787260,180127,8.7798
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 8,783460,233298,1339828,148935,7.5016
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary and secondary,,Year 10,524941,7991277,1172325,363994,10.5637
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary,,Year 4,930007,9048500,128025,460991,0.9231
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded primary,,Year 6,929516,9022992,4420240,350476,7.6263
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded secondary,,Year 8,535524,5970083,3697539,328489,4.6321
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,State-funded secondary,,Year 10,435263,4919212,1055600,422276,12.6506
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,101269,3022014,Colindale Primary School,State-funded primary,,Year 4,519041,7906994,4405937,89041,4.744
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,101269,3022014,Colindale Primary School,State-funded primary,,Year 6,674329,776260,1342817,241868,9.1741
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,135507,3026906,Wren Academy Finchley,State-funded secondary,Secondary sponsor led academy,Year 8,455256,921184,4608260,20074,8.3842
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,135507,3026906,Wren Academy Finchley,State-funded secondary,Secondary sponsor led academy,Year 10,135692,7302541,324393,244258,7.7954
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 4,303770,670289,4766068,486141,13.9153
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 6,37346,4344143,1516845,387614,3.5746
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 8,903110,9011174,417857,433299,9.0392
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary and secondary,,Year 10,100966,3931562,4064499,301608,13.4953
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary,,Year 4,750557,1399665,270713,209296,3.9268
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded primary,,Year 6,147524,53494,2877891,10248,2.3631
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded secondary,,Year 8,92708,5795664,2225558,165760,0.5731
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,State-funded secondary,,Year 10,620300,8365110,938239,103917,14.8688
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,102579,3142032,King Athelstan Primary School,State-funded primary,,Year 4,695463,951512,2881136,224021,1.7931
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,102579,3142032,King Athelstan Primary School,State-funded primary,,Year 6,57424,7954628,3860012,134564,11.4722
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,141862,3144001,The Kingston Academy,State-funded secondary,Secondary free school,Year 8,304011,8070409,1297358,26349,2.1772
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,141862,3144001,The Kingston Academy,State-funded secondary,Secondary free school,Year 10,422137,145499,2199762,452887,8.9538
