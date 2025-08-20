@@ -86,12 +86,14 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-1',
       title: 'Publication 1',
+      slug: 'publication-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
+      slug: 'release-slug',
     },
     content: 'Data set summary 1',
     theme: {
@@ -121,12 +123,14 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-1',
       title: 'Publication 1',
+      slug: 'publication-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
+      slug: 'release-slug',
     },
     content: 'Data set summary 1',
     theme: {
@@ -156,12 +160,14 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-2',
       title: 'Publication 2',
+      slug: 'publication-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
+      slug: 'release-slug',
     },
     content: 'Data set summary 1',
     theme: {

@@ -76,10 +76,12 @@ export interface DataSetFileSummary {
   publication: {
     id: string;
     title: string;
+    slug: string;
   };
   release: {
     id: string;
     title: string;
+    slug: string;
   };
   latestData: boolean;
   isSuperseded: boolean;

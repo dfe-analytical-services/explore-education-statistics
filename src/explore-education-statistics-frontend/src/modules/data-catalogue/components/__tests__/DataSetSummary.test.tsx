@@ -29,9 +29,15 @@ describe('DataSetFileSummary', () => {
     expect(
       within(screen.getByTestId('Published')).getByText('1 Jan 2020'),
     ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId('Release')).getByText('Release 1'),
-    ).toBeInTheDocument();
+
+    const releaseLink = within(screen.getByTestId('Release')).getByText(
+      'Release 1',
+    );
+    expect(releaseLink).toBeInTheDocument();
+    expect(releaseLink).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-slug/release-slug',
+    );
   });
 
   test('renders the expanded view when show more details is clicked', async () => {

@@ -127,15 +127,17 @@ public class DataSetFileService(
                     Id = result.Value.ReleaseVersion.Release.Publication.ThemeId,
                     Title = result.Value.ReleaseVersion.Release.Publication.Theme.Title
                 },
-                Publication = new IdTitleViewModel
+                Publication = new IdTitleSlugViewModel
                 {
                     Id = result.Value.ReleaseVersion.Release.Publication.Id,
-                    Title = result.Value.ReleaseVersion.Release.Publication.Title
+                    Title = result.Value.ReleaseVersion.Release.Publication.Title,
+                    Slug = result.Value.ReleaseVersion.Release.Publication.Slug
                 },
-                Release = new IdTitleViewModel
+                Release = new IdTitleSlugViewModel
                 {
                     Id = result.Value.ReleaseVersionId,
-                    Title = result.Value.ReleaseVersion.Release.Title
+                    Title = result.Value.ReleaseVersion.Release.Title,
+                    Slug = result.Value.ReleaseVersion.Release.Slug
                 },
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Release.Publication.LatestPublishedReleaseVersionId,
