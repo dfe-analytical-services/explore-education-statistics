@@ -159,7 +159,6 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository,
                     userReleaseRoleRepository);
 
                 Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);

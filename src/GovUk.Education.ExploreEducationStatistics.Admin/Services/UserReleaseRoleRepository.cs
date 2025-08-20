@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -105,7 +106,7 @@ public class UserReleaseRoleRepository(
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude)
     {
-        if (userId == Guid.Empty)
+        if (userId.IsEmpty())
         {
             logger.LogError(
                 "Trying to remove roles/invites for a publication and user combination, " +

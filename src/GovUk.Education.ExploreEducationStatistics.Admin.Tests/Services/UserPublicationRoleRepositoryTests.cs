@@ -1,29 +1,24 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class UserPublicationRoleAndInviteManagerTests
+public abstract class UserPublicationRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
 
-    public class CreateTests : UserPublicationRoleAndInviteManagerTests
+    public class CreateTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task Create()
@@ -45,9 +40,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                var result = await service.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
+                var result = await repository.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
 
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
@@ -72,7 +67,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class UserHasRoleOnPublication_TrueIfRoleExistsTests : UserPublicationRoleAndInviteManagerTests
+    public class UserHasRoleOnPublication_TrueIfRoleExistsTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task UserHasRoleOnPublication_TrueIfRoleExists()
@@ -94,9 +89,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                Assert.True(await service.UserHasRoleOnPublication(
+                Assert.True(await repository.UserHasRoleOnPublication(
                     userPublicationRole.UserId,
                     userPublicationRole.PublicationId,
                     PublicationRole.Owner));
@@ -127,9 +122,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                Assert.False(await service.UserHasRoleOnPublication(
+                Assert.False(await repository.UserHasRoleOnPublication(
                     userPublicationRoleOtherPublication.UserId,
                     publication.Id,
                     PublicationRole.Owner));
@@ -137,7 +132,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class GetDistinctRolesByUserTests : UserPublicationRoleAndInviteManagerTests
+    public class GetDistinctRolesByUserTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task GetDistinctRolesByUser()
@@ -185,9 +180,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                var result = await service.GetDistinctRolesByUser(user1.Id);
+                var result = await repository.GetDistinctRolesByUser(user1.Id);
 
                 // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
                 Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
@@ -228,16 +223,16 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                var result = await service.GetDistinctRolesByUser(user.Id);
+                var result = await repository.GetDistinctRolesByUser(user.Id);
 
                 Assert.Empty(result);
             }
         }
     }
 
-    public class GetAllRolesByUserAndPublicationTests : UserPublicationRoleAndInviteManagerTests
+    public class GetAllRolesByUserAndPublicationTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task GetAllRolesByUserAndPublication()
@@ -285,9 +280,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUserAndPublication(
+                var result = await repository.GetAllRolesByUserAndPublication(
                     userId: user1.Id,
                     publicationId: publication1.Id);
 
@@ -337,9 +332,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUserAndPublication(
+                var result = await repository.GetAllRolesByUserAndPublication(
                     userId: user.Id,
                     publicationId: publication.Id);
 
@@ -348,7 +343,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveTests : UserPublicationRoleAndInviteManagerTests
+    public class RemoveTests : UserPublicationRoleRepositoryTests
     {
         [Theory]
         // Valid roles
@@ -380,13 +375,13 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
                 var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles
                     .IgnoreQueryFilters()
                     .SingleAsync(urr => urr.Id == userPublicationRole.Id);
 
-                await service.Remove(userPublicationRoleToRemove);
+                await repository.Remove(userPublicationRoleToRemove);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -399,7 +394,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveManyTests : UserPublicationRoleAndInviteManagerTests
+    public class RemoveManyTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -457,9 +452,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await service.RemoveMany([userPublicationRole1, userPublicationRole2]);
+                await repository.RemoveMany([userPublicationRole1, userPublicationRole2]);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -472,7 +467,7 @@ public abstract class UserPublicationRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveForUserTests : UserPublicationRoleAndInviteManagerTests
+    public class RemoveForUserTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
@@ -513,9 +508,9 @@ public abstract class UserPublicationRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForUser(targetUser.Id);
+                await repository.RemoveForUser(targetUser.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

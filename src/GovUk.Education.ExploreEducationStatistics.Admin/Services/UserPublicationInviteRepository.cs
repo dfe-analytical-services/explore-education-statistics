@@ -44,11 +44,11 @@ public class UserPublicationInviteRepository(ContentDbContext contentDbContext) 
         await contentDbContext.SaveChangesAsync();
     }
 
-    public Task<List<UserPublicationInvite>> GetInvitesByEmail(
+    public async Task<List<UserPublicationInvite>> GetInvitesByEmail(
         string email,
         CancellationToken cancellationToken = default)
     {
-        return contentDbContext
+        return await contentDbContext
             .UserPublicationInvites
             .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
             .ToListAsync(cancellationToken);

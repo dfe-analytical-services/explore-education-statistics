@@ -1,9 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,18 +12,17 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class UserReleaseRoleAndInviteManagerTests
+public abstract class UserReleaseRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
 
-    public class CreateTests : UserReleaseRoleAndInviteManagerTests
+    public class CreateTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task Create()
@@ -79,7 +76,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class CreateIfNotExistsTests : UserReleaseRoleAndInviteManagerTests
+    public class CreateIfNotExistsTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task CreateIfNotExists_DoesNotExist()
@@ -174,7 +171,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class CreateManyIfNotExistsTests : UserReleaseRoleAndInviteManagerTests
+    public class CreateManyIfNotExistsTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task CreateManyIfNotExists_Users()
@@ -330,7 +327,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class CreateManyTests : UserReleaseRoleAndInviteManagerTests
+    public class CreateManyTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task CreateMany_NoUsersToAdd()
@@ -364,7 +361,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class GetAllRolesByUserAndReleaseTests : UserReleaseRoleAndInviteManagerTests
+    public class GetAllRolesByUserAndReleaseTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task GetAllRolesByUserAndRelease()
@@ -431,7 +428,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class GetAllRolesByUserAndPublicationTests : UserReleaseRoleAndInviteManagerTests
+    public class GetAllRolesByUserAndPublicationTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task GetAllRolesByUserAndPublication()
@@ -504,7 +501,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class GetDistinctRolesByUserTests : UserReleaseRoleAndInviteManagerTests
+    public class GetDistinctRolesByUserTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task GetDistinctRolesByUser()
@@ -582,7 +579,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class GetUserReleaseRoleTests : UserReleaseRoleAndInviteManagerTests
+    public class GetUserReleaseRoleTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task GetUserReleaseRole_ReturnRoleIfExists()
@@ -666,7 +663,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -712,7 +709,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveManyTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveManyTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -791,7 +788,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveForPublicationTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveForPublicationTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetPublicationHasRoles_RemovesTargetRoles()
@@ -879,9 +876,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForPublication(publicationId: targetPublication.Id);
+                await repository.RemoveForPublication(publicationId: targetPublication.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1026,9 +1023,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForPublication(
+                await repository.RemoveForPublication(
                     publicationId: targetPublication.Id,
                     rolesToInclude: targetRolesToInclude);
             }
@@ -1056,18 +1053,8 @@ public abstract class UserReleaseRoleAndInviteManagerTests
             var user1 = new User { Email = "test1@test.com" };
             var user2 = new User { Email = "test2@test.com" };
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetPublication = _fixture.DefaultPublication()
-                .Generate();
             var otherPublication = _fixture.DefaultPublication()
                .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(targetPublication))
-                .Generate();
             var otherReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
                     .WithPublication(otherPublication))
@@ -1102,9 +1089,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForPublication(publicationId: targetPublication.Id);
+                await repository.RemoveForPublication(publicationId: Guid.NewGuid());
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1117,7 +1104,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveForPublicationAndUserTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveForPublicationAndUserTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetPublicationAndUserCombinationHasRoles_RemovesTargetRoles()
@@ -1125,11 +1112,11 @@ public abstract class UserReleaseRoleAndInviteManagerTests
             var targetUser = new User
             {
                 Email = "test1@test.com"
-            }; ;
+            };
             var otherUser = new User
             {
                 Email = "test2@test.com"
-            }; ;
+            };
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var targetPublication = _fixture.DefaultPublication()
                 .Generate();
@@ -1207,9 +1194,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForPublicationAndUser(
+                await repository.RemoveForPublicationAndUser(
                     publicationId: targetPublication.Id,
                     userId: targetUser.Id);
             }
@@ -1348,9 +1335,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForPublicationAndUser(
+                await repository.RemoveForPublicationAndUser(
                     publicationId: targetPublication.Id,
                     userId: targetUser.Id,
                     rolesToInclude: targetRolesToInclude);
@@ -1379,18 +1366,8 @@ public abstract class UserReleaseRoleAndInviteManagerTests
             var targetUser = new User { Email = "test1@test.com" };
             var otherUser = new User { Email = "test2@test.com" };
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetPublication = _fixture.DefaultPublication()
-                .Generate();
             var otherPublication = _fixture.DefaultPublication()
                .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(targetPublication))
-                .Generate();
             var otherReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
                     .WithPublication(otherPublication))
@@ -1421,10 +1398,10 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForPublicationAndUser(
-                    publicationId: targetPublication.Id,
+                await repository.RemoveForPublicationAndUser(
+                    publicationId: Guid.NewGuid(),
                     userId: targetUser.Id);
             }
 
@@ -1442,17 +1419,17 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var manager = CreateRepository(
+            var repository = CreateRepository(
                 contentDbContext: contentDbContext);
 
             await Assert.ThrowsAsync<ArgumentException>(
-                async () => await manager.RemoveForPublicationAndUser(
+                async () => await repository.RemoveForPublicationAndUser(
                     publicationId: Guid.NewGuid(),
                     userId: Guid.Empty));
         }
     }
 
-    public class RemoveForReleaseVersionTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveForReleaseVersionTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetReleaseVersionHasRoles_RemovesTargetRoles()
@@ -1516,9 +1493,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+                await repository.RemoveForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1635,9 +1612,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForReleaseVersion(
+                await repository.RemoveForReleaseVersion(
                     releaseVersionId: targetReleaseVersion.Id,
                     rolesToInclude: targetRolesToInclude);
             }
@@ -1665,10 +1642,6 @@ public abstract class UserReleaseRoleAndInviteManagerTests
             var user1 = new User { Email = "test1@test.com" };
             var user2 = new User { Email = "test2@test.com" };
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(_fixture.DefaultPublication()))
-                .Generate();
             var otherReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
                     .WithPublication(_fixture.DefaultPublication()))
@@ -1703,9 +1676,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForReleaseVersion(releaseVersionId: targetReleaseVersion.Id);
+                await repository.RemoveForReleaseVersion(releaseVersionId: Guid.NewGuid());
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1718,7 +1691,7 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         }
     }
 
-    public class RemoveForReleaseVersionAndUserTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveForReleaseVersionAndUserTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetReleaseVersionAndUserCombinationHasRoles_RemovesTargetRoles()
@@ -1784,9 +1757,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForReleaseVersionAndUser(
+                await repository.RemoveForReleaseVersionAndUser(
                     releaseVersionId: targetReleaseVersion.Id,
                     userId: targetUser.Id);
             }
@@ -1897,9 +1870,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForReleaseVersionAndUser(
+                await repository.RemoveForReleaseVersionAndUser(
                     releaseVersionId: targetReleaseVersion.Id,
                     userId: targetUser.Id,
                     rolesToInclude: targetRolesToInclude);
@@ -1928,10 +1901,6 @@ public abstract class UserReleaseRoleAndInviteManagerTests
             var targetUser = new User { Email = "test1@test.com" };
             var otherUser = new User { Email = "test2@test.com" };
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(_fixture.DefaultPublication()))
-                .Generate();
             var otherReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
                     .WithPublication(_fixture.DefaultPublication()))
@@ -1962,10 +1931,10 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForReleaseVersionAndUser(
-                    releaseVersionId: targetReleaseVersion.Id,
+                await repository.RemoveForReleaseVersionAndUser(
+                    releaseVersionId: Guid.NewGuid(),
                     userId: targetUser.Id);
             }
 
@@ -1983,17 +1952,17 @@ public abstract class UserReleaseRoleAndInviteManagerTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var manager = CreateRepository(
+            var repository = CreateRepository(
                 contentDbContext: contentDbContext);
 
             await Assert.ThrowsAsync<ArgumentException>(
-                async () => await manager.RemoveForReleaseVersionAndUser(
+                async () => await repository.RemoveForReleaseVersionAndUser(
                     releaseVersionId: Guid.NewGuid(),
                     userId: Guid.Empty));
         }
     }
 
-    public class RemoveForUserTests : UserReleaseRoleAndInviteManagerTests
+    public class RemoveForUserTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
@@ -2038,9 +2007,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForUser(targetUser.Id);
+                await repository.RemoveForUser(targetUser.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2098,9 +2067,9 @@ public abstract class UserReleaseRoleAndInviteManagerTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var manager = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext);
 
-                await manager.RemoveForUser(targetUser.Id);
+                await repository.RemoveForUser(targetUser.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
