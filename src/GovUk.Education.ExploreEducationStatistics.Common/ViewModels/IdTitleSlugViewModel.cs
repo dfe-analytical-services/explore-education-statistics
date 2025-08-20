@@ -2,5 +2,5 @@
 
 public record IdTitleSlugViewModel : IdTitleViewModel
 {
-    public string Slug { get; init; } = string.Empty;
+    public required string Slug { get; init; }
 }
