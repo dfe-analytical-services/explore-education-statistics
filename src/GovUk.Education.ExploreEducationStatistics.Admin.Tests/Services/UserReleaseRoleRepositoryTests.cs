@@ -361,10 +361,10 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class GetAllRolesByUserAndReleaseTests : UserReleaseRoleRepositoryTests
+    public class GetAllRolesByUserAndReleaseVersionTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task GetAllRolesByUserAndRelease()
+        public async Task GetAllRolesByUserAndReleaseVersion()
         {
             var user = new User();
             var releaseVersion = new ReleaseVersion();
@@ -418,7 +418,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var service = CreateRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUserAndRelease(userId: user.Id,
+                var result = await service.GetAllRolesByUserAndReleaseVersion(userId: user.Id,
                     releaseVersionId: releaseVersion.Id);
 
                 Assert.Equal(2, result.Count);

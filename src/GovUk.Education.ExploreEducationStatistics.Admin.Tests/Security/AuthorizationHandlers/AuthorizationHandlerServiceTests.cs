@@ -76,7 +76,7 @@ public class AuthorizationHandlerServiceTests
 
         var userReleaseRoleAndInviteManagerMock = new Mock<IUserReleaseRoleRepository>();
         userReleaseRoleAndInviteManagerMock
-            .Setup(rvr => rvr.GetAllRolesByUserAndRelease(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Setup(rvr => rvr.GetAllRolesByUserAndReleaseVersion(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync([]);
         userReleaseRoleAndInviteManagerMock
             .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))

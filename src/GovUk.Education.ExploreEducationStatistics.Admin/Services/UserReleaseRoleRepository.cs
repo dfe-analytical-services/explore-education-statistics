@@ -39,7 +39,7 @@ public class UserReleaseRoleRepository(
         return await GetDistinctResourceRolesByUser(userId);
     }
 
-    public async Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseVersionId)
+    public async Task<List<ReleaseRole>> GetAllRolesByUserAndReleaseVersion(Guid userId, Guid releaseVersionId)
     {
         return await GetAllResourceRolesByUserAndResource(userId, releaseVersionId);
     }

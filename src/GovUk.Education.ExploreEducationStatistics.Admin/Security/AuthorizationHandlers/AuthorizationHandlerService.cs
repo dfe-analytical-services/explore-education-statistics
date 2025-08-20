@@ -74,7 +74,7 @@ public class AuthorizationHandlerService(
         }
 
         var usersReleaseRoles = await userReleaseRoleRepository
-            .GetAllRolesByUserAndRelease(userId: userId,
+            .GetAllRolesByUserAndReleaseVersion(userId: userId,
                 releaseVersionId: releaseVersionId.Value);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
@@ -117,7 +117,7 @@ public class AuthorizationHandlerService(
         params ReleaseRole[] releaseRoles)
     {
         var usersReleaseRoles = await userReleaseRoleRepository
-            .GetAllRolesByUserAndRelease(userId: userId,
+            .GetAllRolesByUserAndReleaseVersion(userId: userId,
                 releaseVersionId: releaseVersionId);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);

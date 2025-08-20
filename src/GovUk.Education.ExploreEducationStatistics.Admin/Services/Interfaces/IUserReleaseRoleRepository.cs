@@ -31,7 +31,7 @@ public interface IUserReleaseRoleRepository
 
     Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
 
-    Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId,
+    Task<List<ReleaseRole>> GetAllRolesByUserAndReleaseVersion(Guid userId,
         Guid releaseVersionId);
 
     Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId,
