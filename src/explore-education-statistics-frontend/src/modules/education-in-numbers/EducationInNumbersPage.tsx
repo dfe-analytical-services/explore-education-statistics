@@ -7,7 +7,7 @@ import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import { format } from 'date-fns';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import Link from '@frontend/components/Link';
+import SubNav from '@frontend/components/SubNav';
 import EducationInNumbersContentSection from './components/EducationInNumbersContentSection';
 
 interface Props {
@@ -32,22 +32,17 @@ const EducationInNumbersPageComponent: NextPage<Props> = ({
       caption={format(new Date(pageData.published), 'MMMM yyyy')}
     >
       <div className="govuk-grid-row govuk-!-margin-bottom-3">
-        <div className="govuk-grid-column-one-third">
-          <nav aria-label="Education in Numbers pages">
-            <ul>
-              {educationInNumbersPageList.map(page => (
-                <li key={page.id}>
-                  <Link
-                    to={`/education-in-numbers/${page.slug}`}
-                    className="govuk-link govuk-link--no-visited-state govuk-link--no-underline"
-                  >
-                    {page.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
+        <SubNav
+          headingVisible={false}
+          items={educationInNumbersPageList.map(page => {
+            return {
+              href: `/education-in-numbers/${page.slug}`,
+              isActive: page.slug === pageData.slug,
+              slug: page.slug,
+              text: page.title,
+            };
+          })}
+        />
         <div className="govuk-grid-column-two-thirds">
           {pageData.content.map(({ heading, order, content }, index) => {
             return (
