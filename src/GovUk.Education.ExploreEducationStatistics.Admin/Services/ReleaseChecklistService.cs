@@ -150,7 +150,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
                 ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved));
         }
         
-        if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Mapping))
+        if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Mapping || status.Status == DataSetVersionStatus.Finalising))
         {
             errors.Add(new ReleaseChecklistIssue(
                 ValidationErrorMessages.PublicApiDataSetMappingsMustBeCompleted));
