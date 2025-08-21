@@ -1,0 +1,39 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.navContainer {
+  @include govuk-media-query($from: tablet) {
+    border-bottom: 0;
+    max-height: 100vh;
+    position: sticky;
+    overflow-y: auto;
+    top: govuk-spacing(4);
+  }
+}
+
+.navSection {
+  margin: 0 0 govuk-spacing(4);
+  padding: 0;
+  list-style-type: none;
+}
+
+.navLink {
+  padding: 2px 0;
+}
+
+.navSectionItem {
+  margin-bottom: govuk-spacing(1);
+  padding-top: govuk-spacing(1);
+  padding-bottom: govuk-spacing(1);
+}
+
+.navSectionItemCurrent {
+  $_current-indicator-width: 4px;
+  margin-left: -(govuk-spacing(1) + $_current-indicator-width);
+  padding-left: govuk-spacing(2);
+  border-left: $_current-indicator-width solid govuk-colour('blue');
+  background-color: govuk-colour('white');
+
+  @include govuk-media-query($from: tablet) {
+    margin-left: -(govuk-spacing(2) + $_current-indicator-width);
+  }
+}

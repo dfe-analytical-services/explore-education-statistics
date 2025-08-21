@@ -28,7 +28,9 @@ const educationInNumbersService = {
     return new Promise(resolve => {
       resolve({
         id: '1',
-        title: 'Sample Education in Numbers Page',
+        title: slug
+          ? 'Sample Education in Numbers Page'
+          : 'Education in Numbers',
         slug,
         description:
           'This is a sample description for the Education in Numbers page.',
@@ -36,7 +38,7 @@ const educationInNumbersService = {
         content: [
           {
             order: 1,
-            heading: 'Sample Heading',
+            heading: slug ? 'Sample Heading' : 'Overview',
             caption: 'This is a sample caption.',
             content: [
               {
