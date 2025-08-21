@@ -541,49 +541,8 @@ public class DataSetValidatorTests
         
         var dataSetServiceMock = new Mock<IDataSetService>(MockBehavior.Strict);
         dataSetServiceMock
-            .Setup(s => s.GetDataSet(existingDataReleaseFile.PublicApiDataSetId.Value, CancellationToken.None))
-            .ReturnsAsync(new DataSetViewModel
-            {
-                DraftVersion = new DataSetDraftVersionViewModel
-                {
-                    Id = Guid.NewGuid(),
-                    Version = "1.1.1",
-                    Status = DataSetVersionStatus.Draft,
-                    Type = DataSetVersionType.Minor,
-                    File = new IdTitleViewModel(Guid.NewGuid(),
-                        "File title"),
-                    ReleaseVersion = new IdTitleViewModel(Guid.NewGuid(),
-                        "Release version title"),
-                    Notes = "Test note"
-                },
-                Id = existingDataReleaseFile.PublicApiDataSetId.Value,
-                Title = "Test data set",
-                Summary = "Test summary",
-                Status = DataSetStatus.Draft,
-                LatestLiveVersion = new DataSetLiveVersionViewModel
-                {
-                    Published = DateTime.Now,
-                    TotalResults = 10,
-                    TimePeriods = new TimePeriodRangeViewModel
-                    {
-                        Start = "1",
-                        End = "2",
-                    },
-                    GeographicLevels = new []{ "LA" },
-                    Filters = new []{ "F1" },
-                    Indicators = new []{ "I1" },
-                    Id = Guid.NewGuid(),
-                    Version = "1.1",
-                    Status = DataSetVersionStatus.Published,
-                    Type = DataSetVersionType.Minor,
-                    File = new IdTitleViewModel(Guid.NewGuid(),
-                        "Release version title"),
-                    ReleaseVersion = new IdTitleViewModel(Guid.NewGuid(),
-                        "Release version title"),
-                    Notes = "Note"
-                },
-                PreviousReleaseIds = [Guid.NewGuid()]
-            });
+            .Setup(s => s.HasDraftVersion(existingDataReleaseFile.PublicApiDataSetId.Value, CancellationToken.None))
+            .ReturnsAsync(true);
 
         var sut = BuildService(
                 contentDbContext: context, 

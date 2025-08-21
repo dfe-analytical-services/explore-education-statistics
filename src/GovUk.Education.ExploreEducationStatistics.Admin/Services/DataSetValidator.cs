@@ -94,10 +94,10 @@ public class DataSetValidator(
                 }
                 
                 await dataSetService
-                    .GetDataSet(releaseFileWithApiDataSet.PublicApiDataSetId!.Value)
-                    .OnSuccessDo(apiDataSet =>
+                    .HasDraftVersion(releaseFileWithApiDataSet.PublicApiDataSetId!.Value)
+                    .OnSuccessDo(hasDraftVersion =>
                     {
-                        if (apiDataSet?.DraftVersion is not null)
+                        if (hasDraftVersion)
                         {
                             errors.Add(ValidationMessages.GenerateErrorCannotCreateMultipleDraftApiDataSet(dataSet.Title));
                         }
