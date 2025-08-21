@@ -415,6 +415,21 @@ public static class ValidationMessages
         };
     }
     
+    public static readonly LocalizableMessage CannotCreateMultipleDraftApiDataSet = new(
+        Code: nameof(CannotCreateMultipleDraftApiDataSet),
+        Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set." +
+                 " There is a draft API version which is not published. Multiple draft API versions at the same time are not permitted in the system." +
+                 " Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this action."
+    );
+
+    public static ErrorViewModel GenerateErrorCannotCreateMultipleDraftApiDataSet(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = CannotCreateMultipleDraftApiDataSet.Code,
+            Message = string.Format(CannotCreateMultipleDraftApiDataSet.Message, title),
+        };
+    }
     public static readonly LocalizableMessage AnalystCannotReplaceApiDataSet = new(
         Code: nameof(AnalystCannotReplaceApiDataSet),
         Message: "You do not have permission to start this data replacement. This is because data set with title '{0}' is linked to an API data set version which can only be modified by BAU users. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on starting this replacement."
