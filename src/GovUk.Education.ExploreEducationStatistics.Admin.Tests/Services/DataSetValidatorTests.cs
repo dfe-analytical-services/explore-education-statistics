@@ -584,7 +584,6 @@ public class DataSetValidatorTests
                 },
                 PreviousReleaseIds = [Guid.NewGuid()]
             });
-        
 
         var sut = BuildService(
                 contentDbContext: context, 

@@ -102,7 +102,6 @@ public class DataSetValidator(
                             errors.Add(ValidationMessages.GenerateErrorCannotCreateMultipleDraftApiDataSet(dataSet.Title));
                         }
                     });
-
             }
         }
 
