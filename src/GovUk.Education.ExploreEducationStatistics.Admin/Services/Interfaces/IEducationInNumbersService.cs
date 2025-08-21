@@ -13,7 +13,7 @@ public interface IEducationInNumbersService
 {
     Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id);
 
-    Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> ListLatestPages();
+    Task<Either<ActionResult, List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages();
 
     Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request);

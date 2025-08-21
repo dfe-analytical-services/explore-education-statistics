@@ -20,6 +20,9 @@ public class EducationInNumbersSummaryViewModel
 
     [JsonIgnore]
     public int Order { get; set; }
+}
 
+public class EducationInNumbersSummaryWithPrevVersionViewModel :  EducationInNumbersSummaryViewModel
+{
     public Guid? PreviousVersionId { get; set; }
 }

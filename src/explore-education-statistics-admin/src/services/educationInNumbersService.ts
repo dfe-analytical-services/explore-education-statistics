@@ -7,7 +7,11 @@ export interface EducationInNumbersSummary {
   description: string;
   version: number;
   published?: string;
-  previousVersionId?: string; // only returned with listLatestPages
+}
+
+export interface EducationInNumbersSummaryWithPrevVersion
+  extends EducationInNumbersSummary {
+  previousVersionId?: string;
 }
 
 export interface CreateEducationInNumbersPageRequest {
@@ -24,7 +28,7 @@ const educationInNumbersService = {
   getEducationInNumbersPage(id: string): Promise<EducationInNumbersSummary> {
     return client.get(`/education-in-numbers/${id}`);
   },
-  listLatestPages(): Promise<EducationInNumbersSummary[]> {
+  listLatestPages(): Promise<EducationInNumbersSummaryWithPrevVersion[]> {
     return client.get('/education-in-numbers');
   },
   createEducationInNumbersPage(

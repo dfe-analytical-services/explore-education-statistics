@@ -41,20 +41,20 @@ describe('EducationInNumbersSignOffPage', () => {
 
     const summaryList = screen.getByTestId('page-list');
 
-    expect(
-      within(summaryList).getByText('Title').nextElementSibling,
-    ).toHaveTextContent('Page 1 title');
+    expect(within(summaryList).getByTestId('Title-value')).toHaveTextContent(
+      'Page 1 title',
+    );
+
+    expect(within(summaryList).getByTestId('Slug-value')).toHaveTextContent(
+      'page-1-slug',
+    );
 
     expect(
-      within(summaryList).getByText('Slug').nextElementSibling,
-    ).toHaveTextContent('page-1-slug');
-
-    expect(
-      within(summaryList).getByText('Description').nextElementSibling,
+      within(summaryList).getByTestId('Description-value'),
     ).toHaveTextContent('Page 1 description');
 
     expect(
-      within(summaryList).getByText('Published on').nextElementSibling,
+      within(summaryList).getByTestId('Published on-value'),
     ).toHaveTextContent('Not yet published');
   });
 
@@ -66,7 +66,7 @@ describe('EducationInNumbersSignOffPage', () => {
     const summaryList = screen.getByTestId('page-list');
 
     expect(
-      within(summaryList).getByText('Published on').nextElementSibling,
+      within(summaryList).getByTestId('Published on-value'),
     ).toHaveTextContent('10:30:00 - 21 March 2022');
   });
 

@@ -33,14 +33,14 @@ public class EducationInNumbersService(
             .OnSuccess(page => page.ToViewModel());
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> ListLatestPages()
+    public async Task<Either<ActionResult, List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
         var uniqueSlugs = await contentDbContext.EducationInNumbersPages
             .Select(p => p.Slug)
             .Distinct()
             .ToListAsync();
 
-        var viewModels = new List<EducationInNumbersSummaryViewModel>();
+        var viewModels = new List<EducationInNumbersSummaryWithPrevVersionViewModel>();
 
         foreach (var slug in uniqueSlugs)
         {

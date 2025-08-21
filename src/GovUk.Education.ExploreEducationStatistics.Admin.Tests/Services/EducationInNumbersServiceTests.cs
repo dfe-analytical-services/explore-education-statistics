@@ -67,8 +67,7 @@ public class EducationInNumbersServiceTests
                 () => Assert.Equal(latestPageVersion.Description, fetchedPage.Description),
                 () => Assert.Equal(latestPageVersion.Version, fetchedPage.Version),
                 () => Assert.Equal(latestPageVersion.Published, fetchedPage.Published),
-                () => Assert.Equal(latestPageVersion.Order, fetchedPage.Order),
-                () => Assert.Null(fetchedPage.PreviousVersionId) // we don't fetch PreviousVersionId - it is only used with ListLatestPages
+                () => Assert.Equal(latestPageVersion.Order, fetchedPage.Order)
             );
         }
     }
@@ -263,8 +262,7 @@ public class EducationInNumbersServiceTests
                 () => Assert.Equal("New page description", fetchedPage.Description),
                 () => Assert.Equal(0, fetchedPage.Version),
                 () => Assert.Null(fetchedPage.Published),
-                () => Assert.Equal(1, fetchedPage.Order),
-                () => Assert.Null(fetchedPage.PreviousVersionId) // we don't fetch PreviousVersionId - it is only used with ListLatestPages
+                () => Assert.Equal(1, fetchedPage.Order)
             );
         }
 
@@ -415,8 +413,7 @@ public class EducationInNumbersServiceTests
                 () => Assert.Equal("Page description", amendment.Description),
                 () => Assert.Equal(originalPage.Version + 1, amendment.Version),
                 () => Assert.Null(amendment.Published),
-                () => Assert.Equal(0, amendment.Order),
-                () => Assert.Null(amendment.PreviousVersionId) // we don't fetch PreviousVersionId - it is only used with ListLatestPages
+                () => Assert.Equal(0, amendment.Order)
             );
         }
 
@@ -582,8 +579,7 @@ public class EducationInNumbersServiceTests
                 () => Assert.Equal("New page description", updatedPage.Description),
                 () => Assert.Equal(originalPage.Version, updatedPage.Version), // we're updating this version of the page, not creating a new page version
                 () => Assert.Null(updatedPage.Published),
-                () => Assert.Equal(0, updatedPage.Order),
-                () => Assert.Null(updatedPage.PreviousVersionId) // we don't fetch PreviousVersionId - it is only used with ListLatestPages
+                () => Assert.Equal(0, updatedPage.Order)
             );
         }
 

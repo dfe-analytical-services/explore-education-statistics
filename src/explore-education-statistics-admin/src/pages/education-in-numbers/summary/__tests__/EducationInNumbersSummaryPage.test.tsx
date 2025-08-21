@@ -36,20 +36,20 @@ describe('EducationInNumbersSummaryPage', () => {
     renderPage(testDraftPage);
 
     const summaryList = screen.getByTestId('summary-list');
+    expect(within(summaryList).getByTestId('Title-value')).toHaveTextContent(
+      'Page 1 title',
+    );
+    expect(within(summaryList).getByTestId('Slug-value')).toHaveTextContent(
+      'page-1-slug',
+    );
     expect(
-      within(summaryList).getByText('Title').nextElementSibling,
-    ).toHaveTextContent('Page 1 title');
-    expect(
-      within(summaryList).getByText('Slug').nextElementSibling,
-    ).toHaveTextContent('page-1-slug');
-    expect(
-      within(summaryList).getByText('Description').nextElementSibling,
+      within(summaryList).getByTestId('Description-value'),
     ).toHaveTextContent('Page 1 description');
+    expect(within(summaryList).getByTestId('Status-value')).toHaveTextContent(
+      'Draft',
+    );
     expect(
-      within(summaryList).getByText('Status').nextElementSibling,
-    ).toHaveTextContent('Draft');
-    expect(
-      within(summaryList).getByText('Published on').nextElementSibling,
+      within(summaryList).getByTestId('Published on-value'),
     ).toHaveTextContent('Not yet published');
 
     expect(
@@ -61,11 +61,11 @@ describe('EducationInNumbersSummaryPage', () => {
     renderPage(testPublishedPage);
 
     const summaryList = screen.getByTestId('summary-list');
+    expect(within(summaryList).getByTestId('Status-value')).toHaveTextContent(
+      'Published',
+    );
     expect(
-      within(summaryList).getByText('Status').nextElementSibling,
-    ).toHaveTextContent('Published');
-    expect(
-      within(summaryList).getByText('Published on').nextElementSibling,
+      within(summaryList).getByTestId('Published on-value'),
     ).toHaveTextContent('13:00:00 - 1 April 2022'); // Europe/London time
 
     expect(screen.queryByRole('link', { name: 'Edit summary' })).toBeNull();
@@ -75,9 +75,9 @@ describe('EducationInNumbersSummaryPage', () => {
     renderPage(testDraftAmendmentPage);
 
     const summaryList = screen.getByTestId('summary-list');
-    expect(
-      within(summaryList).getByText('Status').nextElementSibling,
-    ).toHaveTextContent('Draft amendment');
+    expect(within(summaryList).getByTestId('Status-value')).toHaveTextContent(
+      'Draft amendment',
+    );
 
     expect(screen.queryByRole('link', { name: 'Edit summary' })).toBeNull();
   });

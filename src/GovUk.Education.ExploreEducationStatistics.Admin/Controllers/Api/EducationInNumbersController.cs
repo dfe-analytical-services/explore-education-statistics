@@ -28,7 +28,7 @@ public class EducationInNumbersController(
     }
 
     [HttpGet("education-in-numbers")]
-    public async Task<ActionResult<List<EducationInNumbersSummaryViewModel>>> ListLatestPages()
+    public async Task<ActionResult<List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
         return await einService.ListLatestPages()
             .HandleFailuresOrOk();

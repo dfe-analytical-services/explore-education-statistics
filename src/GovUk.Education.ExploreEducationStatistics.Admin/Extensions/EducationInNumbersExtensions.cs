@@ -7,10 +7,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 public static class EducationInNumbersExtensions
 {
     public static EducationInNumbersSummaryViewModel ToViewModel(
-        this EducationInNumbersPage page,
-        Guid? previousVersionId = null)
+        this EducationInNumbersPage page)
     {
-        return new EducationInNumbersSummaryViewModel
+            return new EducationInNumbersSummaryViewModel
+            {
+                Id = page.Id,
+                Title = page.Title,
+                Slug = page.Slug,
+                Description = page.Description,
+                Version = page.Version,
+                Published = page.Published,
+                Order = page.Order,
+            };
+    }
+
+    public static EducationInNumbersSummaryWithPrevVersionViewModel ToViewModel(
+        this EducationInNumbersPage page,
+        Guid? previousVersionId)
+    {
+        return new EducationInNumbersSummaryWithPrevVersionViewModel
         {
             Id = page.Id,
             Title = page.Title,
