@@ -79,6 +79,18 @@ internal class DataSetService(
             )
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
     }
+    
+    public async Task<Either<ActionResult, bool>> HasDraftVersion(
+        Guid dataSetId,
+        CancellationToken cancellationToken = default)
+    {
+        return await QueryDataSet(dataSetId)
+            .SingleOrNotFoundAsync(cancellationToken)
+            .OnSuccessDo(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken)
+                .OnSuccess(userService.CheckCanViewPublication)
+            )
+            .OnSuccess(dataSet => dataSet.LatestDraftVersion is not null);
+    }
 
     public async Task<Either<ActionResult, DataSetViewModel>> CreateDataSet(
         Guid releaseFileId,

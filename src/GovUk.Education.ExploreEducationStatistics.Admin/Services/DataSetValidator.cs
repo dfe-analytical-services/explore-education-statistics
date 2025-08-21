@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common;
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class DataSetValidator(
     ContentDbContext contentDbContext,
     IUserService userService,
+    IDataSetService dataSetService,
     IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
 {
     public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(DataSetDto dataSet)
@@ -88,7 +90,18 @@ public class DataSetValidator(
                 if (!releaseFileWithApiDataSet.ReleaseVersion.Amendment)
                 {
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDraftApiDataSet(dataSet.Title));
+                    return errors;
                 }
+                
+                await dataSetService
+                    .HasDraftVersion(releaseFileWithApiDataSet.PublicApiDataSetId!.Value)
+                    .OnSuccessDo(hasDraftVersion =>
+                    {
+                        if (hasDraftVersion)
+                        {
+                            errors.Add(ValidationMessages.GenerateErrorCannotCreateMultipleDraftApiDataSet(dataSet.Title));
+                        }
+                    });
             }
         }
 

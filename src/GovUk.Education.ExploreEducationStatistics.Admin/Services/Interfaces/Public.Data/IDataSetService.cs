@@ -24,4 +24,8 @@ public interface IDataSetService
     Task<Either<ActionResult, DataSetViewModel>> CreateDataSet(
         Guid releaseFileId,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, bool>> HasDraftVersion(
+        Guid dataSetId,
+        CancellationToken cancellationToken = default);
 }
