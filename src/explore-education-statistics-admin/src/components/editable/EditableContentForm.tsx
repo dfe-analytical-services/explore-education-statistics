@@ -28,7 +28,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
-import formatContentLink from '@common/utils/url/formatContentLink';
+import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import sanitizeHtml, {
@@ -150,7 +150,7 @@ const EditableContentForm = ({
             tagName,
             attribs: {
               ...attribs,
-              href: formatContentLink(attribs.href),
+              href: formatContentLinkUrl(attribs.href),
             },
           };
         },

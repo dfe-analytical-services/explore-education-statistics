@@ -14,6 +14,7 @@ import ReleaseHelpAndSupportSection from '@common/modules/release/components/Rel
 import publicationService, {
   ReleaseVersion,
 } from '@common/services/publicationService';
+import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -358,7 +359,10 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                               data-testid="other-release-item"
                             >
                               {isLegacyLink ? (
-                                <a href={legacyLinkUrl}>{description}</a>
+                                <LegacyLink
+                                  description={description}
+                                  legacyLinkUrl={legacyLinkUrl}
+                                />
                               ) : (
                                 <Link
                                   to={`/find-statistics/${releaseVersion.publication.slug}/${releaseSlug}`}
@@ -582,6 +586,32 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
       />
     </Page>
   );
+};
+
+const LegacyLink = ({
+  description,
+  legacyLinkUrl,
+}: {
+  description: string;
+  legacyLinkUrl?: string;
+}) => {
+  if (!legacyLinkUrl) {
+    return undefined;
+  }
+  const { isExternal, isTrusted } = getUrlAttributes(legacyLinkUrl) ?? {};
+
+  if (isExternal) {
+    return (
+      <a
+        href={legacyLinkUrl}
+        rel={`noopener noreferrer nofollow ${!isTrusted ? 'external' : ''}`}
+        target="_blank"
+      >
+        {description} <VisuallyHidden>(opens in new tab)</VisuallyHidden>
+      </a>
+    );
+  }
+  return <a href={legacyLinkUrl}>{description}</a>;
 };
 
 export const getServerSideProps: GetServerSideProps = withAxiosHandler(
