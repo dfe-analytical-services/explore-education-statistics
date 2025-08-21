@@ -89,6 +89,8 @@ public class ContentDbContext : DbContext
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
     public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
     public virtual DbSet<EducationInNumbersPage> EducationInNumbersPages { get; set; }
+    public virtual DbSet<EinContentSection> EinContentSections { get; set; }
+    public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -137,6 +139,7 @@ public class ContentDbContext : DbContext
         ConfigureDataBlockVersion(modelBuilder);
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
+        ConfigureEinContentBlock(modelBuilder);
 
         // Apply model configuration for types which implement IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -953,6 +956,13 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.AdditionalFeedback)
             .HasMaxLength(2000);
+    }
+
+    private static void ConfigureEinContentBlock(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<EinContentBlock>()
+            .HasDiscriminator<string>("Type")
+            .HasValue<EinHtmlBlock>("HtmlBlock");
     }
 }
 
