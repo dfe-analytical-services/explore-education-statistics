@@ -8,17 +8,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -851,6 +848,16 @@ public class DataSetValidatorTests
                 .Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser))
                 .ReturnsAsync(true);
             userService = userServiceMock.Object;
+        }
+
+        if (dataSetService is null)
+        {
+            
+            var dataSetServiceMock = new Mock<IDataSetService>(MockBehavior.Strict);
+            dataSetServiceMock
+                .Setup(s => s.HasDraftVersion(It.IsAny<Guid>(), CancellationToken.None))
+                .ReturnsAsync(false);
+            dataSetService = dataSetServiceMock.Object;
         }
 
         if (featureFlags is null)
