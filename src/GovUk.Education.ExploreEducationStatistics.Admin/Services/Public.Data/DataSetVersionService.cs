@@ -147,6 +147,7 @@ public class DataSetVersionService(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
             .OnSuccessDo(CheckCanUpdatePatchVersion)
+            .OnSuccessDo(UpdateStatusToFinalizing)
             .OnSuccess(async _ => await processorClient.CompleteNextDataSetVersionImport(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
@@ -156,6 +157,13 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
+    }
+
+    private async Task UpdateStatusToFinalizing(DataSetVersion dataSetVersion)
+    {
+        dataSetVersion.Status = DataSetVersionStatus.Finalising;
+        publicDataDbContext.DataSetVersions.Update(dataSetVersion);
+        await publicDataDbContext.SaveChangesAsync();
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
