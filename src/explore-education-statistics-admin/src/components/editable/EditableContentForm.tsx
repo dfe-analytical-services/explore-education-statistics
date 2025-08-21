@@ -335,10 +335,10 @@ function InvalidImagesDetails({ errors }: { errors: JsonElement[] }) {
           Alternative text must be added for all images, for guidance see{' '}
           <a
             href="https://www.w3.org/WAI/tutorials/images/tips/"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             target="_blank"
           >
-            W3C tips on writing alternative text
+            W3C tips on writing alternative text (opens in new tab)
           </a>
           .
         </li>

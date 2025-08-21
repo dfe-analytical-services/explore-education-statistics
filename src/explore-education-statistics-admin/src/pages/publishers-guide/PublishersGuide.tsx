@@ -24,9 +24,9 @@ const PublishersGuide = () => {
         <a
           href="https://dfe-analytical-services.github.io/analysts-guide/"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow"
         >
-          Analysts' Guide (opens in a new tab)
+          Analysts' Guide (opens in new tab)
         </a>
         .
       </p>
@@ -47,9 +47,9 @@ const PublishersGuide = () => {
         <a
           href="https://teams.microsoft.com/l/team/19%3Ae3c8551e86094e259a60848fcff4dbc1%40thread.skype/conversations?groupId=679b2376-8c8c-4062-a1c9-0744ce5ac88f&amp;tenantId=fad277c9-c60a-4da1-b5f3-b3b8b34a82f9"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow"
         >
-          Statistics production and publishing teams area (opens in a new tab)
+          Statistics production and publishing teams area (opens in new tab)
         </a>
         .
       </p>
@@ -59,9 +59,9 @@ const PublishersGuide = () => {
           <a
             href="https://teams.microsoft.com/l/channel/19%3A1bdf09280fd94df09f0d42e19cb251fb%40thread.skype/Explore%20Education%20Statistics?groupId=679b2376-8c8c-4062-a1c9-0744ce5ac88f&amp;tenantId=fad277c9-c60a-4da1-b5f3-b3b8b34a82f9"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
           >
-            Explore education statistics (opens in a new tab)
+            Explore education statistics (opens in new tab)
           </a>{' '}
           - for all major updates relating to the service
         </li>
@@ -69,9 +69,9 @@ const PublishersGuide = () => {
           <a
             href="https://teams.microsoft.com/l/channel/19%3A66b7e8767c084396b7f86f7796bc54e4%40thread.skype/Top%20tips?groupId=679b2376-8c8c-4062-a1c9-0744ce5ac88f&amp;tenantId=fad277c9-c60a-4da1-b5f3-b3b8b34a82f9"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
           >
-            Top tips (opens in a new tab)
+            Top tips (opens in new tab)
           </a>{' '}
           - regular tips and reminders on features available in the service to
           help you get the best out of it

@@ -13,8 +13,13 @@ export default function PhaseBanner({ url }: Props) {
 
         <span className="govuk-phase-banner__text">
           This is a new service – your{' '}
-          <a href={url} rel="noopener noreferrer" target="_blank">
-            feedback
+          <a
+            href={url}
+            rel="noopener noreferrer nofollow"
+            target="_blank"
+            data-testid="banner-feedback-link"
+          >
+            feedback (opens in new tab)
           </a>{' '}
           will help us to improve it.
         </span>

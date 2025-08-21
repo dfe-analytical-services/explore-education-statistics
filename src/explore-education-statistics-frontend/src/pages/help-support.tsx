@@ -15,8 +15,12 @@ function HelpSupportPage() {
             <h2 className="govuk-heading-m">About the service</h2>
             <p>
               Explore education statistics has been built by{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education">
-                the Department for Education (DfE)
+              <a
+                href="https://www.gov.uk/government/organisations/department-for-education"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
+              >
+                the Department for Education (DfE) (opens in new tab)
               </a>{' '}
               to make it easier for you to find, access, navigate and understand
               the range of education-related statistics and data it provides.
@@ -24,12 +28,20 @@ function HelpSupportPage() {
             <p>
               All the statistics and data published this service are produced in
               line with the UK Statistical Authority's{' '}
-              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/">
-                Code of Practice for Official Statistics
+              <a
+                href="https://www.statisticsauthority.gov.uk/code-of-practice/"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
+              >
+                Code of Practice for Official Statistics (opens in new tab)
               </a>{' '}
               and DfE's{' '}
-              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                Standards for official statistics
+              <a
+                href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
+              >
+                Standards for official statistics (opens in new tab)
               </a>
               .
             </p>

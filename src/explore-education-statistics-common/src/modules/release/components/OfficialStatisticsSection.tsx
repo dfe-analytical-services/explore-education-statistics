@@ -10,8 +10,12 @@ export default function OfficialStatisticsSection({
       {showHeading && <h3>Official statistics</h3>}
       <p>
         These are Official Statistics and have been produced in line with the{' '}
-        <a href="https://code.statisticsauthority.gov.uk/the-code/">
-          Code of Practice for Official Statistics
+        <a
+          href="https://code.statisticsauthority.gov.uk/the-code/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Code of Practice for Official Statistics (opens in new tab)
         </a>
         .
       </p>
@@ -28,8 +32,13 @@ export default function OfficialStatisticsSection({
       <p>
         Find out more about the standards we follow to produce these statistics
         through our{' '}
-        <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-          Standards for official statistics published by DfE guidance
+        <a
+          href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Standards for official statistics published by DfE guidance (opens in
+          new tab)
         </a>
         .
       </p>
@@ -39,8 +48,12 @@ export default function OfficialStatisticsSection({
       </p>
       <p>
         OSR sets the standards of trustworthiness, quality and value in the{' '}
-        <a href="https://code.statisticsauthority.gov.uk/the-code/">
-          Code of Practice for Statistics
+        <a
+          href="https://code.statisticsauthority.gov.uk/the-code/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Code of Practice for Statistics (opens in new tab)
         </a>{' '}
         that all producers of official statistics should adhere to.
       </p>
@@ -51,7 +64,14 @@ export default function OfficialStatisticsSection({
           regulation@statistics.gov.uk
         </a>{' '}
         or via the{' '}
-        <a href="https://osr.statisticsauthority.gov.uk/">OSR website</a>.
+        <a
+          href="https://osr.statisticsauthority.gov.uk/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          OSR website (opens in new tab)
+        </a>
+        .
       </p>
     </>
   );

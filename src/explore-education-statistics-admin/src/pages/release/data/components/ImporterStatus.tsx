@@ -234,8 +234,12 @@ const ImporterStatus = ({
           )}
           <WarningMessage>
             Try running the file through the{' '}
-            <a href="https://rsconnect/rsc/dfe-published-data-qa/">
-              data screener
+            <a
+              href="https://rsconnect/rsc/dfe-published-data-qa/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
+            >
+              data screener (opens in new tab)
             </a>{' '}
             to check for potential causes of this failure before trying again.
           </WarningMessage>
