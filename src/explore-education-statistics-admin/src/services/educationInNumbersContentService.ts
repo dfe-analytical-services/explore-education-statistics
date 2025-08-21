@@ -22,30 +22,32 @@ const educationInNumbersContentService = {
   getEducationInNumbersPageContent(
     educationInNumbersPageId: string,
   ): Promise<EducationInNumbersPageContent> {
-    // return client.get(`/education-in-numbers/${educationInNumbersPageId}/content`);
-    return new Promise(resolve => {
-      resolve({
-        id: educationInNumbersPageId,
-        title: 'Key Statistics',
-        slug: 'key-statistics',
-        published: '2023-10-01T00:00:00Z',
-        content: [
-          {
-            id: 'section-1',
-            heading: 'Section 1',
-            order: 1,
-            content: [
-              {
-                id: 'block-1',
-                order: 1,
-                body: '<p>This is the first block of content in section 1.</p>',
-                type: 'HtmlBlock',
-              },
-            ],
-          },
-        ],
-      });
-    });
+    return client.get(
+      `/education-in-numbers/${educationInNumbersPageId}/content`,
+    );
+    // return new Promise(resolve => { // @MarkFix
+    //  resolve({
+    //    id: educationInNumbersPageId,
+    //    title: 'Key Statistics',
+    //    slug: 'key-statistics',
+    //    published: '2023-10-01T00:00:00Z',
+    //    content: [
+    //      {
+    //        id: 'section-1',
+    //        heading: 'Section 1',
+    //        order: 1,
+    //        content: [
+    //          {
+    //            id: 'block-1',
+    //            order: 1,
+    //            body: '<p>This is the first block of content in section 1.</p>',
+    //            type: 'HtmlBlock',
+    //          },
+    //        ],
+    //      },
+    //    ],
+    //  });
+    // });
   },
 
   addContentSection({
