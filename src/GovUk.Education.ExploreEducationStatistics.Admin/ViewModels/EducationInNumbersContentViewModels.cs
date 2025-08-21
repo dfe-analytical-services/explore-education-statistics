@@ -27,8 +27,6 @@ public class EinContentSectionViewModel
 
     public string? Caption { get; set; }
 
-    public Guid EducationInNumbersPageId { get; set; }
-
     public List<EinContentBlockViewModel> Content { get; set; } = new(); // @MarkFix rename to Blocks?
 }
 
