@@ -15,7 +15,7 @@ export interface EducationInNumbersPageContent {
   title: string;
   slug: string;
   published?: string;
-  content: ContentSection<HtmlBlock>[];
+  content: ContentSectionViewModel[];
 }
 
 const educationInNumbersContentService = {
