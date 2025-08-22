@@ -1,0 +1,56 @@
+﻿#nullable enable
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Errors;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
+
+public class RelatedInformationService(ContentDbContext contentDbContext) : IRelatedInformationService
+{
+    public async Task<Result<RelatedInformationDto[], ResourceNotFoundError>> GetRelatedInformationForRelease(
+        string publicationSlug,
+        string releaseSlug,
+        CancellationToken cancellationToken = default)
+    {
+        return await GetPublicationBySlug(publicationSlug, cancellationToken)
+            .Bind(publication =>
+                GetLatestPublishedReleaseVersionByReleaseSlug(
+                    publication,
+                    releaseSlug,
+                    cancellationToken))
+            .Map(releaseVersion => releaseVersion.RelatedInformation
+                .Select(RelatedInformationDto.From)
+                .ToArray());
+    }
+
+    private Task<Result<Publication, ResourceNotFoundError>> GetPublicationBySlug(
+        string publicationSlug,
+        CancellationToken cancellationToken = default)
+    {
+        return contentDbContext.Publications
+            .GetBySlug(publicationSlug)
+            .TryFirstAsync(cancellationToken)
+            .ToResult<Publication, ResourceNotFoundError>(
+                new PublicationNotFoundError(publicationSlug));
+    }
+
+    private Task<Result<ReleaseVersion, ResourceNotFoundError>> GetLatestPublishedReleaseVersionByReleaseSlug(
+        Publication publication,
+        string releaseSlug,
+        CancellationToken cancellationToken = default)
+    {
+        return contentDbContext.ReleaseVersions
+            .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
+            .TryFirstAsync(cancellationToken)
+            .ToResult<ReleaseVersion, ResourceNotFoundError>(
+                new ReleaseNotFoundError(publication.Slug, releaseSlug));
+    }
+}

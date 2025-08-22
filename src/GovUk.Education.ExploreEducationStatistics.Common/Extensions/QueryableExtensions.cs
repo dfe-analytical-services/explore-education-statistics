@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -67,7 +68,15 @@ public static class QueryableExtensions
     {
         return source.Skip((page - 1) * pageSize).Take(pageSize);
     }
-    
+
+    public static async Task<Maybe<T>> TryFirstAsync<T>(
+        this IQueryable<T> source,
+        CancellationToken cancellationToken = default)
+    {
+        var firstOrNull = await source.FirstOrDefaultAsync(cancellationToken);
+        return firstOrNull == null ? Maybe<T>.None : Maybe<T>.From(firstOrNull);
+    }
+
     /// <summary>
     /// Facilitate declaring an optional Where clause inline.
     /// </summary>

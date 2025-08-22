@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -175,8 +176,12 @@ public class Startup(
         services.AddTransient<IThemeService, ThemeService>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
+        services.AddTransient<IRelatedInformationService, RelatedInformationService>();
 
         services.AddAnalytics(configuration);
+
+        // TODO is this needed?
+        //services.AddProblemDetails();
 
         services.AddSingleton<DateTimeProvider>();
 
