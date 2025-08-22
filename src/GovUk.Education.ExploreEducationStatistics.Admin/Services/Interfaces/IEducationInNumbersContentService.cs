@@ -47,4 +47,9 @@ public interface IEducationInNumbersContentService
         Guid pageId,
         Guid sectionId,
         List<Guid> newBlockOrder);
+
+    Task<Either<ActionResult, List<EinContentBlockViewModel>>> DeleteBlock(
+        Guid pageId,
+        Guid sectionId,
+        Guid blockId);
 }

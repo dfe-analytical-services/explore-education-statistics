@@ -107,12 +107,13 @@ public class EducationInNumbersContentController(
 
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
-    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteBlock(
+    public async Task<ActionResult<List<EinContentBlockViewModel>>> DeleteBlock( // @MarkFix at the time of writing, the frontend expects a list of sections to be returned
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromRoute] Guid blockId)
     {
-        return new List<EinContentSectionViewModel>(); // @MarkFix
+        return await einContentService.DeleteBlock(pageId, sectionId, blockId)
+            .HandleFailuresOrOk(); // @MarkFix NoContent?
     }
 
 
