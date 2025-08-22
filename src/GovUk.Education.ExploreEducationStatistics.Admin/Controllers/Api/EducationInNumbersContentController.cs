@@ -79,14 +79,15 @@ public class EducationInNumbersContentController(
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
-    public async Task<ActionResult<EinContentBlockViewModel>> UpdateBlock(
+    [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}/html")]
+    public async Task<ActionResult<EinContentBlockViewModel>> UpdateHtmlBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromRoute] Guid blockId,
-        [FromBody] EinContentBlockUpdateRequest request)
+        [FromBody] EinHtmlBlockUpdateRequest request)
     {
-        return new EinContentBlockViewModel(); // @MarkFix
+        return await einContentService.UpdateHtmlBlock(pageId, sectionId, blockId, request)
+            .HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/blocks/order")]

@@ -26,7 +26,7 @@ public static class EducationInNumbersContentExtensions
             {
                 Id = htmlBlock.Id,
                 Order = htmlBlock.Order,
-                Type = EinBlockType.EinHtmlBlock,
+                Type = EinBlockType.HtmlBlock,
                 Body = htmlBlock.Body,
             },
             _ => throw new Exception("Ein block type not found")

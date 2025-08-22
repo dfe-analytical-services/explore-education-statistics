@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -20,8 +19,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EducationInNumbersContentService(
-    ContentDbContext contentDbContext,
-    IUserService userService) : IEducationInNumbersContentService
+    ContentDbContext contentDbContext): IEducationInNumbersContentService
 {
     public async Task<Either<ActionResult, EducationInNumbersContentViewModel>> GetPageContent(Guid pageId)
     {
@@ -167,7 +165,7 @@ public class EducationInNumbersContentService(
 
         return pageSections
             .Where(section => section.Id != sectionId)
-            .Select(section => section.ToViewModel())
+            .Select(section => section.ToViewModel()) // @MarkFix frontend expects blocks to be hydrated in section.Content?
             .ToList();
     }
 
@@ -184,7 +182,7 @@ public class EducationInNumbersContentService(
 
         EinContentBlock newBlock = type switch
         {
-            EinBlockType.EinHtmlBlock => new EinHtmlBlock
+            EinBlockType.HtmlBlock => new EinHtmlBlock
             {
                 Id = Guid.NewGuid(),
                 EinContentSectionId = sectionId,
@@ -198,5 +196,29 @@ public class EducationInNumbersContentService(
         await contentDbContext.SaveChangesAsync();
 
         return newBlock.ToViewModel();
+    }
+
+    public async Task<Either<ActionResult, EinContentBlockViewModel>> UpdateHtmlBlock(
+        Guid pageId,
+        Guid sectionId,
+        Guid blockId,
+        EinHtmlBlockUpdateRequest request)
+    {
+        var blockToUpdate = contentDbContext.EinContentBlocks
+            .OfType<EinHtmlBlock>()
+            .SingleOrDefault(block => block.Id == blockId
+                                      && block.EinContentSectionId == sectionId
+                                      && block.EinContentSection.EducationInNumbersPageId == pageId);
+
+        if (blockToUpdate == null)
+        {
+            return new NotFoundResult();
+        }
+
+        blockToUpdate.Body = request.Body;
+        contentDbContext.EinContentBlocks.Update(blockToUpdate);
+        await contentDbContext.SaveChangesAsync();
+
+        return blockToUpdate.ToViewModel();
     }
 }

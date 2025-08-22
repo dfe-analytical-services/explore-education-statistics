@@ -28,7 +28,7 @@ public abstract class EinContentBlock
 
 public enum EinBlockType
 {
-    EinHtmlBlock,
+    HtmlBlock,
 }
 
 public class EinHtmlBlock : EinContentBlock
