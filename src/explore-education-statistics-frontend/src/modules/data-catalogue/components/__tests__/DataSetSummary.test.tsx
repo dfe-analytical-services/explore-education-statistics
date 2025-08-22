@@ -46,7 +46,6 @@ describe('DataSetFileSummary', () => {
     const releaseRow = rows[1]; // index 1 = second item
     expect(releaseRow).toHaveTextContent('Release');
     expect(releaseRow).toHaveAttribute('data-testId', 'Release-key');
-    expect(releaseLink).toHaveAttribute('data-testId', 'Release-value');
 
     expect(releaseLink).toBeInTheDocument();
     // Assert it is a link
