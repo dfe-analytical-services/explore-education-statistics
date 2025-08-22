@@ -31,7 +31,7 @@ public class EducationInNumbersContentController(
         [FromRoute] Guid pageId,
         [FromBody] int order)
     {
-        return await einContentService.AddContentSection(pageId, order)
+        return await einContentService.AddSection(pageId, order)
             .HandleFailuresOrOk();
     }
 
@@ -41,7 +41,8 @@ public class EducationInNumbersContentController(
         [FromRoute] Guid sectionId,
         [FromBody] string heading)
     {
-        return new EinContentSectionViewModel(); // @MarkFix
+        return await einContentService.UpdateSectionHeading(pageId, sectionId, heading)
+            .HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/{pageId:guid}/content/sections/order")]
