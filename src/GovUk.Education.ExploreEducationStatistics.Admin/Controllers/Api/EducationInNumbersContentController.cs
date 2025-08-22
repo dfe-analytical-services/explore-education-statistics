@@ -61,11 +61,12 @@ public class EducationInNumbersContentController(
     }
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}")]
-    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteSection(
+    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteSection( // @MarkFix do we want to return a list of remaining sections here? Check the return types of other methods too
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId)
     {
-        return new List<EinContentSectionViewModel>(); // @MarkFix
+        return await einContentService.DeleteSection(pageId, sectionId)
+            .HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/blocks/add")]
