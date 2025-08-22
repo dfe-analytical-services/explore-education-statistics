@@ -66,7 +66,7 @@ public class EducationInNumbersContentController(
         [FromRoute] Guid sectionId)
     {
         return await einContentService.DeleteSection(pageId, sectionId)
-            .HandleFailuresOrOk();
+            .HandleFailuresOrOk(); // @MarkFix is NoContent for Deletes normally?
     }
 
     [HttpPost("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/blocks/add")]
@@ -75,7 +75,8 @@ public class EducationInNumbersContentController(
         [FromRoute] Guid sectionId,
         [FromBody] EinContentBlockAddRequest request)
     {
-        return new EinContentBlockViewModel(); // @MarkFix frontend wants editableContentBlock?
+        return await einContentService.AddBlock(pageId, sectionId, request.Type, request.Order)
+            .HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
