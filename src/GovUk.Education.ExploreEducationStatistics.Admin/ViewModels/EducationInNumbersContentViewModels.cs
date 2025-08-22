@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -28,11 +29,6 @@ public class EinContentSectionViewModel
     public string? Caption { get; set; }
 
     public List<EinContentBlockViewModel> Content { get; set; } = new(); // @MarkFix rename to Blocks?
-}
-
-public enum EinBlockType
-{
-    HtmlBlock,
 }
 
 public class EinContentBlockViewModel

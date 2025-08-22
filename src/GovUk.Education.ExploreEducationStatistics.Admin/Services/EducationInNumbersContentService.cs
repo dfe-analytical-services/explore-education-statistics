@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -47,8 +48,7 @@ public class EducationInNumbersContentService(
                         Heading = section.Heading,
                         Caption = section.Caption,
                         Content = section.Content
-                            .Select(block => GenerateBlockViewModel(block))
-                            .WhereNotNull()
+                            .Select(block => block.ToViewModel())
                             .OrderBy(block => block.Order)
                             .ToList()
                     };
@@ -58,18 +58,23 @@ public class EducationInNumbersContentService(
         };
     }
 
-    private EinContentBlockViewModel? GenerateBlockViewModel(EinContentBlock block)
+    public async Task<Either<ActionResult, EinContentSectionViewModel>> AddContentSection(
+        Guid pageId,
+        int order)
     {
-        return block switch
-        {
-            EinHtmlBlock htmlBlock => new EinHtmlBlockViewModel
-            {
-                Id = htmlBlock.Id,
-                Order = htmlBlock.Order,
-                Type = EinBlockType.HtmlBlock,
-                Body = htmlBlock.Body,
-            },
-            _ => throw new Exception("Ein block type not found")
-        };
+         var newSection = new EinContentSection
+         {
+             Id = Guid.NewGuid(),
+             EducationInNumbersPageId = pageId,
+             Order = order,
+             Heading = "New section", // @MarkFix yeah?
+             Caption = null, // @MarkFix yeah?
+             Content = [],
+         };
+
+         contentDbContext.EinContentSections.Add(newSection);
+         await contentDbContext.SaveChangesAsync();
+
+         return newSection.ToViewModel();
     }
 }
