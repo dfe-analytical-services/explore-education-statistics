@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.Data.SqlClient;

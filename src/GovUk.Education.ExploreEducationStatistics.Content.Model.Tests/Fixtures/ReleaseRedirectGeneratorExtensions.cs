@@ -1,5 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 

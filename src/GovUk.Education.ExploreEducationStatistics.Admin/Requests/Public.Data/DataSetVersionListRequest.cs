@@ -1,7 +1,6 @@
 #nullable enable
-using System;
-using FluentValidation;
 using System.ComponentModel;
+using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 

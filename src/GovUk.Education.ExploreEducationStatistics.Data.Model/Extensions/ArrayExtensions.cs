@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 
 public static class ArrayExtensions

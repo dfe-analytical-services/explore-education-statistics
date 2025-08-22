@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -41,7 +42,7 @@ public record ReleaseViewModel
 
     public ContentSectionViewModel? RelatedDashboardsSection { get; }
 
-    public List<Common.Model.FileInfo> DownloadFiles { get; }
+    public List<FileInfo> DownloadFiles { get; }
 
     public bool HasPreReleaseAccessList { get; }
 

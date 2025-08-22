@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using KellermanSoftware.CompareNetObjects;

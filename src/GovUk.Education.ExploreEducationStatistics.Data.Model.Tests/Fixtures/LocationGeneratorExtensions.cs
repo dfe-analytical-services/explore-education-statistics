@@ -1,5 +1,4 @@
 #nullable enable
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures.LocationHierarchyPresets;

@@ -10,6 +10,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImportStage;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
@@ -53,7 +54,7 @@ public class CopyCsvFilesFunction(
     }
 
     private async Task CopyCsvFile(
-        GovUk.Education.ExploreEducationStatistics.Content.Model.File csvFile,
+        File csvFile,
         string destinationPath,
         bool compress,
         CancellationToken cancellationToken)
@@ -64,7 +65,7 @@ public class CopyCsvFilesFunction(
             Directory.CreateDirectory(destinationDirectoryPath);
         }
 
-        if (File.Exists(destinationPath))
+        if (System.IO.File.Exists(destinationPath))
         {
             logger.LogWarning("Destination csv file '{DestinationPath}' already exists and will be overwritten.",
                 destinationPath);

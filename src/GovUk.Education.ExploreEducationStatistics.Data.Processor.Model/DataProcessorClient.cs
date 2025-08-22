@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;

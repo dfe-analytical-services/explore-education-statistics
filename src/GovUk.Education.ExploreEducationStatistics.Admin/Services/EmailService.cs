@@ -1,9 +1,6 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;

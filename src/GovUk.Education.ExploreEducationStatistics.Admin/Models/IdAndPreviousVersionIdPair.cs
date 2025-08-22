@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 public class IdAndPreviousVersionIdPair<TId> where TId : class, IComparable
@@ -22,7 +18,7 @@ public class IdAndPreviousVersionIdPair<TId> where TId : class, IComparable
 
     protected bool Equals(IdAndPreviousVersionIdPair<TId> other)
     {
-        return Id.Equals(other.Id) && Nullable.Equals(PreviousVersionId, other.PreviousVersionId);
+        return Id.Equals(other.Id) && Equals(PreviousVersionId, other.PreviousVersionId);
     }
 
     public override bool Equals(object? obj)

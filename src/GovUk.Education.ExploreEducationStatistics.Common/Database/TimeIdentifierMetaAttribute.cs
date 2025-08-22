@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Database;

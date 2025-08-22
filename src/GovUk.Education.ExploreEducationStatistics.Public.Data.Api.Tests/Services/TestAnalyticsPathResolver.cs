@@ -1,6 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 

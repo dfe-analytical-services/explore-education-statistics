@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;

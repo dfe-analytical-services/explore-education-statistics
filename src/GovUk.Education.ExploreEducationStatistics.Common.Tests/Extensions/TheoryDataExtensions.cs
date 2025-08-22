@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Xunit;
+﻿using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 

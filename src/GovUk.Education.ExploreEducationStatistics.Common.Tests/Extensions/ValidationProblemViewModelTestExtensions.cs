@@ -1,11 +1,8 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.AllowedValueValidator;
 

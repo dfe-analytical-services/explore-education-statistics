@@ -1,5 +1,4 @@
 #nullable enable
-using System.IO;
 using System.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

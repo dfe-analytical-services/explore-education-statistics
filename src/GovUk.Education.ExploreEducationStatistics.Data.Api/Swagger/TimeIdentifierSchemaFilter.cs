@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.OpenApi.Any;

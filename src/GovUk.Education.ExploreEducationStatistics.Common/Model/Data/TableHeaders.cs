@@ -1,6 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 public class TableHeaders

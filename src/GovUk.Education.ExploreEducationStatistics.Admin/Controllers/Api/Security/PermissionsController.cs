@@ -10,8 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;

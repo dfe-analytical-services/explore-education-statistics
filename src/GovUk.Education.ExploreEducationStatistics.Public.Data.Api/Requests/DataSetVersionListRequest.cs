@@ -1,5 +1,5 @@
-using FluentValidation;
 using System.ComponentModel;
+using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 

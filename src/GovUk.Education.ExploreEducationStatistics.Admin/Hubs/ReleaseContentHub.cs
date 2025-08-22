@@ -1,5 +1,4 @@
 #nullable enable
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Messages;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;

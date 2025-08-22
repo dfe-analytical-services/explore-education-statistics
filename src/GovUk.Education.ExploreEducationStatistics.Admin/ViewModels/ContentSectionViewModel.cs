@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public class ContentSectionViewModel

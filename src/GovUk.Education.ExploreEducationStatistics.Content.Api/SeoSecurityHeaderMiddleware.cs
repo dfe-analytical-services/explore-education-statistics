@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api;
 
 public class SeoSecurityHeaderMiddleware(RequestDelegate next)

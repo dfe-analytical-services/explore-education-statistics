@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;

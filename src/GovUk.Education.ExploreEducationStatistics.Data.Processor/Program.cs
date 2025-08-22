@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Threading.Tasks;
 using Azure.Storage.Queues;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -16,8 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 var host = new HostBuilder()

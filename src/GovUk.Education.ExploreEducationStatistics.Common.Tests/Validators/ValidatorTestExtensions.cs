@@ -1,4 +1,3 @@
-using System;
 using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 

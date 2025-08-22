@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Threading;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
 using Moq;

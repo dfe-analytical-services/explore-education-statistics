@@ -1,9 +1,8 @@
 #nullable enable
-using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters.SystemJson;

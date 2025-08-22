@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public static class FileNameValidators

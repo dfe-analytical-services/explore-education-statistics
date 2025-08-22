@@ -1,8 +1,7 @@
 #nullable enable
-using Semver;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Globalization;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
@@ -49,7 +48,7 @@ public static class DataSetVersionWildcardHelper
             parts = versionString
                 .Trim(' ', 'v')
                 .Split('.')
-                .Select(a => a != "*" ? (int?)int.Parse(a, System.Globalization.NumberStyles.None)
+                .Select(a => a != "*" ? (int?)int.Parse(a, NumberStyles.None)
                 : null)
                 .ToArray();
         }

@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Extensions.Logging;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 

@@ -1,8 +1,6 @@
 #nullable enable
-using System;
 using System.Collections.Concurrent;
 using System.Text;
-using System.Threading;
 using Bogus;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 

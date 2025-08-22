@@ -1,10 +1,10 @@
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
-using Microsoft.AspNetCore.Mvc;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 

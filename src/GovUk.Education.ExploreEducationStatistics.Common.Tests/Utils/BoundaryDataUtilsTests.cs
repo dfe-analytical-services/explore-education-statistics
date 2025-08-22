@@ -1,6 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;

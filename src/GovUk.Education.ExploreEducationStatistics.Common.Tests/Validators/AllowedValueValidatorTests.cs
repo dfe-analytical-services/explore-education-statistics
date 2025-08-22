@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;

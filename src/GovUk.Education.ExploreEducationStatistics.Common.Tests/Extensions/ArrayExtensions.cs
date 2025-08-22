@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.Linq;
+﻿using System.Diagnostics.Contracts;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 

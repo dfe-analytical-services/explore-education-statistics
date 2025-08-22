@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-
 #nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 

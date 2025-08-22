@@ -2,9 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 

@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;

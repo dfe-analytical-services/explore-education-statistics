@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Testcontainers.Azurite;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;

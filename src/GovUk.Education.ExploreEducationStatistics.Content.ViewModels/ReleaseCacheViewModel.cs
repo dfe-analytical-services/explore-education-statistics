@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -47,7 +48,7 @@ public record ReleaseCacheViewModel(Guid Id)
 
     public ContentSectionViewModel? RelatedDashboardsSection { get; set; }
 
-    public List<Common.Model.FileInfo> DownloadFiles { get; set; } = [];
+    public List<FileInfo> DownloadFiles { get; set; } = [];
 
     public string DataGuidance { get; set; } = string.Empty;
 

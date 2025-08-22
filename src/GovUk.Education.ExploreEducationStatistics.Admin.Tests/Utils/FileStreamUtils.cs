@@ -1,7 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 

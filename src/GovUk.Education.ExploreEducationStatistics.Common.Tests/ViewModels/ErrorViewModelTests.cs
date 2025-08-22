@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using FluentValidation.Results;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Xunit;

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;

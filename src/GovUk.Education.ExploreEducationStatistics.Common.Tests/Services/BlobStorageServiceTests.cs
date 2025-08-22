@@ -1,4 +1,7 @@
 #nullable enable
+using System.Collections.Immutable;
+using System.Net.Mime;
+using System.Text.RegularExpressions;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -11,14 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Net.Mime;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Xunit;
 using static Azure.Storage.Blobs.Models.BlobsModelFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;

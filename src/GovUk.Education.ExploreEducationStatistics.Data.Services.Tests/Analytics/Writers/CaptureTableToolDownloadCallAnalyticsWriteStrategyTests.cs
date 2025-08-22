@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;

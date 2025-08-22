@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class ComparerUtils

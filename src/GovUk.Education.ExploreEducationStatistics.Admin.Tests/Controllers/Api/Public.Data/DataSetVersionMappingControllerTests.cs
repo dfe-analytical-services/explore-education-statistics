@@ -1,9 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;

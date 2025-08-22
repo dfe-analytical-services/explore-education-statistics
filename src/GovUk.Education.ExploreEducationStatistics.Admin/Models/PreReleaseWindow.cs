@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 public class PreReleaseWindow
 {

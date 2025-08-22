@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;

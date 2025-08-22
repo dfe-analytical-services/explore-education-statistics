@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 
 public interface IProcessorService

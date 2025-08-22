@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.MigrationConstants;
 

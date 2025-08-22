@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;

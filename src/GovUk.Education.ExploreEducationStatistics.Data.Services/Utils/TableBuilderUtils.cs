@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 
 public static class TableBuilderUtils

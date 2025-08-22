@@ -1,6 +1,6 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodYearFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifierCategory;

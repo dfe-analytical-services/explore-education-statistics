@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Runtime.InteropServices;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

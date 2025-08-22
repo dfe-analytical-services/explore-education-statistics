@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Models;

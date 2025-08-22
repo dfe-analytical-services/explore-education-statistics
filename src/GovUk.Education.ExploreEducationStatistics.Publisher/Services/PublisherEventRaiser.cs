@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;

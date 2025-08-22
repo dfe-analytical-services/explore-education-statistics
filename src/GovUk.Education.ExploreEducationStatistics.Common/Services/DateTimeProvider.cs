@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class DateTimeProvider
