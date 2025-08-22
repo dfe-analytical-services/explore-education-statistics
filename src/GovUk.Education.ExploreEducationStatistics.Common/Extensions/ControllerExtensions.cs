@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

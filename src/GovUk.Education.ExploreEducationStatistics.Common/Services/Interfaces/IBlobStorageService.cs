@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;

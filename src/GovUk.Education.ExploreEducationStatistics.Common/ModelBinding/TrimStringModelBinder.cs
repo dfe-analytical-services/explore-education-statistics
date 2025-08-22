@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 

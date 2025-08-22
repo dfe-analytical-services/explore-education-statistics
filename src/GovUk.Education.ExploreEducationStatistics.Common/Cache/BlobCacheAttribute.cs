@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;

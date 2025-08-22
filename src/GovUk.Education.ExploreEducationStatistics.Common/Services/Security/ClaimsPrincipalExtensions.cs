@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
