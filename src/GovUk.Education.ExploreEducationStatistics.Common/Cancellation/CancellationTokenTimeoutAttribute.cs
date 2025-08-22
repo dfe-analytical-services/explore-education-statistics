@@ -1,4 +1,3 @@
-#nullable enable
 using AspectInjector.Broker;
 using Microsoft.Extensions.Configuration;
 

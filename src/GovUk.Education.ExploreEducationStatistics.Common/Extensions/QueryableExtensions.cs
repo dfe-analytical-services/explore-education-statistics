@@ -1,4 +1,3 @@
-#nullable enable
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;

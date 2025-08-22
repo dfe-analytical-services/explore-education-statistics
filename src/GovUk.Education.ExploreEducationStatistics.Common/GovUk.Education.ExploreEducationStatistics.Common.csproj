@@ -9,6 +9,10 @@
         <NoWarn>1591</NoWarn>
     </PropertyGroup>
 
+    <PropertyGroup>
+      <Nullable>enable</Nullable>
+    </PropertyGroup>
+
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />

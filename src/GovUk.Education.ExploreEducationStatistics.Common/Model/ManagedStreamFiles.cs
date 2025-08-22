@@ -1,4 +1,3 @@
-#nullable enable
 using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 

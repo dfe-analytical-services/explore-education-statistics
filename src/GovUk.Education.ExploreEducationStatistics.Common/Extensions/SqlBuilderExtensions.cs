@@ -1,4 +1,3 @@
-#nullable enable
 using InterpolatedSql;
 using InterpolatedSql.SqlBuilders;
 
