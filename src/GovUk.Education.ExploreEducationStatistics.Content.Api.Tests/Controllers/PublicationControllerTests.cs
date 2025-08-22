@@ -15,9 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public class PublicationControllerTests
 {
-    private const string SitemapItemLastModifiedTime = "2024-02-05T09:36:45.00Z";
-    private const string PublicationLastModifiedTime = "2024-01-03T10:14:23.00Z";
-
     [Fact]
     public async Task GetPublicationTitle()
     {
@@ -90,45 +87,6 @@ public class PublicationControllerTests
         var theme = Assert.Single(publicationTree);
 
         Assert.Single(theme.Publications);
-    }
-
-    [Fact]
-    public async Task ListSitemapItems()
-    {
-        var publicationService = new Mock<IPublicationService>(Strict);
-
-        publicationService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<PublicationSitemapItemViewModel>
-            {
-                new()
-                {
-                    Slug = "test-publication",
-                    LastModified = DateTime.Parse(PublicationLastModifiedTime),
-                    Releases =
-                    [
-                        new ReleaseSitemapItemViewModel
-                        {
-                            Slug = "test-release",
-                            LastModified = DateTime.Parse(SitemapItemLastModifiedTime)
-                        }
-                    ]
-                }
-            });
-
-        var controller = BuildPublicationController(publicationService: publicationService.Object);
-
-        var response = await controller.ListSitemapItems();
-        var sitemapItems = response.AssertOkResult();
-
-        var item = Assert.Single(sitemapItems);
-        Assert.Equal("test-publication", item.Slug);
-
-        Assert.NotNull(item);
-        Assert.NotNull(item.Releases);
-        var release = Assert.Single(item.Releases);
-        Assert.Equal("test-release", release.Slug);
-
-        VerifyAllMocks(publicationService);
     }
 
     private static PublicationController BuildPublicationController(

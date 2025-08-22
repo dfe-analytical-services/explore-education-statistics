@@ -26,9 +26,6 @@ public interface IPublicationService
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null);
 
-    Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default);
-
     Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
         Guid? themeId = null,
         CancellationToken cancellationToken = default);

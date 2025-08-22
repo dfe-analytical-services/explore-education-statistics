@@ -100,12 +100,6 @@ public class PublicationController : ControllerBase
             })
             .HandleFailuresOrOk();
     }
-
-    [HttpGet("publications/sitemap-items")]
-    public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await _publicationService.ListSitemapItems(cancellationToken)
-            .HandleFailuresOrOk();
     
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(

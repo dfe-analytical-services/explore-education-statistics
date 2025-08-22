@@ -324,35 +324,6 @@ public class PublicationService : IPublicationService
             .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
     }
 
-    public async Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await
-            _contentDbContext.Publications
-                .Include(p => p.Releases)
-                .ThenInclude(r => r.Versions)
-                .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
-                            (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
-                .Select(p => new PublicationSitemapItemViewModel
-                {
-                    Slug = p.Slug,
-                    LastModified = p.Updated,
-                    Releases = ListUniqueReleaseVersionSitemapItems(p)
-                })
-                .ToListAsync(cancellationToken);
-
-    private static List<ReleaseSitemapItemViewModel> ListUniqueReleaseVersionSitemapItems(Publication publication) =>
-        publication.Releases
-            .SelectMany(r => r.Versions)
-            .Where(rv => rv.Published != null) // r.Live cannot be translated by LINQ
-            .OrderByDescending(rv => rv.Published)
-            .GroupBy(rv => rv.Release)
-            .Select(grouping => new ReleaseSitemapItemViewModel
-            {
-                Slug = grouping.Key.Slug,
-                LastModified = grouping.First().Published
-            })
-            .ToList();
-    
     public async Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
         Guid? themeId = null,
         CancellationToken cancellationToken = default) =>
