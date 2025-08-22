@@ -128,4 +128,5 @@ public enum ValidationErrorMessages
 
     // Education in numbers
     ProvidedPageIdsDifferFromActualPageIds,
+    ProvidedSectionIdsDifferFromActualSectionIds,
 }

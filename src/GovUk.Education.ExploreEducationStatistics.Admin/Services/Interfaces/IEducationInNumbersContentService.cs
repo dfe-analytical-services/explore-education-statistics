@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,4 +20,8 @@ public interface IEducationInNumbersContentService
         Guid pageId,
         Guid sectionId,
         string heading);
+
+    Task<Either<ActionResult, List<EinContentSectionViewModel>>> ReorderSections(
+        Guid pageId,
+        List<Guid> newSectionOrder);
 }

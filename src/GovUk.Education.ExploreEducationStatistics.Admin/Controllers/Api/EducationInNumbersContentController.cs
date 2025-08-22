@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -48,9 +49,15 @@ public class EducationInNumbersContentController(
     [HttpPut("education-in-numbers/{pageId:guid}/content/sections/order")]
     public async Task<ActionResult<List<EinContentSectionViewModel>>> UpdatePageSectionOrder(
         [FromRoute] Guid pageId,
-        [FromBody] Dictionary<Guid, int> newSectionOrder)
+        [FromBody] Dictionary<Guid, int> newSectionOrder) // @MarkFix change to accept a List<Guid>?
     {
-        return new List<EinContentSectionViewModel>(); // @MarkFix
+        var newSectionOrderList = newSectionOrder
+            .OrderBy(kvp => kvp.Value)
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        return await einContentService.ReorderSections(pageId, newSectionOrderList)
+            .HandleFailuresOrOk();
     }
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}")]
