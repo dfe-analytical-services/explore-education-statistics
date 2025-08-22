@@ -3,10 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.RelatedInformation;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.RelatedInformation.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.RelatedInformation;
@@ -18,7 +16,7 @@ public abstract class RelatedInformationControllerTests
     public class GetRelatedInformationForReleaseTests : RelatedInformationControllerTests
     {
         [Fact]
-        public async Task GetRelatedInformationForRelease_ReturnsExpectedOrganisations()
+        public async Task GetRelatedInformationForRelease_ReturnsOk_WhenServiceReturnsRelatedInformation()
         {
             // Arrange
             const string publicationSlug = "test-publication";

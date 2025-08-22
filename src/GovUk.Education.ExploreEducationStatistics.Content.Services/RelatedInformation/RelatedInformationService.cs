@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +26,7 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
                     releaseSlug,
                     cancellationToken))
             .OnSuccess(releaseVersion => releaseVersion.RelatedInformation
-                .Select(RelatedInformationDto.From)
+                .Select(RelatedInformationDto.FromLink)
                 .ToArray());
     }
 
@@ -36,7 +35,7 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
         CancellationToken cancellationToken = default)
     {
         return contentDbContext.Publications
-            .GetBySlug(publicationSlug)
+            .Where(p => p.Slug == publicationSlug)
             .FirstOrNotFoundAsync(cancellationToken);
     }
 

@@ -12,7 +12,7 @@ public record RelatedInformationDto
 
     public required string Url { get; init; }
 
-    public static RelatedInformationDto From(Link link) =>
+    public static RelatedInformationDto FromLink(Link link) =>
         new()
         {
             Id = link.Id,
