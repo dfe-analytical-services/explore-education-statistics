@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -168,5 +169,34 @@ public class EducationInNumbersContentService(
             .Where(section => section.Id != sectionId)
             .Select(section => section.ToViewModel())
             .ToList();
+    }
+
+    public async Task<Either<ActionResult, EinContentBlockViewModel>> AddBlock(
+        Guid pageId,
+        Guid sectionId,
+        EinBlockType type,
+        int? order)
+    {
+        var newOrder = order ?? contentDbContext.EinContentBlocks
+            .Count(block =>
+                block.EinContentSectionId == sectionId
+                && block.EinContentSection.EducationInNumbersPageId == pageId);
+
+        EinContentBlock newBlock = type switch
+        {
+            EinBlockType.EinHtmlBlock => new EinHtmlBlock
+            {
+                Id = Guid.NewGuid(),
+                EinContentSectionId = sectionId,
+                Order = newOrder,
+                Body = "",
+            },
+            _ => throw new Exception("There is no such block type")
+        };
+
+        contentDbContext.EinContentBlocks.Add(newBlock);
+        await contentDbContext.SaveChangesAsync();
+
+        return newBlock.ToViewModel();
     }
 }
