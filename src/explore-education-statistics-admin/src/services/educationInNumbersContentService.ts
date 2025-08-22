@@ -129,6 +129,7 @@ const educationInNumbersContentService = {
     sectionId: string;
     blockId: string;
   }): Promise<ContentSectionViewModel[]> {
+    // @MarkFix returns all content sections?!
     return client.delete(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}`,
     );

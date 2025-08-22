@@ -261,4 +261,37 @@ public class EducationInNumbersContentService(
             .Select(block => block.ToViewModel())
             .ToList();
     }
+
+    public async Task<Either<ActionResult, List<EinContentBlockViewModel>>> DeleteBlock(
+        Guid pageId,
+        Guid sectionId,
+        Guid blockId)
+    {
+        var section = contentDbContext.EinContentSections
+            .Include(p => p.Content)
+            .SingleOrDefault(s => s.Id == sectionId
+                && s.EducationInNumbersPageId == pageId);
+
+        if (section == null)
+        {
+            return new NotFoundResult();
+        }
+
+        var blockList = section.Content;
+
+        var blockToDelete= blockList.SingleOrDefault(block => block.Id == blockId);
+
+        if (blockToDelete == null)
+        {
+            return new NotFoundResult();
+        }
+
+        contentDbContext.EinContentBlocks.Remove(blockToDelete);
+        await contentDbContext.SaveChangesAsync();
+
+        return blockList
+            .Where(block => block.Id != blockId)
+            .Select(block => block.ToViewModel())
+            .ToList();
+    }
 }
