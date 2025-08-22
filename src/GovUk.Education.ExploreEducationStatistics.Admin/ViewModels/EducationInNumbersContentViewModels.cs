@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class EducationInNumbersContentViewModel
+public class EinContentViewModel
 {
     public Guid Id { get; set; }
 
@@ -37,6 +39,7 @@ public class EinContentBlockViewModel
 
     public int Order { get; set; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public EinBlockType Type { get; set; }
 }
 

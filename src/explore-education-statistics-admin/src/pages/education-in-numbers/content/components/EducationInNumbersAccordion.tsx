@@ -1,14 +1,14 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import { Dictionary } from '@common/types';
 import React, { useCallback } from 'react';
-import { EducationInNumbersPageContent } from '@admin/services/educationInNumbersContentService';
+import { EinContent } from '@admin/services/educationInNumbersContentService';
 import useEducationInNumbersPageContentActions from '../context/useEducationInNumbersPageContentActions';
 import EducationInNumbersAccordionSection from './EducationInNumbersAccordionSection';
 
 export interface EducationInNumbersAccordionProps {
   id?: string;
   title: string;
-  pageContent: EducationInNumbersPageContent;
+  pageContent: EinContent;
   onSectionOpen: ({ id, title }: { id: string; title: string }) => void;
 }
 
@@ -110,7 +110,7 @@ const EducationInNumbersAccordion = ({
           id={`${id}-${section.id}`}
           educationInNumbersPageId={pageContent.id}
           educationInNumbersPageSlug={pageContent.slug}
-          section={section}
+          section={section} // @MarkFix
           onRemoveSection={handleRemoveSection}
         />
       ))}

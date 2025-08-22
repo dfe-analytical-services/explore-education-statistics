@@ -2,7 +2,7 @@ import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
-import { EducationInNumbersPageContent } from '@admin/services/educationInNumbersContentService';
+import { EinContent } from '@admin/services/educationInNumbersContentService';
 import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
 import { EducationInNumbersPageDispatchAction } from './EducationInNumbersPageContentContextActionTypes';
 
@@ -11,7 +11,7 @@ export type EducationInNumbersPageContextDispatch = (
 ) => void;
 
 export type EducationInNumbersPageContextState = {
-  pageContent: EducationInNumbersPageContent;
+  pageContent: EinContent;
   pageVersion: EducationInNumbersSummary;
 };
 

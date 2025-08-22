@@ -1,6 +1,5 @@
 import React from 'react';
 import { generatePath } from 'react-router';
-import { useHistory } from 'react-router-dom';
 import { useEducationInNumbersPageContext } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import {
   EducationInNumbersRouteParams,
@@ -15,11 +14,16 @@ import educationInNumbersService from '@admin/services/educationInNumbersService
 import ModalConfirm from '@common/components/ModalConfirm';
 import UrlContainer from '@common/components/UrlContainer';
 import { useConfig } from '@admin/contexts/ConfigContext';
+import { useHistory } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import educationInNumbersContentQueries from '@admin/queries/educationInNumbersContentQueries';
+import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries';
 
 const EducationInNumbersSignOffPage = () => {
   const { educationInNumbersPage: page, onEducationInNumbersPageChange } =
     useEducationInNumbersPageContext();
 
+  const queryClient = useQueryClient();
   const history = useHistory();
 
   const { publicAppUrl } = useConfig();
@@ -70,6 +74,14 @@ const EducationInNumbersSignOffPage = () => {
                   );
 
                 onEducationInNumbersPageChange(publishedPage);
+                queryClient.removeQueries(
+                  educationInNumbersContentQueries.get(publishedPage.id),
+                );
+                queryClient.removeQueries(
+                  educationInNumbersQueries.getEducationInNumbersPage(
+                    publishedPage.id,
+                  ),
+                );
 
                 history.push(
                   generatePath<EducationInNumbersRouteParams>(

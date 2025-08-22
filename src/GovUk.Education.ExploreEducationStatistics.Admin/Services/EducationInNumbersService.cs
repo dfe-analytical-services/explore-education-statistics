@@ -147,6 +147,9 @@ public class EducationInNumbersService(
                 };
 
                 contentDbContext.EducationInNumbersPages.Add(amendment);
+
+                // @MarkFix also need to copy sections and blocks
+
                 await contentDbContext.SaveChangesAsync();
 
                 return new Either<ActionResult, EducationInNumbersSummaryViewModel>(amendment.ToViewModel());
@@ -189,7 +192,7 @@ public class EducationInNumbersService(
                     var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages
                         .Any(p =>
                             p.Slug == newSlug
-                            && p.Id != id);
+                            && p.Id != id); // if the slug is for the page we're updating, we don't care
                     if (newSlugIsNotUnique)
                     {
                         return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
@@ -292,6 +295,9 @@ public class EducationInNumbersService(
                 }
 
                 contentDbContext.EducationInNumbersPages.Remove(page);
+
+                // NOTE: Sections and blocks are cascade deleted by the database, so no worries
+
                 await contentDbContext.SaveChangesAsync();
             });
     }

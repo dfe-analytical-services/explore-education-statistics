@@ -36,7 +36,6 @@ const EducationInNumbersEditableBlock = ({
 
   switch (block.type) {
     case 'HtmlBlock':
-    case 'MarkDownBlock':
       return (
         <EditableContentBlock
           editable={editable && !isBrowser('IE')}

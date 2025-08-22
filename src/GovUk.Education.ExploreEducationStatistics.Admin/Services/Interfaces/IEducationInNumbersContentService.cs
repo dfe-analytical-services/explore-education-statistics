@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEducationInNumbersContentService
 {
-    Task<Either<ActionResult, EducationInNumbersContentViewModel>> GetPageContent(Guid pageId);
+    Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId);
 
     Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(
         Guid pageId,
@@ -48,7 +48,7 @@ public interface IEducationInNumbersContentService
         Guid sectionId,
         List<Guid> newBlockOrder);
 
-    Task<Either<ActionResult, List<EinContentBlockViewModel>>> DeleteBlock(
+    Task<Either<ActionResult, List<EinContentBlockViewModel>>> DeleteBlock( // @MarkFix frontend expects List<EinContentSectionViewModel> returned - but maybe should change it to EinContentSectionViewModel?
         Guid pageId,
         Guid sectionId,
         Guid blockId);

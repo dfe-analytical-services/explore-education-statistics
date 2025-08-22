@@ -20,19 +20,19 @@ public class EducationInNumbersContentController(
     IEducationInNumbersContentService einContentService) : ControllerBase
 {
     [HttpGet("education-in-numbers/{pageId:guid}/content")]
-    public async Task<ActionResult<EducationInNumbersContentViewModel>> GetPageContent(
+    public async Task<ActionResult<EinContentViewModel>> GetPageContent(
         [FromRoute] Guid pageId)
     {
         return await einContentService.GetPageContent(pageId)
             .HandleFailuresOrOk();
     }
 
-    [HttpPost("education-in-numbers/{pageId:guid}/content/section/add")]
+    [HttpPost("education-in-numbers/{pageId:guid}/content/sections/add")]
     public async Task<ActionResult<EinContentSectionViewModel>> AddSection(
         [FromRoute] Guid pageId,
-        [FromBody] int order)
+        [FromBody] EinContentSectionAddRequest request)
     {
-        return await einContentService.AddSection(pageId, order)
+        return await einContentService.AddSection(pageId, request.Order)
             .HandleFailuresOrOk();
     }
 
@@ -40,9 +40,9 @@ public class EducationInNumbersContentController(
     public async Task<ActionResult<EinContentSectionViewModel>> UpdateSectionHeading(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromBody] string heading)
+        [FromBody] EinContentSectionUpdateHeadingRequest request)
     {
-        return await einContentService.UpdateSectionHeading(pageId, sectionId, heading)
+        return await einContentService.UpdateSectionHeading(pageId, sectionId, request.Heading)
             .HandleFailuresOrOk();
     }
 

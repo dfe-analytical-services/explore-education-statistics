@@ -1,16 +1,17 @@
-import { EducationInNumbersPageContent } from '@admin/services/educationInNumbersContentService';
-import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
+import { EinContent } from '@admin/services/educationInNumbersContentService';
+import { EducationInNumbersSummaryWithPrevVersion } from '@admin/services/educationInNumbersService';
 
-const testEinPageVersion: EducationInNumbersSummary = {
+const testEinPageVersion: EducationInNumbersSummaryWithPrevVersion = {
   id: 'test-ein-page',
   title: 'Test Education in Numbers Page',
   slug: 'test-ein-page',
   description: 'Test description for the Education in Numbers page',
   version: 2,
-  previousVersionId: '',
+  previousVersionId: '', // @MarkFix do we want this here? or maybe two - Summary and SummaryWithPrevVersion instead?
 };
 
-export const testEinPageContent: EducationInNumbersPageContent = {
+export const testEinPageContent: EinContent = {
+  // @MarkFix currently unused but should be used in tests
   id: 'ein-content-2',
   title: 'The content',
   slug: 'content-1',

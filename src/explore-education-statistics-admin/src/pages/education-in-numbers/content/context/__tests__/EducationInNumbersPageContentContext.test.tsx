@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { EducationInNumbersPageContent } from '@admin/services/educationInNumbersContentService';
+import { EinContent } from '@admin/services/educationInNumbersContentService';
 import testEinPageVersion from '@admin/pages/education-in-numbers/__tests__/__data__/testEducationInNumbersPageAndContent';
 import { HtmlBlock } from '@common/services/types/blocks';
 import {
@@ -8,7 +8,7 @@ import {
 } from '../EducationInNumbersPageContentContext';
 import { EducationInNumbersPageDispatchAction } from '../EducationInNumbersPageContentContextActionTypes';
 
-const basicEinPage: EducationInNumbersPageContent = {
+const basicEinPage: EinContent = {
   id: 'ein-page-0',
   title: 'Education in Numbers',
   slug: '2020-21',

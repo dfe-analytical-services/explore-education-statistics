@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -15,6 +16,10 @@ public static class EducationInNumbersContentExtensions
                 Order = section.Order,
                 Heading = section.Heading,
                 Caption = section.Caption,
+                Content = section.Content
+                    .Select(block => block.ToViewModel())
+                    .OrderBy(block => block.Order)
+                    .ToList(),
             };
     }
 

@@ -7,11 +7,11 @@ import React, { useEffect } from 'react';
 
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
-import { EducationInNumbersPageContent } from '@admin/services/educationInNumbersContentService';
+import { EinContent } from '@admin/services/educationInNumbersContentService';
 import EducationInNumbersAccordion from './EducationInNumbersAccordion';
 
 interface Props {
-  pageContent: EducationInNumbersPageContent;
+  pageContent: EinContent;
   pageVersion: EducationInNumbersSummary;
 }
 
@@ -43,7 +43,6 @@ export default function EducationInNumbersContent({
   }, 100);
 
   // has anchor link is the problems in preview - it puts position relative on.
-
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
 

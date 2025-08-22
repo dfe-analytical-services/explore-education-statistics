@@ -42,17 +42,20 @@ const EducationInNumbersContentPage = ({
 }: RouteComponentProps<EducationInNumbersRouteParams>) => {
   const { educationInNumbersPageId } = match.params;
 
-  const { data: pageVersion, isLoading: isPageVersionLoading } = useQuery(
+  const { data: pageVersion, isLoading: isPageVersionFetching } = useQuery(
     educationInNumbersQueries.getEducationInNumbersPage(
       educationInNumbersPageId,
     ),
   );
 
-  const { data: pageContent, isLoading: isPageContentLoading } = useQuery(
+  const { data: pageContent, isLoading: isPageContentFetching } = useQuery(
     educationInNumbersContentQueries.get(educationInNumbersPageId),
   );
 
-  const isLoading = isPageVersionLoading || isPageContentLoading;
+  console.log('pageVersion:', pageVersion);
+  console.log('pageContent:', pageContent);
+
+  const isLoading = isPageVersionFetching || isPageContentFetching; // @MarkFix rename
 
   return (
     <LoadingSpinner loading={isLoading}>
