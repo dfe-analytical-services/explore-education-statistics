@@ -1,53 +1,41 @@
-import {
-  ContentBlockPostModel,
-  ContentBlockPutModel,
-  EditableContentBlock,
-} from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
 import { HtmlBlock } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 
-type ContentSectionViewModel = ContentSection<HtmlBlock>;
+// NOTE: Ein content is saved in the EinContentSections and EinContentBlocks db
+// tables. But despite that several interfaces/types are shared for content
+// across Ein page, releases, and methodologies.
+type EinContentSection = ContentSection<HtmlBlock>;
 
-export interface EducationInNumbersPageContent {
+// Generic Ein block types
+export type EinBlockType = 'HtmlBlock';
+type EinContentBlock = HtmlBlock;
+
+export interface EinContentBlockAddRequest {
+  type: EinBlockType;
+  order?: number;
+}
+
+export interface EinHtmlBlockUpdateRequest {
+  body: string;
+}
+
+export interface EinContent {
   id: string;
   title: string;
   slug: string;
   published?: string;
-  content: ContentSectionViewModel[];
+  content: EinContentSection[];
 }
 
 const educationInNumbersContentService = {
   getEducationInNumbersPageContent(
     educationInNumbersPageId: string,
-  ): Promise<EducationInNumbersPageContent> {
+  ): Promise<EinContent> {
     return client.get(
       `/education-in-numbers/${educationInNumbersPageId}/content`,
     );
-    // return new Promise(resolve => { // @MarkFix
-    //  resolve({
-    //    id: educationInNumbersPageId,
-    //    title: 'Key Statistics',
-    //    slug: 'key-statistics',
-    //    published: '2023-10-01T00:00:00Z',
-    //    content: [
-    //      {
-    //        id: 'section-1',
-    //        heading: 'Section 1',
-    //        order: 1,
-    //        content: [
-    //          {
-    //            id: 'block-1',
-    //            order: 1,
-    //            body: '<p>This is the first block of content in section 1.</p>',
-    //            type: 'HtmlBlock',
-    //          },
-    //        ],
-    //      },
-    //    ],
-    //  });
-    // });
   },
 
   addContentSection({
@@ -56,7 +44,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     order: number;
-  }): Promise<ContentSectionViewModel> {
+  }): Promise<EinContentSection> {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/add`,
       {
@@ -73,7 +61,7 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     sectionId: string;
     heading: string;
-  }): Promise<ContentSectionViewModel> {
+  }): Promise<EinContentSection> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/heading`,
       { heading },
@@ -85,8 +73,8 @@ const educationInNumbersContentService = {
     order,
   }: {
     educationInNumbersPageId: string;
-    order: Dictionary<number>;
-  }): Promise<ContentSectionViewModel[]> {
+    order: Dictionary<number>; // @MarkFix
+  }): Promise<EinContentSection[]> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/order`,
       order,
@@ -99,7 +87,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-  }): Promise<ContentSectionViewModel[]> {
+  }): Promise<EinContentSection[]> {
     return client.delete(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}`,
     );
@@ -112,26 +100,11 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-    block: ContentBlockPostModel; // @MarkFix align with backend
-  }): Promise<EditableContentBlock> {
-    return client.post<EditableContentBlock>(
+    block: EinContentBlockAddRequest;
+  }): Promise<EinContentBlock> {
+    return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/blocks/add`,
       block,
-    );
-  },
-
-  deleteContentSectionBlock({
-    educationInNumbersPageId,
-    sectionId,
-    blockId,
-  }: {
-    educationInNumbersPageId: string;
-    sectionId: string;
-    blockId: string;
-  }): Promise<ContentSectionViewModel[]> {
-    // @MarkFix returns all content sections?!
-    return client.delete(
-      `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}`,
     );
   },
 
@@ -144,8 +117,8 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
-    block: ContentBlockPutModel; // @MarkFix align with backend?
-  }): Promise<EditableContentBlock> {
+    block: EinHtmlBlockUpdateRequest;
+  }): Promise<HtmlBlock> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}/html`,
       block,
@@ -159,11 +132,26 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-    order: Dictionary<number>;
-  }): Promise<EditableContentBlock[]> {
-    return client.put<EditableContentBlock[]>(
+    order: Dictionary<number>; // @MarkFix
+  }): Promise<EinContentBlock[]> {
+    return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/blocks/order`,
       order,
+    );
+  },
+
+  deleteContentSectionBlock({
+    educationInNumbersPageId,
+    sectionId,
+    blockId,
+  }: {
+    educationInNumbersPageId: string;
+    sectionId: string;
+    blockId: string;
+  }): Promise<EinContentSection[]> {
+    // @MarkFix can just return a content section?
+    return client.delete(
+      `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}`,
     );
   },
 };

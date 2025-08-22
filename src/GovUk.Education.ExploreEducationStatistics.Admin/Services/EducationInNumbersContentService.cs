@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class EducationInNumbersContentService(
     ContentDbContext contentDbContext): IEducationInNumbersContentService
 {
-    public async Task<Either<ActionResult, EducationInNumbersContentViewModel>> GetPageContent(Guid pageId)
+    public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId)
     {
         var page = await contentDbContext.EducationInNumbersPages
             .Include(page => page.Content)
@@ -34,7 +34,7 @@ public class EducationInNumbersContentService(
             return new NotFoundResult();
         }
 
-        return new EducationInNumbersContentViewModel
+        return new EinContentViewModel
         {
             Id = page.Id,
             Title = page.Title,
@@ -85,6 +85,7 @@ public class EducationInNumbersContentService(
         string heading)
     {
         var section = contentDbContext.EinContentSections
+            .Include(s => s.Content)
             .SingleOrDefault(section =>
                 section.EducationInNumbersPageId == pageId
                 && section.Id == sectionId);
@@ -107,6 +108,7 @@ public class EducationInNumbersContentService(
     {
         var page = contentDbContext.EducationInNumbersPages
             .Include(p => p.Content)
+            .ThenInclude(s => s.Content)
             .SingleOrDefault(p => p.Id == pageId);
 
         if (page == null)
@@ -136,6 +138,7 @@ public class EducationInNumbersContentService(
 
         return sectionList
             .Select(section => section.ToViewModel())
+            .OrderBy(section => section.Order)
             .ToList();
     }
 
@@ -160,12 +163,17 @@ public class EducationInNumbersContentService(
             return new NotFoundResult();
         }
 
-        contentDbContext.EinContentSections.Remove(sectionToDelete);
+        pageSections
+            .Where(section => section.Order > sectionToDelete.Order)
+            .ForEach(section => section.Order--);
+
+        pageSections.Remove(sectionToDelete);
+
         await contentDbContext.SaveChangesAsync();
 
         return pageSections
-            .Where(section => section.Id != sectionId)
             .Select(section => section.ToViewModel()) // @MarkFix frontend expects blocks to be hydrated in section.Content?
+            .OrderBy(section => section.Order)
             .ToList();
     }
 
@@ -259,6 +267,7 @@ public class EducationInNumbersContentService(
 
         return blockList
             .Select(block => block.ToViewModel())
+            .OrderBy(block => block.Order)
             .ToList();
     }
 
@@ -286,11 +295,15 @@ public class EducationInNumbersContentService(
             return new NotFoundResult();
         }
 
-        contentDbContext.EinContentBlocks.Remove(blockToDelete);
+        blockList
+            .Where(block => block.Order > blockToDelete.Order)
+            .ForEach(block => block.Order--);
+
+        blockList.Remove(blockToDelete);
+
         await contentDbContext.SaveChangesAsync();
 
         return blockList
-            .Where(block => block.Id != blockId)
             .Select(block => block.ToViewModel())
             .ToList();
     }
