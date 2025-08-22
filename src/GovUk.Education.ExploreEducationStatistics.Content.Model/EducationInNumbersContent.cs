@@ -13,7 +13,7 @@ public class EinContentSection
     public string Heading { get; set; } = string.Empty;
     [MaxLength(2048)] // @MarkFix check this
     public string? Caption { get; set; } // @MarkFix is this being used?
-    public Guid EducationInNumbersPageId { get; set; }
+    public Guid EducationInNumbersPageId { get; set; } // @MarkFix rename PageId (and below to just Page)?
     public EducationInNumbersPage EducationInNumbersPage { get; set; } = null!;
     public List<EinContentBlock> Content { get; set; } = [];
 }

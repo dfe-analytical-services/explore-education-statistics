@@ -19,12 +19,12 @@ public class EducationInNumbersContentService(
     ContentDbContext contentDbContext,
     IUserService userService) : IEducationInNumbersContentService
 {
-    public async Task<Either<ActionResult, EducationInNumbersContentViewModel>> GetPageContent(Guid id)
+    public async Task<Either<ActionResult, EducationInNumbersContentViewModel>> GetPageContent(Guid pageId)
     {
         var page = await contentDbContext.EducationInNumbersPages
             .Include(page => page.Content)
             .ThenInclude(section => section.Content)
-            .Where(page => page.Id == id)
+            .Where(page => page.Id == pageId)
             .SingleOrDefaultAsync();
 
         if (page == null)
@@ -58,8 +58,7 @@ public class EducationInNumbersContentService(
         };
     }
 
-    public async Task<Either<ActionResult, EinContentSectionViewModel>> AddContentSection(
-        Guid pageId,
+    public async Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(Guid pageId,
         int order)
     {
          var newSection = new EinContentSection
@@ -76,5 +75,27 @@ public class EducationInNumbersContentService(
          await contentDbContext.SaveChangesAsync();
 
          return newSection.ToViewModel();
+    }
+
+    public async Task<Either<ActionResult, EinContentSectionViewModel>> UpdateSectionHeading(
+        Guid pageId,
+        Guid sectionId,
+        string heading)
+    {
+        var section = contentDbContext.EinContentSections
+            .SingleOrDefault(section =>
+                section.EducationInNumbersPageId == pageId
+                && section.Id == sectionId);
+
+        if (section == null)
+        {
+            return new NotFoundResult();
+        }
+
+        section.Heading = heading;
+        contentDbContext.EinContentSections.Update(section);
+        await contentDbContext.SaveChangesAsync();
+
+        return section.ToViewModel();
     }
 }
