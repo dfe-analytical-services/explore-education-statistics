@@ -10,4 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 public interface IEducationInNumbersContentService
 {
     Task<Either<ActionResult, EducationInNumbersContentViewModel>> GetPageContent(Guid id);
+
+    Task<Either<ActionResult, EinContentSectionViewModel>> AddContentSection(
+        Guid pageId,
+        int order);
 }
