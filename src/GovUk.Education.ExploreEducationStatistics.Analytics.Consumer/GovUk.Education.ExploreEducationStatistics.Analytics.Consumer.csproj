@@ -3,7 +3,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>V4</AzureFunctionsVersion>
     <OutputType>Exe</OutputType>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Analytics.Consumer</RootNamespace>
   </PropertyGroup>
