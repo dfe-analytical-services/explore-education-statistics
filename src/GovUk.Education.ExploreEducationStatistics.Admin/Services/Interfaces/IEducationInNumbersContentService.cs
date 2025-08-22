@@ -36,4 +36,10 @@ public interface IEducationInNumbersContentService
         Guid sectionId,
         EinBlockType type,
         int? order);
+
+    Task<Either<ActionResult, EinContentBlockViewModel>> UpdateHtmlBlock(
+        Guid pageId,
+        Guid sectionId,
+        Guid blockId,
+        EinHtmlBlockUpdateRequest request);
 }

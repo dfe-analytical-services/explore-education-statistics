@@ -43,7 +43,7 @@ export default function useEducationInNumbersPageContentActions() {
     bodyContent: string;
   }) {
     const updateBlock =
-      await educationInNumbersContentService.updateContentSectionBlock({
+      await educationInNumbersContentService.updateContentSectionHtmlBlock({
         educationInNumbersPageId,
         sectionId,
         blockId,

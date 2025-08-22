@@ -10,9 +10,7 @@ public record EinContentBlockAddRequest
     public int? Order { get; set; }
 }
 
-public record EinContentBlockUpdateRequest
+public record EinHtmlBlockUpdateRequest
 {
-    public string? Heading { get; set; }
-
     public string Body { get; set; } = string.Empty;
 }

@@ -112,7 +112,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-    block: ContentBlockPostModel;
+    block: ContentBlockPostModel; // @MarkFix align with backend
   }): Promise<EditableContentBlock> {
     return client.post<EditableContentBlock>(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/blocks/add`,
@@ -134,7 +134,7 @@ const educationInNumbersContentService = {
     );
   },
 
-  updateContentSectionBlock({
+  updateContentSectionHtmlBlock({
     educationInNumbersPageId,
     sectionId,
     blockId,
@@ -143,10 +143,10 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
-    block: ContentBlockPutModel;
+    block: ContentBlockPutModel; // @MarkFix align with backend?
   }): Promise<EditableContentBlock> {
     return client.put(
-      `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}`,
+      `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}/html`,
       block,
     );
   },
