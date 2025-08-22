@@ -1,13 +1,16 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -97,5 +100,43 @@ public class EducationInNumbersContentService(
         await contentDbContext.SaveChangesAsync();
 
         return section.ToViewModel();
+    }
+
+    public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> ReorderSections(
+        Guid pageId,
+        List<Guid> newSectionOrder)
+    {
+        var page = contentDbContext.EducationInNumbersPages
+            .Include(p => p.Content)
+            .SingleOrDefault(p => p.Id == pageId);
+
+        if (page == null)
+        {
+            return new NotFoundResult();
+        }
+
+        var sectionList = page.Content;
+
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                sectionList.Select(section => section.Id), newSectionOrder))
+        {
+            return ValidationUtils.ValidationActionResult(ValidationErrorMessages
+                .ProvidedSectionIdsDifferFromActualSectionIds);
+        }
+
+        newSectionOrder.ForEach((sectionId, order) =>
+        {
+            var matchingSection = sectionList.Single(section => section.Id == sectionId);
+            matchingSection.Order = order;
+        });
+
+        // @MarkFix update Page.Updated/UpdatedBy? - I don't think we should bother
+
+        contentDbContext.EinContentSections.UpdateRange(sectionList);
+        await contentDbContext.SaveChangesAsync();
+
+        return sectionList
+            .Select(section => section.ToViewModel())
+            .ToList();
     }
 }
