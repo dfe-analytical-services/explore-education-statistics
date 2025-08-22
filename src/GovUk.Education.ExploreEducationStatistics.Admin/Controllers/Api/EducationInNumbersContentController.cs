@@ -94,14 +94,20 @@ public class EducationInNumbersContentController(
     public async Task<ActionResult<List<EinContentBlockViewModel>>> UpdateSectionBlocksOrder(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromBody] Dictionary<Guid, int> newSectionOrder)
+        [FromBody] Dictionary<Guid, int> newBlockOrder) // @MarkFix frontend provide List<Guid> instead?
     {
-        return new List<EinContentBlockViewModel>(); // @MarkFix
+        var newBlockOrderList = newBlockOrder
+            .OrderBy(kvp => kvp.Value)
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        return await einContentService.ReorderBlocks(pageId, sectionId, newBlockOrderList)
+            .HandleFailuresOrOk();
     }
 
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
-    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteSection(
+    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromRoute] Guid blockId)

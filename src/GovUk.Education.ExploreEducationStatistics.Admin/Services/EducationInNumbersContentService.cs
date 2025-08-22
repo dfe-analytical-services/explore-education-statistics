@@ -221,4 +221,44 @@ public class EducationInNumbersContentService(
 
         return blockToUpdate.ToViewModel();
     }
+
+    public async Task<Either<ActionResult, List<EinContentBlockViewModel>>> ReorderBlocks(
+        Guid pageId,
+        Guid sectionId,
+        List<Guid> newBlockOrder)
+    {
+        var section = contentDbContext.EinContentSections
+            .Include(p => p.Content)
+            .SingleOrDefault(s => s.Id == sectionId
+                && s.EducationInNumbersPageId == pageId);
+
+        if (section == null)
+        {
+            return new NotFoundResult();
+        }
+
+        var blockList = section.Content;
+
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                blockList.Select(block => block.Id), newBlockOrder))
+        {
+            return ValidationUtils.ValidationActionResult(ValidationErrorMessages
+                .ProvidedBlockIdsDifferFromActualBlockIds);
+        }
+
+        newBlockOrder.ForEach((blockId, order) =>
+        {
+            var matchingBlock = blockList.Single(block => block.Id == blockId);
+            matchingBlock.Order = order;
+        });
+
+        // @MarkFix update Page.Updated/UpdatedBy? - I don't think we should bother
+
+        contentDbContext.EinContentBlocks.UpdateRange(blockList);
+        await contentDbContext.SaveChangesAsync();
+
+        return blockList
+            .Select(block => block.ToViewModel())
+            .ToList();
+    }
 }
