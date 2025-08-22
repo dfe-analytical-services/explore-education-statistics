@@ -139,4 +139,34 @@ public class EducationInNumbersContentService(
             .Select(section => section.ToViewModel())
             .ToList();
     }
+
+    public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> DeleteSection(
+        Guid pageId, Guid sectionId)
+    {
+        var page = contentDbContext.EducationInNumbersPages
+            .Include(p => p.Content)
+            .SingleOrDefault(p => p.Id == pageId);
+
+        if (page == null)
+        {
+            return new NotFoundResult();
+        }
+
+        var pageSections = page.Content;
+
+        var sectionToDelete= pageSections.SingleOrDefault(section => section.Id == sectionId);
+
+        if (sectionToDelete == null)
+        {
+            return new NotFoundResult();
+        }
+
+        contentDbContext.EinContentSections.Remove(sectionToDelete);
+        await contentDbContext.SaveChangesAsync();
+
+        return pageSections
+            .Where(section => section.Id != sectionId)
+            .Select(section => section.ToViewModel())
+            .ToList();
+    }
 }

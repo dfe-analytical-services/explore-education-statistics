@@ -24,4 +24,8 @@ public interface IEducationInNumbersContentService
     Task<Either<ActionResult, List<EinContentSectionViewModel>>> ReorderSections(
         Guid pageId,
         List<Guid> newSectionOrder);
+
+    Task<Either<ActionResult, List<EinContentSectionViewModel>>> DeleteSection(
+        Guid pageId,
+        Guid sectionId);
 }
