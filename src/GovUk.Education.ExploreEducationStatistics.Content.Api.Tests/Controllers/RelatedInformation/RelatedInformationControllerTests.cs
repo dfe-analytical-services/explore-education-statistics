@@ -47,6 +47,9 @@ public abstract class RelatedInformationControllerTests
                 CancellationToken.None);
 
             // Assert
+            _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
+                publicationSlug: publicationSlug,
+                releaseSlug: releaseSlug);
             result.AssertOkResult(relatedInformation);
         }
     }
