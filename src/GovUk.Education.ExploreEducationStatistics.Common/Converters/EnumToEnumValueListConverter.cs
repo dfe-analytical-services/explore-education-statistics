@@ -1,4 +1,3 @@
-#nullable enable
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;

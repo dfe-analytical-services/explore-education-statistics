@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 
