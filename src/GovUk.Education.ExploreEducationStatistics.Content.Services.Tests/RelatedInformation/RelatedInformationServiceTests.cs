@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInforma
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.RelatedInformation;
 
 public abstract class RelatedInformationServiceTests
 {
