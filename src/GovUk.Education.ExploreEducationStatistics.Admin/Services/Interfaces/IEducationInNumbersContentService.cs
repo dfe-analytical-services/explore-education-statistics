@@ -42,4 +42,9 @@ public interface IEducationInNumbersContentService
         Guid sectionId,
         Guid blockId,
         EinHtmlBlockUpdateRequest request);
+
+    Task<Either<ActionResult, List<EinContentBlockViewModel>>> ReorderBlocks(
+        Guid pageId,
+        Guid sectionId,
+        List<Guid> newBlockOrder);
 }
