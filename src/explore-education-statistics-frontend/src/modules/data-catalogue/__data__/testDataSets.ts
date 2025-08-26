@@ -160,7 +160,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-2',
       title: 'Publication 2',
-      slug: 'publication-slug',
+      slug: 'publication-2-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
