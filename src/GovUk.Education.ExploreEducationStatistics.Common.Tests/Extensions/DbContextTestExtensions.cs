@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;

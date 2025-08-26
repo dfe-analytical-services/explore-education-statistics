@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

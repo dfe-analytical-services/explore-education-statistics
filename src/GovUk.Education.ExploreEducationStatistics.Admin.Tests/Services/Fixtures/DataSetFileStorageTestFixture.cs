@@ -1,11 +1,4 @@
 ﻿#nullable enable
-using static Moq.MockBehavior;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -23,6 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Semver;
+using static Moq.MockBehavior;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;

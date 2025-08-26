@@ -7,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 

@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 public record FilterHierarchyOptions

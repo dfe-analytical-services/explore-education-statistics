@@ -1,7 +1,6 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 

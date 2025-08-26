@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 public class FilterItem : IEquatable<FilterItem>

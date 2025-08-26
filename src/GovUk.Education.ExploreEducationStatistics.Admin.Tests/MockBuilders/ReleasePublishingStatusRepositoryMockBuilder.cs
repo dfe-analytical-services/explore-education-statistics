@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 

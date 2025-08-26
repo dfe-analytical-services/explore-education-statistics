@@ -1,5 +1,3 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class DateTimeOffsetExtensions

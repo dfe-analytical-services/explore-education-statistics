@@ -1,5 +1,3 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class User

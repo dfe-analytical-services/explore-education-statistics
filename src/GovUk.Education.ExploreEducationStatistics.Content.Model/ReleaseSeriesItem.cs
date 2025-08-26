@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;

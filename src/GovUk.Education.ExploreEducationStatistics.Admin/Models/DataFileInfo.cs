@@ -1,11 +1,11 @@
 #nullable enable
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Newtonsoft.Json;
-using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 

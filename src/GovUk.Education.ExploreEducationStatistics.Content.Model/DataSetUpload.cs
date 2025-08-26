@@ -1,9 +1,8 @@
 #nullable enable
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using System;
-using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 

@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;

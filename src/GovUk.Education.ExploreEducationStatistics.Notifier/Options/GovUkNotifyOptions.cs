@@ -1,3 +1,5 @@
+using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Validators;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Options;
@@ -46,9 +48,9 @@ public class GovUkNotifyOptions
         /// <exception cref="System.ArgumentException"></exception>
         public string SelectDataSetPublishedTemplateId(string version)
         {
-            if (!Common.Utils.DataSetVersionNumber.TryParse(version, out var dataSetVersionNumber))
+            if (!DataSetVersionNumber.TryParse(version, out var dataSetVersionNumber))
             {
-                throw new System.ArgumentException(ValidationMessages.InvalidDataSetVersion.Message);
+                throw new ArgumentException(ValidationMessages.InvalidDataSetVersion.Message);
             }
             var isNewMajorVersion = dataSetVersionNumber!.Major >= 2
                 && dataSetVersionNumber.Patch == 0

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;

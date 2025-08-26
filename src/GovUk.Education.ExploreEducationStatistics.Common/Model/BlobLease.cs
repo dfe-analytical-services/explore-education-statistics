@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Azure.Storage.Blobs.Specialized;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;

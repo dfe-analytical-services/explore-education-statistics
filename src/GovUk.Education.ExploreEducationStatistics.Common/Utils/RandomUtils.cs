@@ -1,5 +1,3 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class RandomUtils

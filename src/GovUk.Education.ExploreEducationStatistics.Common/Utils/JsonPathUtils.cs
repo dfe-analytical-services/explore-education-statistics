@@ -1,7 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class JsonPathUtils

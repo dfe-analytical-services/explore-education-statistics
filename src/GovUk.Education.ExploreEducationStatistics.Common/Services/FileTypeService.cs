@@ -1,15 +1,11 @@
 #nullable enable
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using MimeDetective.Extensions;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FileType = MimeDetective.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;

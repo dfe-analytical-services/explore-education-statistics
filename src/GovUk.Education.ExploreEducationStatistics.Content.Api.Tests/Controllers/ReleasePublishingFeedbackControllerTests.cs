@@ -1,7 +1,5 @@
 #nullable enable
-using System;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;

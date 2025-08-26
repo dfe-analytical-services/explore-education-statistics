@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using Microsoft.AspNetCore.Mvc;

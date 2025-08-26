@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;

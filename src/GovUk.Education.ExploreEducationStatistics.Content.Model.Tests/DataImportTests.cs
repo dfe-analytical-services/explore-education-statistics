@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 

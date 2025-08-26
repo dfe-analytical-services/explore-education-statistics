@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;

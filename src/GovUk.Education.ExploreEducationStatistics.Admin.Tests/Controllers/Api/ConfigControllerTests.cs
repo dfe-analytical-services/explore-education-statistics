@@ -1,5 +1,4 @@
-﻿using System.IO;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;

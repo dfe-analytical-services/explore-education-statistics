@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;

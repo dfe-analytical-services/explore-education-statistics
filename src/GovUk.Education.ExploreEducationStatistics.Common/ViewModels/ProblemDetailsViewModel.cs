@@ -1,10 +1,9 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
@@ -20,7 +19,7 @@ public record ProblemDetailsViewModel
     /// </summary>
     /// <example>https://tools.ietf.org/html/rfc9110#section-15.5.1</example>
     [JsonPropertyOrder(-5)]
-    [Newtonsoft.Json.JsonProperty(Order = -5)]
+    [JsonProperty(Order = -5)]
     [Required]
     public string? Type { get; set; }
 
@@ -29,7 +28,7 @@ public record ProblemDetailsViewModel
     /// </summary>
     /// <example>One or more validation errors occurred.</example>
     [JsonPropertyOrder(-4)]
-    [Newtonsoft.Json.JsonProperty(Order = -4)]
+    [JsonProperty(Order = -4)]
     [Required]
     public string? Title { get; set; }
 
@@ -38,7 +37,7 @@ public record ProblemDetailsViewModel
     /// </summary>
     /// <example>400</example>
     [JsonPropertyOrder(-3)]
-    [Newtonsoft.Json.JsonProperty(Order = -3)]
+    [JsonProperty(Order = -3)]
     [Required]
     public virtual int Status { get; set; } = StatusCodes.Status500InternalServerError;
 
@@ -47,7 +46,7 @@ public record ProblemDetailsViewModel
     /// </summary>
     /// <example>More detail about the problem.</example>
     [JsonPropertyOrder(-2)]
-    [Newtonsoft.Json.JsonProperty(Order = -2)]
+    [JsonProperty(Order = -2)]
     public string? Detail { get; set; }
 
     /// <summary>
@@ -56,10 +55,10 @@ public record ProblemDetailsViewModel
     /// </summary>
     /// <example>https://example.com</example>
     [JsonPropertyOrder(-1)]
-    [Newtonsoft.Json.JsonProperty(Order = -1)]
+    [JsonProperty(Order = -1)]
     public string? Instance { get; set; }
 
-    [JsonExtensionData]
+    [System.Text.Json.Serialization.JsonExtensionData]
     [Newtonsoft.Json.JsonExtensionData]
     public IDictionary<string, object?> Extensions { get; set; }
         = new Dictionary<string, object?>(StringComparer.Ordinal);

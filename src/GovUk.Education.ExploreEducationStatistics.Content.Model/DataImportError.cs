@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataImportError
 {

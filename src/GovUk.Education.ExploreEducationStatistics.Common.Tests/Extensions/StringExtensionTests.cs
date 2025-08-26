@@ -1,6 +1,6 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;

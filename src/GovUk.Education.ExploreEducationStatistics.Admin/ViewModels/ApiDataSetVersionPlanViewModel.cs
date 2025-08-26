@@ -1,7 +1,6 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

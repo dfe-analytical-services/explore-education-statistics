@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 

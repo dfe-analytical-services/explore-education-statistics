@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

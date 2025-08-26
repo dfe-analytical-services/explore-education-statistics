@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;

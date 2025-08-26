@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 

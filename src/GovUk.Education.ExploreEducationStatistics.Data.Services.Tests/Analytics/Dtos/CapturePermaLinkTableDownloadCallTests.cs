@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
+﻿using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 using Snapshooter.Xunit;
 using Xunit;

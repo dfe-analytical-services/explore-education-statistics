@@ -6,9 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -64,12 +62,12 @@ public class AuthorizationHandlerServiceTests
     }
 
     private static AuthorizationHandlerService CreateService(
-        Content.Model.Repository.Interfaces.IReleaseVersionRepository? releaseVersionRepository = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IPreReleaseService? preReleaseService = null)
     {
-        var releaseVersionRepositoryMock = new Mock<Content.Model.Repository.Interfaces.IReleaseVersionRepository>();
+        var releaseVersionRepositoryMock = new Mock<IReleaseVersionRepository>();
         releaseVersionRepositoryMock
             .Setup(rvr => rvr.IsLatestPublishedReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);

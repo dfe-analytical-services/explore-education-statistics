@@ -1,4 +1,5 @@
-using AngleSharp.Dom;
+using System.Linq.Expressions;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,11 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 using Semver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -165,8 +162,8 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<DataSetUpload>()
             .Property(upload => upload.ScreenerResult)
             .HasConversion(
-                r => System.Text.Json.JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
-                r => System.Text.Json.JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
+                r => JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                r => JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
 
         modelBuilder.Entity<DataSetUpload>()
             .Property(m => m.Created)

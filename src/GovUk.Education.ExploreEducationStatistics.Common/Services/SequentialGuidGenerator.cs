@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 

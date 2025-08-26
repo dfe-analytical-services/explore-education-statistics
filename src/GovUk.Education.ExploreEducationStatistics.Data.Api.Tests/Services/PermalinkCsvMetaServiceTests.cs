@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -30,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
 
@@ -415,7 +411,7 @@ public class PermalinkCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = releaseSubject.ReleaseVersion.Id,
             },
@@ -590,7 +586,7 @@ public class PermalinkCsvMetaServiceTests
                 .WithIndicatorGroups(indicatorGroups)
         };
 
-        var releaseVersion = new Content.Model.ReleaseVersion
+        var releaseVersion = new ReleaseVersion
         {
             Id = releaseSubject.ReleaseVersion.Id
         };
@@ -619,7 +615,7 @@ public class PermalinkCsvMetaServiceTests
         // Create a data file for the subject but for a different release
         var releaseDataFileOtherRelease = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             },
@@ -873,7 +869,7 @@ public class PermalinkCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = releaseSubject.ReleaseVersion.Id,
             },

@@ -1,9 +1,8 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using System;
 using System.ComponentModel.DataAnnotations;
-using static System.String;
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using static System.String;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 

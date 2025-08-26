@@ -1,4 +1,10 @@
 #nullable enable
+using System.IO.Compression;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Net.Mime;
+using System.Reflection;
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -20,18 +26,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Net.Mime;
-using System.Reflection;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -1500,7 +1494,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                 multipartContent.Add(fileContent, "ZipFile", fileName);
             }
@@ -1530,7 +1524,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                 multipartContent.Add(fileContent, "ZipFile", fileName);
             }

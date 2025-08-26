@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 
 public class InvalidGeographicLevelException : Exception

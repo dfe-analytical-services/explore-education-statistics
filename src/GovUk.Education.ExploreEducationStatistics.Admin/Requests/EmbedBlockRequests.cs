@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;

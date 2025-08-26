@@ -1,4 +1,3 @@
-using System;
 using System.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;

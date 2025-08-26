@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.The
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
+using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
@@ -75,7 +76,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             var dataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
 
             Directory.CreateDirectory(dataSetVersionDirectory);
-            await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, "version1.txt")).DisposeAsync();
+            await File.Create(Path.Combine(dataSetVersionDirectory, "version1.txt")).DisposeAsync();
 
             await DeleteDataSetVersion(dataSetVersion.Id);
 
@@ -191,11 +192,11 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             Directory.CreateDirectory(liveDataSetVersionDirectory);
             Directory.CreateDirectory(draftDataSetVersionDirectory);
 
-            await System.IO.File.WriteAllTextAsync(
+            await File.WriteAllTextAsync(
                 Path.Combine(liveDataSetVersionDirectory, "version1.txt"),
                 "dummy file text"
             );
-            await System.IO.File.WriteAllTextAsync(
+            await File.WriteAllTextAsync(
                 Path.Combine(draftDataSetVersionDirectory, "version2.txt"),
                 "dummy file text"
             );

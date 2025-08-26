@@ -1,5 +1,3 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 [AttributeUsage(AttributeTargets.Field)]
