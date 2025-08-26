@@ -78,7 +78,7 @@ public class EducationInNumbersService(
 
         var slug = NamingUtils.SlugFromTitle(request.Title);
         var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages
-            .Any(page => page.Slug == slug );
+            .Any(page => page.Slug == slug);
         if (pageWithSlugAlreadyExists)
         {
             return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
@@ -187,7 +187,9 @@ public class EducationInNumbersService(
 
                     newSlug = NamingUtils.SlugFromTitle(request.Title);
                     var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages
-                        .Any(p => p.Slug == newSlug);
+                        .Any(p =>
+                            p.Slug == newSlug
+                            && p.Id != id);
                     if (newSlugIsNotUnique)
                     {
                         return new Either<ActionResult, EducationInNumbersSummaryViewModel>(

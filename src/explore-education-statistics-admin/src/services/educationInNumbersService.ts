@@ -48,7 +48,7 @@ const educationInNumbersService = {
   publishEducationInNumbersPage(
     id: string,
   ): Promise<EducationInNumbersSummary> {
-    return client.patch(`education-in-numbers/${id}/publish`);
+    return client.patch(`/education-in-numbers/${id}/publish`);
   },
   createEducationInNumbersPageAmendment(
     id: string,
@@ -56,7 +56,7 @@ const educationInNumbersService = {
     return client.post(`/education-in-numbers/${id}/amendment`);
   },
   deleteEducationInNumbersPage(id: string): Promise<void> {
-    return client.delete(`education-in-numbers/${id}`);
+    return client.delete(`/education-in-numbers/${id}`);
   },
 };
 
