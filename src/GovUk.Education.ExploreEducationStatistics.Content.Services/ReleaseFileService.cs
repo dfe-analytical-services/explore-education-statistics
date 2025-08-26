@@ -1,4 +1,3 @@
-#nullable enable
 using System.IO.Compression;
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
