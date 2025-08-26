@@ -18,6 +18,7 @@ type Props = {
   description?: string;
   breadcrumbLabel?: string;
   pageMeta?: PageMetaProps;
+  pageTitleComponent?: ReactNode;
   className?: string;
   children?: ReactNode;
   customBannerContent?: ReactNode;
@@ -33,6 +34,7 @@ const Page = ({
   description,
   breadcrumbLabel = '',
   pageMeta,
+  pageTitleComponent = null,
   className,
   children = null,
   customBannerContent = null,
@@ -75,7 +77,7 @@ const Page = ({
           id="main-content"
           role="main"
         >
-          <PageTitle title={title} caption={caption} />
+          {pageTitleComponent || <PageTitle title={title} caption={caption} />}
           {children}
         </main>
       </div>
