@@ -1,4 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -49,6 +54,7 @@ public class ReleaseVersionService(
     IReleaseFileRepository releaseFileRepository,
     IReleaseDataFileService releaseDataFileService,
     IReleaseFileService releaseFileService,
+    IDataSetUploadRepository dataSetUploadRepository,
     IDataImportService dataImportService,
     IFootnoteRepository footnoteRepository,
     IDataBlockService dataBlockService,
@@ -188,6 +194,9 @@ public class ReleaseVersionService(
             .OnSuccessDo(() => releaseFileService.DeleteAll(
                 releaseVersionId: releaseVersion.Id,
                 forceDelete: forceDeleteRelatedData))
+            .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(
+                releaseVersion.Id,
+                cancellationToken))
             .OnSuccessDo(async _ =>
             {
                 if (hardDeleteContentReleaseVersion)
