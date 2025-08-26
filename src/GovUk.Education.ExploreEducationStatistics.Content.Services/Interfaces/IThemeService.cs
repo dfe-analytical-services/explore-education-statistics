@@ -1,4 +1,3 @@
-#nullable enable
 
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
