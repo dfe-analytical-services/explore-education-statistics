@@ -131,14 +131,23 @@ Validate Related information section and links exist
 Validate data sets list
     user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    10
 
-    ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
+    # Confirm the second item in the <dl> has data-testid="Release"
+    ${rows}=    Get WebElements
+    ...    xpath=.//li[@data-testid="data-set-file-summary-UI test subject 3"]//dl[contains(@id, '-details')]//div[@data-testid][starts-with(@class, 'govuk-summary-list__row')]
+    Should Be Equal As Strings    ${rows[1].get_attribute('data-testid')}    Release
 
+    ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3}
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3} data guidance content
     user checks element contains    ${dataSet}    UI test theme
     user checks element contains    ${dataSet}    This is the latest data
     user checks element contains    ${dataSet}    ${PUBLICATION_NAME}
-    user checks element contains    ${dataSet}    ${RELEASE_NAME}
+
+    ${publication_url}=    Replace String    ${PUBLICATION_NAME.lower()}    ${SPACE}    -
+    user checks page contains link with text and url
+    ...    ${RELEASE_NAME} 2021/22
+    ...    /find-statistics/${publication_url}/2021-22-q1
+    ...    ${dataSet}
 
     user clicks button    Show more details    ${dataSet}
     user clicks button containing text    Download data set    ${dataSet}
