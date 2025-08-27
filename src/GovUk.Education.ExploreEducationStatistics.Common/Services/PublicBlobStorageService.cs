@@ -7,5 +7,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 public class PublicBlobStorageService(
     string connectionString,
     ILogger<IBlobStorageService> logger,
-    DateTimeProvider dateTimeProvider)
-    : BlobStorageService(connectionString, logger, dateTimeProvider), IPublicBlobStorageService;
+    IBlobSasService sasService)
+    : BlobStorageService(connectionString, logger, sasService), IPublicBlobStorageService;

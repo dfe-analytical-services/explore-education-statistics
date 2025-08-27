@@ -179,7 +179,7 @@ public class ReleaseFileService : IReleaseFileService
             .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccess(file => _privateBlobStorageService
                 .GetBlobDownloadToken(
-                    containerName: PrivateReleaseFiles,
+                    container: PrivateReleaseFiles,
                     filename: file.Filename,
                     path: file.Path(),
                     cancellationToken: cancellationToken));

@@ -136,11 +136,12 @@ public class Startup
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
+        services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
             new PublicBlobStorageService(
                 connectionString: Configuration.GetValue<string>("PublicStorage")!,
                 logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                dateTimeProvider: new DateTimeProvider()));
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()

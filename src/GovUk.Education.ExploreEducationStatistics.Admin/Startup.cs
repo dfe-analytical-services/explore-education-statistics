@@ -625,14 +625,15 @@ public class Startup(
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
+        services.AddTransient<IBlobSasService, BlobSasService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
             new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
                 provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                dateTimeProvider: new DateTimeProvider()));
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
             new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
                 provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                dateTimeProvider: new DateTimeProvider()));
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
             new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
         services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();

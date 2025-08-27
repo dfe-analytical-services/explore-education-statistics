@@ -111,7 +111,7 @@ public interface IBlobStorageService
         CancellationToken cancellationToken);
     
     Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
-        IBlobContainer containerName,
+        IBlobContainer container,
         string filename,
         string path,
         CancellationToken cancellationToken);

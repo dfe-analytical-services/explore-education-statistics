@@ -42,6 +42,7 @@ var host = new HostBuilder()
             .AddDbContext<ContentDbContext>(options =>
                 options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                     providerOptions => providerOptions.EnableCustomRetryOnFailure()))
+            .AddSingleton<IBlobSasService, BlobSasService>()
             .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(
                     connectionString: provider
@@ -49,7 +50,7 @@ var host = new HostBuilder()
                         .Value
                         .PrivateStorageConnectionString,
                     logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                    new DateTimeProvider())
+                    sasService: provider.GetRequiredService<IBlobSasService>())
             )
             .AddTransient<IFileImportService, FileImportService>()
             .AddTransient<IImporterService, ImporterService>()

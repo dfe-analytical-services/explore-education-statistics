@@ -6,6 +6,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -18,6 +19,7 @@ using Xunit;
 using static Azure.Storage.Blobs.Models.BlobsModelFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Services.BlobServiceTestUtils;
 using static Moq.MockBehavior;
 using Capture = Moq.Capture;
 
@@ -178,81 +180,89 @@ public class BlobStorageServiceTests
     {
         const string filename = "test.pdf";
         const string path = "path/to/test.pdf";
-        var now = DateTime.UtcNow;
-
-        var dateTimeProvider = new DateTimeProvider(now);
-
-        var blobClient = MockBlobClient(
-            name: path,
-            createdOn: DateTimeOffset.UtcNow,
-            contentLength: 10 * 1024,
-            contentType: MediaTypeNames.Application.Pdf,
-            metadata: new Dictionary<string, string>()
-        );
-
-        blobClient
-            .Setup(c => c.BlobContainerName)
-            .Returns(PublicReleaseFiles.Name);
-
-        blobClient.SetupCanGenerateSasUri(true);
+        var container = PublicReleaseFiles;
         
-        blobClient.SetupGenerateReadonlySasUri(
-            expectedExpiry: now.AddMinutes(5),
-            expectedContainerName: PublicReleaseFiles.Name,
-            uriToReturn: "https://sasurl?param1=1&param2=2");
+        var tokenCreated = new BlobDownloadToken(
+            Token: "a-token",
+            ContainerName: container.Name,
+            Path: path,
+            Filename: filename,
+            ContentType: MediaTypeNames.Text.Csv);
+        
+        var blobServiceClient = MockBlobServiceClient();
 
-        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+        var blobSasService = new Mock<IBlobSasService>(Strict);
 
+        blobSasService
+            .Setup(s => s.CreateBlobDownloadToken(
+                blobServiceClient.Object,
+                PublicReleaseFiles,
+                filename,
+                path,
+                TimeSpan.FromMinutes(5),
+                default))
+            .ReturnsAsync(tokenCreated);
+        
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
-            dateTimeProvider: dateTimeProvider);
+            blobSasService: blobSasService.Object);
 
         var result = await service.GetBlobDownloadToken(
-            containerName: PublicReleaseFiles,
+            container: PublicReleaseFiles,
             filename: filename,
             path: path,
             cancellationToken: default);
 
-        var token = result.AssertRight();
+        var tokenReturned = result.AssertRight();
+        
+        blobSasService.Verify();
      
-        Assert.Equal("param1=1&param2=2", token.Token);
-        Assert.Equal(PublicReleaseFiles.Name, token.ContainerName);
-        Assert.Equal(filename, token.Filename);
-        Assert.Equal(path, token.Path);
-        Assert.Equal(MediaTypeNames.Application.Pdf, token.ContentType);
+        Assert.Same(tokenCreated, tokenReturned);
     }
     
     [Fact]
-    public async Task GetBlobDownloadToken_BlobNotFound()
+    public async Task StreamWithToken_Success()
     {
-        const string filename = "test.pdf";
-        const string path = "path/to/test.pdf";
+        var token = new BlobDownloadToken(
+            Token: "a-token",
+            ContainerName: "a-container",
+            Path: "a-path",
+            Filename: "a-filename.csv",
+            ContentType: MediaTypeNames.Text.Csv);
 
-        var blobClient = MockBlobClient(
-            name: path,
+        var secureClient = MockBlobClient(
+            name: token.Path,
             createdOn: DateTimeOffset.UtcNow,
             contentLength: 10 * 1024,
             contentType: MediaTypeNames.Application.Pdf,
             metadata: new Dictionary<string, string>()
         );
 
-        blobClient
-            .Setup(client => client.ExistsAsync(default))
-            .ReturnsAsync(Response.FromValue(false, null!));
+        var blobServiceClient = MockBlobServiceClient();
 
-        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+        var blobSasService = new Mock<IBlobSasService>(Strict);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        blobSasService
+            .Setup(s => s.CreateSecureBlobClient(
+                blobServiceClient.Object,
+                token))
+            .ReturnsAsync(secureClient.Object);
+        
+        secureClient.SetupGetDownloadStreamAsync(content: "Test content");
+        
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            blobSasService: blobSasService.Object);
 
-        var result = await service.GetBlobDownloadToken(
-            containerName: PublicReleaseFiles,
-            filename: filename,
-            path: path,
+        var result = await service.StreamWithToken(
+            token: token,
             cancellationToken: default);
 
-        result.AssertNotFound();
+        var fileStreamResult = result.AssertRight();
+        
+        Assert.Equal("Test content", fileStreamResult.FileStream.ReadToEnd());
+        Assert.Equal(token.Filename, fileStreamResult.FileDownloadName);
+        Assert.Equal(token.ContentType, fileStreamResult.ContentType);
     }
     
     [Fact]
@@ -769,82 +779,16 @@ public class BlobStorageServiceTests
         Assert.False(result);
     }
 
-    private static Mock<BlobServiceClient> MockBlobServiceClient(
-        params Mock<BlobContainerClient>[] blobContainerClients)
-    {
-        var blobServiceClient = new Mock<BlobServiceClient>(Strict);
-
-        blobServiceClient.Setup(s => s.Uri)
-            .Returns(new Uri("https://data-storage:10001/devstoreaccount1;"));
-
-        foreach (var blobContainerClient in blobContainerClients)
-        {
-            blobServiceClient.Setup(client => client.GetBlobContainerClient(blobContainerClient.Object.Name))
-                .Returns(blobContainerClient.Object);
-        }
-
-        return blobServiceClient;
-    }
-
-    private static Mock<BlobContainerClient> MockBlobContainerClient(
-        string containerName,
-        params Mock<BlobClient>[] blobClients)
-    {
-        var blobContainerClient = new Mock<BlobContainerClient>(Strict);
-
-        blobContainerClient
-            .SetupGet(client => client.Name)
-            .Returns(containerName);
-
-        foreach (var blobClient in blobClients)
-        {
-            blobContainerClient.Setup(client => client.GetBlobClient(blobClient.Object.Name))
-                .Returns(blobClient.Object);
-        }
-
-        return blobContainerClient;
-    }
-
-    private static Mock<BlobClient> MockBlobClient(
-        string name,
-        DateTimeOffset createdOn = default,
-        int contentLength = 0,
-        string? contentType = null,
-        IDictionary<string, string>? metadata = null,
-        bool exists = true)
-    {
-        var blobClient = new Mock<BlobClient>(Strict);
-
-        blobClient.SetupGet(client => client.Name)
-            .Returns(name);
-
-        blobClient.Setup(client => client.ExistsAsync(default))
-            .ReturnsAsync(Response.FromValue(exists, null!));
-
-        var blobProperties = BlobProperties(
-            createdOn: createdOn,
-            contentLength: contentLength,
-            contentType: contentType,
-            metadata: metadata
-        );
-
-        blobClient.Setup(client => client.GetPropertiesAsync(default, default))
-            .ReturnsAsync(Response.FromValue(blobProperties, null!));
-
-        return blobClient;
-    }
-
     private static TestBlobStorageService SetupTestBlobStorageService(
         BlobServiceClient? blobServiceClient = null,
-        DateTimeProvider? dateTimeProvider = null)
+        IBlobSasService? blobSasService = null)
     {
         return new TestBlobStorageService(
             connectionString: "",
-            blobServiceClient ?? new Mock<BlobServiceClient>().Object,
+            blobServiceClient ?? Mock.Of<BlobServiceClient>(),
             Mock.Of<ILogger<BlobStorageService>>(),
             Mock.Of<IStorageInstanceCreationUtil>(),
-            dateTimeProvider ?? new DateTimeProvider()
-        );
+            blobSasService ?? Mock.Of<IBlobSasService>(Strict));
     }
 
     private class TestBlobStorageService(
@@ -852,13 +796,13 @@ public class BlobStorageServiceTests
         BlobServiceClient client,
         ILogger<IBlobStorageService> logger,
         IStorageInstanceCreationUtil storageInstanceCreationUtil,
-        DateTimeProvider dateTimeProvider)
+        IBlobSasService blobSasService)
         : BlobStorageService(
             connectionString,
             client,
             logger,
             storageInstanceCreationUtil,
-            dateTimeProvider);
+            blobSasService);
 
     private IEnumerable<Page<T>> CreatePages<T>(params List<T>[] pages)
     {

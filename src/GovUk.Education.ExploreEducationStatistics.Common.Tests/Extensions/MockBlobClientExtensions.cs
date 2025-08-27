@@ -113,4 +113,18 @@ public static class MockBlobClientExtensions
                     builder.ExpiresOn == expectedExpiry)))
             .Returns(new Uri(uriToReturn));
     }
+    
+    public static IReturnsResult<BlobClient> SetupGetDownloadStreamAsync(
+        this Mock<BlobClient> blobClient,
+        string content,
+        CancellationToken cancellationToken = default)
+    {
+        return blobClient.
+            Setup(c => c.OpenReadAsync(
+                0,
+                null,
+                null,
+                cancellationToken))
+            .ReturnsAsync(content.ToStream);
+    }
 }

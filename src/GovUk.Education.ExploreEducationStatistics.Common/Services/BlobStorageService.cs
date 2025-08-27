@@ -5,7 +5,6 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using Azure.Storage.Sas;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -36,23 +35,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 /// </summary>
 public abstract class BlobStorageService : IBlobStorageService
 {
-    private static readonly TimeSpan DOWNLOAD_TOKEN_EXPIRY_DURATION = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan DownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
     
     private readonly string _connectionString;
     private readonly BlobServiceClient _client;
     private readonly ILogger<IBlobStorageService> _logger;
     private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
-    private readonly DateTimeProvider _dateTimeProvider;
+    private readonly IBlobSasService _blobSasService;
 
     protected BlobStorageService(
         string connectionString,
         ILogger<IBlobStorageService> logger,
-        DateTimeProvider dateTimeProvider)
+        IBlobSasService blobSasService)
     {
         _connectionString = connectionString;
         _client = new BlobServiceClient(connectionString);
         _logger = logger;
-        _dateTimeProvider = dateTimeProvider;
+        _blobSasService = blobSasService;
         _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
     }
 
@@ -61,13 +60,13 @@ public abstract class BlobStorageService : IBlobStorageService
         BlobServiceClient client,
         ILogger<IBlobStorageService> logger,
         IStorageInstanceCreationUtil storageInstanceCreationUtil,
-        DateTimeProvider dateTimeProvider)
+        IBlobSasService blobSasService)
     {
         _connectionString = connectionString;
         _client = client;
         _logger = logger;
         _storageInstanceCreationUtil = storageInstanceCreationUtil;
-        _dateTimeProvider = dateTimeProvider;
+        _blobSasService = blobSasService;
     }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
@@ -433,18 +432,13 @@ public abstract class BlobStorageService : IBlobStorageService
         return await blob.OpenReadAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
+    public Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
         BlobDownloadToken token,
         CancellationToken cancellationToken)
     {
-        return await GetBlobClientOrNotFound(
-                containerName: token.ContainerName,
-                path: token.Path)
-            .OnSuccess(blob =>
-            {
-                var blobClient = new BlobClient(blob.Uri, new AzureSasCredential(token.Token));
-                return GetDownloadStream(blob: blobClient, decompress: true, cancellationToken);
-            })
+        return _blobSasService
+            .CreateSecureBlobClient(blobServiceClient: _client, token: token)
+            .OnSuccess(blobClient => GetDownloadStream(blob: blobClient, decompress: true, cancellationToken))
             .OnSuccess(stream => new FileStreamResult(
                 fileStream: stream,
                 contentType: token.ContentType) { FileDownloadName = token.Filename });
@@ -488,31 +482,19 @@ public abstract class BlobStorageService : IBlobStorageService
     }
 
     public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
-        IBlobContainer containerName,
+        IBlobContainer container,
         string filename,
         string path,
         CancellationToken cancellationToken)
     {
-        return await GetBlobClientOrNotFound(containerName, path)
-            .OnSuccess(async blob =>
-            {
-                BlobProperties blobProperties = 
-                    await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
-
-                var uri = CreateSasUrl(
-                    client: blob,
-                    containerName: containerName.Name,
-                    expiryDuration: DOWNLOAD_TOKEN_EXPIRY_DURATION);
-
-                var requestParameters = uri.Query[1..];
-                
-                return new BlobDownloadToken(
-                    Token: requestParameters,
-                    ContainerName: blob.BlobContainerName,
-                    Path: path,
-                    Filename: filename,
-                    ContentType: blobProperties.ContentType);           
-            });
+        return await _blobSasService
+            .CreateBlobDownloadToken(
+                blobServiceClient: _client,
+                container: container,
+                filename: filename,
+                path: path,
+                expiryDuration: DownloadTokenExpiryDuration,
+                cancellationToken: cancellationToken);
     }
 
     public async Task<Either<ActionResult, string>> DownloadBlobText(
@@ -732,22 +714,6 @@ public abstract class BlobStorageService : IBlobStorageService
         return new NotFoundResult();
     }
 
-    // TODO DW - how to make neater?
-    private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
-        string containerName,
-        string path)
-    {
-        var blobContainer = _client.GetBlobContainerClient(containerName);
-        var client = blobContainer.GetBlobClient(path);
-        if (await client.ExistsAsync())
-        {
-            return client;
-        }
-
-        _logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
-        return new NotFoundResult();
-    }
-
     /**
      * TODO EES-4202
      * We still need to use the older CloudBlobContainer implementation as we
@@ -787,30 +753,6 @@ public abstract class BlobStorageService : IBlobStorageService
             () => containerClient.CreateIfNotExistsAsync());
 
         return containerClient;
-    }
-
-    private Uri CreateSasUrl(
-        BlobClient client,
-        string containerName,
-        TimeSpan expiryDuration)
-    {
-        // Check if BlobContainerClient object has been authorized with Shared Key
-        if (client.CanGenerateSasUri)
-        {
-            // Create a SAS token that's valid for a very short time.
-            var sasBuilder = new BlobSasBuilder
-            {
-                BlobContainerName = containerName,
-                Resource = "c",
-                ExpiresOn = _dateTimeProvider.UtcNow.Add(expiryDuration)
-            };
-
-            sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
-
-            return client.GenerateSasUri(sasBuilder);
-        }
-
-        throw new InvalidOperationException("Could not generate SAS");
     }
 
     private static bool IsDevelopmentStorageAccount(BlobServiceClient client)

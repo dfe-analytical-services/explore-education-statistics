@@ -108,7 +108,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                         new PublicBlobStorageService(
                             _azuriteContainer.GetConnectionString(),
                             sp.GetRequiredService<ILogger<IBlobStorageService>>(),
-                            new DateTimeProvider()
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                 });

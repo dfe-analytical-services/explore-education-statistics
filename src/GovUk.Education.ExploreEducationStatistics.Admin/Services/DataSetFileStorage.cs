@@ -292,7 +292,7 @@ public class DataSetFileStorage(
                 };
 
                 return privateBlobStorageService.GetBlobDownloadToken(
-                    containerName: PrivateReleaseTempFiles,
+                    container: PrivateReleaseTempFiles,
                     filename: filename,
                     path: filePath,
                     cancellationToken: cancellationToken);

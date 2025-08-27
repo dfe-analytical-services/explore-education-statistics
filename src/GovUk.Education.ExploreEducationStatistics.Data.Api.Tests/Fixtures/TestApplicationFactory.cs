@@ -79,7 +79,7 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                         new PublicBlobStorageService(
                             connectionString: _azuriteContainer.GetConnectionString(),
                             logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
-                            dateTimeProvider: new DateTimeProvider()
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                 });
