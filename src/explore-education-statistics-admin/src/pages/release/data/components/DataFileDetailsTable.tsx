@@ -79,6 +79,7 @@ const DataFileDetailsTable = ({
                 downloadReleaseFileSecurely({
                   releaseVersionId,
                   fileId: dataFile.id,
+                  fileName: dataFile.fileName,
                 })
               }
             >
@@ -92,6 +93,7 @@ const DataFileDetailsTable = ({
                   downloadReleaseFileSecurely({
                     releaseVersionId,
                     fileId: replacementDataFile.id,
+                    fileName: replacementDataFile.fileName,
                   })
                 }
               >
@@ -108,6 +110,7 @@ const DataFileDetailsTable = ({
                 downloadReleaseFileSecurely({
                   releaseVersionId,
                   fileId: dataFile.metaFileId,
+                  fileName: dataFile.metaFileName,
                 })
               }
             >
@@ -121,6 +124,7 @@ const DataFileDetailsTable = ({
                   downloadReleaseFileSecurely({
                     releaseVersionId,
                     fileId: replacementDataFile.metaFileId,
+                    fileName: replacementDataFile.metaFileName,
                   })
                 }
               >

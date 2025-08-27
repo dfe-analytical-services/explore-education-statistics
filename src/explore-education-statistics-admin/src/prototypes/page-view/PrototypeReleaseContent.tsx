@@ -393,6 +393,7 @@ const PrototypeReleaseContent = ({
                 downloadReleaseFileSecurely({
                   releaseVersionId: release.id,
                   fileId: file.id,
+                  fileName: file.fileName,
                 })
               }
             >

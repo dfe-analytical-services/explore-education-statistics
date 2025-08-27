@@ -1,6 +1,7 @@
 import releaseDataFileService, {
   FileType,
 } from '@admin/services/releaseDataFileService';
+import downloadFile from '@common/utils/file/downloadFile';
 
 /**
  * Download a temporary ReleaseVersion file securely by first obtaining
@@ -11,16 +12,19 @@ import releaseDataFileService, {
  * belongs.
  * @param dataSetUploadId - the ID of the DataSetUpload record that owns the
  * data and metadata files.
+ * @param fileName - the name of the file to be downloaded.
  * @param fileType - the type of file to retrieve from the DataSetUpload.
  * Can be either 'data' or 'metadata'.
  */
 const downloadTemporaryReleaseFileSecurely = async ({
   releaseVersionId,
   dataSetUploadId,
+  fileName,
   fileType,
 }: {
   releaseVersionId: string;
   dataSetUploadId: string;
+  fileName: string;
   fileType: FileType;
 }) => {
   const token = await releaseDataFileService.getDownloadTemporaryBlobToken(
@@ -29,7 +33,10 @@ const downloadTemporaryReleaseFileSecurely = async ({
     fileType,
   );
 
-  window.open(`/api/download-blob?token=${token}`);
+  downloadFile({
+    file: `/api/download-blob?token=${token}`,
+    fileName,
+  });
 };
 
 export default downloadTemporaryReleaseFileSecurely;

@@ -466,6 +466,7 @@ const ReleaseContent = ({
                 downloadReleaseFileSecurely({
                   releaseVersionId: release.id,
                   fileId: file.id,
+                  fileName: file.fileName,
                 })
               }
             >

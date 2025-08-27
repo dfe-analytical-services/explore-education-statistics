@@ -33,6 +33,7 @@ export default function DataSetUploadSummaryList({
             downloadTemporaryReleaseFileSecurely({
               releaseVersionId,
               dataSetUploadId: dataSetUpload.id,
+              fileName: dataSetUpload.dataFileName,
               fileType: 'data',
             })
           }
@@ -46,6 +47,7 @@ export default function DataSetUploadSummaryList({
             downloadTemporaryReleaseFileSecurely({
               releaseVersionId,
               dataSetUploadId: dataSetUpload.id,
+              fileName: dataSetUpload.metaFileName,
               fileType: 'metadata',
             })
           }

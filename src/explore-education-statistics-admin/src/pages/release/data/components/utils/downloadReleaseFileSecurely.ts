@@ -1,4 +1,5 @@
 import releaseDataFileService from '@admin/services/releaseDataFileService';
+import downloadFile from '@common/utils/file/downloadFile';
 
 /**
  * Download a ReleaseVersion file securely by first obtaining permission to
@@ -7,21 +8,27 @@ import releaseDataFileService from '@admin/services/releaseDataFileService';
  *
  * @param releaseVersionId - the ID of the ReleaseVersion to which the file
  * belongs.
+ * @param fileName - the name of the file to be downloaded.
  * @param fileId - the ID of the file to be downloaded.
  */
 const downloadReleaseFileSecurely = async ({
   releaseVersionId,
   fileId,
+  fileName,
 }: {
   releaseVersionId: string;
   fileId: string;
+  fileName: string;
 }) => {
   const token = await releaseDataFileService.getDownloadBlobToken(
     releaseVersionId,
     fileId,
   );
 
-  window.open(`/api/download-blob?token=${token}`);
+  downloadFile({
+    file: `/api/download-blob?token=${token}`,
+    fileName,
+  });
 };
 
 export default downloadReleaseFileSecurely;

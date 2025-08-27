@@ -7,7 +7,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
-import { downloadReleaseFileSecurely } from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
+import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 
 interface Props {
   dataFile: DataFile;
@@ -29,6 +29,7 @@ export default function DataFileSummaryList({
             downloadReleaseFileSecurely({
               releaseVersionId,
               fileId: dataFile.id,
+              fileName: dataFile.fileName,
             })
           }
         >
@@ -41,6 +42,7 @@ export default function DataFileSummaryList({
             downloadReleaseFileSecurely({
               releaseVersionId,
               fileId: dataFile.metaFileId,
+              fileName: dataFile.metaFileName,
             })
           }
         >

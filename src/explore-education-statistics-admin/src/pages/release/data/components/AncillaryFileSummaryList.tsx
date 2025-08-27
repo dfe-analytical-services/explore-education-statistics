@@ -42,6 +42,7 @@ export default function AncillaryFileSummaryList({
             downloadReleaseFileSecurely({
               releaseVersionId,
               fileId: file.id,
+              fileName: file.filename,
             })
           }
         >
