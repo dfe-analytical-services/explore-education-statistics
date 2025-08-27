@@ -186,6 +186,21 @@ public class ReleaseFileService : IReleaseFileService
             });
     }
 
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetDownloadToken(
+        Guid releaseVersionId,
+        Guid fileId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
+            .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
+            .OnSuccess(file => _privateBlobStorageService
+                .GetBlobDownloadToken(
+                    containerName: PrivateReleaseFiles,
+                    filename: file.Filename,
+                    path: file.Path()));
+    }
+
     public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
         Guid releaseVersionId,
         Stream outputStream,

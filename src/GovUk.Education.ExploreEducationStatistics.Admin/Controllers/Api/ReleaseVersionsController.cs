@@ -78,8 +78,9 @@ public class ReleaseVersionsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
+    // TODO EES-6359 - can we get rid?
     [HttpGet("releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download")]
-    public async Task<ActionResult> GetDataSetUploadFile(
+    public async Task<ActionResult> GetTemporaryDataSetUploadFile(
         Guid releaseVersionId,
         FileType fileType,
         Guid dataSetUploadId,
@@ -88,6 +89,20 @@ public class ReleaseVersionsController : ControllerBase
         return await _dataSetFileStorage
             .RetrieveDataSetFileFromTemporaryStorage(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
             .HandleFailures();
+    }
+
+    [HttpGet(
+        "releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download-temporary-file/blob-token")]
+    public async Task<ActionResult<string>> GetTemporaryDataSetUploadFileBlobDownloadToken(
+        Guid releaseVersionId,
+        FileType fileType,
+        Guid dataSetUploadId,
+        CancellationToken cancellationToken)
+    {
+        return await _dataSetFileStorage
+            .GetTemporaryFileDownloadToken(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
+            .OnSuccess(token => token.ToBase64JsonString())
+            .HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895

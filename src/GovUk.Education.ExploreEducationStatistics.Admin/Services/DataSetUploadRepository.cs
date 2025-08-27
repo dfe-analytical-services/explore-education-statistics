@@ -12,6 +12,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+// TODO EES-6359 - no permission checks.
 public class DataSetUploadRepository(
     ContentDbContext contentDbContext,
     IPrivateBlobStorageService privateBlobStorageService,

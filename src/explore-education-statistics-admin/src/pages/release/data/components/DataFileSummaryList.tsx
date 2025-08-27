@@ -1,14 +1,13 @@
 import ImporterStatus, {
   ImporterStatusChangeHandler,
 } from '@admin/pages/release/data/components/ImporterStatus';
-import releaseDataFileService, {
-  DataFile,
-} from '@admin/services/releaseDataFileService';
+import { DataFile } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
+import { downloadReleaseFileSecurely } from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 
 interface Props {
   dataFile: DataFile;
@@ -27,11 +26,10 @@ export default function DataFileSummaryList({
       <SummaryListItem term="Data file">
         <ButtonText
           onClick={() =>
-            releaseDataFileService.downloadFile(
+            downloadReleaseFileSecurely({
               releaseVersionId,
-              dataFile.id,
-              dataFile.fileName,
-            )
+              fileId: dataFile.id,
+            })
           }
         >
           {dataFile.fileName}
@@ -40,11 +38,10 @@ export default function DataFileSummaryList({
       <SummaryListItem term="Meta file">
         <ButtonText
           onClick={() =>
-            releaseDataFileService.downloadFile(
+            downloadReleaseFileSecurely({
               releaseVersionId,
-              dataFile.metaFileId,
-              dataFile.metaFileName,
-            )
+              fileId: dataFile.metaFileId,
+            })
           }
         >
           {dataFile.metaFileName}

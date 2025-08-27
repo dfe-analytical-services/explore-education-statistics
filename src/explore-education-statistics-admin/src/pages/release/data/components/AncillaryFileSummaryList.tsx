@@ -3,9 +3,7 @@ import {
   releaseAncillaryFileRoute,
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
-import releaseAncillaryFileService, {
-  AncillaryFile,
-} from '@admin/services/releaseAncillaryFileService';
+import { AncillaryFile } from '@admin/services/releaseAncillaryFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -13,6 +11,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 import { generatePath } from 'react-router-dom';
+import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -40,11 +39,10 @@ export default function AncillaryFileSummaryList({
       <SummaryListItem term="File">
         <ButtonText
           onClick={() =>
-            releaseAncillaryFileService.downloadFile(
+            downloadReleaseFileSecurely({
               releaseVersionId,
-              file.id,
-              file.filename,
-            )
+              fileId: file.id,
+            })
           }
         >
           {file.filename}

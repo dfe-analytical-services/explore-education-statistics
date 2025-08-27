@@ -52,6 +52,7 @@ public class ReleaseFileController : ControllerBase
             .HandleFailuresOrNoContent();
     }
 
+    // TODO EES-6359 - no permissions
     [HttpGet("release/{releaseVersionId:guid}/files")]
     [Produces(MediaTypeNames.Application.Octet)]
     public async Task<ActionResult> StreamFilesToZip(
@@ -104,6 +105,7 @@ public class ReleaseFileController : ControllerBase
             .HandleFailuresOrOk();
     }
 
+    // TODO EES-6359 - can we get rid?
     [HttpGet("release/{releaseVersionId:guid}/file/{fileId:guid}/download")]
     public async Task<ActionResult> Stream(Guid releaseVersionId,
         Guid fileId)
@@ -114,6 +116,18 @@ public class ReleaseFileController : ControllerBase
             .HandleFailures();
     }
 
+    [HttpGet("release/{releaseVersionId:guid}/file/{fileId:guid}/download/blob-token")]
+    public async Task<ActionResult<string>> GetDownloadToken(Guid releaseVersionId,
+        Guid fileId)
+    {
+        return await _releaseFileService
+            .GetDownloadToken(
+                releaseVersionId: releaseVersionId,
+                fileId: fileId)
+            .OnSuccess(token => token.ToBase64JsonString())
+            .HandleFailuresOrOk();
+    }
+    
     [HttpPatch("release/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult<Unit>> UpdateDataFileDetails(
         Guid releaseVersionId,

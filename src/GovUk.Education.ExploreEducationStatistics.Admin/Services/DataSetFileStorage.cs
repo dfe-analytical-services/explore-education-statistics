@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -24,6 +25,7 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Adm
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+// TODO EES-6359 - no permission checks.
 public class DataSetFileStorage(
     ContentDbContext contentDbContext,
     IPrivateBlobStorageService privateBlobStorageService,
@@ -247,9 +249,9 @@ public class DataSetFileStorage(
     }
 
     public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
-    Guid releaseVersionId,
-    List<DataSet> dataSets,
-    CancellationToken cancellationToken)
+        Guid releaseVersionId,
+        List<DataSet> dataSets,
+        CancellationToken cancellationToken)
     {
         var uploadTasks = dataSets.Select(dataSet
             => UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken));
@@ -260,12 +262,16 @@ public class DataSetFileStorage(
     }
 
     public async Task<Either<ActionResult, FileStreamResult>> RetrieveDataSetFileFromTemporaryStorage(
-    Guid releaseVersionId,
-    Guid dataSetUploadId,
-    FileType fileType,
-    CancellationToken cancellationToken)
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        FileType fileType,
+        CancellationToken cancellationToken)
     {
-        var upload = await contentDbContext.DataSetUploads.FindAsync(dataSetUploadId, cancellationToken);
+        var upload = await contentDbContext
+            .DataSetUploads
+            .FindAsync(
+                [dataSetUploadId],
+                cancellationToken: cancellationToken);
 
         if (upload is null)
         {
@@ -283,6 +289,43 @@ public class DataSetFileStorage(
             .DownloadToStream(PrivateReleaseTempFiles, filePath, new MemoryStream(), cancellationToken: cancellationToken)
             .OnSuccess(stream
                 => new FileStreamResult(stream, ContentTypes.Csv));
+    }
+
+    // TODO EES-6359 - no permission checks.
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        FileType fileType,
+        CancellationToken cancellationToken)
+    {
+        return await contentDbContext
+            .DataSetUploads
+            .SingleOrNotFoundAsync(
+                upload => upload.Id == dataSetUploadId,
+                cancellationToken: cancellationToken)
+            .OnSuccess(upload =>
+            {
+                var filePath = fileType switch
+                {
+                    FileType.Data =>
+                        $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
+                    FileType.Metadata =>
+                        $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
+                    _ => throw new InvalidEnumArgumentException(nameof(fileType), (int)fileType, typeof(FileType))
+                };
+
+                var filename = fileType switch
+                {
+                    FileType.Data => upload.DataFileName,
+                    FileType.Metadata => upload.MetaFileName,
+                    _ => throw new InvalidEnumArgumentException(nameof(fileType), (int)fileType, typeof(FileType))
+                };
+
+                return privateBlobStorageService.GetBlobDownloadToken(
+                    containerName: PrivateReleaseTempFiles,
+                    filename: filename,
+                    path: filePath);
+            });
     }
 
     /// <summary>

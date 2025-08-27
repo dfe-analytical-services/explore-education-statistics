@@ -44,6 +44,11 @@ public interface IDataSetFileStorage
         FileType fileType,
         CancellationToken cancellationToken);
 
+    Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(Guid releaseVersionId,
+        Guid dataSetUploadId,
+        FileType fileType,
+        CancellationToken cancellationToken);
+
     /// <summary>
     /// Persist an existing temporary data set to permanent storage.
     /// </summary>

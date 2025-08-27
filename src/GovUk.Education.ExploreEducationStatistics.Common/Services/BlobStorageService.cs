@@ -5,6 +5,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -60,46 +61,6 @@ public abstract class BlobStorageService : IBlobStorageService
         _client = client;
         _logger = logger;
         _storageInstanceCreationUtil = storageInstanceCreationUtil;
-    }
-
-    public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
-    {
-        var blobContainer = await GetBlobContainer(containerName);
-        var blobInfos = new List<BlobInfo>();
-
-        string? continuationToken = null;
-
-        do
-        {
-            var blobPages = blobContainer.GetBlobsAsync(BlobTraits.Metadata, prefix: path)
-                .AsPages(continuationToken);
-
-            await foreach (Page<BlobItem> page in blobPages)
-            {
-                foreach (var blob in page.Values)
-                {
-                    if (blob == null)
-                    {
-                        break;
-                    }
-
-                    blobInfos.Add(
-                        new BlobInfo(
-                            path: blob.Name,
-                            contentType: blob.Properties.ContentType,
-                            contentLength: blob.Properties.ContentLength ?? 0,
-                            meta: blob.Metadata,
-                            created: blob.Properties.CreatedOn,
-                            updated: blob.Properties.LastModified
-                        )
-                    );
-                }
-
-                continuationToken = page.ContinuationToken;
-            }
-        } while (continuationToken != string.Empty);
-
-        return blobInfos;
     }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
@@ -437,11 +398,54 @@ public abstract class BlobStorageService : IBlobStorageService
                 return await blob.OpenReadAsync(cancellationToken: cancellationToken);
             });
     }
-    
+
+    private async Task<Either<ActionResult, Stream>> GetDownloadStream(
+        BlobClient blob,
+        bool decompress = true,
+        CancellationToken cancellationToken = default)
+    {
+        if (decompress)
+        {
+            BlobProperties blobProperties =
+                await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+
+            // Check the ContentEncoding property to determine if the blob
+            // is compressed and only decompress if necessary.
+            if (blobProperties.ContentEncoding.IsNullOrEmpty())
+            {
+                return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+            }
+
+            var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+            return CompressionUtils.GetCompressionStream(
+                blobStream,
+                contentEncoding: blobProperties.ContentEncoding,
+                CompressionMode.Decompress);
+        }
+
+        return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+    }
+
+    public async Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
+        BlobDownloadToken token,
+        CancellationToken cancellationToken)
+    {
+        return await GetBlobClientOrNotFound(
+                containerName: token.ContainerName,
+                path: token.Path)
+            .OnSuccess(blob =>
+            {
+                var blobClient = new BlobClient(blob.Uri, new AzureSasCredential(token.Token));
+                return GetDownloadStream(blob: blobClient, decompress: true, cancellationToken);
+            })
+            .OnSuccess(stream => new FileStreamResult(
+                fileStream: stream,
+                contentType: token.ContentType) { FileDownloadName = token.FileName });
+    }
+
     public async Task<Stream> StreamBlob(
         IBlobContainer containerName,
         string path,
-        int? bufferSize = null,
         CancellationToken cancellationToken = default)
     {
         var blob = await GetBlobClient(containerName, path);
@@ -475,6 +479,48 @@ public abstract class BlobStorageService : IBlobStorageService
             throw;
         }
     }
+
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
+        IBlobContainer containerName,
+        string filename,
+        string path)
+    {
+        var blob = await GetBlobClient(containerName, path);
+        BlobProperties blobProperties = await blob.GetPropertiesAsync();
+
+        var uri = CreateSasUrl(blob, containerName.Name);
+
+        return new BlobDownloadToken(
+            Token: uri.Query[..],
+            ContainerName: blob.BlobContainerName,
+            Path: path,
+            FileName: filename,
+            ContentType: blobProperties.ContentType);
+    }
+
+    private static Uri CreateSasUrl(
+        BlobClient client,
+        string containerName)
+    {
+        // Check if BlobContainerClient object has been authorized with Shared Key
+        if (client.CanGenerateSasUri)
+        {
+            // Create a SAS token that's valid for a very short time.
+            var sasBuilder = new BlobSasBuilder
+            {
+                BlobContainerName = containerName,
+                Resource = "c",
+                ExpiresOn = DateTimeOffset.UtcNow.AddSeconds(30)
+            };
+
+            sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+
+            return client.GenerateSasUri(sasBuilder);
+        }
+
+        throw new InvalidOperationException("Could not generate SAS");
+    }
+
 
     public async Task<Either<ActionResult, string>> DownloadBlobText(
         IBlobContainer containerName,
@@ -687,6 +733,22 @@ public abstract class BlobStorageService : IBlobStorageService
         if (await blobClient.ExistsAsync())
         {
             return blobClient;
+        }
+
+        _logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
+        return new NotFoundResult();
+    }
+
+    // TODO DW - how to make neater?
+    private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
+        string containerName,
+        string path)
+    {
+        var blobContainer = _client.GetBlobContainerClient(containerName);
+        var client = blobContainer.GetBlobClient(path);
+        if (await client.ExistsAsync())
+        {
+            return client;
         }
 
         _logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);

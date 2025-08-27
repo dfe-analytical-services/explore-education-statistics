@@ -54,4 +54,6 @@ public interface IReleaseFileService
     Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseVersionId,
         IFormFile formFile,
         Guid? replacingId = null);
+
+    Task<Either<ActionResult, BlobDownloadToken>> GetDownloadToken(Guid releaseVersionId, Guid fileId);
 }

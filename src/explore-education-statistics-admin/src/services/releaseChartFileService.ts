@@ -48,12 +48,6 @@ const releaseChartFileService = {
   async deleteChartFile(releaseId: string, id: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/chart/${id}`);
   },
-
-  getChartFile(releaseId: string, id: string): Promise<Blob> {
-    return client.get<Blob>(`/release/${releaseId}/file/${id}/download`, {
-      responseType: 'blob',
-    });
-  },
 };
 
 export default releaseChartFileService;

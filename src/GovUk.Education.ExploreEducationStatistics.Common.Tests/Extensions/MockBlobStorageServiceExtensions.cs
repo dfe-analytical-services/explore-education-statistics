@@ -27,7 +27,7 @@ public static class MockBlobStorageServiceExtensions
         string expectedBlobPath,
         string filePathToStream) where T : class, IBlobStorageService
     {
-        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null, default))
+        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, default))
             .ReturnsAsync(() => File.OpenRead(filePathToStream));
     }
 
@@ -36,7 +36,7 @@ public static class MockBlobStorageServiceExtensions
         IBlobContainer container,
         string expectedBlobPath) where T : class, IBlobStorageService
     {
-        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null, default))
+        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, default))
             .ThrowsAsync(new FileNotFoundException($"Could not find file at {container.Name}/{expectedBlobPath}"));
     }
 
@@ -46,7 +46,7 @@ public static class MockBlobStorageServiceExtensions
         string expectedBlobPath,
         Exception exception) where T : class, IBlobStorageService
     {
-        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null, default))
+        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, default))
             .ThrowsAsync(exception);
     }
 

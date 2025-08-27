@@ -1,6 +1,5 @@
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
-import downloadFile from '@common/utils/file/downloadFile';
 
 interface AncillaryFileInfo extends FileInfo {
   summary: string;
@@ -96,13 +95,6 @@ const releaseAncillaryFileService = {
   },
   deleteFile(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/ancillary/${fileId}`);
-  },
-  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
-    return client
-      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
-        responseType: 'blob',
-      })
-      .then(response => downloadFile({ file: response, fileName }));
   },
 };
 

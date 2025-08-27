@@ -18,7 +18,6 @@ import {
   preReleaseAccessListRoute,
   releaseDataGuidanceRoute,
 } from '@admin/routes/routes';
-import releaseDataFileService from '@admin/services/releaseDataFileService';
 import releaseFileService from '@admin/services/releaseFileService';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
@@ -39,6 +38,7 @@ import React, {
   useRef,
 } from 'react';
 import { generatePath, useLocation } from 'react-router';
+import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface MethodologyLink {
@@ -463,11 +463,10 @@ const ReleaseContent = ({
           renderDownloadLink={file => (
             <ButtonText
               onClick={() =>
-                releaseDataFileService.downloadFile(
-                  release.id,
-                  file.id,
-                  file.fileName,
-                )
+                downloadReleaseFileSecurely({
+                  releaseVersionId: release.id,
+                  fileId: file.id,
+                })
               }
             >
               {`${file.name} (${file.extension}, ${file.size})`}

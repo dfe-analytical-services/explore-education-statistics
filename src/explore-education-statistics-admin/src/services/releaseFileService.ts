@@ -3,6 +3,7 @@ import downloadFile from '@common/utils/file/downloadFile';
 import parseContentDisposition from '@common/utils/http/parseContentDisposition';
 
 const releaseFileService = {
+  // TODO EES-6359 - rewrite?  Not easy as it's not from Blob Storage.
   downloadAllFilesZip(releaseId: string): Promise<void> {
     return client
       .get<Blob>(`/release/${releaseId}/files`, {
