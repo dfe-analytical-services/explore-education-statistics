@@ -13,7 +13,7 @@ import releaseDataFileService from '@admin/services/releaseDataFileService';
  * belongs.
  * @param fileId - the ID of the file to be downloaded.
  */
-const getReleaseFileSecurely = async ({
+const streamReleaseFileSecurely = async ({
   releaseVersionId,
   fileId,
 }: {
@@ -30,4 +30,4 @@ const getReleaseFileSecurely = async ({
   });
 };
 
-export default getReleaseFileSecurely;
+export default streamReleaseFileSecurely;

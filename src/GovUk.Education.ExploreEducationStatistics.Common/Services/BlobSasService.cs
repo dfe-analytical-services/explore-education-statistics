@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -127,7 +124,7 @@ public class BlobSasService(
             string sasToken);
     }
 
-    internal class SecureBlobClientCreator : ISecureBlobClientCreator
+    private class SecureBlobClientCreator : ISecureBlobClientCreator
     {
         public BlobClient CreateSecureBlobClient(Uri blobClientUri, string sasToken)
         {

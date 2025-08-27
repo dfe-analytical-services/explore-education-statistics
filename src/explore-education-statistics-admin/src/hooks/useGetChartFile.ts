@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
-import getReleaseFileSecurely from '@admin/pages/release/data/components/utils/getReleaseFileSecurely';
+import streamReleaseFileSecurely from '@admin/pages/release/data/components/utils/streamReleaseFileSecurely';
 
 export default function useGetChartFile(releaseVersionId: string) {
   return useCallback(
     (fileId: string) =>
-      getReleaseFileSecurely({
+      streamReleaseFileSecurely({
         releaseVersionId,
         fileId,
       }),

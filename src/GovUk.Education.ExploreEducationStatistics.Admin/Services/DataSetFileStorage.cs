@@ -1,5 +1,4 @@
 #nullable enable
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -11,6 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -268,33 +270,24 @@ public class DataSetFileStorage(
         FileType fileType,
         CancellationToken cancellationToken)
     {
-        return await contentDbContext
-            .DataSetUploads
-            .SingleOrNotFoundAsync(
-                upload => upload.Id == dataSetUploadId,
-                cancellationToken: cancellationToken)
+        return await
+            ValidateFileTypeForTemporaryDataSetUploadFile(fileType)
+            .OnSuccess(async () => await contentDbContext
+                .DataSetUploads
+                .SingleOrNotFoundAsync(
+                    upload => upload.Id == dataSetUploadId,
+                    cancellationToken: cancellationToken))
             .OnSuccess(upload =>
             {
-                var filePath = fileType switch
-                {
-                    FileType.Data =>
-                        $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
-                    FileType.Metadata =>
-                        $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
-                    _ => throw new InvalidEnumArgumentException(nameof(fileType), (int)fileType, typeof(FileType))
-                };
-
-                var filename = fileType switch
-                {
-                    FileType.Data => upload.DataFileName,
-                    FileType.Metadata => upload.MetaFileName,
-                    _ => throw new InvalidEnumArgumentException(nameof(fileType), (int)fileType, typeof(FileType))
-                };
-
+                var fileDetails = GetTemporaryDataUploadFileDetails(
+                    releaseVersionId: releaseVersionId,
+                    fileType: fileType,
+                    upload: upload);
+                
                 return privateBlobStorageService.GetBlobDownloadToken(
                     container: PrivateReleaseTempFiles,
-                    filename: filename,
-                    path: filePath,
+                    filename: fileDetails.FileName,
+                    path: fileDetails.FilePath,
                     cancellationToken: cancellationToken);
             });
     }
@@ -506,5 +499,36 @@ public class DataSetFileStorage(
                 rf.ReleaseVersionId == releaseVersionId
                 && rf.File.Type == FileType.Data
                 && rf.File.Id == fileToBeReplacedId);
+    }
+
+    private static Either<ActionResult, Unit> ValidateFileTypeForTemporaryDataSetUploadFile(FileType fileType)
+    {
+        return fileType is FileType.Data or FileType.Metadata
+            ? Unit.Instance
+            : ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Message = $"Invalid {nameof(fileType)} value {fileType} for temporary data set upload file type",
+                Path = nameof(fileType),
+                Detail = new InvalidErrorDetail<FileType>(fileType)
+            });
+    }
+
+    private static (string FilePath, string FileName) GetTemporaryDataUploadFileDetails(
+        Guid releaseVersionId,
+        FileType fileType,
+        DataSetUpload upload)
+    {
+        if (fileType == FileType.Data)
+        {
+            return (
+                FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
+                FileName: upload.DataFileName
+            );
+        }
+        
+        return (
+            FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
+            FileName: upload.MetaFileName
+        );
     }
 }

@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using JetBrains.Annotations;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -673,7 +674,7 @@ public class DataSetFileStorageTests
     }
     
     [Fact]
-    public async Task GetTemporaryFileDownloadToken_InvalidFileType_ThrowsInvalidEnumArgumentException()
+    public async Task GetTemporaryFileDownloadToken_InvalidFileType_ThrowsBadResult()
     {
         // Arrange
         var dataSetUpload = new DataSetUpload
@@ -700,14 +701,21 @@ public class DataSetFileStorageTests
         var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
     
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidEnumArgumentException>(async ()
-            => await service.GetTemporaryFileDownloadToken(
-                dataSetUpload.ReleaseVersionId,
-                dataSetUpload.Id,
-                FileType.Image,
-                cancellationToken: default));
-    
-        Assert.Equal($"The value of argument 'fileType' ({(int)FileType.Image}) is invalid for Enum type '{nameof(FileType)}'. (Parameter 'fileType')", exception.Message);
+        var result = await service.GetTemporaryFileDownloadToken(
+            dataSetUpload.ReleaseVersionId,
+            dataSetUpload.Id,
+            FileType.Image,
+            cancellationToken: default);
+
+        result.AssertBadRequestWithErrorViewModels(
+            expectedErrorViewModels: [
+                new ErrorViewModel
+                {
+                    Message = "Invalid fileType value Image for temporary data set upload file type",
+                    Path = "fileType",
+                    Detail = "Image"
+                }
+            ]);
     }
 
     private DataSetFileStorage SetupReleaseDataFileService(
