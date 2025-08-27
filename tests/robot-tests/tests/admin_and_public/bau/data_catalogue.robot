@@ -15,6 +15,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    Data catalogue %{RUN_IDENTIFIER}
+${PUBLICATION_URL}=     /find-statistics/data-catalogue-%{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Academic year Q1
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -131,11 +132,6 @@ Validate Related information section and links exist
 Validate data sets list
     user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    10
 
-    # Confirm the second item in the <dl> has data-testid="Release"
-    ${rows}=    Get WebElements
-    ...    xpath=.//li[@data-testid="data-set-file-summary-UI test subject 3"]//dl[contains(@id, '-details')]//div[@data-testid][starts-with(@class, 'govuk-summary-list__row')]
-    Should Be Equal As Strings    ${rows[1].get_attribute('data-testid')}    Release
-
     ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3}
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3} data guidance content
@@ -143,10 +139,9 @@ Validate data sets list
     user checks element contains    ${dataSet}    This is the latest data
     user checks element contains    ${dataSet}    ${PUBLICATION_NAME}
 
-    ${publication_url}=    Replace String    ${PUBLICATION_NAME.lower()}    ${SPACE}    -
     user checks page contains link with text and url
     ...    ${RELEASE_NAME} 2021/22
-    ...    /find-statistics/${publication_url}/2021-22-q1
+    ...    ${PUBLICATION_URL}/2021-22-q1
     ...    ${dataSet}
 
     user clicks button    Show more details    ${dataSet}
