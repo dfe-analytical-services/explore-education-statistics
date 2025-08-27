@@ -150,7 +150,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), null, default))
+                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -299,7 +299,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), null, default))
+                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -415,7 +415,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), null, default))
+                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -513,7 +513,7 @@ public class SubjectCsvMetaServiceTests
             releaseFileBlobService
                 .Setup(
                     s =>
-                        s.StreamBlob(It.IsAny<ReleaseFile>(), null, default)
+                        s.StreamBlob(It.IsAny<ReleaseFile>(), default)
                 )
                 .ReturnsAsync("csv_header".ToStream());
 
@@ -620,7 +620,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), null, default))
+                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -707,7 +707,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), null, default))
+                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -832,7 +832,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
@@ -1011,7 +1010,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
@@ -1147,7 +1145,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
@@ -1271,7 +1268,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
@@ -1396,7 +1392,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
@@ -1565,7 +1560,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
@@ -1783,7 +1777,6 @@ public class SubjectCsvMetaServiceTests
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
-                        null,
                         default
                     )
                 )
