@@ -1735,8 +1735,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     () => Assert.Equal(releaseFile.Summary, viewModel.Content),
                     () => Assert.Equal(releaseVersion.Id, viewModel.Release.Id),
                     () => Assert.Equal(release.Title, viewModel.Release.Title),
+                    () => Assert.Equal(release.Slug, viewModel.Release.Slug),
                     () => Assert.Equal(publication.Id, viewModel.Publication.Id),
                     () => Assert.Equal(publication.Title, viewModel.Publication.Title),
+                    () => Assert.Equal(publication.Slug, viewModel.Publication.Slug),
                     () => Assert.Equal(theme.Id, viewModel.Theme.Id),
                     () => Assert.Equal(theme.Title, viewModel.Theme.Title),
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
@@ -1746,9 +1748,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             viewModel.IsSuperseded),
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
                     () => Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api?.Id),
-                    () => Assert.Equal(releaseFile.PublicApiDataSetVersionString, viewModel.Api?.Version),
-                    () => Assert.Equal(releaseFile.ReleaseVersion.Release.Publication.Slug, viewModel.Publication.Slug),
-                    () => Assert.Equal(releaseFile.ReleaseVersion.Release.Slug, viewModel.Release.Slug)
+                    () => Assert.Equal(releaseFile.PublicApiDataSetVersionString, viewModel.Api?.Version)
                     );
             });
         }
