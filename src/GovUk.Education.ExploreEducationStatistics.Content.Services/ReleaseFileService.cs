@@ -238,8 +238,7 @@ public class ReleaseFileService(
             var streamResult = await publicBlobStorageService.GetDownloadStream(
                 containerName: PublicReleaseFiles,
                 path: releaseFile.PublicPath(),
-                cancellationToken: cancellationToken
-            );
+                cancellationToken: cancellationToken);
 
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
@@ -257,7 +256,6 @@ public class ReleaseFileService(
             
             var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
             await using var entryStream = entry.Open();
-            
             await blobStream.CopyToAsync(
                 destination: entryStream,
                 cancellationToken: cancellationToken);
