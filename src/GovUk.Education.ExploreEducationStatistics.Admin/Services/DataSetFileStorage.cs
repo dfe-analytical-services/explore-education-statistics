@@ -152,7 +152,7 @@ public class DataSetFileStorage(
     {
         await dataSetVersionService.CreateNextVersion(
             releaseFileId: dataReleaseFileId,
-            dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+            dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
             dataSetVersionToReplaceId: dataSetVersion.Id,
             cancellationToken
         ).OnFailureDo(_ =>
@@ -177,7 +177,7 @@ public class DataSetFileStorage(
             {
                 await dataSetVersionService.CreateNextVersion(
                     releaseFileId: dataReleaseFileId,
-                    dataSetId: replacedReleaseDataFile!.PublicApiDataSetId!.Value,
+                    dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
                     dataSetVersionToReplaceId: null,
                     cancellationToken
                 ).OnFailureDo(_ =>
@@ -261,36 +261,6 @@ public class DataSetFileStorage(
         return [.. uploads];
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> RetrieveDataSetFileFromTemporaryStorage(
-        Guid releaseVersionId,
-        Guid dataSetUploadId,
-        FileType fileType,
-        CancellationToken cancellationToken)
-    {
-        var upload = await contentDbContext
-            .DataSetUploads
-            .FindAsync(
-                [dataSetUploadId],
-                cancellationToken: cancellationToken);
-
-        if (upload is null)
-        {
-            return new NotFoundResult();
-        }
-
-        var filePath = fileType switch
-        {
-            FileType.Data => $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
-            FileType.Metadata => $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
-            _ => throw new InvalidEnumArgumentException(nameof(fileType), (int)fileType, typeof(FileType))
-        };
-
-        return await privateBlobStorageService
-            .DownloadToStream(PrivateReleaseTempFiles, filePath, new MemoryStream(), cancellationToken: cancellationToken)
-            .OnSuccess(stream
-                => new FileStreamResult(stream, ContentTypes.Csv));
-    }
-
     // TODO EES-6359 - no permission checks.
     public async Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
         Guid releaseVersionId,
@@ -324,7 +294,8 @@ public class DataSetFileStorage(
                 return privateBlobStorageService.GetBlobDownloadToken(
                     containerName: PrivateReleaseTempFiles,
                     filename: filename,
-                    path: filePath);
+                    path: filePath,
+                    cancellationToken: cancellationToken);
             });
     }
 

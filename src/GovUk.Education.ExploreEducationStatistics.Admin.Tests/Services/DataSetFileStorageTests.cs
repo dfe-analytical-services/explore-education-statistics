@@ -1,11 +1,8 @@
 #nullable enable
-using System.ComponentModel;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
@@ -18,11 +15,20 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using JetBrains.Annotations;
 using LinqToDB;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using JetBrains.Annotations;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -582,17 +588,13 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task RetrieveDataSetFileFromTemporaryStorage_Success_ReturnsFileStreamResult()
+    public async Task GetTemporaryFileDownloadToken_Success_ReturnsBlobDownloadToken()
     {
         // Arrange
-        var dataSetUploadId = Guid.NewGuid();
-        var releaseVersionId = Guid.NewGuid();
-
-        await using var contentDbContext = InMemoryApplicationDbContext();
-        contentDbContext.DataSetUploads.Add(new()
+        var dataSetUpload = new DataSetUpload
         {
-            Id = dataSetUploadId,
-            ReleaseVersionId = releaseVersionId,
+            Id = Guid.NewGuid(),
+            ReleaseVersionId = Guid.NewGuid(),
             DataSetTitle = "Test Data Set",
             DataFileId = Guid.NewGuid(),
             DataFileName = "data.csv",
@@ -602,72 +604,82 @@ public class DataSetFileStorageTests
             MetaFileId = Guid.NewGuid(),
             UploadedBy = _user.Email,
             Status = DataSetUploadStatus.SCREENING,
-        });
+        };
+        
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        
+        contentDbContext.DataSetUploads.Add(dataSetUpload);
 
         await contentDbContext.SaveChangesAsync();
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
+        var expectedBlobPath =
+            $"{FileStoragePathUtils.FilesPath(dataSetUpload.ReleaseVersionId, FileType.Data)}{dataSetUpload.DataFileId}";
+        
         privateBlobStorageService
-            .Setup(mock => mock.DownloadToStream(
-                PrivateReleaseTempFiles,
-                It.IsAny<string>(),
-                It.IsAny<MemoryStream>(),
-                It.IsAny<bool>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Stream.Null);
+            .SetupGetDownloadToken(
+                container: PrivateReleaseTempFiles,
+                contentType: ContentTypes.Csv,
+                filename: dataSetUpload.DataFileName,
+                path: expectedBlobPath,
+                cancellationToken: default);
 
         var service = SetupReleaseDataFileService(
             contentDbContext: contentDbContext,
             privateBlobStorageService: privateBlobStorageService.Object);
 
         // Act
-        var result = await service.RetrieveDataSetFileFromTemporaryStorage(
-            releaseVersionId,
-            dataSetUploadId,
+        var result = await service.GetTemporaryFileDownloadToken(
+            dataSetUpload.ReleaseVersionId,
+            dataSetUpload.Id,
             FileType.Data,
             cancellationToken: default);
 
         // Assert
         privateBlobStorageService.Verify();
-        var fileStreamResult = result.AssertRight();
-        Assert.Equal(ContentTypes.Csv, fileStreamResult.ContentType);
-        Assert.Equal(Stream.Null, fileStreamResult.FileStream);
+        var token = result.AssertRight();
+        
+        Assert.Equal(ContentTypes.Csv, token.ContentType);
+        Assert.Equal(dataSetUpload.DataFileName, token.Filename);
+        Assert.Equal("token", token.Token);
+        Assert.Equal(PrivateReleaseTempFiles.Name, token.ContainerName);
+        Assert.Equal(expectedBlobPath, token.Path);
     }
 
     [Fact]
-    public async Task RetrieveDataSetFileFromTemporaryStorage_UploadNotFound_ReturnsNotFound()
+    public async Task GetTemporaryFileDownloadToken_UploadNotFound_ReturnsNotFound()
     {
         // Arrange
         await using var contentDbContext = InMemoryApplicationDbContext();
-
-        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        
+        var service = SetupReleaseDataFileService(
+            privateBlobStorageService: privateBlobStorageService.Object,
+            contentDbContext: contentDbContext);
 
         // Act
-        var result = await service.RetrieveDataSetFileFromTemporaryStorage(
+        var result = await service.GetTemporaryFileDownloadToken(
             releaseVersionId: Guid.NewGuid(),
             dataSetUploadId: Guid.NewGuid(),
             FileType.Data,
             cancellationToken: default);
-
+    
         // Assert
         result
             .AssertLeft()
             .AssertNotFoundResult();
     }
-
+    
     [Fact]
-    public async Task RetrieveDataSetFileFromTemporaryStorage_InvalidFileType_ThrowsInvalidEnumArgumentException()
+    public async Task GetTemporaryFileDownloadToken_InvalidFileType_ThrowsInvalidEnumArgumentException()
     {
         // Arrange
-        var dataSetUploadId = Guid.NewGuid();
-        var releaseVersionId = Guid.NewGuid();
-
-        await using var contentDbContext = InMemoryApplicationDbContext();
-        contentDbContext.DataSetUploads.Add(new()
+        var dataSetUpload = new DataSetUpload
         {
-            Id = dataSetUploadId,
-            ReleaseVersionId = releaseVersionId,
+            Id = Guid.NewGuid(),
+            ReleaseVersionId = Guid.NewGuid(),
             DataSetTitle = "Test Data Set",
             DataFileId = Guid.NewGuid(),
             DataFileName = "data.csv",
@@ -677,20 +689,24 @@ public class DataSetFileStorageTests
             MetaFileId = Guid.NewGuid(),
             UploadedBy = _user.Email,
             Status = DataSetUploadStatus.SCREENING,
-        });
-
+        };
+    
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        
+        contentDbContext.DataSetUploads.Add(dataSetUpload);
+    
         await contentDbContext.SaveChangesAsync();
-
+    
         var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
-
+    
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidEnumArgumentException>(async ()
-            => await service.RetrieveDataSetFileFromTemporaryStorage(
-                releaseVersionId,
-                dataSetUploadId,
+            => await service.GetTemporaryFileDownloadToken(
+                dataSetUpload.ReleaseVersionId,
+                dataSetUpload.Id,
                 FileType.Image,
                 cancellationToken: default));
-
+    
         Assert.Equal($"The value of argument 'fileType' ({(int)FileType.Image}) is invalid for Enum type '{nameof(FileType)}'. (Parameter 'fileType')", exception.Message);
     }
 

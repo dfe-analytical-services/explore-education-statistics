@@ -168,27 +168,10 @@ public class ReleaseFileService : IReleaseFileService
             .OnSuccess(releaseFile => releaseFile.ToFileInfo());
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId, Guid fileId)
-    {
-        return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanViewReleaseVersion)
-            .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
-            .OnSuccessCombineWith(file =>
-                _privateBlobStorageService.GetDownloadStream(PrivateReleaseFiles, file.Path()))
-            .OnSuccess(fileAndStream =>
-            {
-                var (file, stream) = fileAndStream;
-                return new FileStreamResult(stream, file.ContentType)
-                {
-                    FileDownloadName = file.Filename
-                };
-            });
-    }
-
-    public async Task<Either<ActionResult, BlobDownloadToken>> GetDownloadToken(
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
         Guid releaseVersionId,
-        Guid fileId)
+        Guid fileId,
+        CancellationToken cancellationToken)
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -198,7 +181,8 @@ public class ReleaseFileService : IReleaseFileService
                 .GetBlobDownloadToken(
                     containerName: PrivateReleaseFiles,
                     filename: file.Filename,
-                    path: file.Path()));
+                    path: file.Path(),
+                    cancellationToken: cancellationToken));
     }
 
     public async Task<Either<ActionResult, Unit>> ZipFilesToStream(

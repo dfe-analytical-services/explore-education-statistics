@@ -17,28 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [Route("api")]
 [ApiController]
 [Authorize]
-public class ReleaseFileController : ControllerBase
+public class ReleaseFileController(
+    IPersistenceHelper<ContentDbContext> persistenceHelper,
+    IDataBlockService dataBlockService,
+    IReleaseFileService releaseFileService)
+    : ControllerBase
 {
-    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IDataBlockService _dataBlockService;
-    private readonly IReleaseFileService _releaseFileService;
-
-    public ReleaseFileController(
-        IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IDataBlockService dataBlockService,
-        IReleaseFileService releaseFileService)
-    {
-        _persistenceHelper = persistenceHelper;
-        _dataBlockService = dataBlockService;
-        _releaseFileService = releaseFileService;
-    }
-
     [HttpDelete("release/{releaseVersionId:guid}/ancillary/{fileId:guid}")]
     public async Task<ActionResult> DeleteFile(
         Guid releaseVersionId,
         Guid fileId)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .Delete(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrNoContent();
     }
@@ -48,7 +38,7 @@ public class ReleaseFileController : ControllerBase
         Guid releaseVersionId,
         Guid fileId)
     {
-        return await _dataBlockService.RemoveChartFile(releaseVersionId, fileId)
+        return await dataBlockService.RemoveChartFile(releaseVersionId, fileId)
             .HandleFailuresOrNoContent();
     }
 
@@ -59,7 +49,7 @@ public class ReleaseFileController : ControllerBase
         Guid releaseVersionId,
         [FromQuery] IList<Guid>? fileIds = null)
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+        return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
                 releaseVersionId,
                 q => q.Include(rv => rv.Release)
                     .ThenInclude(r => r.Publication)
@@ -76,7 +66,7 @@ public class ReleaseFileController : ControllerBase
                     // appended in-flight to the user's download.
                     // This is more efficient and means the user doesn't have
                     // to spend time waiting for the download to initiate.
-                    return await _releaseFileService.ZipFilesToStream(
+                    return await releaseFileService.ZipFilesToStream(
                         releaseVersionId: releaseVersionId,
                         outputStream: Response.BodyWriter.AsStream(),
                         fileIds: fileIds,
@@ -99,31 +89,24 @@ public class ReleaseFileController : ControllerBase
     public async Task<ActionResult<FileInfo>> GetFile(Guid releaseVersionId,
         Guid fileId)
     {
-        return await _releaseFileService
-            .GetFile(releaseVersionId: releaseVersionId,
+        return await releaseFileService
+            .GetFile(
+                releaseVersionId: releaseVersionId,
                 fileId: fileId)
             .HandleFailuresOrOk();
     }
 
-    // TODO EES-6359 - can we get rid?
-    [HttpGet("release/{releaseVersionId:guid}/file/{fileId:guid}/download")]
-    public async Task<ActionResult> Stream(Guid releaseVersionId,
-        Guid fileId)
-    {
-        return await _releaseFileService
-            .Stream(releaseVersionId: releaseVersionId,
-                fileId: fileId)
-            .HandleFailures();
-    }
-
     [HttpGet("release/{releaseVersionId:guid}/file/{fileId:guid}/download/blob-token")]
-    public async Task<ActionResult<string>> GetDownloadToken(Guid releaseVersionId,
-        Guid fileId)
+    public async Task<ActionResult<string>> GetDownloadToken(
+        Guid releaseVersionId,
+        Guid fileId,
+        CancellationToken cancellationToken)
     {
-        return await _releaseFileService
-            .GetDownloadToken(
+        return await releaseFileService
+            .GetBlobDownloadToken(
                 releaseVersionId: releaseVersionId,
-                fileId: fileId)
+                fileId: fileId,
+                cancellationToken: cancellationToken)
             .OnSuccess(token => token.ToBase64JsonString())
             .HandleFailuresOrOk();
     }
@@ -134,7 +117,7 @@ public class ReleaseFileController : ControllerBase
         Guid fileId,
         ReleaseDataFileUpdateRequest update)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .UpdateDataFileDetails(releaseVersionId: releaseVersionId,
                 fileId: fileId,
                 update: update)
@@ -144,7 +127,7 @@ public class ReleaseFileController : ControllerBase
     [HttpGet("release/{releaseVersionId:guid}/ancillary")]
     public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseVersionId)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .GetAncillaryFiles(releaseVersionId)
             .HandleFailuresOrOk();
     }
@@ -156,7 +139,7 @@ public class ReleaseFileController : ControllerBase
         Guid releaseVersionId,
         [FromForm] ReleaseAncillaryFileUploadRequest upload)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .UploadAncillary(releaseVersionId, upload)
             .HandleFailuresOrOk();
     }
@@ -169,7 +152,7 @@ public class ReleaseFileController : ControllerBase
         Guid fileId,
         [FromForm] ReleaseAncillaryFileUpdateRequest request)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .UpdateAncillary(releaseVersionId: releaseVersionId,
                 fileId: fileId,
                 request)
@@ -183,7 +166,7 @@ public class ReleaseFileController : ControllerBase
         Guid fileId,
         IFormFile file)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .UploadChart(releaseVersionId: releaseVersionId,
                 file,
                 replacingId: fileId)
@@ -195,7 +178,7 @@ public class ReleaseFileController : ControllerBase
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<ActionResult<FileInfo>> UploadChart(Guid releaseVersionId, IFormFile file)
     {
-        return await _releaseFileService
+        return await releaseFileService
             .UploadChart(releaseVersionId, file)
             .HandleFailuresOrOk();
     }

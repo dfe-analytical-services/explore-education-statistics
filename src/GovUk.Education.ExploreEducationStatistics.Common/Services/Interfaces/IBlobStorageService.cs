@@ -113,7 +113,8 @@ public interface IBlobStorageService
     Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
         IBlobContainer containerName,
         string filename,
-        string path);
+        string path,
+        CancellationToken cancellationToken);
 
     Task<Either<ActionResult, string>> DownloadBlobText(
         IBlobContainer containerName,

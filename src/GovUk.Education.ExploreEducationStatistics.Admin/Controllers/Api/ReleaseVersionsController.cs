@@ -78,19 +78,6 @@ public class ReleaseVersionsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    // TODO EES-6359 - can we get rid?
-    [HttpGet("releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download")]
-    public async Task<ActionResult> GetTemporaryDataSetUploadFile(
-        Guid releaseVersionId,
-        FileType fileType,
-        Guid dataSetUploadId,
-        CancellationToken cancellationToken)
-    {
-        return await _dataSetFileStorage
-            .RetrieveDataSetFileFromTemporaryStorage(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
-            .HandleFailures();
-    }
-
     [HttpGet(
         "releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download-temporary-file/blob-token")]
     public async Task<ActionResult<string>> GetTemporaryDataSetUploadFileBlobDownloadToken(

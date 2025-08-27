@@ -146,7 +146,7 @@ public class ReleaseFileServicePermissionTests
     }
 
     [Fact]
-    public async Task Stream()
+    public async Task GetDownloadToken()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
@@ -154,8 +154,10 @@ public class ReleaseFileServicePermissionTests
                 userService =>
                 {
                     var service = SetupReleaseFileService(userService: userService.Object);
-                    return service.Stream(releaseVersionId: _releaseVersion.Id,
-                        fileId: Guid.NewGuid());
+                    return service.GetBlobDownloadToken(
+                        releaseVersionId: _releaseVersion.Id,
+                        fileId: Guid.NewGuid(),
+                        cancellationToken: default);
                 }
             );
     }

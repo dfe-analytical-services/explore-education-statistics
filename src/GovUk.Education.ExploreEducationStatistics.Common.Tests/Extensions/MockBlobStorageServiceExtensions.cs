@@ -178,6 +178,46 @@ public static class MockBlobStorageServiceExtensions
             .ReturnsAsync(new NotFoundResult());
     }
 
+    public static IReturnsResult<T> SetupGetDownloadToken<T>(
+        this Mock<T> service,
+        IBlobContainer container,
+        string filename,
+        string path,
+        string contentType,
+        CancellationToken cancellationToken = default) where T : class, IBlobStorageService
+    {
+        var token = new BlobDownloadToken(
+            Token: "token",
+            ContainerName: container.Name,
+            Path: path,
+            Filename: filename,
+            ContentType: contentType);
+        
+        return service.Setup(
+            s => s.GetBlobDownloadToken(
+                container,
+                filename,
+                path,
+                cancellationToken)
+        ).ReturnsAsync(new Either<ActionResult, BlobDownloadToken>(token));
+    }
+    
+    public static IReturnsResult<T> SetupGetDownloadTokenNotFound<T>(
+        this Mock<T> service,
+        IBlobContainer container,
+        string filename,
+        string path,
+        CancellationToken cancellationToken = default) where T : class, IBlobStorageService
+    {
+        return service.Setup(
+            s => s.GetBlobDownloadToken(
+                container,
+                filename,
+                path,
+                cancellationToken)
+        ).ReturnsAsync(new Either<ActionResult, BlobDownloadToken>(new NotFoundResult()));
+    }
+
     public static IReturnsResult<T> SetupGetDeserializedJson<T>(
         this Mock<T> service,
         IBlobContainer container,

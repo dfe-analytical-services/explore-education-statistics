@@ -440,7 +440,7 @@ public abstract class BlobStorageService : IBlobStorageService
             })
             .OnSuccess(stream => new FileStreamResult(
                 fileStream: stream,
-                contentType: token.ContentType) { FileDownloadName = token.FileName });
+                contentType: token.ContentType) { FileDownloadName = token.Filename });
     }
 
     public async Task<Stream> StreamBlob(
@@ -483,10 +483,11 @@ public abstract class BlobStorageService : IBlobStorageService
     public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
         IBlobContainer containerName,
         string filename,
-        string path)
+        string path,
+        CancellationToken cancellationToken)
     {
         var blob = await GetBlobClient(containerName, path);
-        BlobProperties blobProperties = await blob.GetPropertiesAsync();
+        BlobProperties blobProperties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
 
         var uri = CreateSasUrl(blob, containerName.Name);
 
@@ -494,7 +495,7 @@ public abstract class BlobStorageService : IBlobStorageService
             Token: uri.Query[..],
             ContainerName: blob.BlobContainerName,
             Path: path,
-            FileName: filename,
+            Filename: filename,
             ContentType: blobProperties.ContentType);
     }
 
