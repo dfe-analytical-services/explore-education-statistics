@@ -12,8 +12,6 @@ public interface IBlobStorageService
 {
     Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
-    Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
-
     Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);
 
     public record DeleteBlobsOptions

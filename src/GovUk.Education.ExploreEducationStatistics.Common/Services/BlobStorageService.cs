@@ -75,21 +75,6 @@ public abstract class BlobStorageService : IBlobStorageService
         return await blob.ExistsAsync();
     }
 
-    public async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
-    {
-        var blob = await GetBlobClient(containerName, path);
-        BlobProperties properties = await blob.GetPropertiesAsync();
-
-        return new BlobInfo(
-            path: blob.Name,
-            contentType: properties.ContentType,
-            contentLength: properties.ContentLength,
-            meta: properties.Metadata,
-            created: properties.CreatedOn,
-            updated: properties.LastModified
-        );
-    }
-
     public async Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path)
     {
         var exists = await CheckBlobExists(containerName, path);
@@ -768,5 +753,20 @@ public abstract class BlobStorageService : IBlobStorageService
     private static void ThrowFileNotFoundException(IBlobContainer containerName, string path)
     {
         throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+    }
+
+    private async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
+    {
+        var blob = await GetBlobClient(containerName, path);
+        BlobProperties properties = await blob.GetPropertiesAsync();
+
+        return new BlobInfo(
+            path: blob.Name,
+            contentType: properties.ContentType,
+            contentLength: properties.ContentLength,
+            meta: properties.Metadata,
+            created: properties.CreatedOn,
+            updated: properties.LastModified
+        );
     }
 }
