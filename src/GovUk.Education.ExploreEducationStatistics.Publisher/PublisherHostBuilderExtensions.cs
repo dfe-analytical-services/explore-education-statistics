@@ -94,12 +94,20 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IPublishingService, PublishingService>()
                     .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                         new PublicBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublicStorageConnectionString,
-                            provider.GetRequiredService<ILogger<IBlobStorageService>>()))
+                            connectionString: provider
+                                .GetRequiredService<IOptions<AppOptions>>()
+                                .Value
+                                .PublicStorageConnectionString,
+                            logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            dateTimeProvider: new DateTimeProvider()))
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                         new PrivateBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PrivateStorageConnectionString,
-                            provider.GetRequiredService<ILogger<IBlobStorageService>>()))
+                            connectionString: provider
+                                .GetRequiredService<IOptions<AppOptions>>()
+                                .Value
+                                .PrivateStorageConnectionString,
+                            logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            dateTimeProvider: new DateTimeProvider()))
                     .AddScoped<IContentService, ContentService>(provider =>
                         new ContentService(
                             contentDbContext: provider.GetRequiredService<ContentDbContext>(),

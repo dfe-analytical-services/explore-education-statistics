@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 
 public class BlobStorageServiceTests
 {
+    // ReSharper disable once NotAccessedPositionalProperty.Local
     private record TestClass(string Value);
 
     [Fact]
@@ -171,7 +172,89 @@ public class BlobStorageServiceTests
 
         result.AssertNotFound();
     }
+    
+    [Fact]
+    public async Task GetBlobDownloadToken_Success()
+    {
+        const string filename = "test.pdf";
+        const string path = "path/to/test.pdf";
+        var now = DateTime.UtcNow;
 
+        var dateTimeProvider = new DateTimeProvider(now);
+
+        var blobClient = MockBlobClient(
+            name: path,
+            createdOn: DateTimeOffset.UtcNow,
+            contentLength: 10 * 1024,
+            contentType: MediaTypeNames.Application.Pdf,
+            metadata: new Dictionary<string, string>()
+        );
+
+        blobClient
+            .Setup(c => c.BlobContainerName)
+            .Returns(PublicReleaseFiles.Name);
+
+        blobClient.SetupCanGenerateSasUri(true);
+        
+        blobClient.SetupGenerateReadonlySasUri(
+            expectedExpiry: now.AddMinutes(5),
+            expectedContainerName: PublicReleaseFiles.Name,
+            uriToReturn: "https://sasurl?param1=1&param2=2");
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            dateTimeProvider: dateTimeProvider);
+
+        var result = await service.GetBlobDownloadToken(
+            containerName: PublicReleaseFiles,
+            filename: filename,
+            path: path,
+            cancellationToken: default);
+
+        var token = result.AssertRight();
+     
+        Assert.Equal("param1=1&param2=2", token.Token);
+        Assert.Equal(PublicReleaseFiles.Name, token.ContainerName);
+        Assert.Equal(filename, token.Filename);
+        Assert.Equal(path, token.Path);
+        Assert.Equal(MediaTypeNames.Application.Pdf, token.ContentType);
+    }
+    
+    [Fact]
+    public async Task GetBlobDownloadToken_BlobNotFound()
+    {
+        const string filename = "test.pdf";
+        const string path = "path/to/test.pdf";
+
+        var blobClient = MockBlobClient(
+            name: path,
+            createdOn: DateTimeOffset.UtcNow,
+            contentLength: 10 * 1024,
+            contentType: MediaTypeNames.Application.Pdf,
+            metadata: new Dictionary<string, string>()
+        );
+
+        blobClient
+            .Setup(client => client.ExistsAsync(default))
+            .ReturnsAsync(Response.FromValue(false, null!));
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+        var result = await service.GetBlobDownloadToken(
+            containerName: PublicReleaseFiles,
+            filename: filename,
+            path: path,
+            cancellationToken: default);
+
+        result.AssertNotFound();
+    }
+    
     [Fact]
     public async Task GetBlob()
     {
@@ -752,26 +835,30 @@ public class BlobStorageServiceTests
     }
 
     private static TestBlobStorageService SetupTestBlobStorageService(
-        BlobServiceClient? blobServiceClient = null)
+        BlobServiceClient? blobServiceClient = null,
+        DateTimeProvider? dateTimeProvider = null)
     {
         return new TestBlobStorageService(
             connectionString: "",
             blobServiceClient ?? new Mock<BlobServiceClient>().Object,
             Mock.Of<ILogger<BlobStorageService>>(),
-            Mock.Of<IStorageInstanceCreationUtil>()
+            Mock.Of<IStorageInstanceCreationUtil>(),
+            dateTimeProvider ?? new DateTimeProvider()
         );
     }
 
-    private class TestBlobStorageService : BlobStorageService
-    {
-        public TestBlobStorageService(
-            string connectionString,
-            BlobServiceClient client,
-            ILogger<IBlobStorageService> logger,
-            IStorageInstanceCreationUtil storageInstanceCreationUtil)
-            : base(connectionString, client, logger, storageInstanceCreationUtil)
-        { }
-    }
+    private class TestBlobStorageService(
+        string connectionString,
+        BlobServiceClient client,
+        ILogger<IBlobStorageService> logger,
+        IStorageInstanceCreationUtil storageInstanceCreationUtil,
+        DateTimeProvider dateTimeProvider)
+        : BlobStorageService(
+            connectionString,
+            client,
+            logger,
+            storageInstanceCreationUtil,
+            dateTimeProvider);
 
     private IEnumerable<Page<T>> CreatePages<T>(params List<T>[] pages)
     {

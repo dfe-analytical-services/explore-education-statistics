@@ -97,14 +97,16 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                 {
                     services.ReplaceService<IPublicBlobStorageService>(sp =>
                         new PublicBlobStorageService(
-                            _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            connectionString: _azuriteContainer.GetConnectionString(),
+                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            dateTimeProvider: new DateTimeProvider()
                         )
                     );
                     services.ReplaceService<IPrivateBlobStorageService>(sp =>
                         new PrivateBlobStorageService(
-                            _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            connectionString: _azuriteContainer.GetConnectionString(),
+                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            dateTimeProvider: new DateTimeProvider()
                         )
                     );
                     services.ReplaceService<IPublisherTableStorageService>(_ =>

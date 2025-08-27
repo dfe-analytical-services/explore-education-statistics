@@ -2,6 +2,7 @@
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Moq;
 using Moq.Language.Flow;
@@ -86,5 +87,30 @@ public static class MockBlobClientExtensions
                 (destinationStream, token) =>
                     sourceStream.CopyToAsync(destinationStream, token))
             .ReturnsAsync(new Mock<Response>().Object);
+    }
+    
+    public static IReturnsResult<BlobClient> SetupCanGenerateSasUri(
+        this Mock<BlobClient> blobClient,
+        bool canGenerate)
+    {
+        return blobClient
+            .Setup(c => c.CanGenerateSasUri)
+            .Returns(canGenerate);
+    }
+    
+    public static IReturnsResult<BlobClient> SetupGenerateReadonlySasUri(
+        this Mock<BlobClient> blobClient,
+        DateTimeOffset expectedExpiry,
+        string expectedContainerName,
+        string uriToReturn)
+    {
+        return blobClient
+            .Setup(c => c.GenerateSasUri(
+                It.Is<BlobSasBuilder>(builder => 
+                    builder.BlobContainerName == expectedContainerName &&
+                    builder.Permissions == "r" &&
+                    builder.Resource == "c" &&
+                    builder.ExpiresOn == expectedExpiry)))
+            .Returns(new Uri(uriToReturn));
     }
 }

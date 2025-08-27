@@ -93,9 +93,12 @@ public static class ProcessorHostBuilder
                     .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                         new PrivateBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value
+                            connectionString: provider
+                                .GetRequiredService<IOptions<AppOptions>>()
+                                .Value
                                 .PrivateStorageConnectionString,
-                            provider.GetRequiredService<ILogger<IBlobStorageService>>()))
+                            logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            dateTimeProvider: new DateTimeProvider()))
                     .Configure<AppOptions>(
                         hostBuilderContext.Configuration.GetSection(AppOptions.Section))
                     .Configure<FeatureFlagsOptions>(

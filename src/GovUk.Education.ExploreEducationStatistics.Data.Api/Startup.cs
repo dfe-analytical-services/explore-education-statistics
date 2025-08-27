@@ -137,8 +137,10 @@ public class Startup
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            new PublicBlobStorageService(
+                connectionString: Configuration.GetValue<string>("PublicStorage")!,
+                logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                dateTimeProvider: new DateTimeProvider()));
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()

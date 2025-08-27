@@ -44,8 +44,12 @@ var host = new HostBuilder()
                     providerOptions => providerOptions.EnableCustomRetryOnFailure()))
             .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(
-                    provider.GetRequiredService<IOptions<AppOptions>>().Value.PrivateStorageConnectionString,
-                    provider.GetRequiredService<ILogger<IBlobStorageService>>())
+                    connectionString: provider
+                        .GetRequiredService<IOptions<AppOptions>>()
+                        .Value
+                        .PrivateStorageConnectionString,
+                    logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    new DateTimeProvider())
             )
             .AddTransient<IFileImportService, FileImportService>()
             .AddTransient<IImporterService, ImporterService>()

@@ -627,10 +627,12 @@ public class Startup(
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
             new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+                provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                dateTimeProvider: new DateTimeProvider()));
         services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
             new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+                provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                dateTimeProvider: new DateTimeProvider()));
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
             new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
         services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();

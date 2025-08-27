@@ -122,8 +122,10 @@ public class Startup(
 
         // Services
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            new PublicBlobStorageService(
+                connectionString: configuration.GetRequiredValue("PublicStorage"),
+                logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                dateTimeProvider: new DateTimeProvider()));
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()));
