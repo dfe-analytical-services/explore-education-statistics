@@ -174,16 +174,21 @@ public class ReleaseFileService(
         if (allFilesZip?.Updated is not null
             && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
         {
-            var result = await publicBlobStorageService.DownloadToStream(
+            var streamResult = await publicBlobStorageService.GetDownloadStream(
                 containerName: PublicReleaseFiles,
                 path: path,
-                stream: outputStream,
-                cancellationToken: cancellationToken
-            );
+                cancellationToken: cancellationToken);
 
+            if (streamResult.IsLeft)
+            {
+                return false;
+            }
+
+            await using var blobStream = streamResult.Right;
+            await blobStream.CopyToAsync(outputStream, cancellationToken);
             await outputStream.DisposeAsync();
 
-            return result.IsRight;
+            return true;
         }
 
         return false;
