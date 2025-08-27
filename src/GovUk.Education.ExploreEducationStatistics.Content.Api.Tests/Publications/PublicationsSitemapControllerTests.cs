@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
@@ -15,10 +13,10 @@ public abstract class PublicationsSitemapControllerTests
     public class GetSitemapItemsTests : PublicationsSitemapControllerTests
     {
         [Fact]
-        public async Task GetSitemap_ReturnsOk_WhenServiceReturnsSitemap()
+        public async Task GetSitemapItems_ReturnsOk_WhenServiceReturnsSitemap()
         {
             // Arrange
-            PublicationSitemapItemDto[] sitemapItems =
+            PublicationSitemapPublicationDto[] sitemapItems =
             [
                 new()
                 {
@@ -26,7 +24,7 @@ public abstract class PublicationsSitemapControllerTests
                     LastModified = DateTime.Parse("2024-02-05T09:36:45.00Z"),
                     Releases =
                     [
-                        new ReleaseSitemapItemDto
+                        new PublicationSitemapReleaseDto
                         {
                             Slug = "test-release",
                             LastModified = DateTime.Parse("2024-01-03T10:14:23.00Z")

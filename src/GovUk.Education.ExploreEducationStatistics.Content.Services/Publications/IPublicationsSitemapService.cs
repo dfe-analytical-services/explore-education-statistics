@@ -4,5 +4,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publicatio
 
 public interface IPublicationsSitemapService
 {
-    Task<PublicationSitemapItemDto[]> GetSitemapItems(CancellationToken cancellationToken = default);
+    Task<PublicationSitemapPublicationDto[]> GetSitemapItems(CancellationToken cancellationToken = default);
 }

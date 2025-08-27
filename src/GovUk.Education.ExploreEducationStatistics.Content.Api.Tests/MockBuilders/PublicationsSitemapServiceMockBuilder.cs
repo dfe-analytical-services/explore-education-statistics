@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Threading;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Moq;
@@ -10,7 +9,7 @@ public class PublicationsSitemapServiceMockBuilder
 {
     private readonly Mock<IPublicationsSitemapService> _mock = new(MockBehavior.Strict);
 
-    private PublicationSitemapItemDto[]? _sitemapItems;
+    private PublicationSitemapPublicationDto[]? _sitemapItems;
 
     public IPublicationsSitemapService Build()
     {
@@ -21,7 +20,7 @@ public class PublicationsSitemapServiceMockBuilder
         return _mock.Object;
     }
 
-    public PublicationsSitemapServiceMockBuilder WhereHasSitemapItems(PublicationSitemapItemDto[] sitemapItems)
+    public PublicationsSitemapServiceMockBuilder WhereHasSitemapItems(PublicationSitemapPublicationDto[] sitemapItems)
     {
         _sitemapItems = sitemapItems;
         return this;
