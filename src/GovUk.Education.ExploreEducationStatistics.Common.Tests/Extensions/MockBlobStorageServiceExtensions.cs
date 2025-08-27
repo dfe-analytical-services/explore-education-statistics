@@ -145,14 +145,16 @@ public static class MockBlobStorageServiceExtensions
         string path,
         string content,
         bool decompress = true,
-        CancellationToken cancellationToken = default) where T : class, IBlobStorageService
+        CancellationToken cancellationToken = default,
+        Action? callback = null) where T : class, IBlobStorageService
     {
         return service.SetupGetDownloadStream(
             container,
             path,
             Encoding.UTF8.GetBytes(content),
             decompress,
-            cancellationToken
+            cancellationToken,
+            callback
         );
     }
 
@@ -162,7 +164,8 @@ public static class MockBlobStorageServiceExtensions
         string path,
         byte[] content,
         bool decompress = true,
-        CancellationToken cancellationToken = default) where T : class, IBlobStorageService
+        CancellationToken cancellationToken = default,
+        Action? callback = null) where T : class, IBlobStorageService
     {
         var stream = new MemoryStream(content);
         
@@ -174,7 +177,9 @@ public static class MockBlobStorageServiceExtensions
         return service.Setup(
                 s =>
                     s.GetDownloadStream(container, path, decompress, cancellationToken)
-            ).ReturnsAsync(stream);
+            )
+            .Callback(callback ?? (() => { }))
+            .ReturnsAsync(stream);
     }
     
     public static IReturnsResult<T> SetupGetDownloadStreamNotFound<T>(
