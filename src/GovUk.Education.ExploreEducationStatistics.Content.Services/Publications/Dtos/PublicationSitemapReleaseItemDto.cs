@@ -8,12 +8,10 @@ public record PublicationSitemapReleaseDto
 
     public required DateTime LastModified { get; init; }
 
-    public static PublicationSitemapReleaseDto FromReleaseVersion(ReleaseVersion releaseVersion)
-    {
-        return new PublicationSitemapReleaseDto
+    public static PublicationSitemapReleaseDto FromReleaseVersion(ReleaseVersion releaseVersion) =>
+        new()
         {
             Slug = releaseVersion.Release.Slug,
             LastModified = releaseVersion.Published ?? throw new ArgumentException("ReleaseVersion must be published")
         };
-    }
 }
