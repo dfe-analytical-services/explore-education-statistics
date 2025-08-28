@@ -1,12 +1,16 @@
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
 import { HtmlBlock } from '@common/services/types/blocks';
-import { Dictionary } from '@common/types';
+import { EditableContentBlock } from '@admin/services/types/content';
 
-// NOTE: Ein content is saved in the EinContentSections and EinContentBlocks db
-// tables. But despite that several interfaces/types are shared for content
-// across Ein page, releases, and methodologies.
-type EinContentSection = ContentSection<HtmlBlock>;
+// NOTE: EiN content is saved in the EinContentSections and EinContentBlocks db
+// tables. But despite that several frontend interfaces/types are shared for content
+// across EiN page, releases, and methodologies.
+
+// NOTE: We need to use EditableContentBlock rather than HtmlBlock - despite not
+// needing here `comments`, `locked`, etc. - as otherwise we'd need to create
+// an alternate version of `EditableContentBlock`. For now, we're avoiding this.
+export type EinContentSection = ContentSection<EditableContentBlock>;
 
 // Generic Ein block types
 export type EinBlockType = 'HtmlBlock';
@@ -148,8 +152,7 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
-  }): Promise<EinContentSection[]> {
-    // @MarkFix can just return a content section?
+  }): Promise<void> {
     return client.delete(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}`,
     );

@@ -7,14 +7,13 @@ import useEducationInNumbersPageContentActions from '@admin/pages/education-in-n
 import EducationInNumbersEditableBlock from '@admin/pages/education-in-numbers/content/components/EducationInNumbersEditableBlock';
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
-import { ContentSection } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { EinContentSection } from '@admin/services/educationInNumbersContentService';
 
 interface EducationInNumbersAccordionSectionProps {
   id: string;
-  section: ContentSection<EditableContentBlock>;
+  section: EinContentSection;
   educationInNumbersPageId: string;
   educationInNumbersPageSlug: string;
   onRemoveSection: (sectionId: string) => void;

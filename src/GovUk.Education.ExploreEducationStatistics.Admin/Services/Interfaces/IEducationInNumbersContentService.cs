@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -48,7 +45,7 @@ public interface IEducationInNumbersContentService
         Guid sectionId,
         List<Guid> newBlockOrder);
 
-    Task<Either<ActionResult, List<EinContentBlockViewModel>>> DeleteBlock( // @MarkFix frontend expects List<EinContentSectionViewModel> returned - but maybe should change it to EinContentSectionViewModel?
+    Task<Either<ActionResult, Unit>> DeleteBlock(
         Guid pageId,
         Guid sectionId,
         Guid blockId);
