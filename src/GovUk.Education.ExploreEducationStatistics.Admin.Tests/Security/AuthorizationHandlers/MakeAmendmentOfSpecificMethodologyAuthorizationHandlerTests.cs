@@ -28,7 +28,9 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(), PublishingStrategy = Immediately, MethodologyId = Guid.NewGuid()
+        Id = Guid.NewGuid(), 
+        PublishingStrategy = Immediately, 
+        MethodologyId = Guid.NewGuid()
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };

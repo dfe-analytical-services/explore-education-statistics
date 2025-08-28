@@ -27,7 +27,7 @@ public class AuthorizationHandlerServiceTests
             
             var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepositoryMock
-                .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>(), false))
                 .ReturnsAsync([publicationRole]);
 
             var authorizationHandlerService = CreateService(
@@ -49,7 +49,7 @@ public class AuthorizationHandlerServiceTests
             
             var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepositoryMock
-                .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>(), false))
                 .ReturnsAsync([publicationRole]);
 
             var authorizationHandlerService = CreateService(
@@ -82,7 +82,7 @@ public class AuthorizationHandlerServiceTests
         
         var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>();
         userPublicationRoleRepositoryMock
-            .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>(), false))
             .ReturnsAsync([]);
 
         var preReleaseServiceMock = new Mock<IPreReleaseService>();

@@ -23,7 +23,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid()
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid()
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -35,7 +36,11 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task NoClaimsAllowUpdatingApprovedMethodology()
         {
-            var methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid(), Status = Approved };
+            var methodologyVersion = new MethodologyVersion 
+            { 
+                Id = Guid.NewGuid(), 
+                Status = Approved 
+            };
 
             await ForEachSecurityClaimAsync(async claim =>
             {

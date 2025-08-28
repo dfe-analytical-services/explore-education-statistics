@@ -26,7 +26,9 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = MethodologyApprovalStatus.Approved,
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid(), 
+        Status = MethodologyApprovalStatus.Approved,
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };

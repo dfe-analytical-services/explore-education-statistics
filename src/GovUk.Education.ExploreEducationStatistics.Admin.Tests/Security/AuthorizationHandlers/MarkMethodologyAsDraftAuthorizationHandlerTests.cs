@@ -28,12 +28,16 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
     private static readonly MethodologyVersion HigherReviewMethodologyVersion = new()
     {
-        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = MethodologyApprovalStatus.HigherLevelReview,
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid(), 
+        Status = MethodologyApprovalStatus.HigherLevelReview,
     };
 
     private static readonly MethodologyVersion ApprovedMethodologyVersion = new()
     {
-        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = MethodologyApprovalStatus.Approved,
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid(), 
+        Status = MethodologyApprovalStatus.Approved,
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };

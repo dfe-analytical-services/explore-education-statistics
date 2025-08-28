@@ -25,7 +25,8 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid()
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid()
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -71,7 +72,9 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = Draft
+                Id = Guid.NewGuid(), 
+                MethodologyId = Guid.NewGuid(), 
+                Status = Draft
             };
 
             await ForEachSecurityClaimAsync(async claim =>
@@ -130,7 +133,9 @@ public class MarkMethodologyAsApprovedAuthorizationHandlerTests
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Id = Guid.NewGuid(), MethodologyId = Guid.NewGuid(), Status = Approved
+                Id = Guid.NewGuid(),
+                MethodologyId = Guid.NewGuid(), 
+                Status = Approved
             };
 
             await ForEachSecurityClaimAsync(async claim =>
