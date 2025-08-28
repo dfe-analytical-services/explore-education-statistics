@@ -99,10 +99,7 @@ const EducationInNumbersAccordionSection = ({
   );
 
   const reorderBlocksInAccordionSection = useCallback(async () => {
-    const order = blocks.reduce<Dictionary<number>>((acc, block, newIndex) => {
-      acc[block.id] = newIndex;
-      return acc;
-    }, {});
+    const order = blocks.map(block => block.id);
 
     await updateSectionBlockOrder({
       educationInNumbersPageId,

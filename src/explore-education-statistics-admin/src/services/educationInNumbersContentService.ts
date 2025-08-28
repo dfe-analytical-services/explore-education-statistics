@@ -73,7 +73,7 @@ const educationInNumbersContentService = {
     order,
   }: {
     educationInNumbersPageId: string;
-    order: Dictionary<number>; // @MarkFix
+    order: string[];
   }): Promise<EinContentSection[]> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/order`,
@@ -132,7 +132,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-    order: Dictionary<number>; // @MarkFix
+    order: string[];
   }): Promise<EinContentBlock[]> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/blocks/order`,
