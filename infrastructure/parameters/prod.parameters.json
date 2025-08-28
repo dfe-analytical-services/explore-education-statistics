@@ -102,7 +102,7 @@
       "value": 2199023255552
     },
     "enableReplacementOfPublicApiDataSets" : {
-      "value": false
+      "value": true
     }
   }
 }
