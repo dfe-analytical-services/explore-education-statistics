@@ -1092,7 +1092,7 @@ public class PermalinkServiceTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService.SetupDownloadToStream(
+        publicBlobStorageService.SetupGetDownloadStream(
             container: BlobContainers.PermalinkSnapshots,
             path: $"{permalink.Id}.csv.zst",
             content: "Test csv");
@@ -1137,7 +1137,7 @@ public class PermalinkServiceTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService.SetupDownloadToStreamNotFound(
+        publicBlobStorageService.SetupGetDownloadStreamNotFound(
             container: BlobContainers.PermalinkSnapshots,
             path: $"{permalink.Id}.csv.zst");
 

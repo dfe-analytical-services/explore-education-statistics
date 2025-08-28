@@ -573,7 +573,7 @@ public class MethodologyImageServiceTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
+            .SetupGetDownloadStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -673,7 +673,7 @@ public class MethodologyImageServiceTests
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 
-        privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateMethodologyFiles, methodologyFile.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateMethodologyFiles, methodologyFile.Path());
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {

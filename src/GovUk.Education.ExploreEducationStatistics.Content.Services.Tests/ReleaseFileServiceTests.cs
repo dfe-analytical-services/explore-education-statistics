@@ -65,7 +65,7 @@ public class ReleaseFileServiceTests : IDisposable
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test blob");
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -163,7 +163,7 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService.SetupDownloadToStreamNotFound(PublicReleaseFiles, releaseFile.PublicPath());
+        publicBlobStorageService.SetupGetDownloadStreamNotFound(PublicReleaseFiles, releaseFile.PublicPath());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -222,9 +222,9 @@ public class ReleaseFileServiceTests : IDisposable
         publicBlobStorageService
             .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
@@ -321,7 +321,7 @@ public class ReleaseFileServiceTests : IDisposable
         publicBlobStorageService
             .SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), true);
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test data 1 blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test data 1 blob");
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
@@ -859,9 +859,9 @@ public class ReleaseFileServiceTests : IDisposable
         publicBlobStorageService
             .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
         var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
@@ -983,7 +983,7 @@ public class ReleaseFileServiceTests : IDisposable
             );
 
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
+            .SetupGetDownloadStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
 
         var request = new CaptureZipDownloadRequest
         {
@@ -1072,7 +1072,7 @@ public class ReleaseFileServiceTests : IDisposable
         publicBlobStorageService
             .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
         publicBlobStorageService
-            .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test ancillary blob");
+            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test ancillary blob");
 
         // 'All files' zip will be uploaded to blob storage to be re-cached
         publicBlobStorageService
