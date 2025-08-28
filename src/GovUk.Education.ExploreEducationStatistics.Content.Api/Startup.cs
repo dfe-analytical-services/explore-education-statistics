@@ -172,6 +172,7 @@ public class Startup(
         services.AddTransient<IGlossaryService, GlossaryService>();
         services.AddTransient<IThemeService, ThemeService>();
         services.AddTransient<IPublicationsSitemapService, PublicationsSitemapService>();
+        services.AddTransient<IPublicationsSearchService, PublicationsSearchService>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
