@@ -44,11 +44,7 @@ const EducationInNumbersAccordion = ({
     async (ids: string[]) => {
       const order = ids
         // Strip out the accordion id prefix
-        .map(sectionId => sectionId.replace(`${id}-`, ''))
-        .reduce<Dictionary<number>>((acc, sectionId, index) => {
-          acc[sectionId] = index;
-          return acc;
-        }, {});
+        .map(sectionId => sectionId.replace(`${id}-`, ''));
 
       await updateContentSectionsOrder({
         educationInNumbersPageId: pageContent.id,

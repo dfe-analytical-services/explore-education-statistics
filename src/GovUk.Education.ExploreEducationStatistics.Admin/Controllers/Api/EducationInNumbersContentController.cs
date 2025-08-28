@@ -49,14 +49,9 @@ public class EducationInNumbersContentController(
     [HttpPut("education-in-numbers/{pageId:guid}/content/sections/order")]
     public async Task<ActionResult<List<EinContentSectionViewModel>>> UpdatePageSectionOrder(
         [FromRoute] Guid pageId,
-        [FromBody] Dictionary<Guid, int> newSectionOrder) // @MarkFix change to accept a List<Guid>?
+        [FromBody] List<Guid> order)
     {
-        var newSectionOrderList = newSectionOrder
-            .OrderBy(kvp => kvp.Value)
-            .Select(kvp => kvp.Key)
-            .ToList();
-
-        return await einContentService.ReorderSections(pageId, newSectionOrderList)
+        return await einContentService.ReorderSections(pageId, order)
             .HandleFailuresOrOk();
     }
 
@@ -94,14 +89,9 @@ public class EducationInNumbersContentController(
     public async Task<ActionResult<List<EinContentBlockViewModel>>> UpdateSectionBlocksOrder(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromBody] Dictionary<Guid, int> newBlockOrder) // @MarkFix frontend provide List<Guid> instead?
+        [FromBody] List<Guid> order)
     {
-        var newBlockOrderList = newBlockOrder
-            .OrderBy(kvp => kvp.Value)
-            .Select(kvp => kvp.Key)
-            .ToList();
-
-        return await einContentService.ReorderBlocks(pageId, sectionId, newBlockOrderList)
+        return await einContentService.ReorderBlocks(pageId, sectionId, order)
             .HandleFailuresOrOk();
     }
 

@@ -93,7 +93,7 @@ export default function useEducationInNumbersPageContentActions() {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-    order: Dictionary<number>;
+    order: string[];
   }) {
     const sectionContent =
       await educationInNumbersContentService.updateContentSectionBlocksOrder({
@@ -137,7 +137,7 @@ export default function useEducationInNumbersPageContentActions() {
     order,
   }: {
     educationInNumbersPageId: string;
-    order: Dictionary<number>;
+    order: string[];
   }) {
     const content =
       await educationInNumbersContentService.updateContentSectionsOrder({
