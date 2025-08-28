@@ -96,20 +96,13 @@ public static class MockBlobStorageServiceExtensions
     {
         return service.Setup(
                 s =>
-                    s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
+                    s.GetDownloadStream(container, path, decompress, cancellationToken)
             )
-            .Callback<IBlobContainer, string, Stream, bool, CancellationToken?>(
-                (_, _, stream, _, _) =>
-                {
-                    stream.Write(content, 0, content.Length);
-
-                    if (stream.CanSeek)
-                    {
-                        stream.Position = 0;
-                    }
-                }
-            )
-            .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
+            .ReturnsAsync((IBlobContainer _, string _, bool _, CancellationToken? _) =>
+            {
+                var stream = new MemoryStream(content);
+                return stream;
+            });
     }
 
     public static IReturnsResult<T> SetupDownloadToStreamNotFound<T>(
@@ -121,7 +114,7 @@ public static class MockBlobStorageServiceExtensions
     {
         return service.Setup(
                 s =>
-                    s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
+                    s.GetDownloadStream(container, path, decompress, cancellationToken)
             )
             .ReturnsAsync(new NotFoundResult());
     }
