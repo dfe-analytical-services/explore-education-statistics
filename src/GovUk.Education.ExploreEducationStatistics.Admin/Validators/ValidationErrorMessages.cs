@@ -2,6 +2,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public enum ValidationErrorMessages
 {
+    // Title
+    TitleNotUnique,
+
     // Slug
     SlugNotUnique,
     ReleaseSlugUsedByRedirect,
@@ -122,4 +125,7 @@ public enum ValidationErrorMessages
     // Featured tables
     DataBlockAlreadyHasFeaturedTable,
     ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
+
+    // Education in numbers
+    ProvidedPageIdsDifferFromActualPageIds,
 }

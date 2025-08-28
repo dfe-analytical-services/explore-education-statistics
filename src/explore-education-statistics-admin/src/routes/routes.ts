@@ -1,6 +1,9 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
+import EducationInNumbersCreatePage from '@admin/pages/education-in-numbers/EducationInNumbersCreatePage';
+import EducationInNumbersListPage from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
+import EducationInNumbersPage from '@admin/pages/education-in-numbers/EducationInNumbersPage';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
@@ -161,6 +164,26 @@ export const releaseDataGuidanceRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const educationInNumbersListRoute: ProtectedRouteProps = {
+  path: '/education-in-numbers',
+  component: EducationInNumbersListPage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
+export const educationInNumbersCreateRoute: ProtectedRouteProps = {
+  path: '/education-in-numbers/create',
+  component: EducationInNumbersCreatePage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
+export const educationInNumbersRoute: ProtectedRouteProps = {
+  path: '/education-in-numbers/:educationInNumbersPageId',
+  component: EducationInNumbersPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
 export const publicRoutes = {
   signInRoute,
   signedOutRoute,
@@ -188,6 +211,9 @@ const routes = {
   releaseRoute,
   releaseCreateRoute,
   publicationRoute,
+  educationInNumbersListRoute,
+  educationInNumbersCreateRoute,
+  educationInNumbersRoute,
 };
 
 export default routes;
