@@ -565,9 +565,22 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
       <ReleaseHelpAndSupportSection
         publication={releaseVersion.publication}
         releaseType={releaseVersion.type}
-        renderExternalMethodologyLink={externalMethodology => (
-          <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
-        )}
+        renderExternalMethodologyLink={externalMethodology => {
+          const externalMethodologyAttributes = getUrlAttributes(
+            externalMethodology.url,
+          );
+          return (
+            <Link
+              to={externalMethodology.url}
+              rel={`noopener noreferrer nofollow ${
+                !externalMethodologyAttributes?.isTrusted ? 'external' : ''
+              }`}
+              target="_blank"
+            >
+              {externalMethodology.title} (opens in new tab)
+            </Link>
+          );
+        }}
         renderMethodologyLink={methodology => (
           <Link to={`/methodology/${methodology.slug}`}>
             {methodology.title}
