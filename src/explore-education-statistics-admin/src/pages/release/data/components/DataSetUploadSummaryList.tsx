@@ -1,12 +1,11 @@
-import releaseDataFileService, {
-  DataSetUpload,
-} from '@admin/services/releaseDataFileService';
+import { DataSetUpload } from '@admin/services/releaseDataFileService';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import React from 'react';
 import ButtonText from '@common/components/ButtonText';
+import downloadTemporaryReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadTemporaryReleaseFileSecurely';
 import {
   getDataSetUploadStatusColour,
   getDataSetUploadStatusLabel,
@@ -31,12 +30,12 @@ export default function DataSetUploadSummaryList({
       <SummaryListItem term="Data file">
         <ButtonText
           onClick={() =>
-            releaseDataFileService.downloadTemporaryFile(
+            downloadTemporaryReleaseFileSecurely({
               releaseVersionId,
-              'data',
-              dataSetUpload.id,
-              dataSetUpload.dataFileName,
-            )
+              dataSetUploadId: dataSetUpload.id,
+              fileName: dataSetUpload.dataFileName,
+              fileType: 'data',
+            })
           }
         >
           {dataSetUpload.dataFileName}
@@ -45,12 +44,12 @@ export default function DataSetUploadSummaryList({
       <SummaryListItem term="Meta file">
         <ButtonText
           onClick={() =>
-            releaseDataFileService.downloadTemporaryFile(
+            downloadTemporaryReleaseFileSecurely({
               releaseVersionId,
-              'metadata',
-              dataSetUpload.id,
-              dataSetUpload.metaFileName,
-            )
+              dataSetUploadId: dataSetUpload.id,
+              fileName: dataSetUpload.metaFileName,
+              fileType: 'metadata',
+            })
           }
         >
           {dataSetUpload.metaFileName}

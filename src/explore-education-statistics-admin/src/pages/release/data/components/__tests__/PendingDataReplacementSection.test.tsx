@@ -98,10 +98,13 @@ describe('PendingDataReplacementSection', () => {
   test('cancelling as an analyst when there is a public API linked to the data file is not possible', async () => {
     renderWithAuth({ ...defaultProps }, analyst);
     await waitFor(async () => {
-      await userEvent.click(
+      expect(
         screen.getByRole('button', { name: /cancel data replacement/i }),
-      );
+      ).toBeInTheDocument();
     });
+    await userEvent.click(
+      screen.getByRole('button', { name: /cancel data replacement/i }),
+    );
     expect(
       screen.getByText(
         /You do not have permission to cancel this data replacement. This is because it is linked to an API data set version which can only be modified by BAU users./i,
@@ -124,11 +127,13 @@ describe('PendingDataReplacementSection', () => {
   test('cancelling as an bau when there is a public API linked to the data file is not possible', async () => {
     renderWithAuth({ ...defaultProps }, bau);
     await waitFor(async () => {
-      await userEvent.click(
+      expect(
         screen.getByRole('button', { name: /cancel data replacement/i }),
-      );
+      ).toBeInTheDocument();
     });
-
+    await userEvent.click(
+      screen.getByRole('button', { name: /cancel data replacement/i }),
+    );
     expect(
       screen.queryByText(/explore.statistics@education.gov.uk/i),
     ).not.toBeInTheDocument();

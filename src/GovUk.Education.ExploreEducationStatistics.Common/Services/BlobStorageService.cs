@@ -35,18 +35,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 /// </summary>
 public abstract class BlobStorageService : IBlobStorageService
 {
+    private static readonly TimeSpan DownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
+    
     private readonly string _connectionString;
     private readonly BlobServiceClient _client;
     private readonly ILogger<IBlobStorageService> _logger;
     private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
+    private readonly IBlobSasService _blobSasService;
 
     protected BlobStorageService(
         string connectionString,
-        ILogger<IBlobStorageService> logger)
+        ILogger<IBlobStorageService> logger,
+        IBlobSasService blobSasService)
     {
         _connectionString = connectionString;
         _client = new BlobServiceClient(connectionString);
         _logger = logger;
+        _blobSasService = blobSasService;
         _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
     }
 
@@ -54,52 +59,14 @@ public abstract class BlobStorageService : IBlobStorageService
         string connectionString,
         BlobServiceClient client,
         ILogger<IBlobStorageService> logger,
-        IStorageInstanceCreationUtil storageInstanceCreationUtil)
+        IStorageInstanceCreationUtil storageInstanceCreationUtil,
+        IBlobSasService blobSasService)
     {
         _connectionString = connectionString;
         _client = client;
         _logger = logger;
         _storageInstanceCreationUtil = storageInstanceCreationUtil;
-    }
-
-    public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
-    {
-        var blobContainer = await GetBlobContainer(containerName);
-        var blobInfos = new List<BlobInfo>();
-
-        string? continuationToken = null;
-
-        do
-        {
-            var blobPages = blobContainer.GetBlobsAsync(BlobTraits.Metadata, prefix: path)
-                .AsPages(continuationToken);
-
-            await foreach (Page<BlobItem> page in blobPages)
-            {
-                foreach (var blob in page.Values)
-                {
-                    if (blob == null)
-                    {
-                        break;
-                    }
-
-                    blobInfos.Add(
-                        new BlobInfo(
-                            path: blob.Name,
-                            contentType: blob.Properties.ContentType,
-                            contentLength: blob.Properties.ContentLength ?? 0,
-                            meta: blob.Metadata,
-                            created: blob.Properties.CreatedOn,
-                            updated: blob.Properties.LastModified
-                        )
-                    );
-                }
-
-                continuationToken = page.ContinuationToken;
-            }
-        } while (continuationToken != string.Empty);
-
-        return blobInfos;
+        _blobSasService = blobSasService;
     }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
@@ -437,11 +404,49 @@ public abstract class BlobStorageService : IBlobStorageService
                 return await blob.OpenReadAsync(cancellationToken: cancellationToken);
             });
     }
-    
+
+    private async Task<Either<ActionResult, Stream>> GetDownloadStream(
+        BlobClient blob,
+        bool decompress = true,
+        CancellationToken cancellationToken = default)
+    {
+        if (decompress)
+        {
+            BlobProperties blobProperties =
+                await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+
+            // Check the ContentEncoding property to determine if the blob
+            // is compressed and only decompress if necessary.
+            if (blobProperties.ContentEncoding.IsNullOrEmpty())
+            {
+                return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+            }
+
+            var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+            return CompressionUtils.GetCompressionStream(
+                blobStream,
+                contentEncoding: blobProperties.ContentEncoding,
+                CompressionMode.Decompress);
+        }
+
+        return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+    }
+
+    public Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
+        BlobDownloadToken token,
+        CancellationToken cancellationToken)
+    {
+        return _blobSasService
+            .CreateSecureBlobClient(blobServiceClient: _client, token: token)
+            .OnSuccess(blobClient => GetDownloadStream(blob: blobClient, decompress: true, cancellationToken))
+            .OnSuccess(stream => new FileStreamResult(
+                fileStream: stream,
+                contentType: token.ContentType) { FileDownloadName = token.Filename });
+    }
+
     public async Task<Stream> StreamBlob(
         IBlobContainer containerName,
         string path,
-        int? bufferSize = null,
         CancellationToken cancellationToken = default)
     {
         var blob = await GetBlobClient(containerName, path);
@@ -474,6 +479,22 @@ public abstract class BlobStorageService : IBlobStorageService
 
             throw;
         }
+    }
+
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
+        IBlobContainer container,
+        string filename,
+        string path,
+        CancellationToken cancellationToken)
+    {
+        return await _blobSasService
+            .CreateBlobDownloadToken(
+                blobServiceClient: _client,
+                container: container,
+                filename: filename,
+                path: path,
+                expiryDuration: DownloadTokenExpiryDuration,
+                cancellationToken: cancellationToken);
     }
 
     public async Task<Either<ActionResult, string>> DownloadBlobText(

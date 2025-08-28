@@ -122,9 +122,12 @@ public class Startup(
             .Bind(configuration.GetSection(AnalyticsOptions.Section));
 
         // Services
-        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+        services.AddSingleton<IBlobSasService, BlobSasService>();
+        services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+            new PublicBlobStorageService(
+                connectionString: configuration.GetRequiredValue("PublicStorage"),
+                logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()));

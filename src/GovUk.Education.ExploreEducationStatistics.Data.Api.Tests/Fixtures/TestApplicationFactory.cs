@@ -77,8 +77,9 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                 {
                     services.ReplaceService<IPublicBlobStorageService>(sp =>
                         new PublicBlobStorageService(
-                            _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            connectionString: _azuriteContainer.GetConnectionString(),
+                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                 });

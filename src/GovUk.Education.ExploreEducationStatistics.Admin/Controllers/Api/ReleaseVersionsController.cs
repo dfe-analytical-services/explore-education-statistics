@@ -78,16 +78,18 @@ public class ReleaseVersionsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download")]
-    public async Task<ActionResult> GetDataSetUploadFile(
+    [HttpGet(
+        "releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download-temporary-file/blob-token")]
+    public async Task<ActionResult<string>> GetTemporaryDataSetUploadFileBlobDownloadToken(
         Guid releaseVersionId,
         FileType fileType,
         Guid dataSetUploadId,
         CancellationToken cancellationToken)
     {
         return await _dataSetFileStorage
-            .RetrieveDataSetFileFromTemporaryStorage(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
-            .HandleFailures();
+            .GetTemporaryFileDownloadToken(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
+            .OnSuccess(token => token.ToBase64JsonString())
+            .HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895

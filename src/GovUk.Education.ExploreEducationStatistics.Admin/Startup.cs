@@ -625,12 +625,15 @@ public class Startup(
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
+        services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
             new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+                provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
             new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+                provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
             new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
         services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
@@ -638,7 +641,7 @@ public class Startup(
         AddPersistenceHelper<StatisticsDbContext>(services);
         AddPersistenceHelper<UsersAndRolesDbContext>(services);
         services.AddTransient<AuthorizationHandlerService>();
-        services.AddScoped<DateTimeProvider>();
+        services.AddSingleton<DateTimeProvider>();
 
         // This service allows a set of users to be pre-invited to the service on startup.
         if (hostEnvironment.IsDevelopment())

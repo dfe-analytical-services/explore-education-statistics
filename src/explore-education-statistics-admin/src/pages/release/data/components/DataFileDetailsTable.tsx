@@ -1,9 +1,7 @@
 import ImporterStatus, {
   ImporterStatusChangeHandler,
 } from '@admin/pages/release/data/components/ImporterStatus';
-import releaseDataFileService, {
-  DataFile,
-} from '@admin/services/releaseDataFileService';
+import { DataFile } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
@@ -11,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import getDataSetVersionStatusText from './utils/getDataSetVersionStatusText';
 
 interface Props {
@@ -77,11 +76,11 @@ const DataFileDetailsTable = ({
           <td data-testid="Data file">
             <ButtonText
               onClick={() =>
-                releaseDataFileService.downloadFile(
+                downloadReleaseFileSecurely({
                   releaseVersionId,
-                  dataFile.id,
-                  dataFile.fileName,
-                )
+                  fileId: dataFile.id,
+                  fileName: dataFile.fileName,
+                })
               }
             >
               {dataFile.fileName}
@@ -91,11 +90,11 @@ const DataFileDetailsTable = ({
             <td data-testid="Replacement Data file">
               <ButtonText
                 onClick={() =>
-                  releaseDataFileService.downloadFile(
+                  downloadReleaseFileSecurely({
                     releaseVersionId,
-                    replacementDataFile.id,
-                    replacementDataFile.fileName,
-                  )
+                    fileId: replacementDataFile.id,
+                    fileName: replacementDataFile.fileName,
+                  })
                 }
               >
                 {replacementDataFile.fileName}
@@ -108,11 +107,11 @@ const DataFileDetailsTable = ({
           <td data-testid="Metadata file">
             <ButtonText
               onClick={() =>
-                releaseDataFileService.downloadFile(
+                downloadReleaseFileSecurely({
                   releaseVersionId,
-                  dataFile.metaFileId,
-                  dataFile.metaFileName,
-                )
+                  fileId: dataFile.metaFileId,
+                  fileName: dataFile.metaFileName,
+                })
               }
             >
               {dataFile.metaFileName}
@@ -122,11 +121,11 @@ const DataFileDetailsTable = ({
             <td data-testid="Replacement Metadata file">
               <ButtonText
                 onClick={() =>
-                  releaseDataFileService.downloadFile(
+                  downloadReleaseFileSecurely({
                     releaseVersionId,
-                    replacementDataFile.metaFileId,
-                    replacementDataFile.metaFileName,
-                  )
+                    fileId: replacementDataFile.metaFileId,
+                    fileName: replacementDataFile.metaFileName,
+                  })
                 }
               >
                 {replacementDataFile.metaFileName}
