@@ -30,6 +30,7 @@ import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import React, {
   Fragment,
   useCallback,
@@ -542,9 +543,22 @@ const ReleaseContent = ({
       <ReleaseHelpAndSupportSection
         publication={release.publication}
         releaseType={release.type}
-        renderExternalMethodologyLink={externalMethodology => (
-          <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
-        )}
+        renderExternalMethodologyLink={externalMethodology => {
+          const externalMethodologyAttributes = getUrlAttributes(
+            externalMethodology.url,
+          );
+          return (
+            <Link
+              to={externalMethodology.url}
+              rel={`noopener noreferrer nofollow ${
+                !externalMethodologyAttributes?.isTrusted ? 'external' : ''
+              }`}
+              target="_blank"
+            >
+              {externalMethodology.title} (opens in new tab)
+            </Link>
+          );
+        }}
         renderMethodologyLink={methodology => (
           <>
             {editingMode === 'edit' ? (

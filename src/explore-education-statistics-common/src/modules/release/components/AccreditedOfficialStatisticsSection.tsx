@@ -11,24 +11,40 @@ export default function AccreditedOfficialStatisticsSection({
       <p>
         These accredited official statistics have been independently reviewed by
         the{' '}
-        <a href="https://osr.statisticsauthority.gov.uk/what-we-do/">
-          Office for Statistics Regulation
+        <a
+          href="https://osr.statisticsauthority.gov.uk/what-we-do/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Office for Statistics Regulation (opens in new tab)
         </a>{' '}
         (OSR). They comply with the standards of trustworthiness, quality and
         value in the{' '}
-        <a href="https://code.statisticsauthority.gov.uk/the-code/">
-          Code of Practice for Statistics
+        <a
+          href="https://code.statisticsauthority.gov.uk/the-code/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Code of Practice for Statistics (opens in new tab)
         </a>
         . Accredited official statistics are called National Statistics in the{' '}
-        <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-          Statistics and Registration Service Act 2007
+        <a
+          href="https://www.legislation.gov.uk/ukpga/2007/18/contents"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Statistics and Registration Service Act 2007 (opens in new tab)
         </a>
         .
       </p>
       <p>
         Accreditation signifies their compliance with the authority's{' '}
-        <a href="https://code.statisticsauthority.gov.uk/the-code/">
-          Code of Practice for Statistics
+        <a
+          href="https://code.statisticsauthority.gov.uk/the-code/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Code of Practice for Statistics (opens in new tab)
         </a>{' '}
         which broadly means these statistics are:
       </p>
@@ -44,8 +60,12 @@ export default function AccreditedOfficialStatisticsSection({
       </p>
       <p>
         OSR sets the standards of trustworthiness, quality and value in the{' '}
-        <a href="https://code.statisticsauthority.gov.uk/the-code/">
-          Code of Practice for Statistics
+        <a
+          href="https://code.statisticsauthority.gov.uk/the-code/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Code of Practice for Statistics (opens in new tab)
         </a>{' '}
         that all producers of official statistics should adhere to.
       </p>
@@ -56,7 +76,14 @@ export default function AccreditedOfficialStatisticsSection({
           regulation@statistics.gov.uk
         </a>{' '}
         or via the{' '}
-        <a href="https://osr.statisticsauthority.gov.uk/">OSR website</a>.
+        <a
+          href="https://osr.statisticsauthority.gov.uk/"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          OSR website (opens in new tab)
+        </a>
+        .
       </p>
     </>
   );

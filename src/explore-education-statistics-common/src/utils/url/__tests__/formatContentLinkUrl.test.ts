@@ -1,9 +1,9 @@
-import formatContentLink from '@common/utils/url/formatContentLink';
+import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
 
-describe('formatContentLink', () => {
+describe('formatContentLinkUrl', () => {
   test('converts EES links to lowercase', () => {
     expect(
-      formatContentLink(
+      formatContentLinkUrl(
         'https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools',
       ),
     ).toEqual(
@@ -13,7 +13,7 @@ describe('formatContentLink', () => {
 
   test('does not convert query params on EES links to lowercase', () => {
     expect(
-      formatContentLink(
+      formatContentLinkUrl(
         'https://explore-education-statistics.service.gov.uk/find-statistics?testParam=Something',
       ),
     ).toEqual(
@@ -23,7 +23,7 @@ describe('formatContentLink', () => {
 
   test('does not convert anchors on EES links to lowercase', () => {
     expect(
-      formatContentLink(
+      formatContentLinkUrl(
         'https://explore-education-statistics.service.gov.uk/find-statistics#Something',
       ),
     ).toEqual(
@@ -33,7 +33,7 @@ describe('formatContentLink', () => {
 
   test('trims EES links', () => {
     expect(
-      formatContentLink(
+      formatContentLinkUrl(
         '  https://explore-education-statistics.service.gov.uk/find-statistics  ',
       ),
     ).toEqual(
@@ -43,7 +43,7 @@ describe('formatContentLink', () => {
 
   test('encodes EES links', () => {
     expect(
-      formatContentLink(
+      formatContentLinkUrl(
         'https://explore-education-statistics.service.gov.uk/find statistics',
       ),
     ).toEqual(
@@ -52,24 +52,24 @@ describe('formatContentLink', () => {
   });
 
   test('does not convert external links to lowercase', () => {
-    expect(formatContentLink('https://gov.uk/Something')).toEqual(
+    expect(formatContentLinkUrl('https://gov.uk/Something')).toEqual(
       'https://gov.uk/Something',
     );
   });
 
   test('trims external links', () => {
-    expect(formatContentLink('  https://gov.uk/Something  ')).toEqual(
+    expect(formatContentLinkUrl('  https://gov.uk/Something  ')).toEqual(
       'https://gov.uk/Something',
     );
   });
 
   test('encodes external links', () => {
-    expect(formatContentLink('https://gov.uk/Some thing')).toEqual(
+    expect(formatContentLinkUrl('https://gov.uk/Some thing')).toEqual(
       'https://gov.uk/Some%20thing',
     );
   });
 
   test('does not format anchor links', () => {
-    expect(formatContentLink('#Something')).toEqual('#Something');
+    expect(formatContentLinkUrl('#Something')).toEqual('#Something');
   });
 });

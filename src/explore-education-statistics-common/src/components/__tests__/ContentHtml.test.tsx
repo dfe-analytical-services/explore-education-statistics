@@ -12,104 +12,108 @@ describe('ContentHtml', () => {
     expect(screen.getByText('Test text')).toBeInTheDocument();
   });
 
-  test('renders glossary info modal when clicking glossary entry', async () => {
-    const getEntry = jest.fn().mockResolvedValue({
-      title: 'Absence heading',
-      slug: 'absence-slug',
-      body: '<p>Absence body</p>',
-    } as GlossaryEntry);
+  describe('rendering glossary links', () => {
+    test('renders glossary info modal when clicking glossary entry', async () => {
+      const getEntry = jest.fn().mockResolvedValue({
+        title: 'Absence heading',
+        slug: 'absence-slug',
+        body: '<p>Absence body</p>',
+      } as GlossaryEntry);
 
-    render(
-      <ContentHtml
-        html="<a href='/glossary#absence' data-glossary>Absence</a>"
-        getGlossaryEntry={getEntry}
-      />,
-    );
+      render(
+        <ContentHtml
+          html="<a href='/glossary#absence' data-glossary>Absence</a>"
+          getGlossaryEntry={getEntry}
+        />,
+      );
 
-    const glossaryButton = screen.getByRole('button', {
-      name: 'Absence (show glossary term definition)',
+      const glossaryButton = screen.getByRole('button', {
+        name: 'Absence (show glossary term definition)',
+      });
+
+      await userEvent.click(glossaryButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Absence body')).toBeInTheDocument();
+      });
+
+      expect(getEntry).toHaveBeenCalled();
+
+      const modal = within(screen.getByRole('dialog'));
+      expect(
+        modal.getByRole('heading', { name: 'Absence heading' }),
+      ).toBeInTheDocument();
+      expect(modal.getByText('Absence body')).toBeInTheDocument();
+      const closeButton = modal.getByRole('button', { name: 'Close modal' });
+      expect(closeButton).toBeInTheDocument();
     });
 
-    await userEvent.click(glossaryButton);
+    test('can close glossary info modal', async () => {
+      const getEntry = jest.fn().mockResolvedValue({
+        title: 'Absence heading',
+        slug: 'absence-slug',
+        body: '<p>Absence body</p>',
+      } as GlossaryEntry);
 
-    await waitFor(() => {
-      expect(screen.getByText('Absence body')).toBeInTheDocument();
+      render(
+        <ContentHtml
+          html="<a href='/glossary#absence' data-glossary>Absence</a>"
+          getGlossaryEntry={getEntry}
+        />,
+      );
+
+      const glossaryButton = screen.getByRole('button', {
+        name: 'Absence (show glossary term definition)',
+      });
+      await userEvent.click(glossaryButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Absence body')).toBeInTheDocument();
+      });
+
+      expect(getEntry).toHaveBeenCalled();
+
+      const modal = within(screen.getByRole('dialog'));
+      const closeButton = modal.getByRole('button', { name: 'Close modal' });
+      await userEvent.click(closeButton);
+
+      await waitFor(() => {
+        expect(closeButton).not.toBeInTheDocument();
+        expect(glossaryButton).toBeInTheDocument();
+      });
     });
-
-    expect(getEntry).toHaveBeenCalled();
-
-    const modal = within(screen.getByRole('dialog'));
-    expect(
-      modal.getByRole('heading', { name: 'Absence heading' }),
-    ).toBeInTheDocument();
-    expect(modal.getByText('Absence body')).toBeInTheDocument();
-    const closeButton = modal.getByRole('button', { name: 'Close modal' });
-    expect(closeButton).toBeInTheDocument();
   });
 
-  test('can close glossary info modal', async () => {
-    const getEntry = jest.fn().mockResolvedValue({
-      title: 'Absence heading',
-      slug: 'absence-slug',
-      body: '<p>Absence body</p>',
-    } as GlossaryEntry);
+  describe('rendering featured table links', () => {
+    test('transforms featured table links when `transformFeaturedTableLinks` is provided', () => {
+      render(
+        <ContentHtml
+          html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>"
+          transformFeaturedTableLinks={() => {
+            return <span>I am transformed</span>;
+          }}
+        />,
+      );
 
-    render(
-      <ContentHtml
-        html="<a href='/glossary#absence' data-glossary>Absence</a>"
-        getGlossaryEntry={getEntry}
-      />,
-    );
-
-    const glossaryButton = screen.getByRole('button', {
-      name: 'Absence (show glossary term definition)',
-    });
-    await userEvent.click(glossaryButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Absence body')).toBeInTheDocument();
+      expect(screen.getByText('I am transformed')).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Featured table' }),
+      ).not.toBeInTheDocument();
     });
 
-    expect(getEntry).toHaveBeenCalled();
+    test('does not transform featured table links when `transformFeaturedTableLinks` is not provided', () => {
+      render(
+        <ContentHtml html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>" />,
+      );
 
-    const modal = within(screen.getByRole('dialog'));
-    const closeButton = modal.getByRole('button', { name: 'Close modal' });
-    await userEvent.click(closeButton);
-
-    await waitFor(() => {
-      expect(closeButton).not.toBeInTheDocument();
-      expect(glossaryButton).toBeInTheDocument();
+      expect(screen.queryByText('I am transformed')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Featured table' }),
+      ).toBeInTheDocument();
     });
   });
 
-  test('transforms featured table links when `transformFeaturedTableLinks` is provided', () => {
-    render(
-      <ContentHtml
-        html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>"
-        transformFeaturedTableLinks={() => {
-          return <span>I am transformed</span>;
-        }}
-      />,
-    );
-
-    expect(screen.getByText('I am transformed')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('link', { name: 'Featured table' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('does not transform featured table links when `transformFeaturedTableLinks` is not provided', () => {
-    render(
-      <ContentHtml html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>" />,
-    );
-
-    expect(screen.queryByText('I am transformed')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Featured table' }),
-    ).toBeInTheDocument();
-  });
-
-  describe('formatting tables', () => {
+  describe('rendering tables', () => {
     test('removes figure and adds tabindex to table markup from CKEditor', () => {
       const html = `
         <figure class="table">
@@ -197,7 +201,7 @@ describe('ContentHtml', () => {
     });
   });
 
-  describe('formatting links', () => {
+  describe('rendering links', () => {
     test('encodes special characters in urls', () => {
       render(
         <ContentHtml html='<a href="https://gov.uk/TEST something">External link</a>' />,
@@ -205,7 +209,7 @@ describe('ContentHtml', () => {
 
       expect(
         screen.getByRole('link', {
-          name: 'External link (opens in a new tab)',
+          name: 'External link (opens in new tab)',
         }),
       ).toHaveAttribute('href', 'https://gov.uk/TEST%20something');
     });
@@ -217,7 +221,7 @@ describe('ContentHtml', () => {
 
       expect(
         screen.getByRole('link', {
-          name: 'External link (opens in a new tab)',
+          name: 'External link (opens in new tab)',
         }),
       ).toHaveAttribute('href', 'https://gov.uk/TEST');
     });
@@ -243,7 +247,7 @@ describe('ContentHtml', () => {
       );
       expect(
         screen.getByRole('link', {
-          name: 'External link (opens in a new tab)',
+          name: 'External link (opens in new tab)',
         }),
       ).toHaveAttribute('href', 'https://gov.uk/TEST');
     });
@@ -253,11 +257,10 @@ describe('ContentHtml', () => {
         <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
       );
       const link = screen.getByRole('link', {
-        name: 'External link (opens in a new tab)',
+        name: 'External link (opens in new tab)',
       });
       expect(link).toHaveAttribute('href', 'https://gov.uk/');
       expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
     test('opens internal links in the same tab', () => {
@@ -272,7 +275,56 @@ describe('ContentHtml', () => {
         'https://explore-education-statistics.service.gov.uk/',
       );
       expect(link).not.toHaveAttribute('target', '_blank');
-      expect(link).not.toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    test("appends '(opens in new tab)' to the name for external links", () => {
+      render(
+        <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+
+      expect(link.textContent).toBe('External link (opens in new tab)');
+    });
+
+    test("does not append '(opens in new tab)' to any 'mailto:' links", () => {
+      render(
+        <ContentHtml html='<a href="mailto:explore.statistics@education.gov.uk">Mailto link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+
+      expect(link.textContent).toBe('Mailto link');
+    });
+
+    test('adds the correct rel attributes for trusted external links', () => {
+      render(
+        <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer nofollow');
+    });
+
+    test('adds the correct rel attributes for untrusted external links', () => {
+      render(
+        <ContentHtml html='<a href="https://example.com/">External link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute(
+        'rel',
+        'noopener noreferrer nofollow external',
+      );
+    });
+
+    test('does not add rel attributes on internal links', () => {
+      render(
+        <ContentHtml html='<a href="https://explore-education-statistics.service.gov.uk/">Internal link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+      expect(link).not.toHaveAttribute('rel');
     });
 
     test('does not format links when `formatLinks` is false', () => {
@@ -303,27 +355,10 @@ describe('ContentHtml', () => {
         '  https://gov.uk/TEST something  ',
       );
       expect(externalLink).not.toHaveAttribute('target', '_blank');
-      expect(externalLink).not.toHaveAttribute('rel', 'noopener noreferrer');
-    });
-
-    test("appends '(opens in a new tab)' to the name for external links", () => {
-      render(
-        <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
+      expect(externalLink).not.toHaveAttribute(
+        'rel',
+        'noopener noreferrer nofollow',
       );
-
-      const link = screen.getByRole('link');
-
-      expect(link.textContent).toBe('External link (opens in a new tab)');
-    });
-
-    test("does not append '(opens in a new tab)' to any 'mailto:' links", () => {
-      render(
-        <ContentHtml html='<a href="mailto:explore.statistics@education.gov.uk">Mailto link</a>' />,
-      );
-
-      const link = screen.getByRole('link');
-
-      expect(link.textContent).toBe('Mailto link');
     });
   });
 });

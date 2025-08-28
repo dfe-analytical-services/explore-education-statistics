@@ -8,9 +8,8 @@ describe('PhaseBanner', () => {
 
     expect(screen.getByText('Beta')).toBeInTheDocument();
 
-    expect(screen.getByRole('link', { name: 'feedback' })).toHaveAttribute(
-      'href',
-      'http://test.com',
-    );
+    expect(
+      screen.getByRole('link', { name: 'feedback (opens in new tab)' }),
+    ).toHaveAttribute('href', 'http://test.com');
   });
 });
