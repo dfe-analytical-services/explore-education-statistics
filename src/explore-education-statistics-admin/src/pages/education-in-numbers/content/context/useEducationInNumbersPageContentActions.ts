@@ -1,5 +1,4 @@
 import { ContentBlockPostModel } from '@admin/services/types/content';
-import { Dictionary } from '@admin/types';
 import educationInNumbersContentService from '@admin/services/educationInNumbersContentService';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 

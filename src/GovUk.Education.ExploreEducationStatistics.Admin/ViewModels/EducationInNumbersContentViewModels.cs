@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -17,7 +15,7 @@ public class EinContentViewModel
 
     public DateTimeOffset? Published { get; set; }
 
-    public List<EinContentSectionViewModel> Content { get; set; } = []; // @MarkFix rename to Sections?
+    public List<EinContentSectionViewModel> Content { get; set; } = [];
 }
 
 public class EinContentSectionViewModel
@@ -30,7 +28,7 @@ public class EinContentSectionViewModel
 
     public string? Caption { get; set; }
 
-    public List<EinContentBlockViewModel> Content { get; set; } = new(); // @MarkFix rename to Blocks?
+    public List<EinContentBlockViewModel> Content { get; set; } = new();
 }
 
 public class EinContentBlockViewModel

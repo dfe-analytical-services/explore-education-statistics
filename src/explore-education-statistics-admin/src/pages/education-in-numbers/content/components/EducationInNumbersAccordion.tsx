@@ -106,7 +106,7 @@ const EducationInNumbersAccordion = ({
           id={`${id}-${section.id}`}
           educationInNumbersPageId={pageContent.id}
           educationInNumbersPageSlug={pageContent.slug}
-          section={section} // @MarkFix
+          section={section}
           onRemoveSection={handleRemoveSection}
         />
       ))}

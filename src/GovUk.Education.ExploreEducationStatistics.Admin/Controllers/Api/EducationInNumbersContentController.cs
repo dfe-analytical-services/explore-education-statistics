@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -56,12 +52,12 @@ public class EducationInNumbersContentController(
     }
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}")]
-    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteSection( // @MarkFix do we want to return a list of remaining sections here? Check the return types of other methods too
+    public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteSection(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId)
     {
         return await einContentService.DeleteSection(pageId, sectionId)
-            .HandleFailuresOrOk(); // @MarkFix is NoContent for Deletes normally?
+            .HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/blocks/add")]
@@ -97,13 +93,13 @@ public class EducationInNumbersContentController(
 
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
-    public async Task<ActionResult<List<EinContentBlockViewModel>>> DeleteBlock( // @MarkFix at the time of writing, the frontend expects a list of sections to be returned
+    public async Task<ActionResult> DeleteBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromRoute] Guid blockId)
     {
         return await einContentService.DeleteBlock(pageId, sectionId, blockId)
-            .HandleFailuresOrOk(); // @MarkFix NoContent?
+            .HandleFailuresOrNoContent();
     }
 
 

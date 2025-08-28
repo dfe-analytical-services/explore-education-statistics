@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -68,8 +64,8 @@ public class EducationInNumbersContentService(
              Id = Guid.NewGuid(),
              EducationInNumbersPageId = pageId,
              Order = order,
-             Heading = "New section", // @MarkFix yeah?
-             Caption = null, // @MarkFix yeah?
+             Heading = "New section",
+             Caption = null,
              Content = [],
          };
 
@@ -131,8 +127,6 @@ public class EducationInNumbersContentService(
             matchingSection.Order = order;
         });
 
-        // @MarkFix update Page.Updated/UpdatedBy? - I don't think we should bother
-
         contentDbContext.EinContentSections.UpdateRange(sectionList);
         await contentDbContext.SaveChangesAsync();
 
@@ -147,6 +141,7 @@ public class EducationInNumbersContentService(
     {
         var page = contentDbContext.EducationInNumbersPages
             .Include(p => p.Content)
+            .ThenInclude(section => section.Content)
             .SingleOrDefault(p => p.Id == pageId);
 
         if (page == null)
@@ -172,7 +167,7 @@ public class EducationInNumbersContentService(
         await contentDbContext.SaveChangesAsync();
 
         return pageSections
-            .Select(section => section.ToViewModel()) // @MarkFix frontend expects blocks to be hydrated in section.Content?
+            .Select(section => section.ToViewModel())
             .OrderBy(section => section.Order)
             .ToList();
     }
@@ -260,8 +255,6 @@ public class EducationInNumbersContentService(
             matchingBlock.Order = order;
         });
 
-        // @MarkFix update Page.Updated/UpdatedBy? - I don't think we should bother
-
         contentDbContext.EinContentBlocks.UpdateRange(blockList);
         await contentDbContext.SaveChangesAsync();
 
@@ -271,7 +264,7 @@ public class EducationInNumbersContentService(
             .ToList();
     }
 
-    public async Task<Either<ActionResult, List<EinContentBlockViewModel>>> DeleteBlock(
+    public async Task<Either<ActionResult, Unit>> DeleteBlock(
         Guid pageId,
         Guid sectionId,
         Guid blockId)
@@ -303,8 +296,6 @@ public class EducationInNumbersContentService(
 
         await contentDbContext.SaveChangesAsync();
 
-        return blockList
-            .Select(block => block.ToViewModel())
-            .ToList();
+        return Unit.Instance;
     }
 }
