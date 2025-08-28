@@ -1,4 +1,3 @@
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 

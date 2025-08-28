@@ -40,4 +40,4 @@ param recoveryVaultImmutable = true
 param enableThemeDeletion = false
 param enableSwagger = true
 
-param enableReplacementOfPublicApiDataSets = false
+param enableReplacementOfPublicApiDataSets = true

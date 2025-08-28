@@ -83,7 +83,6 @@ const DataFileReplacementPlan = ({
     hasIncompleteLocationMapping,
     hasIncompleteFilterMapping,
     isNotReadyToPublish,
-    isMajorVersionUpdate,
     hasMajorLocationMapping,
     hasMajorFilterMapping,
   } = useMemo(() => {
@@ -93,7 +92,6 @@ const DataFileReplacementPlan = ({
         hasIncompleteLocationMapping: false,
         hasIncompleteFilterMapping: false,
         isNotReadyToPublish: false,
-        isMajorVersionUpdate: false,
         hasMajorLocationMapping: false,
         hasMajorFilterMapping: false,
       };
@@ -110,8 +108,6 @@ const DataFileReplacementPlan = ({
       hasMajorFilterMapping:
         plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
       isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
-      isMajorVersionUpdate:
-        plan?.apiDataSetVersionPlan?.mappingStatus?.isMajorVersionUpdate,
     };
   }, [plan, isNewReplaceDsvFeatureEnabled]);
 
@@ -578,27 +574,29 @@ const DataFileReplacementPlan = ({
           {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
 
           <ButtonGroup className="govuk-!-margin-top-8">
-            {plan.valid && (
-              <Button
-                disabled={isSubmitting}
-                onClick={async () => {
-                  toggleSubmitting.on();
+            {plan.valid &&
+              ((hasDataSetVersionPlan && user?.permissions.isBauUser) ||
+                !hasDataSetVersionPlan) && (
+                <Button
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    toggleSubmitting.on();
 
-                  await dataReplacementService.replaceData(releaseVersionId, [
-                    fileId,
-                  ]);
+                    await dataReplacementService.replaceData(releaseVersionId, [
+                      fileId,
+                    ]);
 
-                  if (onReplacement) {
-                    onReplacement();
-                  }
-                  if (isMounted.current) {
-                    toggleSubmitting.off();
-                  }
-                }}
-              >
-                Confirm data replacement
-              </Button>
-            )}
+                    if (onReplacement) {
+                      onReplacement();
+                    }
+                    if (isMounted.current) {
+                      toggleSubmitting.off();
+                    }
+                  }}
+                >
+                  Confirm data replacement
+                </Button>
+              )}
             {cancelButton}
           </ButtonGroup>
         </>

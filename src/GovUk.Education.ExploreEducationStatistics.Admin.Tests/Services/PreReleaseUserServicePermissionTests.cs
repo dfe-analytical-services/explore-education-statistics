@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -110,7 +108,7 @@ public class PreReleaseUserServicePermissionTests
         IUserService? userService = null,
         IUserRepository? userRepository = null,
         IUserInviteRepository? userInviteRepository = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null)
     {
         return new(
@@ -124,7 +122,7 @@ public class PreReleaseUserServicePermissionTests
             userService ?? Mock.Of<IUserService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
-            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
         );
     }

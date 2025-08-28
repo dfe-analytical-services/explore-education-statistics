@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;

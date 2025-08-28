@@ -1,8 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 public interface IQueueServiceClient

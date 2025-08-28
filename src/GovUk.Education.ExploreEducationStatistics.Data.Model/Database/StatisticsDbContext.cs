@@ -7,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database;

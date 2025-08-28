@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
 

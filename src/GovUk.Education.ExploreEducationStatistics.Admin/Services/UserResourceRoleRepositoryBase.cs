@@ -1,22 +1,13 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TResource, TRoleEnum>(
-    ContentDbContext contentDbContext,
-    IUserRepository userRepository,
-    ILogger<TParent> logger)
+    ContentDbContext contentDbContext)
     where TResourceRole : ResourceRole<TRoleEnum, TResource>
     where TResource : class
     where TRoleEnum : Enum
@@ -87,20 +78,6 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
 
         await ContentDbContext.Set<TResourceRole>().AddRangeAsync(newTResourceRoles);
         await ContentDbContext.SaveChangesAsync();
-    }
-
-    protected async Task<string> GetUserEmail(Guid userId, CancellationToken cancellationToken)
-    {
-        var user = await userRepository.FindById(userId, cancellationToken);
-
-        if (user is null)
-        {
-            logger.LogError($"User with ID '{userId}' was not found.");
-
-            throw new KeyNotFoundException($"User with ID '{userId}' was not found.");
-        }
-            
-        return user.Email;
     }
 
     protected async Task Remove(TResourceRole resourceRole, CancellationToken cancellationToken = default)

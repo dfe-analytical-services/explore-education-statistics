@@ -1,11 +1,7 @@
-using System.IO;
+using System.Text;
 using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using System.Text;
-using System.Threading.Tasks;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Validators;
 
@@ -178,24 +174,5 @@ public class DataSetDtoValidatorTests
         result.ShouldHaveValidationErrorFor(dto => dto.MetaFile)
             .WithErrorMessage("Meta file 'data.meta.jpg' must end in '.meta.csv'.")
             .WithErrorCode("MetaFileNameMustEndDotMetaDotCsv");
-    }
-
-    [Fact]
-    public async Task DataSetDto_ReplacingFileIsNotADataFile_ReturnsExpectedError()
-    {
-        // Arrange
-        var file = new File { Type = FileType.Ancillary };
-
-        var dto = await new DataSetDtoBuilder()
-            .WhereReplacingFileIs(file)
-            .Build();
-
-        // Act
-        var result = await _validator.TestValidateAsync(dto);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.ReplacingFile)
-            .WithErrorMessage("Replacing file should be of type 'Data'.")
-            .WithErrorCode("InvalidFileTypeForReplacement");
     }
 }

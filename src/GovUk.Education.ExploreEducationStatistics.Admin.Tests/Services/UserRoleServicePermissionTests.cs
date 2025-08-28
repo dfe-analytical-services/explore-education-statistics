@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -236,8 +233,8 @@ public class UserRoleServicePermissionTests
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IEmailTemplateService? emailTemplateService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserPublicationRoleAndInviteManager? userPublicationRoleAndInviteManager = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null)
     {
@@ -252,8 +249,8 @@ public class UserRoleServicePermissionTests
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
             userService ?? Mock.Of<IUserService>(),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
-            userPublicationRoleAndInviteManager ?? Mock.Of<IUserPublicationRoleAndInviteManager>(),
-            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
             userManager ?? MockUserManager().Object);
     }
 }

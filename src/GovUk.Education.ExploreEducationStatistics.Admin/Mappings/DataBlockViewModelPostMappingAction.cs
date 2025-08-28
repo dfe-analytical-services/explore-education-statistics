@@ -1,4 +1,3 @@
-using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;

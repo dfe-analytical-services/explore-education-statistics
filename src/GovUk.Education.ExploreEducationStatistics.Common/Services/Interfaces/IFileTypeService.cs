@@ -1,8 +1,5 @@
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 

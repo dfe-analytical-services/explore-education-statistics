@@ -1,10 +1,7 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -21,8 +18,6 @@ public record DataSetDto
     public FileDto? DataFile { get; init; }
 
     public FileDto? MetaFile { get; init; }
-
-    public File? ReplacingFile { get; init; }
 
     public class Validator : AbstractValidator<DataSetDto>
     {
@@ -44,10 +39,6 @@ public record DataSetDto
 
             RuleFor(dto => dto.MetaFile)
                 .MustBeValidMetaFile();
-
-            RuleFor(dto => dto.ReplacingFile)
-                .Must(file => file is null || file.Type == FileType.Data)
-                    .WithMessage(ValidationMessages.InvalidFileTypeForReplacement, FileType.Data.ToString());
         }
     }
 }
@@ -80,6 +71,4 @@ public record DataSetIndexItem
     public required string DataFileName { get; init; }
 
     public required string MetaFileName { get; init; }
-
-    public File? ReplacingFile { get; init; }
 }

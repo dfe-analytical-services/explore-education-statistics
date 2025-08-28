@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -8,11 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
@@ -84,7 +80,7 @@ public static class AuthorizationHandlersTestUtil
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
         HandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
     {
-        using (var context = DbUtils.InMemoryApplicationDbContext())
+        using (var context = InMemoryApplicationDbContext())
         {
             var handler = handlerSupplier(context);
             await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);

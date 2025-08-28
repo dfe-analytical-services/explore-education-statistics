@@ -1,4 +1,5 @@
 #nullable enable
+using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
@@ -18,11 +19,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -348,8 +344,8 @@ public class PreReleaseUserServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 "invited.prerelease@test.com",
                 releaseVersion.Id,
@@ -357,7 +353,7 @@ public class PreReleaseUserServiceTests
             ))
             .ReturnsAsync(false)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 "existing.prerelease.user@test.com",
                 releaseVersion.Id,
@@ -382,7 +378,7 @@ public class PreReleaseUserServiceTests
             var service = SetupPreReleaseUserService(
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
             var result = await service.GetPreReleaseUsersInvitePlan(
@@ -393,7 +389,7 @@ public class PreReleaseUserServiceTests
             result.AssertBadRequest(NoInvitableEmails);
         }
 
-        VerifyAllMocks(userReleaseRoleAndInviteManager, userReleaseInviteRepository);
+        VerifyAllMocks(userReleaseRoleRepository, userReleaseInviteRepository);
     }
 
     [Fact]
@@ -429,12 +425,12 @@ public class PreReleaseUserServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
         foreach (var email in allEmails)
         {
             if (usersWithExistingRoleEmails.Contains(email))
             {
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                 .Setup(mock => mock.HasUserReleaseRole(
                     email,
                     releaseVersion.Id,
@@ -446,7 +442,7 @@ public class PreReleaseUserServiceTests
                 continue;
             }
 
-            userReleaseRoleAndInviteManager
+            userReleaseRoleRepository
                 .Setup(mock => mock.HasUserReleaseRole(
                     email,
                     releaseVersion.Id,
@@ -494,7 +490,7 @@ public class PreReleaseUserServiceTests
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object
         );
 
@@ -521,7 +517,7 @@ public class PreReleaseUserServiceTests
         }
 
         VerifyAllMocks(
-            userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository,
             userReleaseInviteRepository);
     }
 
@@ -586,8 +582,8 @@ public class PreReleaseUserServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 "invited.prerelease@test.com",
                 releaseVersion.Id,
@@ -595,7 +591,7 @@ public class PreReleaseUserServiceTests
             ))
             .ReturnsAsync(false)
             .Verifiable();
-        userReleaseRoleAndInviteManager
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 "existing.prerelease.user@test.com",
                 releaseVersion.Id,
@@ -620,7 +616,7 @@ public class PreReleaseUserServiceTests
             var service = SetupPreReleaseUserService(
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object);
 
             var result = await service.InvitePreReleaseUsers(
@@ -634,7 +630,7 @@ public class PreReleaseUserServiceTests
         }
 
         VerifyAllMocks(
-            userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository,
             userReleaseInviteRepository);
     }
 
@@ -676,8 +672,8 @@ public class PreReleaseUserServiceTests
         var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
         SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 user.Email,
                 releaseVersion.Id,
@@ -702,7 +698,7 @@ public class PreReleaseUserServiceTests
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 preReleaseService: preReleaseService.Object,
                 emailService: emailService.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object
         );
 
@@ -717,7 +713,7 @@ public class PreReleaseUserServiceTests
         VerifyAllMocks(
             emailService,
             preReleaseService,
-            userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository,
             userReleaseInviteRepository);
     }
 
@@ -755,8 +751,8 @@ public class PreReleaseUserServiceTests
         var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
         SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
             .Setup(mock => mock.HasUserReleaseRole(
                 email,
                 releaseVersion.Id,
@@ -781,7 +777,7 @@ public class PreReleaseUserServiceTests
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 preReleaseService: preReleaseService.Object,
                 emailService: emailService.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object
             );
 
@@ -796,7 +792,7 @@ public class PreReleaseUserServiceTests
         VerifyAllMocks(
             emailService,
             preReleaseService,
-            userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository,
             userReleaseInviteRepository);
     }
 
@@ -871,12 +867,12 @@ public class PreReleaseUserServiceTests
             .Verifiable();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
         foreach (var email in allEmails)
         {
             if (emailsWithExistingRoles.Contains(email))
             {
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                 .Setup(mock => mock.HasUserReleaseRole(
                     email,
                     releaseVersion.Id,
@@ -888,7 +884,7 @@ public class PreReleaseUserServiceTests
                 continue;
             }
 
-            userReleaseRoleAndInviteManager
+            userReleaseRoleRepository
                 .Setup(mock => mock.HasUserReleaseRole(
                     email,
                     releaseVersion.Id,
@@ -899,7 +895,7 @@ public class PreReleaseUserServiceTests
 
             if (existingUsersByEmail.ContainsKey(email))
             {
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                 .Setup(mock => mock.CreateIfNotExists(
                     existingUsersByEmail[email].Id,
                     releaseVersion.Id,
@@ -965,7 +961,7 @@ public class PreReleaseUserServiceTests
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 emailService: emailService.Object,
                 preReleaseService: preReleaseService.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object
             );
 
@@ -987,7 +983,7 @@ public class PreReleaseUserServiceTests
         VerifyAllMocks(
             emailService,
             preReleaseService,
-            userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository,
             userReleaseInviteRepository);
     }
 
@@ -1038,12 +1034,12 @@ public class PreReleaseUserServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
         foreach (var email in allEmails)
         {
             if (emailsWithExistingRoles.Contains(email))
             {
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                 .Setup(mock => mock.HasUserReleaseRole(
                     email,
                     releaseVersion.Id,
@@ -1055,7 +1051,7 @@ public class PreReleaseUserServiceTests
                 continue;
             }
 
-            userReleaseRoleAndInviteManager
+            userReleaseRoleRepository
                 .Setup(mock => mock.HasUserReleaseRole(
                     email,
                     releaseVersion.Id,
@@ -1066,7 +1062,7 @@ public class PreReleaseUserServiceTests
 
             if (existingUsersByEmail.ContainsKey(email))
             {
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                 .Setup(mock => mock.CreateIfNotExists(
                     existingUsersByEmail[email].Id,
                     releaseVersion.Id,
@@ -1127,7 +1123,7 @@ public class PreReleaseUserServiceTests
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object
             );
 
@@ -1147,7 +1143,7 @@ public class PreReleaseUserServiceTests
         }
 
         VerifyAllMocks(
-            userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository,
             userReleaseInviteRepository);
     }
 
@@ -1241,11 +1237,22 @@ public class PreReleaseUserServiceTests
             await usersAndRolesDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.RemoveForReleaseVersionAndUser(
                 releaseVersion.Id,
                 user.Id,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(m => m.RemoveByReleaseVersionAndEmail(
+                releaseVersion.Id,
+                user.Email,
                 default,
                 ReleaseRole.PrereleaseViewer
             ))
@@ -1258,7 +1265,8 @@ public class PreReleaseUserServiceTests
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object
+                userReleaseInviteRepository: userReleaseInviteRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
             var result = await service.RemovePreReleaseUser(
@@ -1269,13 +1277,15 @@ public class PreReleaseUserServiceTests
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleAndInviteManager);
+        VerifyAllMocks(
+            userReleaseRoleRepository,
+            userReleaseInviteRepository);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             // The UserInvite should not have been removed
             var remainingUserInvites = await usersAndRolesDbContext.UserInvites
-            .ToListAsync();
+                .ToListAsync();
 
             var remainingUserInvite = Assert.Single(remainingUserInvites);
 
@@ -1328,9 +1338,9 @@ public class PreReleaseUserServiceTests
             await usersAndRolesDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.RemoveForReleaseVersionAndUser(
                 releaseVersion.Id,
                 user.Id,
                 default,
@@ -1339,13 +1349,35 @@ public class PreReleaseUserServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(m => m.RemoveByReleaseVersionAndEmail(
+                releaseVersion.Id,
+                user.Email,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Callback(async () =>
+            {
+                await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+                var releaseInvite = await contentDbContext.UserReleaseInvites
+                    .SingleAsync(uri => uri.Id == userReleaseInvite.Id);
+
+                contentDbContext.Remove(releaseInvite);
+                await contentDbContext.SaveChangesAsync();
+            })
+            .Verifiable();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object
+                userReleaseInviteRepository: userReleaseInviteRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
             var result = await service.RemovePreReleaseUser(
@@ -1356,19 +1388,17 @@ public class PreReleaseUserServiceTests
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleAndInviteManager);
+        VerifyAllMocks(
+            userReleaseRoleRepository,
+            userReleaseInviteRepository);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
-            // The UserInvite should not have been removed
+            // The UserInvite should have been removed
             var remainingUserInvites = await usersAndRolesDbContext.UserInvites
-            .ToListAsync();
+                .ToListAsync();
 
-            var remainingUserInvite = Assert.Single(remainingUserInvites);
-
-            Assert.Equal(user.Email, remainingUserInvite.Email);
-            Assert.False(remainingUserInvite.Accepted);
-            Assert.Equal(Role.PrereleaseUser.GetEnumValue(), remainingUserInvite.RoleId);
+            Assert.Empty(remainingUserInvites);
         }
     }
 
@@ -1408,11 +1438,22 @@ public class PreReleaseUserServiceTests
             await usersAndRolesDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict);
-        userReleaseRoleAndInviteManager
-            .Setup(m => m.RemoveAllRolesAndInvitesForReleaseVersionAndUser(
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.RemoveForReleaseVersionAndUser(
                 releaseVersion.Id,
                 user.Id,
+                default,
+                ReleaseRole.PrereleaseViewer
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
+        userReleaseInviteRepository
+            .Setup(m => m.RemoveByReleaseVersionAndEmail(
+                releaseVersion.Id,
+                user.Email,
                 default,
                 ReleaseRole.PrereleaseViewer
             ))
@@ -1425,7 +1466,8 @@ public class PreReleaseUserServiceTests
             var service = SetupPreReleaseUserService(
                 contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object
+                userReleaseInviteRepository: userReleaseInviteRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
             var result = await service.RemovePreReleaseUser(
@@ -1436,13 +1478,15 @@ public class PreReleaseUserServiceTests
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleAndInviteManager);
+        VerifyAllMocks(
+            userReleaseRoleRepository,
+            userReleaseInviteRepository);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             // The unaccepted UserInvite should have been removed
             var remainingUserInvites = await usersAndRolesDbContext.UserInvites
-            .ToListAsync();
+                .ToListAsync();
 
             Assert.Empty(remainingUserInvites);
         }
@@ -1502,7 +1546,7 @@ public class PreReleaseUserServiceTests
         IUserService? userService = null,
         IUserRepository? userRepository = null,
         IUserInviteRepository? userInviteRepository = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null)
     {
         userRepository ??= new UserRepository(contentDbContext);
@@ -1521,7 +1565,7 @@ public class PreReleaseUserServiceTests
             userService ?? AlwaysTrueUserService(_userId).Object,
             userRepository,
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(MockBehavior.Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(MockBehavior.Strict)
         );
     }

@@ -20,6 +20,7 @@ import Tag from '@common/components/Tag';
 import React, { useEffect } from 'react';
 import { generatePath } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import styles from './DataFilesTable.module.scss';
 
 interface Props {
@@ -39,6 +40,7 @@ export default function DataFilesReplacementTableRow({
 }: Props) {
   const [fetchPlan, toggleFetchPlan] = useToggle(false);
   const [canCancel, toggleCanCancel] = useToggle(false);
+  const { user } = useAuthContext();
 
   const { data: replacementDataFile, isLoading } = useQuery({
     ...releaseDataFileQueries.getDataFile(
@@ -148,41 +150,45 @@ export default function DataFilesReplacementTableRow({
             View details
           </Link>
           <>
-            {(canCancel || replacementDataFile.status === 'COMPLETE') && (
-              <ModalConfirm
-                title="Cancel data replacement"
-                triggerButton={
-                  <ButtonText variant="secondary">
-                    Cancel replacement
-                  </ButtonText>
-                }
-                onConfirm={async () => {
-                  await releaseDataFileService.deleteDataFiles(
-                    releaseVersionId,
-                    replacementDataFile.id,
-                  );
-                  onConfirmAction?.();
-                }}
-              >
-                <p>
-                  Are you sure you want to cancel this data replacement? The
-                  pending replacement data file will be deleted.
-                </p>
-              </ModalConfirm>
-            )}
-            {plan?.valid && (
-              <ButtonText
-                onClick={async () => {
-                  await dataReplacementService.replaceData(releaseVersionId, [
-                    dataFile.id,
-                  ]);
+            {(canCancel || replacementDataFile.status === 'COMPLETE') &&
+              (dataFile.publicApiDataSetId === undefined ||
+                user?.permissions.isBauUser) && (
+                <ModalConfirm
+                  title="Cancel data replacement"
+                  triggerButton={
+                    <ButtonText variant="secondary">
+                      Cancel replacement
+                    </ButtonText>
+                  }
+                  onConfirm={async () => {
+                    await releaseDataFileService.deleteDataFiles(
+                      releaseVersionId,
+                      replacementDataFile.id,
+                    );
+                    onConfirmAction?.();
+                  }}
+                >
+                  <p>
+                    Are you sure you want to cancel this data replacement? The
+                    pending replacement data file will be deleted.
+                  </p>
+                </ModalConfirm>
+              )}
+            {plan?.valid &&
+              (dataFile.publicApiDataSetId === undefined ||
+                user?.permissions.isBauUser) && (
+                <ButtonText
+                  onClick={async () => {
+                    await dataReplacementService.replaceData(releaseVersionId, [
+                      dataFile.id,
+                    ]);
 
-                  onConfirmAction?.();
-                }}
-              >
-                Confirm replacement
-              </ButtonText>
-            )}
+                    onConfirmAction?.();
+                  }}
+                >
+                  Confirm replacement
+                </ButtonText>
+              )}
           </>
         </ButtonGroup>
       </td>

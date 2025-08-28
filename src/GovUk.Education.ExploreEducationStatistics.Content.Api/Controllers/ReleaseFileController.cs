@@ -1,9 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;

@@ -12,16 +12,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.PublicationsSortBy;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
@@ -2187,122 +2184,6 @@ public abstract class PublicationServiceTests
             await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
             var service = SetupPublicationService(contentDbContext);
             return await service.ListPublicationInfos(themeId);
-        }
-    }
-
-    public class ListSitemapItemsTests : PublicationServiceTests
-    {
-        [Fact]
-        public async Task ListSitemapItems()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([
-                    _dataFixture.DefaultRelease(publishedVersions: 2), // Two versions to test de-duping
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                ])
-                .WithUpdated(DateTime.UtcNow.AddDays(-1));
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupPublicationService(contentDbContext);
-
-                var result = await service.ListSitemapItems();
-                var viewModel = result.AssertRight();
-
-                var publicationItem = Assert.Single(viewModel);
-                Assert.Equal(publication.Slug, publicationItem.Slug);
-                Assert.Equal(publication.Updated, publicationItem.LastModified);
-
-                Assert.NotNull(publicationItem.Releases);
-                var releaseItem = Assert.Single(publicationItem.Releases);
-
-                Assert.Equal(publication.Releases[0].Slug, releaseItem.Slug);
-                Assert.Equal(publication.Releases[0].Versions[1].Published, releaseItem.LastModified);
-            }
-        }
-
-        [Fact]
-        public async Task ListSitemapItems_ExcludesSupersededPublications()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
-                .WithSupersededBy(_dataFixture
-                    .DefaultPublication()
-                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]));
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupPublicationService(contentDbContext);
-
-                var result = await service.ListSitemapItems();
-                var viewModel = result.AssertRight();
-
-                // The sitemap should only include the superseding publication,
-                // not the superseded publication
-                var publicationItem = Assert.Single(viewModel);
-                Assert.Equal(publication.SupersededBy!.Slug, publicationItem.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task ListSitemapItems_ExcludesPublicationsWithNoPublishedReleases()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupPublicationService(contentDbContext);
-
-                var result = await service.ListSitemapItems();
-                var viewModel = result.AssertRight();
-
-                Assert.Empty(viewModel);
-            }
-        }
-
-        [Fact]
-        public async Task ListSitemapItems_PublicationHasNoReleases()
-        {
-            Publication publication = _dataFixture.DefaultPublication();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupPublicationService(contentDbContext);
-
-                var result = await service.ListSitemapItems();
-                var viewModel = result.AssertRight();
-
-                Assert.Empty(viewModel);
-            }
         }
     }
 

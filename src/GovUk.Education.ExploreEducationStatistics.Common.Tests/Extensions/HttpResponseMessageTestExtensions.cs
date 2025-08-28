@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;

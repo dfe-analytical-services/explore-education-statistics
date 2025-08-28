@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -631,7 +627,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [Fact]
         public async Task DataSetIdEmpty_ThrowsValidationException()
         {
-            var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(() =>
+            var exception = await Assert.ThrowsAsync<ValidationException>(() =>
                 NotifyApiSubscribers(
                     dataSetId: Guid.Empty,
                     dataSetFileId: _dataSetFileId,
@@ -644,7 +640,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [Fact]
         public async Task DataSetFileIdEmpty_ThrowsValidationException()
         {
-            var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(() =>
+            var exception = await Assert.ThrowsAsync<ValidationException>(() =>
                 NotifyApiSubscribers(
                     dataSetId: _dataSetId,
                     dataSetFileId: Guid.Empty,
@@ -659,7 +655,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [InlineData("")]
         public async Task VersionEmpty_ThrowsValidationException(string? version)
         {
-            var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(() =>
+            var exception = await Assert.ThrowsAsync<ValidationException>(() =>
                 NotifyApiSubscribers(
                     dataSetId: _dataSetId,
                     dataSetFileId: _dataSetFileId,

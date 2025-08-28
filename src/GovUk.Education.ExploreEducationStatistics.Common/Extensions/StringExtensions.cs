@@ -1,15 +1,11 @@
 #nullable enable
-using AngleSharp.Text;
-using NaturalSort.Extension;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using AngleSharp.Text;
+using NaturalSort.Extension;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 

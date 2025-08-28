@@ -6,13 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseVersionAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
@@ -158,27 +154,18 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
 
     private static DeleteSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
-        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            new UserReleaseInviteRepository(
-                contentDbContext: contentDbContext,
-                logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
-            userRepository,
-            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
-        var userPublicationRoleAndInviteManager = new UserPublicationRoleAndInviteManager(
-            contentDbContext,
-            new UserPublicationInviteRepository(contentDbContext),
-            userRepository,
-            logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>());
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(
+            contentDbContext);
 
         return new DeleteSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
-                userPublicationRoleAndInviteManager: userPublicationRoleAndInviteManager,
+                userReleaseRoleRepository: userReleaseRoleRepository,
+                userPublicationRoleRepository: userPublicationRoleRepository,
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

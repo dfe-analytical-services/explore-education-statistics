@@ -1,14 +1,11 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
-    AuthorizationHandlerService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
@@ -21,7 +18,7 @@ public class ViewSpecificMethodologyRequirement : IAuthorizationRequirement
 
 public class ViewSpecificMethodologyAuthorizationHandler(
     IMethodologyRepository methodologyRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IPreReleaseService preReleaseService,
     IReleaseVersionRepository releaseVersionRepository,
     AuthorizationHandlerService authorizationHandlerService) :
@@ -86,7 +83,7 @@ public class ViewSpecificMethodologyAuthorizationHandler(
                     continue;
                 }
 
-                if (await userReleaseRoleAndInviteManager.HasUserReleaseRole(
+                if (await userReleaseRoleRepository.HasUserReleaseRole(
                         context.User.GetUserId(),
                         latestReleaseVersion.Id,
                         ReleaseRole.PrereleaseViewer))

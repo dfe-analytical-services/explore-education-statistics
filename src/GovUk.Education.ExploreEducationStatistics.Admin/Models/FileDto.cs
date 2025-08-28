@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 

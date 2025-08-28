@@ -102,7 +102,7 @@ export default function ReleaseDataUploadsSection({
 
         setAllDataFiles(currentDataFiles =>
           currentDataFiles.map(file =>
-            file.fileName !== dataFile.fileName
+            file.id !== dataFile.id
               ? file
               : {
                   ...dataFile,
@@ -129,7 +129,7 @@ export default function ReleaseDataUploadsSection({
 
         setAllDataFiles(currentDataFiles =>
           currentDataFiles.map(file =>
-            file.fileName !== updatedDataFile.fileName
+            file.id !== updatedDataFile.id
               ? file
               : {
                   ...updatedDataFile,
@@ -273,9 +273,16 @@ export default function ReleaseDataUploadsSection({
             </a>
           </li>
         </ul>
+
+        <p>
+          Files are expected to have a unique "Title", any files that are
+          uploaded with a "Title" that matches an existing "Title" will provide
+          an option to start a data replacement instead of importing as a
+          separate file.
+        </p>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={allDataFiles} onSubmit={handleSubmit} />
+        <DataFileUploadForm onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.

@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -10,8 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -79,15 +75,15 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleAndInviteManager,
-                    userReleaseRoleAndInviteManager
+                    userPublicationRoleRepository,
+                    userReleaseRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
@@ -96,7 +92,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 if (!expectedToPassByRole)
                 {
-                    userReleaseRoleAndInviteManager
+                    userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
@@ -111,8 +107,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 VerifyAllMocks(
                     methodologyRepository,
-                    userReleaseRoleAndInviteManager,
-                    userPublicationRoleAndInviteManager);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
             });
@@ -132,19 +128,19 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 var (
                     handler,
                     methodologyRepository,
-                    userPublicationRoleAndInviteManager,
-                    userReleaseRoleAndInviteManager
+                    userPublicationRoleRepository,
+                    userReleaseRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                userPublicationRoleAndInviteManager
+                userPublicationRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                userReleaseRoleAndInviteManager
+                userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
@@ -158,9 +154,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 VerifyAllMocks(
                     methodologyRepository,
-                    userPublicationRoleAndInviteManager,
-                    userReleaseRoleAndInviteManager,
-                    userReleaseRoleAndInviteManager);
+                    userPublicationRoleRepository,
+                    userReleaseRoleRepository);
 
                 Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
             });
@@ -172,19 +167,19 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
             var (
                 handler,
                 methodologyRepository,
-                userPublicationRoleAndInviteManager,
-                userReleaseRoleAndInviteManager
+                userPublicationRoleRepository,
+                userReleaseRoleRepository
                 ) = CreateHandlerAndDependencies();
 
             methodologyRepository.Setup(s =>
                     s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
-            userPublicationRoleAndInviteManager
+            userPublicationRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<PublicationRole>());
 
-            userReleaseRoleAndInviteManager
+            userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
@@ -198,8 +193,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
             VerifyAllMocks(
                 methodologyRepository,
-                userPublicationRoleAndInviteManager,
-                userReleaseRoleAndInviteManager);
+                userPublicationRoleRepository,
+                userReleaseRoleRepository);
 
             Assert.False(authContext.HasSucceeded);
         }
@@ -208,29 +203,29 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
     private static (
         UpdateSpecificMethodologyAuthorizationHandler,
         Mock<IMethodologyRepository>,
-        Mock<IUserPublicationRoleAndInviteManager>,
-        Mock<IUserReleaseRoleAndInviteManager>
+        Mock<IUserPublicationRoleRepository>,
+        Mock<IUserReleaseRoleRepository>
         )
         CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-        var userPublicationRoleAndInviteManager = new Mock<IUserPublicationRoleAndInviteManager>(Strict);
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
 
         var handler = new UpdateSpecificMethodologyAuthorizationHandler(
             methodologyRepository.Object,
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleAndInviteManager.Object,
-                userPublicationRoleAndInviteManager.Object,
+                userReleaseRoleRepository.Object,
+                userPublicationRoleRepository.Object,
                 Mock.Of<IPreReleaseService>(Strict))
         );
 
         return (
             handler,
             methodologyRepository,
-            userPublicationRoleAndInviteManager,
-            userReleaseRoleAndInviteManager
+            userPublicationRoleRepository,
+            userReleaseRoleRepository
         );
     }
 }

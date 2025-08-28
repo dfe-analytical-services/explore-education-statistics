@@ -1,8 +1,7 @@
 #nullable enable
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using System.IO;
-using System.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
@@ -56,7 +55,7 @@ public static class MockFormTestUtils
         var formFile = new Mock<IFormFile>();
         formFile
             .Setup(f => f.OpenReadStream())
-            .Returns(() => System.IO.File.OpenRead(filePath));
+            .Returns(() => File.OpenRead(filePath));
 
         formFile
             .Setup(f => f.FileName)

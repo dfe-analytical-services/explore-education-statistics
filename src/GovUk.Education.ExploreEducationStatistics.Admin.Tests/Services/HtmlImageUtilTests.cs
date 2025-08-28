@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 

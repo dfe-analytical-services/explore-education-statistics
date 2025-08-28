@@ -1,11 +1,9 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
@@ -40,7 +38,7 @@ public static class ValidationMessages
         Code: nameof(DataSetVersionMappingResultedInMajorChange),
         Message: "The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments."
     );
-    
+
     public static readonly LocalizableMessage ReleaseFileMustBeOriginal = new(
         Code: nameof(ReleaseFileMustBeOriginal),
         Message: "This must be an original file linked to a replacement. You must cancel the replacement first before removing file."
@@ -345,20 +343,6 @@ public static class ValidationMessages
         Message: "File name '{0}' of type {1} isn't unique to this release."
     );
 
-    public static ErrorViewModel GenerateErrorInvalidFileTypeForReplacement(FileType type)
-    {
-        return new ErrorViewModel
-        {
-            Code = InvalidFileTypeForReplacement.Code,
-            Message = string.Format(InvalidFileTypeForReplacement.Message, type.ToString()),
-        };
-    }
-
-    public static readonly LocalizableMessage InvalidFileTypeForReplacement = new(
-        Code: nameof(InvalidFileTypeForReplacement),
-        Message: "Replacing file should be of type '{0}'."
-    );
-
     public static ErrorViewModel GenerateErrorFileNameNotUnique(string fileName, FileType type)
     {
         return new ErrorViewModel
@@ -403,7 +387,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage CannotReplaceDataSetWithApiDataSet = new(
         Code: nameof(CannotReplaceDataSetWithApiDataSet),
-        Message: "Data set with title '{0}' cannot be replaced as it has an API data set."
+        Message: "Data set with title '{0}' cannot be replaced as it has an API data set linked to it. Please remove the API data set before replacing the data."
     );
 
     public static ErrorViewModel GenerateErrorCannotReplaceDataSetWithApiDataSet(string title)
@@ -412,6 +396,50 @@ public static class ValidationMessages
         {
             Code = CannotReplaceDataSetWithApiDataSet.Code,
             Message = string.Format(CannotReplaceDataSetWithApiDataSet.Message, title),
+        };
+    }
+
+    public static readonly LocalizableMessage CannotReplaceDraftApiDataSet = new(
+        Code: nameof(CannotReplaceDraftApiDataSet),
+        Message: "Data set with title '{0}' cannot be replaced as it is targeting an existing draft API data set. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this replacement."
+    );
+
+    public static ErrorViewModel GenerateErrorCannotReplaceDraftApiDataSet(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = CannotReplaceDraftApiDataSet.Code,
+            Message = string.Format(CannotReplaceDraftApiDataSet.Message, title),
+        };
+    }
+    
+    public static readonly LocalizableMessage CannotCreateMultipleDraftApiDataSet = new(
+        Code: nameof(CannotCreateMultipleDraftApiDataSet),
+        Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set." +
+                 " There is a draft API version which is not published. Multiple draft API versions at the same time are not permitted in the system." +
+                 " Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this action."
+    );
+
+    public static ErrorViewModel GenerateErrorCannotCreateMultipleDraftApiDataSet(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = CannotCreateMultipleDraftApiDataSet.Code,
+            Message = string.Format(CannotCreateMultipleDraftApiDataSet.Message, title),
+        };
+    }
+
+    public static readonly LocalizableMessage AnalystCannotReplaceApiDataSet = new(
+        Code: nameof(AnalystCannotReplaceApiDataSet),
+        Message: "You do not have permission to start this data replacement. This is because data set with title '{0}' is linked to an API data set version which can only be modified by BAU users. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on starting this replacement."
+    );
+
+    public static ErrorViewModel GenerateErrorAnalystCannotReplaceApiDataSet(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = AnalystCannotReplaceApiDataSet.Code,
+            Message = string.Format(AnalystCannotReplaceApiDataSet.Message, title),
         };
     }
 

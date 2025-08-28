@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;

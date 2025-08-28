@@ -4,12 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Guid = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -100,12 +94,14 @@ public class UserReleaseInviteRepository(
         return releaseVersionIds.All(inviteReleaseVersionIds.Contains);
     }
 
-    public async Task<List<UserReleaseInvite>> GetInvitesByEmail(string email)
+    public async Task<List<UserReleaseInvite>> GetInvitesByEmail(
+        string email,
+        CancellationToken cancellationToken = default)
     {
         return await contentDbContext
             .UserReleaseInvites
             .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     public async Task Remove(
@@ -216,9 +212,7 @@ public class UserReleaseInviteRepository(
         string email,
         CancellationToken cancellationToken = default)
     {
-        var invites = await contentDbContext.UserReleaseInvites
-            .Where(i => i.Email.ToLower().Equals(email.ToLower()))
-            .ToListAsync(cancellationToken);
+        var invites = await GetInvitesByEmail(email, cancellationToken);
 
         await RemoveMany(invites, cancellationToken);
     }

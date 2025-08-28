@@ -605,6 +605,19 @@ user uploads subject
         user waits until data file import is in status    ${SUBJECT_NAME}    ${IMPORT_STATUS}
     END
 
+user uploads subject replacement
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
+    user clicks link    Data and files
+    user waits until page contains element    id:dataFileUploadForm-title    %{WAIT_SMALL}
+    user enters text into element    id:dataFileUploadForm-title    ${SUBJECT_NAME}
+    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
+    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
+    user clicks button    Upload data files
+
 user confirms upload to complete import
     [Arguments]
     ...    ${SUBJECT_NAME}

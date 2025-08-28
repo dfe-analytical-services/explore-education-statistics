@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 

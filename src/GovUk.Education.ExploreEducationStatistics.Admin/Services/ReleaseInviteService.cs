@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -34,7 +30,7 @@ public class ReleaseInviteService(
     IUserRoleService userRoleService,
     IUserInviteRepository userInviteRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
     IOptions<NotifyOptions> notifyOptions) : IReleaseInviteService
@@ -160,7 +156,7 @@ public class ReleaseInviteService(
             return emailResult;
         }
 
-        await userReleaseRoleAndInviteManager.CreateManyIfNotExists(
+        await userReleaseRoleRepository.CreateManyIfNotExists(
             userId: userId,
             releaseVersionIds: missingReleaseRoleReleaseVersionIds,
             role: Contributor,

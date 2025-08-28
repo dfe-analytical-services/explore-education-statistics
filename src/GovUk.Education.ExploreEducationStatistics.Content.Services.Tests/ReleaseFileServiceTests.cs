@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -349,13 +343,13 @@ public class ReleaseFileServiceTests : IDisposable
 
         var captureRequest = new CaptureZipDownloadRequest
         {
-            PublicationName =  releaseVersion.Release.Publication.Title,
-            ReleaseVersionId =  releaseVersion.Id,
-            ReleaseName =  releaseVersion.Release.Title,
-            ReleaseLabel =  releaseVersion.Release.Label,
-            SubjectId =  releaseFile.File.SubjectId,
-            DataSetTitle =  releaseFile.Name,
-            FromPage =  AnalyticsFromPage.DataCatalogue,
+            PublicationName = releaseVersion.Release.Publication.Title,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseName = releaseVersion.Release.Title,
+            ReleaseLabel = releaseVersion.Release.Label,
+            SubjectId = releaseFile.File.SubjectId,
+            DataSetTitle = releaseFile.Name,
+            FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
         analyticsManager.Setup(m => m.Add(
@@ -540,10 +534,10 @@ public class ReleaseFileServiceTests : IDisposable
 
         var request = new CaptureZipDownloadRequest
         {
-            PublicationName =  releaseVersion.Release.Publication.Title,
-            ReleaseVersionId =  releaseVersion.Id,
-            ReleaseName =  releaseVersion.Release.Title,
-            ReleaseLabel =  releaseVersion.Release.Label,
+            PublicationName = releaseVersion.Release.Publication.Title,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseName = releaseVersion.Release.Title,
+            ReleaseLabel = releaseVersion.Release.Label,
             FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);

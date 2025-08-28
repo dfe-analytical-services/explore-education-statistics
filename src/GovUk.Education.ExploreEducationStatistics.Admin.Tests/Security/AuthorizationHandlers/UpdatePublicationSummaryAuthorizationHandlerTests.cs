@@ -4,14 +4,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Logging;
 using Moq;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
@@ -43,12 +39,9 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
         return new UpdatePublicationSummaryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleAndInviteManager: Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
-                userPublicationRoleAndInviteManager: new UserPublicationRoleAndInviteManager(
-                    contentDbContext: contentDbContext,
-                    userPublicationInviteRepository: new UserPublicationInviteRepository(contentDbContext),
-                    userRepository: new UserRepository(contentDbContext),
-                    logger: Mock.Of<ILogger<UserPublicationRoleAndInviteManager>>()),
+                userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
+                userPublicationRoleRepository: new UserPublicationRoleRepository(
+                    contentDbContext: contentDbContext),
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
     }
 }

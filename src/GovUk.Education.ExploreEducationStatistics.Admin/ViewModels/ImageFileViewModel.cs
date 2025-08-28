@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public class ImageFileViewModel : Dictionary<string, string>
 {

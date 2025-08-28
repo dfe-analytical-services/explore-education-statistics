@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Models;

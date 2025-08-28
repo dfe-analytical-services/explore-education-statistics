@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -197,8 +193,8 @@ public class ReleaseInviteServiceTests
                 mock.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, user.Id))
             .ReturnsAsync(Unit.Instance);
 
-        var userReleaseRoleAndInviteManager = new Mock<IUserReleaseRoleAndInviteManager>(Strict);
-        userReleaseRoleAndInviteManager
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        userReleaseRoleRepository
             .Setup(mock => mock.CreateManyIfNotExists(
                 user.Id,
                 missingReleaseRoleReleaseVersionIds,
@@ -215,7 +211,7 @@ public class ReleaseInviteServiceTests
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userRoleService: userRoleService.Object,
                 emailService: emailService.Object,
-                userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await service.InviteContributor(
                 email: Email,
@@ -236,7 +232,7 @@ public class ReleaseInviteServiceTests
         VerifyAllMocks(
             userRoleService,
             emailService,
-            userReleaseRoleAndInviteManager);
+            userReleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -734,7 +730,7 @@ public class ReleaseInviteServiceTests
         IUserRoleService? userRoleService = null,
         IUserInviteRepository? userInviteRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-        IUserReleaseRoleAndInviteManager? userReleaseRoleAndInviteManager = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
         IOptions<NotifyOptions>? notifyOptions = null)
@@ -751,7 +747,7 @@ public class ReleaseInviteServiceTests
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
-            userReleaseRoleAndInviteManager ?? Mock.Of<IUserReleaseRoleAndInviteManager>(Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             emailService ?? Mock.Of<IEmailService>(Strict),
             appOptions ?? DefaultAppOptions(),
             notifyOptions ?? DefaultNotifyOptions()

@@ -1,8 +1,3 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -29,9 +24,6 @@ public interface IPublicationService
         int page = 1,
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null);
-
-    Task<Either<ActionResult, List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default);
 
     Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
         Guid? themeId = null,

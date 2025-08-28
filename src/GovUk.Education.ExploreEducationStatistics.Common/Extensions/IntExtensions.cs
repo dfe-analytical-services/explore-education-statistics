@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class IntExtensions

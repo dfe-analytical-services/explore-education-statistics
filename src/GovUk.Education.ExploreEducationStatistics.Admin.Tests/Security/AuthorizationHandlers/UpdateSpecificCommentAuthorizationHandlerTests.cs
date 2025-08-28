@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;

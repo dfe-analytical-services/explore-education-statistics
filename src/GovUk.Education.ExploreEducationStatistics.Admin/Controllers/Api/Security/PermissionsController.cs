@@ -10,8 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;
@@ -24,8 +22,8 @@ public class PermissionsController(
     IReleaseFileService releaseFileService,
     IUserService userService,
     IPreReleaseService preReleaseService,
-    IUserPublicationRoleAndInviteManager userPublicationRoleAndInviteManager,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager) : ControllerBase
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository) : ControllerBase
 {
     [HttpGet("permissions/access")]
     public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
@@ -165,13 +163,13 @@ public class PermissionsController(
 
     private async Task<bool> IsReleaseApprover()
     {
-        return (await userReleaseRoleAndInviteManager.GetDistinctRolesByUser(userService.GetUserId()))
+        return (await userReleaseRoleRepository.GetDistinctRolesByUser(userService.GetUserId()))
             .Contains(ReleaseRole.Approver);
     }
 
     private async Task<bool> IsPublicationApprover()
     {
-        return (await userPublicationRoleAndInviteManager.GetDistinctRolesByUser(userService.GetUserId()))
+        return (await userPublicationRoleRepository.GetDistinctRolesByUser(userService.GetUserId()))
             .Contains(PublicationRole.Allower);
     }
 }

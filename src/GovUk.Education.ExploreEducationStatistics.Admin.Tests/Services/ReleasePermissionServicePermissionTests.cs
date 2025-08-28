@@ -9,8 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -165,21 +163,15 @@ public class ReleasePermissionServicePermissionTests
         ContentDbContext contentDbContext,
         IUserService userService)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
-        var userReleaseRoleAndInviteManager = new UserReleaseRoleAndInviteManager(
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            new UserReleaseInviteRepository(
-                contentDbContext: contentDbContext,
-                logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()),
-            userRepository,
-            logger: Mock.Of<ILogger<UserReleaseRoleAndInviteManager>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
 
         return new(
             contentDbContext: contentDbContext,
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
             releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-            userReleaseRoleAndInviteManager: userReleaseRoleAndInviteManager,
+            userReleaseRoleRepository: userReleaseRoleRepository,
             userService: userService
         );
     }

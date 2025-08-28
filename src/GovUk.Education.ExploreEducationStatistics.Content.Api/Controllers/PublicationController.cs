@@ -1,9 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -104,12 +100,6 @@ public class PublicationController : ControllerBase
             })
             .HandleFailuresOrOk();
     }
-
-    [HttpGet("publications/sitemap-items")]
-    public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await _publicationService.ListSitemapItems(cancellationToken)
-            .HandleFailuresOrOk();
     
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(

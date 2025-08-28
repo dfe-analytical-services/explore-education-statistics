@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;

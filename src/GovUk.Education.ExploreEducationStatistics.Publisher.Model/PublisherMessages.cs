@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
 public record NotifyChangeMessage(bool Immediate, ReleasePublishingKey ReleasePublishingKey)

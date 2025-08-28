@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using JsonKnownTypes;

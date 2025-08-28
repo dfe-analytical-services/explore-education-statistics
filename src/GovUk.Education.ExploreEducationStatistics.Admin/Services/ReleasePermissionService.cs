@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -22,7 +18,7 @@ public class ReleasePermissionService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IReleaseVersionRepository releaseVersionRepository,
-    IUserReleaseRoleAndInviteManager userReleaseRoleAndInviteManager,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserService userService) : IReleasePermissionService
 {
     public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
@@ -34,7 +30,7 @@ public class ReleasePermissionService(
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
             {
-                var users = await userReleaseRoleAndInviteManager
+                var users = await userReleaseRoleRepository
                     .ListUserReleaseRoles(releaseVersionId, rolesToInclude);
 
                 return users
@@ -135,9 +131,9 @@ public class ReleasePermissionService(
                     .Where(userId => !releaseContributorReleaseRolesByUserId.ContainsKey(userId))
                     .ToList();
 
-                await userReleaseRoleAndInviteManager.RemoveRolesAndInvites(releaseRolesToBeRemoved);
+                await userReleaseRoleRepository.RemoveMany(releaseRolesToBeRemoved);
 
-                await userReleaseRoleAndInviteManager.CreateManyIfNotExists(
+                await userReleaseRoleRepository.CreateManyIfNotExists(
                     userIds: usersToBeAdded,
                     releaseVersionId: releaseVersion.Id,
                     role: ReleaseRole.Contributor,
@@ -154,7 +150,7 @@ public class ReleasePermissionService(
                 .CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
             .OnSuccessVoid(async publication =>
             {
-                await userReleaseRoleAndInviteManager.RemoveAllRolesAndInvitesForPublicationAndUser(
+                await userReleaseRoleRepository.RemoveForPublicationAndUser(
                     userId: userId,
                     publicationId: publicationId,
                     rolesToInclude: ReleaseRole.Contributor);

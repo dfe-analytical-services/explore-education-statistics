@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Generator.Equals;
+﻿using Generator.Equals;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 

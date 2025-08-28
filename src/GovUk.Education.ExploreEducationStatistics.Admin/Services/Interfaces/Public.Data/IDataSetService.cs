@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -23,5 +20,9 @@ public interface IDataSetService
 
     Task<Either<ActionResult, DataSetViewModel>> CreateDataSet(
         Guid releaseFileId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, bool>> HasDraftVersion(
+        Guid dataSetId,
         CancellationToken cancellationToken = default);
 }

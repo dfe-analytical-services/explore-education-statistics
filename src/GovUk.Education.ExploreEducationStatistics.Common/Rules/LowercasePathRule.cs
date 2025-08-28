@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;

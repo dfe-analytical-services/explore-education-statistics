@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using InterpolatedSql;
 using InterpolatedSql.SqlBuilders;
 
@@ -48,7 +49,7 @@ public static class DuckDbConnectionExtensions
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
         InterpolatedSqlBuilderOptions options,
-        [System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("options")]
+        [InterpolatedStringHandlerArgument("options")]
         ref InterpolatedSqlHandler command)
     {
         if (command.InterpolatedSqlBuilder.Options.AutoAdjustMultilineString)

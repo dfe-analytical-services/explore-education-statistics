@@ -1,8 +1,6 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using System;
-using System.Linq;
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static System.Char;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 
