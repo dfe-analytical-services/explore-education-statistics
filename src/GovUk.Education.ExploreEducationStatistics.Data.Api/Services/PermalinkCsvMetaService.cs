@@ -94,7 +94,9 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
                     cancellationToken: cancellationToken
                 );
 
-            return await _releaseFileBlobService.StreamBlob(releaseFile, cancellationToken: cancellationToken);
+            return (await _releaseFileBlobService
+                .GetDownloadStream(releaseFile, cancellationToken: cancellationToken))
+                .Right;
         }
         catch (Exception exception)
         {

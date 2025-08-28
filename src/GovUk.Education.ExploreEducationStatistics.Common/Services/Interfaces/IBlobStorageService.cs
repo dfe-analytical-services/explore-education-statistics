@@ -67,25 +67,6 @@ public interface IBlobStorageService
         string path,
         bool decompress = true,
         CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Stream a blob in chunks.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// This differs from <see cref="DownloadToStream">DownloadToStream</see> in
-    /// that it does not download the entirety of the blob beforehand. This causes
-    /// differences in how the outputted stream behaves that you may or may not want.
-    /// </para>
-    /// </remarks>
-    /// <param name="containerName">Name of the blob container</param>
-    /// <param name="path">Path to the blob within the container</param>
-    /// <param name="cancellationToken">Token to cancel the request</param>
-    /// <returns>The chunked blob stream</returns>
-    Task<Stream> StreamBlob(
-        IBlobContainer containerName,
-        string path,
-        CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Obtain a secure,short-lived download token for use with <see cref="StreamWithToken"/>.

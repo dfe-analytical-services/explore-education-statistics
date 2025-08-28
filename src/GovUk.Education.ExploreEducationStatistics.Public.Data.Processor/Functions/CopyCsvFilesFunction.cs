@@ -71,11 +71,18 @@ public class CopyCsvFilesFunction(
                 destinationPath);
         }
 
-        var blobStream = await privateBlobStorageService.StreamBlob(
+        var blobStreamResult = await privateBlobStorageService.GetDownloadStream(
             BlobContainers.PrivateReleaseFiles,
             csvFile.Path(),
             cancellationToken: cancellationToken);
 
+        if (blobStreamResult.IsLeft)
+        {
+            throw new Exception($"Error getting blob stream for csv file '{csvFile.Path()}'. " +
+                                $"Got {blobStreamResult.Left.GetType().Name}");
+        }
+
+        await using var blobStream = blobStreamResult.Right;
         await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
 
         if (compress)

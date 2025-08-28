@@ -150,7 +150,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
+                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -299,7 +299,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
+                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -415,7 +415,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
+                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -513,7 +513,7 @@ public class SubjectCsvMetaServiceTests
             releaseFileBlobService
                 .Setup(
                     s =>
-                        s.StreamBlob(It.IsAny<ReleaseFile>(), default)
+                        s.GetDownloadStream(It.IsAny<ReleaseFile>(), default)
                 )
                 .ReturnsAsync("csv_header".ToStream());
 
@@ -620,7 +620,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
+                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -707,7 +707,7 @@ public class SubjectCsvMetaServiceTests
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
                 .Setup(s =>
-                    s.StreamBlob(It.IsAny<ReleaseFile>(), default))
+                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -828,7 +828,7 @@ public class SubjectCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
@@ -1006,7 +1006,7 @@ public class SubjectCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
@@ -1141,7 +1141,7 @@ public class SubjectCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
@@ -1264,7 +1264,7 @@ public class SubjectCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
@@ -1388,7 +1388,7 @@ public class SubjectCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
@@ -1556,7 +1556,7 @@ public class SubjectCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
                         ),
@@ -1773,7 +1773,7 @@ public class SubjectCsvMetaServiceTests
             // Blob for release file does not exist in storage
             releaseFileBlobService
                 .Setup(
-                    s => s.StreamBlob(
+                    s => s.GetDownloadStream(
                         It.Is<ReleaseFile>(
                             rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),

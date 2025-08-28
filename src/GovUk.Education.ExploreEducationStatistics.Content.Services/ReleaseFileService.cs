@@ -102,12 +102,12 @@ public class ReleaseFileService(
                 .Include(rf => rf.ReleaseVersion)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
             )
-            .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
-            .OnSuccessCombineWith(rf =>
-                publicBlobStorageService.GetDownloadStream(PublicReleaseFiles, rf.PublicPath()))
-            .OnSuccess(tuple =>
+            .OnSuccessDo(releaseFile => userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion))
+            .OnSuccessCombineWith(releaseFile => publicBlobStorageService
+                .GetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath()))
+            .OnSuccess(releaseFileAndStream =>
             {
-                var (releaseFile, stream) = tuple;
+                var (releaseFile, stream) = releaseFileAndStream;
 
                 return new FileStreamResult(stream, releaseFile.File.ContentType)
                 {
@@ -240,11 +240,12 @@ public class ReleaseFileService(
 
         foreach (var releaseFile in releaseFiles)
         {
-            var streamResult = await publicBlobStorageService.GetDownloadStream(
-                containerName: PublicReleaseFiles,
-                path: releaseFile.PublicPath(),
-                cancellationToken: cancellationToken);
-
+            var streamResult = await publicBlobStorageService
+                .GetDownloadStream(
+                    containerName: PublicReleaseFiles,
+                    path: releaseFile.PublicPath(),
+                    cancellationToken: cancellationToken);
+                
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
             {

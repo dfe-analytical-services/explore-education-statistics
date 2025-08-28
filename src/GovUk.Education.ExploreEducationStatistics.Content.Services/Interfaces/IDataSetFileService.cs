@@ -23,7 +23,9 @@ public interface IDataSetFileService
         int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId);
+    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
+        Guid dataSetFileId,
+        CancellationToken cancellationToken);
 
     Task<ActionResult> DownloadDataSetFile(
         Guid dataSetFileId,

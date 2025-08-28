@@ -49,10 +49,11 @@ public class DataSetFilesController : ControllerBase
 
     [HttpGet("data-set-files/{dataSetFileId:guid}")]
     public async Task<ActionResult<DataSetFileViewModel>> GetDataSetFile(
-        Guid dataSetFileId)
+        Guid dataSetFileId,
+        CancellationToken cancellationToken)
     {
         return await _dataSetFileService
-            .GetDataSetFile(dataSetFileId)
+            .GetDataSetFile(dataSetFileId, cancellationToken)
             .HandleFailuresOrOk();
     }
 

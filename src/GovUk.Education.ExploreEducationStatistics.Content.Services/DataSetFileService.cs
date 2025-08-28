@@ -2,11 +2,9 @@ using System.Globalization;
 using System.Linq.Expressions;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -32,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 public class DataSetFileService(
     ContentDbContext contentDbContext,
     IReleaseVersionRepository releaseVersionRepository,
-    IPublicBlobStorageService publicBlobStorageService,
+    IReleaseFileBlobService releaseFileBlobStorageService,
     IFootnoteRepository footnoteRepository,
     IAnalyticsManager analyticsManager,
     ILogger<DataSetFileService> logger)
@@ -188,7 +187,9 @@ public class DataSetFileService(
             .ToListAsync();
     }
 
-    public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId)
+    public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
+        Guid dataSetFileId,
+        CancellationToken cancellationToken)
     {
         var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.ReleaseVersion.Release.Publication.Theme)
@@ -199,16 +200,23 @@ public class DataSetFileService(
                 && rf.ReleaseVersion.Published.HasValue
                 && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
             .OrderByDescending(rf => rf.ReleaseVersion.Version)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (releaseFile == null
             || !await releaseVersionRepository.IsLatestPublishedReleaseVersion(
-                releaseFile.ReleaseVersionId))
+                releaseFile.ReleaseVersionId, cancellationToken))
         {
             return new NotFoundResult();
         }
 
-        var dataCsvPreview = await GetDataCsvPreview(releaseFile);
+        var dataCsvPreviewResult = await GetDataCsvPreview(
+            releaseFile: releaseFile,
+            cancellationToken: cancellationToken);
+
+        if (dataCsvPreviewResult.IsLeft)
+        {
+            return dataCsvPreviewResult.Left;
+        }
 
         var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
 
@@ -253,7 +261,7 @@ public class DataSetFileService(
                     releaseFile.File.DataSetFileMeta,
                     releaseFile.FilterSequence,
                     releaseFile.IndicatorSequence),
-                DataCsvPreview = dataCsvPreview,
+                DataCsvPreview = dataCsvPreviewResult.Right,
                 Variables = variables,
                 SubjectId = releaseFile.File.SubjectId!.Value,
             },
@@ -285,12 +293,16 @@ public class DataSetFileService(
 
         await RecordCsvDownloadAnalytics(releaseFile, cancellationToken);
 
-        var stream = await publicBlobStorageService.StreamBlob(
-            containerName: BlobContainers.PublicReleaseFiles,
-            path: releaseFile.PublicPath(),
+        var streamResult = await releaseFileBlobStorageService.GetDownloadStream(
+            releaseFile: releaseFile,
             cancellationToken: cancellationToken);
 
-        return new FileStreamResult(stream, "text/csv")
+        if (streamResult.IsLeft)
+        {
+            return streamResult.Left;
+        }
+        
+        return new FileStreamResult(streamResult.Right, "text/csv")
         {
             FileDownloadName = releaseFile.File.Filename,
         };
@@ -328,13 +340,20 @@ public class DataSetFileService(
         };
     }
 
-    private async Task<DataSetFileCsvPreviewViewModel> GetDataCsvPreview(ReleaseFile releaseFile)
+    private async Task<Either<ActionResult, DataSetFileCsvPreviewViewModel>> GetDataCsvPreview(
+        ReleaseFile releaseFile,
+        CancellationToken cancellationToken)
     {
-        var datafileStreamProvider = () => publicBlobStorageService.StreamBlob(
-            containerName: BlobContainers.PublicReleaseFiles,
-            path: releaseFile.PublicPath());
+        var streamResult = await releaseFileBlobStorageService.GetDownloadStream(
+            releaseFile: releaseFile,
+            cancellationToken: cancellationToken);
 
-        await using var stream = await datafileStreamProvider.Invoke();
+        if (streamResult.IsLeft)
+        {
+            return streamResult.Left;
+        }
+
+        await using var stream = streamResult.Right;
         using var streamReader = new StreamReader(stream);
         using var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
         await csvReader.ReadAsync();
