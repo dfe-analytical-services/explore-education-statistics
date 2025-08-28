@@ -1099,18 +1099,15 @@ public class PermalinkServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            using var stream = new MemoryStream();
-
             var service = BuildService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object
             );
 
-            var result = await service.DownloadCsvToStream(permalink.Id, stream);
+            var result = await service.GetCsvDownloadStream(permalink.Id);
 
-            result.AssertRight();
+            await using var stream = result.AssertRight();
 
-            stream.SeekToBeginning();
             var csv = stream.ReadToEnd();
 
             Assert.Equal("Test csv", csv);
@@ -1121,7 +1118,7 @@ public class PermalinkServiceTests
     public async Task DownloadCsvToStream_PermalinkNotFound()
     {
         var service = BuildService();
-        var result = await service.DownloadCsvToStream(Guid.NewGuid(), new MemoryStream());
+        var result = await service.GetCsvDownloadStream(Guid.NewGuid());
 
         result.AssertNotFound();
     }
@@ -1149,7 +1146,7 @@ public class PermalinkServiceTests
             var service = BuildService(contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await service.DownloadCsvToStream(permalink.Id, new MemoryStream());
+            var result = await service.GetCsvDownloadStream(permalink.Id);
 
             result.AssertNotFound();
         }

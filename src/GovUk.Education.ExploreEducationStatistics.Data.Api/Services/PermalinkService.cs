@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 
@@ -145,17 +144,15 @@ public class PermalinkService : IPermalinkService
             });
     }
 
-    public async Task<Either<ActionResult, Unit>> DownloadCsvToStream(Guid permalinkId,
-        Stream stream,
+    public async Task<Either<ActionResult, Stream>> GetCsvDownloadStream(
+        Guid permalinkId,
         CancellationToken cancellationToken = default)
     {
         return await Find(permalinkId, cancellationToken)
-            .OnSuccessVoid(() => _publicBlobStorageService.DownloadToStream(
+            .OnSuccess(() => _publicBlobStorageService.GetDownloadStream(
                 containerName: BlobContainers.PermalinkSnapshots,
                 path: $"{permalinkId}.csv.zst",
-                stream: stream,
-                cancellationToken: cancellationToken
-            ));
+                cancellationToken: cancellationToken));
     }
 
     private static async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
