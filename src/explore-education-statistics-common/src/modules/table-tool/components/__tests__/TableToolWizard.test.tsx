@@ -640,6 +640,35 @@ describe('TableToolWizard', () => {
     });
   });
 
+  test('renders related info when the current step is 2 or higher', async () => {
+    render(
+      <TableToolWizard
+        renderRelatedInfo={<h2>Related information</h2>}
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 2,
+          subjects: testSubjects,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: '',
+            locationIds: [],
+            filters: [],
+            indicators: [],
+          },
+        }}
+      />,
+    );
+
+    expect(await screen.findByText('Related information')).toBeInTheDocument();
+  });
+
+  test('does not render related info on the first step', async () => {
+    render(<TableToolWizard themeMeta={testThemeMeta} />);
+
+    expect(screen.getByText('Step 1')).toBeInTheDocument();
+    expect(screen.queryByText('Related information')).not.toBeInTheDocument();
+  });
+
   describe('location step heading', () => {
     test('sets the step heading to `Choose locations` if multiple location types', () => {
       render(

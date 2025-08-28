@@ -1,30 +1,17 @@
-import Link from '@admin/components/Link';
-import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import publicationService, {
-  Contact,
-  Publication,
-} from '@admin/services/publicationService';
+import { Publication } from '@admin/services/publicationService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
-import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import React, { memo, useRef } from 'react';
-import { generatePath } from 'react-router-dom';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import { ReleaseType } from '@common/services/types/releaseType';
 
 interface TableToolFinalStepProps {
   publication?: Publication;
   query: ReleaseTableDataQuery;
-  releaseVersionId: string;
-  releaseType: ReleaseType;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
@@ -33,22 +20,11 @@ interface TableToolFinalStepProps {
 const PreReleaseTableToolFinalStep = ({
   publication,
   query,
-  releaseVersionId,
-  releaseType,
   table,
   tableHeaders,
   onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
-
-  const { value: contact, isLoading } = useAsyncHandledRetry<
-    Contact | undefined
-  >(async () => {
-    if (!publication) {
-      return undefined;
-    }
-    return publicationService.getContact(publication.id);
-  }, [publication]);
 
   return (
     <div className="govuk-!-margin-bottom-4">
@@ -78,34 +54,12 @@ const PreReleaseTableToolFinalStep = ({
       )}
 
       {publication && table && (
-        <>
-          <DownloadTable
-            fullTable={table}
-            fileName={`data-${publication.slug}`}
-            onCsvDownload={() => tableBuilderService.getTableCsv(query)}
-            tableRef={dataTableRef}
-          />
-
-          <LoadingSpinner loading={isLoading}>
-            <TableToolInfo
-              contactDetails={contact}
-              releaseLink={
-                <Link
-                  to={generatePath<ReleaseRouteParams>(
-                    preReleaseContentRoute.path,
-                    {
-                      publicationId: publication.id,
-                      releaseVersionId,
-                    },
-                  )}
-                >
-                  {publication.title}
-                </Link>
-              }
-              releaseType={releaseType}
-            />
-          </LoadingSpinner>
-        </>
+        <DownloadTable
+          fullTable={table}
+          fileName={`data-${publication.slug}`}
+          onCsvDownload={() => tableBuilderService.getTableCsv(query)}
+          tableRef={dataTableRef}
+        />
       )}
     </div>
   );

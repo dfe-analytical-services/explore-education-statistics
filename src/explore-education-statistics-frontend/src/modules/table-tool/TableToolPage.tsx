@@ -19,13 +19,12 @@ import publicationService, {
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import TableToolInfoWrapper from '@frontend/modules/table-tool/components/TableToolInfoWrapper';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
-import PublicTableToolInfo from './components/PublicTableToolInfo';
 
 const defaultPageTitle = 'Create your own tables';
 
@@ -162,47 +161,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
     selectedPublication,
   ]);
 
-  const tableToolInfo: ReactNode = useMemo(() => {
-    if (!selectedPublication || !fullPublication) return null;
-
-    const { publication } = fullPublication;
-    const getMethodologyLinks = () => {
-      const links: ReactNode[] =
-        publication?.methodologies?.map(methodology => (
-          <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
-            {methodology.title}
-          </Link>
-        )) ?? [];
-
-      if (publication?.externalMethodology) {
-        links.push(
-          <Link
-            key={publication.externalMethodology.url}
-            to={publication.externalMethodology.url}
-          >
-            {publication.externalMethodology.title}
-          </Link>,
-        );
-      }
-      return links;
-    };
-
-    return (
-      <TableToolInfo
-        contactDetails={publication?.contact}
-        methodologyLinks={getMethodologyLinks()}
-        releaseLink={
-          <Link
-            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
-          >
-            {`${selectedPublication.title}, ${selectedPublication.latestRelease.title}`}
-          </Link>
-        }
-        releaseType={selectedPublication.selectedRelease.type}
-      />
-    );
-  }, [fullPublication, selectedPublication]);
-
   return (
     <Page
       // Don't include the default meta title after intitial step to prevent too much screen reader noise.
@@ -247,11 +205,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {featuredTable.name}
           </Link>
         )}
-        afterStep={
-          <PublicTableToolInfo
-            selectedPublication={selectedPublication}
-            fullPublication={fullPublication}
-          />
+        renderRelatedInfo={
+          selectedPublication && (
+            <TableToolInfoWrapper
+              selectedPublication={selectedPublication}
+              fullPublication={fullPublication}
+            />
+          )
         }
         currentStep={currentStep}
         finalStep={({

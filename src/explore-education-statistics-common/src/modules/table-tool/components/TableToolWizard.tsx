@@ -1,6 +1,7 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import useToggle from '@common/hooks/useToggle';
 import DataSetStep, {
   DataSetFormSubmitHandler,
 } from '@common/modules/table-tool/components/DataSetStep';
@@ -80,12 +81,12 @@ export interface FinalStepRenderProps {
 
 export interface TableToolWizardProps {
   currentStep?: number;
-  afterStep?: ReactNode;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   hidePublicationStep?: boolean;
   initialState?: Partial<InitialTableToolState>;
   loadingFastTrack?: boolean;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderRelatedInfo?: ReactNode;
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
   themeMeta?: Theme[];
@@ -115,12 +116,12 @@ export interface TableToolWizardProps {
 
 export default function TableToolWizard({
   currentStep,
-  afterStep,
   finalStep,
   hidePublicationStep,
   initialState = {},
   loadingFastTrack = false,
   renderFeaturedTableLink,
+  renderRelatedInfo,
   scrollOnMount,
   showTableQueryErrorDownload = true,
   themeMeta = [],
@@ -165,6 +166,9 @@ export default function TableToolWizard({
   );
   const [dataSetStepTitle, setDataSetStepTitle] = useState<string>(
     defaultDataSetStepTitle,
+  );
+  const [showRelatedInfo, toggleShowRelatedInfo] = useToggle(
+    !!(initialState.initialStep && initialState?.initialStep >= 2),
   );
 
   const stepTitles = {
@@ -519,6 +523,7 @@ export default function TableToolWizard({
             currentStep={currentStep}
             onStepChange={async (nextStep, previousStep) => {
               onStepChange?.(nextStep, previousStep);
+              toggleShowRelatedInfo(nextStep >= 2);
               if (
                 nextStep < previousStep &&
                 showChangeWarningForSteps.includes(nextStep)
@@ -533,106 +538,91 @@ export default function TableToolWizard({
             {!hidePublicationStep && (
               <WizardStep size="l" onBack={handlePublicationStepBack}>
                 {stepProps => (
-                  <>
-                    <PublicationForm
-                      {...stepProps}
-                      initialValues={{
-                        publicationId: state.query.publicationId ?? '',
-                        themeId: '',
-                      }}
-                      stepTitle={stepTitles.publication}
-                      themes={themeMeta}
-                      renderSummaryAfter={
-                        state.selectedPublication?.isSuperseded &&
-                        state.selectedPublication.supersededBy ? (
-                          <WarningMessage testId="superseded-warning">
-                            This publication has been superseded by{' '}
-                            <a
-                              data-testid="superseded-by-link"
-                              href={`/find-statistics/${state.selectedPublication.supersededBy.slug}`}
-                            >
-                              {state.selectedPublication.supersededBy.title}
-                            </a>
-                          </WarningMessage>
-                        ) : null
-                      }
-                      onSubmit={handlePublicationFormSubmit}
-                    />
-                    {stepProps.isActive && afterStep}
-                  </>
+                  <PublicationForm
+                    {...stepProps}
+                    initialValues={{
+                      publicationId: state.query.publicationId ?? '',
+                      themeId: '',
+                    }}
+                    stepTitle={stepTitles.publication}
+                    themes={themeMeta}
+                    renderSummaryAfter={
+                      state.selectedPublication?.isSuperseded &&
+                      state.selectedPublication.supersededBy ? (
+                        <WarningMessage testId="superseded-warning">
+                          This publication has been superseded by{' '}
+                          <a
+                            data-testid="superseded-by-link"
+                            href={`/find-statistics/${state.selectedPublication.supersededBy.slug}`}
+                          >
+                            {state.selectedPublication.supersededBy.title}
+                          </a>
+                        </WarningMessage>
+                      ) : null
+                    }
+                    onSubmit={handlePublicationFormSubmit}
+                  />
                 )}
               </WizardStep>
             )}
             <WizardStep size="l" onBack={handleDataSetStepBack}>
               {stepProps => (
-                <>
-                  <DataSetStep
-                    {...stepProps}
-                    featuredTables={state.featuredTables}
-                    loadingFastTrack={loadingFastTrack}
-                    renderFeaturedTableLink={renderFeaturedTableLink}
-                    releaseVersion={state.selectedPublication?.selectedRelease}
-                    stepTitle={stepTitles.dataSet}
-                    subjects={state.subjects}
-                    subjectId={state.query.subjectId}
-                    onSubmit={handleDataSetFormSubmit}
-                  />
-                  {stepProps.isActive && afterStep}
-                </>
+                <DataSetStep
+                  {...stepProps}
+                  featuredTables={state.featuredTables}
+                  loadingFastTrack={loadingFastTrack}
+                  renderFeaturedTableLink={renderFeaturedTableLink}
+                  releaseVersion={state.selectedPublication?.selectedRelease}
+                  stepTitle={stepTitles.dataSet}
+                  subjects={state.subjects}
+                  subjectId={state.query.subjectId}
+                  onSubmit={handleDataSetFormSubmit}
+                />
               )}
             </WizardStep>
             <WizardStep size="l" onBack={handleLocationStepBack}>
               {stepProps => (
-                <>
-                  <LocationStep
-                    {...stepProps}
-                    initialValues={state.query.locationIds}
-                    options={state.subjectMeta.locations}
-                    stepTitle={stepTitles.location}
-                    onSubmit={handleLocationFiltersFormSubmit}
-                  />
-                  {stepProps.isActive && afterStep}
-                </>
+                <LocationStep
+                  {...stepProps}
+                  initialValues={state.query.locationIds}
+                  options={state.subjectMeta.locations}
+                  stepTitle={stepTitles.location}
+                  onSubmit={handleLocationFiltersFormSubmit}
+                />
               )}
             </WizardStep>
             <WizardStep size="l" onBack={handleTimePeriodStepBack}>
               {stepProps => (
-                <>
-                  <TimePeriodForm
-                    {...stepProps}
-                    initialValues={state.query.timePeriod}
-                    options={state.subjectMeta.timePeriod.options}
-                    stepTitle={stepTitles.timePeriod}
-                    onSubmit={handleTimePeriodFormSubmit}
-                  />
-                  {stepProps.isActive && afterStep}
-                </>
+                <TimePeriodForm
+                  {...stepProps}
+                  initialValues={state.query.timePeriod}
+                  options={state.subjectMeta.timePeriod.options}
+                  stepTitle={stepTitles.timePeriod}
+                  onSubmit={handleTimePeriodFormSubmit}
+                />
               )}
             </WizardStep>
             <WizardStep size="l" onBack={handleFiltersStepBack}>
               {stepProps => (
-                <>
-                  <FiltersForm
-                    {...stepProps}
-                    initialValues={{
-                      indicators: state.query.indicators,
-                      filters: state.query.filters,
-                      filterHierarchies: state.query.filterHierarchiesOptions,
-                    }}
-                    selectedPublication={state.selectedPublication}
-                    stepTitle={stepTitles.filter}
-                    subject={
-                      state.subjects.filter(
-                        subject => subject.id === state.query.subjectId,
-                      )[0]
-                    }
-                    subjectMeta={state.subjectMeta}
-                    showTableQueryErrorDownload={showTableQueryErrorDownload}
-                    onTableQueryError={onTableQueryError}
-                    onSubmit={handleFiltersFormSubmit}
-                  />
-                  {stepProps.isActive && afterStep}
-                </>
+                <FiltersForm
+                  {...stepProps}
+                  initialValues={{
+                    indicators: state.query.indicators,
+                    filters: state.query.filters,
+                    filterHierarchies: state.query.filterHierarchiesOptions,
+                  }}
+                  selectedPublication={state.selectedPublication}
+                  stepTitle={stepTitles.filter}
+                  subject={
+                    state.subjects.filter(
+                      subject => subject.id === state.query.subjectId,
+                    )[0]
+                  }
+                  subjectMeta={state.subjectMeta}
+                  showTableQueryErrorDownload={showTableQueryErrorDownload}
+                  onTableQueryError={onTableQueryError}
+                  onSubmit={handleFiltersFormSubmit}
+                />
               )}
             </WizardStep>
             {finalStep &&
@@ -645,9 +635,8 @@ export default function TableToolWizard({
                 onReorder: reordered => setReorderedTableHeaders(reordered),
               })}
           </Wizard>
-
+          {showRelatedInfo && renderRelatedInfo}
           <PreviousStepModalConfirm />
-          {afterStep}
         </>
       )}
     </ConfirmContextProvider>
