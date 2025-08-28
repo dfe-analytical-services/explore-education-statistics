@@ -45,10 +45,5 @@ public abstract class PublicationsSitemapControllerTests
         }
     }
 
-    private PublicationsSitemapController BuildController()
-    {
-        return new PublicationsSitemapController(
-            _publicationsSitemapService.Build()
-        );
-    }
+    private PublicationsSitemapController BuildController() => new(_publicationsSitemapService.Build());
 }

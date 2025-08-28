@@ -248,8 +248,5 @@ public abstract class PublicationsSitemapServiceTests
         }
     }
 
-    private static PublicationsSitemapService BuildService(ContentDbContext contentDbContext)
-    {
-        return new PublicationsSitemapService(contentDbContext);
-    }
+    private static PublicationsSitemapService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
 }

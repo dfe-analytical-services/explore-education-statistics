@@ -51,10 +51,5 @@ public abstract class RelatedInformationControllerTests
         }
     }
 
-    private RelatedInformationController BuildController()
-    {
-        return new RelatedInformationController(
-            _relatedInformationService.Build()
-        );
-    }
+    private RelatedInformationController BuildController() => new(_relatedInformationService.Build());
 }
