@@ -526,7 +526,9 @@ public class ReleaseFileServiceTests : IDisposable
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
         // File does not exist in blob storage
-        publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), false);
+        publicBlobStorageService.SetupGetDownloadStreamNotFound(
+            PublicReleaseFiles,
+            releaseFile.PublicPath());
 
         var request = new CaptureZipDownloadRequest
         {
@@ -713,7 +715,8 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_Cancelled()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease()
                 .WithPublication(_dataFixture.DefaultPublication()));
 
@@ -756,16 +759,20 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        // After the first file has completed, we cancel the request
-        // to prevent the next file from being fetched.
         publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-
-        publicBlobStorageService
-            .SetupDownloadToStream(
+            .SetupGetDownloadStream(
                 container: PublicReleaseFiles,
                 path: releaseFile1.PublicPath(),
                 content: "Test ancillary blob",
+                cancellationToken: tokenSource.Token);
+        
+        // After the first file has completed, we cancel the request
+        // to prevent the next file from being fetched.
+        publicBlobStorageService
+            .SetupGetDownloadStream(
+                container: PublicReleaseFiles,
+                path: releaseFile2.PublicPath(),
+                content: "Test ancillary blob 2",
                 cancellationToken: tokenSource.Token,
                 callback: tokenSource.Cancel);
 
