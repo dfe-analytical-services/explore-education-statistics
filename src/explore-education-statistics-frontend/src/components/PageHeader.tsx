@@ -1,14 +1,25 @@
 import React from 'react';
+import classNames from 'classnames';
 import Link from './Link';
+import { PageWidth } from './Page';
 
-const PageHeader = () => (
+interface Props {
+  width?: PageWidth;
+}
+
+const PageHeader = ({ width }: Props) => (
   <>
     <a href="#main-content" className="govuk-skip-link">
       Skip to main content
     </a>
 
     <header className="govuk-header" role="banner" data-module="header">
-      <div className="govuk-header__container govuk-width-container">
+      <div
+        className={classNames('govuk-header__container govuk-width-container', {
+          'dfe-width-container--wide': width === 'wide',
+          'dfe-width-container--full': width === 'full',
+        })}
+      >
         <div className="govuk-header__logo">
           <a
             href="//www.gov.uk"

@@ -165,7 +165,7 @@ export default function DataSetFilePage({
       title={title}
       caption={`Data set from ${release.publication.title}`}
       breadcrumbs={[{ name: 'Data catalogue', link: '/data-catalogue' }]}
-      wide={fullScreenPreview}
+      width={fullScreenPreview ? 'full' : undefined}
       pageMeta={{
         additionalMeta: [getDataSetFileMetaCSVW({ dataSetFile })],
       }}
