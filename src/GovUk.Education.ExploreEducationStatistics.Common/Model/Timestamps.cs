@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public interface ICreatedTimestamp<TDate> : ITimestampsInternal.ICreated
