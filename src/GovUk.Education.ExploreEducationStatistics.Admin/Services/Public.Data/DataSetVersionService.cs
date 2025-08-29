@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -19,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Semver;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
+[assembly: InternalsVisibleTo("GovUk.Education.ExploreEducationStatistics.Admin.Tests")]
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -159,7 +161,7 @@ public class DataSetVersionService(
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
     }
 
-    private async Task UpdateStatusToFinalizing(DataSetVersion dataSetVersion)
+    internal async Task UpdateStatusToFinalizing(DataSetVersion dataSetVersion)
     {
         dataSetVersion.Status = DataSetVersionStatus.Finalising;
         publicDataDbContext.DataSetVersions.Update(dataSetVersion);
