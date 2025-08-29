@@ -167,7 +167,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           : undefined
       }
       caption="Table Tool"
-      wide
+      width="wide"
     >
       <p>
         Choose the data and area of interest you want to explore and then use

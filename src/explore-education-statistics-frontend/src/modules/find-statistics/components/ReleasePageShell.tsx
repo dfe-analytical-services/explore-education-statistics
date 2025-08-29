@@ -19,7 +19,7 @@ const ReleasePageShell: NextPage<Props> = ({ releaseVersion, children }) => {
         { name: 'Find statistics and data', link: '/find-statistics' },
       ]}
       pageTitleComponent={<ReleasePageTitle releaseVersion={releaseVersion} />}
-      wide
+      width="wide"
     >
       <ReleasePageIntro releaseVersion={releaseVersion} />
       {children}
