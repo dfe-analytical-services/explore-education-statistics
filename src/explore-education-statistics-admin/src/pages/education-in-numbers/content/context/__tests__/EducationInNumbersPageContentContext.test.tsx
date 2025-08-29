@@ -1,47 +1,13 @@
 import { produce } from 'immer';
-import { EinContent } from '@admin/services/educationInNumbersContentService';
-import testEinPageVersion from '@admin/pages/education-in-numbers/__tests__/__data__/testEducationInNumbersPageAndContent';
+import testEinPageVersion, {
+  testEinPageContent,
+} from '@admin/pages/education-in-numbers/__tests__/__data__/testEducationInNumbersPageAndContent';
 import { HtmlBlock } from '@common/services/types/blocks';
 import {
   EducationInNumbersPageContextState,
   educationInNumbersPageReducer as originalEinPageReducer,
-} from '../EducationInNumbersPageContentContext';
-import { EducationInNumbersPageDispatchAction } from '../EducationInNumbersPageContentContextActionTypes';
-
-const basicEinPage: EinContent = {
-  id: 'ein-page-0',
-  title: 'Education in Numbers',
-  slug: '2020-21',
-  content: [
-    {
-      id: 'content-section-0',
-      order: 0,
-      caption: '',
-      heading: 'New section 3',
-      content: [
-        {
-          id: 'content-section-0-content-0',
-          body: '',
-          type: 'HtmlBlock',
-          order: 0,
-        },
-        {
-          id: 'content-section-0-content-1',
-          body: 'Part 2',
-          type: 'HtmlBlock',
-          order: 0,
-        },
-      ],
-    },
-    {
-      id: 'content-section-1',
-      order: 1,
-      heading: 'New section',
-      content: [],
-      caption: '',
-    },
-  ],
-};
+} from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
+import { EducationInNumbersPageDispatchAction } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContextActionTypes';
 
 const einPageReducer = (
   initial: EducationInNumbersPageContextState,
@@ -50,13 +16,13 @@ const einPageReducer = (
 
 describe('EducationInNumbersPageContentContext', () => {
   test('REMOVE_BLOCK_FROM_SECTION removes a block from a section', () => {
-    const keyStatsSection = basicEinPage.content[0];
+    const keyStatsSection = testEinPageContent.content[0];
     const removingBlockId = keyStatsSection.content[0].id;
     const originalLength = keyStatsSection.content.length;
 
     const { pageContent } = einPageReducer(
       {
-        pageContent: basicEinPage,
+        pageContent: testEinPageContent,
         pageVersion: testEinPageVersion,
       },
       {
@@ -80,14 +46,14 @@ describe('EducationInNumbersPageContentContext', () => {
   });
 
   test('UPDATE_BLOCK_FROM_SECTION updates a block from section', () => {
-    const section = basicEinPage.content[0];
+    const section = testEinPageContent.content[0];
     const blockToUpdate = (section.content as HtmlBlock[])[0];
 
     const newBody = 'This is some updated text!';
 
     const { pageContent } = einPageReducer(
       {
-        pageContent: basicEinPage,
+        pageContent: testEinPageContent,
         pageVersion: testEinPageVersion,
       },
       {
@@ -111,7 +77,7 @@ describe('EducationInNumbersPageContentContext', () => {
   });
 
   test('ADD_BLOCK_TO_SECTION adds a block to a section', () => {
-    const section = basicEinPage.content[0];
+    const section = testEinPageContent.content[0];
     const newBlock: HtmlBlock = {
       id: '123',
       order: 1,
@@ -123,7 +89,7 @@ describe('EducationInNumbersPageContentContext', () => {
 
     const { pageContent } = einPageReducer(
       {
-        pageContent: basicEinPage,
+        pageContent: testEinPageContent,
         pageVersion: testEinPageVersion,
       },
       {
@@ -145,10 +111,10 @@ describe('EducationInNumbersPageContentContext', () => {
   });
 
   test('ADD_CONTENT_SECTION adds a new section to page content', () => {
-    const originalLength = basicEinPage.content.length;
+    const originalLength = testEinPageContent.content.length;
     const { pageContent } = einPageReducer(
       {
-        pageContent: basicEinPage,
+        pageContent: testEinPageContent,
         pageVersion: testEinPageVersion,
       },
       {
@@ -158,7 +124,7 @@ describe('EducationInNumbersPageContentContext', () => {
             caption: '',
             heading: 'A new section',
             id: 'new-section-1',
-            order: basicEinPage.content.length,
+            order: testEinPageContent.content.length,
             content: [],
           },
         },
@@ -171,8 +137,8 @@ describe('EducationInNumbersPageContentContext', () => {
   });
 
   test("SET_CONTENT sets the page's content", () => {
-    const contentSectionsLength = basicEinPage.content.length;
-    const contentSectionsReversed = basicEinPage.content.map(
+    const contentSectionsLength = testEinPageContent.content.length;
+    const contentSectionsReversed = testEinPageContent.content.map(
       (section, index) => {
         return { ...section, order: contentSectionsLength - (1 + index) };
       },
@@ -180,7 +146,7 @@ describe('EducationInNumbersPageContentContext', () => {
 
     const { pageContent } = einPageReducer(
       {
-        pageContent: basicEinPage,
+        pageContent: testEinPageContent,
         pageVersion: testEinPageVersion,
       },
       {
@@ -197,10 +163,10 @@ describe('EducationInNumbersPageContentContext', () => {
   });
 
   test('UPDATE_CONTENT_SECTION updates a content section', () => {
-    const basicSection = basicEinPage.content[0];
+    const basicSection = testEinPageContent.content[0];
     const { pageContent } = einPageReducer(
       {
-        pageContent: basicEinPage,
+        pageContent: testEinPageContent,
         pageVersion: testEinPageVersion,
       },
       {
