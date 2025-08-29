@@ -15,4 +15,8 @@ public interface IDataSetUploadRepository
         Guid releaseVersionId,
         Guid dataSetUploadId,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Unit>> DeleteAll(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default);
 }
