@@ -11,11 +11,40 @@ const testEinPageVersion: EducationInNumbersSummaryWithPrevVersion = {
 };
 
 export const testEinPageContent: EinContent = {
-  // @MarkFix tests: currently unused but should be used in tests
-  id: 'ein-content-2',
-  title: 'The content',
-  slug: 'content-1',
-  content: [],
+  id: 'ein-page-0',
+  title: 'Education in Numbers',
+  slug: '2020-21',
+  content: [
+    {
+      id: 'content-section-0',
+      order: 0,
+      caption: '',
+      heading: 'New section 3',
+      content: [
+        {
+          id: 'content-section-0-content-0',
+          body: '',
+          type: 'HtmlBlock',
+          order: 0,
+          comments: [],
+        },
+        {
+          id: 'content-section-0-content-1',
+          body: 'Part 2',
+          type: 'HtmlBlock',
+          order: 0,
+          comments: [],
+        },
+      ],
+    },
+    {
+      id: 'content-section-1',
+      order: 1,
+      heading: 'New section',
+      content: [],
+      caption: '',
+    },
+  ],
 };
 
 export default testEinPageVersion;

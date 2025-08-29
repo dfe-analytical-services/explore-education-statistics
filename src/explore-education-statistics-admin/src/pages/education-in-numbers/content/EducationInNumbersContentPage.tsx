@@ -11,8 +11,8 @@ import EditablePageModeToggle from '@admin/components/editable/EditablePageModeT
 import {
   EducationInNumbersPageContentProvider,
   useEducationInNumbersPageContentState,
-} from './context/EducationInNumbersPageContentContext';
-import EducationInNumbersContent from './components/EducationInNumbersContent';
+} from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
+import EducationInNumbersContent from '@admin/pages/education-in-numbers/content/components/EducationInNumbersContent';
 
 export const EducationInNumbersContentPageInternal = () => {
   const { pageContent, pageVersion } = useEducationInNumbersPageContentState();
@@ -51,9 +51,6 @@ const EducationInNumbersContentPage = ({
   const { data: pageContent, isLoading: isPageContentLoading } = useQuery(
     educationInNumbersContentQueries.get(educationInNumbersPageId),
   );
-
-  console.log('pageVersion:', pageVersion);
-  console.log('pageContent:', pageContent);
 
   const isLoading = isPageVersionLoading || isPageContentLoading;
 
