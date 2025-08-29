@@ -118,52 +118,47 @@ describe('DraftApiDataSetsTable', () => {
       previousReleaseIds: [],
     },
   ];
+  const baseDataSetProps: DraftApiDataSetSummary = {
+    id: 'data-set-7',
+    title: 'Data set 7 title',
+    summary: 'Data set 7 summary',
+    status: 'Published',
+    previousReleaseIds: [],
+    draftVersion: {
+      id: 'version-8',
+      version: '2.0.1',
+      status: 'Draft',
+      type: 'Patch',
+    },
+  };
 
   const patchDataSet: DraftApiDataSetSummary[] = [
     {
-      id: 'data-set-7',
-      title: 'Data set 7 title',
-      summary: 'Data set 7 summary',
-      status: 'Published',
+      ...baseDataSetProps,
       draftVersion: {
-        id: 'version-8',
-        version: '2.0.1',
+        ...baseDataSetProps.draftVersion,
         status: 'Mapping',
-        type: 'Patch',
       },
-      previousReleaseIds: [],
     },
   ];
 
   const finalisingDataSet: DraftApiDataSetSummary[] = [
     {
-      id: 'data-set-7',
-      title: 'Data set 7 title',
-      summary: 'Data set 7 summary',
-      status: 'Published',
+      ...baseDataSetProps,
       draftVersion: {
-        id: 'version-8',
-        version: '2.0.1',
+        ...baseDataSetProps.draftVersion,
         status: 'Finalising',
-        type: 'Patch',
       },
-      previousReleaseIds: [],
     },
   ];
 
   const draftDataSet: DraftApiDataSetSummary[] = [
     {
-      id: 'data-set-7',
-      title: 'Data set 7 title',
-      summary: 'Data set 7 summary',
-      status: 'Published',
+      ...baseDataSetProps,
       draftVersion: {
-        id: 'version-8',
-        version: '2.0.1',
+        ...baseDataSetProps.draftVersion,
         status: 'Draft',
-        type: 'Patch',
       },
-      previousReleaseIds: [],
     },
   ];
 

@@ -1,15 +1,20 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -248,6 +253,80 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
 
             Assert.Equal(releaseVersion2.Release.Slug, actualDataSetVersion2.Release.Slug);
             Assert.Equal(releaseVersion2.Release.Title, actualDataSetVersion2.Release.Title);
+        }
+    }
+
+    public class UpdateStatusToFinalizingTests(TestApplicationFactory testApp)
+        : DataSetVersionServiceTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            ReleaseVersion releaseVersion1 = DataFixture.DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease()
+                    .WithPublication(DataFixture.DefaultPublication()));
+
+            ReleaseFile releaseVersion1DataFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion1);
+            
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.ReleaseVersions.Add(releaseVersion1);
+                context.ReleaseFiles.Add(releaseVersion1DataFile);
+            });
+
+            DataSetVersion dataSetVersion1 = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatusMapping()
+                .WithDataSet(DataFixture.DefaultDataSet())
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(releaseVersion1DataFile.Id)
+                    .WithSlug(releaseVersion1.Release.Slug)
+                    .WithTitle(releaseVersion1.Release.Title));
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion1);
+            });
+            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
+
+            processorClient
+                .Setup(c => c.CompleteNextDataSetVersionImport(
+                    dataSetVersion1.Id,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new ProcessDataSetVersionResponseViewModel
+                {
+                    DataSetId = Guid.NewGuid(),
+                    DataSetVersionId = dataSetVersion1.Id,
+                    InstanceId = Guid.NewGuid()
+                });
+            var userService = new Mock<IUserService>(MockBehavior.Strict);
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser))
+                .ReturnsAsync(true);
+
+            await using var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
+            await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
+
+            var service = new DataSetVersionService(
+                contentDbContext: contentDbContext,
+                publicDataDbContext: publicDataDbContext,
+                processorClient: processorClient.Object,
+                mapper: null!,
+                userService: userService.Object,
+                publicDataApiClient: null!,
+                dataSetVersionMappingService: null!
+            );
+
+            await service.UpdateStatusToFinalizing(dataSetVersion1);
+            
+            var actualDataSetVersion1 = await publicDataDbContext.DataSetVersions
+                .AsNoTracking()
+                .SingleAsync(dsv => dsv.Id == dataSetVersion1.Id);
+
+            Assert.Equal(DataSetVersionStatus.Finalising, actualDataSetVersion1.Status);
         }
     }
 }
