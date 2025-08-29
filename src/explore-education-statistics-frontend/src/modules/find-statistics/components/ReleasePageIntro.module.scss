@@ -1,0 +1,11 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  row-gap: govuk-spacing(4);
+  column-gap: govuk-spacing(5);
+  margin-bottom: govuk-spacing(6);
+}

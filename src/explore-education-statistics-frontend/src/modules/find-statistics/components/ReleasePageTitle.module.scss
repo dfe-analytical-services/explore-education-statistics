@@ -9,18 +9,8 @@
 
 .releasePageTitle {
   flex: 1 1 66%;
-}
 
-.subscribeLink {
-  display: inline-flex;
-  gap: govuk-spacing(2);
-  align-items: center;
-  border: 1px solid $govuk-border-colour;
-  text-decoration: none;
-  padding: govuk-spacing(1) govuk-spacing(2);
-  color: $govuk-link-colour;
-
-  svg {
-    fill: $govuk-text-colour;
+  @include govuk-media-query($from: tablet) {
+    flex-grow: 0;
   }
 }
