@@ -2,16 +2,18 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import React from 'react';
 import Link from './Link';
+import { PageWidth } from './Page';
 
 interface Props {
-  wide?: boolean;
+  width?: PageWidth;
 }
 
-const PageFooter = ({ wide }: Props) => (
+const PageFooter = ({ width }: Props) => (
   <footer className="govuk-footer" role="contentinfo">
     <div
       className={classNames('govuk-width-container', {
-        'dfe-width-container--wide': wide,
+        'dfe-width-container--wide': width === 'wide',
+        'dfe-width-container--full': width === 'full',
       })}
     >
       <svg

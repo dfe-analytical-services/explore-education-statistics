@@ -1,15 +1,16 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import styles from './TemporaryNotice.module.scss';
+import { PageWidth } from './Page';
 
 interface Props {
   children: ReactNode;
   start?: Date;
   end?: Date;
-  wide?: boolean;
+  width?: PageWidth;
 }
 
-const TemporaryNotice = ({ children, start, end, wide }: Props) => {
+const TemporaryNotice = ({ children, start, end, width }: Props) => {
   const now = new Date();
 
   if (start && now < start) {
@@ -24,7 +25,8 @@ const TemporaryNotice = ({ children, start, end, wide }: Props) => {
     <aside className={styles.notice}>
       <div
         className={classNames('govuk-width-container', {
-          'dfe-width-container--wide': wide,
+          'dfe-width-container--wide': width === 'wide',
+          'dfe-width-container--full': width === 'full',
         })}
       >
         {children}

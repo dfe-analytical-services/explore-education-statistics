@@ -10,6 +10,8 @@ import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
 import PageFeedback from './PageFeedback';
 
+export type PageWidth = 'wide' | 'full';
+
 type Props = {
   includeDefaultMetaTitle?: boolean;
   title: string;
@@ -22,7 +24,7 @@ type Props = {
   className?: string;
   children?: ReactNode;
   customBannerContent?: ReactNode;
-  wide?: boolean;
+  width?: PageWidth;
   isHomepage?: boolean;
 } & BreadcrumbsProps;
 
@@ -38,26 +40,27 @@ const Page = ({
   className,
   children = null,
   customBannerContent = null,
-  wide = false,
+  width,
   isHomepage = false,
   breadcrumbs = [],
 }: Props) => {
   return (
     <>
-      <CookieBanner wide={wide} />
+      <CookieBanner width={width} />
       <PageMeta
         includeDefaultMetaTitle={includeDefaultMetaTitle}
         title={metaTitle ?? `${title}${caption && `, ${caption}`}`}
         description={description}
         {...pageMeta}
       />
-      <PageHeader />
+      <PageHeader width={width} />
 
       <UserTestingBanner />
 
       <div
         className={classNames('govuk-width-container', className, {
-          'dfe-width-container--wide': wide,
+          'dfe-width-container--wide': width === 'wide',
+          'dfe-width-container--full': width === 'full',
         })}
       >
         <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u" />
@@ -83,7 +86,7 @@ const Page = ({
       </div>
 
       <PageFeedback />
-      <PageFooter wide={wide} />
+      <PageFooter width={width} />
     </>
   );
 };

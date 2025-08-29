@@ -35,7 +35,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       title={`'${dataSetTitle}' from '${publicationTitle}'`}
       caption="Permanent data table"
       className={styles.permalinkPage}
-      wide
+      width="wide"
       breadcrumbs={[
         { name: 'Data tables', link: '/data-tables' },
         { name: 'Permanent link', link: '/data-tables' },
