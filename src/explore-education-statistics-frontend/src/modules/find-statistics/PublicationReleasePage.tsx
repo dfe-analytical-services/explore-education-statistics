@@ -5,7 +5,7 @@ import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import PublicationReleasePageRedesign from './PublicationReleasePageRedesign';
+import PublicationReleasePageHome from './PublicationReleasePageHome';
 import PublicationReleasePageCurrent from './PublicationReleasePageCurrent';
 
 interface Props {
@@ -18,7 +18,7 @@ const PublicationReleasePage: NextPage<Props> = ({
   previewRedesign,
 }) => {
   return previewRedesign ? (
-    <PublicationReleasePageRedesign releaseVersion={releaseVersion} />
+    <PublicationReleasePageHome releaseVersion={releaseVersion} />
   ) : (
     <PublicationReleasePageCurrent releaseVersion={releaseVersion} />
   );
