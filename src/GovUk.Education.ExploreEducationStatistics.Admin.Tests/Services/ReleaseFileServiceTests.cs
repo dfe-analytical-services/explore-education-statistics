@@ -1592,9 +1592,9 @@ public class ReleaseFileServiceTests : IDisposable
         privateBlobStorageService
             .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test ancillary blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test ancillary blob");
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
@@ -1694,9 +1694,9 @@ public class ReleaseFileServiceTests : IDisposable
         privateBlobStorageService
             .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data 1 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data 1 blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test data 2 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test data 2 blob");
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
@@ -1812,11 +1812,11 @@ public class ReleaseFileServiceTests : IDisposable
         privateBlobStorageService
             .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile3.Path(), true);
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test 2 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test 2 blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -1982,8 +1982,8 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         // Files do not exist in blob storage
-        privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), false);
-        privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), false);
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile1.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile2.Path());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -2164,15 +2164,20 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        // After the first file has completed, we cancel the request
-        // to prevent the next file from being fetched.
         privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
-        privateBlobStorageService
-            .SetupDownloadToStream(
+            .SetupGetDownloadStream(
                 container: PrivateReleaseFiles,
                 path: releaseFile1.Path(),
                 content: "Test ancillary blob",
+                cancellationToken: tokenSource.Token);
+        
+        // After the first file has completed, we cancel the request
+        // to prevent the next file from being fetched.
+        privateBlobStorageService
+            .SetupGetDownloadStream(
+                container: PrivateReleaseFiles,
+                path: releaseFile2.Path(),
+                content: "Test ancillary blob 2",
                 cancellationToken: tokenSource.Token,
                 callback: tokenSource.Cancel);
 

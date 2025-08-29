@@ -226,33 +226,28 @@ public class ReleaseFileService : IReleaseFileService
         var releaseFilesWithZipEntries = new List<ReleaseFile>();
         foreach (var releaseFile in releaseFiles)
         {
+            var streamResult = await _privateBlobStorageService.GetDownloadStream(
+                containerName: PrivateReleaseFiles,
+                path: releaseFile.Path(),
+                cancellationToken: cancellationToken);
+            
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
-
-            var blobExists = await _privateBlobStorageService.CheckBlobExists(
-                PrivateReleaseFiles,
-                releaseFile.Path()
-            );
-
-            // Ignore files which do not exist in blob storage
-            if (!blobExists)
+            
+            // Ignore files where we cannot successfully get their blob download streams.
+            if (streamResult.IsLeft)
             {
                 continue;
             }
+            
+            await using var blobStream = streamResult.Right;
 
             var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
-
             await using var entryStream = entry.Open();
-
-            await _privateBlobStorageService.DownloadToStream(
-                containerName: PrivateReleaseFiles,
-                path: releaseFile.Path(),
-                stream: entryStream,
-                cancellationToken: cancellationToken
-            );
+            await blobStream.CopyToAsync(entryStream, cancellationToken);
 
             releaseFilesWithZipEntries.Add(releaseFile);
         }

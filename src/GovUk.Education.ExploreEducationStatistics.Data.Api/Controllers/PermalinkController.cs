@@ -28,16 +28,16 @@ public class PermalinkController : ControllerBase
     {
         if (Request.AcceptsCsv(exact: true))
         {
-            Response.ContentDispositionAttachment(
-                contentType: ContentTypes.Csv,
-                filename: $"permalink-{permalinkId}.csv");
-
-            return await _permalinkService.DownloadCsvToStream( // TODO EES-5976 analytics
+            return await _permalinkService
+                .GetCsvDownloadStream( // TODO EES-5976 analytics
                     permalinkId: permalinkId,
-                    stream: Response.BodyWriter.AsStream(),
-                    cancellationToken: cancellationToken
-                )
-                .HandleFailuresOrNoOp();
+                    cancellationToken: cancellationToken)
+                .HandleFailuresOr(stream => new FileStreamResult(
+                    fileStream: stream,
+                    contentType: ContentTypes.Csv)
+                {
+                    FileDownloadName = $"permalink-{permalinkId}.csv"
+                });
         }
 
         return await _permalinkService

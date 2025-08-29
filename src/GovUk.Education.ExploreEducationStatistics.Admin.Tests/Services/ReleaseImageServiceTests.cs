@@ -64,7 +64,7 @@ public class ReleaseImageServiceTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -166,7 +166,7 @@ public class ReleaseImageServiceTests
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {

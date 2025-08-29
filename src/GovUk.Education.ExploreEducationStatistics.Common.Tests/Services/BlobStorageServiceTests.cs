@@ -266,35 +266,6 @@ public class BlobStorageServiceTests
     }
     
     [Fact]
-    public async Task GetBlob()
-    {
-        var createdOn = DateTimeOffset.UtcNow;
-        const string path = "path/to/test.pdf";
-
-        var blobClient = MockBlobClient(
-            name: path,
-            createdOn: createdOn,
-            contentLength: 10 * 1024,
-            contentType: MediaTypeNames.Application.Pdf,
-            metadata: new Dictionary<string, string>()
-        );
-
-        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
-
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
-
-        var result = await service.GetBlob(PublicReleaseFiles, path);
-
-        Assert.Equal(createdOn, result.Created);
-        Assert.Equal(10 * 1024, result.ContentLength);
-        Assert.Equal(MediaTypeNames.Application.Pdf, result.ContentType);
-        Assert.Equal("test.pdf", result.FileName);
-        Assert.Equal(new Dictionary<string, string>(), result.Meta);
-        Assert.Equal(path, result.Path);
-    }
-
-    [Fact]
     public async Task GetDeserializedJson()
     {
         const string path = "path/to/test.pdf";

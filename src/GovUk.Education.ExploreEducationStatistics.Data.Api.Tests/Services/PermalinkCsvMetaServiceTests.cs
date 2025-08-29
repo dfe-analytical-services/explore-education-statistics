@@ -470,7 +470,6 @@ public class PermalinkCsvMetaServiceTests
                 .Setup(s => s.StreamBlob(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
-                    null,
                     default
                 ))
                 .ReturnsAsync(csv.ToStream());
@@ -677,7 +676,6 @@ public class PermalinkCsvMetaServiceTests
                 .Setup(s => s.StreamBlob(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId),
-                    null,
                     default
                 ))
                 .ReturnsAsync(csv.ToStream());
@@ -908,7 +906,6 @@ public class PermalinkCsvMetaServiceTests
                 .Setup(s => s.StreamBlob(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
-                    null,
                     default
                 ))
                 .ThrowsAsync(new FileNotFoundException("File not found"));

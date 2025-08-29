@@ -130,11 +130,8 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
 
         permalinkService
             .Setup(s => s
-                .DownloadCsvToStream(permalinkId, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Unit.Instance)
-            .Callback<Guid, Stream, CancellationToken>(
-                (_, stream, _) => { stream.WriteText("Test csv"); }
-            );
+                .GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("Test csv".ToStream());
 
         var client = SetupApp(permalinkService: permalinkService.Object)
             .CreateClient();
@@ -161,7 +158,7 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
 
         permalinkService
             .Setup(s => s
-                .DownloadCsvToStream(permalinkId, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         var client = SetupApp(permalinkService: permalinkService.Object)
