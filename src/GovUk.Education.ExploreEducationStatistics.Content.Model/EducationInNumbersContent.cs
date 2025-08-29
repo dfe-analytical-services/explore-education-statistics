@@ -26,6 +26,7 @@ public abstract class EinContentBlock
 
 public enum EinBlockType
 {
+    // NOTE: Update ContentDbContext.ConfigureEinContentBlock if you add a new type!
     HtmlBlock,
 }
 
