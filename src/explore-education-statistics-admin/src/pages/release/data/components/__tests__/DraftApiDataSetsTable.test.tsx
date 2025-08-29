@@ -118,20 +118,47 @@ describe('DraftApiDataSetsTable', () => {
       previousReleaseIds: [],
     },
   ];
+  const baseDataSetProps: DraftApiDataSetSummary = {
+    id: 'data-set-7',
+    title: 'Data set 7 title',
+    summary: 'Data set 7 summary',
+    status: 'Published',
+    previousReleaseIds: [],
+    draftVersion: {
+      id: 'version-8',
+      version: '2.0.1',
+      status: 'Draft',
+      type: 'Patch',
+    },
+  };
 
   const patchDataSet: DraftApiDataSetSummary[] = [
     {
-      id: 'data-set-7',
-      title: 'Data set 7 title',
-      summary: 'Data set 7 summary',
-      status: 'Published',
+      ...baseDataSetProps,
       draftVersion: {
-        id: 'version-8',
-        version: '2.0.1',
+        ...baseDataSetProps.draftVersion,
         status: 'Mapping',
-        type: 'Patch',
       },
-      previousReleaseIds: [],
+    },
+  ];
+
+  const finalisingDataSet: DraftApiDataSetSummary[] = [
+    {
+      ...baseDataSetProps,
+      draftVersion: {
+        ...baseDataSetProps.draftVersion,
+        status: 'Finalising',
+      },
+    },
+  ];
+
+  const draftDataSet: DraftApiDataSetSummary[] = [
+    {
+      ...baseDataSetProps,
+      draftVersion: {
+        ...baseDataSetProps.draftVersion,
+        status: 'Draft',
+      },
     },
   ];
 
@@ -438,6 +465,52 @@ describe('DraftApiDataSetsTable', () => {
     expect(row1Cells[3]).not.toHaveTextContent(
       'Remove draft for Data set 7 title',
     );
+  });
+
+  test('it doesnt render Remove Draft button if working with a finalising draft version', () => {
+    render(
+      <DraftApiDataSetsTable
+        canUpdateRelease
+        dataSets={finalisingDataSet}
+        publicationId="publication-1"
+        releaseVersionId="release-1"
+      />,
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(rows).toHaveLength(2);
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+
+    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
+    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
+    expect(row1Cells[2]).toHaveTextContent('Finalising');
+    expect(row1Cells[3]).not.toHaveTextContent(
+      'Remove draft for Data set 7 title',
+    );
+  });
+
+  test('it renders Remove Draft button if working with a Ready draft version', () => {
+    render(
+      <DraftApiDataSetsTable
+        canUpdateRelease
+        dataSets={draftDataSet}
+        publicationId="publication-1"
+        releaseVersionId="release-1"
+      />,
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(rows).toHaveLength(2);
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+
+    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
+    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
+    expect(row1Cells[2]).toHaveTextContent('Ready');
+    expect(row1Cells[3]).toHaveTextContent('Remove draft for Data set 7 title');
   });
 
   function render(

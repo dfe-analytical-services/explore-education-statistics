@@ -96,6 +96,7 @@ export type DataSetStatus = 'Draft' | 'Published' | 'Deprecated' | 'Withdrawn';
 export type DataSetDraftVersionStatus =
   | 'Processing'
   | 'Failed'
+  | 'Finalising'
   | 'Mapping'
   | 'Draft'
   | 'Cancelled';
