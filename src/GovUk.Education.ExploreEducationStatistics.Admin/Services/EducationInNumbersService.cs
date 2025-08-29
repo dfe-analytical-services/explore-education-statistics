@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -110,6 +111,8 @@ public class EducationInNumbersService(
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
+            .Include(p => p.Content)
+            .ThenInclude(section => section.Content)
             .FirstOrNotFoundAsync(page => page.Id == id)
             .OnSuccess(async page =>
             {
@@ -142,9 +145,12 @@ public class EducationInNumbersService(
                     UpdatedById = null,
                 };
 
-                contentDbContext.EducationInNumbersPages.Add(amendment);
+                var amendmentContent = page.Content
+                    .Select(section => section.Clone(amendment.Id))
+                    .ToList();
 
-                // @MarkFix also need to copy sections and blocks
+                contentDbContext.EducationInNumbersPages.Add(amendment);
+                contentDbContext.EinContentSections.AddRange(amendmentContent); // includes cloned EinContentBlocks
 
                 await contentDbContext.SaveChangesAsync();
 
