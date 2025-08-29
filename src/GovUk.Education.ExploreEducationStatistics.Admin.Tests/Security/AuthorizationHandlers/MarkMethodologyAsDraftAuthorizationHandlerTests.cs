@@ -28,15 +28,15 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
     private static readonly MethodologyVersion HigherReviewMethodologyVersion = new()
     {
-        Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid(),
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid(), 
         Status = MethodologyApprovalStatus.HigherLevelReview,
     };
 
     private static readonly MethodologyVersion ApprovedMethodologyVersion = new()
     {
-        Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid(),
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid(), 
         Status = MethodologyApprovalStatus.Approved,
     };
 
@@ -104,12 +104,12 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                        .ReturnsAsync([]);
 
                     userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<ReleaseRole>());
+                        .ReturnsAsync([]);
                 }
 
                 var user = DataFixture
@@ -160,7 +160,7 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
                 userPublicationRoleRepository
                     .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
@@ -216,7 +216,7 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
                 userPublicationRoleRepository
                     .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
@@ -274,8 +274,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                    .ReturnsAsync([]);
 
                 userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
@@ -325,8 +325,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
                 userPublicationRoleRepository
                     .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                    .ReturnsAsync([]);
 
                 userReleaseRoleRepository
                     .Setup(mock =>
@@ -372,12 +372,12 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 

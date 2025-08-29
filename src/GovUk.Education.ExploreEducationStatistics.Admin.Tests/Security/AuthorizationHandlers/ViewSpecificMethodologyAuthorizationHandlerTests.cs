@@ -26,8 +26,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid(),
+        Id = Guid.NewGuid(), 
+        MethodologyId = Guid.NewGuid(), 
         Status = MethodologyApprovalStatus.Approved,
     };
 
@@ -69,12 +69,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync((ReleaseVersion?)null);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                        .ReturnsAsync([]);
 
                     userReleaseRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<ReleaseRole>());
+                        .ReturnsAsync([]);
                 }
 
                 var user = DataFixture
@@ -121,7 +121,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .Contains(publicationRole);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 userReleaseRoleRepository
@@ -196,8 +196,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 }
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                    .ReturnsAsync([]);
 
                 userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
@@ -249,12 +249,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             methodologyRepository.Setup(s =>
                     s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
@@ -325,12 +325,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             methodologyRepository.Setup(s =>
                     s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
@@ -381,9 +381,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
             // Setup a draft release version that cannot be in prerelease
             var latestReleaseVersion = new ReleaseVersion
             {
-                Id = Guid.NewGuid(),
-                PublicationId = Guid.NewGuid(),
-                ApprovalStatus = ReleaseApprovalStatus.Draft
+                Id = Guid.NewGuid(), PublicationId = Guid.NewGuid(), ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var (
@@ -400,12 +398,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             methodologyRepository.Setup(s =>
                     s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
@@ -462,12 +460,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             methodologyRepository.Setup(s =>
                     s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
@@ -514,12 +512,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             methodologyRepository.Setup(s =>
                     s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
@@ -569,12 +567,12 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                .ReturnsAsync([]);
 
             userReleaseRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .ReturnsAsync([]);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
