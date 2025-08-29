@@ -20,9 +20,9 @@ public record DataSetFileSummaryViewModel
 
     public required IdTitleViewModel Theme { get; init; }
 
-    public required IdTitleViewModel Publication { get; init; }
+    public required IdTitleSlugViewModel Publication { get; init; }
 
-    public required IdTitleViewModel Release { get; init; }
+    public required IdTitleSlugViewModel Release { get; init; }
 
     public required bool LatestData { get; init; }
 

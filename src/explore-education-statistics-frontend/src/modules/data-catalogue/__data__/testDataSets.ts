@@ -86,12 +86,14 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-1',
       title: 'Publication 1',
+      slug: 'publication-1-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
+      slug: 'release-1-slug',
     },
     content: 'Data set summary 1',
     theme: {
@@ -121,12 +123,14 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-1',
       title: 'Publication 1',
+      slug: 'publication-1-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
+      slug: 'release-1-slug',
     },
     content: 'Data set summary 1',
     theme: {
@@ -156,12 +160,14 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     publication: {
       id: 'publication-2',
       title: 'Publication 2',
+      slug: 'publication-2-slug',
     },
     published: new Date('2020-01-01'),
     lastUpdated: '2023-12-01',
     release: {
       id: 'release-1',
       title: 'Release 1',
+      slug: 'release-1-slug',
     },
     content: 'Data set summary 1',
     theme: {
@@ -198,13 +204,13 @@ export const testDataSetFile: DataSetFile = {
     isSuperseded: false,
     publication: {
       id: 'publication-id',
-      slug: 'publication-slug',
+      slug: 'publication-1-slug',
       themeTitle: 'Theme 1',
       title: 'Publication 1',
     },
     published: new Date('2024-01-01'),
     lastUpdated: '2023-12-01',
-    slug: 'release-slug',
+    slug: 'release-1-slug',
     title: 'Release 1',
     type: 'AccreditedOfficialStatistics',
   },
@@ -232,8 +238,8 @@ export const testApiDataSetVersion: ApiDataSetVersion = {
     id: 'file-id',
   },
   release: {
-    title: 'Release title',
-    slug: 'release-slug',
+    title: 'Release 1 title',
+    slug: 'release-1-slug',
   },
   timePeriods: { start: '2019', end: '2020' },
   geographicLevels: [],
