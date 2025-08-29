@@ -1,3 +1,5 @@
+import ReleaseTableToolInfoWrapper from '@admin/pages/release/content/components/ReleaseTableToolInfoWrapper';
+import { ReleaseType } from '@common/services/types/releaseType';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import dataBlockService from '@admin/services/dataBlockService';
@@ -14,7 +16,6 @@ import ReleasePreviewTableToolFinalStep from '@admin/pages/release/content/compo
 import { Publication } from '@admin/services/publicationService';
 import { Publication as ContentPublication } from '@common/services/publicationService';
 import React, { useState } from 'react';
-import { ReleaseType } from '@common/services/types/releaseType';
 
 interface Props {
   featuredTableId?: string;
@@ -106,6 +107,12 @@ const ReleasePreviewTableTool = ({
                 {featuredTable.name}
               </ButtonText>
             )}
+            renderRelatedInfo={
+              <ReleaseTableToolInfoWrapper
+                publication={publication}
+                releaseType={releaseType}
+              />
+            }
             finalStep={({ query, table, tableHeaders, onReorder }) => (
               <WizardStep>
                 {wizardStepProps => (
@@ -118,7 +125,6 @@ const ReleasePreviewTableTool = ({
                       <ReleasePreviewTableToolFinalStep
                         publication={publication as Publication}
                         query={query}
-                        releaseType={releaseType}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}

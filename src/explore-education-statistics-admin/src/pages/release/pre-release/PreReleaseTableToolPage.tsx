@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
 import PageTitle from '@admin/components/PageTitle';
 import PreReleaseTableToolFinalStep from '@admin/pages/release/pre-release/components/PreReleaseTableToolFinalStep';
+import ReleaseTableToolInfoWrapper from '@admin/pages/release/content/components/ReleaseTableToolInfoWrapper';
 import {
   preReleaseTableToolRoute,
   PreReleaseTableToolRouteParams,
@@ -134,6 +135,15 @@ const PreReleaseTableToolPage = ({
                 {featuredTable.name}
               </Link>
             )}
+            renderRelatedInfo={
+              publication &&
+              release && (
+                <ReleaseTableToolInfoWrapper
+                  publication={publication}
+                  releaseType={release?.type}
+                />
+              )
+            }
             finalStep={({ query, table, tableHeaders, onReorder }) => (
               <WizardStep>
                 {wizardStepProps => (
@@ -146,8 +156,6 @@ const PreReleaseTableToolPage = ({
                       <PreReleaseTableToolFinalStep
                         publication={publication}
                         query={query}
-                        releaseVersionId={releaseVersionId}
-                        releaseType={release.type}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}

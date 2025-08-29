@@ -11,6 +11,23 @@ const publicationQueries = createQueryKeys('publication', {
       queryFn: () => publicationService.getPublication(publicationId),
     };
   },
+  getContact(publicationId: string) {
+    return {
+      queryKey: [publicationId],
+      queryFn: () => publicationService.getContact(publicationId),
+    };
+  },
+  getExternalMethodology(publicationId: string) {
+    return {
+      queryKey: [publicationId],
+      // This endpoint 404s when there isn't an external methodology,
+      // react-query doesn't allow returning undefined from here so
+      // return null instead.
+      queryFn: async () =>
+        (await publicationService.getExternalMethodology(publicationId)) ??
+        null,
+    };
+  },
   getReleaseSeries(publicationId: string) {
     return {
       queryKey: [publicationId],

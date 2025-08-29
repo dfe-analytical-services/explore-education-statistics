@@ -2,6 +2,12 @@ import { createQueryKeys } from '@lukemorales/query-key-factory';
 import methodologyService from '@admin/services/methodologyService';
 
 const methodologyQueries = createQueryKeys('methodology', {
+  get(methodologyId: string) {
+    return {
+      queryKey: [methodologyId],
+      queryFn: () => methodologyService.getMethodology(methodologyId),
+    };
+  },
   getMethodologyStatuses(methodologyId: string) {
     return {
       queryKey: [methodologyId],
@@ -12,10 +18,11 @@ const methodologyQueries = createQueryKeys('methodology', {
     queryKey: null,
     queryFn: () => methodologyService.listMethodologiesForApproval(),
   },
-  get(methodologyId: string) {
+  listLatestMethodologyVersions(publicationId: string) {
     return {
-      queryKey: [methodologyId],
-      queryFn: () => methodologyService.getMethodology(methodologyId),
+      queryKey: [publicationId],
+      queryFn: () =>
+        methodologyService.listLatestMethodologyVersions(publicationId),
     };
   },
 });

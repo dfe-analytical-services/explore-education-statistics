@@ -2,6 +2,7 @@ import publicationService, {
   PublicationListSummary,
   PublicationTreeOptions,
   ReleaseSummary,
+  ReleaseVersion,
   Theme,
 } from '@common/services/publicationService';
 import createPublicationListRequest from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
@@ -10,6 +11,15 @@ import { UseQueryOptions } from '@tanstack/react-query';
 import { PaginatedList } from '@common/services/types/pagination';
 
 const publicationQueries = {
+  getLatestPublicationRelease(
+    publicationSlug: string,
+  ): UseQueryOptions<ReleaseVersion> {
+    return {
+      queryKey: ['latestPublicationRelease', publicationSlug],
+      queryFn: () =>
+        publicationService.getLatestPublicationRelease(publicationSlug),
+    };
+  },
   getPublicationTree(query: PublicationTreeOptions): UseQueryOptions<Theme[]> {
     return {
       queryKey: ['publicationTree', query],

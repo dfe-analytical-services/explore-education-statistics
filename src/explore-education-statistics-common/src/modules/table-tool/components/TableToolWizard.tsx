@@ -1,6 +1,7 @@
 import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import useToggle from '@common/hooks/useToggle';
 import DataSetStep, {
   DataSetFormSubmitHandler,
 } from '@common/modules/table-tool/components/DataSetStep';
@@ -85,6 +86,7 @@ export interface TableToolWizardProps {
   initialState?: Partial<InitialTableToolState>;
   loadingFastTrack?: boolean;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderRelatedInfo?: ReactNode;
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
   themeMeta?: Theme[];
@@ -119,6 +121,7 @@ export default function TableToolWizard({
   initialState = {},
   loadingFastTrack = false,
   renderFeaturedTableLink,
+  renderRelatedInfo,
   scrollOnMount,
   showTableQueryErrorDownload = true,
   themeMeta = [],
@@ -163,6 +166,9 @@ export default function TableToolWizard({
   );
   const [dataSetStepTitle, setDataSetStepTitle] = useState<string>(
     defaultDataSetStepTitle,
+  );
+  const [showRelatedInfo, toggleShowRelatedInfo] = useToggle(
+    !!(initialState.initialStep && initialState?.initialStep >= 2),
   );
 
   const stepTitles = {
@@ -517,6 +523,7 @@ export default function TableToolWizard({
             currentStep={currentStep}
             onStepChange={async (nextStep, previousStep) => {
               onStepChange?.(nextStep, previousStep);
+              toggleShowRelatedInfo(nextStep >= 2);
               if (
                 nextStep < previousStep &&
                 showChangeWarningForSteps.includes(nextStep)
@@ -628,7 +635,7 @@ export default function TableToolWizard({
                 onReorder: reordered => setReorderedTableHeaders(reordered),
               })}
           </Wizard>
-
+          {showRelatedInfo && renderRelatedInfo}
           <PreviousStepModalConfirm />
         </>
       )}

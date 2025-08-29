@@ -12,10 +12,14 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import publicationService, { Theme } from '@common/services/publicationService';
+import publicationService, {
+  ReleaseVersion,
+  Theme,
+} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import TableToolInfoWrapper from '@frontend/modules/table-tool/components/TableToolInfoWrapper';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
@@ -32,6 +36,7 @@ export interface TableToolPageProps {
   fastTrack?: FastTrackTable;
   featuredTables?: FeaturedTable[];
   selectedPublication?: SelectedPublication;
+  fullPublication?: ReleaseVersion;
   selectedSubjectId?: string;
   subjects?: Subject[];
   subjectMeta?: SubjectMeta;
@@ -42,6 +47,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   fastTrack,
   featuredTables = [],
   selectedPublication,
+  fullPublication,
   selectedSubjectId,
   subjects,
   subjectMeta,
@@ -199,6 +205,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {featuredTable.name}
           </Link>
         )}
+        renderRelatedInfo={
+          selectedPublication && (
+            <TableToolInfoWrapper
+              selectedPublication={selectedPublication}
+              fullPublication={fullPublication}
+            />
+          )
+        }
         currentStep={currentStep}
         finalStep={({
           query,
@@ -343,9 +357,10 @@ export const getServerSideProps: GetServerSideProps<
           releaseSlug,
         );
 
-  const [subjects, featuredTables] = await Promise.all([
+  const [subjects, featuredTables, fullPublication] = await Promise.all([
     tableBuilderService.listReleaseSubjects(selectedRelease.id),
     tableBuilderService.listReleaseFeaturedTables(selectedRelease.id),
+    publicationService.getLatestPublicationRelease(publicationSlug),
   ]);
 
   if (subjectId && subjects.some(subject => subject.id === subjectId)) {
@@ -357,7 +372,7 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         featuredTables,
-
+        fullPublication,
         selectedPublication: {
           ...selectedPublication,
           selectedRelease: {
@@ -383,6 +398,7 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       themeMeta,
+      fullPublication,
       selectedPublication: {
         ...selectedPublication,
         selectedRelease: {
