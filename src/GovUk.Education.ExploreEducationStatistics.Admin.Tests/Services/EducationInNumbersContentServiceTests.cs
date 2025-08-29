@@ -233,7 +233,7 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
-    public async Task ReorderSections_ValidationFails_IdsDoNotMatch()
+    public async Task ReorderSections_IdsDoNotMatch_ValidationError()
     {
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -322,7 +322,7 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
-    public async Task AddBlock_Success_OrderProvided()
+    public async Task AddBlock_OrderProvided_Success()
     {
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -353,7 +353,7 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
-    public async Task AddBlock_Success_OrderNotProvided()
+    public async Task AddBlock_OrderNotProvided_Success()
     {
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -466,7 +466,7 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
-    public async Task ReorderBlocks_IdsDoNotMatch()
+    public async Task ReorderBlocks_IdsDoNotMatch_ValidationError()
     {
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
