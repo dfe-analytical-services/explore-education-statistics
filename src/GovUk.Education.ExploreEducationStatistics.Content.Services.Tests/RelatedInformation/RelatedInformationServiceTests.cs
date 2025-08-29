@@ -135,8 +135,5 @@ public abstract class RelatedInformationServiceTests
         }
     }
 
-    private static RelatedInformationService BuildService(ContentDbContext contentDbContext)
-    {
-        return new RelatedInformationService(contentDbContext);
-    }
+    private static RelatedInformationService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
 }
