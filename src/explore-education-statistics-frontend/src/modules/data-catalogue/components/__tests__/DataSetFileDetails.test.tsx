@@ -18,7 +18,10 @@ describe('DataSetFileDetails', () => {
       within(screen.getByTestId('Release')).getByRole('link', {
         name: 'Release 1',
       }),
-    ).toHaveAttribute('href', '/find-statistics/publication-slug/release-slug');
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-1-slug/release-1-slug',
+    );
     expect(
       within(screen.getByTestId('Release type')).getByRole('button', {
         name: /Accredited official statistics/,

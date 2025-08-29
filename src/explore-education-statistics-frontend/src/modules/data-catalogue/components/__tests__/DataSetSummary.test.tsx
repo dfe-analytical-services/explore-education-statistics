@@ -51,7 +51,7 @@ describe('DataSetFileSummary', () => {
     // Assert it is a link
     expect(releaseLink).toHaveAttribute(
       'href',
-      '/find-statistics/publication-slug/release-slug',
+      '/find-statistics/publication-1-slug/release-1-slug',
     );
   });
 
