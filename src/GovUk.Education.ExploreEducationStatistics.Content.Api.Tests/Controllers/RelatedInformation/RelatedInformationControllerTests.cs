@@ -13,7 +13,7 @@ public abstract class RelatedInformationControllerTests
     public class GetRelatedInformationForReleaseTests : RelatedInformationControllerTests
     {
         [Fact]
-        public async Task GetRelatedInformationForRelease_ReturnsOk_WhenServiceReturnsRelatedInformation()
+        public async Task GetRelatedInformationForRelease_WhenServiceReturnsRelatedInformation_ReturnsOk()
         {
             // Arrange
             const string publicationSlug = "test-publication";
