@@ -77,8 +77,7 @@ public class EducationInNumbersService(
             .Any(page => page.Slug == slug);
         if (pageWithSlugAlreadyExists)
         {
-            return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
-                ValidationResult(ValidationErrorMessages.SlugNotUnique));
+            return ValidationResult(ValidationErrorMessages.SlugNotUnique);
         }
 
         var currentMaxOrder = contentDbContext.EducationInNumbersPages
@@ -196,8 +195,7 @@ public class EducationInNumbersService(
                             && p.Id != id); // if the slug is for the page we're updating, we don't care
                     if (newSlugIsNotUnique)
                     {
-                        return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
-                            ValidationResult(ValidationErrorMessages.SlugNotUnique));
+                        return ValidationResult(ValidationErrorMessages.SlugNotUnique);
                     }
                 }
 
@@ -210,7 +208,7 @@ public class EducationInNumbersService(
 
                 await contentDbContext.SaveChangesAsync();
 
-                return new Either<ActionResult, EducationInNumbersSummaryViewModel>(page.ToSummaryViewModel());
+                return page.ToSummaryViewModel();
             });
     }
 
@@ -250,9 +248,8 @@ public class EducationInNumbersService(
         if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
                 newOrder, pageList.Select(page => page.Id)))
         {
-            return new Either<ActionResult, List<EducationInNumbersSummaryViewModel>>(
-                ValidationUtils.ValidationActionResult(
-                    ValidationErrorMessages.ProvidedPageIdsDifferFromActualPageIds));
+            return ValidationUtils.ValidationActionResult(
+                ValidationErrorMessages.ProvidedPageIdsDifferFromActualPageIds);
         }
 
         var updatingUserId = userService.GetUserId();

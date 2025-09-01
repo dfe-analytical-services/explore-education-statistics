@@ -1,5 +1,7 @@
-import { ContentSection } from '@common/services/publicationService';
-import { HtmlBlock } from '@common/services/types/blocks';
+import {
+  EinContentSection,
+  EinEditableContentBlock,
+} from '@admin/services/educationInNumbersContentService';
 
 type BlockMeta = {
   sectionId: string;
@@ -16,7 +18,7 @@ export type RemoveBlockFromSection = {
 export type UpdateBlockFromSection = {
   type: 'UPDATE_BLOCK_FROM_SECTION';
   payload: {
-    block: HtmlBlock;
+    block: EinEditableContentBlock;
     meta: BlockMeta;
   };
 };
@@ -24,7 +26,7 @@ export type UpdateBlockFromSection = {
 export type AddBlockToSection = {
   type: 'ADD_BLOCK_TO_SECTION';
   payload: {
-    block: HtmlBlock;
+    block: EinEditableContentBlock;
     meta: SectionMeta;
   };
 };
@@ -32,7 +34,7 @@ export type AddBlockToSection = {
 export type UpdateSectionContent = {
   type: 'UPDATE_SECTION_CONTENT';
   payload: {
-    sectionContent: HtmlBlock[];
+    sectionContent: EinEditableContentBlock[];
     meta: SectionMeta;
   };
 };
@@ -40,14 +42,14 @@ export type UpdateSectionContent = {
 export type AddContentSection = {
   type: 'ADD_CONTENT_SECTION';
   payload: {
-    section: ContentSection<HtmlBlock>;
+    section: EinContentSection;
   };
 };
 
 export type SetEducationInNumbersPageContent = {
   type: 'SET_CONTENT';
   payload: {
-    content: ContentSection<HtmlBlock>[];
+    content: EinContentSection[];
   };
 };
 
@@ -55,7 +57,7 @@ export type UpdateContentSection = {
   type: 'UPDATE_CONTENT_SECTION';
   payload: {
     meta: { sectionId: string };
-    section: ContentSection<HtmlBlock>;
+    section: EinContentSection;
   };
 };
 

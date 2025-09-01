@@ -1,5 +1,4 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
-import { Dictionary } from '@common/types';
 import React, { useCallback } from 'react';
 import { EinContent } from '@admin/services/educationInNumbersContentService';
 import useEducationInNumbersPageContentActions from '../context/useEducationInNumbersPageContentActions';

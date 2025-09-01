@@ -5,11 +5,13 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import EducationInNumbersBlock from '@admin/pages/education-in-numbers/components/EducationInNumbersBlock';
 import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
 import EducationInNumbersEditableBlock from '@admin/pages/education-in-numbers/content/components/EducationInNumbersEditableBlock';
-import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { EinContentSection } from '@admin/services/educationInNumbersContentService';
+import {
+  EinContentSection,
+  EinEditableContentBlock,
+} from '@admin/services/educationInNumbersContentService';
 
 interface EducationInNumbersAccordionSectionProps {
   id: string;
@@ -38,7 +40,8 @@ const EducationInNumbersAccordionSection = ({
   } = useEducationInNumbersPageContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
-  const [blocks, setBlocks] = useState<EditableContentBlock[]>(sectionContent);
+  const [blocks, setBlocks] =
+    useState<EinEditableContentBlock[]>(sectionContent);
 
   const addTextBlockButton = useRef<HTMLButtonElement>(null);
 
@@ -53,7 +56,6 @@ const EducationInNumbersAccordionSection = ({
       block: {
         type: 'HtmlBlock',
         order: sectionContent.length,
-        body: '',
       },
     });
 
@@ -78,8 +80,8 @@ const EducationInNumbersAccordionSection = ({
   );
 
   const removeBlockFromAccordionSection = useCallback(
-    (blockId: string) => {
-      deleteContentSectionBlock({
+    async (blockId: string) => {
+      await deleteContentSectionBlock({
         educationInNumbersPageId,
         sectionId,
         blockId,
@@ -146,7 +148,7 @@ const EducationInNumbersAccordionSection = ({
       onHeadingChange={handleHeadingChange}
       onRemoveSection={() => onRemoveSection(sectionId)}
     >
-      <EditableSectionBlocks<EditableContentBlock>
+      <EditableSectionBlocks<EinEditableContentBlock>
         blocks={blocks}
         isReordering={isReordering}
         onBlocksChange={setBlocks}

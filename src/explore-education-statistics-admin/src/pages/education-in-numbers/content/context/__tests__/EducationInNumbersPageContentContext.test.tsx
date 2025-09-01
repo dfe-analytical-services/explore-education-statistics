@@ -8,6 +8,7 @@ import {
   educationInNumbersPageReducer as originalEinPageReducer,
 } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import { EducationInNumbersPageDispatchAction } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContextActionTypes';
+import { EinEditableContentBlock } from '@admin/services/educationInNumbersContentService';
 
 const einPageReducer = (
   initial: EducationInNumbersPageContextState,
@@ -47,7 +48,7 @@ describe('EducationInNumbersPageContentContext', () => {
 
   test('UPDATE_BLOCK_FROM_SECTION updates a block from section', () => {
     const section = testEinPageContent.content[0];
-    const blockToUpdate = (section.content as HtmlBlock[])[0];
+    const blockToUpdate = (section.content as EinEditableContentBlock[])[0];
 
     const newBody = 'This is some updated text!';
 
@@ -78,11 +79,12 @@ describe('EducationInNumbersPageContentContext', () => {
 
   test('ADD_BLOCK_TO_SECTION adds a block to a section', () => {
     const section = testEinPageContent.content[0];
-    const newBlock: HtmlBlock = {
+    const newBlock: EinEditableContentBlock = {
       id: '123',
       order: 1,
       body: 'This section is empty...',
       type: 'HtmlBlock',
+      comments: [],
     };
 
     const originalLength = section.content?.length || 0;
