@@ -192,6 +192,77 @@ public class DataSetValidatorTests
     }
 
     [Fact]
+    public async Task ValidateDataSet_ToBeReplacedFileHasIncompleteImport_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        var dataSetTitle = "Data set title";
+
+        var toBeReplacedDataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename("test-data.csv"))
+            .Generate();
+
+        var toBeReplacedMetaReleaseFile = _fixture.DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Metadata)
+                .WithFilename("test-data.meta.csv"))
+            .Generate();
+
+        var toBeReplacedDataFileIncompleteImport = new DataImport
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = releaseVersion.Id,
+            Status = DataImportStatus.STAGE_1,
+            File = toBeReplacedDataReleaseFile.File,
+        };
+
+        var replacementDataFile = await new DataSetFileBuilder().WhereFileNameIs("test-data.csv").Build(FileType.Data);
+        var replacementMetaFile = await new DataSetFileBuilder().WhereFileNameIs("test-data.meta.csv").Build(FileType.Metadata);
+
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            Title = dataSetTitle,
+            DataFile = replacementDataFile,
+            MetaFile = replacementMetaFile,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            context.AddRange(
+                toBeReplacedDataReleaseFile,
+                toBeReplacedMetaReleaseFile,
+                toBeReplacedDataFileIncompleteImport);
+
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            var sut = BuildService(context);
+
+            // Act
+            var result = await sut.ValidateDataSet(dataSetDto);
+
+            // Assert
+            var errors = result.AssertLeft();
+            Assert.Single(errors);
+            Assert.Equal(ValidationMessages.DataSetImportInProgress.Code, errors[0].Code);
+        }
+    }
+
+    [Fact]
     public async Task ValidateDataSet_DataSetFilesAreEmpty_ReturnsErrorDetails()
     {
         // Arrange
@@ -680,19 +751,30 @@ public class DataSetValidatorTests
 
         var dataSetTitle = "Data set title";
 
-        var toBeReplacedDataReleaseFiles = _fixture
+        var originalDataReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
             .WithName(dataSetTitle)
             .WithFile(_fixture.DefaultFile()
                 .WithType(FileType.Data)
                 .WithFilename("test-data.csv"))
-            .Generate(2);
+            .Generate();
+
+        var toBeReplacedDataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile()
+                .WithType(FileType.Data)
+                .WithFilename("test-data.csv"))
+            .Generate();
+
+        originalDataReleaseFile.File.ReplacedBy = toBeReplacedDataReleaseFile.File;
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
-            context.ReleaseFiles.AddRange(toBeReplacedDataReleaseFiles);
+            context.ReleaseFiles.AddRange(originalDataReleaseFile, toBeReplacedDataReleaseFile);
             await context.SaveChangesAsync();
         }
 

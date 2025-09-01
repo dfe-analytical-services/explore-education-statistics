@@ -65,6 +65,7 @@ const fileErrorMappings = {
   AnalystCannotReplaceApiDataSet: 'AnalystCannotReplaceApiDataSet',
   CannotCreateMultipleDraftApiDataSet: 'CannotCreateMultipleDraftApiDataSet',
   DataReplacementAlreadyInProgress: 'DataReplacementAlreadyInProgress',
+  DataSetImportInProgress: 'DataSetImportInProgress',
 };
 
 function baseErrorMappings(
