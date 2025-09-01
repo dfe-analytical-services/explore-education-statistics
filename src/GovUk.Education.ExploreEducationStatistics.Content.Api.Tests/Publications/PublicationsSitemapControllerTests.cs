@@ -13,7 +13,7 @@ public abstract class PublicationsSitemapControllerTests
     public class GetSitemapItemsTests : PublicationsSitemapControllerTests
     {
         [Fact]
-        public async Task GetSitemapItems_ReturnsOk_WhenServiceReturnsSitemap()
+        public async Task GetSitemapItems_WhenServiceReturnsSitemap_ReturnsOk()
         {
             // Arrange
             PublicationSitemapPublicationDto[] sitemapItems =
@@ -45,10 +45,5 @@ public abstract class PublicationsSitemapControllerTests
         }
     }
 
-    private PublicationsSitemapController BuildController()
-    {
-        return new PublicationsSitemapController(
-            _publicationsSitemapService.Build()
-        );
-    }
+    private PublicationsSitemapController BuildController() => new(_publicationsSitemapService.Build());
 }
