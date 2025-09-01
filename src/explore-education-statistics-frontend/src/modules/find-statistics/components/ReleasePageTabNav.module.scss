@@ -32,12 +32,8 @@
     color: $govuk-link-hover-colour;
   }
 
-  &[aria-current='page'] {
-    border-color: $govuk-link-colour;
-  }
-
   &:focus,
-  &[aria-current='page']:focus {
+  &[aria-current='page'] {
     border-color: currentColor;
   }
 }
