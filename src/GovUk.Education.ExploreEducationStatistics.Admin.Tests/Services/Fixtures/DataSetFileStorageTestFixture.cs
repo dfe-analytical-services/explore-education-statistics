@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -16,8 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Semver;
-using static Moq.MockBehavior;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
+using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -58,7 +58,7 @@ public class DataSetFileStorageTestFixture
         DataSetVersionService = dataSetVersionService ?? new Mock<IDataSetVersionService>(Strict);
         DataSetService = dataSetService ?? new Mock<IDataSetService>(Strict);
     }
-    
+
     /// <summary>
     /// Creates test data and mocks for DataSetFileStorage.UploadDataSet
     /// </summary>
@@ -97,7 +97,7 @@ public class DataSetFileStorageTestFixture
 
         return testFixture;
     }
-    
+
     /// <summary>
     /// Used to Create test data for the ZIP uploading mechanisms provided by DataSetFileStorage method MoveDataSetsToPermanentStorage
     /// </summary>
@@ -136,7 +136,7 @@ public class DataSetFileStorageTestFixture
 
         return testFixture;
     }
-    
+
     /// <summary>
     /// Used to Create test data for the BULK ZIP uploading mechanisms provided by DataSetFileStorage method MoveDataSetsToPermanentStorage
     /// </summary>
@@ -222,11 +222,11 @@ public class DataSetFileStorageTestFixture
 
         var releaseFileReplacing = CreateReplacingReleaseFiles(
             fixture,
-            user, 
-            dataFileName, 
+            user,
+            dataFileName,
             releaseVersion,
             dataSetVersions);
-        
+
         testFixture.ReleaseFilesReplacing = releaseFileReplacing; // Used to create the input DataSet view model that the method under test takes
 
         for (var i = 0; i < metaFileName.Length; i++)
@@ -238,15 +238,15 @@ public class DataSetFileStorageTestFixture
                 .WithCreatedByUser(user)
                 .Generate();
         }
-        var fileAndDataSetName = dataFiles.Zip(dataSetName, 
+        var fileAndDataSetName = dataFiles.Zip(dataSetName,
                 (file, name) => (file, name)).ToArray();
-        
+
         testFixture.ReleaseVersion = releaseVersion; //Used by some of the shared mock services set up
 
         testFixture.SetupMockBulkPatchDataSetVersionCreation(dataSetVersions, releaseFiles);
         testFixture.SetupMocksForBulkUpload(fileAndDataSetName);
-        
-        foreach(var metafile in metaFiles)
+
+        foreach (var metafile in metaFiles)
         {
             testFixture.ReleaseDataFileRepository
                 .Setup(mock => mock.Create(
@@ -256,7 +256,7 @@ public class DataSetFileStorageTestFixture
                     157,
                     FileType.Metadata,
                     user.Id,
-                    null, null, null, 0))
+                    null, null, 0))
                 .Returns(Task.FromResult(metafile));
         }
 
@@ -304,12 +304,11 @@ public class DataSetFileStorageTestFixture
                 DataFile.ContentLength,
                 FileType.Data,
                 user.Id,
-                dataSetName, 
+                dataSetName,
                 ReleaseFile.File,
-                null, 
-                0 ))
+                0))
             .Returns(Task.FromResult(DataFile));
-        
+
         PrivateBlobStorageService
             .Setup(mock => mock.MoveBlob(
                 BlobContainers.PrivateReleaseTempFiles,
@@ -317,11 +316,11 @@ public class DataSetFileStorageTestFixture
                 It.IsAny<string>(),
                 BlobContainers.PrivateReleaseFiles))
             .Returns(Task.FromResult(true));
-        
+
         SetupPatchDataSetVersionCreation();
         SetUpImportAndBlobMocks(user, ReleaseVersion, metaFileName);
     }
-    
+
     private void SetupMocksForBulkUpload((File, string)[] fileAndDataSetName)
     {
         for (var i = 0; i < fileAndDataSetName.Length; i++)
@@ -337,7 +336,6 @@ public class DataSetFileStorageTestFixture
                     It.IsAny<Guid>(),
                     It.Is<string>(actual => actual == dataSetName),
                     It.IsAny<File>(),
-                    null,
                     It.IsAny<int>()))
                 .Returns(Task.FromResult(fileAndDataSetName[i].Item1));
         }
@@ -423,8 +421,8 @@ public class DataSetFileStorageTestFixture
     }
 
     private async Task SetupContentDbContext(
-        ContentDbContext contentDbContext, 
-        ReleaseVersion releaseVersion, 
+        ContentDbContext contentDbContext,
+        ReleaseVersion releaseVersion,
         ReleaseFile[] releaseFiles,
         File metaFile)
     {
@@ -449,7 +447,6 @@ public class DataSetFileStorageTestFixture
                 user.Id,
                 dataSetName,
                 DataFileReplace,
-                null,
                 1))
             .Returns(Task.FromResult(DataFile));
 
@@ -476,10 +473,10 @@ public class DataSetFileStorageTestFixture
                     157,
                     FileType.Metadata,
                     user.Id,
-                    null, null, null, 0))
+                    null, null, 0))
                 .Returns(Task.FromResult(MetaFile));
         }
-        
+
         PrivateBlobStorageService
             .Setup(mock => mock.UploadStream(
                 It.IsAny<IBlobContainer>(),
@@ -595,7 +592,7 @@ public class DataSetFileStorageTestFixture
         {
             DataSetVersionService.Setup<Task<Either<ActionResult, DataSetVersion>>>(mock => mock.GetDataSetVersion(
                     dataSetVersion.DataSetId,
-                    new SemVersion(2,0, 0),
+                    new SemVersion(2, 0, 0),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataSetVersion);
         }

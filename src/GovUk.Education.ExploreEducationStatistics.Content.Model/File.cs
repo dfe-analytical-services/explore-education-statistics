@@ -38,10 +38,6 @@ public partial class File : ICreatedTimestamp<DateTime?>
 
     public File? Replacing { get; set; }
 
-    public Guid? SourceId { get; set; }
-
-    public File? Source { get; set; }
-
     public long ContentLength { get; set; }
 
     public DateTime? Created { get; set; }

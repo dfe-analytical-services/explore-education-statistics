@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IReleaseDataFileRepository
 {
-    public Task<File> Create(
+    Task<File> Create(
         Guid releaseVersionId,
         Guid subjectId,
         string filename,
@@ -14,15 +14,15 @@ public interface IReleaseDataFileRepository
         Guid createdById,
         string? name = null,
         File? replacingDataFile = null,
-        File? source = null,
         int order = 0);
 
-    public Task<IList<File>> ListDataFiles(Guid releaseVersionId);
+    Task<IList<File>> ListDataFiles(Guid releaseVersionId);
 
-    public Task<bool> HasAnyDataFiles(Guid releaseVersionId);
+    Task<bool> HasAnyDataFiles(Guid releaseVersionId);
 
-    public Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId);
+    Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId);
 
-    public Task<ReleaseFile> GetBySubject(Guid releaseVersionId,
+    Task<ReleaseFile> GetBySubject(
+        Guid releaseVersionId,
         Guid subjectId);
 }

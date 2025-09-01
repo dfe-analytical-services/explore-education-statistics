@@ -52,16 +52,6 @@ public static class FileGeneratorExtensions
         Guid rootPath)
         => generator.ForInstance(s => s.SetRootPath(rootPath));
 
-    public static Generator<File> WithSource(
-        this Generator<File> generator,
-        File source)
-        => generator.ForInstance(s => s.SetSource(source));
-
-    public static Generator<File> WithSourceId(
-        this Generator<File> generator,
-        Guid sourceId)
-        => generator.ForInstance(s => s.SetSourceId(sourceId));
-
     public static Generator<File> WithSubjectId(
         this Generator<File> generator,
         Guid subjectId)
@@ -173,17 +163,6 @@ public static class FileGeneratorExtensions
         this InstanceSetters<File> setters,
         Guid replacingId)
         => setters.Set(f => f.ReplacingId, replacingId);
-
-    public static InstanceSetters<File> SetSource(
-        this InstanceSetters<File> setters,
-        File source)
-        => setters.Set(f => f.Source, source)
-            .SetSourceId(source.Id);
-
-    public static InstanceSetters<File> SetSourceId(
-        this InstanceSetters<File> setters,
-        Guid sourceId)
-        => setters.Set(f => f.SourceId, sourceId);
 
     public static InstanceSetters<File> SetSubjectId(
         this InstanceSetters<File> setters,
