@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class EducationInNumbersExtensions
 {
-    public static EducationInNumbersSummaryViewModel ToViewModel(
+    public static EducationInNumbersSummaryViewModel ToSummaryViewModel(
         this EducationInNumbersPage page)
     {
             return new EducationInNumbersSummaryViewModel

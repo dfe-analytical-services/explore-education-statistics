@@ -5,6 +5,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class EducationInNumbersContentExtensions
 {
+    public static EinContentViewModel ToContentViewModel(
+        this EducationInNumbersPage page)
+    {
+        return new EinContentViewModel
+        {
+            Id = page.Id,
+            Title = page.Title,
+            Slug = page.Slug,
+            Published = page.Published,
+            Content = page.Content
+                .Select(section => section.ToViewModel())
+                .OrderBy(section => section.Order)
+                .ToList(),
+        };
+    }
+
     public static EinContentSectionViewModel ToViewModel(
         this EinContentSection section)
     {

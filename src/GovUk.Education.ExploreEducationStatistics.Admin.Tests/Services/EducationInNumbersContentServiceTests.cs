@@ -136,6 +136,57 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
+    public async Task AddSection_OrderClashesWithPreExistingSection_Success()
+    {
+        var preExistingSectionId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+
+            await context.EducationInNumbersPages.AddAsync(new EducationInNumbersPage
+            {
+                Id = _pageId,
+                Content =
+                [
+                    new EinContentSection
+                    {
+                        Id = preExistingSectionId,
+                        Order = 0,
+                        Heading = "PreExisting section",
+                        EducationInNumbersPageId = _pageId,
+                    }
+                ]
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var result = await service.AddSection(_pageId, 0);
+
+            var viewModel = result.AssertRight();
+            Assert.Equal(0, viewModel.Order);
+            Assert.Equal("New section", viewModel.Heading);
+            Assert.Empty(viewModel.Content);
+
+            var newSectionId = viewModel.Id;
+
+            var dbSectionList = await context.EinContentSections.ToListAsync();
+            Assert.Equal(2, dbSectionList.Count);
+
+            var newSection = dbSectionList
+                .Single(block => block.Id == newSectionId);
+            Assert.Equal(0, newSection.Order);
+
+            var preExistingSection = dbSectionList
+                .Single(block => block.Id == preExistingSectionId);
+            Assert.Equal(1, preExistingSection.Order);
+            Assert.Equal("PreExisting section", preExistingSection.Heading);
+        }
+    }
+
+    [Fact]
     public async Task UpdateSectionHeading_Success()
     {
         var contextId = Guid.NewGuid().ToString();
@@ -380,6 +431,59 @@ public class EducationInNumbersContentServiceTests
             var dbBlocks = await context.EinContentBlocks.ToListAsync();
             Assert.Equal(2, dbBlocks.Count);
             Assert.Equal(1, dbBlocks.Single(b => b.Id == viewModel.Id).Order);
+        }
+    }
+
+    [Fact]
+    public async Task AddBlock_OrderProvidedClashesWithExistingBlock_Success()
+    {
+        var preExistingBlockId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentSections.AddAsync(new EinContentSection
+            {
+                Id = _sectionAId,
+                EducationInNumbersPageId = _pageId,
+                Content =
+                [
+                    new EinHtmlBlock
+                    {
+                        Id = preExistingBlockId,
+                        Order = 0,
+                        Body = "PreExisting block",
+                    }
+                ]
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var result = await service.AddBlock(
+                _pageId, _sectionAId, EinBlockType.HtmlBlock, 0);
+
+            var viewModel = result.AssertRight();
+            Assert.IsType<EinHtmlBlockViewModel>(viewModel);
+            Assert.Equal(0, viewModel.Order);
+
+            var newBlockId = viewModel.Id;
+
+            var dbBlockList = await context.EinContentBlocks.ToListAsync();
+            Assert.Equal(2, dbBlockList.Count);
+
+            var newBlock = dbBlockList
+                .OfType<EinHtmlBlock>()
+                .Single(block => block.Id == newBlockId);
+            Assert.Equal(0, newBlock.Order);
+            Assert.Equal(_sectionAId, newBlock.EinContentSectionId);
+
+            var preExistingBlock = dbBlockList
+                .OfType<EinHtmlBlock>()
+                .Single(block => block.Id == preExistingBlockId);
+            Assert.Equal(1, preExistingBlock.Order);
+            Assert.Equal("PreExisting block", preExistingBlock.Body);
         }
     }
 

@@ -26,7 +26,7 @@ public class EducationInNumbersService(
             .Where(page => page.Id == id)
             .OrderByDescending(page => page.Version)
             .FirstOrNotFoundAsync()
-            .OnSuccess(page => page.ToViewModel());
+            .OnSuccess(page => page.ToSummaryViewModel());
     }
 
     public async Task<Either<ActionResult, List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages()
@@ -103,7 +103,7 @@ public class EducationInNumbersService(
         contentDbContext.EducationInNumbersPages.Add(newPage);
         await contentDbContext.SaveChangesAsync();
 
-        return newPage.ToViewModel();
+        return newPage.ToSummaryViewModel();
     }
 
     public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment(
@@ -153,7 +153,7 @@ public class EducationInNumbersService(
 
                 await contentDbContext.SaveChangesAsync();
 
-                return new Either<ActionResult, EducationInNumbersSummaryViewModel>(amendment.ToViewModel());
+                return amendment.ToSummaryViewModel();
             });
     }
 
@@ -210,7 +210,7 @@ public class EducationInNumbersService(
 
                 await contentDbContext.SaveChangesAsync();
 
-                return new Either<ActionResult, EducationInNumbersSummaryViewModel>(page.ToViewModel());
+                return new Either<ActionResult, EducationInNumbersSummaryViewModel>(page.ToSummaryViewModel());
             });
     }
 
@@ -233,7 +233,7 @@ public class EducationInNumbersService(
 
                 await contentDbContext.SaveChangesAsync();
 
-                return page.ToViewModel();
+                return page.ToSummaryViewModel();
             });
     }
 
@@ -279,7 +279,7 @@ public class EducationInNumbersService(
         await contentDbContext.SaveChangesAsync();
 
         return pageList
-            .Select(page => page.ToViewModel())
+            .Select(page => page.ToSummaryViewModel())
             .ToList();
     }
 

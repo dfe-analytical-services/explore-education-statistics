@@ -30,49 +30,34 @@ public class EducationInNumbersContentService(
             return new NotFoundResult();
         }
 
-        return new EinContentViewModel
-        {
-            Id = page.Id,
-            Title = page.Title,
-            Slug = page.Slug,
-            Published = page.Published,
-            Content = page.Content
-                .Select(section =>
-                {
-                    return new EinContentSectionViewModel
-                    {
-                        Id = section.Id,
-                        Order = section.Order,
-                        Heading = section.Heading,
-                        Caption = section.Caption,
-                        Content = section.Content
-                            .Select(block => block.ToViewModel())
-                            .OrderBy(block => block.Order)
-                            .ToList()
-                    };
-                })
-                .OrderBy(section => section.Order)
-                .ToList()
-        };
+        return page.ToContentViewModel();
     }
 
     public async Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(Guid pageId,
         int order)
     {
-         var newSection = new EinContentSection
-         {
-             Id = Guid.NewGuid(),
-             EducationInNumbersPageId = pageId,
-             Order = order,
-             Heading = "New section",
-             Caption = null,
-             Content = [],
-         };
+        var sectionList = contentDbContext.EinContentSections
+            .Where(section => section.EducationInNumbersPageId == pageId)
+            .ToList();
 
-         contentDbContext.EinContentSections.Add(newSection);
-         await contentDbContext.SaveChangesAsync();
+        var newSection = new EinContentSection
+        {
+            Id = Guid.NewGuid(),
+            EducationInNumbersPageId = pageId,
+            Order = order,
+            Heading = "New section",
+            Caption = null,
+            Content = [],
+        };
 
-         return newSection.ToViewModel();
+        sectionList.Where(section => section.Order >= order)
+            .ForEach(section => section.Order++);
+
+        contentDbContext.EinContentSections.Add(newSection);
+        contentDbContext.EinContentSections.UpdateRange(sectionList);
+        await contentDbContext.SaveChangesAsync();
+
+        return newSection.ToViewModel();
     }
 
     public async Task<Either<ActionResult, EinContentSectionViewModel>> UpdateSectionHeading(
@@ -158,12 +143,13 @@ public class EducationInNumbersContentService(
             return new NotFoundResult();
         }
 
-        pageSections
+        pageSections.Remove(sectionToDelete);
+
+        pageSections // fix order of remaining sections
             .Where(section => section.Order > sectionToDelete.Order)
             .ForEach(section => section.Order--);
 
-        pageSections.Remove(sectionToDelete);
-
+        contentDbContext.EinContentSections.UpdateRange(pageSections);
         await contentDbContext.SaveChangesAsync();
 
         return pageSections
@@ -178,10 +164,9 @@ public class EducationInNumbersContentService(
         EinBlockType type,
         int? order)
     {
-        var newOrder = order ?? contentDbContext.EinContentBlocks
-            .Count(block =>
-                block.EinContentSectionId == sectionId
-                && block.EinContentSection.EducationInNumbersPageId == pageId);
+        var blockList = contentDbContext.EinContentBlocks
+            .Where(block => block.EinContentSectionId == sectionId)
+            .ToList();
 
         EinContentBlock newBlock = type switch
         {
@@ -189,12 +174,17 @@ public class EducationInNumbersContentService(
             {
                 Id = Guid.NewGuid(),
                 EinContentSectionId = sectionId,
-                Order = newOrder,
+                Order = order ?? blockList.Count,
                 Body = "",
             },
             _ => throw new Exception("There is no such block type")
         };
 
+        blockList // fix order of preexisting blocks
+            .Where(block => block.Order >= newBlock.Order)
+            .ForEach(block => block.Order++);
+
+        contentDbContext.EinContentBlocks.UpdateRange(blockList);
         contentDbContext.EinContentBlocks.Add(newBlock);
         await contentDbContext.SaveChangesAsync();
 
@@ -288,11 +278,11 @@ public class EducationInNumbersContentService(
             return new NotFoundResult();
         }
 
-        blockList
+        blockList.Remove(blockToDelete);
+
+        blockList // fix order of remaining blocks
             .Where(block => block.Order > blockToDelete.Order)
             .ForEach(block => block.Order--);
-
-        blockList.Remove(blockToDelete);
 
         await contentDbContext.SaveChangesAsync();
 
