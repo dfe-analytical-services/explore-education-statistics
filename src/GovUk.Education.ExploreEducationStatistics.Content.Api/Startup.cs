@@ -151,6 +151,7 @@ public class Startup(
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
+        services.AddTransient<IPublicationsService, PublicationsService>();
         services.AddTransient<ITimePeriodService, TimePeriodService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
