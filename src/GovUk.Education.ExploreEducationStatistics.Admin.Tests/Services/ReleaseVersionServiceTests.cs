@@ -1696,8 +1696,7 @@ public abstract class ReleaseVersionServiceTests
                 context.ReleaseVersions.AddRange(releaseVersion, anotherRelease);
                 context.UserReleaseRoles.AddRange(userReleaseRole, anotherUserReleaseRole);
                 context.UserReleaseInvites.AddRange(userReleaseInvite, anotherUserReleaseInvite);
-                context.MethodologyVersions.AddRange(methodologyScheduledWithRelease,
-                    methodologyScheduledWithAnotherRelease);
+                context.MethodologyVersions.AddRange(methodologyScheduledWithRelease, methodologyScheduledWithAnotherRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -1709,6 +1708,7 @@ public abstract class ReleaseVersionServiceTests
 
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
@@ -1722,6 +1722,9 @@ public abstract class ReleaseVersionServiceTests
 
             releaseFileService.Setup(mock =>
                 mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
                     mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
@@ -1756,6 +1759,7 @@ public abstract class ReleaseVersionServiceTests
                     statisticsDbContext: statisticsDbContext,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
@@ -1774,6 +1778,10 @@ public abstract class ReleaseVersionServiceTests
                         mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
                     Times.Once);
 
+                dataSetUploadRepository.Verify(mock =>
+                        mock.DeleteAll(releaseVersion.Id, default),
+                    Times.Once);
+
                 releaseSubjectRepository.Verify(mock =>
                         mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
                     Times.Once);
@@ -1781,6 +1789,7 @@ public abstract class ReleaseVersionServiceTests
                 VerifyAllMocks(privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
+                    dataSetUploadRepository,
                     processorClient,
                     userReleaseInviteRepository,
                     userReleaseRoleRepository
@@ -1797,6 +1806,7 @@ public abstract class ReleaseVersionServiceTests
                         .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.Null(hardDeletedRelease);
+                    Assert.Empty(contentDbContext.DataSetUploads);
                 }
                 else
                 {
@@ -2073,6 +2083,7 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
@@ -2083,6 +2094,9 @@ public abstract class ReleaseVersionServiceTests
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
 
             var forceDeleteRelatedData = true;
+
+            dataSetUploadRepository.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
@@ -2125,6 +2139,7 @@ public abstract class ReleaseVersionServiceTests
                 var releaseVersionService = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
@@ -2783,6 +2798,7 @@ public abstract class ReleaseVersionServiceTests
         IReleaseFileRepository? releaseFileRepository = null,
         IReleaseFileService? releaseFileService = null,
         IReleaseDataFileService? releaseDataFileService = null,
+        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataImportService? dataImportService = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
@@ -2814,6 +2830,7 @@ public abstract class ReleaseVersionServiceTests
             releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
             releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
             releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
+            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
