@@ -7,7 +7,7 @@ const testEinPageVersion: EducationInNumbersSummaryWithPrevVersion = {
   slug: 'test-ein-page',
   description: 'Test description for the Education in Numbers page',
   version: 2,
-  previousVersionId: '', // @MarkFix tests: do we want this here? or maybe two - Summary and SummaryWithPrevVersion instead?
+  previousVersionId: '',
 };
 
 export const testEinPageContent: EinContent = {

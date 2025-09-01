@@ -1,5 +1,7 @@
-import { ContentBlockPostModel } from '@admin/services/types/content';
-import educationInNumbersContentService from '@admin/services/educationInNumbersContentService';
+import educationInNumbersContentService, {
+  EinContentBlockAddRequest,
+  EinEditableContentBlock,
+} from '@admin/services/educationInNumbersContentService';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 
 export default function useEducationInNumbersPageContentActions() {
@@ -55,11 +57,15 @@ export default function useEducationInNumbersPageContentActions() {
           sectionId,
           blockId,
         },
-        block: updateBlock,
+        block: updateBlock as EinEditableContentBlock,
       },
     });
   }
 
+  // NOTE: `order` could be removed the EinContentBlockAddRequest, as
+  // we only ever add new blocks to the end of all existing blocks. If
+  // someone ever did provide an order that clashed with an existing block,
+  // currently the frontend doesn't adjust the `order`s of existing blocks.
   async function addContentSectionBlock({
     educationInNumbersPageId,
     sectionId,
@@ -67,7 +73,7 @@ export default function useEducationInNumbersPageContentActions() {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-    block: ContentBlockPostModel;
+    block: EinContentBlockAddRequest;
   }) {
     const newBlock =
       await educationInNumbersContentService.addContentSectionBlock({
@@ -79,7 +85,7 @@ export default function useEducationInNumbersPageContentActions() {
       type: 'ADD_BLOCK_TO_SECTION',
       payload: {
         meta: { sectionId },
-        block: newBlock,
+        block: newBlock as EinEditableContentBlock,
       },
     });
     return newBlock;
@@ -94,7 +100,7 @@ export default function useEducationInNumbersPageContentActions() {
     sectionId: string;
     order: string[];
   }) {
-    const sectionContent =
+    const sectionBlocks =
       await educationInNumbersContentService.updateContentSectionBlocksOrder({
         educationInNumbersPageId,
         sectionId,
@@ -104,11 +110,15 @@ export default function useEducationInNumbersPageContentActions() {
       type: 'UPDATE_SECTION_CONTENT',
       payload: {
         meta: { sectionId },
-        sectionContent,
+        sectionContent: sectionBlocks as EinEditableContentBlock[],
       },
     });
   }
 
+  // NOTE: `order` could be removed from addContentSection as an argument, as
+  // we only ever add new sections to the end of all existing sections. If
+  // someone ever did provide an order that clashed with an existing section,
+  // currently the frontend doesn't adjust the `order`s of existing sections.
   async function addContentSection({
     educationInNumbersPageId,
     order,

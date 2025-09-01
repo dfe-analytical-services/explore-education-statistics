@@ -4,12 +4,12 @@ import educationInNumbersService from '@admin/services/educationInNumbersService
 const educationInNumbersQueries = createQueryKeys('education-in-numbers', {
   getEducationInNumbersPage(id: string) {
     return {
-      queryKey: [id],
+      queryKey: ['ein', id],
       queryFn: () => educationInNumbersService.getEducationInNumbersPage(id),
     };
   },
   listLatestPages: {
-    queryKey: null,
+    queryKey: ['ein'],
     queryFn: () => educationInNumbersService.listLatestPages(),
   },
 });

@@ -6,7 +6,7 @@ const educationInNumbersContentQueries = createQueryKeys(
   {
     get(educationInNumbersPageId: string) {
       return {
-        queryKey: [educationInNumbersPageId],
+        queryKey: ['ein-content', educationInNumbersPageId],
         queryFn: () =>
           educationInNumbersContentService.getEducationInNumbersPageContent(
             educationInNumbersPageId,
