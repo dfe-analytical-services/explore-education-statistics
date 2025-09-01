@@ -90,7 +90,7 @@
       "value": "GeneralPurpose"
     },
     "capacityStatisticsDb": {
-      "value": 10
+      "value": 12
     },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
@@ -101,7 +101,7 @@
     "maxStatsDbSizeBytes": {
       "value": 2199023255552
     },
-    "enableReplacementOfPublicApiDataSets" : {
+    "enableReplacementOfPublicApiDataSets": {
       "value": true
     }
   }
