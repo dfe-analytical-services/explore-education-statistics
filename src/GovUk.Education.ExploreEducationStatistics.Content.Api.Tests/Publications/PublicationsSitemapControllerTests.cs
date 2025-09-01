@@ -1,5 +1,4 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Xunit;

@@ -1,4 +1,3 @@
-#nullable enable
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;

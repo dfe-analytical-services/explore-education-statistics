@@ -1,4 +1,3 @@
-#nullable enable
 using DotNet.Testcontainers.Containers;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;

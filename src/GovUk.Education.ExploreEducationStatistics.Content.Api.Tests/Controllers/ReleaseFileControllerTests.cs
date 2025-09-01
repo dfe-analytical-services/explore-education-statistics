@@ -1,4 +1,3 @@
-#nullable enable
 using System.Net.Http.Json;
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
