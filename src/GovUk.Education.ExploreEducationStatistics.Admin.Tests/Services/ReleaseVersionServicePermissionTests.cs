@@ -376,6 +376,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseDataFileService>(),
             Mock.Of<IReleaseFileService>(),
+            Mock.Of<IDataSetUploadRepository>(),
             Mock.Of<IDataImportService>(),
             Mock.Of<IFootnoteRepository>(),
             Mock.Of<IDataBlockService>(),
