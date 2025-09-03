@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
+﻿using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Moq;
 
@@ -10,14 +11,17 @@ public class PublicationsSitemapServiceMockBuilder
 
     private PublicationSitemapPublicationDto[]? _sitemapItems;
 
-    public IPublicationsSitemapService Build()
-    {
-        _mock.Setup(m => m.GetSitemapItems(
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_sitemapItems ?? []);
+    private static readonly Expression<Func<IPublicationsSitemapService,
+        Task<PublicationSitemapPublicationDto[]>>> GetSitemapItems =
+        m => m.GetSitemapItems(
+            It.IsAny<CancellationToken>());
 
-        return _mock.Object;
+    public PublicationsSitemapServiceMockBuilder()
+    {
+        _mock.Setup(GetSitemapItems).ReturnsAsync(() => _sitemapItems ?? []);
     }
+
+    public IPublicationsSitemapService Build() => _mock.Object;
 
     public PublicationsSitemapServiceMockBuilder WhereHasSitemapItems(PublicationSitemapPublicationDto[] sitemapItems)
     {
@@ -31,9 +35,7 @@ public class PublicationsSitemapServiceMockBuilder
     {
         public void GetSitemapItemsWasCalled()
         {
-            mock.Verify(m => m.GetSitemapItems(
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(GetSitemapItems, Times.Once);
         }
     }
 }
