@@ -158,7 +158,6 @@ public class ReleaseChecklistServiceTests
                     Title: "Data set 3",
                     Status: DataSetVersionStatus.Failed)
             ];
-
             
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
