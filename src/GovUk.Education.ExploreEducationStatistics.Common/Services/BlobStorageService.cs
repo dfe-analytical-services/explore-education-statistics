@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 /// details e.g. Azure SDK v12 is an entirely new package compared to v11.
 /// </summary>
 public abstract class BlobStorageService(
-    string s,
+    string defaultConnectionString,
     BlobServiceClient client,
     ILogger<IBlobStorageService> logger,
     IStorageInstanceCreationUtil storageInstanceCreationUtil,
@@ -659,7 +659,7 @@ public abstract class BlobStorageService(
         IBlobContainer container,
         string? connectionString = null)
     {
-        var storageAccount = CloudStorageAccount.Parse(connectionString ?? s);
+        var storageAccount = CloudStorageAccount.Parse(connectionString ?? defaultConnectionString);
         var blobClient = storageAccount.CreateCloudBlobClient();
 
         var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
@@ -667,7 +667,7 @@ public abstract class BlobStorageService(
         var containerClient = blobClient.GetContainerReference(containerName);
 
         await storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-            s,
+            defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
             () => containerClient.CreateIfNotExistsAsync());
@@ -682,7 +682,7 @@ public abstract class BlobStorageService(
         var containerClient = client.GetBlobContainerClient(containerName);
 
         await storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-            s,
+            defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
             () => containerClient.CreateIfNotExistsAsync());
