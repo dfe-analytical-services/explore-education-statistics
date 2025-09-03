@@ -12,7 +12,7 @@ using Moq;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Publications;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.Publications;
 
 public abstract class PublicationsSearchControllerCachingTests : CacheServiceTestFixture
 {

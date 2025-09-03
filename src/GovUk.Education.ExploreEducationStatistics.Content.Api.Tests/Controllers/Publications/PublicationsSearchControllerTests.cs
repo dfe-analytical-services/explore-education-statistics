@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Publications;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.Publications;
 
 public abstract class PublicationsSearchControllerTests
 {
