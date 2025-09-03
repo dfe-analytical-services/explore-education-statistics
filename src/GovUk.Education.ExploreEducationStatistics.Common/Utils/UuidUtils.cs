@@ -1,4 +1,3 @@
-#nullable enable
 using Medo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;

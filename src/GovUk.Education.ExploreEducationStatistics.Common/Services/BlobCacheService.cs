@@ -1,5 +1,4 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Logging;

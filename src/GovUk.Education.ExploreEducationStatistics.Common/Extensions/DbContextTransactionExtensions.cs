@@ -1,4 +1,3 @@
-#nullable enable
 using System.Transactions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;

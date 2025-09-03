@@ -1,4 +1,3 @@
-#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;

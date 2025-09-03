@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;

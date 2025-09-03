@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
