@@ -11,13 +11,13 @@ public class Update : ICreatedTimestamp<DateTime?>
 
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
-    // TODO - Can this be non-nullable?
+    // Nullable to support older records missing Created timestamps
     public DateTime? Created { get; set; }
 
-    // TODO - Can this be non-nullable?
+    // Nullable to support older records missing CreatedBy references
     public User? CreatedBy { get; set; }
 
-    // TODO - Can this be non-nullable?
+    // Nullable to support older records missing CreatedBy references
     public Guid? CreatedById { get; set; }
 
     public DateTime On { get; set; }
