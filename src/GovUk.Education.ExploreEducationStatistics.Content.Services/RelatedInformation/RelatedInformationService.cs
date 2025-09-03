@@ -31,8 +31,8 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
         CancellationToken cancellationToken = default)
     {
         return contentDbContext.Publications
-            .Where(p => p.Slug == publicationSlug)
-            .FirstOrNotFoundAsync(cancellationToken);
+            .SingleOrNotFoundAsync(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue,
+                cancellationToken);
     }
 
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
@@ -42,6 +42,6 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
     {
         return contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
-            .FirstOrNotFoundAsync(cancellationToken);
+            .SingleOrNotFoundAsync(cancellationToken);
     }
 }
