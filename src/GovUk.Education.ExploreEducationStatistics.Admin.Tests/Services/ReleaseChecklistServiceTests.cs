@@ -36,8 +36,7 @@ public class ReleaseChecklistServiceTests
     [Theory]
     [InlineData(DataSetVersionStatus.Mapping)]
     [InlineData(DataSetVersionStatus.Finalising)]
-    [InlineData(null)]
-    public async Task GetChecklist_AllErrors(DataSetVersionStatus? status)
+    public async Task GetChecklist_AllErrors(DataSetVersionStatus mappingStatus)
     {
         Release release = _dataFixture.DefaultRelease()
             .WithPublication(_dataFixture.DefaultPublication());
@@ -143,7 +142,7 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-            List<DataSetVersionStatusSummary> mockVersions =
+            List<DataSetVersionStatusSummary> dataSetVersionStatusSummaries =
             [
                 new(
                     Id: Guid.NewGuid(),
@@ -152,26 +151,20 @@ public class ReleaseChecklistServiceTests
                 new(
                     Id: Guid.NewGuid(),
                     Title: "Data set 2",
-                    Status: DataSetVersionStatus.Processing),
+                    Status: mappingStatus),
                 new(
                     Id: Guid.NewGuid(),
                     Title: "Data set 3",
+                    Status: DataSetVersionStatus.Processing),
+                new(
+                    Id: Guid.NewGuid(),
+                    Title: "Data set 4",
                     Status: DataSetVersionStatus.Failed)
             ];
             
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
-                .ReturnsAsync(status is null
-                    ? mockVersions
-                    : mockVersions
-                        .Concat(new[]
-                        {
-                            new DataSetVersionStatusSummary(
-                                Id: Guid.NewGuid(),
-                                Title: "Data set 4",
-                                Status: status.Value)
-                        })
-                        .ToList());
+                .ReturnsAsync(dataSetVersionStatusSummaries);
 
             var service = BuildReleaseChecklistService(
                 context,
@@ -198,8 +191,7 @@ public class ReleaseChecklistServiceTests
                 .Select(error => error.Code)
                 .ToList();
 
-            Assert.Equal(status is null ? 12 : 13, errors.Count);
-
+            Assert.Equal(13, errors.Count);
             Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
             Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
             Assert.Equal(PublicDataGuidanceRequired, errors[2]);
@@ -212,10 +204,7 @@ public class ReleaseChecklistServiceTests
             Assert.Equal(PublicApiDataSetImportsMustBeCompleted, errors[9]);
             Assert.Equal(PublicApiDataSetCancellationsMustBeResolved, errors[10]);
             Assert.Equal(PublicApiDataSetFailuresMustBeResolved, errors[11]);
-            if (status is not null)
-            {
-                Assert.Equal(PublicApiDataSetMappingsMustBeCompleted, errors[12]);
-            }
+            Assert.Equal(PublicApiDataSetMappingsMustBeCompleted, errors[12]);
         }
     }
 
