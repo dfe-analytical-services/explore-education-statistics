@@ -1,5 +1,4 @@
 #nullable enable
-using System.Runtime.CompilerServices;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -20,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Semver;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
-[assembly: InternalsVisibleTo("GovUk.Education.ExploreEducationStatistics.Admin.Tests")]
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -149,7 +147,6 @@ public class DataSetVersionService(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
             .OnSuccessDo(CheckCanUpdatePatchVersion)
-            .OnSuccessDo(UpdateStatusToFinalizing)
             .OnSuccess(async _ => await processorClient.CompleteNextDataSetVersionImport(
                 dataSetVersionId: dataSetVersionId,
                 cancellationToken: cancellationToken))
@@ -159,13 +156,6 @@ public class DataSetVersionService(
                     dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
                     cancellationToken))
             .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
-    }
-
-    internal async Task UpdateStatusToFinalizing(DataSetVersion dataSetVersion)
-    {
-        dataSetVersion.Status = DataSetVersionStatus.Finalising;
-        publicDataDbContext.DataSetVersions.Update(dataSetVersion);
-        await publicDataDbContext.SaveChangesAsync();
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
