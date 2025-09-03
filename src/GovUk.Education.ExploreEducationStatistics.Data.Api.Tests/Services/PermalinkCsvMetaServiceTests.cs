@@ -467,7 +467,7 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.StreamBlob(
+                .Setup(s => s.GetDownloadStream(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
                     default
@@ -673,7 +673,7 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.StreamBlob(
+                .Setup(s => s.GetDownloadStream(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId),
                     default
@@ -903,7 +903,7 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.StreamBlob(
+                .Setup(s => s.GetDownloadStream(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
                     default
