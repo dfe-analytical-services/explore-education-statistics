@@ -10,14 +10,15 @@ public abstract class RelatedInformationControllerTests
 {
     private readonly RelatedInformationServiceMockBuilder _relatedInformationService = new();
 
+    private const string PublicationSlug = "test-publication";
+    private const string ReleaseSlug = "test-release";
+
     public class GetRelatedInformationForReleaseTests : RelatedInformationControllerTests
     {
         [Fact]
         public async Task GetRelatedInformationForRelease_WhenServiceReturnsRelatedInformation_ReturnsOk()
         {
             // Arrange
-            const string publicationSlug = "test-publication";
-            const string releaseSlug = "test-release";
             RelatedInformationDto[] relatedInformation =
             [
                 new()
@@ -39,15 +40,36 @@ public abstract class RelatedInformationControllerTests
 
             // Act
             var result = await sut.GetRelatedInformationForRelease(
-                publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug,
-                CancellationToken.None);
+                publicationSlug: PublicationSlug,
+                releaseSlug: ReleaseSlug);
 
             // Assert
             _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
-                publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug);
+                publicationSlug: PublicationSlug,
+                releaseSlug: ReleaseSlug);
             result.AssertOkResult(relatedInformation);
+        }
+
+        [Fact]
+        public async Task GetRelatedInformationForRelease_WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _relatedInformationService.WhereGetRelatedInformationForReleaseReturnsNotFound(
+                publicationSlug: PublicationSlug,
+                releaseSlug: ReleaseSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetRelatedInformationForRelease(
+                publicationSlug: PublicationSlug,
+                releaseSlug: ReleaseSlug);
+
+            // Assert
+            _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
+                publicationSlug: PublicationSlug,
+                releaseSlug: ReleaseSlug);
+            result.AssertNotFoundResult();
         }
     }
 
