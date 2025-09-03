@@ -1,5 +1,4 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;

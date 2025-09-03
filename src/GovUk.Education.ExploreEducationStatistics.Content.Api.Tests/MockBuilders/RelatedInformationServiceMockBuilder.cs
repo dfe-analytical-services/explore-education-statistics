@@ -1,5 +1,4 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
 using Moq;
 

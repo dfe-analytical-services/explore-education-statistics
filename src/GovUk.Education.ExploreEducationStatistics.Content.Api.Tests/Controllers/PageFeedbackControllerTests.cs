@@ -1,4 +1,3 @@
-#nullable enable
 using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
