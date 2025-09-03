@@ -89,13 +89,11 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
             : DataSetVersionType.Patch;
 
     public bool CanBeDeleted => Status is DataSetVersionStatus.Failed
-        or DataSetVersionStatus.Finalising
         or DataSetVersionStatus.Mapping
         or DataSetVersionStatus.Draft
         or DataSetVersionStatus.Cancelled;
 
-    public bool CanBeUpdated => Status is DataSetVersionStatus.Mapping 
-        or DataSetVersionStatus.Finalising
+    public bool CanBeUpdated => Status is DataSetVersionStatus.Mapping
         or DataSetVersionStatus.Draft;
 
     internal class Config : IEntityTypeConfiguration<DataSetVersion>
