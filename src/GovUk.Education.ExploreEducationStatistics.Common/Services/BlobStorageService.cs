@@ -33,40 +33,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 /// changes that make it difficult to upgrade when relying on lower-level
 /// details e.g. Azure SDK v12 is an entirely new package compared to v11.
 /// </summary>
-public abstract class BlobStorageService : IBlobStorageService
+public abstract class BlobStorageService(
+    string defaultConnectionString,
+    BlobServiceClient client,
+    ILogger<IBlobStorageService> logger,
+    IStorageInstanceCreationUtil storageInstanceCreationUtil,
+    IBlobSasService blobSasService)
+    : IBlobStorageService
 {
     private static readonly TimeSpan DownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
-    
-    private readonly string _connectionString;
-    private readonly BlobServiceClient _client;
-    private readonly ILogger<IBlobStorageService> _logger;
-    private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
-    private readonly IBlobSasService _blobSasService;
 
     protected BlobStorageService(
         string connectionString,
         ILogger<IBlobStorageService> logger,
         IBlobSasService blobSasService)
+        : this(
+            connectionString,
+            new BlobServiceClient(connectionString),
+            logger,
+            new StorageInstanceCreationUtil(),
+            blobSasService)
     {
-        _connectionString = connectionString;
-        _client = new BlobServiceClient(connectionString);
-        _logger = logger;
-        _blobSasService = blobSasService;
-        _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
-    }
-
-    protected BlobStorageService(
-        string connectionString,
-        BlobServiceClient client,
-        ILogger<IBlobStorageService> logger,
-        IStorageInstanceCreationUtil storageInstanceCreationUtil,
-        IBlobSasService blobSasService)
-    {
-        _connectionString = connectionString;
-        _client = client;
-        _logger = logger;
-        _storageInstanceCreationUtil = storageInstanceCreationUtil;
-        _blobSasService = blobSasService;
     }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
@@ -100,7 +87,7 @@ public abstract class BlobStorageService : IBlobStorageService
 
         var blobContainer = await GetBlobContainer(containerName);
 
-        _logger.LogInformation("Deleting blobs from {containerName}/{path}", blobContainer.Name, directoryPath);
+        logger.LogInformation("Deleting blobs from {containerName}/{path}", blobContainer.Name, directoryPath);
 
         string? continuationToken = null;
 
@@ -125,11 +112,11 @@ public abstract class BlobStorageService : IBlobStorageService
 
                     if (excluded || !included)
                     {
-                        _logger.LogInformation("Ignoring blob {containerName}/{path}", blobContainer.Name, blob.Name);
+                        logger.LogInformation("Ignoring blob {containerName}/{path}", blobContainer.Name, blob.Name);
                         continue;
                     }
 
-                    _logger.LogInformation("Deleting blob {containerName}/{path}", blobContainer.Name, blob.Name);
+                    logger.LogInformation("Deleting blob {containerName}/{path}", blobContainer.Name, blob.Name);
 
                     deleteTasks.Add(blobContainer.DeleteBlobIfExistsAsync(blob.Name));
                 }
@@ -145,7 +132,7 @@ public abstract class BlobStorageService : IBlobStorageService
     {
         var blob = await GetBlobClient(containerName, path);
 
-        _logger.LogInformation("Deleting blob {containerName}/{path}", containerName, path);
+        logger.LogInformation("Deleting blob {containerName}/{path}", containerName, path);
 
         await blob.DeleteIfExistsAsync();
     }
@@ -159,7 +146,7 @@ public abstract class BlobStorageService : IBlobStorageService
 
         var tempFilePath = await UploadToTemporaryFile(file);
 
-        _logger.LogInformation("Uploading file to blob {containerName}/{path}", containerName, path);
+        logger.LogInformation("Uploading file to blob {containerName}/{path}", containerName, path);
 
         await blob.UploadAsync(
             path: tempFilePath,
@@ -184,7 +171,7 @@ public abstract class BlobStorageService : IBlobStorageService
         var sourceBlob = sourceContainerClient.GetBlobClient(sourcePath);
         if (!await sourceBlob.ExistsAsync())
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Source blob not found while moving blob. Source: '{Source}' Destination: '{Destination}'",
                 sourcePath,
                 destinationPath);
@@ -194,7 +181,7 @@ public abstract class BlobStorageService : IBlobStorageService
         var destinationBlob = destinationContainerClient.GetBlobClient(destinationPath);
         if (await destinationBlob.ExistsAsync())
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Destination already exists while moving blob. Source: '{Source}' Destination: '{Destination}'",
                 sourcePath,
                 destinationPath);
@@ -217,7 +204,7 @@ public abstract class BlobStorageService : IBlobStorageService
             while (destinationProperties.CopyStatus == CopyStatus.Pending)
             {
                 await Task.Delay(1000);
-                _logger.LogInformation("Copy progress: {Progress}", destinationProperties.CopyProgress);
+                logger.LogInformation("Copy progress: {Progress}", destinationProperties.CopyProgress);
                 destinationProperties = await destinationBlob.GetPropertiesAsync();
             }
 
@@ -258,7 +245,7 @@ public abstract class BlobStorageService : IBlobStorageService
     {
         var blob = await GetBlobClient(containerName, path);
 
-        _logger.LogInformation("Uploading text to blob {containerName}/{path}", containerName, path);
+        logger.LogInformation("Uploading text to blob {containerName}/{path}", containerName, path);
 
         sourceStream.SeekToBeginning();
 
@@ -421,49 +408,12 @@ public abstract class BlobStorageService : IBlobStorageService
         BlobDownloadToken token,
         CancellationToken cancellationToken)
     {
-        return _blobSasService
-            .CreateSecureBlobClient(blobServiceClient: _client, token: token)
+        return blobSasService
+            .CreateSecureBlobClient(blobServiceClient: client, token: token)
             .OnSuccess(blobClient => GetDownloadStream(blob: blobClient, decompress: true, cancellationToken))
             .OnSuccess(stream => new FileStreamResult(
                 fileStream: stream,
                 contentType: token.ContentType) { FileDownloadName = token.Filename });
-    }
-
-    public async Task<Stream> StreamBlob(
-        IBlobContainer containerName,
-        string path,
-        CancellationToken cancellationToken = default)
-    {
-        var blob = await GetBlobClient(containerName, path);
-
-        try
-        {
-            var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
-
-            BlobProperties blobProperties =
-                await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
-
-            // Check the ContentEncoding property to determine if the blob
-            // is compressed and only decompress if necessary.
-            if (blobProperties.ContentEncoding.IsNullOrEmpty())
-            {
-                return blobStream;
-            }
-
-            return CompressionUtils.GetCompressionStream(
-                targetStream: blobStream,
-                contentEncoding: blobProperties.ContentEncoding!,
-                compressionMode: CompressionMode.Decompress);
-        }
-        catch (RequestFailedException exception)
-        {
-            if (exception.Status == 404)
-            {
-                ThrowFileNotFoundException(containerName, path);
-            }
-
-            throw;
-        }
     }
 
     public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
@@ -472,9 +422,9 @@ public abstract class BlobStorageService : IBlobStorageService
         string path,
         CancellationToken cancellationToken)
     {
-        return await _blobSasService
+        return await blobSasService
             .CreateBlobDownloadToken(
-                blobServiceClient: _client,
+                blobServiceClient: client,
                 container: container,
                 filename: filename,
                 path: path,
@@ -555,7 +505,7 @@ public abstract class BlobStorageService : IBlobStorageService
         string destinationDirectoryPath,
         IBlobStorageService.CopyDirectoryOptions? options = null)
     {
-        _logger.LogInformation(
+        logger.LogInformation(
             "Copying directory from {sourceContainer}/{sourcePath} to {destinationContainer}/{destinationPath}",
             sourceContainerName,
             sourceDirectoryPath,
@@ -641,7 +591,7 @@ public abstract class BlobStorageService : IBlobStorageService
             )
         );
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Transferred {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
             source.Container.Name,
             source.Name,
@@ -655,7 +605,7 @@ public abstract class BlobStorageService : IBlobStorageService
         var source = (CloudBlockBlob)e.Source;
         var destination = (CloudBlockBlob)e.Destination;
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
             source.Container.Name,
             source.Name,
@@ -670,7 +620,7 @@ public abstract class BlobStorageService : IBlobStorageService
         var source = (CloudBlockBlob)e.Source;
         var destination = (CloudBlockBlob)e.Destination;
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Skipped transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
             source.Container.Name,
             source.Name,
@@ -695,7 +645,7 @@ public abstract class BlobStorageService : IBlobStorageService
             return blobClient;
         }
 
-        _logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
+        logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
         return new NotFoundResult();
     }
 
@@ -709,15 +659,15 @@ public abstract class BlobStorageService : IBlobStorageService
         IBlobContainer container,
         string? connectionString = null)
     {
-        var storageAccount = CloudStorageAccount.Parse(connectionString ?? _connectionString);
+        var storageAccount = CloudStorageAccount.Parse(connectionString ?? defaultConnectionString);
         var blobClient = storageAccount.CreateCloudBlobClient();
 
         var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
 
         var containerClient = blobClient.GetContainerReference(containerName);
 
-        await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-            _connectionString,
+        await storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+            defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
             () => containerClient.CreateIfNotExistsAsync());
@@ -727,12 +677,12 @@ public abstract class BlobStorageService : IBlobStorageService
 
     private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
     {
-        var containerName = IsDevelopmentStorageAccount(_client) ? container.EmulatedName : container.Name;
+        var containerName = IsDevelopmentStorageAccount(client) ? container.EmulatedName : container.Name;
 
-        var containerClient = _client.GetBlobContainerClient(containerName);
+        var containerClient = client.GetBlobContainerClient(containerName);
 
-        await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-            _connectionString,
+        await storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+            defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
             () => containerClient.CreateIfNotExistsAsync());

@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -21,35 +22,6 @@ public static class MockBlobStorageServiceExtensions
             .ReturnsAsync(blob);
     }
 
-    public static IReturnsResult<T> SetupStreamBlob<T>(
-        this Mock<T> service,
-        IBlobContainer container,
-        string expectedBlobPath,
-        string filePathToStream) where T : class, IBlobStorageService
-    {
-        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, default))
-            .ReturnsAsync(() => File.OpenRead(filePathToStream));
-    }
-
-    public static IReturnsResult<T> SetupStreamBlobNotFound<T>(
-        this Mock<T> service,
-        IBlobContainer container,
-        string expectedBlobPath) where T : class, IBlobStorageService
-    {
-        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, default))
-            .ThrowsAsync(new FileNotFoundException($"Could not find file at {container.Name}/{expectedBlobPath}"));
-    }
-
-    public static IReturnsResult<T> SetupStreamBlobThrows<T>(
-        this Mock<T> service,
-        IBlobContainer container,
-        string expectedBlobPath,
-        Exception exception) where T : class, IBlobStorageService
-    {
-        return service.Setup(s => s.StreamBlob(container, expectedBlobPath, default))
-            .ThrowsAsync(exception);
-    }
-
     public static IReturnsResult<T> SetupCheckBlobExists<T>(
         this Mock<T> service,
         IBlobContainer container,
@@ -67,6 +39,23 @@ public static class MockBlobStorageServiceExtensions
     {
         return service.Setup(s => s.DeleteBlob(container, path))
             .Returns(Task.CompletedTask);
+    }
+    
+    public static IReturnsResult<T> SetupGetDownloadStreamWithFilePath<T>(
+        this Mock<T> service,
+        IBlobContainer container,
+        string path,
+        string filePathToStream,
+        bool decompress = true,
+        CancellationToken cancellationToken = default,
+        Action? callback = null) where T : class, IBlobStorageService
+    {
+        return service.Setup(
+                s =>
+                    s.GetDownloadStream(container, path, decompress, cancellationToken)
+            )
+            .Callback(callback ?? (() => { }))
+            .ReturnsAsync(() => File.OpenRead(filePathToStream));
     }
     
     public static IReturnsResult<T> SetupGetDownloadStream<T>(
@@ -97,19 +86,17 @@ public static class MockBlobStorageServiceExtensions
         CancellationToken cancellationToken = default,
         Action? callback = null) where T : class, IBlobStorageService
     {
-        var stream = new MemoryStream(content);
-        
-        if (stream.CanSeek)
-        {
-            stream.Position = 0;
-        }
-        
         return service.Setup(
                 s =>
                     s.GetDownloadStream(container, path, decompress, cancellationToken)
             )
             .Callback(callback ?? (() => { }))
-            .ReturnsAsync(stream);
+            .ReturnsAsync(() =>
+            {
+                var stream = new MemoryStream(content);
+                stream.SeekToBeginning();
+                return stream;
+            });
     }
     
     public static IReturnsResult<T> SetupGetDownloadStreamNotFound<T>(
