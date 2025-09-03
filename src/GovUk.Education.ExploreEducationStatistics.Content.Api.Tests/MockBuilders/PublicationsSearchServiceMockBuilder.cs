@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -14,22 +15,27 @@ public class PublicationsSearchServiceMockBuilder
 
     private PaginatedListViewModel<PublicationSearchResultViewModel>? _publications;
 
-    public IPublicationsSearchService Build()
-    {
-        _mock.Setup(m => m.GetPublications(
-                It.IsAny<ReleaseType?>(),
-                It.IsAny<Guid?>(),
-                It.IsAny<string?>(),
-                It.IsAny<PublicationsSortBy?>(),
-                It.IsAny<SortDirection?>(),
-                It.IsAny<int>(),
-                It.IsAny<int>(),
-                It.IsAny<IEnumerable<Guid>?>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_publications ?? new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, 1, 10));
+    private static readonly Expression<Func<IPublicationsSearchService,
+        Task<PaginatedListViewModel<PublicationSearchResultViewModel>>>> GetPublications =
+        m => m.GetPublications(
+            It.IsAny<ReleaseType?>(),
+            It.IsAny<Guid?>(),
+            It.IsAny<string?>(),
+            It.IsAny<PublicationsSortBy?>(),
+            It.IsAny<SortDirection?>(),
+            It.IsAny<int>(),
+            It.IsAny<int>(),
+            It.IsAny<IEnumerable<Guid>?>(),
+            It.IsAny<CancellationToken>());
 
-        return _mock.Object;
+    public PublicationsSearchServiceMockBuilder()
+    {
+        _mock.Setup(GetPublications)
+            .ReturnsAsync(() =>
+                _publications ?? new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, 1, 10));
     }
+
+    public IPublicationsSearchService Build() => _mock.Object;
 
     public PublicationsSearchServiceMockBuilder WhereHasPublications(
         PaginatedListViewModel<PublicationSearchResultViewModel> publications)
@@ -42,7 +48,7 @@ public class PublicationsSearchServiceMockBuilder
 
     public class Asserter(Mock<IPublicationsSearchService> mock)
     {
-        public void GetSearchItemsWasCalledForRequest(PublicationsListGetRequest request) =>
+        public void GetPublicationsWasCalledForRequest(PublicationsListGetRequest request) =>
             mock.Verify(m => m.GetPublications(
                     It.Is<ReleaseType?>(actual => actual == request.ReleaseType),
                     It.Is<Guid?>(actual => actual == request.ThemeId),
@@ -55,7 +61,7 @@ public class PublicationsSearchServiceMockBuilder
                     It.IsAny<CancellationToken>()),
                 Times.Once);
 
-        public void GetSearchItemsWasCalledForRequest(PublicationsListPostRequest request) =>
+        public void GetPublicationsWasCalledForRequest(PublicationsListPostRequest request) =>
             mock.Verify(m => m.GetPublications(
                     It.Is<ReleaseType?>(actual => actual == request.ReleaseType),
                     It.Is<Guid?>(actual => actual == request.ThemeId),
@@ -68,17 +74,6 @@ public class PublicationsSearchServiceMockBuilder
                     It.IsAny<CancellationToken>()),
                 Times.Once);
 
-        public void GetSearchItemsWasNotCalledForRequest() =>
-            mock.Verify(m => m.GetPublications(
-                    It.IsAny<ReleaseType?>(),
-                    It.IsAny<Guid?>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<PublicationsSortBy?>(),
-                    It.IsAny<SortDirection?>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<IEnumerable<Guid>?>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Never);
+        public void GetPublicationsWasNotCalled() => mock.Verify(GetPublications, Times.Never);
     }
 }

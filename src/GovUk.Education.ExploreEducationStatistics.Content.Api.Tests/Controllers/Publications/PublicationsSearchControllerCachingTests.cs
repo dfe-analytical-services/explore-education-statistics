@@ -75,7 +75,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
             var result = await sut.GetPublications(_getQuery);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasCalledForRequest(_getQuery);
+            _publicationsSearchService.Assert.GetPublicationsWasCalledForRequest(_getQuery);
             Assert.Equal(_publications, result);
             Mock.VerifyAll(MemoryCacheService);
         }
@@ -96,7 +96,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
             var result = await sut.GetPublications(_getQuery);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasNotCalledForRequest();
+            _publicationsSearchService.Assert.GetPublicationsWasNotCalled();
             Assert.Equal(_publications, result);
             Mock.VerifyAll(MemoryCacheService);
         }
@@ -128,7 +128,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
             var result = await sut.GetPublications(_postQuery);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasCalledForRequest(_postQuery);
+            _publicationsSearchService.Assert.GetPublicationsWasCalledForRequest(_postQuery);
             Assert.Equal(_publications, result);
             Mock.VerifyAll(MemoryCacheService);
         }
@@ -149,7 +149,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
             var result = await sut.GetPublications(_postQuery);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasNotCalledForRequest();
+            _publicationsSearchService.Assert.GetPublicationsWasNotCalled();
             Assert.Equal(_publications, result);
             Mock.VerifyAll(MemoryCacheService);
         }

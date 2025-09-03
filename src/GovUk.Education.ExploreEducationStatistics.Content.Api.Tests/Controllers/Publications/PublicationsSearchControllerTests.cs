@@ -54,7 +54,7 @@ public abstract class PublicationsSearchControllerTests
             var result = await sut.GetPublications(request);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasCalledForRequest(request);
+            _publicationsSearchService.Assert.GetPublicationsWasCalledForRequest(request);
             Assert.Equal(_publications, result);
         }
     }
@@ -82,7 +82,7 @@ public abstract class PublicationsSearchControllerTests
             var result = await sut.GetPublications(request);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasCalledForRequest(request);
+            _publicationsSearchService.Assert.GetPublicationsWasCalledForRequest(request);
             Assert.Equal(_publications, result);
         }
     }
