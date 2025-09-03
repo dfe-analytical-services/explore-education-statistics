@@ -252,7 +252,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = File.OpenWrite(path);
+            await using var stream = File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -356,7 +356,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = File.OpenWrite(path);
+            await using var stream = File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -449,7 +449,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = File.OpenWrite(path);
+        await using var stream = File.OpenWrite(path);
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
@@ -521,7 +521,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = File.OpenWrite(path);
+        await using var stream = File.OpenWrite(path);
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
@@ -609,7 +609,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = File.OpenWrite(path);
+        await using var stream = File.OpenWrite(path);
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
@@ -669,7 +669,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = File.OpenWrite(path);
+        await using var stream = File.OpenWrite(path);
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
@@ -753,7 +753,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = File.OpenWrite(path);
+        await using var stream = File.OpenWrite(path);
 
         var tokenSource = new CancellationTokenSource();
 
@@ -915,7 +915,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = File.OpenWrite(path);
+            await using var stream = File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -1016,7 +1016,8 @@ public class ReleaseFileServiceTests : IDisposable
             );
 
             result.AssertRight();
-
+            
+            await stream.DisposeAsync();
             await using var zip = File.OpenRead(path);
             Assert.Equal("Test cached all files zip", zip.ReadToEnd());
         }
@@ -1107,7 +1108,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = File.OpenWrite(path);
+            await using var stream = File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,

@@ -186,8 +186,6 @@ public class ReleaseFileService(
 
             await using var blobStream = streamResult.Right;
             await blobStream.CopyToAsync(outputStream, cancellationToken);
-            await outputStream.DisposeAsync();
-
             return true;
         }
 

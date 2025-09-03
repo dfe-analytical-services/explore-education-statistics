@@ -1613,7 +1613,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = System.IO.File.OpenWrite(path);
+            await using var stream = System.IO.File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -1715,7 +1715,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = System.IO.File.OpenWrite(path);
+            await using var stream = System.IO.File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -1801,7 +1801,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -1909,7 +1909,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -1977,7 +1977,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2050,7 +2050,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2094,7 +2094,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2158,7 +2158,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var tokenSource = new CancellationTokenSource();
 
