@@ -27,7 +27,7 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Adm
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-// TODO EES-6359 - no permission checks.
+// TODO - EES-6480.
 public class DataSetFileStorage(
     ContentDbContext contentDbContext,
     IPrivateBlobStorageService privateBlobStorageService,
@@ -263,7 +263,7 @@ public class DataSetFileStorage(
         return [.. uploads];
     }
 
-    // TODO EES-6359 - no permission checks.
+    // TODO - EES-6480.
     public async Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
         Guid releaseVersionId,
         Guid dataSetUploadId,

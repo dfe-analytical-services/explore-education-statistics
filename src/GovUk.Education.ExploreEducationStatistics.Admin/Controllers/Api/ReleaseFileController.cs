@@ -42,7 +42,7 @@ public class ReleaseFileController(
             .HandleFailuresOrNoContent();
     }
 
-    // TODO EES-6359 - no permissions
+    // TODO - EES-6480.
     [HttpGet("release/{releaseVersionId:guid}/files")]
     [Produces(MediaTypeNames.Application.Octet)]
     public async Task<ActionResult> StreamFilesToZip(
