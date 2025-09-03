@@ -12,8 +12,6 @@ public interface IBlobStorageService
 {
     Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
-    Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
-
     Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);
 
     public record DeleteBlobsOptions
@@ -54,23 +52,6 @@ public interface IBlobStorageService
         T content,
         string? contentEncoding = null,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Download the entirety of a blob to a target stream.
-    /// </summary>
-    /// <param name="containerName">name of the blob container</param>
-    /// <param name="path">path to the blob within the container</param>
-    /// <param name="stream">stream to output blob to</param>
-    /// <param name="decompress">if true, checks the content encoding and decompresses the blob if necessary</param>
-    /// <param name="cancellationToken">used to cancel the download</param>
-    /// <returns>the stream that the blob has been output to</returns>
-    [Obsolete("Use GetDownloadStream instead to create a download stream with no intermediary Streams necessary.")]
-    Task<Either<ActionResult, Stream>> DownloadToStream(
-        IBlobContainer containerName,
-        string path,
-        Stream stream,
-        bool decompress = true,
         CancellationToken cancellationToken = default);
 
     /// <summary>
