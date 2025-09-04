@@ -3,7 +3,7 @@ import {
   EducationInNumbersPageContextState,
 } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import _educationInNumbersService, {
-  EducationInNumbersSummary,
+  EinSummary,
 } from '@admin/services/educationInNumbersService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
@@ -20,7 +20,7 @@ const educationInNumbersService = _educationInNumbersService as jest.Mocked<
 >;
 
 describe('EducationInNumbersSummaryEditPage', () => {
-  const testPage: EducationInNumbersSummary = {
+  const testPage: EinSummary = {
     id: 'page-1-id',
     title: 'Page 1 title',
     slug: 'page-1-slug',
@@ -84,7 +84,7 @@ describe('EducationInNumbersSummaryEditPage', () => {
   });
 
   function renderPage(
-    page: EducationInNumbersSummary,
+    page: EinSummary,
     history: MemoryHistory = createMemoryHistory(),
     onEducationInNumbersPageChange: EducationInNumbersPageContextState['onEducationInNumbersPageChange'] = () => {},
   ) {

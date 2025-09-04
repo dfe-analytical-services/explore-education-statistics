@@ -6,13 +6,13 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useEffect } from 'react';
 
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
+import { EinSummary } from '@admin/services/educationInNumbersService';
 import { EinContent } from '@admin/services/educationInNumbersContentService';
 import EducationInNumbersAccordion from './EducationInNumbersAccordion';
 
 interface Props {
   pageContent: EinContent;
-  pageVersion: EducationInNumbersSummary;
+  pageVersion: EinSummary;
 }
 
 export default function EducationInNumbersContent({

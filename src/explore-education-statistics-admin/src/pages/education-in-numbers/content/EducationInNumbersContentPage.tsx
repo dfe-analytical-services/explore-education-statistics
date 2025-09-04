@@ -14,7 +14,7 @@ import {
 } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import EducationInNumbersContent from '@admin/pages/education-in-numbers/content/components/EducationInNumbersContent';
 
-export const EducationInNumbersContentPageInternal = () => {
+const EducationInNumbersContentPageInternal = () => {
   const { pageContent, pageVersion } = useEducationInNumbersPageContentState();
 
   const canUpdateContent = !pageVersion.published;

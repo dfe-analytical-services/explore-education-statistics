@@ -62,7 +62,7 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
-  // NOTE: `order` could be removed the EinContentBlockAddRequest, as
+  // NOTE: `order` could be removed from EinContentBlockAddRequest, as
   // we only ever add new blocks to the end of all existing blocks. If
   // someone ever did provide an order that clashed with an existing block,
   // currently the frontend doesn't adjust the `order`s of existing blocks.

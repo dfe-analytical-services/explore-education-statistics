@@ -7,12 +7,12 @@ import { EditableContentBlock } from '@admin/services/types/content';
 export type EinBlockType = 'HtmlBlock';
 export type EinContentBlock = EinHtmlBlock;
 
-// This is a hack to make the EiN stuff with preexisting block/section content
-// code used for release/methodology pages, while keeping a separate EiN type.
-// We need to use EditableContentBlock rather than just EinContentBlock -
-// despite not needing `comments`, `locked`, etc. - as otherwise we'd need to
-// create an alternate version of `EditableContentBlock`. For now, we're
-// avoiding this.
+// This is a hack to make the EiN stuff work with preexisting block/section
+// content code used for release/methodology pages, while keeping a separate
+// EiN type. We need to use EditableContentBlock rather than just
+// EinContentBlock - despite not needing `comments`, `locked`, etc. - as
+// otherwise we'd need to create an alternate version of `EditableContentBlock`.
+// For now, we're avoiding this.
 export type EinEditableContentBlock = EinContentBlock & EditableContentBlock;
 // ContentSection is shared with release/methodology too
 export type EinContentSection = ContentSection<EinEditableContentBlock>;
