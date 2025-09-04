@@ -70,7 +70,7 @@ export default function useMethodologyContentActions() {
     });
   }
 
-  // NOTE: `order` could be removed the ContentBlockPostModel, as
+  // NOTE: `order` could be removed from ContentBlockPostModel, as
   // we only ever add new blocks to the end of all existing blocks. If
   // someone ever did provide an order that clashed with an existing block,
   // currently the frontend doesn't adjust the `order`s of existing blocks.

@@ -1,7 +1,7 @@
 import { EinContent } from '@admin/services/educationInNumbersContentService';
-import { EducationInNumbersSummaryWithPrevVersion } from '@admin/services/educationInNumbersService';
+import { EinSummaryWithPrevVersion } from '@admin/services/educationInNumbersService';
 
-const testEinPageVersion: EducationInNumbersSummaryWithPrevVersion = {
+const testEinPageVersion: EinSummaryWithPrevVersion = {
   id: 'test-ein-page',
   title: 'Test Education in Numbers Page',
   slug: 'test-ein-page',

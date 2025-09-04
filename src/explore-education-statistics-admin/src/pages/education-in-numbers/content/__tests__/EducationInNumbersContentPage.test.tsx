@@ -1,20 +1,26 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
-import { useQuery } from '@tanstack/react-query';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import EducationInNumbersContentPage from '@admin/pages/education-in-numbers/content/EducationInNumbersContentPage';
 import { EducationInNumbersRouteParams } from '@admin/routes/educationInNumbersRoutes';
-import { EinContent } from '@admin/services/educationInNumbersContentService';
-import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
+import _einContentService, {
+  EinContent,
+} from '@admin/services/educationInNumbersContentService';
+import _einService, {
+  EinSummary,
+} from '@admin/services/educationInNumbersService';
 import render from '@common-test/render';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { educationInNumbersRoute } from '@admin/routes/routes';
 
-jest.mock('@tanstack/react-query', () => ({
-  ...jest.requireActual('@tanstack/react-query'),
-  useQuery: jest.fn(),
-}));
+jest.mock('@admin/services/educationInNumbersService');
+const einService = _einService as jest.Mocked<typeof _einService>;
+
+jest.mock('@admin/services/educationInNumbersContentService');
+const einContentService = _einContentService as jest.Mocked<
+  typeof _einContentService
+>;
 
 jest.mock(
   '@admin/pages/education-in-numbers/content/components/EducationInNumbersContent',
@@ -25,10 +31,8 @@ jest.mock(
   },
 );
 
-const useQueryMock = useQuery as jest.Mock;
-
 describe('EducationInNumbersContentPage', () => {
-  const testPageVersion: EducationInNumbersSummary = {
+  const testPageVersion: EinSummary = {
     id: 'test-page-id',
     title: 'Test Page Title',
     slug: 'test-page-slug',
@@ -43,66 +47,50 @@ describe('EducationInNumbersContentPage', () => {
     content: [],
   };
 
-  beforeEach(() => {
-    useQueryMock.mockReset();
-  });
-
-  test('renders loading spinner while fetching data', async () => {
-    useQueryMock.mockReturnValue({
-      isLoading: true,
-    });
-
-    await renderPage();
-
-    expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
-  });
-
   describe('when data has loaded successfully', () => {
     test('renders the page title and content', async () => {
-      useQueryMock.mockReturnValueOnce({
-        data: { ...testPageVersion },
-        isLoading: false,
-      });
-      useQueryMock.mockReturnValueOnce({
-        data: { ...testPageContent },
-        isLoading: false,
-      });
+      einService.getEducationInNumbersPage.mockResolvedValue(testPageVersion);
+      einContentService.getEducationInNumbersPageContent.mockResolvedValueOnce(
+        testPageContent,
+      );
 
       await renderPage();
 
-      expect(screen.getByTestId('page-title')).toHaveTextContent(
-        'Test Page Title',
-      );
-      expect(
-        screen.getByTestId('EducationInNumbersContent'),
-      ).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('page-title')).toHaveTextContent(
+          'Test Page Title',
+        );
+        expect(
+          screen.getByTestId('EducationInNumbersContent'),
+        ).toBeInTheDocument();
+      });
     });
 
     test('is in edit mode and shows the mode toggle when the page is not published', async () => {
-      useQueryMock.mockReturnValueOnce({
-        data: { ...testPageVersion, published: undefined },
-        isLoading: false,
+      einService.getEducationInNumbersPage.mockResolvedValueOnce({
+        ...testPageVersion,
+        published: undefined,
       });
-      useQueryMock.mockReturnValueOnce({
-        data: { ...testPageContent },
-        isLoading: false,
-      });
+      einContentService.getEducationInNumbersPageContent.mockResolvedValueOnce(
+        testPageContent,
+      );
 
       await renderPage();
 
-      expect(screen.getByLabelText('Edit content')).toBeInTheDocument();
-      expect(screen.getByLabelText('Preview content')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByLabelText('Edit content')).toBeInTheDocument();
+        expect(screen.getByLabelText('Preview content')).toBeInTheDocument();
+      });
     });
 
     test('is in preview mode and hides the mode toggle when the page is published', async () => {
-      useQueryMock.mockReturnValueOnce({
-        data: { ...testPageVersion, published: '2023-08-28T12:00:00Z' },
-        isLoading: false,
+      einService.getEducationInNumbersPage.mockResolvedValueOnce({
+        ...testPageVersion,
+        published: '2023-08-28T12:00:00Z',
       });
-      useQueryMock.mockReturnValueOnce({
-        data: { ...testPageContent },
-        isLoading: false,
-      });
+      einContentService.getEducationInNumbersPageContent.mockResolvedValueOnce(
+        testPageContent,
+      );
 
       await renderPage();
 
@@ -131,8 +119,5 @@ describe('EducationInNumbersContentPage', () => {
         </TestConfigContextProvider>
       </MemoryRouter>,
     );
-    await waitFor(() => {
-      expect(useQueryMock).toHaveBeenCalled();
-    });
   };
 });

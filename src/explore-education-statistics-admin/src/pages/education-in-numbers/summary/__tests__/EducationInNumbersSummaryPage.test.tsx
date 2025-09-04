@@ -1,5 +1,5 @@
 import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
-import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
+import { EinSummary } from '@admin/services/educationInNumbersService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
@@ -9,7 +9,7 @@ import { Router } from 'react-router-dom';
 import EducationInNumbersSummaryPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryPage';
 
 describe('EducationInNumbersSummaryPage', () => {
-  const testDraftPage: EducationInNumbersSummary = {
+  const testDraftPage: EinSummary = {
     id: 'page-1-id',
     title: 'Page 1 title',
     slug: 'page-1-slug',
@@ -17,17 +17,17 @@ describe('EducationInNumbersSummaryPage', () => {
     version: 0,
   };
 
-  const testPublishedPage: EducationInNumbersSummary = {
+  const testPublishedPage: EinSummary = {
     ...testDraftPage,
     published: '2022-04-01T12:00:00+00:00', // utc
   };
 
-  const testDraftAmendmentPage: EducationInNumbersSummary = {
+  const testDraftAmendmentPage: EinSummary = {
     ...testDraftPage,
     version: 1,
   };
 
-  const testPageWithNoSlug: EducationInNumbersSummary = {
+  const testPageWithNoSlug: EinSummary = {
     ...testDraftPage,
     slug: undefined,
   };
@@ -89,7 +89,7 @@ describe('EducationInNumbersSummaryPage', () => {
   });
 
   function renderPage(
-    page: EducationInNumbersSummary,
+    page: EinSummary,
     history: MemoryHistory = createMemoryHistory(),
   ) {
     return render(

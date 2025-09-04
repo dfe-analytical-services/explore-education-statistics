@@ -1,12 +1,12 @@
-import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
+import { EinSummary } from '@admin/services/educationInNumbersService';
 import noop from 'lodash/noop';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 
 export interface EducationInNumbersPageContextState {
-  educationInNumbersPage: EducationInNumbersSummary;
+  educationInNumbersPage: EinSummary;
   educationInNumbersPageId: string;
   onEducationInNumbersPageChange: (
-    nextEducationInNumbersPage: EducationInNumbersSummary,
+    nextEducationInNumbersPage: EinSummary,
   ) => void;
 }
 
@@ -16,9 +16,9 @@ const EducationInNumbersPageContext = createContext<
 
 interface EducationInNumbersPageContextProviderProps {
   children: ReactNode;
-  educationInNumbersPage: EducationInNumbersSummary;
+  educationInNumbersPage: EinSummary;
   onEducationInNumbersPageChange?: (
-    nextEducationInNumbersPage: EducationInNumbersSummary,
+    nextEducationInNumbersPage: EinSummary,
   ) => void;
 }
 

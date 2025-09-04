@@ -20,7 +20,7 @@ public class EducationInNumbersService(
     ContentDbContext contentDbContext,
     IUserService userService) : IEducationInNumbersService
 {
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id)
+    public async Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
             .Where(page => page.Id == id)
@@ -29,14 +29,14 @@ public class EducationInNumbersService(
             .OnSuccess(page => page.ToSummaryViewModel());
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages()
+    public async Task<Either<ActionResult, List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
         var uniqueSlugs = await contentDbContext.EducationInNumbersPages
             .Select(p => p.Slug)
             .Distinct()
             .ToListAsync();
 
-        var viewModels = new List<EducationInNumbersSummaryWithPrevVersionViewModel>();
+        var viewModels = new List<EinSummaryWithPrevVersionViewModel>();
 
         foreach (var slug in uniqueSlugs)
         {
@@ -61,14 +61,14 @@ public class EducationInNumbersService(
             .ToList();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage(
+    public async Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request)
     {
         var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
             .Any(page => page.Title == request.Title);
         if (pageWithTitleAlreadyExists)
         {
-            return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
+            return new Either<ActionResult, EinSummaryViewModel>(
                 ValidationResult(ValidationErrorMessages.TitleNotUnique));
         }
 
@@ -105,7 +105,7 @@ public class EducationInNumbersService(
         return newPage.ToSummaryViewModel();
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment(
+    public async Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -156,7 +156,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> UpdatePage(
+    public async Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(
         Guid id,
         UpdateEducationInNumbersPageRequest request)
     {
@@ -184,7 +184,7 @@ public class EducationInNumbersService(
                         .Any(p => p.Title == request.Title);
                     if (pageWithTitleAlreadyExists)
                     {
-                        return new Either<ActionResult, EducationInNumbersSummaryViewModel>(
+                        return new Either<ActionResult, EinSummaryViewModel>(
                             ValidationResult(ValidationErrorMessages.TitleNotUnique));
                     }
 
@@ -212,7 +212,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> PublishPage(
+    public async Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(
         Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -235,7 +235,7 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> Reorder(
+    public async Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(
         List<Guid> newOrder)
     {
         var pageList = await contentDbContext.EducationInNumbersPages
@@ -249,7 +249,7 @@ public class EducationInNumbersService(
                 newOrder, pageList.Select(page => page.Id)))
         {
             return ValidationUtils.ValidationActionResult(
-                ValidationErrorMessages.ProvidedPageIdsDifferFromActualPageIds);
+                ValidationErrorMessages.EinProvidedPageIdsDifferFromActualPageIds);
         }
 
         var updatingUserId = userService.GetUserId();
