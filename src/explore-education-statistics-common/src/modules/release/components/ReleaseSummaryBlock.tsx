@@ -65,8 +65,8 @@ const ListItem = ({
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: Date;
-  latestRelease: boolean;
+  lastUpdated?: string;
+  isLatestRelease: boolean;
   nextReleaseDate?: PartialDate;
   releaseDate?: string;
   releaseType: ReleaseType;
@@ -79,7 +79,7 @@ interface Props {
 export default function ReleaseSummaryBlock({
   isEditing,
   lastUpdated,
-  latestRelease,
+  isLatestRelease,
   nextReleaseDate,
   releaseDate,
   releaseType,
@@ -125,7 +125,7 @@ export default function ReleaseSummaryBlock({
             <p>TBA</p>
           )}
         </ListItem>
-        {latestRelease && isValidPartialDate(nextReleaseDate) && (
+        {isLatestRelease && isValidPartialDate(nextReleaseDate) && (
           <ListItem term="Next update">
             <time>{formatPartialDate(nextReleaseDate)}</time>
           </ListItem>
