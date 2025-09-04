@@ -176,50 +176,10 @@ export default function ReleaseDataUploadsSection({
     );
   }, []);
 
-  const handleSubmit = useCallback(
-    async (values: DataFileUploadFormValues) => {
-      switch (values.uploadType) {
-        case 'csv': {
-          if (!values.title) {
-            return;
-          }
-
-          await releaseDataFileService.uploadDataSetFilePair(releaseVersionId, {
-            title: values.title,
-            dataFile: values.dataFile as File,
-            metadataFile: values.metadataFile as File,
-          });
-          break;
-        }
-        case 'zip': {
-          if (!values.title) {
-            return;
-          }
-          await releaseDataFileService.uploadZippedDataSetFilePair(
-            releaseVersionId,
-            {
-              title: values.title,
-              zipFile: values.zipFile as File,
-            },
-          );
-          break;
-        }
-        case 'bulkZip': {
-          await releaseDataFileService.uploadBulkZipDataSetFile(
-            releaseVersionId,
-            values.bulkZipFile!,
-          );
-          break;
-        }
-        default:
-          break;
-      }
-
-      await refetchDataFiles();
-      await refetchDataSetUploads();
-    },
-    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
-  );
+  const handleSubmit = async () => {
+    await refetchDataFiles();
+    await refetchDataSetUploads();
+  };
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
@@ -273,16 +233,21 @@ export default function ReleaseDataUploadsSection({
             </a>
           </li>
         </ul>
-
+        <h4>Data replacement</h4>
         <p>
-          Files are expected to have a unique "Title", any files that are
-          uploaded with a "Title" that matches an existing "Title" will provide
-          an option to start a data replacement instead of importing as a
-          separate file.
+          Files are expected to have a unique title, any files that are uploaded
+          with a title that matches an existing file will start a data
+          replacement instead of importing as a separate file.
         </p>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm onSubmit={handleSubmit} />
+        <DataFileUploadForm
+          dataSetFileTitles={dataFilesExcludingReplacements.map(
+            file => file.title,
+          )}
+          releaseVersionId={releaseVersionId}
+          onSubmit={handleSubmit}
+        />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
@@ -347,6 +312,7 @@ export default function ReleaseDataUploadsSection({
                     onDeleteFile={handleDeleteConfirm}
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
+                    onReplaceFile={handleSubmit}
                     onStatusChange={handleStatusChange}
                   />
                 )}
