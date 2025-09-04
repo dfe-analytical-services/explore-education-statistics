@@ -5,11 +5,6 @@ import Modal from '@common/components/Modal';
 import styles from '@common/modules/release/components/ReleaseSummaryBlock.module.scss';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
-import {
-  PartialDate,
-  formatPartialDate,
-  isValidPartialDate,
-} from '@common/utils/date/partialDate';
 import classNames from 'classnames';
 import { parseISO } from 'date-fns';
 import React, { ReactNode } from 'react';
@@ -66,8 +61,6 @@ const ListItem = ({
 interface Props {
   isEditing?: boolean;
   lastUpdated?: string;
-  isLatestRelease: boolean;
-  nextReleaseDate?: PartialDate;
   releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
@@ -79,8 +72,6 @@ interface Props {
 export default function ReleaseSummaryBlock({
   isEditing,
   lastUpdated,
-  isLatestRelease,
-  nextReleaseDate,
   releaseDate,
   releaseType,
   renderProducerLink,
@@ -93,6 +84,7 @@ export default function ReleaseSummaryBlock({
       data-scroll={trackScroll ? true : undefined}
       id="summary-section"
       className={styles.container}
+      data-testid="release-summary-block"
     >
       <dl className={styles.list}>
         <ListItem term="Release type">
@@ -125,11 +117,6 @@ export default function ReleaseSummaryBlock({
             <p>TBA</p>
           )}
         </ListItem>
-        {isLatestRelease && isValidPartialDate(nextReleaseDate) && (
-          <ListItem term="Next update">
-            <time>{formatPartialDate(nextReleaseDate)}</time>
-          </ListItem>
-        )}
 
         {(isEditing || lastUpdated) && (
           <ListItem term="Last updated">

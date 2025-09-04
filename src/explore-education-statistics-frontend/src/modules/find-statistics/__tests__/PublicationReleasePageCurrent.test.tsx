@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { testPublication, testRelease } from './__data__/testReleaseData';
 
-describe('PublicationReleasePage', () => {
+describe('PublicationReleasePageCurrent', () => {
   test('renders latest data tag', () => {
     render(<PublicationReleasePage releaseVersion={testRelease} />);
 

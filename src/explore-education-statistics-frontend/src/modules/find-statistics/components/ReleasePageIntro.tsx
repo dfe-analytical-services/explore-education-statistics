@@ -54,7 +54,7 @@ const ReleasePageIntro = ({
       )}
 
       <div className={styles.container}>
-        {!supersededByPublication && releaseVersionSummary.latestRelease ? (
+        {!supersededByPublication && releaseVersionSummary.isLatestRelease ? (
           <Tag>Latest release</Tag>
         ) : (
           <>
@@ -69,14 +69,18 @@ const ReleasePageIntro = ({
           </>
         )}
 
-        {latestRelease && isValidPartialDate(nextReleaseDate) && (
-          <p className="govuk-!-margin-bottom-0">
-            Next release{' '}
-            <time className="govuk-!-font-weight-bold">
-              {formatPartialDate(nextReleaseDate)}
-            </time>
-          </p>
-        )}
+        {releaseVersionSummary.isLatestRelease &&
+          isValidPartialDate(nextReleaseDate) && (
+            <p className="govuk-!-margin-bottom-0">
+              Next release{' '}
+              <time
+                className="govuk-!-font-weight-bold"
+                data-testid="Next update"
+              >
+                {formatPartialDate(nextReleaseDate)}
+              </time>
+            </p>
+          )}
 
         <Link
           to={`/find-statistics/${publicationSummary.slug}/releases`}
@@ -101,8 +105,7 @@ const ReleasePageIntro = ({
 
       {!isMobileMedia && (
         <ReleaseSummaryBlock
-          lastUpdated={lastUpdated} // TODO change to `published` once API changes are made
-          isLatestRelease={!!latestRelease}
+          lastUpdated={lastUpdated}
           releaseDate={published}
           releaseType={type}
           renderProducerLink={
