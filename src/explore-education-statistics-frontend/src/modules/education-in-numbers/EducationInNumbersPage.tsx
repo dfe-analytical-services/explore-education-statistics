@@ -36,9 +36,11 @@ const EducationInNumbersPageComponent: NextPage<Props> = ({
           headingVisible={false}
           items={educationInNumbersPageList.map(page => {
             return {
-              href: `/education-in-numbers/${page.slug}`,
+              href: `/education-in-numbers/${
+                page.slug === undefined ? '' : page.slug
+              }`,
               isActive: page.slug === pageData.slug,
-              slug: page.slug,
+              slug: page.slug ?? '',
               text: page.title,
             };
           })}

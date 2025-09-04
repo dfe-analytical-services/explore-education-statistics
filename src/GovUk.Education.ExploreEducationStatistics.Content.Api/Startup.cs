@@ -175,6 +175,7 @@ public class Startup(
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
         services.AddAnalytics(configuration);
 

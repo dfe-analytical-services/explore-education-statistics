@@ -24,12 +24,6 @@ public abstract class EinContentBlock
     public EinContentSection EinContentSection { get; set; } = null!;
 }
 
-public enum EinBlockType
-{
-    // NOTE: Update ContentDbContext.ConfigureEinContentBlock if you add a new type!
-    HtmlBlock,
-}
-
 public class EinHtmlBlock : EinContentBlock
 {
     public string Body { get; set; } = string.Empty;

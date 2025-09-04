@@ -3,22 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
-public class EinContentViewModel
-{
-    public Guid Id { get; set; }
-
-    public string Title { get; set; } = string.Empty;
-
-    public string? Slug { get; set; } = string.Empty;
-
-    public DateTimeOffset? Published { get; set; }
-
-    public List<EinContentSectionViewModel> Content { get; set; } = [];
-}
-
-public class EinContentSectionViewModel // @MarkFix remove
+public class EinContentSectionViewModel
 {
     public Guid Id { get; set; }
 
