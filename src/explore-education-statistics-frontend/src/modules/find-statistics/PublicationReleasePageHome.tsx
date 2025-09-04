@@ -1,19 +1,29 @@
-import { ReleaseVersion } from '@common/services/publicationService';
+import {
+  PublicationSummaryRedesign,
+  ReleaseVersionSummary,
+} from '@common/services/publicationService';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
 import ReleasePageTabNav from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import { NextPage } from 'next';
 import React from 'react';
 
 interface Props {
-  releaseVersion: ReleaseVersion;
+  publicationSummary: PublicationSummaryRedesign;
+  releaseVersionSummary: ReleaseVersionSummary;
 }
 
-const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
+const PublicationReleasePage: NextPage<Props> = ({
+  publicationSummary,
+  releaseVersionSummary,
+}) => {
   return (
-    <ReleasePageShell releaseVersion={releaseVersion}>
+    <ReleasePageShell
+      publicationSummary={publicationSummary}
+      releaseVersionSummary={releaseVersionSummary}
+    >
       <ReleasePageTabNav
         activePage="home"
-        releaseUrlBase={`/find-statistics/${releaseVersion.publication.slug}/${releaseVersion.slug}/`}
+        releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}/`}
       />
       <p>Home</p>
     </ReleasePageShell>

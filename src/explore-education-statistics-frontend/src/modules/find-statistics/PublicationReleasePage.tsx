@@ -1,5 +1,7 @@
 import publicationService, {
+  PublicationSummaryRedesign,
   ReleaseVersion,
+  ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
@@ -9,18 +11,27 @@ import PublicationReleasePageHome from './PublicationReleasePageHome';
 import PublicationReleasePageCurrent from './PublicationReleasePageCurrent';
 
 interface Props {
-  releaseVersion: ReleaseVersion;
+  publicationSummary?: PublicationSummaryRedesign;
+  releaseVersionSummary?: ReleaseVersionSummary;
+  releaseVersion?: ReleaseVersion;
   previewRedesign?: boolean;
 }
 
 const PublicationReleasePage: NextPage<Props> = ({
+  publicationSummary,
   releaseVersion,
+  releaseVersionSummary,
   previewRedesign,
 }) => {
-  return previewRedesign ? (
-    <PublicationReleasePageHome releaseVersion={releaseVersion} />
+  return previewRedesign && releaseVersionSummary && publicationSummary ? (
+    <PublicationReleasePageHome
+      publicationSummary={publicationSummary}
+      releaseVersionSummary={releaseVersionSummary}
+    />
   ) : (
-    <PublicationReleasePageCurrent releaseVersion={releaseVersion} />
+    releaseVersion && (
+      <PublicationReleasePageCurrent releaseVersion={releaseVersion} />
+    )
   );
 };
 
@@ -31,6 +42,42 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
       release: releaseSlug,
       redesign,
     } = query as Dictionary<string>;
+
+    if (
+      redesign &&
+      redesign === 'true' &&
+      process.env.APP_ENV !== 'Production'
+    ) {
+      const publicationSummary = await publicationService.getPublicationSummary(
+        publicationSlug,
+      );
+
+      const releaseVersionSummary = await (releaseSlug
+        ? publicationService.getReleaseVersionSummary(
+            publicationSlug,
+            releaseSlug,
+          )
+        : publicationService.getPublicationLatestReleaseVersionSummary(
+            publicationSlug,
+          ));
+
+      if (!releaseSlug) {
+        return {
+          redirect: {
+            destination: `/find-statistics/${publicationSlug}/${releaseVersionSummary.slug}`,
+            permanent: true,
+          },
+        };
+      }
+
+      return {
+        props: {
+          publicationSummary,
+          releaseVersionSummary,
+          previewRedesign: true,
+        },
+      };
+    }
 
     const releaseVersion = await (releaseSlug
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
@@ -48,7 +95,6 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
     return {
       props: {
         releaseVersion,
-        previewRedesign: !!redesign,
       },
     };
   },
