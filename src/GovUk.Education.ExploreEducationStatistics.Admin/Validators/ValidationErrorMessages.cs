@@ -127,7 +127,7 @@ public enum ValidationErrorMessages
     ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
 
     // Education in numbers
-    ProvidedPageIdsDifferFromActualPageIds,
-    ProvidedSectionIdsDifferFromActualSectionIds,
-    ProvidedBlockIdsDifferFromActualBlockIds,
+    EinProvidedPageIdsDifferFromActualPageIds,
+    EinProvidedSectionIdsDifferFromActualSectionIds,
+    EinProvidedBlockIdsDifferFromActualBlockIds,
 }

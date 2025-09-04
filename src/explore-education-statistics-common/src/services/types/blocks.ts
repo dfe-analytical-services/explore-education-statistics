@@ -15,7 +15,6 @@ export interface BaseBlock {
   type: BlockType;
 }
 
-// WARN: Data returned from two different tables use this interface: ContentBlocks and EinContentBlocks
 export interface HtmlBlock extends BaseBlock {
   type: 'HtmlBlock';
   body: string;

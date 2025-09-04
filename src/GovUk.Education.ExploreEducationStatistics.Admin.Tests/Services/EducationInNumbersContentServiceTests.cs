@@ -308,7 +308,7 @@ public class EducationInNumbersContentServiceTests
             var result = await service.ReorderSections(_pageId, newOrder);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
-            validationResult.AssertHasGlobalError(ValidationErrorMessages.ProvidedSectionIdsDifferFromActualSectionIds);
+            validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedSectionIdsDifferFromActualSectionIds);
         }
     }
 
@@ -595,7 +595,7 @@ public class EducationInNumbersContentServiceTests
             var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
-            validationResult.AssertHasGlobalError(ValidationErrorMessages.ProvidedBlockIdsDifferFromActualBlockIds);
+            validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedBlockIdsDifferFromActualBlockIds);
         }
     }
 

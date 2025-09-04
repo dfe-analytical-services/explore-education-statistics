@@ -19,18 +19,12 @@ public class EducationInNumbersContentService(
 {
     public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId)
     {
-        var page = await contentDbContext.EducationInNumbersPages
+        return await contentDbContext.EducationInNumbersPages
             .Include(page => page.Content)
             .ThenInclude(section => section.Content)
             .Where(page => page.Id == pageId)
-            .SingleOrDefaultAsync();
-
-        if (page == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return page.ToContentViewModel();
+            .FirstOrNotFoundAsync()
+            .OnSuccess(page => page.ToContentViewModel());
     }
 
     public async Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(Guid pageId,
@@ -65,22 +59,19 @@ public class EducationInNumbersContentService(
         Guid sectionId,
         string heading)
     {
-        var section = contentDbContext.EinContentSections
+        return await contentDbContext.EinContentSections
             .Include(s => s.Content)
-            .SingleOrDefault(section =>
+            .FirstOrNotFoundAsync(section =>
                 section.EducationInNumbersPageId == pageId
-                && section.Id == sectionId);
+                && section.Id == sectionId)
+            .OnSuccess(async section =>
+            {
+                section.Heading = heading;
+                contentDbContext.EinContentSections.Update(section);
+                await contentDbContext.SaveChangesAsync();
 
-        if (section == null)
-        {
-            return new NotFoundResult();
-        }
-
-        section.Heading = heading;
-        contentDbContext.EinContentSections.Update(section);
-        await contentDbContext.SaveChangesAsync();
-
-        return section.ToViewModel();
+                return section.ToViewModel();
+            });
     }
 
     public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> ReorderSections(
@@ -103,7 +94,7 @@ public class EducationInNumbersContentService(
                 sectionList.Select(section => section.Id), newSectionOrder))
         {
             return ValidationUtils.ValidationActionResult(ValidationErrorMessages
-                .ProvidedSectionIdsDifferFromActualSectionIds);
+                .EinProvidedSectionIdsDifferFromActualSectionIds);
         }
 
         newSectionOrder.ForEach((sectionId, order) =>
@@ -136,7 +127,7 @@ public class EducationInNumbersContentService(
 
         var pageSections = page.Content;
 
-        var sectionToDelete= pageSections.SingleOrDefault(section => section.Id == sectionId);
+        var sectionToDelete = pageSections.SingleOrDefault(section => section.Id == sectionId);
 
         if (sectionToDelete == null)
         {
@@ -236,7 +227,7 @@ public class EducationInNumbersContentService(
                 blockList.Select(block => block.Id), newBlockOrder))
         {
             return ValidationUtils.ValidationActionResult(ValidationErrorMessages
-                .ProvidedBlockIdsDifferFromActualBlockIds);
+                .EinProvidedBlockIdsDifferFromActualBlockIds);
         }
 
         newBlockOrder.ForEach((blockId, order) =>
@@ -271,7 +262,7 @@ public class EducationInNumbersContentService(
 
         var blockList = section.Content;
 
-        var blockToDelete= blockList.SingleOrDefault(block => block.Id == blockId);
+        var blockToDelete = blockList.SingleOrDefault(block => block.Id == blockId);
 
         if (blockToDelete == null)
         {

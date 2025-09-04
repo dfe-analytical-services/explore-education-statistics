@@ -1141,7 +1141,7 @@ public class EducationInNumbersServiceTests
             var result = await service.Reorder(newOrder);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-            validationProblem.AssertHasGlobalError(ValidationErrorMessages.ProvidedPageIdsDifferFromActualPageIds);
+            validationProblem.AssertHasGlobalError(ValidationErrorMessages.EinProvidedPageIdsDifferFromActualPageIds);
         }
     }
 

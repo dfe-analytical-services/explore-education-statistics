@@ -48,7 +48,7 @@ public static class EducationInNumbersContentExtensions
                 Type = EinBlockType.HtmlBlock,
                 Body = htmlBlock.Body,
             },
-            _ => throw new Exception("Ein block type not found")
+            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
         };
     }
 
@@ -81,7 +81,7 @@ public static class EducationInNumbersContentExtensions
                 Body = htmlBlock.Body,
                 EinContentSectionId = newSectionId,
             },
-            _ => throw new Exception("Ein block type not found")
+            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
         };
     }
 }

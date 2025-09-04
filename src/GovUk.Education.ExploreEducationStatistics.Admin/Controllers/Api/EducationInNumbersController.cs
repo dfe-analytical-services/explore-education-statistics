@@ -17,7 +17,7 @@ public class EducationInNumbersController(
     IEducationInNumbersService einService) : ControllerBase
 {
     [HttpGet("education-in-numbers/{id:guid}")]
-    public async Task<ActionResult<EducationInNumbersSummaryViewModel>> GetLatestPage(
+    public async Task<ActionResult<EinSummaryViewModel>> GetLatestPage(
         [FromRoute] Guid id)
     {
         return await einService.GetPage(id)
@@ -25,14 +25,14 @@ public class EducationInNumbersController(
     }
 
     [HttpGet("education-in-numbers")]
-    public async Task<ActionResult<List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages()
+    public async Task<ActionResult<List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
         return await einService.ListLatestPages()
             .HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers")]
-    public async Task<ActionResult<EducationInNumbersSummaryViewModel>> CreateEducationInNumbersPage(
+    public async Task<ActionResult<EinSummaryViewModel>> CreateEducationInNumbersPage(
         [FromBody] CreateEducationInNumbersPageRequest request)
     {
         return await einService.CreatePage(request)
@@ -40,7 +40,7 @@ public class EducationInNumbersController(
     }
 
     [HttpPost("education-in-numbers/{id:Guid}/amendment")]
-    public async Task<ActionResult<EducationInNumbersSummaryViewModel>> CreateAmendment(
+    public async Task<ActionResult<EinSummaryViewModel>> CreateAmendment(
         [FromRoute] Guid id)
     {
         return await einService.CreateAmendment(id)
@@ -48,7 +48,7 @@ public class EducationInNumbersController(
     }
 
     [HttpPut("education-in-numbers/{id:Guid}")]
-    public async Task<ActionResult<EducationInNumbersSummaryViewModel>> UpdatePage(
+    public async Task<ActionResult<EinSummaryViewModel>> UpdatePage(
         [FromRoute] Guid id,
         [FromBody] UpdateEducationInNumbersPageRequest request)
     {
@@ -57,7 +57,7 @@ public class EducationInNumbersController(
     }
 
     [HttpPatch("education-in-numbers/{id:Guid}/publish")]
-    public async Task<ActionResult<EducationInNumbersSummaryViewModel>> PublishPage(
+    public async Task<ActionResult<EinSummaryViewModel>> PublishPage(
         [FromRoute] Guid id)
     {
         return await einService.PublishPage(id)
@@ -65,7 +65,7 @@ public class EducationInNumbersController(
     }
 
     [HttpPut("education-in-numbers/order")]
-    public async Task<ActionResult<List<EducationInNumbersSummaryViewModel>>> Reorder(
+    public async Task<ActionResult<List<EinSummaryViewModel>>> Reorder(
         [FromBody] List<Guid> pageIds)
     {
         return await einService.Reorder(pageIds)

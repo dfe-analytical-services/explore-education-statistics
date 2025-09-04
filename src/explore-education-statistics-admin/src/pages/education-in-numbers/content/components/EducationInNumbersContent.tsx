@@ -6,19 +6,11 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useEffect } from 'react';
 
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import { EducationInNumbersSummary } from '@admin/services/educationInNumbersService';
-import { EinContent } from '@admin/services/educationInNumbersContentService';
-import EducationInNumbersAccordion from './EducationInNumbersAccordion';
+import { useEducationInNumbersPageContentState } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
+import EducationInNumbersAccordion from '@admin/pages/education-in-numbers/content/components/EducationInNumbersAccordion';
 
-interface Props {
-  pageContent: EinContent;
-  pageVersion: EducationInNumbersSummary;
-}
-
-export default function EducationInNumbersContent({
-  pageContent,
-  pageVersion,
-}: Props) {
+export default function EducationInNumbersContent() {
+  const { pageContent, pageVersion } = useEducationInNumbersPageContentState();
   const { setActiveSection } = useEditingContext();
 
   const [handleScroll] = useDebouncedCallback(() => {
@@ -53,7 +45,10 @@ export default function EducationInNumbersContent({
 
   return (
     <>
-      <div className="govuk-grid-row">
+      <div
+        className="govuk-grid-row"
+        data-testid="education-in-numbers-content"
+      >
         <div className="govuk-grid-column-two-thirds">
           <div data-scroll id="summary">
             <SummaryList>

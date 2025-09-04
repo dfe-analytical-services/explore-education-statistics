@@ -8,7 +8,7 @@ import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries'
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { formatInTimeZone } from 'date-fns-tz';
 import educationInNumbersService, {
-  EducationInNumbersSummary,
+  EinSummary,
 } from '@admin/services/educationInNumbersService';
 import { generatePath } from 'react-router';
 import {
@@ -158,9 +158,7 @@ const EducationInNumbersListPage = () => {
   );
 };
 
-export function GetEducationInNumbersPageStatus(
-  page: EducationInNumbersSummary,
-) {
+export function GetEducationInNumbersPageStatus(page: EinSummary) {
   if (page.published === undefined) {
     return page.version === 0 ? 'Draft' : 'Draft amendment';
   }
