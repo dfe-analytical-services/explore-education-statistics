@@ -150,7 +150,7 @@ public class SignInService(
             .ForEachAwaitAsync(invite => userReleaseRoleRepository.Create(
                 userId: newUserId,
                 releaseVersionId: invite.ReleaseVersionId,
-                role: invite.Role,
+                releaseRole: invite.Role,
                 createdById: invite.CreatedById));
 
         await userReleaseInviteRepository.RemoveByUserEmail(email);
@@ -162,10 +162,10 @@ public class SignInService(
 
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userPublicationRoleRepository.Create(
+            .ForEachAwaitAsync(invite => userPublicationRoleRepository.TryCreate(
                 userId: newUserId,
                 publicationId: invite.PublicationId,
-                role: invite.Role,
+                publicationRole: invite.Role,
                 createdById: invite.CreatedById));
 
         await userPublicationInviteRepository.RemoveByUserEmail(email);
