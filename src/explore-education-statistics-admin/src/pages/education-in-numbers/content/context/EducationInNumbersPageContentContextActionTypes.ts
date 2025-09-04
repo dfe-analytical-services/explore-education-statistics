@@ -1,5 +1,5 @@
 import {
-  EinContentSection,
+  EinEditableContentSection,
   EinEditableContentBlock,
 } from '@admin/services/educationInNumbersContentService';
 
@@ -42,14 +42,14 @@ export type UpdateSectionContent = {
 export type AddContentSection = {
   type: 'ADD_CONTENT_SECTION';
   payload: {
-    section: EinContentSection;
+    section: EinEditableContentSection;
   };
 };
 
 export type SetEducationInNumbersPageContent = {
   type: 'SET_CONTENT';
   payload: {
-    content: EinContentSection[];
+    content: EinEditableContentSection[];
   };
 };
 
@@ -57,7 +57,7 @@ export type UpdateContentSection = {
   type: 'UPDATE_CONTENT_SECTION';
   payload: {
     meta: { sectionId: string };
-    section: EinContentSection;
+    section: EinEditableContentSection;
   };
 };
 

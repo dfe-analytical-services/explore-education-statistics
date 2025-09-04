@@ -15,13 +15,13 @@ const EducationInNumbersContentSection = ({
   isLastSection = false,
 }: EducationInNumbersSectionProps) => {
   return (
-    <>
+    <div data-testid="ein-content-section">
       {heading && (
         <h2 className="govuk-heading-l govuk-!-margin-bottom-2">{heading}</h2>
       )}
       <EducationInNumbersSectionBlocks blocks={content} />
       {!isLastSection && <SectionBreak size="l" />}
-    </>
+    </div>
   );
 };
 

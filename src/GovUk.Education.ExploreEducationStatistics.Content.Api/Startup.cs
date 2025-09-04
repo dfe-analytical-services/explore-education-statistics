@@ -179,6 +179,7 @@ public class Startup(
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
+        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
         services.AddAnalytics(configuration);
 

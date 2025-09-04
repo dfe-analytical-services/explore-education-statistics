@@ -1,6 +1,6 @@
 import educationInNumbersService, {
-  EducationInNumbersNavItem,
-  EducationInNumbersPage,
+  EinNavItem,
+  EinPage,
 } from '@frontend/services/educationInNumbersService';
 import Page from '@frontend/components/Page';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
@@ -8,11 +8,12 @@ import { format } from 'date-fns';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import SubNav from '@frontend/components/SubNav';
+import Head from 'next/head';
 import EducationInNumbersContentSection from './components/EducationInNumbersContentSection';
 
 interface Props {
-  pageData: EducationInNumbersPage;
-  educationInNumbersPageList: EducationInNumbersNavItem[];
+  pageData: EinPage;
+  educationInNumbersPageList: EinNavItem[];
 }
 
 const EducationInNumbersPageComponent: NextPage<Props> = ({
@@ -31,14 +32,20 @@ const EducationInNumbersPageComponent: NextPage<Props> = ({
       }
       caption={format(new Date(pageData.published), 'MMMM yyyy')}
     >
+      <Head>
+        {/* EES-6497 Remove Head so EiN pages are indexed by search engines */}
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
       <div className="govuk-grid-row govuk-!-margin-bottom-3">
         <SubNav
           headingVisible={false}
           items={educationInNumbersPageList.map(page => {
             return {
-              href: `/education-in-numbers/${page.slug}`,
+              href: `/education-in-numbers/${
+                page.slug === undefined ? '' : page.slug
+              }`,
               isActive: page.slug === pageData.slug,
-              slug: page.slug,
+              slug: page.slug ?? '',
               text: page.title,
             };
           })}
