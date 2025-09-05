@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Publications;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.Publications;
 
 public abstract class PublicationsSitemapControllerTests
 {

@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Publications;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.Publications;
 
 public abstract class PublicationsSearchControllerTests
 {
@@ -54,7 +54,7 @@ public abstract class PublicationsSearchControllerTests
             var result = await sut.GetPublications(request);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasCalledForRequest(request);
+            _publicationsSearchService.Assert.GetPublicationsWasCalledForRequest(request);
             Assert.Equal(_publications, result);
         }
     }
@@ -82,7 +82,7 @@ public abstract class PublicationsSearchControllerTests
             var result = await sut.GetPublications(request);
 
             // Assert
-            _publicationsSearchService.Assert.GetSearchItemsWasCalledForRequest(request);
+            _publicationsSearchService.Assert.GetPublicationsWasCalledForRequest(request);
             Assert.Equal(_publications, result);
         }
     }

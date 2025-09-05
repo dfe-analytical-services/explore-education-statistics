@@ -1,5 +1,8 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
+﻿using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
@@ -10,20 +13,36 @@ public class RelatedInformationServiceMockBuilder
 
     private RelatedInformationDto[]? _relatedInformation;
 
-    public IRelatedInformationService Build()
-    {
-        _mock.Setup(m => m.GetRelatedInformationForRelease(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_relatedInformation ?? []);
+    private static readonly Expression<Func<IRelatedInformationService,
+        Task<Either<ActionResult, RelatedInformationDto[]>>>> GetRelatedInformationForRelease =
+        m => m.GetRelatedInformationForRelease(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<CancellationToken>());
 
-        return _mock.Object;
+    public RelatedInformationServiceMockBuilder()
+    {
+        _mock.Setup(GetRelatedInformationForRelease).ReturnsAsync(() => _relatedInformation ?? []);
     }
+
+    public IRelatedInformationService Build() => _mock.Object;
 
     public RelatedInformationServiceMockBuilder WhereHasRelatedInformation(RelatedInformationDto[] relatedInformation)
     {
         _relatedInformation = relatedInformation;
+        return this;
+    }
+
+    public RelatedInformationServiceMockBuilder WhereGetRelatedInformationForReleaseReturnsNotFound(
+        string publicationSlug,
+        string releaseSlug)
+    {
+        _mock.Setup(m => m.GetRelatedInformationForRelease(
+                publicationSlug,
+                releaseSlug,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new NotFoundResult());
+
         return this;
     }
 
