@@ -1,6 +1,7 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
@@ -37,6 +38,10 @@ public class CompleteNextDataSetVersionImportFunction(
 
                 importToContinue.InstanceId = Guid.NewGuid();
                 publicDataDbContext.DataSetVersionImports.Update(importToContinue);
+                
+                nextVersion.Status = DataSetVersionStatus.Finalising;
+                publicDataDbContext.DataSetVersions.Update(nextVersion);
+                
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
                 await ProcessCompletionOfNextDataSetVersionImport(

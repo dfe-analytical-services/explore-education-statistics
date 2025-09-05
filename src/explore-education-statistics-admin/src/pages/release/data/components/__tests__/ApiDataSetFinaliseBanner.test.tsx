@@ -92,3 +92,26 @@ describe('ApiDataSetFinaliseBanner', () => {
     ).toBeInTheDocument();
   });
 });
+
+test('renders the finalising banner when `draftVersionStatus` is `Finalising`', () => {
+  render(
+    <ApiDataSetFinaliseBanner
+      dataSetId="data-set-id"
+      dataSetVersionId="data-set-version-id"
+      releaseVersionId="release-id"
+      publicationId="publication-id"
+      draftVersionStatus="Finalising"
+      onFinalise={noop}
+    />,
+  );
+  const banner = within(screen.getByTestId('notificationBanner'));
+  expect(
+    banner.getByRole('heading', { name: 'Finalising' }),
+  ).toBeInTheDocument();
+  expect(
+    banner.getByText('Finalising draft API data set version'),
+  ).toBeInTheDocument();
+  expect(
+    banner.getByText('This process can take a few minutes.'),
+  ).toBeInTheDocument();
+});
