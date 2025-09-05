@@ -1,16 +1,16 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
 
 public class ReleaseUpdateDtoBuilder
 {
-    private string? _summary;
-    private DateTime? _date;
+    private string _summary = "Summary";
+    private DateTime _date = new(2025, 09, 01);
 
     public ReleaseUpdateDto Build() => new()
     {
-        Summary = _summary ?? "Summary",
-        Date = _date ?? new DateTime(2025, 09, 01)
+        Summary = _summary,
+        Date = _date
     };
 
     public ReleaseUpdateDtoBuilder WithSummary(string summary)

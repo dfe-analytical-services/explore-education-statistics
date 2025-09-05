@@ -1,7 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 using Xunit;
