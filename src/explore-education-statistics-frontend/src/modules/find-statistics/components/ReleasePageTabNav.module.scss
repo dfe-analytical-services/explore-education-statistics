@@ -1,0 +1,39 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.nav {
+  display: flex;
+  align-items: flex-end;
+  gap: govuk-spacing(4);
+  border-bottom: 1px solid $govuk-border-colour;
+  min-width: 100%;
+  overflow-y: hidden;
+  overflow-x: auto;
+  list-style: none;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: govuk-spacing(8);
+
+  > li {
+    margin: 0;
+    flex-shrink: 0;
+  }
+}
+
+.navItem {
+  display: inline-flex;
+  margin: 0;
+  padding: govuk-spacing(3) govuk-spacing(1) govuk-spacing(2);
+  color: $govuk-link-colour;
+  border-bottom: 5px solid transparent;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: $govuk-link-hover-colour;
+  }
+
+  &:focus,
+  &[aria-current='page'] {
+    border-color: currentColor;
+  }
+}

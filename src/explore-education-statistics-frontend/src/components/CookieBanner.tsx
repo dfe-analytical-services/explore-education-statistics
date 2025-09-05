@@ -6,12 +6,13 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
 import classNames from 'classnames';
 import styles from './CookieBanner.module.scss';
+import { PageWidth } from './Page';
 
 interface Props {
-  wide?: boolean;
+  width?: PageWidth;
 }
 
-function CookieBanner({ wide }: Props) {
+function CookieBanner({ width }: Props) {
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
   const isBannerSeen = getCookie('bannerSeen') === 'true';
   const [isVisible, setVisible] = useState(!isBannerSeen);
@@ -25,7 +26,8 @@ function CookieBanner({ wide }: Props) {
     <div className={classNames('govuk-cookie-banner', styles.container)}>
       <div
         className={classNames('govuk-width-container', {
-          'dfe-width-container--wide': wide,
+          'dfe-width-container--wide': width === 'wide',
+          'dfe-width-container--full': width === 'full',
         })}
         data-nosnippet
         role="region"
