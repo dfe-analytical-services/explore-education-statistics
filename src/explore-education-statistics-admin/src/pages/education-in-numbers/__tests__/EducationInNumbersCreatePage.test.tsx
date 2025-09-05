@@ -1,5 +1,5 @@
 import _educationInNumbersService, {
-  EducationInNumbersSummary,
+  EinSummary,
 } from '@admin/services/educationInNumbersService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
@@ -16,7 +16,7 @@ const educationInNumbersService = _educationInNumbersService as jest.Mocked<
 >;
 
 describe('EducationInNumbersCreatePage', () => {
-  const newPage: EducationInNumbersSummary = {
+  const newPage: EinSummary = {
     id: 'new-page-id',
     title: 'New page title',
     slug: 'new-page-title',

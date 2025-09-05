@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,24 +8,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEducationInNumbersService
 {
-    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> GetPage(Guid id);
+    Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id);
 
-    Task<Either<ActionResult, List<EducationInNumbersSummaryWithPrevVersionViewModel>>> ListLatestPages();
+    Task<Either<ActionResult, List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages();
 
-    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreatePage(
+    Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(
         CreateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> CreateAmendment(
+    Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(
         Guid id);
 
-    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> UpdatePage(
+    Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(
         Guid id,
         UpdateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EducationInNumbersSummaryViewModel>> PublishPage(
+    Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(
         Guid id);
 
-    Task<Either<ActionResult, List<EducationInNumbersSummaryViewModel>>> Reorder(
+    Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(
         List<Guid> newOrder);
 
     Task<Either<ActionResult, Unit>> Delete(Guid id);

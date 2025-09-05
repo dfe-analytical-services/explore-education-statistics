@@ -53,6 +53,28 @@ export const methodologyToolbarConfigFull: ReadonlyArray<
   },
 ];
 
+export const educationInNumbersToolbarConfig: ReadonlyArray<
+  ToolbarOption | ToolbarGroup
+> = [
+  'accessibilityHelp',
+  '|',
+  'heading',
+  '|',
+  'bold',
+  'link',
+  '|',
+  'bulletedList',
+  'numberedList',
+  '|',
+  'blockQuote',
+  'insertTable',
+  'toggleTableCaption',
+  'alignment',
+  '|',
+  'redo',
+  'undo',
+];
+
 export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
   'accessibilityHelp',
   '|',
