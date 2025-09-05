@@ -1,14 +1,15 @@
+import render from '@common-test/render';
+import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
+import {
+  testPublicationSummary,
+  testReleaseVersionSummary,
+} from '@frontend/modules/find-statistics/__tests__/__data__/testReleaseData';
+import { screen, within } from '@testing-library/react';
+import React from 'react';
 import {
   PublicationSummaryRedesign,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
-import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
-import { render, screen, within } from '@testing-library/react';
-import React from 'react';
-import {
-  testPublicationSummary,
-  testReleaseVersionSummary,
-} from './__data__/testReleaseData';
 
 let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -19,11 +20,10 @@ jest.mock('@common/hooks/useMedia', () => ({
   },
 }));
 
-describe('PublicationReleasePageHome', () => {
-  test('renders latest data tag', () => {
+describe('ReleasePageIntro', () => {
+  test('renders latest release tag', () => {
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -36,7 +36,7 @@ describe('PublicationReleasePageHome', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not render latest data tag when publication is superseded', () => {
+  test('does not render latest release tag when publication is superseded', () => {
     const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
       ...testPublicationSummary,
       supersededByPublication: {
@@ -46,8 +46,7 @@ describe('PublicationReleasePageHome', () => {
       },
     };
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummarySuperseded}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -56,14 +55,13 @@ describe('PublicationReleasePageHome', () => {
     expect(screen.queryByText('Latest release')).not.toBeInTheDocument();
   });
 
-  test('renders not latest data link and tag when publication is not the latest', () => {
+  test('renders not latest release link and tag when publication is not the latest', () => {
     const testReleaseVersionSummaryNotLatest: ReleaseVersionSummary = {
       ...testReleaseVersionSummary,
       isLatestRelease: false,
     };
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummaryNotLatest}
       />,
@@ -79,6 +77,21 @@ describe('PublicationReleasePageHome', () => {
     ).toBeInTheDocument();
   });
 
+  test('renders the link to all releases in series', () => {
+    render(
+      <ReleasePageIntro
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={testReleaseVersionSummary}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'All releases in this series',
+      }),
+    ).toHaveAttribute('href', '/find-statistics/publication-slug/releases');
+  });
+
   test('renders superseded warning text when publication is superseded', () => {
     const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
       ...testPublicationSummary,
@@ -90,8 +103,7 @@ describe('PublicationReleasePageHome', () => {
     };
 
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummarySuperseded}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -111,8 +123,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('does not render superseded warning text when publication is not superseded', () => {
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -121,11 +132,52 @@ describe('PublicationReleasePageHome', () => {
     expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
   });
 
+  test('renders "Next release" section if this is the latest Release for a Publication and there is a valid partial date', () => {
+    render(
+      <ReleasePageIntro
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={testReleaseVersionSummary}
+      />,
+    );
+    const nextUpdateValue = screen.getByTestId('Next update');
+    expect(nextUpdateValue.textContent).toEqual('March 2026');
+  });
+
+  test(`doesn't render "Next release" section if there is no valid partial date`, () => {
+    render(
+      <ReleasePageIntro
+        publicationSummary={{
+          ...testPublicationSummary,
+          nextReleaseDate: undefined,
+        }}
+        releaseVersionSummary={{
+          ...testReleaseVersionSummary,
+          isLatestRelease: true,
+        }}
+      />,
+    );
+
+    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
+  });
+
+  test(`doesn't render "Next release" section if the Release is not the latest Release for the Publication`, () => {
+    render(
+      <ReleasePageIntro
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={{
+          ...testReleaseVersionSummary,
+          isLatestRelease: false,
+        }}
+      />,
+    );
+
+    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
+  });
+
   test('does not render ReleaseSummaryBlock on small screens', () => {
     mockIsMedia = true;
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -140,8 +192,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders accredited official statistics image', () => {
     const { container } = render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -156,8 +207,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders accredited official statistics section', () => {
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -177,8 +227,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('does not render image for official statistics', () => {
     const { container } = render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={{
           ...testReleaseVersionSummary,
@@ -194,55 +243,9 @@ describe('PublicationReleasePageHome', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders "Next update" section if this is the latest Release for a Publication and there is a valid partial date', () => {
-    render(
-      <PublicationReleasePage
-        previewRedesign
-        publicationSummary={testPublicationSummary}
-        releaseVersionSummary={testReleaseVersionSummary}
-      />,
-    );
-    const nextUpdateValue = screen.getByTestId('Next update');
-    expect(nextUpdateValue.textContent).toEqual('March 2026');
-  });
-
-  test(`doesn't render "Next update" section if there is no valid partial date`, () => {
-    render(
-      <PublicationReleasePage
-        previewRedesign
-        publicationSummary={{
-          ...testPublicationSummary,
-          nextReleaseDate: undefined,
-        }}
-        releaseVersionSummary={{
-          ...testReleaseVersionSummary,
-          isLatestRelease: true,
-        }}
-      />,
-    );
-
-    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
-  });
-
-  test(`doesn't render "Next update" section if the Release is not the latest Release for the Publication`, () => {
-    render(
-      <PublicationReleasePage
-        previewRedesign
-        publicationSummary={testPublicationSummary}
-        releaseVersionSummary={{
-          ...testReleaseVersionSummary,
-          isLatestRelease: false,
-        }}
-      />,
-    );
-
-    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
-  });
-
   test('renders default publishing organisation text', () => {
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
@@ -265,8 +268,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders custom publishing organisation text correctly if set', () => {
     render(
-      <PublicationReleasePage
-        previewRedesign
+      <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={{
           ...testReleaseVersionSummary,
