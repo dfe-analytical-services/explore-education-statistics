@@ -4,26 +4,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
 
 public class PublicationDtoBuilder
 {
-    private Guid? _id;
-    private string? _slug;
-    private string? _summary;
-    private string? _title;
-    private PublicationContactDto? _contact;
-    private PublicationLatestReleaseDto? _latestRelease;
-    private PublicationSupersededByPublicationDto? _supersededByPublication;
-    private PublicationThemeDto? _theme;
+    private Guid _id = Guid.NewGuid();
+
+    private string _slug = "Slug";
+
+    private string _summary = "Summary";
+
+    private string _title = "Title";
+
+    private PublicationContactDto _contact = new PublicationContactDtoBuilder().Build();
+
+    private PublicationLatestReleaseDto _latestRelease = new PublicationLatestReleaseDtoBuilder().Build();
+
+    private PublicationSupersededByPublicationDto? _supersededByPublication =
+        new PublicationSupersededByPublicationDtoBuilder().Build();
+
+    private PublicationThemeDto _theme = new PublicationThemeDtoBuilder().Build();
 
     public PublicationDto Build() => new()
     {
-        Id = _id ?? Guid.NewGuid(),
-        Slug = _slug ?? "Slug",
-        Summary = _summary ?? "Summary",
-        Title = _title ?? "Title",
-        Contact = _contact ?? new PublicationContactDtoBuilder().Build(),
-        LatestRelease = _latestRelease ?? new PublicationLatestReleaseDtoBuilder().Build(),
-        SupersededByPublication =
-            _supersededByPublication ?? new PublicationSupersededByPublicationDtoBuilder().Build(),
-        Theme = _theme ?? new PublicationThemeDtoBuilder().Build()
+        Id = _id,
+        Slug = _slug,
+        Summary = _summary,
+        Title = _title,
+        Contact = _contact,
+        LatestRelease = _latestRelease,
+        SupersededByPublication = _supersededByPublication,
+        Theme = _theme
     };
 
     public PublicationDtoBuilder WithId(Guid id)

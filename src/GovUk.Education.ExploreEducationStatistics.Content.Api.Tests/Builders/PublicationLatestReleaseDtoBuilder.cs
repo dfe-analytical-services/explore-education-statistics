@@ -4,15 +4,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
 
 public class PublicationLatestReleaseDtoBuilder
 {
-    private Guid? _id;
-    private string? _slug;
-    private string? _title;
+    private Guid _id = Guid.NewGuid();
+    private string _slug = "Slug";
+    private string _title = "Title";
 
     public PublicationLatestReleaseDto Build() => new()
     {
-        Id = _id ?? Guid.NewGuid(),
-        Slug = _slug ?? "Slug",
-        Title = _title ?? "Title"
+        Id = _id,
+        Slug = _slug,
+        Title = _title
     };
 
     public PublicationLatestReleaseDtoBuilder WithId(Guid id)

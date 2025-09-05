@@ -4,19 +4,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
 
 public class PublicationContactDtoBuilder
 {
-    private Guid? _id;
-    private string? _contactName;
-    private string? _contactTelNo;
-    private string? _teamName;
-    private string? _teamEmail;
+    private Guid _id = Guid.NewGuid();
+    private string _contactName = "Contact name";
+    private string? _contactTelNo = "Contact tel no";
+    private string _teamName = "Team email";
+    private string _teamEmail = "Team name";
 
     public PublicationContactDto Build() => new()
     {
-        Id = _id ?? Guid.NewGuid(),
-        ContactName = _contactName ?? "Contact name",
-        ContactTelNo = _contactTelNo ?? "Contact tel no",
-        TeamEmail = _teamName ?? "Team email",
-        TeamName = _teamEmail ?? "Team name"
+        Id = _id,
+        ContactName = _contactName,
+        ContactTelNo = _contactTelNo,
+        TeamEmail = _teamName,
+        TeamName = _teamEmail
     };
 
     public PublicationContactDtoBuilder WithId(Guid id)
@@ -31,7 +31,7 @@ public class PublicationContactDtoBuilder
         return this;
     }
 
-    public PublicationContactDtoBuilder WithContactTelNo(string contactTelNo)
+    public PublicationContactDtoBuilder WithContactTelNo(string? contactTelNo)
     {
         _contactTelNo = contactTelNo;
         return this;
