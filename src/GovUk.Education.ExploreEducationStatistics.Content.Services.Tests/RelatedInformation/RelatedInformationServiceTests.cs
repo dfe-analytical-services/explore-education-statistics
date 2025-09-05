@@ -13,13 +13,13 @@ public abstract class RelatedInformationServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetAllRelatedInformationForReleaseTests : RelatedInformationServiceTests
+    public class GetRelatedInformationForReleaseTests : RelatedInformationServiceTests
     {
         [Theory]
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(10)]
-        public async Task GetAllRelatedInformationForRelease_ReturnsRelatedInformation_WhenPublicationAndReleaseExist(
+        public async Task GetRelatedInformationForRelease_WhenPublicationAndReleaseExist_ReturnsRelatedInformation(
             int numRelatedInformation)
         {
             // Arrange
@@ -61,7 +61,7 @@ public abstract class RelatedInformationServiceTests
         }
 
         [Fact]
-        public async Task GetAllRelatedInformationForRelease_ReturnsError_WhenPublicationDoesNotExist()
+        public async Task GetRelatedInformationForRelease_WhenPublicationDoesNotExist_ReturnsNotFound()
         {
             // Arrange
             const string publicationSlug = "publication-that-does-not-exist";
@@ -78,7 +78,7 @@ public abstract class RelatedInformationServiceTests
         }
 
         [Fact]
-        public async Task GetAllRelatedInformationForRelease_ReturnsError_WhenReleaseDoesNotExist()
+        public async Task GetRelatedInformationForRelease_WhenReleaseDoesNotExist_ReturnsNotFound()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication();
@@ -106,7 +106,7 @@ public abstract class RelatedInformationServiceTests
         }
 
         [Fact]
-        public async Task GetAllRelatedInformationForRelease_ReturnsError_WhenReleaseHasNoPublishedVersion()
+        public async Task GetRelatedInformationForRelease_WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()

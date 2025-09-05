@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -177,6 +178,7 @@ public class Startup(
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+        services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
 
         services.AddAnalytics(configuration);
 
