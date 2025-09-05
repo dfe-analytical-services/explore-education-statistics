@@ -16,6 +16,8 @@ public class PublicationDtoBuilder
 
     private PublicationLatestReleaseDto _latestRelease = new PublicationLatestReleaseDtoBuilder().Build();
 
+    private PublicationNextReleaseDateDto? _nextReleaseDate = new PublicationNextReleaseDateDtoBuilder().Build();
+
     private PublicationSupersededByPublicationDto? _supersededByPublication =
         new PublicationSupersededByPublicationDtoBuilder().Build();
 
@@ -29,6 +31,7 @@ public class PublicationDtoBuilder
         Title = _title,
         Contact = _contact,
         LatestRelease = _latestRelease,
+        NextReleaseDate = _nextReleaseDate,
         SupersededByPublication = _supersededByPublication,
         Theme = _theme
     };
@@ -67,6 +70,12 @@ public class PublicationDtoBuilder
     public PublicationDtoBuilder WithLatestRelease(PublicationLatestReleaseDto latestRelease)
     {
         _latestRelease = latestRelease;
+        return this;
+    }
+
+    public PublicationDtoBuilder WithNextReleaseDate(PublicationNextReleaseDateDto? nextReleaseDate)
+    {
+        _nextReleaseDate = nextReleaseDate;
         return this;
     }
 

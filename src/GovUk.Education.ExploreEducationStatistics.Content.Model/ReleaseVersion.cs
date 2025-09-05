@@ -155,9 +155,9 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
 
     public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-    private PartialDate _nextReleaseDate;
+    private PartialDate? _nextReleaseDate;
 
-    public PartialDate NextReleaseDate
+    public PartialDate? NextReleaseDate
     {
         get => _nextReleaseDate;
         set
