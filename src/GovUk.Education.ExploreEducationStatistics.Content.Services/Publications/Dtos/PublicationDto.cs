@@ -17,6 +17,8 @@ public record PublicationDto
 
     public required PublicationLatestReleaseDto LatestRelease { get; init; }
 
+    public required PublicationNextReleaseDateDto? NextReleaseDate { get; init; }
+
     public required PublicationSupersededByPublicationDto? SupersededByPublication { get; init; }
 
     public required PublicationThemeDto Theme { get; init; }
@@ -32,6 +34,10 @@ public record PublicationDto
             Title = publication.Title,
             Contact = PublicationContactDto.FromContact(publication.Contact),
             LatestRelease = PublicationLatestReleaseDto.FromRelease(publication.LatestPublishedReleaseVersion!.Release),
+            NextReleaseDate = publication.LatestPublishedReleaseVersion!.NextReleaseDate is null
+                ? null
+                : PublicationNextReleaseDateDto.FromPartialDate(
+                    publication.LatestPublishedReleaseVersion.NextReleaseDate),
             SupersededByPublication = supersededByPublication is null
                 ? null
                 : PublicationSupersededByPublicationDto.FromPublication(supersededByPublication),
@@ -60,6 +66,25 @@ public record PublicationContactDto
             TeamEmail = contact.TeamEmail,
             TeamName = contact.TeamName
         };
+}
+
+public record PublicationNextReleaseDateDto
+{
+    public int Year { get; init; }
+
+    public int? Month { get; init; }
+
+    public int? Day { get; init; }
+
+    public static PublicationNextReleaseDateDto FromPartialDate(PartialDate partialDate) =>
+        partialDate.IsEmpty()
+            ? throw new ArgumentException("Next release date cannot be empty", nameof(partialDate))
+            : new PublicationNextReleaseDateDto
+            {
+                Year = int.Parse(partialDate.Year),
+                Month = string.IsNullOrWhiteSpace(partialDate.Month) ? null : int.Parse(partialDate.Month),
+                Day = string.IsNullOrWhiteSpace(partialDate.Day) ? null : int.Parse(partialDate.Day)
+            };
 }
 
 public record PublicationLatestReleaseDto

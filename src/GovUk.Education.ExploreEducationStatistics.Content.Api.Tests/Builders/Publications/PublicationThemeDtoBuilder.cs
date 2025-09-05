@@ -1,18 +1,18 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Publications;
 
 public class PublicationThemeDtoBuilder
 {
-    private Guid? _id;
-    private string? _summary;
-    private string? _title;
+    private Guid _id = Guid.NewGuid();
+    private string _summary = "Summary";
+    private string _title = "Title";
 
     public PublicationThemeDto Build() => new()
     {
-        Id = _id ?? Guid.NewGuid(),
-        Summary = _summary ?? "Summary",
-        Title = _title ?? "Title"
+        Id = _id,
+        Summary = _summary,
+        Title = _title
     };
 
     public PublicationThemeDtoBuilder WithId(Guid id)
