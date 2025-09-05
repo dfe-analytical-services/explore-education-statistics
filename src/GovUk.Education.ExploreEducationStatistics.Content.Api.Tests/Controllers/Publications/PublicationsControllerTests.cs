@@ -1,6 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using Xunit;
 

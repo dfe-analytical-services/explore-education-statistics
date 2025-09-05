@@ -1,33 +1,33 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Publications;
 
-public class PublicationLatestReleaseDtoBuilder
+public class PublicationSupersededByPublicationDtoBuilder
 {
     private Guid _id = Guid.NewGuid();
     private string _slug = "Slug";
     private string _title = "Title";
 
-    public PublicationLatestReleaseDto Build() => new()
+    public PublicationSupersededByPublicationDto Build() => new()
     {
         Id = _id,
         Slug = _slug,
         Title = _title
     };
 
-    public PublicationLatestReleaseDtoBuilder WithId(Guid id)
+    public PublicationSupersededByPublicationDtoBuilder WithId(Guid id)
     {
         _id = id;
         return this;
     }
 
-    public PublicationLatestReleaseDtoBuilder WithSlug(string slug)
+    public PublicationSupersededByPublicationDtoBuilder WithSlug(string slug)
     {
         _slug = slug;
         return this;
     }
 
-    public PublicationLatestReleaseDtoBuilder WithTitle(string title)
+    public PublicationSupersededByPublicationDtoBuilder WithTitle(string title)
     {
         _title = title;
         return this;

@@ -1,6 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Publications;
 
 public class PublicationContactDtoBuilder
 {
