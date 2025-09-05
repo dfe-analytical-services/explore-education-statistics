@@ -134,6 +134,7 @@ describe('PendingDataReplacementSection', () => {
     await userEvent.click(
       screen.getByRole('button', { name: /cancel data replacement/i }),
     );
+
     expect(
       screen.queryByText(/explore.statistics@education.gov.uk/i),
     ).not.toBeInTheDocument();

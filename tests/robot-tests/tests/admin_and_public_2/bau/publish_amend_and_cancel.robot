@@ -216,8 +216,26 @@ Change the Release type
 Upload a replacement data set
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user uploads subject and waits until complete    Dates test subject    dates-replacement.csv
+    user uploads subject replacement    Dates test subject    dates-replacement.csv
     ...    dates-replacement.meta.csv
+
+Confirm data replacement via quick action
+    user waits until page contains element    testid:Data file replacements table
+    user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
+    user checks table cell contains    1    2    17 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
+
+    user clicks button    Confirm replacement
+    user waits until page contains data uploads table
+    user checks table cell contains    1    1    Dates test subject    testid:Data files table
+    user checks table cell contains    1    2    17 Kb    testid:Data files table
+    user checks table cell contains    1    3    Complete    testid:Data files table
+
+Upload a replacement data set using the button
+    user clicks button    Replace data
+    user chooses file    id:dataFileReplacementUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
+    user chooses file    id:dataFileReplacementUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
+    user clicks element    testid:upload-replacement-files-button
 
 Confirm data replacement via quick action
     user waits until page contains element    testid:Data file replacements table
