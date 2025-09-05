@@ -17,10 +17,12 @@ import {
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
+import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import { generatePath } from 'react-router';
 import styles from './DataFilesTable.module.scss';
 import DeleteDataFileModal from './DeleteDataFileModal';
+import DataFileUploadForm from './DataFileUploadForm';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -28,6 +30,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmDelete: (deletedFileId: string) => void;
+  onReplaceFile: () => void;
   onStatusChange: (
     dataFile: DataFile,
     importStatus: DataFileImportStatus,
@@ -39,9 +42,11 @@ export default function DataFilesTableRow({
   dataFile,
   publicationId,
   releaseVersionId,
+  onReplaceFile,
   onConfirmDelete,
   onStatusChange,
 }: Props) {
+  const [showReplacementModal, toggleReplacementModal] = useToggle(false);
   return (
     <tr key={dataFile.title}>
       <td data-testid="Title" className={styles.title}>
@@ -76,18 +81,40 @@ export default function DataFilesTableRow({
             terminalImportStatuses.includes(dataFile.status) && (
               <>
                 {dataFile.status === 'COMPLETE' && (
-                  <Link
-                    to={generatePath<ReleaseDataFileRouteParams>(
-                      releaseDataFileRoute.path,
-                      {
-                        publicationId,
-                        releaseVersionId,
-                        fileId: dataFile.id,
-                      },
-                    )}
-                  >
-                    Edit title
-                  </Link>
+                  <>
+                    <Link
+                      to={generatePath<ReleaseDataFileRouteParams>(
+                        releaseDataFileRoute.path,
+                        {
+                          publicationId,
+                          releaseVersionId,
+                          fileId: dataFile.id,
+                        },
+                      )}
+                    >
+                      Edit title
+                    </Link>
+                    <Modal
+                      open={showReplacementModal}
+                      title="Replace data"
+                      triggerButton={
+                        <ButtonText onClick={toggleReplacementModal.on}>
+                          Replace data
+                        </ButtonText>
+                      }
+                    >
+                      <DataFileUploadForm
+                        isDataReplacement
+                        releaseVersionId={releaseVersionId}
+                        dataFileTitle={dataFile.title}
+                        onCancel={toggleReplacementModal.off}
+                        onSubmit={() => {
+                          toggleReplacementModal.off();
+                          onReplaceFile();
+                        }}
+                      />
+                    </Modal>
+                  </>
                 )}
                 {dataFile.publicApiDataSetId ? (
                   <Modal
