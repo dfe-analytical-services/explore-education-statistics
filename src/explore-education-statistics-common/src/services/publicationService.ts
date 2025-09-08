@@ -266,32 +266,6 @@ export interface ReleaseSitemapItem {
   lastModified?: string;
 }
 
-const DUMMY_RELEASE_VERSION_SUMMARY: ReleaseVersionSummary = {
-  id: 'release-version-summary-1',
-  slug: '2024',
-  type: 'AccreditedOfficialStatistics',
-  title: 'Calendar year 2024 - Final',
-  yearTitle: '2024',
-  coverageTitle: 'Calendar year',
-  label: 'Final',
-  published: '2025-08-10T09:30:00+01:00',
-  lastUpdated: '2025-08-11T14:30:00+01:00',
-  // publishingOrganisations: [
-  //   {
-  //     id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
-  //     title: 'Department for Education',
-  //     url: 'https://www.gov.uk/government/organisations/department-for-education',
-  //   },
-  //   {
-  //     id: '5e089801-ce1a-e274-9915-e83f3e978699',
-  //     title: 'Skills England',
-  //     url: 'https://www.gov.uk/government/organisations/skills-england',
-  //   },
-  // ],
-  isLatestRelease: true,
-  updateCount: 5,
-};
-
 const publicationService = {
   getPublicationSummary(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -360,19 +334,6 @@ const publicationService = {
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
     );
   },
-  getPublicationLatestReleaseVersionSummary(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    publicationSlug: string,
-  ): Promise<ReleaseVersionSummary> {
-    // return contentApi.get(
-    //   `/publications/${publicationSlug}/releases/latest/summary`,
-    // );
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(DUMMY_RELEASE_VERSION_SUMMARY);
-      }, 500);
-    });
-  },
   getReleaseVersionSummary(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     publicationSlug: string,
@@ -384,7 +345,31 @@ const publicationService = {
     // );
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve(DUMMY_RELEASE_VERSION_SUMMARY);
+        resolve({
+          id: 'release-version-summary-1',
+          slug: '2024',
+          type: 'AccreditedOfficialStatistics',
+          title: 'Calendar year 2024 - Final',
+          yearTitle: '2024',
+          coverageTitle: 'Calendar year',
+          label: 'Final',
+          published: '2025-08-10T09:30:00+01:00',
+          lastUpdated: '2025-08-11T14:30:00+01:00',
+          // publishingOrganisations: [
+          //   {
+          //     id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
+          //     title: 'Department for Education',
+          //     url: 'https://www.gov.uk/government/organisations/department-for-education',
+          //   },
+          //   {
+          //     id: '5e089801-ce1a-e274-9915-e83f3e978699',
+          //     title: 'Skills England',
+          //     url: 'https://www.gov.uk/government/organisations/skills-england',
+          //   },
+          // ],
+          isLatestRelease: true,
+          updateCount: 5,
+        });
       }, 500);
     });
   },

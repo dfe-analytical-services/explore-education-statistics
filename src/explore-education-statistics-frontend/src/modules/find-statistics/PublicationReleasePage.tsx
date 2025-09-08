@@ -52,23 +52,20 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
         publicationSlug,
       );
 
-      const releaseVersionSummary = await (releaseSlug
-        ? publicationService.getReleaseVersionSummary(
-            publicationSlug,
-            releaseSlug,
-          )
-        : publicationService.getPublicationLatestReleaseVersionSummary(
-            publicationSlug,
-          ));
-
       if (!releaseSlug) {
         return {
           redirect: {
-            destination: `/find-statistics/${publicationSlug}/${releaseVersionSummary.slug}`,
+            destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}`,
             permanent: true,
           },
         };
       }
+
+      const releaseVersionSummary =
+        await publicationService.getReleaseVersionSummary(
+          publicationSlug,
+          releaseSlug,
+        );
 
       return {
         props: {
