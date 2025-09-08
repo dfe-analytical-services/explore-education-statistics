@@ -912,7 +912,8 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10));
+        return Task.FromResult(new Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>(
+            PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10)));
     }
 
     public Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
