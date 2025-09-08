@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 
-public class FilterItemRepository : IFilterItemRepository
+public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepository
 {
-    private readonly StatisticsDbContext _context;
-
-    public FilterItemRepository(StatisticsDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Dictionary<Guid, int>> CountFilterItemsByFilter(IEnumerable<Guid> filterItemIds)
     {
-        var filterItems = await _context.FilterItem
+        var filterItems = await context.FilterItem
             .Include(filterItem => filterItem.FilterGroup)
             .Where(filterItem => filterItemIds.Contains(filterItem.Id))
             .ToListAsync();
@@ -40,33 +33,42 @@ public class FilterItemRepository : IFilterItemRepository
         Guid subjectId,
         IQueryable<MatchedObservation> matchedObservations)
     {
-        var matchedObservationIds = matchedObservations.Select(o => o.Id);
-
-        var filtersForSubject = await _context
+        var filterGroupIdsForSubject = await context
             .Filter
             .AsNoTracking()
             .Include(filter => filter.FilterGroups)
             .Where(filter => filter.SubjectId == subjectId)
-            .ToListAsync();
-
-        var filterGroupIds = filtersForSubject
             .SelectMany(filter => filter.FilterGroups)
-            .Select(filterGroup => filterGroup.Id);
-
-        var filterItems = await _context
+            .Select(filterGroup => filterGroup.Id)
+            .ToListAsync();
+        
+        var matchedFilterItemIds = matchedObservations
+            .AsNoTracking()
+            .Join(
+                inner: context.ObservationFilterItem,
+                outerKeySelector: observation => observation.Id,
+                innerKeySelector: observationFilterItem => observationFilterItem.ObservationId,
+                resultSelector: (observation, observationFilterItem) => observationFilterItem.FilterItemId)
+            .Distinct();
+        
+        var filterItems = await context
             .FilterItem
             .AsNoTracking()
-            .Where(filterItem =>
-                filterGroupIds.Contains(filterItem.FilterGroupId) &&
-                _context.ObservationFilterItem.Any(ofi =>
-                    ofi.FilterItemId == filterItem.Id && matchedObservationIds.Contains(ofi.ObservationId)))
+            .Include(filterItem => filterItem.FilterGroup)
+            .ThenInclude(filterGroup => filterGroup.Filter)
+            .Where(filterItem => EF.Constant(filterGroupIdsForSubject).Contains(filterItem.FilterGroupId))
+            .Join(
+                inner: matchedFilterItemIds,
+                outerKeySelector: filterItem => filterItem.Id,
+                innerKeySelector: matchedFilterItem => matchedFilterItem,
+                resultSelector: (filterItem, matchedFilterItem) => filterItem)
             .ToListAsync();
 
-        var filterGroupsById = filtersForSubject
-            .SelectMany(filter => filter.FilterGroups)
-            .ToDictionary(filterGroup => filterGroup.Id);
-
-        filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
+        // var filterGroupsById = filtersForSubject
+        //     .SelectMany(filter => filter.FilterGroups)
+        //     .ToDictionary(filterGroup => filterGroup.Id);
+        //
+        // filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
 
         return filterItems;
     }
@@ -80,7 +82,7 @@ public class FilterItemRepository : IFilterItemRepository
                 .Distinct()
                 .ToList();
 
-        return await _context
+        return await context
             .FilterItem
             .AsNoTracking()
             .Include(fi => fi.FilterGroup)
