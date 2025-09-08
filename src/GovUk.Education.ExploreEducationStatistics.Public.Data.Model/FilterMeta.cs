@@ -43,7 +43,7 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
                 .HasMaxLength(50);
 
             builder.Property(m => m.Label)
-                .HasMaxLength(80);
+                .HasMaxLength(100);
 
             builder.Property(m => m.DefaultOptionId)
                 .HasMaxLength(120);
