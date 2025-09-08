@@ -1,0 +1,14 @@
+steps:
+- task: Bash@3
+  displayName: Upgrade Azure CLI and extensions
+  inputs:
+    targetType: inline
+    script: |
+      set -e
+      sudo apt-get update && \
+        sudo apt-get install --only-upgrade -y azure-cli
+      
+      # Grab the list of installed Azure CLI extensions and
+      # for each, call "az extension update" on it.
+      az extension list --query '[].name' --output tsv \
+        | xargs -i az extension update --name {}
