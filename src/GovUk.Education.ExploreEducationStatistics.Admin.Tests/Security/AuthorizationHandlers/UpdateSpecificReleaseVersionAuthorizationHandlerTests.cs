@@ -32,17 +32,12 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = status
-                    };
+                    var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = status };
 
-                    await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseVersionRequirement>(
-                        HandlerSupplier(releaseVersion),
-                        releaseVersion,
-                        SecurityClaimTypes.UpdateAllReleases
-                    );
+                    await AssertHandlerSucceedsWithCorrectClaims<
+                        ReleaseVersion,
+                        UpdateSpecificReleaseVersionRequirement
+                    >(HandlerSupplier(releaseVersion), releaseVersion, SecurityClaimTypes.UpdateAllReleases);
                 });
         }
 
@@ -50,16 +45,13 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         [Fact]
         public async Task AllClaimsFailIfApproved()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ApprovalStatus = Approved
-            };
+            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Approved };
 
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseVersionRequirement>(
                 HandlerSupplier(releaseVersion),
                 releaseVersion,
-                claimsExpectedToSucceed: Array.Empty<SecurityClaimTypes>());
+                claimsExpectedToSucceed: Array.Empty<SecurityClaimTypes>()
+            );
         }
     }
 
@@ -71,33 +63,24 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
             await GetEnums<ReleaseApprovalStatus>()
                 .Where(releaseStatus => releaseStatus != Approved)
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
-                    async status =>
+                .ForEachAwaitAsync(async status =>
+                {
+                    var releaseVersion = new ReleaseVersion
                     {
-                        var releaseVersion = new ReleaseVersion
-                        {
-                            Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
-                            Published = null,
-                            ApprovalStatus = status
-                        };
+                        Id = Guid.NewGuid(),
+                        Publication = new Publication { Id = Guid.NewGuid() },
+                        Published = null,
+                        ApprovalStatus = status,
+                    };
 
-                        // Assert that a Publication Owner or Approver can update the Release Version in any approval
-                        // state other than Admin
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                            UpdateSpecificReleaseVersionRequirement>(
-                            HandlerSupplier(releaseVersion),
-                            releaseVersion,
-                            rolesExpectedToSucceed: new[]
-                            {
-                                PublicationRole.Owner,
-                                PublicationRole.Allower
-                            });
-                    }
-                );
+                    // Assert that a Publication Owner or Approver can update the Release Version in any approval
+                    // state other than Admin
+                    await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<UpdateSpecificReleaseVersionRequirement>(
+                        HandlerSupplier(releaseVersion),
+                        releaseVersion,
+                        rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    );
+                });
         }
 
         [Fact]
@@ -106,20 +89,17 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                },
+                Publication = new Publication { Id = Guid.NewGuid() },
                 Published = null,
-                ApprovalStatus = Approved
+                ApprovalStatus = Approved,
             };
 
             // Assert that no Publication Role can update the Release Version if it is Approved.
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                UpdateSpecificReleaseVersionRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<UpdateSpecificReleaseVersionRequirement>(
                 HandlerSupplier(releaseVersion),
                 releaseVersion,
-                rolesExpectedToSucceed: Array.Empty<PublicationRole>());
+                rolesExpectedToSucceed: Array.Empty<PublicationRole>()
+            );
         }
     }
 
@@ -131,33 +111,24 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
             await GetEnums<ReleaseApprovalStatus>()
                 .Where(releaseStatus => releaseStatus != Approved)
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
-                    async status =>
+                .ForEachAwaitAsync(async status =>
+                {
+                    var releaseVersion = new ReleaseVersion
                     {
-                        var releaseVersion = new ReleaseVersion
-                        {
-                            Id = Guid.NewGuid(),
-                            Publication = new Publication
-                            {
-                                Id = Guid.NewGuid()
-                            },
-                            Published = null,
-                            ApprovalStatus = status
-                        };
+                        Id = Guid.NewGuid(),
+                        Publication = new Publication { Id = Guid.NewGuid() },
+                        Published = null,
+                        ApprovalStatus = status,
+                    };
 
-                        // Assert that a Release Editor (Contributor, Approver) can update the Release
-                        // Version in any approval state other than Approved.
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
-                            UpdateSpecificReleaseVersionRequirement>(
-                            HandlerSupplier(releaseVersion),
-                            releaseVersion,
-                            rolesExpectedToSucceed: new[]
-                            {
-                                ReleaseRole.Contributor,
-                                ReleaseRole.Approver
-                            });
-                    }
-                );
+                    // Assert that a Release Editor (Contributor, Approver) can update the Release
+                    // Version in any approval state other than Approved.
+                    await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseVersionRequirement>(
+                        HandlerSupplier(releaseVersion),
+                        releaseVersion,
+                        rolesExpectedToSucceed: new[] { ReleaseRole.Contributor, ReleaseRole.Approver }
+                    );
+                });
         }
 
         [Fact]
@@ -166,36 +137,29 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                },
+                Publication = new Publication { Id = Guid.NewGuid() },
                 Published = null,
-                ApprovalStatus = Approved
+                ApprovalStatus = Approved,
             };
 
             // Assert that no Publication Role can update the Release Version if it is Approved.
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
-                UpdateSpecificReleaseVersionRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseVersionRequirement>(
                 HandlerSupplier(releaseVersion),
                 releaseVersion,
-                rolesExpectedToSucceed: Array.Empty<ReleaseRole>());
+                rolesExpectedToSucceed: Array.Empty<ReleaseRole>()
+            );
         }
     }
 
     private static Func<ContentDbContext, UpdateSpecificReleaseVersionAuthorizationHandler> HandlerSupplier(
         ReleaseVersion releaseVersion,
-        List<ReleasePublishingStatus>? publishingStatuses = null)
+        List<ReleasePublishingStatus>? publishingStatuses = null
+    )
     {
         var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
-        releaseStatusRepository.Setup(
-                s => s.GetAllByOverallStage(
-                    releaseVersion.Id,
-                    Started,
-                    Complete
-                )
-            )
+        releaseStatusRepository
+            .Setup(s => s.GetAllByOverallStage(releaseVersion.Id, Started, Complete))
             .ReturnsAsync(publishingStatuses ?? new List<ReleasePublishingStatus>());
 
         return contentDbContext =>
@@ -208,10 +172,14 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                     userReleaseRoleRepository: new UserReleaseRoleRepository(
                         contentDbContext: contentDbContext,
-                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                    ),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: contentDbContext),
-                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                        contentDbContext: contentDbContext
+                    ),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+                )
+            );
         };
     }
 }

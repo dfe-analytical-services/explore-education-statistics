@@ -24,5 +24,6 @@ public interface IDataImportService
         int? totalRows = null,
         HashSet<GeographicLevel>? geographicLevels = null,
         int? importedRows = null,
-        int? lastProcessedRowIndex = null);
+        int? lastProcessedRowIndex = null
+    );
 }

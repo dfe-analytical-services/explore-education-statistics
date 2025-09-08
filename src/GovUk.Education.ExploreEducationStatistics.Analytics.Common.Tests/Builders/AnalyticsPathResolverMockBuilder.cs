@@ -10,10 +10,8 @@ public class AnalyticsPathResolverMockBuilder
 
     public IAnalyticsPathResolver Build()
     {
-        _mock
-            .Setup(m => m.BuildOutputDirectory(It.IsAny<string[]>()))
-            .Returns(() => _outputDirectoryPathReturned);
-        
+        _mock.Setup(m => m.BuildOutputDirectory(It.IsAny<string[]>())).Returns(() => _outputDirectoryPathReturned);
+
         return _mock.Object;
     }
 
@@ -24,12 +22,15 @@ public class AnalyticsPathResolverMockBuilder
     }
 
     public Asserter Assert => new(_mock);
-    
+
     public class Asserter(Mock<IAnalyticsPathResolver> mock)
     {
         public void BuildOutputDirectoryCalled(string[] expectedSubPaths)
         {
-            mock.Verify(m => m.BuildOutputDirectory(It.Is<string[]>(actual => actual.SequenceEqual(expectedSubPaths))), Times.Once);
+            mock.Verify(
+                m => m.BuildOutputDirectory(It.Is<string[]>(actual => actual.SequenceEqual(expectedSubPaths))),
+                Times.Once
+            );
         }
     }
 }

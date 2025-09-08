@@ -13,5 +13,6 @@ public interface ISubjectCsvMetaService
         ReleaseSubject releaseSubject,
         FullTableQuery query,
         IList<Observation> observations,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

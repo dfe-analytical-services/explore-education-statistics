@@ -12,18 +12,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 [Authorize]
 [ApiController]
 [Route("api/public-data/data-set-versions/{nextDataSetVersionId:guid}/mapping")]
-public class DataSetVersionMappingController(IDataSetVersionMappingService mappingService)
-    : ControllerBase
+public class DataSetVersionMappingController(IDataSetVersionMappingService mappingService) : ControllerBase
 {
     [HttpGet("locations")]
     [Produces("application/json")]
     public Task<ActionResult<LocationMappingPlan>> GetLocationMappings(
         [FromRoute] Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return mappingService
-            .GetLocationMappings(nextDataSetVersionId, cancellationToken)
-            .HandleFailuresOrOk();
+        return mappingService.GetLocationMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPatch("locations")]
@@ -31,13 +29,15 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
     public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchLocationMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await mappingService
             .ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -45,25 +45,28 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
     [Produces("application/json")]
     public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
         [FromRoute] Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return mappingService
-            .GetFilterMappings(nextDataSetVersionId, cancellationToken)
-            .HandleFailuresOrOk();
+        return mappingService.GetFilterMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPatch("filters/options")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+    public async Task<
+        ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>
+    > ApplyBatchFilterOptionMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchFilterOptionMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await mappingService
             .ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 }

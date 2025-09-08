@@ -5,14 +5,14 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 
-public abstract class IntegrationTestFixtureWithCommonTestDataSetup(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class IntegrationTestFixtureWithCommonTestDataSetup(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     protected async Task<(DataSet, List<DataSetVersion>)> SetupDataSetWithSpecifiedVersionStatuses(
-        DataSetVersionStatus versionStatus)
+        DataSetVersionStatus versionStatus
+    )
     {
-        DataSet dataSet = DataFixture
-            .DefaultDataSet()
-            .WithStatusPublished();
+        DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
         await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -21,30 +21,36 @@ public abstract class IntegrationTestFixtureWithCommonTestDataSetup(TestApplicat
             .WithStatusPublished()
             .WithDataSetId(dataSet.Id)
             .WithMetaSummary(
-                DataFixture.DefaultDataSetVersionMetaSummary()
+                DataFixture
+                    .DefaultDataSetVersionMetaSummary()
                     .WithGeographicLevels(
                         [
                             GeographicLevel.Country,
                             GeographicLevel.LocalAuthority,
                             GeographicLevel.Region,
-                            GeographicLevel.School
+                            GeographicLevel.School,
                         ]
                     )
             )
             .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
             .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
             .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
-            .ForIndex(3, dsv =>
-            {
-                dsv.SetStatus(versionStatus);
-                dsv.SetVersionNumber(2, 0);
-                
-            })
-            .ForIndex(4, dsv =>
-            {
-                dsv.SetStatus(versionStatus);
-                dsv.SetVersionNumber(2, 1);
-            })
+            .ForIndex(
+                3,
+                dsv =>
+                {
+                    dsv.SetStatus(versionStatus);
+                    dsv.SetVersionNumber(2, 0);
+                }
+            )
+            .ForIndex(
+                4,
+                dsv =>
+                {
+                    dsv.SetStatus(versionStatus);
+                    dsv.SetVersionNumber(2, 1);
+                }
+            )
             .GenerateList();
 
         var version = versionStatus == DataSetVersionStatus.Published ? "2.1" : "1.2";
@@ -52,13 +58,11 @@ public abstract class IntegrationTestFixtureWithCommonTestDataSetup(TestApplicat
         dataSet.LatestLiveVersion = dataSetVersion.FirstOrDefault(dsv => dsv.PublicVersion == version);
         dataSet.Versions = dataSetVersion;
 
-        await TestApp.AddTestData<PublicDataDbContext>(
-            context =>
-            {
-                context.DataSetVersions.AddRange(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            }
-        );
+        await TestApp.AddTestData<PublicDataDbContext>(context =>
+        {
+            context.DataSetVersions.AddRange(dataSetVersion);
+            context.DataSets.Update(dataSet);
+        });
 
         return (dataSet, dataSetVersion);
     }

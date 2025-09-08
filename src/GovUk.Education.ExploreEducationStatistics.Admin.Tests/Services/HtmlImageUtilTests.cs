@@ -4,7 +4,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class HtmlImageUtilTests
 {
-    private const string ContentWithMethodologyImages = @"
+    private const string ContentWithMethodologyImages =
+        @"
 <div class=""dfe-content"">
   <h3>Text block with images</h3>
   <figure class=""image"">
@@ -26,7 +27,8 @@ public class HtmlImageUtilTests
 </div>
 ";
 
-    private const string ContentWithReleaseImages = @"
+    private const string ContentWithReleaseImages =
+        @"
 <div class=""dfe-content"">
   <h3>Text block with images</h3>
   <figure class=""image"">
@@ -71,7 +73,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetMethodologyImages_ContentWithoutImages()
     {
-        var result = HtmlImageUtil.GetMethodologyImages(@"
+        var result = HtmlImageUtil.GetMethodologyImages(
+            @"
 <div class=""dfe-content"">
   <h3>Text block without images</h3>
   <p>This text block has no images.</p>
@@ -94,7 +97,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetMethodologyImages_ContentWithMalformedImage()
     {
-        var result = HtmlImageUtil.GetMethodologyImages(@"
+        var result = HtmlImageUtil.GetMethodologyImages(
+            @"
     <img src=""/api/methodologies/{methodologyId}/images/not-a-valid-uuid""/>
     <img src=""/api/methodologies/{methodologyId}/images/8205b65b-9fd4-40b9-9d77-08d8e53df837""/>"
         );
@@ -106,7 +110,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetMethodologyImages_ContentWithOtherImages()
     {
-        var result = HtmlImageUtil.GetMethodologyImages(@"
+        var result = HtmlImageUtil.GetMethodologyImages(
+            @"
     <img src=""some-other-image.png""/>
     <img src=""/images/some-other-image.png""/>
     <img src=""/images/03c51f5d-f2ef-4ed6-9fa2-0842b94bcebb""/>
@@ -140,7 +145,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetReleaseImages_ContentWithoutImages()
     {
-        var result = HtmlImageUtil.GetReleaseImages(@"
+        var result = HtmlImageUtil.GetReleaseImages(
+            @"
 <div class=""dfe-content"">
   <h3>Text block without images</h3>
   <p>This text block has no images.</p>
@@ -163,7 +169,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetReleaseImages_ContentWithMalformedImage()
     {
-        var result = HtmlImageUtil.GetReleaseImages(@"
+        var result = HtmlImageUtil.GetReleaseImages(
+            @"
     <img src=""/api/releases/{releaseVersionId}/images/not-a-valid-uuid""/>
     <img src=""/api/releases/{releaseVersionId}/images/8205b65b-9fd4-40b9-9d77-08d8e53df837""/>"
         );
@@ -175,7 +182,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetReleaseImages_ContentWithOtherImages()
     {
-        var result = HtmlImageUtil.GetReleaseImages(@"
+        var result = HtmlImageUtil.GetReleaseImages(
+            @"
     <img src=""some-other-image.png""/>
     <img src=""/images/some-other-image.png""/>
     <img src=""/images/03c51f5d-f2ef-4ed6-9fa2-0842b94bcebb""/>
@@ -185,13 +193,14 @@ public class HtmlImageUtilTests
         Assert.Single(result);
         Assert.Equal(Guid.Parse("8205b65b-9fd4-40b9-9d77-08d8e53df837"), result[0]);
     }
-    
+
     // TODO EES-5901 - migrate all content placeholders to be "releaseVersionId" and then remove the legacy
     // "releaseId" test below.
     [Fact]
     public void GetReleaseImages_ContentWithMalformedImage_LegacyPlaceholder()
     {
-        var result = HtmlImageUtil.GetReleaseImages(@"
+        var result = HtmlImageUtil.GetReleaseImages(
+            @"
     <img src=""/api/releases/{releaseId}/images/not-a-valid-uuid""/>
     <img src=""/api/releases/{releaseId}/images/8205b65b-9fd4-40b9-9d77-08d8e53df837""/>"
         );
@@ -205,7 +214,8 @@ public class HtmlImageUtilTests
     [Fact]
     public void GetReleaseImages_ContentWithOtherImages_LegacyPlaceholder()
     {
-        var result = HtmlImageUtil.GetReleaseImages(@"
+        var result = HtmlImageUtil.GetReleaseImages(
+            @"
     <img src=""some-other-image.png""/>
     <img src=""/images/some-other-image.png""/>
     <img src=""/images/03c51f5d-f2ef-4ed6-9fa2-0842b94bcebb""/>

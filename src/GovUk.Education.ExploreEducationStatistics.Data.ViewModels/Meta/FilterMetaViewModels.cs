@@ -24,9 +24,7 @@ public record FilterMetaViewModel
         Order = order;
     }
 
-    public FilterMetaViewModel()
-    {
-    }
+    public FilterMetaViewModel() { }
 }
 
 public record FilterGroupMetaViewModel
@@ -43,9 +41,7 @@ public record FilterGroupMetaViewModel
         Order = order;
     }
 
-    public FilterGroupMetaViewModel()
-    {
-    }
+    public FilterGroupMetaViewModel() { }
 }
 
 public record FilterItemMetaViewModel
@@ -65,9 +61,7 @@ public record FilterItemMetaViewModel
         Value = value;
     }
 
-    public FilterItemMetaViewModel()
-    {
-    }
+    public FilterItemMetaViewModel() { }
 }
 
 public record FilterUpdateViewModel

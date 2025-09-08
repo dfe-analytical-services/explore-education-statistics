@@ -13,21 +13,18 @@ public class PublicationMethodologiesServiceMockBuilder
 
     private PublicationMethodologiesDto? _methodologies;
 
-    private static readonly Expression<Func<IPublicationMethodologiesService,
-        Task<Either<ActionResult, PublicationMethodologiesDto>>>> GetPublicationMethodologies =
-        m => m.GetPublicationMethodologies(
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IPublicationMethodologiesService, Task<Either<ActionResult, PublicationMethodologiesDto>>>
+    > GetPublicationMethodologies = m =>
+        m.GetPublicationMethodologies(It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public PublicationMethodologiesServiceMockBuilder()
     {
-        _mock.Setup(GetPublicationMethodologies)
+        _mock
+            .Setup(GetPublicationMethodologies)
             .ReturnsAsync(() =>
-                _methodologies ?? new PublicationMethodologiesDto
-                {
-                    Methodologies = [],
-                    ExternalMethodology = null
-                });
+                _methodologies ?? new PublicationMethodologiesDto { Methodologies = [], ExternalMethodology = null }
+            );
     }
 
     public IPublicationMethodologiesService Build() => _mock.Object;
@@ -39,11 +36,11 @@ public class PublicationMethodologiesServiceMockBuilder
     }
 
     public PublicationMethodologiesServiceMockBuilder WhereGetPublicationMethodologiesReturnsNotFound(
-        string publicationSlug)
+        string publicationSlug
+    )
     {
-        _mock.Setup(m => m.GetPublicationMethodologies(
-                publicationSlug,
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m => m.GetPublicationMethodologies(publicationSlug, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -55,10 +52,14 @@ public class PublicationMethodologiesServiceMockBuilder
     {
         public void GetPublicationMethodologiesWasCalled(string? publicationSlug = null)
         {
-            mock.Verify(m => m.GetPublicationMethodologies(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetPublicationMethodologies(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

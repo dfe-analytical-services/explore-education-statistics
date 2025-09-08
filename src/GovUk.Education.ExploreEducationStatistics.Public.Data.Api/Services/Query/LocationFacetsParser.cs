@@ -19,17 +19,12 @@ internal class LocationFacetsParser : IFacetsParser
     private readonly QueryState _queryState;
     private readonly Dictionary<GeographicLevel, List<ParquetLocationOption>> _allowedLocationOptionsByLevel;
 
-    public LocationFacetsParser(
-        QueryState queryState,
-        IEnumerable<ParquetLocationOption> locationOptionMetas)
+    public LocationFacetsParser(QueryState queryState, IEnumerable<ParquetLocationOption> locationOptionMetas)
     {
         _queryState = queryState;
         _allowedLocationOptionsByLevel = locationOptionMetas
             .GroupBy(location => EnumUtil.GetFromEnumValue<GeographicLevel>(location.Level))
-            .ToDictionary(
-                group => group.Key,
-                group => group.ToList()
-            );
+            .ToDictionary(group => group.Key, group => group.ToList());
     }
 
     public IInterpolatedSql Parse(DataSetQueryCriteriaFacets facets, string path)
@@ -38,12 +33,7 @@ internal class LocationFacetsParser : IFacetsParser
 
         if (facets.Locations?.Eq is not null)
         {
-            fragments.Add(
-                EqFragment(
-                    location: facets.Locations.Eq,
-                    path: QueryUtils.Path(path, "locations.eq")
-                )
-            );
+            fragments.Add(EqFragment(location: facets.Locations.Eq, path: QueryUtils.Path(path, "locations.eq")));
         }
 
         if (facets.Locations?.NotEq is not null)
@@ -59,34 +49,24 @@ internal class LocationFacetsParser : IFacetsParser
 
         if (facets.Locations?.In is not null && facets.Locations.In.Count != 0)
         {
-            fragments.Add(
-                InFragment(
-                    locations: [..facets.Locations.In],
-                    path: QueryUtils.Path(path, "locations.in")
-                )
-            );
+            fragments.Add(InFragment(locations: [.. facets.Locations.In], path: QueryUtils.Path(path, "locations.in")));
         }
 
         if (facets.Locations?.NotIn is not null && facets.Locations.NotIn.Count != 0)
         {
             fragments.Add(
                 InFragment(
-                    locations: [..facets.Locations.NotIn],
+                    locations: [.. facets.Locations.NotIn],
                     path: QueryUtils.Path(path, "locations.notIn"),
                     negate: true
                 )
             );
         }
 
-        return new DuckDbSqlBuilder()
-            .AppendRange(fragments, "\nAND ")
-            .Build();
+        return new DuckDbSqlBuilder().AppendRange(fragments, "\nAND ").Build();
     }
 
-    private IInterpolatedSql EqFragment(
-        IDataSetQueryLocation location,
-        string path,
-        bool negate = false)
+    private IInterpolatedSql EqFragment(IDataSetQueryLocation location, string path, bool negate = false)
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -94,9 +74,7 @@ internal class LocationFacetsParser : IFacetsParser
         {
             _queryState.Warnings.Add(CreateNotFoundWarning([location], path));
 
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         builder += $"{DataTable.Ref().LocationId(location.ParsedLevel()):raw} {(negate ? "!=" : "="):raw} {option.Id}";
@@ -104,13 +82,9 @@ internal class LocationFacetsParser : IFacetsParser
         return builder.Build();
     }
 
-    private IInterpolatedSql InFragment(
-        HashSet<IDataSetQueryLocation> locations,
-        string path,
-        bool negate = false)
+    private IInterpolatedSql InFragment(HashSet<IDataSetQueryLocation> locations, string path, bool negate = false)
     {
         var builder = new DuckDbSqlBuilder();
-
 
         var options = new List<ParquetLocationOption>();
         var notFoundLocations = new List<IDataSetQueryLocation>();
@@ -125,7 +99,7 @@ internal class LocationFacetsParser : IFacetsParser
 
             notFoundLocations.Add(location);
         }
-        
+
         if (notFoundLocations.Count != 0)
         {
             _queryState.Warnings.Add(CreateNotFoundWarning(notFoundLocations, path));
@@ -133,28 +107,23 @@ internal class LocationFacetsParser : IFacetsParser
 
         if (options.Count == 0)
         {
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         var fragments = options
             .GroupBy(l => l.Level)
-            .Select(
-                group =>
-                {
-                    var level = EnumUtil.GetFromEnumValue<GeographicLevel>(group.Key);
-                    var ids = group.Select(l => l.Id);
+            .Select(group =>
+            {
+                var level = EnumUtil.GetFromEnumValue<GeographicLevel>(group.Key);
+                var ids = group.Select(l => l.Id);
 
-                    return (FormattableString)
-                        $"{DataTable.Ref().LocationId(level):raw} {(negate ? "NOT IN" : "IN"):raw} ({ids})";
-                })
+                return (FormattableString)
+                    $"{DataTable.Ref().LocationId(level):raw} {(negate ? "NOT IN" : "IN"):raw} ({ids})";
+            })
             .ToList();
 
         return fragments.Count == 1
-            ? builder
-                .AppendFormattableString(fragments[0])
-                .Build()
+            ? builder.AppendFormattableString(fragments[0]).Build()
             : builder
                 .AppendLiteral("(")
                 .AppendRange(fragments, joinString: negate ? "\n AND " : "\n OR ")
@@ -164,7 +133,8 @@ internal class LocationFacetsParser : IFacetsParser
 
     private bool TryGetLocationOption(
         IDataSetQueryLocation queryLocation,
-        [MaybeNullWhen(false)] out ParquetLocationOption locationOption)
+        [MaybeNullWhen(false)] out ParquetLocationOption locationOption
+    )
     {
         locationOption = null;
 
@@ -185,8 +155,8 @@ internal class LocationFacetsParser : IFacetsParser
         return true;
     }
 
-    private static bool IsMatchingLocationOption(ParquetLocationOption option, IDataSetQueryLocation queryLocation)
-        => queryLocation switch
+    private static bool IsMatchingLocationOption(ParquetLocationOption option, IDataSetQueryLocation queryLocation) =>
+        queryLocation switch
         {
             DataSetQueryLocationId locationId => option.PublicId == locationId.Id,
             DataSetQueryLocationCode locationCode => option.Code == locationCode.Code,
@@ -195,14 +165,15 @@ internal class LocationFacetsParser : IFacetsParser
             DataSetQueryLocationProviderUkprn provider => option.Ukprn == provider.Ukprn,
             DataSetQueryLocationLocalAuthorityCode localAuthority => option.Code == localAuthority.Code,
             DataSetQueryLocationLocalAuthorityOldCode localAuthority => option.OldCode == localAuthority.OldCode,
-            _ => false
+            _ => false,
         };
 
-    private WarningViewModel CreateNotFoundWarning(IEnumerable<IDataSetQueryLocation> locations, string path) => new()
-    {
-        Code = ValidationMessages.LocationsNotFound.Code,
-        Message = ValidationMessages.LocationsNotFound.Message,
-        Path = path,
-        Detail = new NotFoundItemsErrorDetail<IDataSetQueryLocation>(locations)
-    };
+    private WarningViewModel CreateNotFoundWarning(IEnumerable<IDataSetQueryLocation> locations, string path) =>
+        new()
+        {
+            Code = ValidationMessages.LocationsNotFound.Code,
+            Message = ValidationMessages.LocationsNotFound.Message,
+            Path = path,
+            Detail = new NotFoundItemsErrorDetail<IDataSetQueryLocation>(locations),
+        };
 }

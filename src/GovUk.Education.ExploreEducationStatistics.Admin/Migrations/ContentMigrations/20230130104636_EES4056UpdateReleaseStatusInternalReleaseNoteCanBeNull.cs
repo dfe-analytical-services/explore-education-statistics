@@ -16,7 +16,8 @@ public partial class EES4056UpdateReleaseStatusInternalReleaseNoteCanBeNull : Mi
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -29,6 +30,7 @@ public partial class EES4056UpdateReleaseStatusInternalReleaseNoteCanBeNull : Mi
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 }

@@ -10,6 +10,6 @@ public class CapturePermaLinkTableDownloadCallBuilder
         {
             PermalinkTitle = "the permalink title",
             PermalinkId = Guid.NewGuid(),
-            DownloadFormat = TableDownloadFormat.ODS
+            DownloadFormat = TableDownloadFormat.ODS,
         };
 }

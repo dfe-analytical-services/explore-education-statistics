@@ -18,24 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class ReleaseImageServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task Upload()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupReleaseImageService(userService: userService.Object);
-                    return service.Upload(releaseVersionId: _releaseVersion.Id,
-                        formFile: new Mock<IFormFile>().Object);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupReleaseImageService(userService: userService.Object);
+                return service.Upload(releaseVersionId: _releaseVersion.Id, formFile: new Mock<IFormFile>().Object);
+            });
     }
 
     private ReleaseImageService SetupReleaseImageService(
@@ -44,7 +38,8 @@ public class ReleaseImageServicePermissionTests
         IPrivateBlobStorageService? privateBlobStorageService = null,
         IFileValidatorService? fileValidatorService = null,
         IReleaseFileRepository? releaseFileRepository = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new ReleaseImageService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
@@ -58,7 +53,6 @@ public class ReleaseImageServicePermissionTests
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        return MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id,
-            _releaseVersion);
+        return MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion);
     }
 }

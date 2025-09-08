@@ -14,11 +14,11 @@ public class ContentSectionRepository : IContentSectionRepository
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<List<T>> GetAllContentBlocks<T>(Guid releaseVersionId) where T : ContentBlock
+    public async Task<List<T>> GetAllContentBlocks<T>(Guid releaseVersionId)
+        where T : ContentBlock
     {
         return await _contentDbContext
-            .ContentBlocks
-            .Where(block => block.ReleaseVersionId == releaseVersionId)
+            .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
             .OfType<T>()
             .ToListAsync();
     }

@@ -14,10 +14,9 @@ public class ErrorViewModelSchemaFilterTests
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new ErrorViewModelSchemaFilter()],
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");

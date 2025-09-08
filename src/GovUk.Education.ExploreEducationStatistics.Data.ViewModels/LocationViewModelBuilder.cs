@@ -11,23 +11,24 @@ public static class LocationViewModelBuilder
     public static Dictionary<GeographicLevel, List<LocationAttributeViewModel>> BuildLocationAttributeViewModels(
         IList<Location> locations,
         Dictionary<GeographicLevel, List<string>>? hierarchies,
-        Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? boundaryData = null)
+        Dictionary<GeographicLevel, Dictionary<string, BoundaryData>>? boundaryData = null
+    )
     {
-        var locationAttributes =
-            locations.GetLocationAttributesHierarchical(hierarchies);
+        var locationAttributes = locations.GetLocationAttributesHierarchical(hierarchies);
         return locationAttributes.ToDictionary(
             levelAndLocationAttributes => levelAndLocationAttributes.Key,
             levelAndLocationAttributes =>
             {
-                var boundaryDataByCode =
-                    boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
+                var boundaryDataByCode = boundaryData?.GetValueOrDefault(levelAndLocationAttributes.Key);
                 return BuildLocationAttributeViewModels(levelAndLocationAttributes.Value, boundaryDataByCode);
-            });
+            }
+        );
     }
 
     private static List<LocationAttributeViewModel> BuildLocationAttributeViewModels(
         IEnumerable<LocationAttributeNode> locationAttributes,
-        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
+        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode
+    )
     {
         return DeduplicateLocationViewModels(
             locationAttributes
@@ -39,7 +40,8 @@ public static class LocationViewModelBuilder
 
     private static LocationAttributeViewModel BuildLocationAttributeViewModel(
         LocationAttributeNode locationAttributeNode,
-        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode)
+        IReadOnlyDictionary<string, BoundaryData>? boundaryDataByCode
+    )
     {
         var locationAttribute = locationAttributeNode.Attribute;
 
@@ -57,9 +59,7 @@ public static class LocationViewModelBuilder
 
         var code = locationAttribute.GetCodeOrFallback();
 
-        var feature = code.IsNullOrEmpty()
-            ? null
-            : boundaryDataByCode?.GetValueOrDefault(code)?.GeoJson;
+        var feature = code.IsNullOrEmpty() ? null : boundaryDataByCode?.GetValueOrDefault(code)?.GeoJson;
 
         if (feature != null)
         {
@@ -77,7 +77,8 @@ public static class LocationViewModelBuilder
     }
 
     private static List<LocationAttributeViewModel> DeduplicateLocationViewModels(
-        List<LocationAttributeViewModel> locations)
+        List<LocationAttributeViewModel> locations
+    )
     {
         // Find duplicates by label which also have the same value.
         // They are unique by some other attribute of location and appending the value of this attribute won't deduplicate them.
@@ -108,7 +109,7 @@ public static class LocationViewModelBuilder
         return locationAttribute switch
         {
             Region region => region.Code ?? string.Empty,
-            _ => locationAttribute.Name ?? string.Empty
+            _ => locationAttribute.Name ?? string.Empty,
         };
     }
 }

@@ -18,95 +18,154 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 public static class LoggerTimingExtensions
 {
     private static readonly AsyncLocal<int> CurrentIndentLevel = new AsyncLocal<int>();
-    private const int IndentLength = 4; 
-        
-    public static TResult TraceTime<TResult, TLogger>(this ILogger<TLogger> logger, Func<TResult> action, 
-        string timingDescription, bool includeStartMessage = false)
+    private const int IndentLength = 4;
+
+    public static TResult TraceTime<TResult, TLogger>(
+        this ILogger<TLogger> logger,
+        Func<TResult> action,
+        string timingDescription,
+        bool includeStartMessage = false
+    )
     {
         return LogTime(logger, LogLevel.Trace, action, timingDescription, includeStartMessage);
     }
-    
-    public static void TraceTime<TLogger>(this ILogger<TLogger> logger, Action action, 
-        string timingDescription, bool includeStartMessage = false)
+
+    public static void TraceTime<TLogger>(
+        this ILogger<TLogger> logger,
+        Action action,
+        string timingDescription,
+        bool includeStartMessage = false
+    )
     {
         LogTime(logger, LogLevel.Trace, ActionToFunc(action), timingDescription, includeStartMessage);
     }
-    
-    public static Task<TResult> TraceTime<TResult, TLogger>(this ILogger<TLogger> logger, Func<Task<TResult>> action, 
-        string timingDescription, bool includeStartMessage = false)
+
+    public static Task<TResult> TraceTime<TResult, TLogger>(
+        this ILogger<TLogger> logger,
+        Func<Task<TResult>> action,
+        string timingDescription,
+        bool includeStartMessage = false
+    )
     {
         return LogTime(logger, LogLevel.Trace, action, timingDescription, includeStartMessage);
     }
-    
-    public static Task TraceTime<TLogger>(this ILogger<TLogger> logger, Func<Task> action, 
-        string timingDescription, bool includeStartMessage = false)
+
+    public static Task TraceTime<TLogger>(
+        this ILogger<TLogger> logger,
+        Func<Task> action,
+        string timingDescription,
+        bool includeStartMessage = false
+    )
     {
         return LogTime(logger, LogLevel.Trace, action, timingDescription, includeStartMessage);
     }
-    
-    public static TResult DebugTime<TResult, TLogger>(this ILogger<TLogger> logger, Func<TResult> action, 
-        string timingDescription, bool includeStartMessage = true) where TResult : class
+
+    public static TResult DebugTime<TResult, TLogger>(
+        this ILogger<TLogger> logger,
+        Func<TResult> action,
+        string timingDescription,
+        bool includeStartMessage = true
+    )
+        where TResult : class
     {
         return LogTime(logger, LogLevel.Debug, action, timingDescription, includeStartMessage);
     }
-    
-    public static void DebugTime<TLogger>(this ILogger<TLogger> logger, Action action, 
-        string timingDescription, bool includeStartMessage = true)
+
+    public static void DebugTime<TLogger>(
+        this ILogger<TLogger> logger,
+        Action action,
+        string timingDescription,
+        bool includeStartMessage = true
+    )
     {
         LogTime(logger, LogLevel.Debug, ActionToFunc(action), timingDescription, includeStartMessage);
     }
-    
-    public static Task<TResult> DebugTime<TResult, TLogger>(this ILogger<TLogger> logger, Func<Task<TResult>> action, 
-        string timingDescription, bool includeStartMessage = true)
+
+    public static Task<TResult> DebugTime<TResult, TLogger>(
+        this ILogger<TLogger> logger,
+        Func<Task<TResult>> action,
+        string timingDescription,
+        bool includeStartMessage = true
+    )
     {
         return LogTime(logger, LogLevel.Debug, action, timingDescription, includeStartMessage);
     }
-    
-    public static Task DebugTime<TLogger>(this ILogger<TLogger> logger, Func<Task> action, 
-        string timingDescription, bool includeStartMessage = true)
-    { 
+
+    public static Task DebugTime<TLogger>(
+        this ILogger<TLogger> logger,
+        Func<Task> action,
+        string timingDescription,
+        bool includeStartMessage = true
+    )
+    {
         return LogTime(logger, LogLevel.Debug, action, timingDescription, includeStartMessage);
     }
-    
-    public static TResult InfoTime<TResult, TLogger>(this ILogger<TLogger> logger, Func<TResult> action, 
-        string timingDescription, bool includeStartMessage = false) where TResult : class
-    {
-        return LogTime(logger, LogLevel.Information, action, timingDescription, includeStartMessage);
-    }
-    
-    public static void InfoTime<TLogger>(this ILogger<TLogger> logger, Action action, 
-        string timingDescription, bool includeStartMessage = false)
-    {
-        LogTime(logger, LogLevel.Information, ActionToFunc(action), timingDescription, includeStartMessage);
-    }
-    
-    public static Task<TResult> InfoTime<TResult, TLogger>(this ILogger<TLogger> logger, Func<Task<TResult>> action, 
-        string timingDescription, bool includeStartMessage = false)
-    {
-        return LogTime(logger, LogLevel.Information, action, timingDescription, includeStartMessage);
-    }
-    
-    public static Task InfoTime<TLogger>(this ILogger<TLogger> logger, Func<Task> action, 
-        string timingDescription, bool includeStartMessage = false)
+
+    public static TResult InfoTime<TResult, TLogger>(
+        this ILogger<TLogger> logger,
+        Func<TResult> action,
+        string timingDescription,
+        bool includeStartMessage = false
+    )
+        where TResult : class
     {
         return LogTime(logger, LogLevel.Information, action, timingDescription, includeStartMessage);
     }
 
-    private static TResult LogTime<
-        TResult, TLogger>(ILogger<TLogger> logger, 
-        LogLevel logLevel, 
-        Func<TResult> action, 
+    public static void InfoTime<TLogger>(
+        this ILogger<TLogger> logger,
+        Action action,
         string timingDescription,
-        bool includeStartMessage)
+        bool includeStartMessage = false
+    )
     {
-        return LogTime(logger, logLevel, () => Task.FromResult(action.Invoke()), timingDescription, includeStartMessage).Result;
+        LogTime(logger, LogLevel.Information, ActionToFunc(action), timingDescription, includeStartMessage);
     }
-    
-    private static async Task LogTime<TLogger>(ILogger<TLogger> logger, 
-        LogLevel logLevel, 
-        Func<Task> action, 
+
+    public static Task<TResult> InfoTime<TResult, TLogger>(
+        this ILogger<TLogger> logger,
+        Func<Task<TResult>> action,
         string timingDescription,
-        bool includeStartMessage)
+        bool includeStartMessage = false
+    )
+    {
+        return LogTime(logger, LogLevel.Information, action, timingDescription, includeStartMessage);
+    }
+
+    public static Task InfoTime<TLogger>(
+        this ILogger<TLogger> logger,
+        Func<Task> action,
+        string timingDescription,
+        bool includeStartMessage = false
+    )
+    {
+        return LogTime(logger, LogLevel.Information, action, timingDescription, includeStartMessage);
+    }
+
+    private static TResult LogTime<TResult, TLogger>(
+        ILogger<TLogger> logger,
+        LogLevel logLevel,
+        Func<TResult> action,
+        string timingDescription,
+        bool includeStartMessage
+    )
+    {
+        return LogTime(
+            logger,
+            logLevel,
+            () => Task.FromResult(action.Invoke()),
+            timingDescription,
+            includeStartMessage
+        ).Result;
+    }
+
+    private static async Task LogTime<TLogger>(
+        ILogger<TLogger> logger,
+        LogLevel logLevel,
+        Func<Task> action,
+        string timingDescription,
+        bool includeStartMessage
+    )
     {
         async Task<Unit> TaskFunc()
         {
@@ -116,13 +175,14 @@ public static class LoggerTimingExtensions
 
         await LogTime(logger, logLevel, TaskFunc, timingDescription, includeStartMessage);
     }
-    
-    private static async Task<TResult> LogTime<
-        TResult, TLogger>(ILogger<TLogger> logger,
-        LogLevel logLevel, 
-        Func<Task<TResult>> action, 
+
+    private static async Task<TResult> LogTime<TResult, TLogger>(
+        ILogger<TLogger> logger,
+        LogLevel logLevel,
+        Func<Task<TResult>> action,
         string timingDescription,
-        bool includeStartMessage)
+        bool includeStartMessage
+    )
     {
         if (!logger.IsEnabled(logLevel))
         {
@@ -130,7 +190,7 @@ public static class LoggerTimingExtensions
         }
 
         var stopwatch = Stopwatch.StartNew();
-        
+
         var currentIndentLevel = CurrentIndentLevel.Value;
         var indentPadding = "".PadLeft(currentIndentLevel * IndentLength);
         CurrentIndentLevel.Value = currentIndentLevel + 1;
@@ -143,7 +203,10 @@ public static class LoggerTimingExtensions
             }
 
             var result = await action.Invoke();
-            logger.Log(logLevel, $"{indentPadding}Took {stopwatch.Elapsed.TotalMilliseconds} milliseconds to {timingDescription}");
+            logger.Log(
+                logLevel,
+                $"{indentPadding}Took {stopwatch.Elapsed.TotalMilliseconds} milliseconds to {timingDescription}"
+            );
             return result;
         }
         finally
@@ -154,7 +217,7 @@ public static class LoggerTimingExtensions
 
     private static Func<Unit> ActionToFunc(Action action)
     {
-        return () => 
+        return () =>
         {
             action();
             return Unit.Instance;

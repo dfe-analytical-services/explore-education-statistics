@@ -22,10 +22,7 @@ public class LocationAttributeNodeTests
     {
         var node = new LocationAttributeNode(_england)
         {
-            Children = new List<LocationAttributeNode>
-            {
-                new(_eastMidlands)
-            }
+            Children = new List<LocationAttributeNode> { new(_eastMidlands) },
         };
         Assert.False(node.IsLeaf);
     }
@@ -51,13 +48,9 @@ public class LocationAttributeNodeTests
             {
                 new(_eastMidlands)
                 {
-                    Children = new List<LocationAttributeNode>
-                    {
-                        new(_derby),
-                        new(_nottingham)
-                    }
-                }
-            }
+                    Children = new List<LocationAttributeNode> { new(_derby), new(_nottingham) },
+                },
+            },
         };
 
         var result = node.GetLeafAttributes();

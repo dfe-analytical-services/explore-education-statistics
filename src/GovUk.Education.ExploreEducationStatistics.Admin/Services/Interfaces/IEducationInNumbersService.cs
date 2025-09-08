@@ -12,21 +12,15 @@ public interface IEducationInNumbersService
 
     Task<Either<ActionResult, List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages();
 
-    Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(
-        CreateEducationInNumbersPageRequest request);
+    Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(CreateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(
-        Guid id);
+    Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(Guid id);
 
-    Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(
-        Guid id,
-        UpdateEducationInNumbersPageRequest request);
+    Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(Guid id, UpdateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(
-        Guid id);
+    Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(Guid id);
 
-    Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(
-        List<Guid> newOrder);
+    Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(List<Guid> newOrder);
 
     Task<Either<ActionResult, Unit>> Delete(Guid id);
 }

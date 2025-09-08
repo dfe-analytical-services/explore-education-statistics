@@ -22,13 +22,10 @@ public class ViewDataSetAuthorizationHandlerTests
     private readonly DataFixture _dataFixture = new();
 
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task DataSetHasAvailableStatus_Success(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
@@ -39,13 +36,10 @@ public class ViewDataSetAuthorizationHandlerTests
     }
 
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task DataSetHasUnavailableStatus_Failure(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
@@ -54,15 +48,12 @@ public class ViewDataSetAuthorizationHandlerTests
 
         Assert.False(context.HasSucceeded);
     }
-    
+
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.AllStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task PreviewTokenForDraftDataSetVersionActive_Success(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -77,29 +68,24 @@ public class ViewDataSetAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])]
+        );
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
         await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// Despite the Preview Token being used is expired, the DataSet's status itself is
     /// available to the public, and so the auth succeeds.
     /// </summary>
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task PreviewTokenForDraftDataSetVersionExpired_DataSetStatusAvailable_Success(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -114,29 +100,24 @@ public class ViewDataSetAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])]
+        );
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
         await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// The Preview Token being used is expired and the DataSet's status is
     /// unavailable to the public, and so the auth fails.
     /// </summary>
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task PreviewTokenForDraftDataSetVersionExpired_DataSetStatusUnavailable_Failure(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -151,29 +132,24 @@ public class ViewDataSetAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])]
+        );
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
         await handler.HandleAsync(context);
 
         Assert.False(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// Despite the Preview Token being used is for a non-draft DataSetVersion, the DataSet's
     /// status itself is available to the public, and so the auth succeeds.
     /// </summary>
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task PreviewTokenActiveButForLiveDataSetVersion_DataSetStatusAvailable_Success(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -188,29 +164,24 @@ public class ViewDataSetAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])]
+        );
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
         await handler.HandleAsync(context);
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// The Preview Token being used is for a non-draft DataSetVersion and the DataSet's
     /// status itself is unavailable to the public, and so the auth false.
     /// </summary>
     [Theory]
-    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
-        MemberType = typeof(DataSetStatusTheoryData))]
+    [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses), MemberType = typeof(DataSetStatusTheoryData))]
     public async Task PreviewTokenActiveButForLiveDataSetVersion_DataSetStatusUnavailable_Failure(DataSetStatus status)
     {
-        DataSet dataSet = _dataFixture
-            .DefaultDataSet()
-            .WithStatus(status);
+        DataSet dataSet = _dataFixture.DefaultDataSet().WithStatus(status);
 
         DataSetVersion dataSetVersion = _dataFixture
             .DefaultDataSetVersion()
@@ -225,10 +196,8 @@ public class ViewDataSetAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(dataSetVersion.PreviewTokens[0])]
+        );
         var context = CreateAnonymousAuthContext<ViewDataSetRequirement, DataSet>(dataSet);
 
         await handler.HandleAsync(context);
@@ -238,28 +207,27 @@ public class ViewDataSetAuthorizationHandlerTests
 
     private static ViewDataSetAuthorizationHandler BuildHandler(
         PublicDataDbContext? publicDataDbContext = null,
-        IList<KeyValuePair<string, StringValues>>? requestHeaders = null)
+        IList<KeyValuePair<string, StringValues>>? requestHeaders = null
+    )
     {
         var dbContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
-        
-        var httpContextAccessor = new HttpContextAccessor
-        {
-            HttpContext = new DefaultHttpContext()
-        };
-        
+
+        var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
+
         var headers = httpContextAccessor.HttpContext.Request.Headers;
-        requestHeaders?.ForEach(header => 
-            headers.Append(header.Key, header.Value));
+        requestHeaders?.ForEach(header => headers.Append(header.Key, header.Value));
 
         var previewTokenService = new PreviewTokenService(
             publicDataDbContext: dbContext,
-            httpContextAccessor: httpContextAccessor);
+            httpContextAccessor: httpContextAccessor
+        );
 
         var authorizationHandlerService = new AuthorizationHandlerService(
             httpContextAccessor: httpContextAccessor,
             environment: Mock.Of<IWebHostEnvironment>(),
-            previewTokenService);
-        
+            previewTokenService
+        );
+
         return new ViewDataSetAuthorizationHandler(authorizationHandlerService);
     }
 

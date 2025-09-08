@@ -16,13 +16,12 @@ public interface IFootnoteService
         IReadOnlySet<Guid> filterGroupIds,
         IReadOnlySet<Guid> filterItemIds,
         IReadOnlySet<Guid> indicatorIds,
-        IReadOnlySet<Guid> subjectIds);
+        IReadOnlySet<Guid> subjectIds
+    );
 
-    Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseVersionId,
-        Guid footnoteId);
+    Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseVersionId, Guid footnoteId);
 
-    Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseVersionId,
-        Guid footnoteId);
+    Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseVersionId, Guid footnoteId);
 
     Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseVersionId);
 
@@ -34,8 +33,8 @@ public interface IFootnoteService
         IReadOnlySet<Guid> filterGroupIds,
         IReadOnlySet<Guid> filterItemIds,
         IReadOnlySet<Guid> indicatorIds,
-        IReadOnlySet<Guid> subjectIds);
+        IReadOnlySet<Guid> subjectIds
+    );
 
-    Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseVersionId,
-        FootnotesUpdateRequest request);
+    Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseVersionId, FootnotesUpdateRequest request);
 }

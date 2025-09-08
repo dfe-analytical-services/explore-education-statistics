@@ -22,5 +22,6 @@ public class PreReleaseUserInviteViewModel
 
 public class PreReleaseUserRemoveRequest
 {
-    [EmailAddress] public string Email { get; set; } = string.Empty;
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
 }

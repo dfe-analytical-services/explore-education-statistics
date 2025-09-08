@@ -21,101 +21,82 @@ public class MethodologyNoteServicePermissionTests
     [Fact]
     public async Task AddNote()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid() };
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(methodologyVersion, CanUpdateSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyNoteService(
-                        persistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                            methodologyVersion.Id, methodologyVersion).Object,
-                        userService: userService.Object);
-                    return service.AddNote(
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyNoteService(
+                    persistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
                         methodologyVersion.Id,
-                        new MethodologyNoteAddRequest());
-                }
-            );
+                        methodologyVersion
+                    ).Object,
+                    userService: userService.Object
+                );
+                return service.AddNote(methodologyVersion.Id, new MethodologyNoteAddRequest());
+            });
     }
 
     [Fact]
     public async Task DeleteNote()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid() };
 
-        var methodologyNote = new MethodologyNote
-        {
-            Id = Guid.NewGuid(),
-            MethodologyVersion = methodologyVersion
-        };
+        var methodologyNote = new MethodologyNote { Id = Guid.NewGuid(), MethodologyVersion = methodologyVersion };
 
         var persistenceHelper = new Mock<IPersistenceHelper<ContentDbContext>>(Strict);
         SetupCall(persistenceHelper, methodologyNote);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(methodologyVersion, CanUpdateSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyNoteService(
-                        persistenceHelper: persistenceHelper.Object,
-                        userService: userService.Object);
-                    return service.DeleteNote(
-                        methodologyVersion.Id,
-                        methodologyNote.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyNoteService(
+                    persistenceHelper: persistenceHelper.Object,
+                    userService: userService.Object
+                );
+                return service.DeleteNote(methodologyVersion.Id, methodologyNote.Id);
+            });
     }
 
     [Fact]
     public async Task UpdateNote()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid() };
 
-        var methodologyNote = new MethodologyNote
-        {
-            Id = Guid.NewGuid(),
-            MethodologyVersion = methodologyVersion
-        };
+        var methodologyNote = new MethodologyNote { Id = Guid.NewGuid(), MethodologyVersion = methodologyVersion };
 
         var persistenceHelper = new Mock<IPersistenceHelper<ContentDbContext>>(Strict);
         SetupCall(persistenceHelper, methodologyNote);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(methodologyVersion, CanUpdateSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyNoteService(
-                        persistenceHelper: persistenceHelper.Object,
-                        userService: userService.Object);
-                    return service.UpdateNote(
-                        methodologyVersion.Id,
-                        methodologyNote.Id,
-                        new MethodologyNoteUpdateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyNoteService(
+                    persistenceHelper: persistenceHelper.Object,
+                    userService: userService.Object
+                );
+                return service.UpdateNote(
+                    methodologyVersion.Id,
+                    methodologyNote.Id,
+                    new MethodologyNoteUpdateRequest()
+                );
+            });
     }
 
     private static MethodologyNoteService SetupMethodologyNoteService(
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IMethodologyNoteRepository? methodologyNoteRepository = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             AdminMapper(),
             persistenceHelper,
             methodologyNoteRepository ?? Mock.Of<IMethodologyNoteRepository>(Strict),
-            userService ?? Mock.Of<IUserService>(Strict));
+            userService ?? Mock.Of<IUserService>(Strict)
+        );
     }
 }

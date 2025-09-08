@@ -17,31 +17,25 @@ public partial class ES3547_ChangesToFile : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
-        migrationBuilder.AddColumn<long>(
-            name: "ContentLength",
-            table: "Files",
-            type: "bigint",
-            nullable: true);
+        migrationBuilder.AddColumn<long>(name: "ContentLength", table: "Files", type: "bigint", nullable: true);
 
         migrationBuilder.AddColumn<string>(
             name: "ContentType",
             table: "Files",
             type: "nvarchar(255)",
             maxLength: 255,
-            nullable: true);
+            nullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "ContentLength",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "ContentLength", table: "Files");
 
-        migrationBuilder.DropColumn(
-            name: "ContentType",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "ContentType", table: "Files");
 
         migrationBuilder.AlterColumn<string>(
             name: "Filename",
@@ -49,6 +43,7 @@ public partial class ES3547_ChangesToFile : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

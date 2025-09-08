@@ -7,9 +7,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class CreateReleaseForSpecificPublicationRequirement : IAuthorizationRequirement
-{
-}
+public class CreateReleaseForSpecificPublicationRequirement : IAuthorizationRequirement { }
 
 public class CreateReleaseForSpecificPublicationAuthorizationHandler
     : AuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
@@ -17,14 +15,17 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandler
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public CreateReleaseForSpecificPublicationAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         CreateReleaseForSpecificPublicationRequirement requirement,
-        Publication publication)
+        Publication publication
+    )
     {
         // No user is allowed to create a new release of an archived publication
         if (publication.SupersededById.HasValue)
@@ -38,11 +39,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandler
             return;
         }
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+        if (await _authorizationHandlerService.HasRolesOnPublication(context.User.GetUserId(), publication.Id, Owner))
         {
             context.Succeed(requirement);
         }

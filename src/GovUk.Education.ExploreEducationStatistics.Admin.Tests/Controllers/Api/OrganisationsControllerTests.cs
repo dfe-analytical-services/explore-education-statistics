@@ -20,8 +20,7 @@ public abstract class OrganisationsControllerTests
         public async Task GetAllOrganisations_ReturnsExpectedOrganisations(int numOrganisations)
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(numOrganisations);
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(numOrganisations);
             _organisationService.WhereHasOrganisations(organisations);
             var sut = BuildController();
 
@@ -31,21 +30,21 @@ public abstract class OrganisationsControllerTests
             // Assert
             _organisationService.Assert.GetAllOrganisationsWasCalled();
             Assert.Equal(numOrganisations, result.Length);
-            Assert.All(result,
+            Assert.All(
+                result,
                 (organisation, index) =>
                 {
                     var expectedOrganisation = organisations[index];
                     Assert.Equal(expectedOrganisation.Id, organisation.Id);
                     Assert.Equal(expectedOrganisation.Title, organisation.Title);
                     Assert.Equal(expectedOrganisation.Url, organisation.Url);
-                });
+                }
+            );
         }
     }
 
     private OrganisationsController BuildController()
     {
-        return new OrganisationsController(
-            _organisationService.Build()
-        );
+        return new OrganisationsController(_organisationService.Build());
     }
 }

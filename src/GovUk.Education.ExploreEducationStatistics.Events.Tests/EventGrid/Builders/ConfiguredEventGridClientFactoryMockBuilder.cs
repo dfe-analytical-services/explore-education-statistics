@@ -12,17 +12,19 @@ public class ConfiguredEventGridClientFactoryMockBuilder
     {
         _mock
             .Setup(m => m.TryCreateClient(It.IsAny<string>(), out It.Ref<IEventGridClient?>.IsAny))
-            .Returns((string _, out IEventGridClient? client) =>
-            {
-                if (_topicConfigFound)
+            .Returns(
+                (string _, out IEventGridClient? client) =>
                 {
-                    client = Client.Build();
-                    return true;
-                }
+                    if (_topicConfigFound)
+                    {
+                        client = Client.Build();
+                        return true;
+                    }
 
-                client = null;
-                return false;
-            });
+                    client = null;
+                    return false;
+                }
+            );
         return _mock.Object;
     }
 

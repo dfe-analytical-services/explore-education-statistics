@@ -21,5 +21,5 @@ public enum DataSetsListRequestSortBy
     /// <summary>
     /// Sort by the title of the data set.
     /// </summary>
-    Title
+    Title,
 }

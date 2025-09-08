@@ -10,7 +10,8 @@ public class Theme
 
     public string Slug { get; set; }
 
-    [Required] public string Title { get; set; }
+    [Required]
+    public string Title { get; set; }
 
     public string Summary { get; set; }
 

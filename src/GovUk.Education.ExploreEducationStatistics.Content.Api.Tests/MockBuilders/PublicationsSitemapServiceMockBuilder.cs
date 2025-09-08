@@ -11,10 +11,9 @@ public class PublicationsSitemapServiceMockBuilder
 
     private PublicationSitemapPublicationDto[]? _sitemapItems;
 
-    private static readonly Expression<Func<IPublicationsSitemapService,
-        Task<PublicationSitemapPublicationDto[]>>> GetSitemapItems =
-        m => m.GetSitemapItems(
-            It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IPublicationsSitemapService, Task<PublicationSitemapPublicationDto[]>>
+    > GetSitemapItems = m => m.GetSitemapItems(It.IsAny<CancellationToken>());
 
     public PublicationsSitemapServiceMockBuilder()
     {

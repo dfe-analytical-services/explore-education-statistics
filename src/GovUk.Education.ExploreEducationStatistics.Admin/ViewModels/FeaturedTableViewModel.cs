@@ -7,6 +7,7 @@ public record FeaturedTableViewModel(
     string? Description,
     int Order,
     Guid DataBlockId,
-    Guid DataBlockParentId);
+    Guid DataBlockParentId
+);
 
 public record FeaturedTableBasicViewModel(string Name, string? Description);

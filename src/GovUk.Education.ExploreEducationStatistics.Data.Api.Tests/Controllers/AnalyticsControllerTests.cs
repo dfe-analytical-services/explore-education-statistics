@@ -9,8 +9,7 @@ public class AnalyticsControllerTests
 {
     private readonly AnalyticsManagerMockBuilder _analyticsManager = new();
 
-    private AnalyticsController GetSut() => new(
-        _analyticsManager.Build());
+    private AnalyticsController GetSut() => new(_analyticsManager.Build());
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
@@ -18,8 +17,7 @@ public class AnalyticsControllerTests
     public class TableBuilderTests : AnalyticsControllerTests
     {
         [Fact]
-        public async Task
-            GivenValidRecordTableToolDownloadRequestBindingModel_WhenCallToRecordDownload_ThenInformationPassedToAnalyticsManager()
+        public async Task GivenValidRecordTableToolDownloadRequestBindingModel_WhenCallToRecordDownload_ThenInformationPassedToAnalyticsManager()
         {
             // ARRANGE
             var bindingModel = new RecordTableToolDownloadRequestBindingModelBuilder().Build();
@@ -38,8 +36,7 @@ public class AnalyticsControllerTests
     public class PermalinkTests : AnalyticsControllerTests
     {
         [Fact]
-        public async Task
-            GivenValidRecordPermalinkTableDownloadRequestBindingModel_WhenCallToRecordDownload_ThenInformationPassedToAnalyticsManager()
+        public async Task GivenValidRecordPermalinkTableDownloadRequestBindingModel_WhenCallToRecordDownload_ThenInformationPassedToAnalyticsManager()
         {
             // ARRANGE
             var bindingModel = new RecordPermalinkTableDownloadRequestBindingModelBuilder().Build();

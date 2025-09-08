@@ -6,16 +6,15 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
-public class PublishTaxonomyFunction(
-    ILogger<PublishTaxonomyFunction> logger,
-    IContentService contentService)
+public class PublishTaxonomyFunction(ILogger<PublishTaxonomyFunction> logger, IContentService contentService)
 {
     [Function("PublishTaxonomy")]
     public async Task PublishTaxonomy(
 #pragma warning disable IDE0060
         [QueueTrigger(PublishTaxonomyQueue)] PublishTaxonomyMessage message,
 #pragma warning restore IDE0060
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 

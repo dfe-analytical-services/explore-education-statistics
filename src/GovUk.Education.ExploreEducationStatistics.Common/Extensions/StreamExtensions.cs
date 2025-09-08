@@ -35,9 +35,7 @@ public static class StreamExtensions
             stream.Position = 0;
         }
 
-        return BitConverter.ToString(hash)
-            .Replace("-", string.Empty)
-            .ToLowerInvariant();
+        return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
     }
 
     public static void SeekToBeginning(this Stream stream)

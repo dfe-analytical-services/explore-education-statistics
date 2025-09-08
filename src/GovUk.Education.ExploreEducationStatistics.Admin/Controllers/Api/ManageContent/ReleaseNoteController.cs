@@ -19,8 +19,10 @@ public class ReleaseNoteController : ControllerBase
     }
 
     [HttpPost("release/{releaseVersionId:guid}/content/release-note")]
-    public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(ReleaseNoteSaveRequest saveRequest,
-        Guid releaseVersionId)
+    public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(
+        ReleaseNoteSaveRequest saveRequest,
+        Guid releaseVersionId
+    )
     {
         return await _releaseNoteService
             .AddReleaseNoteAsync(releaseVersionId, saveRequest)
@@ -29,22 +31,24 @@ public class ReleaseNoteController : ControllerBase
 
     [HttpPut("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
     public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
-        ReleaseNoteSaveRequest saveRequest, Guid releaseVersionId, Guid releaseNoteId)
+        ReleaseNoteSaveRequest saveRequest,
+        Guid releaseVersionId,
+        Guid releaseNoteId
+    )
     {
         return await _releaseNoteService
-            .UpdateReleaseNoteAsync(releaseVersionId: releaseVersionId,
-                releaseNoteId: releaseNoteId,
-                saveRequest)
+            .UpdateReleaseNoteAsync(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId, saveRequest)
             .HandleFailuresOrOk();
     }
 
     [HttpDelete("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
-    public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(Guid releaseVersionId,
-        Guid releaseNoteId)
+    public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(
+        Guid releaseVersionId,
+        Guid releaseNoteId
+    )
     {
         return await _releaseNoteService
-            .DeleteReleaseNoteAsync(releaseVersionId: releaseVersionId,
-                releaseNoteId: releaseNoteId)
+            .DeleteReleaseNoteAsync(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId)
             .HandleFailuresOrOk();
     }
 }

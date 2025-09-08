@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 public record DataSetVersionChangeSet
 {
     /// <summary>
-    /// Guideline notes that are associated with the data set version. 
+    /// Guideline notes that are associated with the data set version.
     /// </summary>
     public string? Notes { get; set; }
 
@@ -15,6 +15,7 @@ public record DataSetVersionChangeSet
     /// </summary>
     /// <example>1.0</example>
     public required string VersionNumber { get; set; }
+
     /// <summary>
     /// Any major changes that were made to the data set.
     /// </summary>
@@ -103,10 +104,9 @@ public record LocationOptionChangesViewModel
     /// The geographic level the changes belong to.
     /// </summary>
     public required GeographicLevelViewModel Level { get; init; }
-    
+
     /// <summary>
     /// The list of location option changes.
     /// </summary>
     public required IReadOnlyList<LocationOptionChangeViewModel> Options { get; init; }
 }
-

@@ -27,12 +27,7 @@ public abstract class DataSetVersionPathResolverTests
         [InlineData("  ")]
         public void EmptyBasePath_Throws(string basePath)
         {
-            Assert.Throws<ArgumentException>(() =>
-                BuildService(options: new DataFilesOptions
-                {
-                    BasePath = basePath
-                })
-            );
+            Assert.Throws<ArgumentException>(() => BuildService(options: new DataFilesOptions { BasePath = basePath }));
         }
     }
 
@@ -42,36 +37,29 @@ public abstract class DataSetVersionPathResolverTests
         [
             Environments.Development,
             HostEnvironmentExtensions.IntegrationTestEnvironment,
-            Environments.Production
+            Environments.Production,
         ];
-        
-        public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
-        
-        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPublicStatuses = 
-            new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PublicStatuses));
 
-        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPrivateStatuses = 
-            new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PrivateStatuses));
+        public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
+
+        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPublicStatuses = new(
+            EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PublicStatuses)
+        );
+
+        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPrivateStatuses = new(
+            EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PrivateStatuses)
+        );
 
         [Fact]
         public void DevelopmentEnv_ValidBasePath()
         {
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(Environments.Development);
+            _webHostEnvironmentMock.SetupGet(s => s.EnvironmentName).Returns(Environments.Development);
 
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
+            var resolver = BuildService(
+                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
+            );
 
-            Assert.Equal(
-                Path.Combine(
-                    PathUtils.ProjectRootPath,
-                    "data",
-                    "data-files"
-                ),
-                resolver.BasePath());
+            Assert.Equal(Path.Combine(PathUtils.ProjectRootPath, "data", "data-files"), resolver.BasePath());
         }
 
         [Fact]
@@ -81,10 +69,9 @@ public abstract class DataSetVersionPathResolverTests
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(HostEnvironmentExtensions.IntegrationTestEnvironment);
 
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
+            var resolver = BuildService(
+                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
+            );
 
             var basePath = resolver.BasePath();
 
@@ -108,18 +95,13 @@ public abstract class DataSetVersionPathResolverTests
         [Fact]
         public void ProductionEnv_ValidBasePath()
         {
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(Environments.Production);
+            _webHostEnvironmentMock.SetupGet(s => s.EnvironmentName).Returns(Environments.Production);
 
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
+            var resolver = BuildService(
+                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
+            );
 
-            Assert.Equal(
-                Path.Combine("data", "data-files"),
-                resolver.BasePath());
+            Assert.Equal(Path.Combine("data", "data-files"), resolver.BasePath());
         }
 
         [Theory]
@@ -127,27 +109,19 @@ public abstract class DataSetVersionPathResolverTests
         public void ValidDirectoryPath_PublicVersion((string, DataSetVersionStatus) environmentNameAndStatus)
         {
             var (environmentName, status) = environmentNameAndStatus;
-            
-            DataSetVersion version = _dataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(status);
 
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(environmentName);
+            DataSetVersion version = _dataFixture.DefaultDataSetVersion().WithStatus(status);
 
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
+            _webHostEnvironmentMock.SetupGet(s => s.EnvironmentName).Returns(environmentName);
+
+            var resolver = BuildService(
+                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
+            );
 
             Assert.Equal(
-                Path.Combine(
-                    resolver.DataSetsPath(),
-                    version.DataSetId.ToString(),
-                    "v1.0.0"
-                ),
-                resolver.DirectoryPath(version));
+                Path.Combine(resolver.DataSetsPath(), version.DataSetId.ToString(), "v1.0.0"),
+                resolver.DirectoryPath(version)
+            );
         }
 
         [Theory]
@@ -155,27 +129,19 @@ public abstract class DataSetVersionPathResolverTests
         public void ValidDirectoryPath_PrivateVersion((string, DataSetVersionStatus) environmentNameAndStatus)
         {
             var (environmentName, status) = environmentNameAndStatus;
-            
-            DataSetVersion version = _dataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(status);
-            
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(environmentName);
 
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
+            DataSetVersion version = _dataFixture.DefaultDataSetVersion().WithStatus(status);
+
+            _webHostEnvironmentMock.SetupGet(s => s.EnvironmentName).Returns(environmentName);
+
+            var resolver = BuildService(
+                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
+            );
 
             Assert.Equal(
-                Path.Combine(
-                    resolver.DataSetsPath(),
-                    version.DataSetId.ToString(),
-                    "draft"
-                ),
-                resolver.DirectoryPath(version));
+                Path.Combine(resolver.DataSetsPath(), version.DataSetId.ToString(), "draft"),
+                resolver.DirectoryPath(version)
+            );
         }
 
         [Theory]
@@ -184,21 +150,15 @@ public abstract class DataSetVersionPathResolverTests
         {
             DataSetVersion version = _dataFixture.DefaultDataSetVersion();
 
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(environmentName);
+            _webHostEnvironmentMock.SetupGet(s => s.EnvironmentName).Returns(environmentName);
 
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
+            var resolver = BuildService(
+                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
+            );
 
             var directoryPath = resolver.DirectoryPath(version);
 
-            Assert.Equal(
-                Path.Combine(directoryPath, DataSetFilenames.CsvDataFile),
-                resolver.CsvDataPath(version)
-            );
+            Assert.Equal(Path.Combine(directoryPath, DataSetFilenames.CsvDataFile), resolver.CsvDataPath(version));
             Assert.Equal(
                 Path.Combine(directoryPath, DataSetFilenames.CsvMetadataFile),
                 resolver.CsvMetadataPath(version)
@@ -215,32 +175,21 @@ public abstract class DataSetVersionPathResolverTests
                 Path.Combine(directoryPath, DataSetFilenames.DuckDbSchemaSqlFile),
                 resolver.DuckDbSchemaSqlPath(version)
             );
-            Assert.Equal(
-                Path.Combine(directoryPath, DataTable.ParquetFile),
-                resolver.DataPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(directoryPath, FilterOptionsTable.ParquetFile),
-                resolver.FiltersPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(directoryPath, IndicatorsTable.ParquetFile),
-                resolver.IndicatorsPath(version)
-            );
+            Assert.Equal(Path.Combine(directoryPath, DataTable.ParquetFile), resolver.DataPath(version));
+            Assert.Equal(Path.Combine(directoryPath, FilterOptionsTable.ParquetFile), resolver.FiltersPath(version));
+            Assert.Equal(Path.Combine(directoryPath, IndicatorsTable.ParquetFile), resolver.IndicatorsPath(version));
             Assert.Equal(
                 Path.Combine(directoryPath, LocationOptionsTable.ParquetFile),
                 resolver.LocationsPath(version)
             );
-            Assert.Equal(
-                Path.Combine(directoryPath, TimePeriodsTable.ParquetFile),
-                resolver.TimePeriodsPath(version)
-            );
+            Assert.Equal(Path.Combine(directoryPath, TimePeriodsTable.ParquetFile), resolver.TimePeriodsPath(version));
         }
     }
 
     private IDataSetVersionPathResolver BuildService(
         DataFilesOptions options,
-        IWebHostEnvironment? webHostEnvironment = null)
+        IWebHostEnvironment? webHostEnvironment = null
+    )
     {
         return new DataSetVersionPathResolver(
             options.ToOptionsWrapper(),

@@ -16,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "EinContentBlocks",
                 type: "nvarchar(1024)",
                 maxLength: 1024,
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.CreateTable(
                 name: "EinTiles",
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     Statistic = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Trend = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LinkUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LinkText = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    LinkText = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -40,13 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         column: x => x.EinParentBlockId,
                         principalTable: "EinContentBlocks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_EinTiles_EinParentBlockId",
                 table: "EinTiles",
-                column: "EinParentBlockId");
+                column: "EinParentBlockId"
+            );
 
             migrationBuilder.Sql("GRANT SELECT ON dbo.EinTiles TO [content]");
         }
@@ -54,12 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "EinTiles");
+            migrationBuilder.DropTable(name: "EinTiles");
 
-            migrationBuilder.DropColumn(
-                name: "Title",
-                table: "EinContentBlocks");
+            migrationBuilder.DropColumn(name: "Title", table: "EinContentBlocks");
         }
     }
 }

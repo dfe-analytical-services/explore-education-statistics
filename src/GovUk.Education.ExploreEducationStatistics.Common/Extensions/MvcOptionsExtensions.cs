@@ -14,8 +14,9 @@ public static class MvcOptionsExtensions
 
     public static void AddTrimStringBinderProvider(this MvcOptions option)
     {
-        var simpleTypeModelBinderProvider = option.ModelBinderProviders
-            .FirstOrDefault(x => x.GetType() == typeof(SimpleTypeModelBinderProvider));
+        var simpleTypeModelBinderProvider = option.ModelBinderProviders.FirstOrDefault(x =>
+            x.GetType() == typeof(SimpleTypeModelBinderProvider)
+        );
 
         if (simpleTypeModelBinderProvider == null)
         {

@@ -31,24 +31,24 @@ public abstract class ContentApiClientTests
         [Fact]
         public async Task ValidationProblem()
         {
-            _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
+            _mockHttp
+                .Expect(HttpMethod.Post, "http://localhost/api/publications")
                 .Respond(
-                HttpStatusCode.BadRequest,
-                JsonContent.Create(new ValidationProblemViewModel
-                {
-                    Errors = new ErrorViewModel[]
-                    {
-                        new() {
-                           Code = Errors.Error1.ToString()
+                    HttpStatusCode.BadRequest,
+                    JsonContent.Create(
+                        new ValidationProblemViewModel
+                        {
+                            Errors = new ErrorViewModel[] { new() { Code = Errors.Error1.ToString() } },
                         }
-                    }
-                }));
+                    )
+                );
 
             var response = await _contentApiClient.ListPublications(
                 page: It.IsAny<int>(),
                 pageSize: It.IsAny<int>(),
                 search: It.IsAny<string>(),
-                publicationIds: It.IsAny<IEnumerable<Guid>>());
+                publicationIds: It.IsAny<IEnumerable<Guid>>()
+            );
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -65,11 +65,9 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task FailureStatusCode_ThrowsException(
-                HttpStatusCode responseStatusCode)
+        public async Task FailureStatusCode_ThrowsException(HttpStatusCode responseStatusCode)
         {
-            _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
-                .Respond(responseStatusCode);
+            _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications").Respond(responseStatusCode);
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
@@ -77,7 +75,8 @@ public abstract class ContentApiClientTests
                     page: It.IsAny<int>(),
                     pageSize: It.IsAny<int>(),
                     search: It.IsAny<string>(),
-                    publicationIds: It.IsAny<IEnumerable<Guid>>());
+                    publicationIds: It.IsAny<IEnumerable<Guid>>()
+                );
             });
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -88,23 +87,25 @@ public abstract class ContentApiClientTests
         {
             var results = new List<PublicationSearchResultViewModel>()
             {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LatestReleaseSlug = "latest-release-slug"
-                }
+                new() { Id = Guid.NewGuid(), LatestReleaseSlug = "latest-release-slug" },
             };
-            var responseBody =
-                new PaginatedListViewModel<PublicationSearchResultViewModel>(results, results.Count, 1, results.Count);
+            var responseBody = new PaginatedListViewModel<PublicationSearchResultViewModel>(
+                results,
+                results.Count,
+                1,
+                results.Count
+            );
 
-            _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
+            _mockHttp
+                .Expect(HttpMethod.Post, "http://localhost/api/publications")
                 .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(responseBody));
 
             var response = await _contentApiClient.ListPublications(
                 page: It.IsAny<int>(),
                 pageSize: It.IsAny<int>(),
                 search: It.IsAny<string>(),
-                publicationIds: It.IsAny<IEnumerable<Guid>>());
+                publicationIds: It.IsAny<IEnumerable<Guid>>()
+            );
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -121,18 +122,17 @@ public abstract class ContentApiClientTests
         {
             var publicationId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
+            _mockHttp
+                .Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(
-                HttpStatusCode.BadRequest,
-                JsonContent.Create(new ValidationProblemViewModel
-                {
-                    Errors = new ErrorViewModel[]
-                    {
-                        new() {
-                           Code = Errors.Error1.ToString()
+                    HttpStatusCode.BadRequest,
+                    JsonContent.Create(
+                        new ValidationProblemViewModel
+                        {
+                            Errors = new ErrorViewModel[] { new() { Code = Errors.Error1.ToString() } },
                         }
-                    }
-                }));
+                    )
+                );
 
             var response = await _contentApiClient.GetPublication(publicationId);
 
@@ -147,7 +147,8 @@ public abstract class ContentApiClientTests
         {
             var publicationId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
+            _mockHttp
+                .Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(HttpStatusCode.NotFound);
 
             var response = await _contentApiClient.GetPublication(publicationId);
@@ -167,16 +168,17 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task FailureStatusCode_ThrowsException(
-            HttpStatusCode responseStatusCode)
+        public async Task FailureStatusCode_ThrowsException(HttpStatusCode responseStatusCode)
         {
             var publicationId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
+            _mockHttp
+                .Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(responseStatusCode);
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                await _contentApiClient.GetPublication(publicationId));
+                await _contentApiClient.GetPublication(publicationId)
+            );
 
             _mockHttp.VerifyNoOutstandingExpectation();
         }
@@ -193,7 +195,8 @@ public abstract class ContentApiClientTests
                 Published = DateTime.UtcNow,
             };
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{result.Id}/summary")
+            _mockHttp
+                .Expect(HttpMethod.Get, $"http://localhost/api/publications/{result.Id}/summary")
                 .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(result));
 
             var response = await _contentApiClient.GetPublication(result.Id);

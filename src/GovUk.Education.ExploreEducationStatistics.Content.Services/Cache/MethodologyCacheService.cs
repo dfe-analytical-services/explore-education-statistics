@@ -13,9 +13,7 @@ public class MethodologyCacheService : IMethodologyCacheService
     private readonly IMethodologyService _methodologyService;
     private readonly ILogger<MethodologyCacheService> _logger;
 
-    public MethodologyCacheService(
-        IMethodologyService methodologyService,
-        ILogger<MethodologyCacheService> logger)
+    public MethodologyCacheService(IMethodologyService methodologyService, ILogger<MethodologyCacheService> logger)
     {
         _methodologyService = methodologyService;
         _logger = logger;
@@ -35,7 +33,8 @@ public class MethodologyCacheService : IMethodologyCacheService
     }
 
     public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
-        Guid publicationId)
+        Guid publicationId
+    )
     {
         return GetSummariesTree()
             .OnSuccess(methodologiesByTheme =>

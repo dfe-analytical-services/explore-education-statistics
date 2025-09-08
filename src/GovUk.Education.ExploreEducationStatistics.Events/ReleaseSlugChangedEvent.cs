@@ -10,7 +10,8 @@ public record ReleaseSlugChangedEvent : IEvent
         string newReleaseSlug,
         Guid publicationId,
         string publicationSlug,
-        bool isPublicationArchived)
+        bool isPublicationArchived
+    )
     {
         Subject = releaseId.ToString();
         Payload = new EventPayload
@@ -18,7 +19,7 @@ public record ReleaseSlugChangedEvent : IEvent
             NewReleaseSlug = newReleaseSlug,
             PublicationId = publicationId.ToString(),
             PublicationSlug = publicationSlug,
-            IsPublicationArchived = isPublicationArchived
+            IsPublicationArchived = isPublicationArchived,
         };
     }
 
@@ -38,7 +39,7 @@ public record ReleaseSlugChangedEvent : IEvent
     /// The event payload
     /// </summary>
     public EventPayload Payload { get; }
-    
+
     public record EventPayload
     {
         public required string NewReleaseSlug { get; init; }

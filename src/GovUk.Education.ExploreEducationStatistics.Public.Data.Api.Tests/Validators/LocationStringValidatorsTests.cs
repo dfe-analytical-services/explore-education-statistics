@@ -63,7 +63,8 @@ public class LocationStringValidatorsTests
         {
             var testObj = new TestClass { Location = location! };
 
-            _validator.TestValidate(testObj)
+            _validator
+                .TestValidate(testObj)
                 .ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -82,7 +83,8 @@ public class LocationStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Location)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(ValidationMessages.LocationFormat.Code)
                 .WithErrorMessage(ValidationMessages.LocationFormat.Message)
                 .WithCustomState<FormatErrorDetail>(s => s.Value == location)
@@ -106,12 +108,14 @@ public class LocationStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Location)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(ValidationMessages.LocationAllowedLevel.Code)
                 .WithErrorMessage(ValidationMessages.LocationAllowedLevel.Message)
                 .WithCustomState<LocationAllowedLevelErrorDetail>(s => s.Value == invalidLevel)
                 .WithCustomState<LocationAllowedLevelErrorDetail>(s =>
-                    s.AllowedLevels.SequenceEqual(EnumUtil.GetEnumValues<GeographicLevel>().Order()))
+                    s.AllowedLevels.SequenceEqual(EnumUtil.GetEnumValues<GeographicLevel>().Order())
+                )
                 .Only();
         }
 
@@ -134,12 +138,14 @@ public class LocationStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Location)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(ValidationMessages.LocationAllowedProperty.Code)
                 .WithErrorMessage(ValidationMessages.LocationAllowedProperty.Message)
                 .WithCustomState<LocationAllowedPropertyErrorDetail>(s => s.Value == invalidProperty)
                 .WithCustomState<LocationAllowedPropertyErrorDetail>(s =>
-                    s.AllowedProperties.SequenceEqual(allowedProperties))
+                    s.AllowedProperties.SequenceEqual(allowedProperties)
+                )
                 .Only();
         }
 
@@ -158,7 +164,8 @@ public class LocationStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Location)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(ValidationMessages.LocationValueNotEmpty.Code)
                 .WithAttemptedValue(value)
                 .WithMessageArgument("Property", property)
@@ -176,7 +183,8 @@ public class LocationStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Location)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(ValidationMessages.LocationValueMaxLength.Code)
                 .WithAttemptedValue(location.KeyValue())
                 .WithMessageArgument("Property", location.KeyProperty().ToLowerFirst())

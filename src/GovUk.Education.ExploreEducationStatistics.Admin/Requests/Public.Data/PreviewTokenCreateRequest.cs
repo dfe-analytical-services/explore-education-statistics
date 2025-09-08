@@ -13,12 +13,9 @@ public record PreviewTokenCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.DataSetVersionId)
-                .NotEmpty();
+            RuleFor(request => request.DataSetVersionId).NotEmpty();
 
-            RuleFor(request => request.Label)
-                .NotEmpty()
-                .MaximumLength(100);
+            RuleFor(request => request.Label).NotEmpty().MaximumLength(100);
         }
     }
 }

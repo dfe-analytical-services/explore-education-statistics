@@ -38,7 +38,8 @@ public class ImporterService : IImporterService
         IDataImportService dataImportService,
         ILogger<ImporterService> logger,
         IDatabaseHelper databaseHelper,
-        IObservationBatchImporter? observationBatchImporter = null)
+        IObservationBatchImporter? observationBatchImporter = null
+    )
     {
         _appOptions = appOptions.Value;
         _guidGenerator = guidGenerator;
@@ -54,7 +55,8 @@ public class ImporterService : IImporterService
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
         Subject subject,
-        StatisticsDbContext context)
+        StatisticsDbContext context
+    )
     {
         return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, subject, context);
     }
@@ -63,11 +65,13 @@ public class ImporterService : IImporterService
     {
         public virtual bool Equals(FilterItemMeta? other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return FilterId.Equals(other.FilterId)
-                   && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase)
-                   && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
+                && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase)
+                && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
         }
 
         public override int GetHashCode()
@@ -80,10 +84,12 @@ public class ImporterService : IImporterService
     {
         public virtual bool Equals(FilterGroupMeta? other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return FilterId.Equals(other.FilterId)
-                   && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
+                && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
         }
 
         public override int GetHashCode()
@@ -96,7 +102,8 @@ public class ImporterService : IImporterService
         DataImport dataImport,
         Func<Task<Stream>> dataFileStreamProvider,
         SubjectMeta subjectMeta,
-        StatisticsDbContext context)
+        StatisticsDbContext context
+    )
     {
         var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
         var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
@@ -108,41 +115,56 @@ public class ImporterService : IImporterService
         var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
 
-        await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
-        {
-            if (index % Stage2RowCheck == 0)
+        await CsvUtils.ForEachRow(
+            dataFileStreamProvider,
+            async (rowValues, index, _) =>
             {
-                var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
-
-                if (currentStatus.IsFinishedOrAborting())
+                if (index % Stage2RowCheck == 0)
                 {
-                    _logger.LogInformation(
-                        "Import for {FileName} has finished or is being aborted, " +
-                        "so finishing importing Filters and Locations early", dataImport.File.Filename);
-                    return false;
+                    var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
+
+                    if (currentStatus.IsFinishedOrAborting())
+                    {
+                        _logger.LogInformation(
+                            "Import for {FileName} has finished or is being aborted, "
+                                + "so finishing importing Filters and Locations early",
+                            dataImport.File.Filename
+                        );
+                        return false;
+                    }
+
+                    await _dataImportService.UpdateStatus(
+                        dataImport.Id,
+                        DataImportStatus.STAGE_2,
+                        (double)(index + 1) / dataImport.TotalRows!.Value * 100
+                    );
                 }
 
-                await _dataImportService.UpdateStatus(dataImport.Id,
-                    DataImportStatus.STAGE_2,
-                    (double)(index + 1) / dataImport.TotalRows!.Value * 100);
-            }
-
-            if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
-            {
-                foreach (var filterMeta in subjectMeta.Filters)
+                if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
                 {
-                    var filterItemLabel = filterAndIndicatorReader.GetFilterItemLabel(rowValues, filterMeta.Filter.Id);
-                    var filterGroupLabel = filterAndIndicatorReader.GetFilterGroupLabel(rowValues, filterMeta.Filter.Id);
+                    foreach (var filterMeta in subjectMeta.Filters)
+                    {
+                        var filterItemLabel = filterAndIndicatorReader.GetFilterItemLabel(
+                            rowValues,
+                            filterMeta.Filter.Id
+                        );
+                        var filterGroupLabel = filterAndIndicatorReader.GetFilterGroupLabel(
+                            rowValues,
+                            filterMeta.Filter.Id
+                        );
 
-                    filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
-                    filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
+                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
+                        filterItemsFromCsv.Add(
+                            new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel)
+                        );
+                    }
+
+                    locations.Add(fixedInformationReader.GetLocation(rowValues));
                 }
 
-                locations.Add(fixedInformationReader.GetLocation(rowValues));
+                return true;
             }
-
-            return true;
-        });
+        );
 
         var filterGroups = filterGroupsFromCsv
             .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel))
@@ -154,77 +176,75 @@ public class ImporterService : IImporterService
                 var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
 
                 var filterGroup = filterGroups.Single(fg =>
-                    fg.FilterId.Equals(filterId)
-                    && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
+                    fg.FilterId.Equals(filterId) && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase)
+                );
 
                 return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in returned filterItems
             })
             .ToList();
 
-        var filterIds = filterGroups
-            .Select(group => group.FilterId)
-            .Distinct()
-            .ToList();
+        var filterIds = filterGroups.Select(group => group.FilterId).Distinct().ToList();
 
-        var filterIdToAutoSelectFilterItem = filterIds
-            .ToDictionary(
-                filterId => filterId,
-                filterId =>
-                {
-                    var autoSelectFilterItemLabel = context.Filter
-                        .Where(f => f.Id == filterId)
-                        .Select(f => f.AutoSelectFilterItemLabel)
-                        .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
-
-                    var filterItemsWithAutoSelectLabel = filterItems
-                        .Where(item =>
-                            item.FilterGroup.FilterId == filterId &&
-                            item.Label.Equals(autoSelectFilterItemLabel, OrdinalIgnoreCase))
-                        .ToList();
-
-                    // There might be two or more filter items with the same label under different groups
-                    if (filterItemsWithAutoSelectLabel.Count > 1)
-                    {
-                        // If so, does one belong to a filter group with the same label?
-                        // If it does, this is the auto select filter item
-                        return filterItemsWithAutoSelectLabel
-                            .Where(fi => fi.FilterGroup.Label == "Total")
-                            .Select(fi => new { fi.Id, fi.Label })
-                            .SingleOrDefault(); // is the default "null", or does it break?
-
-                        // NB. This implementation does not currently support filter hierarchies.
-                        // TODO (EES-5884): Fix auto-select filter items for filter hierarchies
-                    }
-
-                    return filterItemsWithAutoSelectLabel
-                        .Select(fi => new { fi.Id, fi.Label })
-                        .FirstOrDefault();
-                }
-            );
-
-        await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
-        {
-            // We don't add filter groups explicitly, as they are included in `filterItems`
-            await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
-
-            var filters = ctxDelegate.Filter
-                .Where(f => filterIds.Contains(f.Id))
-                .ToList();
-            foreach (var filter in filters)
+        var filterIdToAutoSelectFilterItem = filterIds.ToDictionary(
+            filterId => filterId,
+            filterId =>
             {
-                var filterItem = filterIdToAutoSelectFilterItem[filter.Id];
-                filter.AutoSelectFilterItemId = filterItem?.Id;
-                // If filter item Total is found, AutoSelectFilterItemLabel wouldn't be set, so set it
-                filter.AutoSelectFilterItemLabel = filterItem?.Label;
+                var autoSelectFilterItemLabel =
+                    context
+                        .Filter.Where(f => f.Id == filterId)
+                        .Select(f => f.AutoSelectFilterItemLabel)
+                        .SingleOrDefault()
+                    ?? "Total"; // If meta file didn't specify a default, look for "Total"
+
+                var filterItemsWithAutoSelectLabel = filterItems
+                    .Where(item =>
+                        item.FilterGroup.FilterId == filterId
+                        && item.Label.Equals(autoSelectFilterItemLabel, OrdinalIgnoreCase)
+                    )
+                    .ToList();
+
+                // There might be two or more filter items with the same label under different groups
+                if (filterItemsWithAutoSelectLabel.Count > 1)
+                {
+                    // If so, does one belong to a filter group with the same label?
+                    // If it does, this is the auto select filter item
+                    return filterItemsWithAutoSelectLabel
+                        .Where(fi => fi.FilterGroup.Label == "Total")
+                        .Select(fi => new { fi.Id, fi.Label })
+                        .SingleOrDefault(); // is the default "null", or does it break?
+
+                    // NB. This implementation does not currently support filter hierarchies.
+                    // TODO (EES-5884): Fix auto-select filter items for filter hierarchies
+                }
+
+                return filterItemsWithAutoSelectLabel.Select(fi => new { fi.Id, fi.Label }).FirstOrDefault();
             }
+        );
 
-            await ctxDelegate.SaveChangesAsync();
-        });
+        await _databaseHelper.DoInTransaction(
+            context,
+            async ctxDelegate =>
+            {
+                // We don't add filter groups explicitly, as they are included in `filterItems`
+                await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
 
-        // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
+                var filters = ctxDelegate.Filter.Where(f => filterIds.Contains(f.Id)).ToList();
+                foreach (var filter in filters)
+                {
+                    var filterItem = filterIdToAutoSelectFilterItem[filter.Id];
+                    filter.AutoSelectFilterItemId = filterItem?.Id;
+                    // If filter item Total is found, AutoSelectFilterItemLabel wouldn't be set, so set it
+                    filter.AutoSelectFilterItemLabel = filterItem?.Label;
+                }
+
+                await ctxDelegate.SaveChangesAsync();
+            }
+        );
+
+        // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent
         // import processes reaching this stage will wait before adding their own new Locations, if any.
         //
-        // This ensures that we do not end up with duplicate Locations being added by separate processes, or let one 
+        // This ensures that we do not end up with duplicate Locations being added by separate processes, or let one
         // process continue on to the next stage of import before all Locations that it relies on have been
         // persisted successfully by whichever import process introduced it first.
         //
@@ -233,7 +253,8 @@ public class ImporterService : IImporterService
         await _databaseHelper.ExecuteWithExclusiveLock(
             context,
             "Importer_AddNewLocations",
-            ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
+            ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList())
+        );
     }
 
     public async Task ImportObservations(
@@ -241,7 +262,8 @@ public class ImporterService : IImporterService
         Func<Task<Stream>> dataFileStreamProvider,
         Func<Task<Stream>> metaFileStreamProvider,
         Subject subject,
-        StatisticsDbContext context)
+        StatisticsDbContext context
+    )
     {
         var importObservationsBatchSize = _appOptions.RowsPerBatch;
         var soleGeographicLevel = import.HasSoleGeographicLevel();
@@ -259,7 +281,8 @@ public class ImporterService : IImporterService
             metaFileCsvHeaders,
             metaFileCsvRows,
             subject,
-            context);
+            context
+        );
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
         var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
@@ -274,61 +297,68 @@ public class ImporterService : IImporterService
                 if (currentImportStatus.IsFinishedOrAborting())
                 {
                     _logger.LogInformation(
-                        "Import for {FileName} has finished or is being aborted, " +
-                        "so finishing importing Observations early",
-                        import.File.Filename);
+                        "Import for {FileName} has finished or is being aborted, "
+                            + "so finishing importing Observations early",
+                        import.File.Filename
+                    );
                     return false;
                 }
 
                 _logger.LogInformation(
                     "Importing Observation batch {BatchNumber} of {TotalBatches}",
                     batchIndex + 1,
-                    totalBatches);
+                    totalBatches
+                );
 
                 // Find the subset of this batch that hasn't yet been processed. We can use the
                 // lastProcessedRowIndex to work out which rows in this batch have not yet been processed.
-                // A scenario whereby a given batch of rows could already be partially imported can occur 
+                // A scenario whereby a given batch of rows could already be partially imported can occur
                 // if the import process was stopped mid-import and the "RowsPerBatch" configuration value
                 // changed, so that there is now some overlap between the rows in a new batch and the end of
-                // a previous batch using the old batch size. 
+                // a previous batch using the old batch size.
                 var startOfBatchRowIndex = batchIndex * importObservationsBatchSize;
                 var firstRowIndexOfBatchToProcess =
                     Math.Max(startOfBatchRowIndex, lastProcessedRowIndex + 1) - startOfBatchRowIndex;
                 var unprocessedRows = batchOfRows.GetRange(
                     firstRowIndexOfBatchToProcess,
-                    batchOfRows.Count - firstRowIndexOfBatchToProcess);
+                    batchOfRows.Count - firstRowIndexOfBatchToProcess
+                );
 
                 if (unprocessedRows.Count != batchOfRows.Count)
                 {
                     _logger.LogInformation(
-                        "Skipping first {SkippedRowCount} rows of batch {BatchNumber} as it is already " +
-                        "partially imported",
+                        "Skipping first {SkippedRowCount} rows of batch {BatchNumber} as it is already "
+                            + "partially imported",
                         batchOfRows.Count() - unprocessedRows.Count,
-                        batchIndex + 1);
+                        batchIndex + 1
+                    );
                 }
 
-                var allowedRows = unprocessedRows.Select((cells, rowIndex) =>
-                {
-                    if (IsRowAllowed(soleGeographicLevel, cells, fixedInformationReader))
-                    {
-                        var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
+                var allowedRows = unprocessedRows
+                    .Select(
+                        (cells, rowIndex) =>
+                        {
+                            if (IsRowAllowed(soleGeographicLevel, cells, fixedInformationReader))
+                            {
+                                var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
 
-                        return ObservationFromCsv(
-                            cells,
-                            subject,
-                            subjectMeta
-                                .Filters
-                                .Select(meta => meta.Filter)
-                                .ToList(),
-                            fixedInformationReader,
-                            filterAndIndicatorReader,
-                            csvRow);
-                    }
+                                return ObservationFromCsv(
+                                    cells,
+                                    subject,
+                                    subjectMeta.Filters.Select(meta => meta.Filter).ToList(),
+                                    fixedInformationReader,
+                                    filterAndIndicatorReader,
+                                    csvRow
+                                );
+                            }
 
-                    return null;
-                }).WhereNotNull();
+                            return null;
+                        }
+                    )
+                    .WhereNotNull();
 
-                await _databaseHelper.DoInTransaction(context,
+                await _databaseHelper.DoInTransaction(
+                    context,
                     async contextDelegate =>
                         await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows)
                 );
@@ -339,7 +369,8 @@ public class ImporterService : IImporterService
                 await _dataImportService.Update(
                     import.Id,
                     importedRows: importedRowsSoFar,
-                    lastProcessedRowIndex: lastProcessedRowIndex);
+                    lastProcessedRowIndex: lastProcessedRowIndex
+                );
 
                 var percentageComplete = (double)((batchIndex + 1) / totalBatches) * 100;
 
@@ -347,7 +378,8 @@ public class ImporterService : IImporterService
 
                 return true;
             },
-            startingBatchIndex);
+            startingBatchIndex
+        );
     }
 
     /// <summary>
@@ -357,7 +389,8 @@ public class ImporterService : IImporterService
     private static bool IsRowAllowed(
         bool soleGeographicLevel,
         IReadOnlyList<string> rowValues,
-        FixedInformationDataFileReader fixedInformationReader)
+        FixedInformationDataFileReader fixedInformationReader
+    )
     {
         return soleGeographicLevel || !fixedInformationReader.GetGeographicLevel(rowValues).IsSoloImportableLevel();
     }
@@ -368,7 +401,8 @@ public class ImporterService : IImporterService
         List<Filter> filters,
         FixedInformationDataFileReader fixedInformationReader,
         FilterAndIndicatorValuesReader filterAndIndicatorReader,
-        int csvRowNum)
+        int csvRowNum
+    )
     {
         var observationId = _guidGenerator.NewGuid();
 
@@ -381,7 +415,7 @@ public class ImporterService : IImporterService
             SubjectId = subject.Id,
             TimeIdentifier = fixedInformationReader.GetTimeIdentifier(rowValues),
             Year = fixedInformationReader.GetYear(rowValues),
-            CsvRow = csvRowNum
+            CsvRow = csvRowNum,
         };
     }
 
@@ -389,23 +423,25 @@ public class ImporterService : IImporterService
         IReadOnlyList<string> rowValues,
         List<Filter> filters,
         FilterAndIndicatorValuesReader filterAndIndicatorReader,
-        Guid observationId)
+        Guid observationId
+    )
     {
-        return filters.Select(filter =>
-        {
-            var filterItem = filterAndIndicatorReader.GetFilterItem(rowValues, filter);
-
-            return new ObservationFilterItem
+        return filters
+            .Select(filter =>
             {
-                ObservationId = observationId,
-                FilterItemId = filterItem.Id,
-                FilterId = filter.Id
-            };
-        }).ToList();
+                var filterItem = filterAndIndicatorReader.GetFilterItem(rowValues, filter);
+
+                return new ObservationFilterItem
+                {
+                    ObservationId = observationId,
+                    FilterItemId = filterItem.Id,
+                    FilterId = filter.Id,
+                };
+            })
+            .ToList();
     }
 
-    private Guid GetLocationId(
-        IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
+    private Guid GetLocationId(IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
     {
         var location = fixedInformationReader.GetLocation(rowValues);
         return _importerLocationService.Get(location).Id;
@@ -444,18 +480,14 @@ public class StoredProcedureObservationBatchImporter : IObservationBatchImporter
 
             foreach (var item in o.FilterItems)
             {
-                observationsFilterItemsTable.Rows.Add(
-                    item.ObservationId,
-                    item.FilterItemId,
-                    item.FilterId
-                );
+                observationsFilterItemsTable.Rows.Add(item.ObservationId, item.FilterItemId, item.FilterId);
             }
         }
 
         var parameter = new SqlParameter("@Observations", SqlDbType.Structured)
         {
             Value = observationsTable,
-            TypeName = "[dbo].[ObservationType]"
+            TypeName = "[dbo].[ObservationType]",
         };
 
         await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservations] @Observations", parameter);
@@ -463,12 +495,13 @@ public class StoredProcedureObservationBatchImporter : IObservationBatchImporter
         parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
         {
             Value = observationsFilterItemsTable,
-            TypeName = "[dbo].[ObservationFilterItemType]"
+            TypeName = "[dbo].[ObservationFilterItemType]",
         };
 
         await context.Database.ExecuteSqlRawAsync(
             "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems",
-            parameter);
+            parameter
+        );
     }
 }
 

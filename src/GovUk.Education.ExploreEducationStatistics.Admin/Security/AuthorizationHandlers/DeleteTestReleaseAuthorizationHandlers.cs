@@ -10,14 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class DeleteTestReleaseRequirement : IAuthorizationRequirement;
 
-public class DeleteTestReleaseAuthorizationHandler(
-    IOptions<AppOptions> appOptions)
+public class DeleteTestReleaseAuthorizationHandler(IOptions<AppOptions> appOptions)
     : AuthorizationHandler<DeleteTestReleaseRequirement, ReleaseVersion>
 {
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DeleteTestReleaseRequirement requirement,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         if (!appOptions.Value.EnableThemeDeletion)
         {

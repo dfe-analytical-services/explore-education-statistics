@@ -17,19 +17,20 @@ public class OrganisationsValidatorMockBuilder
     private Organisation[]? _organisations;
     private ErrorViewModel[]? _validationErrors;
 
-    private static readonly Expression<Func<IOrganisationsValidator, Task<Either<ActionResult, Organisation[]>>>>
-        ValidateOrganisations =
-            m => m.ValidateOrganisations(
-                It.IsAny<Guid[]?>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IOrganisationsValidator, Task<Either<ActionResult, Organisation[]>>>
+    > ValidateOrganisations = m =>
+        m.ValidateOrganisations(It.IsAny<Guid[]?>(), It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public IOrganisationsValidator Build()
     {
-        _mock.Setup(ValidateOrganisations)
-            .ReturnsAsync(_validationErrors?.Length > 0
-                ? ValidationUtils.ValidationResult(_validationErrors)
-                : _organisations ?? []);
+        _mock
+            .Setup(ValidateOrganisations)
+            .ReturnsAsync(
+                _validationErrors?.Length > 0
+                    ? ValidationUtils.ValidationResult(_validationErrors)
+                    : _organisations ?? []
+            );
 
         return _mock.Object;
     }
@@ -52,13 +53,19 @@ public class OrganisationsValidatorMockBuilder
     {
         public void ValidateOrganisationsWasCalled(
             Guid[]? expectedOrganisationIds = null,
-            string? expectedPath = null) =>
-            mock.Verify(m => m.ValidateOrganisations(
-                    It.Is<Guid[]?>(organisationIds =>
-                        expectedOrganisationIds == null || organisationIds == expectedOrganisationIds),
-                    It.Is<string?>(path => expectedPath == null || path == expectedPath),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            string? expectedPath = null
+        ) =>
+            mock.Verify(
+                m =>
+                    m.ValidateOrganisations(
+                        It.Is<Guid[]?>(organisationIds =>
+                            expectedOrganisationIds == null || organisationIds == expectedOrganisationIds
+                        ),
+                        It.Is<string?>(path => expectedPath == null || path == expectedPath),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
 
         public void ValidateOrganisationsWasNotCalled() => mock.Verify(ValidateOrganisations, Times.Never);
     }

@@ -9,7 +9,8 @@ public partial class EES2222_AddCascadeDeleteToPublicationMethodologyIfPublicati
     {
         migrationBuilder.DropForeignKey(
             name: "FK_PublicationMethodologies_Publications_PublicationId",
-            table: "PublicationMethodologies");
+            table: "PublicationMethodologies"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_PublicationMethodologies_Publications_PublicationId",
@@ -17,20 +18,23 @@ public partial class EES2222_AddCascadeDeleteToPublicationMethodologyIfPublicati
             column: "PublicationId",
             principalTable: "Publications",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_PublicationMethodologies_Publications_PublicationId",
-            table: "PublicationMethodologies");
+            table: "PublicationMethodologies"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_PublicationMethodologies_Publications_PublicationId",
             table: "PublicationMethodologies",
             column: "PublicationId",
             principalTable: "Publications",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 }

@@ -13,13 +13,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class EducationInNumbersContentService(
-    ContentDbContext contentDbContext): IEducationInNumbersContentService
+public class EducationInNumbersContentService(ContentDbContext contentDbContext) : IEducationInNumbersContentService
 {
     public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId)
     {
-        return await contentDbContext.EducationInNumbersPages
-            .Include(page => page.Content)
+        return await contentDbContext
+            .EducationInNumbersPages.Include(page => page.Content)
             .ThenInclude(section => section.Content)
             .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .Where(page => page.Id == pageId)
@@ -27,11 +26,10 @@ public class EducationInNumbersContentService(
             .OnSuccess(EinContentViewModel.FromModel);
     }
 
-    public async Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(Guid pageId,
-        int order)
+    public async Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(Guid pageId, int order)
     {
-        var sectionList = contentDbContext.EinContentSections
-            .Where(section => section.EducationInNumbersPageId == pageId)
+        var sectionList = contentDbContext
+            .EinContentSections.Where(section => section.EducationInNumbersPageId == pageId)
             .ToList();
 
         var newSection = new EinContentSection
@@ -43,8 +41,7 @@ public class EducationInNumbersContentService(
             Content = [],
         };
 
-        sectionList.Where(section => section.Order >= order)
-            .ForEach(section => section.Order++);
+        sectionList.Where(section => section.Order >= order).ForEach(section => section.Order++);
 
         contentDbContext.EinContentSections.Add(newSection);
         contentDbContext.EinContentSections.UpdateRange(sectionList);
@@ -56,13 +53,12 @@ public class EducationInNumbersContentService(
     public async Task<Either<ActionResult, EinContentSectionViewModel>> UpdateSectionHeading(
         Guid pageId,
         Guid sectionId,
-        string heading)
+        string heading
+    )
     {
-        return await contentDbContext.EinContentSections
-            .Include(s => s.Content)
-            .FirstOrNotFoundAsync(section =>
-                section.EducationInNumbersPageId == pageId
-                && section.Id == sectionId)
+        return await contentDbContext
+            .EinContentSections.Include(s => s.Content)
+            .FirstOrNotFoundAsync(section => section.EducationInNumbersPageId == pageId && section.Id == sectionId)
             .OnSuccess(async section =>
             {
                 section.Heading = heading;
@@ -75,10 +71,11 @@ public class EducationInNumbersContentService(
 
     public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> ReorderSections(
         Guid pageId,
-        List<Guid> newSectionOrder)
+        List<Guid> newSectionOrder
+    )
     {
-        var page = contentDbContext.EducationInNumbersPages
-            .Include(p => p.Content)
+        var page = contentDbContext
+            .EducationInNumbersPages.Include(p => p.Content)
             .ThenInclude(s => s.Content)
             .ThenInclude(b => (b as EinTileGroupBlock)!.Tiles)
             .SingleOrDefault(p => p.Id == pageId);
@@ -90,33 +87,31 @@ public class EducationInNumbersContentService(
 
         var sectionList = page.Content;
 
-        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
-                sectionList.Select(section => section.Id), newSectionOrder))
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(sectionList.Select(section => section.Id), newSectionOrder))
         {
-            return ValidationUtils.ValidationActionResult(ValidationErrorMessages
-                .EinProvidedSectionIdsDifferFromActualSectionIds);
+            return ValidationUtils.ValidationActionResult(
+                ValidationErrorMessages.EinProvidedSectionIdsDifferFromActualSectionIds
+            );
         }
 
-        newSectionOrder.ForEach((sectionId, order) =>
-        {
-            var matchingSection = sectionList.Single(section => section.Id == sectionId);
-            matchingSection.Order = order;
-        });
+        newSectionOrder.ForEach(
+            (sectionId, order) =>
+            {
+                var matchingSection = sectionList.Single(section => section.Id == sectionId);
+                matchingSection.Order = order;
+            }
+        );
 
         contentDbContext.EinContentSections.UpdateRange(sectionList);
         await contentDbContext.SaveChangesAsync();
 
-        return sectionList
-            .Select(EinContentSectionViewModel.FromModel)
-            .OrderBy(section => section.Order)
-            .ToList();
+        return sectionList.Select(EinContentSectionViewModel.FromModel).OrderBy(section => section.Order).ToList();
     }
 
-    public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> DeleteSection(
-        Guid pageId, Guid sectionId)
+    public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> DeleteSection(Guid pageId, Guid sectionId)
     {
-        var page = contentDbContext.EducationInNumbersPages
-            .Include(p => p.Content)
+        var page = contentDbContext
+            .EducationInNumbersPages.Include(p => p.Content)
             .ThenInclude(section => section.Content)
             .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .SingleOrDefault(p => p.Id == pageId);
@@ -144,20 +139,18 @@ public class EducationInNumbersContentService(
         contentDbContext.EinContentSections.UpdateRange(pageSections);
         await contentDbContext.SaveChangesAsync();
 
-        return pageSections
-            .Select(EinContentSectionViewModel.FromModel)
-            .OrderBy(section => section.Order)
-            .ToList();
+        return pageSections.Select(EinContentSectionViewModel.FromModel).OrderBy(section => section.Order).ToList();
     }
 
     public async Task<Either<ActionResult, EinContentBlockViewModel>> AddBlock(
         Guid pageId,
         Guid sectionId,
         EinBlockType type,
-        int? order)
+        int? order
+    )
     {
-        var blockList = contentDbContext.EinContentBlocks
-            .Where(block => block.EinContentSectionId == sectionId)
+        var blockList = contentDbContext
+            .EinContentBlocks.Where(block => block.EinContentSectionId == sectionId)
             .ToList();
 
         EinContentBlock newBlock = type switch
@@ -177,7 +170,7 @@ public class EducationInNumbersContentService(
                 Order = order ?? blockList.Count,
                 Tiles = [],
             },
-            _ => throw new Exception($"{nameof(EinContentBlock)} type {type} not found")
+            _ => throw new Exception($"{nameof(EinContentBlock)} type {type} not found"),
         };
 
         blockList // fix order of preexisting blocks
@@ -195,13 +188,16 @@ public class EducationInNumbersContentService(
         Guid pageId,
         Guid sectionId,
         Guid htmlBlockId,
-        EinHtmlBlockUpdateRequest request)
+        EinHtmlBlockUpdateRequest request
+    )
     {
-        var htmlBlockToUpdate = contentDbContext.EinContentBlocks
-            .OfType<EinHtmlBlock>()
-            .SingleOrDefault(htmlBlock => htmlBlock.Id == htmlBlockId
-                                      && htmlBlock.EinContentSectionId == sectionId
-                                      && htmlBlock.EinContentSection.EducationInNumbersPageId == pageId);
+        var htmlBlockToUpdate = contentDbContext
+            .EinContentBlocks.OfType<EinHtmlBlock>()
+            .SingleOrDefault(htmlBlock =>
+                htmlBlock.Id == htmlBlockId
+                && htmlBlock.EinContentSectionId == sectionId
+                && htmlBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
 
         if (htmlBlockToUpdate == null)
         {
@@ -219,14 +215,17 @@ public class EducationInNumbersContentService(
         Guid pageId,
         Guid sectionId,
         Guid tileGroupBlockId,
-        EinTileGroupBlockUpdateRequest request)
+        EinTileGroupBlockUpdateRequest request
+    )
     {
-        var tileGroupBlockToUpdate = contentDbContext.EinContentBlocks
-            .OfType<EinTileGroupBlock>()
+        var tileGroupBlockToUpdate = contentDbContext
+            .EinContentBlocks.OfType<EinTileGroupBlock>()
             .Include(groupBlock => groupBlock.Tiles)
-            .SingleOrDefault(tileGroupBlock => tileGroupBlock.Id == tileGroupBlockId
-                                               && tileGroupBlock.EinContentSectionId == sectionId
-                                               && tileGroupBlock.EinContentSection.EducationInNumbersPageId == pageId);
+            .SingleOrDefault(tileGroupBlock =>
+                tileGroupBlock.Id == tileGroupBlockId
+                && tileGroupBlock.EinContentSectionId == sectionId
+                && tileGroupBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
 
         if (tileGroupBlockToUpdate == null)
         {
@@ -243,13 +242,13 @@ public class EducationInNumbersContentService(
     public async Task<Either<ActionResult, List<EinContentBlockViewModel>>> ReorderBlocks(
         Guid pageId,
         Guid sectionId,
-        List<Guid> newBlockOrder)
+        List<Guid> newBlockOrder
+    )
     {
-        var section = contentDbContext.EinContentSections
-            .Include(p => p.Content)
+        var section = contentDbContext
+            .EinContentSections.Include(p => p.Content)
             .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
-            .SingleOrDefault(s => s.Id == sectionId
-                && s.EducationInNumbersPageId == pageId);
+            .SingleOrDefault(s => s.Id == sectionId && s.EducationInNumbersPageId == pageId);
 
         if (section == null)
         {
@@ -258,38 +257,33 @@ public class EducationInNumbersContentService(
 
         var blockList = section.Content;
 
-        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
-                blockList.Select(block => block.Id), newBlockOrder))
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(blockList.Select(block => block.Id), newBlockOrder))
         {
-            return ValidationUtils.ValidationActionResult(ValidationErrorMessages
-                .EinProvidedBlockIdsDifferFromActualBlockIds);
+            return ValidationUtils.ValidationActionResult(
+                ValidationErrorMessages.EinProvidedBlockIdsDifferFromActualBlockIds
+            );
         }
 
-        newBlockOrder.ForEach((blockId, order) =>
-        {
-            var matchingBlock = blockList.Single(block => block.Id == blockId);
-            matchingBlock.Order = order;
-        });
+        newBlockOrder.ForEach(
+            (blockId, order) =>
+            {
+                var matchingBlock = blockList.Single(block => block.Id == blockId);
+                matchingBlock.Order = order;
+            }
+        );
 
         contentDbContext.EinContentBlocks.UpdateRange(blockList);
         await contentDbContext.SaveChangesAsync();
 
-        return blockList
-            .Select(EinContentBlockViewModel.FromModel)
-            .OrderBy(block => block.Order)
-            .ToList();
+        return blockList.Select(EinContentBlockViewModel.FromModel).OrderBy(block => block.Order).ToList();
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteBlock(
-        Guid pageId,
-        Guid sectionId,
-        Guid blockId)
+    public async Task<Either<ActionResult, Unit>> DeleteBlock(Guid pageId, Guid sectionId, Guid blockId)
     {
-        var section = contentDbContext.EinContentSections
-            .Include(section => section.Content)
+        var section = contentDbContext
+            .EinContentSections.Include(section => section.Content)
             .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
-            .SingleOrDefault(s => s.Id == sectionId
-                && s.EducationInNumbersPageId == pageId);
+            .SingleOrDefault(s => s.Id == sectionId && s.EducationInNumbersPageId == pageId);
 
         if (section == null)
         {
@@ -320,11 +314,14 @@ public class EducationInNumbersContentService(
         Guid pageId,
         Guid parentBlockId,
         EinTileType type,
-        int? order)
+        int? order
+    )
     {
-        var tileList = contentDbContext.EinTiles
-            .Where(tile => tile.EinParentBlockId == parentBlockId
-                           && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId)
+        var tileList = contentDbContext
+            .EinTiles.Where(tile =>
+                tile.EinParentBlockId == parentBlockId
+                && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+            )
             .ToList();
 
         EinTile newTile = type switch
@@ -340,7 +337,7 @@ public class EducationInNumbersContentService(
                 LinkUrl = null,
                 LinkText = null,
             },
-            _ => throw new Exception($"{nameof(EinTile)} type {type} not found")
+            _ => throw new Exception($"{nameof(EinTile)} type {type} not found"),
         };
 
         tileList // fix order of preexisting tiles
@@ -357,12 +354,14 @@ public class EducationInNumbersContentService(
     public async Task<Either<ActionResult, EinTileViewModel>> UpdateFreeTextStatTile(
         Guid pageId,
         Guid tileId,
-        EinFreeTextStatTileUpdateRequest request)
+        EinFreeTextStatTileUpdateRequest request
+    )
     {
-        var tileToUpdate = contentDbContext.EinTiles
-            .OfType<EinFreeTextStatTile>()
-            .SingleOrDefault(tile => tile.Id == tileId
-                                     && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId);
+        var tileToUpdate = contentDbContext
+            .EinTiles.OfType<EinFreeTextStatTile>()
+            .SingleOrDefault(tile =>
+                tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
 
         if (tileToUpdate == null)
         {
@@ -384,13 +383,15 @@ public class EducationInNumbersContentService(
     public async Task<Either<ActionResult, List<EinTileViewModel>>> ReorderTiles(
         Guid pageId,
         Guid parentBlockId,
-        List<Guid> newTileOrder)
+        List<Guid> newTileOrder
+    )
     {
-        var parentBlock = contentDbContext.EinContentBlocks
-            .OfType<EinTileGroupBlock>()
+        var parentBlock = contentDbContext
+            .EinContentBlocks.OfType<EinTileGroupBlock>()
             .Include(parentBlock => parentBlock.Tiles)
-            .SingleOrDefault(parentBlock => parentBlock.Id == parentBlockId
-                                            && parentBlock.EinContentSection.EducationInNumbersPageId == pageId);
+            .SingleOrDefault(parentBlock =>
+                parentBlock.Id == parentBlockId && parentBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
 
         if (parentBlock == null)
         {
@@ -399,38 +400,35 @@ public class EducationInNumbersContentService(
 
         var tileList = parentBlock.Tiles;
 
-        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
-                tileList.Select(tile => tile.Id), newTileOrder))
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(tileList.Select(tile => tile.Id), newTileOrder))
         {
-            return ValidationUtils.ValidationActionResult(ValidationErrorMessages
-                .EinProvidedTileIdsDifferFromActualTileIds);
+            return ValidationUtils.ValidationActionResult(
+                ValidationErrorMessages.EinProvidedTileIdsDifferFromActualTileIds
+            );
         }
 
-        newTileOrder.ForEach((tileId, order) =>
-        {
-            var matching = tileList.Single(tile => tile.Id == tileId);
-            matching.Order = order;
-        });
+        newTileOrder.ForEach(
+            (tileId, order) =>
+            {
+                var matching = tileList.Single(tile => tile.Id == tileId);
+                matching.Order = order;
+            }
+        );
 
         contentDbContext.EinTiles.UpdateRange(tileList);
         await contentDbContext.SaveChangesAsync();
 
-        return tileList
-            .Select(EinTileViewModel.FromModel)
-            .OrderBy(tile => tile.Order)
-            .ToList();
+        return tileList.Select(EinTileViewModel.FromModel).OrderBy(tile => tile.Order).ToList();
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteTile(
-        Guid pageId,
-        Guid blockId,
-        Guid tileId)
+    public async Task<Either<ActionResult, Unit>> DeleteTile(Guid pageId, Guid blockId, Guid tileId)
     {
-        var block = contentDbContext.EinContentBlocks
-            .OfType<EinTileGroupBlock>()
+        var block = contentDbContext
+            .EinContentBlocks.OfType<EinTileGroupBlock>()
             .Include(block => block.Tiles)
-            .SingleOrDefault(block => block.Id == blockId
-                                      && block.EinContentSection.EducationInNumbersPageId == pageId);
+            .SingleOrDefault(block =>
+                block.Id == blockId && block.EinContentSection.EducationInNumbersPageId == pageId
+            );
 
         if (block == null)
         {

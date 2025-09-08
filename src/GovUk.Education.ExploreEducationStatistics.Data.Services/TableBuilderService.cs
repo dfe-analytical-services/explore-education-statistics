@@ -55,7 +55,8 @@ public class TableBuilderService : ITableBuilderService
         ISubjectRepository subjectRepository,
         IUserService userService,
         IOptions<TableBuilderOptions> options,
-        IOptions<LocationsOptions> locationOptions)
+        IOptions<LocationsOptions> locationOptions
+    )
     {
         _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
@@ -73,7 +74,8 @@ public class TableBuilderService : ITableBuilderService
 
     public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
         FullTableQuery query,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await FindLatestPublishedReleaseVersionId(query.SubjectId)
             .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
@@ -82,10 +84,10 @@ public class TableBuilderService : ITableBuilderService
     public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
         Guid releaseVersionId,
         FullTableQuery query,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
-                releaseVersionId: releaseVersionId)
+        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
@@ -104,7 +106,8 @@ public class TableBuilderService : ITableBuilderService
                         {
                             SubjectMeta = subjectMetaViewModel,
                             Results = observations.Select(observation =>
-                                ObservationViewModelBuilder.BuildObservation(observation, query.Indicators)),
+                                ObservationViewModelBuilder.BuildObservation(observation, query.Indicators)
+                            ),
                         };
                     });
             });
@@ -114,10 +117,10 @@ public class TableBuilderService : ITableBuilderService
         Guid releaseVersionId,
         FullTableQuery query,
         long boundaryLevelId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
-                releaseVersionId: releaseVersionId)
+        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
@@ -128,22 +131,21 @@ public class TableBuilderService : ITableBuilderService
                     return [];
                 }
 
-                var locations = observations
-                    .Select(o => o.Location)
-                    .Distinct()
-                    .ToList();
+                var locations = observations.Select(o => o.Location).Distinct().ToList();
 
                 return await _locationService.GetLocationViewModels(
                     locations,
                     _locationOptions.Hierarchies,
-                    boundaryLevelId);
+                    boundaryLevelId
+                );
             });
     }
 
     public async Task<Either<ActionResult, Unit>> QueryToCsvStream(
         FullTableQuery query,
         Stream stream,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await FindLatestPublishedReleaseVersionId(query.SubjectId)
             .OnSuccessVoid(releaseVersionId => QueryToCsvStream(releaseVersionId, query, stream, cancellationToken));
@@ -153,41 +155,41 @@ public class TableBuilderService : ITableBuilderService
         Guid releaseVersionId,
         FullTableQuery query,
         Stream stream,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId,
-                releaseVersionId: releaseVersionId)
+        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
-            .OnSuccess(releaseSubject => ListQueryObservations(query, cancellationToken)
-                .OnSuccessCombineWith(observations =>
-                    _subjectCsvMetaService.GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken))
+            .OnSuccess(releaseSubject =>
+                ListQueryObservations(query, cancellationToken)
+                    .OnSuccessCombineWith(observations =>
+                        _subjectCsvMetaService.GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken)
+                    )
             )
-            .OnSuccessVoid(
-                async tuple =>
-                {
-                    await using var writer = new StreamWriter(stream, leaveOpen: true);
-                    await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
+            .OnSuccessVoid(async tuple =>
+            {
+                await using var writer = new StreamWriter(stream, leaveOpen: true);
+                await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
 
-                    var (observations, meta) = tuple;
+                var (observations, meta) = tuple;
 
-                    await WriteCsvHeaderRow(csv, meta);
-                    await WriteCsvRows(csv, observations, meta, cancellationToken);
-                }
-            );
+                await WriteCsvHeaderRow(csv, meta);
+                await WriteCsvRows(csv, observations, meta, cancellationToken);
+            });
     }
 
     private async Task<Either<ActionResult, List<Observation>>> ListQueryObservations(
         FullTableQuery query,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var matchedObservationIds =
-            (await _observationService.GetMatchedObservations(query, cancellationToken))
-            .Select(row => row.Id);
+        await _observationService.GetMatchedObservations(query, cancellationToken);
+
+        var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
 
         return await _statisticsDbContext
-            .Observation
-            .AsNoTracking()
+            .Observation.AsNoTracking()
             .Include(o => o.Location)
             .Include(o => o.FilterItems)
             .Where(o => matchedObservationIds.Contains(o.Id))
@@ -208,15 +210,16 @@ public class TableBuilderService : ITableBuilderService
     {
         var filterItemIds = query.GetFilterItemIds();
 
-        var countsOfFilterItemsByFilter = filterItemIds.Count == 0
-            ? new List<int>()
-            : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))
-            .Select(pair =>
-            {
-                var (_, count) = pair;
-                return count;
-            })
-            .ToList();
+        var countsOfFilterItemsByFilter =
+            filterItemIds.Count == 0
+                ? new List<int>()
+                : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))
+                    .Select(pair =>
+                    {
+                        var (_, count) = pair;
+                        return count;
+                    })
+                    .ToList();
 
         // TODO Accessing time periods for the Subject by altering the Importer to store them would improve accuracy
         // here rather than assuming the Subject has all time periods between the start and end range.
@@ -231,27 +234,26 @@ public class TableBuilderService : ITableBuilderService
 
     private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
     {
-        return await _subjectRepository.FindPublicationIdForSubject(subjectId)
+        return await _subjectRepository
+            .FindPublicationIdForSubject(subjectId)
             .OrNotFound()
-            .OnSuccess(async publicationId => await _contentDbContext.Publications
-                .Where(p => p.Id == publicationId)
-                .Select(p => p.LatestPublishedReleaseVersionId)
-                .SingleOrDefaultAsync()
-                .OrNotFound());
+            .OnSuccess(async publicationId =>
+                await _contentDbContext
+                    .Publications.Where(p => p.Id == publicationId)
+                    .Select(p => p.LatestPublishedReleaseVersionId)
+                    .SingleOrDefaultAsync()
+                    .OrNotFound()
+            );
     }
 
-    private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId,
-        Guid releaseVersionId)
+    private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId, Guid releaseVersionId)
     {
-        return _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
-            query => query
-                .Where(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId)
+        return _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(query =>
+            query.Where(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId)
         );
     }
 
-    private async Task WriteCsvHeaderRow(
-        CsvWriter csv,
-        SubjectCsvMetaViewModel meta)
+    private async Task WriteCsvHeaderRow(CsvWriter csv, SubjectCsvMetaViewModel meta)
     {
         var headerRow = new ExpandoObject() as IDictionary<string, object>;
 
@@ -269,28 +271,21 @@ public class TableBuilderService : ITableBuilderService
         IWriter csv,
         List<Observation> observations,
         SubjectCsvMetaViewModel meta,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var locationHeaders = meta.Headers
-            .Where(header => LocationCsvUtils.AllCsvColumns().Contains(header))
+        var locationHeaders = meta
+            .Headers.Where(header => LocationCsvUtils.AllCsvColumns().Contains(header))
             .ToHashSet();
 
-        var rows = observations
-            .Select(
-                observation => MapCsvRow(
-                    observation: observation,
-                    meta: meta,
-                    locationHeaders: locationHeaders
-                )
-            );
+        var rows = observations.Select(observation =>
+            MapCsvRow(observation: observation, meta: meta, locationHeaders: locationHeaders)
+        );
 
         await csv.WriteRecordsAsync(rows, cancellationToken);
     }
 
-    private object MapCsvRow(
-        Observation observation,
-        SubjectCsvMetaViewModel meta,
-        HashSet<string> locationHeaders)
+    private object MapCsvRow(Observation observation, SubjectCsvMetaViewModel meta, HashSet<string> locationHeaders)
     {
         var row = new ExpandoObject() as IDictionary<string, object>;
 
@@ -306,7 +301,8 @@ public class TableBuilderService : ITableBuilderService
         string header,
         Observation observation,
         SubjectCsvMetaViewModel meta,
-        IReadOnlySet<string> locationHeaders)
+        IReadOnlySet<string> locationHeaders
+    )
     {
         if (header == "time_period")
         {
@@ -335,8 +331,9 @@ public class TableBuilderService : ITableBuilderService
 
         if (meta.FiltersByGroupingColumn.TryGetValue(header, out var filterFoundFromGroupHeader))
         {
-            var match = observation.FilterItems
-                .FirstOrDefault(fi => filterFoundFromGroupHeader.Items.ContainsKey(fi.FilterItemId));
+            var match = observation.FilterItems.FirstOrDefault(fi =>
+                filterFoundFromGroupHeader.Items.ContainsKey(fi.FilterItemId)
+            );
 
             if (match is not null)
             {
@@ -346,8 +343,7 @@ public class TableBuilderService : ITableBuilderService
 
         if (meta.Filters.TryGetValue(header, out var filter))
         {
-            var match = observation.FilterItems
-                .FirstOrDefault(fi => filter.Items.ContainsKey(fi.FilterItemId));
+            var match = observation.FilterItems.FirstOrDefault(fi => filter.Items.ContainsKey(fi.FilterItemId));
 
             if (match is not null)
             {
@@ -357,8 +353,7 @@ public class TableBuilderService : ITableBuilderService
 
         if (meta.Indicators.TryGetValue(header, out var indicator))
         {
-            var match = observation.Measures
-                .First(measure => measure.Key == indicator.Id);
+            var match = observation.Measures.First(measure => measure.Key == indicator.Id);
 
             return match.Value;
         }

@@ -11,22 +11,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// <summary>
 /// We provide a searchable version of a Release for the Azure AI Search Indexers to ingest.
 /// The contents of a Release along with its metadata are retrieved from the ContentAPI and uploaded
-/// to Azure Blob storage 
+/// to Azure Blob storage
 /// </summary>
 internal class SearchableDocumentCreator(
     IContentApiClient contentApiClient,
     IAzureBlobStorageClient azureBlobStorageClient,
-    IOptions<AppOptions> appOptions) : ISearchableDocumentCreator
+    IOptions<AppOptions> appOptions
+) : ISearchableDocumentCreator
 {
-    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse>
-        CreatePublicationLatestReleaseSearchableDocument(
-            CreatePublicationLatestReleaseSearchableDocumentRequest request,
-            CancellationToken cancellationToken = default)
+    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(
+        CreatePublicationLatestReleaseSearchableDocumentRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        var releaseSearchableDocument =
-            await contentApiClient.GetPublicationLatestReleaseSearchableDocument(
-                request.PublicationSlug,
-                cancellationToken);
+        var releaseSearchableDocument = await contentApiClient.GetPublicationLatestReleaseSearchableDocument(
+            request.PublicationSlug,
+            cancellationToken
+        );
 
         var blobName = releaseSearchableDocument.ReleaseId.ToString();
         await azureBlobStorageClient.UploadBlob(
@@ -34,15 +35,16 @@ internal class SearchableDocumentCreator(
             blobName: blobName,
             blob: new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
             contentType: MediaTypeNames.Text.Html,
-            cancellationToken: cancellationToken);
-        
+            cancellationToken: cancellationToken
+        );
+
         return new CreatePublicationLatestReleaseSearchableDocumentResponse
         {
             PublicationSlug = request.PublicationSlug,
             ReleaseId = releaseSearchableDocument.ReleaseId,
             ReleaseSlug = releaseSearchableDocument.ReleaseSlug,
             ReleaseVersionId = releaseSearchableDocument.ReleaseVersionId,
-            BlobName = blobName
+            BlobName = blobName,
         };
     }
 }

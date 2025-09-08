@@ -36,9 +36,7 @@ public class ThemeServicePermissionTests
 
         await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
         {
-            context.Add(
-                new Theme { Title = "Test theme" }
-            );
+            context.Add(new Theme { Title = "Test theme" });
 
             await context.SaveChangesAsync();
         }
@@ -46,20 +44,18 @@ public class ThemeServicePermissionTests
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.RegisteredUser)
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy)
-            .AssertSuccess(
-                async userService =>
-                {
-                    await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
+            .AssertSuccess(async userService =>
+            {
+                await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
 
-                    var service = SetupThemeService(userService: userService.Object, contentDbContext: context);
-                    var result = await service.GetThemes();
+                var service = SetupThemeService(userService: userService.Object, contentDbContext: context);
+                var result = await service.GetThemes();
 
-                    Assert.Single(result.Right);
-                    Assert.Equal("Test theme", result.Right[0].Title);
+                Assert.Single(result.Right);
+                Assert.Equal("Test theme", result.Right[0].Title);
 
-                    return result;
-                }
-            );
+                return result;
+            });
     }
 
     [Fact]
@@ -67,14 +63,12 @@ public class ThemeServicePermissionTests
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.RegisteredUser, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = SetupThemeService(userService: userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupThemeService(userService: userService.Object);
 
-                    return await service.GetThemes();
-                }
-            );
+                return await service.GetThemes();
+            });
     }
 
     [Fact]
@@ -82,20 +76,14 @@ public class ThemeServicePermissionTests
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = SetupThemeService(userService: userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupThemeService(userService: userService.Object);
 
-                    return await service.CreateTheme(
-                        new ThemeSaveViewModel
-                        {
-                            Title = "Test title",
-                            Summary = "Test summary"
-                        }
-                    );
-                }
-            );
+                return await service.CreateTheme(
+                    new ThemeSaveViewModel { Title = "Test title", Summary = "Test summary" }
+                );
+            });
     }
 
     [Fact]
@@ -103,21 +91,15 @@ public class ThemeServicePermissionTests
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = SetupThemeService(userService: userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupThemeService(userService: userService.Object);
 
-                    return await service.UpdateTheme(
-                        _theme.Id,
-                        new ThemeSaveViewModel
-                        {
-                            Title = "Test title",
-                            Summary = "Test summary"
-                        }
-                    );
-                }
-            );
+                return await service.UpdateTheme(
+                    _theme.Id,
+                    new ThemeSaveViewModel { Title = "Test title", Summary = "Test summary" }
+                );
+            });
     }
 
     [Fact]
@@ -125,14 +107,12 @@ public class ThemeServicePermissionTests
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = SetupThemeService(userService: userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupThemeService(userService: userService.Object);
 
-                    return await service.GetTheme(_theme.Id);
-                }
-            );
+                return await service.GetTheme(_theme.Id);
+            });
     }
 
     [Fact]
@@ -140,14 +120,12 @@ public class ThemeServicePermissionTests
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = SetupThemeService(userService: userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupThemeService(userService: userService.Object);
 
-                    return await service.DeleteTheme(_theme.Id);
-                }
-            );
+                return await service.DeleteTheme(_theme.Id);
+            });
     }
 
     [Fact]
@@ -155,14 +133,12 @@ public class ThemeServicePermissionTests
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = SetupThemeService(userService: userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupThemeService(userService: userService.Object);
 
-                    return await service.DeleteUITestThemes();
-                }
-            );
+                return await service.DeleteUITestThemes();
+            });
     }
 
     private static IOptions<AppOptions> DefaultAppOptions()
@@ -180,7 +156,8 @@ public class ThemeServicePermissionTests
         IPublishingService? publishingService = null,
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
-        IPublicationCacheService? publicationCacheService = null)
+        IPublicationCacheService? publicationCacheService = null
+    )
     {
         var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
         var contentContext = contentDbContext ?? Mock.Of<ContentDbContext>();
@@ -190,7 +167,8 @@ public class ThemeServicePermissionTests
             contentDbContext: contentContext,
             dataSetVersionRepository: new DataSetVersionRepository(
                 contentDbContext: contentContext,
-                publicDataDbContext: publicContext),
+                publicDataDbContext: publicContext
+            ),
             mapper ?? AdminMapper(),
             persistenceHelper ?? MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
             userService ?? AlwaysTrueUserService().Object,
@@ -199,6 +177,7 @@ public class ThemeServicePermissionTests
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             publicationCacheService ?? new PublicationCacheServiceMockBuilder().Build(),
-            NullLogger<ThemeService>.Instance);
+            NullLogger<ThemeService>.Instance
+        );
     }
 }

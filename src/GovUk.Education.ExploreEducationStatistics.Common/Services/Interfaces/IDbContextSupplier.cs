@@ -7,7 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 /// </summary>
 public interface IDbContextSupplier
 {
-    TDbContext CreateDbContext<TDbContext>() where TDbContext : DbContext;
-    
-    TDbContext CreateDbContextDelegate<TDbContext>() where TDbContext : DbContext;
+    TDbContext CreateDbContext<TDbContext>()
+        where TDbContext : DbContext;
+
+    TDbContext CreateDbContextDelegate<TDbContext>()
+        where TDbContext : DbContext;
 }

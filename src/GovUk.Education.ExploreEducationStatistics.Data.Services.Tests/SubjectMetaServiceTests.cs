@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -46,11 +47,9 @@ public class SubjectMetaServiceTests
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext();
 
-        var service = BuildSubjectMetaService(
-            statisticsDbContext);
+        var service = BuildSubjectMetaService(statisticsDbContext);
 
-        var result = await service.GetSubjectMeta(releaseVersionId: Guid.NewGuid(),
-            subjectId: Guid.NewGuid());
+        var result = await service.GetSubjectMeta(releaseVersionId: Guid.NewGuid(), subjectId: Guid.NewGuid());
 
         result.AssertNotFound();
     }
@@ -58,21 +57,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task GetSubjectMeta_EmptyModelReturned()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -122,16 +117,14 @@ public class SubjectMetaServiceTests
                 timePeriodService: timePeriodService.Object
             );
 
-            var result = (await service.GetSubjectMeta(
+            var result = (
+                await service.GetSubjectMeta(
                     releaseVersionId: releaseSubject.ReleaseVersionId,
-                    subjectId: releaseSubject.SubjectId))
-                .AssertRight();
+                    subjectId: releaseSubject.SubjectId
+                )
+            ).AssertRight();
 
-            VerifyAllMocks(
-                filterRepository,
-                indicatorGroupRepository,
-                locationRepository,
-                timePeriodService);
+            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -145,16 +138,16 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task GetSubjectMeta_LocationsForSubject()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
             File = new File
             {
                 SubjectId = releaseSubject.SubjectId,
@@ -198,7 +191,7 @@ public class SubjectMetaServiceTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new Location
             {
@@ -206,21 +199,16 @@ public class SubjectMetaServiceTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            });
+                LocalAuthority = _nottingham,
+            }
+        );
 
         var options = new LocationsOptions
         {
             Hierarchies = new Dictionary<GeographicLevel, List<string>>
             {
-                {
-                    GeographicLevel.LocalAuthority,
-                    [
-                        "Country",
-                        "Region"
-                    ]
-                }
-            }
+                { GeographicLevel.LocalAuthority, ["Country", "Region"] },
+            },
         }.ToOptionsWrapper();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -254,9 +242,7 @@ public class SubjectMetaServiceTests
             .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        locationRepository
-            .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
-            .ReturnsAsync(locations);
+        locationRepository.Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId)).ReturnsAsync(locations);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -271,15 +257,14 @@ public class SubjectMetaServiceTests
                 options: options
             );
 
-            var result = (await service.GetSubjectMeta(releaseVersionId: releaseSubject.ReleaseVersionId,
-                    subjectId: releaseSubject.SubjectId))
-                .AssertRight();
+            var result = (
+                await service.GetSubjectMeta(
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
+                    subjectId: releaseSubject.SubjectId
+                )
+            ).AssertRight();
 
-            VerifyAllMocks(
-                filterRepository,
-                indicatorGroupRepository,
-                locationRepository,
-                timePeriodService);
+            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -373,10 +358,10 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task GetSubjectMeta_FilterHierarchies()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
@@ -384,36 +369,33 @@ public class SubjectMetaServiceTests
         var filter2Id = Guid.NewGuid();
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
             File = new File
             {
                 SubjectId = releaseSubject.SubjectId,
                 Type = FileType.Data,
                 FilterHierarchies =
-                    [
-                        new DataSetFileFilterHierarchy(
-                            [filter1Id, filter2Id],
-                            [
-                                new Dictionary<Guid, List<Guid>>
-                                {
-                                    { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]},
-                                    { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]}
-                                },
-                                new Dictionary<Guid, List<Guid>>
-                                {
-                                    { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]},
-                                    { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()]}
-                                }
-                            ]
-                        ),
-                    ],
+                [
+                    new DataSetFileFilterHierarchy(
+                        [filter1Id, filter2Id],
+                        [
+                            new Dictionary<Guid, List<Guid>>
+                            {
+                                { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()] },
+                                { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()] },
+                            },
+                            new Dictionary<Guid, List<Guid>>
+                            {
+                                { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()] },
+                                { Guid.NewGuid(), [Guid.NewGuid(), Guid.NewGuid()] },
+                            },
+                        ]
+                    ),
+                ],
             },
         };
 
-        var options = new LocationsOptions
-        {
-            Hierarchies = []
-        }.ToOptionsWrapper();
+        var options = new LocationsOptions { Hierarchies = [] }.ToOptionsWrapper();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -446,9 +428,7 @@ public class SubjectMetaServiceTests
             .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        locationRepository
-            .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
-            .ReturnsAsync([]);
+        locationRepository.Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId)).ReturnsAsync([]);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -463,15 +443,14 @@ public class SubjectMetaServiceTests
                 options: options
             );
 
-            var result = (await service.GetSubjectMeta(releaseVersionId: releaseSubject.ReleaseVersionId,
-                    subjectId: releaseSubject.SubjectId))
-                .AssertRight();
+            var result = (
+                await service.GetSubjectMeta(
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
+                    subjectId: releaseSubject.SubjectId
+                )
+            ).AssertRight();
 
-            VerifyAllMocks(
-                filterRepository,
-                indicatorGroupRepository,
-                locationRepository,
-                timePeriodService);
+            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -481,35 +460,26 @@ public class SubjectMetaServiceTests
             Assert.Empty(viewModel.TimePeriod.Options);
 
             var fileFilterHierarchy = releaseFile.File.FilterHierarchies[0];
-            viewModel.FilterHierarchies.AssertDeepEqualTo([
+            viewModel.FilterHierarchies.AssertDeepEqualTo(
                 [
-                    new DataSetFileFilterHierarchyTierViewModel
-                    (
-                       0,
-                       filter1Id,
-                       filter2Id,
-                       fileFilterHierarchy.Tiers[0]
-                    ),
-                    new DataSetFileFilterHierarchyTierViewModel
-                    (
-                        1,
-                        filter2Id,
-                        null,
-                        fileFilterHierarchy.Tiers[1]
-                    ),
-                ],
-            ]);
+                    [
+                        new DataSetFileFilterHierarchyTierViewModel(
+                            0,
+                            filter1Id,
+                            filter2Id,
+                            fileFilterHierarchy.Tiers[0]
+                        ),
+                        new DataSetFileFilterHierarchyTierViewModel(1, filter2Id, null, fileFilterHierarchy.Tiers[1]),
+                    ],
+                ]
+            );
         }
     }
 
     [Fact]
     public async Task FilterSubjectMeta_EmptyModelReturned()
     {
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = new ReleaseVersion(),
-            Subject = new Subject(),
-        };
+        var releaseSubject = new ReleaseSubject { ReleaseVersion = new ReleaseVersion(), Subject = new Subject() };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -531,17 +501,14 @@ public class SubjectMetaServiceTests
             var request = new LocationsOrTimePeriodsQueryRequest
             {
                 SubjectId = releaseSubject.SubjectId,
-                LocationIds = ListOf(Guid.NewGuid())
+                LocationIds = ListOf(Guid.NewGuid()),
             };
 
-            var service = BuildSubjectMetaService(
-                statisticsDbContext,
-                timePeriodService: timePeriodService.Object
-            );
+            var service = BuildSubjectMetaService(statisticsDbContext, timePeriodService: timePeriodService.Object);
 
-            var result =
-                (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
-                .AssertRight();
+            var result = (
+                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
+            ).AssertRight();
 
             VerifyAllMocks(timePeriodService);
 
@@ -560,16 +527,13 @@ public class SubjectMetaServiceTests
         var releaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-1)
+            Published = DateTime.UtcNow.AddDays(-1),
         };
 
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseVersion.Id
-            },
-            Subject = new Subject()
+            ReleaseVersion = new ReleaseVersion { Id = releaseVersion.Id },
+            Subject = new Subject(),
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -609,8 +573,7 @@ public class SubjectMetaServiceTests
                 timePeriodService: timePeriodService.Object
             );
 
-            var result = (await service.FilterSubjectMeta(null, request, cancellationToken))
-                .AssertRight();
+            var result = (await service.FilterSubjectMeta(null, request, cancellationToken)).AssertRight();
 
             VerifyAllMocks(timePeriodService);
 
@@ -626,51 +589,24 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task FilterSubjectMeta_TimePeriods()
     {
-        var subject = new Subject
-        {
-            Id = Guid.NewGuid()
-        };
+        var subject = new Subject { Id = Guid.NewGuid() };
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = new ReleaseVersion(),
-            Subject = subject
-        };
+        var releaseSubject = new ReleaseSubject { ReleaseVersion = new ReleaseVersion(), Subject = subject };
 
-        var location1 = new Location
-        {
-            Id = Guid.NewGuid(),
-            LocalAuthority = _blackpool
-        };
+        var location1 = new Location { Id = Guid.NewGuid(), LocalAuthority = _blackpool };
 
-        var location2 = new Location
-        {
-            Id = Guid.NewGuid(),
-            LocalAuthority = _derby
-        };
+        var location2 = new Location { Id = Guid.NewGuid(), LocalAuthority = _derby };
 
-        var location3 = new Location
-        {
-            Id = Guid.NewGuid(),
-            Country = _england
-        };
+        var location3 = new Location { Id = Guid.NewGuid(), Country = _england };
 
-        var location4 = new Location
-        {
-            Id = Guid.NewGuid(),
-            LocalAuthority = _nottingham
-        };
+        var location4 = new Location { Id = Guid.NewGuid(), LocalAuthority = _nottingham };
 
-        var location5 = new Location
-        {
-            Id = Guid.NewGuid(),
-            LocalAuthority = _sunderland
-        };
+        var location5 = new Location { Id = Guid.NewGuid(), LocalAuthority = _sunderland };
 
         var request = new LocationsOrTimePeriodsQueryRequest
         {
             SubjectId = subject.Id,
-            LocationIds = ListOf(location1.Id, location2.Id, location3.Id)
+            LocationIds = ListOf(location1.Id, location2.Id, location3.Id),
         };
 
         var observations = ListOf(
@@ -678,48 +614,51 @@ public class SubjectMetaServiceTests
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location1
+                Location = location1,
             },
             new Observation
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location2
+                Location = location2,
             },
             new Observation
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location3
-            });
+                Location = location3,
+            }
+        );
 
         var observationsWithDifferentLocations = ListOf(
             new Observation
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location4
+                Location = location4,
             },
             new Observation
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location5
-            });
+                Location = location5,
+            }
+        );
 
         var observationsFromAnotherSubject = ListOf(
             new Observation
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location2
+                Location = location2,
             },
             new Observation
             {
                 Id = Guid.NewGuid(),
                 SubjectId = subject.Id,
-                Location = location3
-            });
+                Location = location3,
+            }
+        );
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -739,25 +678,30 @@ public class SubjectMetaServiceTests
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriods(It.Is<IQueryable<Observation>>(
-                    observationsWihMatchingLocations => observationsWihMatchingLocations
-                        .ToList()
-                        .Select(o => o.Id)
-                        .SequenceEqual(observationsWihMatchingLocations.Select(m => m.Id)))))
-                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
-                {
-                    (2012, TimeIdentifier.April),
-                    (2012, TimeIdentifier.May),
-                    (2012, TimeIdentifier.June)
-                });
+                .Setup(s =>
+                    s.GetTimePeriods(
+                        It.Is<IQueryable<Observation>>(observationsWihMatchingLocations =>
+                            observationsWihMatchingLocations
+                                .ToList()
+                                .Select(o => o.Id)
+                                .SequenceEqual(observationsWihMatchingLocations.Select(m => m.Id))
+                        )
+                    )
+                )
+                .ReturnsAsync(
+                    new List<(int Year, TimeIdentifier TimeIdentifier)>
+                    {
+                        (2012, TimeIdentifier.April),
+                        (2012, TimeIdentifier.May),
+                        (2012, TimeIdentifier.June),
+                    }
+                );
 
-            var service = BuildSubjectMetaService(
-                statisticsDbContext,
-                timePeriodService: timePeriodService.Object);
+            var service = BuildSubjectMetaService(statisticsDbContext, timePeriodService: timePeriodService.Object);
 
-            var result =
-                (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
-                .AssertRight();
+            var result = (
+                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
+            ).AssertRight();
 
             VerifyAllMocks(timePeriodService);
 
@@ -779,10 +723,10 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task FilterSubjectMeta_FiltersAndIndicators()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
@@ -793,7 +737,7 @@ public class SubjectMetaServiceTests
                 Id = releaseSubject.ReleaseVersion.Id,
                 Published = DateTime.UtcNow,
             },
-            File =  new File
+            File = new File
             {
                 SubjectId = releaseSubject.SubjectId,
                 Type = FileType.Data,
@@ -810,8 +754,8 @@ public class SubjectMetaServiceTests
                 StartYear = 2012,
                 StartCode = TimeIdentifier.AcademicYear,
                 EndYear = 2012,
-                EndCode = TimeIdentifier.AcademicYear
-            }
+                EndCode = TimeIdentifier.AcademicYear,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -828,7 +772,8 @@ public class SubjectMetaServiceTests
             await statisticsDbContext.MatchedObservations.AddRangeAsync(
                 new MatchedObservation(Guid.NewGuid()),
                 new MatchedObservation(Guid.NewGuid()),
-                new MatchedObservation(Guid.NewGuid()));
+                new MatchedObservation(Guid.NewGuid())
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -839,12 +784,16 @@ public class SubjectMetaServiceTests
 
             var observationService = new Mock<IObservationService>(MockBehavior.Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
-                .Setup(s => s.GetMatchedObservations(
-                    It.Is<FullTableQuery>(ctx => ctx
-                            .Equals(request.AsFullTableQuery())),
-                    cancellationToken))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        It.Is<FullTableQuery>(ctx => ctx.Equals(request.AsFullTableQuery())),
+                        cancellationToken
+                    )
+                )
+                .ReturnsAsync(matchedObservationsTable);
 
             var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
 
@@ -852,7 +801,7 @@ public class SubjectMetaServiceTests
             {
                 Id = Guid.NewGuid(),
                 SubjectId = releaseSubject.SubjectId,
-                Label = "Filter 1"
+                Label = "Filter 1",
             };
             filter1.FilterGroups = CreateFilterGroups(filter1, 2, 1);
 
@@ -860,26 +809,25 @@ public class SubjectMetaServiceTests
             {
                 Id = Guid.NewGuid(),
                 SubjectId = releaseSubject.SubjectId,
-                Label = "Filter 2"
+                Label = "Filter 2",
             };
             filter2.FilterGroups = CreateFilterGroups(filter2, 2);
 
-            var filter1FilterItems = filter1
-                .FilterGroups
-                .SelectMany(fg => fg.FilterItems)
-                .ToList();
+            var filter1FilterItems = filter1.FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-            var filter2FilterItems = filter2
-                .FilterGroups
-                .SelectMany(fg => fg.FilterItems)
-                .ToList();
+            var filter2FilterItems = filter2.FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
             var allFilterItems = filter1FilterItems.Concat(filter2FilterItems);
 
             filterItemRepository
-                .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
-                    // ReSharper disable once AccessToDisposedClosure
-                    releaseSubject.SubjectId, statisticsDbContext.MatchedObservations))
+                .Setup(s =>
+                    s.GetFilterItemsFromMatchedObservationIds(
+                        // ReSharper disable once AccessToDisposedClosure
+                        releaseSubject.SubjectId,
+                        matchedObservationsTable,
+                        cancellationToken
+                    )
+                )
                 .ReturnsAsync(allFilterItems);
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
@@ -894,8 +842,9 @@ public class SubjectMetaServiceTests
                         {
                             Id = Guid.NewGuid(),
                             Unit = IndicatorUnit.None,
-                            Label = "Indicator 2"
-                        })
+                            Label = "Indicator 2",
+                        }
+                    ),
                 },
                 new IndicatorGroup
                 {
@@ -906,9 +855,11 @@ public class SubjectMetaServiceTests
                         {
                             Id = Guid.NewGuid(),
                             Unit = IndicatorUnit.Percent,
-                            Label = "Indicator 1"
-                        })
-                });
+                            Label = "Indicator 1",
+                        }
+                    ),
+                }
+            );
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
@@ -919,117 +870,128 @@ public class SubjectMetaServiceTests
                 contentDbContext: contentDbContext,
                 observationService: observationService.Object,
                 filterItemRepository: filterItemRepository.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object);
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
 
-            var result =
-                (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken))
-                .AssertRight();
+            var result = (
+                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
+            ).AssertRight();
 
-            VerifyAllMocks(
-                filterItemRepository,
-                indicatorGroupRepository,
-                observationService);
+            VerifyAllMocks(filterItemRepository, indicatorGroupRepository, observationService);
 
             result.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
             Assert.Empty(result.Locations);
 
-            result.Filters.AssertDeepEqualTo(new Dictionary<string, FilterMetaViewModel>
-            {
+            result.Filters.AssertDeepEqualTo(
+                new Dictionary<string, FilterMetaViewModel>
                 {
-                    "Filter1", new FilterMetaViewModel
                     {
-                        Id = filter1.Id,
-                        Legend = "Filter 1",
-                        Options = new Dictionary<string, FilterGroupMetaViewModel>
+                        "Filter1",
+                        new FilterMetaViewModel
                         {
+                            Id = filter1.Id,
+                            Legend = "Filter 1",
+                            Options = new Dictionary<string, FilterGroupMetaViewModel>
                             {
-                                "FilterGroup1", new FilterGroupMetaViewModel
                                 {
-                                    Id = filter1.FilterGroups[0].Id,
-                                    Label = "Filter Group 1",
-                                    Options = new List<FilterItemMetaViewModel>
+                                    "FilterGroup1",
+                                    new FilterGroupMetaViewModel
                                     {
-                                        new("Filter Item 1", filter1FilterItems[0].Id),
-                                        new("Filter Item 2", filter1FilterItems[1].Id)
-                                    },
-                                    Order = 0
-                                }
+                                        Id = filter1.FilterGroups[0].Id,
+                                        Label = "Filter Group 1",
+                                        Options = new List<FilterItemMetaViewModel>
+                                        {
+                                            new("Filter Item 1", filter1FilterItems[0].Id),
+                                            new("Filter Item 2", filter1FilterItems[1].Id),
+                                        },
+                                        Order = 0,
+                                    }
+                                },
+                                {
+                                    "FilterGroup2",
+                                    new FilterGroupMetaViewModel
+                                    {
+                                        Id = filter1.FilterGroups[1].Id,
+                                        Label = "Filter Group 2",
+                                        Options = new List<FilterItemMetaViewModel>
+                                        {
+                                            new("Filter Item 1", filter1FilterItems[2].Id),
+                                        },
+                                        Order = 1,
+                                    }
+                                },
                             },
-                            {
-                                "FilterGroup2", new FilterGroupMetaViewModel
-                                {
-                                    Id = filter1.FilterGroups[1].Id,
-                                    Label = "Filter Group 2",
-                                    Options = new List<FilterItemMetaViewModel>
-                                    {
-                                        new("Filter Item 1", filter1FilterItems[2].Id)
-                                    },
-                                    Order = 1
-                                }
-                            }
-                        },
-                        Order = 0
-                    }
-                },
-                {
-                    "Filter2", new FilterMetaViewModel
+                            Order = 0,
+                        }
+                    },
                     {
-                        Id = filter2.Id,
-                        Legend = "Filter 2",
-                        Options = new Dictionary<string, FilterGroupMetaViewModel>
+                        "Filter2",
+                        new FilterMetaViewModel
                         {
+                            Id = filter2.Id,
+                            Legend = "Filter 2",
+                            Options = new Dictionary<string, FilterGroupMetaViewModel>
                             {
-                                "FilterGroup1", new FilterGroupMetaViewModel
                                 {
-                                    Id = filter2.FilterGroups[0].Id,
-                                    Label = "Filter Group 1",
-                                    Options = new List<FilterItemMetaViewModel>
+                                    "FilterGroup1",
+                                    new FilterGroupMetaViewModel
                                     {
-                                        new("Filter Item 1", filter2FilterItems[0].Id),
-                                        new("Filter Item 2", filter2FilterItems[1].Id)
-                                    },
-                                    Order = 0
-                                }
-                            }
-                        },
-                        Order = 1
-                    }
-                },
-            });
-
-            result.Indicators.AssertDeepEqualTo(new Dictionary<string, IndicatorGroupMetaViewModel>
-            {
-                {
-                    "IndicatorGroup1", new IndicatorGroupMetaViewModel
-                    {
-                        Id = indicatorGroups[1].Id,
-                        Label = "Indicator Group 1",
-                        Options = ListOf(
-                            new IndicatorMetaViewModel
-                            {
-                                Label = "Indicator 1",
-                                Unit = IndicatorUnit.Percent,
-                                Value = indicatorGroups[1].Indicators[0].Id
-                            }),
-                        Order = 0
-                    }
-                },
-                {
-                    "IndicatorGroup2", new IndicatorGroupMetaViewModel
-                    {
-                        Id = indicatorGroups[0].Id,
-                        Label = "Indicator Group 2",
-                        Options = ListOf(
-                            new IndicatorMetaViewModel
-                            {
-                                Label = "Indicator 2",
-                                Unit = IndicatorUnit.None,
-                                Value = indicatorGroups[0].Indicators[0].Id
-                            }),
-                        Order = 1
-                    }
+                                        Id = filter2.FilterGroups[0].Id,
+                                        Label = "Filter Group 1",
+                                        Options = new List<FilterItemMetaViewModel>
+                                        {
+                                            new("Filter Item 1", filter2FilterItems[0].Id),
+                                            new("Filter Item 2", filter2FilterItems[1].Id),
+                                        },
+                                        Order = 0,
+                                    }
+                                },
+                            },
+                            Order = 1,
+                        }
+                    },
                 }
-            });
+            );
+
+            result.Indicators.AssertDeepEqualTo(
+                new Dictionary<string, IndicatorGroupMetaViewModel>
+                {
+                    {
+                        "IndicatorGroup1",
+                        new IndicatorGroupMetaViewModel
+                        {
+                            Id = indicatorGroups[1].Id,
+                            Label = "Indicator Group 1",
+                            Options = ListOf(
+                                new IndicatorMetaViewModel
+                                {
+                                    Label = "Indicator 1",
+                                    Unit = IndicatorUnit.Percent,
+                                    Value = indicatorGroups[1].Indicators[0].Id,
+                                }
+                            ),
+                            Order = 0,
+                        }
+                    },
+                    {
+                        "IndicatorGroup2",
+                        new IndicatorGroupMetaViewModel
+                        {
+                            Id = indicatorGroups[0].Id,
+                            Label = "Indicator Group 2",
+                            Options = ListOf(
+                                new IndicatorMetaViewModel
+                                {
+                                    Label = "Indicator 2",
+                                    Unit = IndicatorUnit.None,
+                                    Value = indicatorGroups[0].Indicators[0].Id,
+                                }
+                            ),
+                            Order = 1,
+                        }
+                    },
+                }
+            );
 
             Assert.Null(result.FilterHierarchies);
         }
@@ -1038,21 +1000,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1067,32 +1025,20 @@ public class SubjectMetaServiceTests
                         Id = Guid.NewGuid(),
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            },
-                        }
+                            new() { Id = Guid.NewGuid() },
+                            new() { Id = Guid.NewGuid() },
+                        },
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
+                            new() { Id = Guid.NewGuid() },
+                            new() { Id = Guid.NewGuid() },
+                        },
+                    },
+                },
             },
             new()
             {
@@ -1102,29 +1048,26 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
+            },
         };
 
         // Create a request with identical filters, filter groups and filter items
-        var request = filters.Select(filter =>
-            new FilterUpdateViewModel
+        var request = filters
+            .Select(filter => new FilterUpdateViewModel
             {
                 Id = filter.Id,
-                FilterGroups = filter.FilterGroups.Select(filterGroup => new FilterGroupUpdateViewModel
-                {
-                    Id = filterGroup.Id,
-                    FilterItems = filterGroup.FilterItems.Select(filterItem => filterItem.Id).ToList()
-                }).ToList()
-            }).ToList();
+                FilterGroups = filter
+                    .FilterGroups.Select(filterGroup => new FilterGroupUpdateViewModel
+                    {
+                        Id = filterGroup.Id,
+                        FilterItems = filterGroup.FilterItems.Select(filterItem => filterItem.Id).ToList(),
+                    })
+                    .ToList(),
+            })
+            .ToList();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1144,13 +1087,14 @@ public class SubjectMetaServiceTests
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
         cacheService
-            .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(
-                releaseSubject.ReleaseVersionId,
-                releaseSubject.SubjectId)))
+            .Setup(service =>
+                service.DeleteItemAsync(
+                    new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId)
+                )
+            )
             .Returns(Task.CompletedTask);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1159,7 +1103,8 @@ public class SubjectMetaServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 cacheService: cacheService.Object,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1175,8 +1120,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseSubject.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             var savedSequence = savedReleaseFile.FilterSequence;
 
@@ -1219,21 +1164,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters_FilterMissing()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1246,15 +1187,9 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
             },
             new()
             {
@@ -1264,16 +1199,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
+            },
         };
 
         // Request has the second filter missing
@@ -1287,13 +1216,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = filters[0].FilterGroups[0].Id,
-                        FilterItems = new List<Guid>
-                        {
-                            filters[0].FilterGroups[0].FilterItems[0].Id
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<Guid> { filters[0].FilterGroups[0].FilterItems[0].Id },
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1312,8 +1238,7 @@ public class SubjectMetaServiceTests
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1321,7 +1246,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1337,8 +1263,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseSubject.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseSubject remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -1348,21 +1274,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters_FilterGroupMissing()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion{ Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1375,27 +1297,15 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
+            },
         };
 
         // Request has the second filter group missing
@@ -1409,13 +1319,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = filters[0].FilterGroups[0].Id,
-                        FilterItems = new List<Guid>
-                        {
-                            filters[0].FilterGroups[0].FilterItems[0].Id
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<Guid> { filters[0].FilterGroups[0].FilterItems[0].Id },
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1434,8 +1341,7 @@ public class SubjectMetaServiceTests
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1443,7 +1349,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1459,8 +1366,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -1470,21 +1377,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters_FilterItemMissing()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1499,18 +1402,12 @@ public class SubjectMetaServiceTests
                         Id = Guid.NewGuid(),
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                            new() { Id = Guid.NewGuid() },
+                            new() { Id = Guid.NewGuid() },
+                        },
+                    },
+                },
+            },
         };
 
         // Request has the second filter item missing
@@ -1524,13 +1421,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = filters[0].FilterGroups[0].Id,
-                        FilterItems = new List<Guid>
-                        {
-                            filters[0].FilterGroups[0].FilterItems[0].Id
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<Guid> { filters[0].FilterGroups[0].FilterItems[0].Id },
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1549,8 +1443,7 @@ public class SubjectMetaServiceTests
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1558,7 +1451,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1574,8 +1468,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -1585,21 +1479,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters_FilterNotForSubject()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1612,16 +1502,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
+            },
         };
 
         // Request has a filter not for this subject
@@ -1635,12 +1519,9 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = filters[0].FilterGroups[0].Id,
-                        FilterItems = new List<Guid>
-                        {
-                            filters[0].FilterGroups[0].FilterItems[0].Id
-                        }
-                    }
-                }
+                        FilterItems = new List<Guid> { filters[0].FilterGroups[0].FilterItems[0].Id },
+                    },
+                },
             },
             new()
             {
@@ -1650,13 +1531,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<Guid>
-                        {
-                            Guid.NewGuid()
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<Guid> { Guid.NewGuid() },
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1675,8 +1553,7 @@ public class SubjectMetaServiceTests
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1684,7 +1561,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1700,8 +1578,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -1711,21 +1589,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters_FilterGroupNotForSubject()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1738,16 +1612,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
+            },
         };
 
         // Request has a filter group not for this subject
@@ -1761,21 +1629,15 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = filters[0].FilterGroups[0].Id,
-                        FilterItems = new List<Guid>
-                        {
-                            filters[0].FilterGroups[0].FilterItems[0].Id
-                        }
+                        FilterItems = new List<Guid> { filters[0].FilterGroups[0].FilterItems[0].Id },
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<Guid>
-                        {
-                            Guid.NewGuid()
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<Guid> { Guid.NewGuid() },
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1794,8 +1656,7 @@ public class SubjectMetaServiceTests
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1803,7 +1664,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1819,8 +1681,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -1830,21 +1692,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectFilters_FilterItemNotForSubject()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1857,16 +1715,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<FilterItem> { new() { Id = Guid.NewGuid() } },
+                    },
+                },
+            },
         };
 
         // Request has a filter item not for this subject
@@ -1880,14 +1732,10 @@ public class SubjectMetaServiceTests
                     new()
                     {
                         Id = filters[0].FilterGroups[0].Id,
-                        FilterItems = new List<Guid>
-                        {
-                            filters[0].FilterGroups[0].FilterItems[0].Id,
-                            Guid.NewGuid()
-                        }
-                    }
-                }
-            }
+                        FilterItems = new List<Guid> { filters[0].FilterGroups[0].FilterItems[0].Id, Guid.NewGuid() },
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1906,8 +1754,7 @@ public class SubjectMetaServiceTests
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(filters);
+        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1915,7 +1762,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object);
+                filterRepository: filterRepository.Object
+            );
 
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -1931,8 +1779,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -1943,21 +1791,17 @@ public class SubjectMetaServiceTests
     public async Task UpdateSubjectFilters_ReleaseNotFound()
     {
         // Create a ReleaseSubject but for a different release than the one which will be used in the update
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1981,13 +1825,7 @@ public class SubjectMetaServiceTests
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: Guid.NewGuid(),
                 subjectId: releaseSubject.SubjectId,
-                new List<FilterUpdateViewModel>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
+                new List<FilterUpdateViewModel> { new() { Id = Guid.NewGuid() } }
             );
 
             result.AssertNotFound();
@@ -1996,8 +1834,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -2008,21 +1846,17 @@ public class SubjectMetaServiceTests
     public async Task UpdateSubjectFilters_SubjectNotFound()
     {
         // Create a ReleaseSubject but for a different release than the one which will be used in the update
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2046,13 +1880,7 @@ public class SubjectMetaServiceTests
             var result = await service.UpdateSubjectFilters(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
                 subjectId: Guid.NewGuid(),
-                new List<FilterUpdateViewModel>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
+                new List<FilterUpdateViewModel> { new() { Id = Guid.NewGuid() } }
             );
 
             result.AssertNotFound();
@@ -2061,8 +1889,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.FilterSequence);
@@ -2072,21 +1900,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectIndicators()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2096,36 +1920,25 @@ public class SubjectMetaServiceTests
                 Id = Guid.NewGuid(),
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
+                    new() { Id = Guid.NewGuid() },
+                    new() { Id = Guid.NewGuid() },
+                },
             },
             new()
             {
                 Id = Guid.NewGuid(),
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            }
+                Indicators = new List<Indicator> { new() { Id = Guid.NewGuid() } },
+            },
         };
 
         // Create a request with identical indicator groups and indicators
-        var request = indicatorGroups.Select(indicatorGroup =>
-            new IndicatorGroupUpdateViewModel
+        var request = indicatorGroups
+            .Select(indicatorGroup => new IndicatorGroupUpdateViewModel
             {
                 Id = indicatorGroup.Id,
-                Indicators = indicatorGroup.Indicators.Select(indicator => indicator.Id).ToList()
-            }).ToList();
+                Indicators = indicatorGroup.Indicators.Select(indicator => indicator.Id).ToList(),
+            })
+            .ToList();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2145,12 +1958,15 @@ public class SubjectMetaServiceTests
         var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
         cacheService
-            .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(
-                releaseSubject.ReleaseVersionId,
-                releaseSubject.SubjectId)))
+            .Setup(service =>
+                service.DeleteItemAsync(
+                    new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId)
+                )
+            )
             .Returns(Task.CompletedTask);
 
-        indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+        indicatorGroupRepository
+            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
             .ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2160,7 +1976,8 @@ public class SubjectMetaServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 cacheService: cacheService.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object);
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
 
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: releaseSubject.ReleaseVersion.Id,
@@ -2178,7 +1995,8 @@ public class SubjectMetaServiceTests
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
                 rf.ReleaseVersionId == releaseFile.ReleaseVersion.Id
                 && rf.File.SubjectId == releaseSubject.SubjectId
-                && rf.File.Type == FileType.Data);
+                && rf.File.Type == FileType.Data
+            );
 
             var savedSequence = savedReleaseFile.IndicatorSequence;
 
@@ -2205,21 +2023,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectIndicators_IndicatorGroupMissing()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2227,25 +2041,13 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = Guid.NewGuid(),
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
+                Indicators = new List<Indicator> { new() { Id = Guid.NewGuid() } },
             },
             new()
             {
                 Id = Guid.NewGuid(),
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            }
+                Indicators = new List<Indicator> { new() { Id = Guid.NewGuid() } },
+            },
         };
 
         // Request has the second indicator group missing
@@ -2254,11 +2056,8 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = indicatorGroups[0].Id,
-                Indicators = new List<Guid>
-                {
-                    indicatorGroups[0].Indicators[0].Id
-                }
-            }
+                Indicators = new List<Guid> { indicatorGroups[0].Indicators[0].Id },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2277,7 +2076,8 @@ public class SubjectMetaServiceTests
 
         var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
-        indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+        indicatorGroupRepository
+            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
             .ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2286,7 +2086,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object);
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
 
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -2302,8 +2103,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.IndicatorSequence);
@@ -2313,21 +2114,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectIndicators_IndicatorMissing()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2337,16 +2134,10 @@ public class SubjectMetaServiceTests
                 Id = Guid.NewGuid(),
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid() },
+                    new() { Id = Guid.NewGuid() },
+                },
+            },
         };
 
         // Request has the second indicator missing
@@ -2355,11 +2146,8 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = indicatorGroups[0].Id,
-                Indicators = new List<Guid>
-                {
-                    indicatorGroups[0].Indicators[0].Id
-                }
-            }
+                Indicators = new List<Guid> { indicatorGroups[0].Indicators[0].Id },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2378,7 +2166,8 @@ public class SubjectMetaServiceTests
 
         var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
-        indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+        indicatorGroupRepository
+            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
             .ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2387,7 +2176,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object);
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
 
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -2403,8 +2193,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.IndicatorSequence);
@@ -2414,21 +2204,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectIndicators_IndicatorGroupNotForSubject()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2436,14 +2222,8 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = Guid.NewGuid(),
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            }
+                Indicators = new List<Indicator> { new() { Id = Guid.NewGuid() } },
+            },
         };
 
         // Request has an indicator group not for this subject
@@ -2452,19 +2232,13 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = indicatorGroups[0].Id,
-                Indicators = new List<Guid>
-                {
-                    indicatorGroups[0].Indicators[0].Id
-                }
+                Indicators = new List<Guid> { indicatorGroups[0].Indicators[0].Id },
             },
             new()
             {
                 Id = Guid.NewGuid(),
-                Indicators = new List<Guid>
-                {
-                    Guid.NewGuid()
-                }
-            }
+                Indicators = new List<Guid> { Guid.NewGuid() },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2483,7 +2257,8 @@ public class SubjectMetaServiceTests
 
         var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
-        indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+        indicatorGroupRepository
+            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
             .ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2492,7 +2267,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object);
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
 
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -2508,8 +2284,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.IndicatorSequence);
@@ -2519,21 +2295,17 @@ public class SubjectMetaServiceTests
     [Fact]
     public async Task UpdateSubjectIndicators_IndicatorNotForSubject()
     {
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2541,14 +2313,8 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = Guid.NewGuid(),
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            }
+                Indicators = new List<Indicator> { new() { Id = Guid.NewGuid() } },
+            },
         };
 
         // Request has an indicator not for this subject
@@ -2557,12 +2323,8 @@ public class SubjectMetaServiceTests
             new()
             {
                 Id = indicatorGroups[0].Id,
-                Indicators = new List<Guid>
-                {
-                    indicatorGroups[0].Indicators[0].Id,
-                    Guid.NewGuid()
-                }
-            }
+                Indicators = new List<Guid> { indicatorGroups[0].Indicators[0].Id, Guid.NewGuid() },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2581,7 +2343,8 @@ public class SubjectMetaServiceTests
 
         var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
-        indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+        indicatorGroupRepository
+            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
             .ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2590,7 +2353,8 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object);
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
 
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
@@ -2606,8 +2370,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.IndicatorSequence);
@@ -2618,21 +2382,17 @@ public class SubjectMetaServiceTests
     public async Task UpdateSubjectIndicators_ReleaseNotFound()
     {
         // Create a ReleaseSubject but for a different release than the one which will be used in the update
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2656,13 +2416,7 @@ public class SubjectMetaServiceTests
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: Guid.NewGuid(),
                 subjectId: releaseSubject.SubjectId,
-                new List<IndicatorGroupUpdateViewModel>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
+                new List<IndicatorGroupUpdateViewModel> { new() { Id = Guid.NewGuid() } }
             );
 
             result.AssertNotFound();
@@ -2671,8 +2425,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.IndicatorSequence);
@@ -2683,23 +2437,18 @@ public class SubjectMetaServiceTests
     public async Task UpdateSubjectIndicators_SubjectNotFound()
     {
         // Create a ReleaseSubject but for a different release than the one which will be used in the update
-        var subject = new Subject { Id = Guid.NewGuid(), };
+        var subject = new Subject { Id = Guid.NewGuid() };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
             SubjectId = subject.Id,
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-            },
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
-
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2722,13 +2471,7 @@ public class SubjectMetaServiceTests
             var result = await service.UpdateSubjectIndicators(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
                 subjectId: Guid.NewGuid(),
-                new List<IndicatorGroupUpdateViewModel>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
+                new List<IndicatorGroupUpdateViewModel> { new() { Id = Guid.NewGuid() } }
             );
 
             result.AssertNotFound();
@@ -2737,8 +2480,8 @@ public class SubjectMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
-                rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                && rf.File.SubjectId == releaseSubject.SubjectId);
+                rf.ReleaseVersionId == releaseFile.ReleaseVersionId && rf.File.SubjectId == releaseSubject.SubjectId
+            );
 
             // Verify that the ReleaseFile remains untouched
             Assert.Null(savedReleaseFile.IndicatorSequence);
@@ -2750,32 +2493,32 @@ public class SubjectMetaServiceTests
         return new LocationsOptions().ToOptionsWrapper();
     }
 
-    private static List<FilterGroup> CreateFilterGroups(Filter filter,
-        params int[] numberOfFilterItemsPerFilterGroup)
+    private static List<FilterGroup> CreateFilterGroups(Filter filter, params int[] numberOfFilterItemsPerFilterGroup)
     {
         return numberOfFilterItemsPerFilterGroup
-            .Select((filterItemCount, index) =>
-            {
-                var filterGroup = new FilterGroup
+            .Select(
+                (filterItemCount, index) =>
                 {
-                    Id = Guid.NewGuid(),
-                    Label = $"Filter Group {index + 1}",
-                    Filter = filter,
-                    FilterItems = Enumerable
-                        .Range(0, filterItemCount)
-                        .Select(filterItemIndex =>
-                            new FilterItem
+                    var filterGroup = new FilterGroup
+                    {
+                        Id = Guid.NewGuid(),
+                        Label = $"Filter Group {index + 1}",
+                        Filter = filter,
+                        FilterItems = Enumerable
+                            .Range(0, filterItemCount)
+                            .Select(filterItemIndex => new FilterItem
                             {
                                 Id = Guid.NewGuid(),
                                 Label = $"Filter Item {filterItemIndex + 1}",
                             })
-                        .ToList()
-                };
+                            .ToList(),
+                    };
 
-                filterGroup.FilterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroup);
+                    filterGroup.FilterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroup);
 
-                return filterGroup;
-            })
+                    return filterGroup;
+                }
+            )
             .ToList();
     }
 
@@ -2791,7 +2534,8 @@ public class SubjectMetaServiceTests
         IObservationService? observationService = null,
         ITimePeriodService? timePeriodService = null,
         IUserService? userService = null,
-        IOptions<LocationsOptions>? options = null)
+        IOptions<LocationsOptions>? options = null
+    )
     {
         var contentDbContextInstance = contentDbContext ?? InMemoryContentDbContext();
 

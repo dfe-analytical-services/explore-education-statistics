@@ -13,11 +13,7 @@ public class FullSearchableDocumentResetterMockBuilder
     {
         _mock
             .Setup(m => m.PerformReset(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => 
-                new PerformResetResponse
-                {
-                    AllPublications = _publicationInfos ?? []
-                });
+            .ReturnsAsync(() => new PerformResetResponse { AllPublications = _publicationInfos ?? [] });
 
         return _mock.Object;
     }
@@ -29,6 +25,7 @@ public class FullSearchableDocumentResetterMockBuilder
     }
 
     public Asserter Assert => new(_mock);
+
     public class Asserter(Mock<IFullSearchableDocumentResetter> mock)
     {
         public void PerformResetWasCalled()

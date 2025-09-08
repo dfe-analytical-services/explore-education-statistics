@@ -14,8 +14,8 @@ public static class DataTable
         public const string GeographicLevel = "geographic_level";
         public const string TimePeriodId = "time_period_id";
 
-        public static string LocationId(GeographicLevel geographicLevel)
-            => $"locations_{geographicLevel.GetEnumValue().ToLower()}_id";
+        public static string LocationId(GeographicLevel geographicLevel) =>
+            $"locations_{geographicLevel.GetEnumValue().ToLower()}_id";
 
         public static string Filter(FilterMeta filter) => $"\"{filter.Column}\"";
 
@@ -24,8 +24,7 @@ public static class DataTable
 
     private static readonly TableRef DefaultRef = new(TableName);
 
-    public static TableRef Ref(string? table = null)
-        => table is not null ? new(table) : DefaultRef;
+    public static TableRef Ref(string? table = null) => table is not null ? new(table) : DefaultRef;
 
     public class TableRef(string table)
     {

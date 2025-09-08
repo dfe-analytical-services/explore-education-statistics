@@ -60,8 +60,8 @@ public record ProblemDetailsViewModel
 
     [System.Text.Json.Serialization.JsonExtensionData]
     [Newtonsoft.Json.JsonExtensionData]
-    public IDictionary<string, object?> Extensions { get; set; }
-        = new Dictionary<string, object?>(StringComparer.Ordinal);
+    public IDictionary<string, object?> Extensions { get; set; } =
+        new Dictionary<string, object?>(StringComparer.Ordinal);
 
     public static ProblemDetailsViewModel Create(ProblemDetails problemDetails)
     {
@@ -72,7 +72,7 @@ public record ProblemDetailsViewModel
             Status = problemDetails.Status ?? StatusCodes.Status500InternalServerError,
             Detail = problemDetails.Detail,
             Instance = problemDetails.Instance,
-            Extensions = problemDetails.Extensions
+            Extensions = problemDetails.Extensions,
         };
     }
 }

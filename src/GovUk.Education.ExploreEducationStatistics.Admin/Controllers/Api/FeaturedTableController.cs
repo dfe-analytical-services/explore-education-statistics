@@ -23,41 +23,34 @@ public class FeaturedTableController : ControllerBase
     public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _featuredTableService
-            .Get(
-                releaseVersionId: releaseVersionId,
-                dataBlockId: dataBlockId)
+            .Get(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId)
             .HandleFailuresOrOk();
     }
 
     [HttpGet("releases/{releaseVersionId:guid}/featured-tables")]
     public async Task<ActionResult<List<FeaturedTableViewModel>>> List(Guid releaseVersionId)
     {
-        return await _featuredTableService
-            .List(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _featuredTableService.List(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpPost("releases/{releaseVersionId:guid}/featured-tables")]
     public async Task<ActionResult<FeaturedTableViewModel>> Create(
         Guid releaseVersionId,
-        FeaturedTableCreateRequest request)
+        FeaturedTableCreateRequest request
+    )
     {
-        return await _featuredTableService
-            .Create(releaseVersionId, request)
-            .HandleFailuresOrOk();
+        return await _featuredTableService.Create(releaseVersionId, request).HandleFailuresOrOk();
     }
 
     [HttpPost("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
     public async Task<ActionResult<FeaturedTableViewModel>> Update(
         Guid releaseVersionId,
         Guid dataBlockId,
-        FeaturedTableUpdateRequest request)
+        FeaturedTableUpdateRequest request
+    )
     {
         return await _featuredTableService
-            .Update(
-                releaseVersionId: releaseVersionId,
-                dataBlockId: dataBlockId,
-                request: request)
+            .Update(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId, request: request)
             .HandleFailuresOrOk();
     }
 
@@ -70,12 +63,8 @@ public class FeaturedTableController : ControllerBase
     }
 
     [HttpPut("releases/{releaseVersionId:guid}/featured-tables/order")]
-    public async Task<ActionResult<List<FeaturedTableViewModel>>> Reorder(
-        Guid releaseVersionId,
-        List<Guid> newOrder)
+    public async Task<ActionResult<List<FeaturedTableViewModel>>> Reorder(Guid releaseVersionId, List<Guid> newOrder)
     {
-        return await _featuredTableService
-            .Reorder(releaseVersionId, newOrder)
-            .HandleFailuresOrOk();
+        return await _featuredTableService.Reorder(releaseVersionId, newOrder).HandleFailuresOrOk();
     }
 }

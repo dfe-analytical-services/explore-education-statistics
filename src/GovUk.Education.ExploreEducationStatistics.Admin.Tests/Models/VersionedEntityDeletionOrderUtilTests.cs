@@ -41,22 +41,19 @@ public class VersionedEntityDeletionOrderUtilTests
             new(entity2Version2Id, entity2Version1Id),
             new(entity1Version4Id, entity1Version3Id),
             new(entity1Version3Id, entity1Version2Id),
-            new(entity2Version1Id, null)
+            new(entity2Version1Id, null),
         };
 
-        var ordered = VersionedEntityDeletionOrderUtil
-            .Sort(versions)
-            .Select(version => version.Id)
-            .ToList();
+        var ordered = VersionedEntityDeletionOrderUtil.Sort(versions).Select(version => version.Id).ToList();
 
         var expectedVersionOrder = ListOf(
             entity1Version8Id,
             entity1Version7Id,
             entity1Version6Id,
-            entity1Version5Id, 
-            entity1Version4Id, 
-            entity1Version3Id, 
-            entity1Version2Id, 
+            entity1Version5Id,
+            entity1Version4Id,
+            entity1Version3Id,
+            entity1Version2Id,
             entity1Version1Id,
             entity2Version3Id,
             entity2Version2Id,
@@ -64,8 +61,9 @@ public class VersionedEntityDeletionOrderUtilTests
             entity3Version2Id,
             entity3Version1Id,
             entity4Version3Id,
-            entity4Version6Id);
-        
+            entity4Version6Id
+        );
+
         Assert.Equal(expectedVersionOrder, ordered);
     }
 }

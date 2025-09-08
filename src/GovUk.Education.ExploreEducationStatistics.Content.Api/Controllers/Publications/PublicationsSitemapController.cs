@@ -11,6 +11,6 @@ public class PublicationsSitemapController(IPublicationsSitemapService publicati
 {
     [HttpGet("publications/sitemap-items")]
     public async Task<PublicationSitemapPublicationDto[]> GetSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await publicationsSitemapService.GetSitemapItems(cancellationToken);
+        CancellationToken cancellationToken = default
+    ) => await publicationsSitemapService.GetSitemapItems(cancellationToken);
 }

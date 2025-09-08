@@ -14,5 +14,6 @@ public interface IPublicationService
 
     Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
         Guid? themeId = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

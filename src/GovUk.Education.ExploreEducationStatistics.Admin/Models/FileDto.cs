@@ -21,8 +21,7 @@ public record FileDto
     {
         public Validator()
         {
-            RuleFor(dto => dto)
-                .MustBeValidFile();
+            RuleFor(dto => dto).MustBeValidFile();
         }
     }
 }

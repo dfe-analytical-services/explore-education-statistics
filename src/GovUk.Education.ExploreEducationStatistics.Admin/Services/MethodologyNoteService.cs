@@ -25,7 +25,8 @@ public class MethodologyNoteService : IMethodologyNoteService
         IMapper mapper,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IMethodologyNoteRepository methodologyNoteRepository,
-        IUserService userService)
+        IUserService userService
+    )
     {
         _mapper = mapper;
         _persistenceHelper = persistenceHelper;
@@ -35,7 +36,8 @@ public class MethodologyNoteService : IMethodologyNoteService
 
     public Task<Either<ActionResult, MethodologyNoteViewModel>> AddNote(
         Guid methodologyVersionId,
-        MethodologyNoteAddRequest request)
+        MethodologyNoteAddRequest request
+    )
     {
         return _persistenceHelper
             .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
@@ -46,24 +48,23 @@ public class MethodologyNoteService : IMethodologyNoteService
                     methodologyVersionId: methodologyVersion.Id,
                     createdByUserId: _userService.GetUserId(),
                     content: request.Content,
-                    displayDate: request.DisplayDate ?? DateTime.Today.ToUniversalTime());
+                    displayDate: request.DisplayDate ?? DateTime.Today.ToUniversalTime()
+                );
 
                 return BuildMethodologyNoteViewModel(addedNote);
             });
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteNote(
-        Guid methodologyVersionId,
-        Guid methodologyNoteId)
+    public async Task<Either<ActionResult, Unit>> DeleteNote(Guid methodologyVersionId, Guid methodologyNoteId)
     {
         return await _persistenceHelper
             .CheckEntityExists<MethodologyNote>(q =>
                 q.Include(n => n.MethodologyVersion)
-                    .Where(
-                        n => n.Id == methodologyNoteId
-                             && n.MethodologyVersionId == methodologyVersionId))
+                    .Where(n => n.Id == methodologyNoteId && n.MethodologyVersionId == methodologyVersionId)
+            )
             .OnSuccessDo(methodologyNote =>
-                _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion))
+                _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion)
+            )
             .OnSuccessVoid(async _ =>
             {
                 await _methodologyNoteRepository.DeleteNote(methodologyNoteId);
@@ -73,16 +74,17 @@ public class MethodologyNoteService : IMethodologyNoteService
     public async Task<Either<ActionResult, MethodologyNoteViewModel>> UpdateNote(
         Guid methodologyVersionId,
         Guid methodologyNoteId,
-        MethodologyNoteUpdateRequest request)
+        MethodologyNoteUpdateRequest request
+    )
     {
         return await _persistenceHelper
             .CheckEntityExists<MethodologyNote>(q =>
                 q.Include(n => n.MethodologyVersion)
-                    .Where(
-                        n => n.Id == methodologyNoteId
-                             && n.MethodologyVersionId == methodologyVersionId))
+                    .Where(n => n.Id == methodologyNoteId && n.MethodologyVersionId == methodologyVersionId)
+            )
             .OnSuccessDo(methodologyNote =>
-                _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion))
+                _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion)
+            )
             .OnSuccess(async _ =>
             {
                 var updatedNote = await _methodologyNoteRepository.UpdateNote(

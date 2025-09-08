@@ -10,15 +10,18 @@ public static class ControllerExtensions
 {
     public static async Task<Either<ActionResult, Unit>> CacheWithLastModified(
         this ControllerBase controller,
-        DateTimeOffset? lastModified)
+        DateTimeOffset? lastModified
+    )
     {
         controller.Response.GetTypedHeaders().LastModified = lastModified;
 
         var requestHeaders = controller.Request.GetTypedHeaders();
 
-        if (lastModified.HasValue
+        if (
+            lastModified.HasValue
             && requestHeaders.IfModifiedSince.HasValue
-            && requestHeaders.IfModifiedSince.Value >= lastModified)
+            && requestHeaders.IfModifiedSince.Value >= lastModified
+        )
         {
             return controller.StatusCode(StatusCodes.Status304NotModified);
         }
@@ -29,7 +32,8 @@ public static class ControllerExtensions
     public static async Task<Either<ActionResult, Unit>> CacheWithETag(
         this ControllerBase controller,
         string content,
-        bool isWeak = true)
+        bool isWeak = true
+    )
     {
         var eTag = new EntityTagHeaderValue($"\"{content}\"", isWeak);
 
@@ -49,7 +53,8 @@ public static class ControllerExtensions
         this ControllerBase controller,
         DateTimeOffset? lastModified,
         string eTagContent,
-        bool isWeak = true)
+        bool isWeak = true
+    )
     {
         var eTag = new EntityTagHeaderValue($"\"{eTagContent}\"", isWeak);
 
@@ -57,10 +62,12 @@ public static class ControllerExtensions
 
         var requestHeaders = controller.Request.GetTypedHeaders();
 
-        if (lastModified.HasValue
+        if (
+            lastModified.HasValue
             && requestHeaders.IfModifiedSince.HasValue
             && requestHeaders.IfModifiedSince.Value >= lastModified
-            && requestHeaders.IfNoneMatch.Contains(eTag))
+            && requestHeaders.IfNoneMatch.Contains(eTag)
+        )
         {
             return controller.StatusCode(StatusCodes.Status304NotModified);
         }

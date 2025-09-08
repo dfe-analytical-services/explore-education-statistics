@@ -30,17 +30,18 @@ public static class StringBuilderExtensionTests
 
     public class SubstringTests
     {
-        public static TheoryData<string, Range> RangeInsideLengthData => new()
-        {
-            { "al", 1..3 },
-            { "alidating", 1.. },
-            { "alidatin", 1..^1 },
-            { "lidat", 2..^3 },
-            { "idating", 3.. },
-            { "dat", ^6..^3 },
-            { "da", 4..^4 },
-            { "valida", ..^4 },
-        };
+        public static TheoryData<string, Range> RangeInsideLengthData =>
+            new()
+            {
+                { "al", 1..3 },
+                { "alidating", 1.. },
+                { "alidatin", 1..^1 },
+                { "lidat", 2..^3 },
+                { "idating", 3.. },
+                { "dat", ^6..^3 },
+                { "da", 4..^4 },
+                { "valida", ..^4 },
+            };
 
         [Theory]
         [MemberData(nameof(RangeInsideLengthData))]
@@ -52,17 +53,18 @@ public static class StringBuilderExtensionTests
             Assert.Equal(expected, builder.Substring(range));
         }
 
-        public static TheoryData<string, Range> RangeOutsideLengthData => new()
-        {
-            { "s", ^7..^5 },
-            { "s", ^6..^5 },
-            { "string", ^7.. },
-            { "string", ^6.. },
-            { "string", ..6 },
-            { "string", ..7 },
-            { "g", 5.. },
-            { "g", 5..6 },
-        };
+        public static TheoryData<string, Range> RangeOutsideLengthData =>
+            new()
+            {
+                { "s", ^7..^5 },
+                { "s", ^6..^5 },
+                { "string", ^7.. },
+                { "string", ^6.. },
+                { "string", ..6 },
+                { "string", ..7 },
+                { "g", 5.. },
+                { "g", 5..6 },
+            };
 
         [Theory]
         [MemberData(nameof(RangeOutsideLengthData))]
@@ -74,13 +76,7 @@ public static class StringBuilderExtensionTests
             Assert.Equal(expected, builder.Substring(range));
         }
 
-        public static TheoryData<Range> InvalidRangeData => new()
-        {
-            5..7,
-            7..5,
-            ^5..^6,
-            ^6..^5,
-        };
+        public static TheoryData<Range> InvalidRangeData => new() { 5..7, 7..5, ^5..^6, ^6..^5 };
 
         [Theory]
         [MemberData(nameof(InvalidRangeData))]

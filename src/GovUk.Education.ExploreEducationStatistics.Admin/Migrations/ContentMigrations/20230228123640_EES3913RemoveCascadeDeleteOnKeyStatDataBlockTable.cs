@@ -10,21 +10,24 @@ public partial class EES3913RemoveCascadeDeleteOnKeyStatDataBlockTable : Migrati
     {
         migrationBuilder.DropForeignKey(
             name: "FK_KeyStatisticsDataBlock_ContentBlock_DataBlockId",
-            table: "KeyStatisticsDataBlock");
+            table: "KeyStatisticsDataBlock"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_KeyStatisticsDataBlock_ContentBlock_DataBlockId",
             table: "KeyStatisticsDataBlock",
             column: "DataBlockId",
             principalTable: "ContentBlock",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_KeyStatisticsDataBlock_ContentBlock_DataBlockId",
-            table: "KeyStatisticsDataBlock");
+            table: "KeyStatisticsDataBlock"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_KeyStatisticsDataBlock_ContentBlock_DataBlockId",
@@ -32,6 +35,7 @@ public partial class EES3913RemoveCascadeDeleteOnKeyStatDataBlockTable : Migrati
             column: "DataBlockId",
             principalTable: "ContentBlock",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 }

@@ -2,5 +2,5 @@
 
 public enum DataSecurityPolicies
 {
-    CanViewSubjectData
+    CanViewSubjectData,
 }

@@ -13,7 +13,8 @@ public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbConte
     public async Task CreateFilterOptionsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await publicDataDbContext
             .Entry(dataSetVersion)
@@ -22,17 +23,19 @@ public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbConte
             .Include(m => m.Options)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.SqlBuilder(
-            $"""
-             CREATE TABLE {FilterOptionsTable.TableName:raw}(
-                 {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
-                 {FilterOptionsTable.Cols.Label:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR
-             )
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
+        await duckDbConnection
+            .SqlBuilder(
+                $"""
+                CREATE TABLE {FilterOptionsTable.TableName:raw}(
+                    {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                    {FilterOptionsTable.Cols.Label:raw} VARCHAR,
+                    {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
+                    {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
+                    {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR
+                )
+                """
+            )
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         var id = 1;
 

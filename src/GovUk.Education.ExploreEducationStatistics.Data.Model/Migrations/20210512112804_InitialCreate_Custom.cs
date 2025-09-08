@@ -28,7 +28,10 @@ public partial class InitialCreate_Custom : Migration
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_InsertObservations.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_RebuildIndexes.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_RemoveSoftDeletedSubjects.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_RemoveSoftDeletedSubjectsAndObservationRows.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_RemoveSoftDeletedSubjectsAndObservationRows.sql"
+        );
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertLocation.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertPublication.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertTheme.sql");

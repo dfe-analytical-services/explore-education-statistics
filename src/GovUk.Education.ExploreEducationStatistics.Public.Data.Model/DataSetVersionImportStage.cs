@@ -15,7 +15,7 @@ public enum DataSetVersionImportStage
     CreatingChanges,
     ImportingData,
     WritingDataFiles,
-    Completing
+    Completing,
 }
 
 public static class DataSetVersionImportStageExtensions
@@ -29,7 +29,8 @@ public static class DataSetVersionImportStageExtensions
             ? throw new ArgumentOutOfRangeException(
                 nameof(stage),
                 stage,
-                $"No previous stage has been defined for '{stage}'")
+                $"No previous stage has been defined for '{stage}'"
+            )
             : stages[prevIndex];
     }
 }

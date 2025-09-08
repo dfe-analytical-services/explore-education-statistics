@@ -10,18 +10,14 @@ public partial class EES4668_RenameReleaseVersionIndexes : Migration
     {
         // Rename ReleaseVersion indexes which were not renamed by the Release -> ReleaseVersion table rename
         // in migration 20240229155441_EES4668_RenameReleaseToReleaseVersion
-        migrationBuilder.RenameIndex(
-            name: "PK_Release",
-            table: "ReleaseVersion",
-            newName: "PK_ReleaseVersion");
+        migrationBuilder.RenameIndex(name: "PK_Release", table: "ReleaseVersion", newName: "PK_ReleaseVersion");
 
         migrationBuilder.RenameIndex(
             name: "IX_Release_PublicationId",
             table: "ReleaseVersion",
-            newName: "IX_ReleaseVersion_PublicationId");
+            newName: "IX_ReleaseVersion_PublicationId"
+        );
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

@@ -12,10 +12,7 @@ public interface IUserRoleService
 
     Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
-    Task<Either<ActionResult, Unit>> AddReleaseRole(
-        Guid userId,
-        Guid releaseId,
-        ReleaseRole role);
+    Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role);
 
     Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId);
 
@@ -30,7 +27,8 @@ public interface IUserRoleService
     Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId);
 
     Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(
-        Guid publicationId);
+        Guid publicationId
+    );
 
     Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId);
 

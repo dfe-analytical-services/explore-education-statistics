@@ -28,7 +28,8 @@ public interface IAzureBlobStorageClient
         Blob blob,
         string contentType,
         string? contentEncoding = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Check for the existence of a container in our configured Azure Blob Storage account

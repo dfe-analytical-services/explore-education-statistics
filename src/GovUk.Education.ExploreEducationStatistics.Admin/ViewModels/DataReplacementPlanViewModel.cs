@@ -15,9 +15,10 @@ public class DataReplacementPlanViewModel
     public Guid OriginalSubjectId { get; init; }
     public Guid ReplacementSubjectId { get; init; }
 
-    public bool Valid => DataBlocks.All(info => info.Valid)
-                         && Footnotes.All(info => info.Valid)
-                         && (ApiDataSetVersionPlan?.Valid ?? true);
+    public bool Valid =>
+        DataBlocks.All(info => info.Valid)
+        && Footnotes.All(info => info.Valid)
+        && (ApiDataSetVersionPlan?.Valid ?? true);
 
     /**
      * Trimmed down version of the data replacement plan that
@@ -31,7 +32,7 @@ public class DataReplacementPlanViewModel
             Footnotes = Footnotes.Select(footnote => footnote.ToSummary()),
             ApiDataSetVersionPlan = ApiDataSetVersionPlan,
             OriginalSubjectId = OriginalSubjectId,
-            ReplacementSubjectId = ReplacementSubjectId
+            ReplacementSubjectId = ReplacementSubjectId,
         };
     }
 }
@@ -46,13 +47,15 @@ public class DataBlockReplacementPlanViewModel
     public Dictionary<string, LocationReplacementViewModel> Locations { get; }
     public TimePeriodRangeReplacementViewModel? TimePeriods { get; }
 
-    public DataBlockReplacementPlanViewModel(Guid id,
+    public DataBlockReplacementPlanViewModel(
+        Guid id,
         string name,
         Dictionary<Guid, FilterReplacementViewModel>? originalFilters = null,
         List<FilterReplacementViewModel>? newlyIntroducedFilters = null,
         Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicators = null,
         Dictionary<string, LocationReplacementViewModel>? locations = null,
-        TimePeriodRangeReplacementViewModel? timePeriods = null)
+        TimePeriodRangeReplacementViewModel? timePeriods = null
+    )
     {
         Id = id;
         Name = name;
@@ -63,15 +66,17 @@ public class DataBlockReplacementPlanViewModel
         TimePeriods = timePeriods;
     }
 
-    public bool Valid => NewlyIntroducedFilters.IsNullOrEmpty()
-                         && Filters.All(model => model.Value.Valid)
-                         && IndicatorGroups.All(model => model.Value.Valid)
-                         && Locations.Values.All(model => model.Valid)
-                         && (TimePeriods?.Valid ?? true);
+    public bool Valid =>
+        NewlyIntroducedFilters.IsNullOrEmpty()
+        && Filters.All(model => model.Value.Valid)
+        && IndicatorGroups.All(model => model.Value.Valid)
+        && Locations.Values.All(model => model.Valid)
+        && (TimePeriods?.Valid ?? true);
 
     // As of fixing EES-2087, we will prevent users from attempting to fix Data Blocks which are invalid due to
     // new Filters being introduced in a replacement Subject.  When taking on EES-2096, we can remove this flag.
-    public bool Fixable => !Valid && NewlyIntroducedFilters.IsNullOrEmpty() && Filters.All(model => model.Value.Fixable);
+    public bool Fixable =>
+        !Valid && NewlyIntroducedFilters.IsNullOrEmpty() && Filters.All(model => model.Value.Fixable);
 
     public DataBlockReplacementPlanViewModel ToSummary()
     {
@@ -94,7 +99,8 @@ public class FootnoteReplacementPlanViewModel
         IEnumerable<FootnoteFilterReplacementViewModel>? filters = null,
         IEnumerable<FootnoteFilterGroupReplacementViewModel>? filterGroups = null,
         IEnumerable<FootnoteFilterItemReplacementViewModel>? filterItems = null,
-        Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicatorGroups = null)
+        Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicatorGroups = null
+    )
     {
         Id = id;
         Content = content;
@@ -104,10 +110,11 @@ public class FootnoteReplacementPlanViewModel
         IndicatorGroups = indicatorGroups ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
     }
 
-    public bool Valid => Filters.All(model => model.Valid)
-                         && FilterGroups.All(model => model.Valid)
-                         && FilterItems.All(model => model.Valid)
-                         && IndicatorGroups.All(model => model.Value.Valid);
+    public bool Valid =>
+        Filters.All(model => model.Valid)
+        && FilterGroups.All(model => model.Valid)
+        && FilterItems.All(model => model.Valid)
+        && IndicatorGroups.All(model => model.Value.Valid);
 
     public FootnoteReplacementPlanViewModel ToSummary()
     {
@@ -117,9 +124,8 @@ public class FootnoteReplacementPlanViewModel
 
 public class FootnoteFilterReplacementViewModel : TargetableReplacementViewModel
 {
-    public FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target) : base(id, label, target)
-    {
-    }
+    public FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target)
+        : base(id, label, target) { }
 }
 
 public class FootnoteFilterGroupReplacementViewModel : TargetableReplacementViewModel
@@ -132,11 +138,9 @@ public class FootnoteFilterGroupReplacementViewModel : TargetableReplacementView
         string label,
         Guid? target,
         Guid filterId,
-        string filterLabel) : base(
-        id,
-        label,
-        target
+        string filterLabel
     )
+        : base(id, label, target)
     {
         FilterId = filterId;
         FilterLabel = filterLabel;
@@ -157,7 +161,9 @@ public class FootnoteFilterItemReplacementViewModel : TargetableReplacementViewM
         Guid filterGroupId,
         string filterGroupLabel,
         Guid filterId,
-        string filterLabel) : base(id, label, target)
+        string filterLabel
+    )
+        : base(id, label, target)
     {
         FilterGroupId = filterGroupId;
         FilterGroupLabel = filterGroupLabel;
@@ -186,7 +192,8 @@ public class FilterReplacementViewModel
         Guid? target,
         string label,
         string name,
-        Dictionary<Guid, FilterGroupReplacementViewModel> groups)
+        Dictionary<Guid, FilterGroupReplacementViewModel> groups
+    )
     {
         Id = id;
         Target = target;
@@ -209,10 +216,7 @@ public class FilterGroupReplacementViewModel
     // replacement file's metadata - can be removed during work on EES-2096.
     public bool Fixable => !Valid && Filters.Any(filter => filter.Valid);
 
-    public FilterGroupReplacementViewModel(
-        Guid id,
-        string label,
-        IEnumerable<FilterItemReplacementViewModel> filters)
+    public FilterGroupReplacementViewModel(Guid id, string label, IEnumerable<FilterItemReplacementViewModel> filters)
     {
         Id = id;
         Label = label;
@@ -222,16 +226,16 @@ public class FilterGroupReplacementViewModel
 
 public class FilterItemReplacementViewModel : TargetableReplacementViewModel
 {
-    public FilterItemReplacementViewModel(Guid id, string label, Guid? target) : base(id, label, target)
-    {
-    }
+    public FilterItemReplacementViewModel(Guid id, string label, Guid? target)
+        : base(id, label, target) { }
 }
 
 public class IndicatorReplacementViewModel : TargetableReplacementViewModel
 {
     public string Name { get; }
 
-    public IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name) : base(id, label, target)
+    public IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name)
+        : base(id, label, target)
     {
         Name = name;
     }
@@ -248,7 +252,8 @@ public class IndicatorGroupReplacementViewModel
     public IndicatorGroupReplacementViewModel(
         Guid id,
         string label,
-        IEnumerable<IndicatorReplacementViewModel> indicators)
+        IEnumerable<IndicatorReplacementViewModel> indicators
+    )
     {
         Id = id;
         Label = label;
@@ -260,11 +265,8 @@ public class LocationAttributeReplacementViewModel : TargetableReplacementViewMo
 {
     public string Code { get; }
 
-    public LocationAttributeReplacementViewModel(
-        Guid id,
-        string code,
-        string label,
-        Guid? target) : base(id, label, target)
+    public LocationAttributeReplacementViewModel(Guid id, string code, string label, Guid? target)
+        : base(id, label, target)
     {
         Code = code;
     }
@@ -278,7 +280,8 @@ public class LocationReplacementViewModel
 
     public LocationReplacementViewModel(
         string label,
-        IEnumerable<LocationAttributeReplacementViewModel> locationAttributes)
+        IEnumerable<LocationAttributeReplacementViewModel> locationAttributes
+    )
     {
         Label = label;
         LocationAttributes = locationAttributes;
@@ -292,9 +295,7 @@ public class TimePeriodRangeReplacementViewModel
 
     public bool Valid => Start.Valid && End.Valid;
 
-    public TimePeriodRangeReplacementViewModel(
-        TimePeriodReplacementViewModel start,
-        TimePeriodReplacementViewModel end)
+    public TimePeriodRangeReplacementViewModel(TimePeriodReplacementViewModel start, TimePeriodReplacementViewModel end)
     {
         Start = start;
         End = end;
@@ -309,7 +310,8 @@ public class TimePeriodReplacementViewModel : ReplacementViewModel
     public int Year { get; }
     public string Label => TimePeriodLabelFormatter.Format(Year, Code);
 
-    public TimePeriodReplacementViewModel(bool valid, TimeIdentifier code, int year) : base(valid)
+    public TimePeriodReplacementViewModel(bool valid, TimeIdentifier code, int year)
+        : base(valid)
     {
         Code = code;
         Year = year;

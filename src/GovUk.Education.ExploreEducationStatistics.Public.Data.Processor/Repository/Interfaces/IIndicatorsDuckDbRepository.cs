@@ -8,5 +8,6 @@ public interface IIndicatorsDuckDbRepository
     Task CreateIndicatorsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

@@ -16,14 +16,16 @@ public partial class EES4482_CreateAlternativeSlugAndOwningPublicationSlugForMet
             name: "AlternativeSlug",
             table: "MethodologyVersions",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "OwningPublicationSlug",
             table: "Methodologies",
             type: "nvarchar(max)",
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
 
         migrationBuilder.CreateTable(
             name: "MethodologyRedirects",
@@ -31,7 +33,7 @@ public partial class EES4482_CreateAlternativeSlugAndOwningPublicationSlugForMet
             {
                 Slug = table.Column<string>(type: "nvarchar(450)", nullable: false),
                 MethodologyVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Created = table.Column<DateTime>(type: "datetime2", nullable: false)
+                Created = table.Column<DateTime>(type: "datetime2", nullable: false),
             },
             constraints: table =>
             {
@@ -41,28 +43,26 @@ public partial class EES4482_CreateAlternativeSlugAndOwningPublicationSlugForMet
                     column: x => x.MethodologyVersionId,
                     principalTable: "MethodologyVersions",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
+                    onDelete: ReferentialAction.Cascade
+                );
+            }
+        );
 
         migrationBuilder.Sql("GRANT SELECT ON dbo.MethodologyRedirects TO [content]");
         migrationBuilder.Sql("GRANT SELECT ON dbo.MethodologyRedirects TO [publisher]");
 
         migrationBuilder.SqlFromFile(
             MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_EES4482_MigrateMethodologyOwningPublicationSlug.sql");
+            $"{MigrationId}_EES4482_MigrateMethodologyOwningPublicationSlug.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "MethodologyRedirects");
+        migrationBuilder.DropTable(name: "MethodologyRedirects");
 
-        migrationBuilder.DropColumn(
-            name: "AlternativeSlug",
-            table: "MethodologyVersions");
+        migrationBuilder.DropColumn(name: "AlternativeSlug", table: "MethodologyVersions");
 
-        migrationBuilder.DropColumn(
-            name: "OwningPublicationSlug",
-            table: "Methodologies");
+        migrationBuilder.DropColumn(name: "OwningPublicationSlug", table: "Methodologies");
     }
 }

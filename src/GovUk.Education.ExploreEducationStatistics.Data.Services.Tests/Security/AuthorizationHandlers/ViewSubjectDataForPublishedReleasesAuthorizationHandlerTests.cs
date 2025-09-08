@@ -24,17 +24,13 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
         ReleaseSubject releaseSubject = _dataFixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_dataFixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id));
+            .WithReleaseVersion(_dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -50,7 +46,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var authContext = new AuthorizationHandlerContext(
                 [Activator.CreateInstance<ViewSubjectDataRequirement>()],
                 _dataFixture.Generator<ClaimsPrincipal>(),
-                releaseSubject);
+                releaseSubject
+            );
 
             await handler.HandleAsync(authContext);
 
@@ -63,17 +60,13 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 2, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 1 });
 
         ReleaseSubject releaseSubject = _dataFixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_dataFixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id));
+            .WithReleaseVersion(_dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -89,7 +82,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var authContext = new AuthorizationHandlerContext(
                 [Activator.CreateInstance<ViewSubjectDataRequirement>()],
                 _dataFixture.Generator<ClaimsPrincipal>(),
-                releaseSubject);
+                releaseSubject
+            );
 
             await handler.HandleAsync(authContext);
 
@@ -98,7 +92,8 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
     }
 
     private static ViewSubjectDataForPublishedReleasesAuthorizationHandler BuildHandler(
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
         return new ViewSubjectDataForPublishedReleasesAuthorizationHandler(
             new ReleaseVersionRepository(contentDbContext)

@@ -9,21 +9,25 @@ public interface IDataSetVersionService
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Guid>> CreateNextVersion(
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
         Guid? dataSetVersionToReplaceId = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Unit>> BulkDeleteVersions(
         Guid releaseVersionId,
         bool forceDeleteAll = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

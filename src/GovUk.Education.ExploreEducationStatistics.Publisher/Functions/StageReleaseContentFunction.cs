@@ -17,7 +17,8 @@ public class StageReleaseContentFunction(
     IOptions<AppOptions> appOptions,
     TimeProvider timeProvider,
     IContentService contentService,
-    IReleasePublishingStatusService releasePublishingStatusService)
+    IReleasePublishingStatusService releasePublishingStatusService
+)
 {
     private readonly AppOptions _appOptions = appOptions.Value;
 
@@ -30,11 +31,10 @@ public class StageReleaseContentFunction(
     [Function("StageReleaseContent")]
     public async Task StageReleaseContent(
         [QueueTrigger(StageReleaseContentQueue)] StageReleaseContentMessage message,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
-        logger.LogInformation("{FunctionName} triggered: {Message}",
-            context.FunctionDefinition.Name,
-            message);
+        logger.LogInformation("{FunctionName} triggered: {Message}", context.FunctionDefinition.Name, message);
 
         await UpdateContentStage(message, Started);
 
@@ -43,27 +43,33 @@ public class StageReleaseContentFunction(
 
         try
         {
-            var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
-                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
-                from: now,
-                timeZone
-            ) ?? throw new CronNoFutureOccurrenceException(
-                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
-                from: now,
-                timeZone);
+            var nextScheduledPublishingTime =
+                CronExpressionUtil.GetNextOccurrence(
+                    cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                    from: now,
+                    timeZone
+                )
+                ?? throw new CronNoFutureOccurrenceException(
+                    cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                    from: now,
+                    timeZone
+                );
 
             await contentService.UpdateContentStaged(
                 expectedPublishDate: nextScheduledPublishingTime.UtcDateTime,
-                releaseVersionIds: message.ReleasePublishingKeys.ToReleaseVersionIds());
+                releaseVersionIds: message.ReleasePublishingKeys.ToReleaseVersionIds()
+            );
             await UpdateContentStage(message, Scheduled);
         }
         catch (Exception e)
         {
             logger.LogError(e, "Exception occured while executing {FunctionName}", context.FunctionDefinition.Name);
 
-            await UpdateContentStage(message,
+            await UpdateContentStage(
+                message,
                 Failed,
-                new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
+                new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}")
+            );
         }
 
         logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
@@ -72,10 +78,11 @@ public class StageReleaseContentFunction(
     private async Task UpdateContentStage(
         StageReleaseContentMessage message,
         ReleasePublishingStatusContentStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null)
+        ReleasePublishingStatusLogMessage? logMessage = null
+    )
     {
-        await message.ReleasePublishingKeys
-            .ToAsyncEnumerable()
+        await message
+            .ReleasePublishingKeys.ToAsyncEnumerable()
             .ForEachAwaitAsync(async key =>
             {
                 await releasePublishingStatusService.UpdateContentStage(key, stage, logMessage);

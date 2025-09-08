@@ -34,7 +34,8 @@ public class MethodologyNoteRepositoryTests
                 methodologyVersionId: methodologyVersion.Id,
                 createdByUserId: createdById,
                 content: content,
-                displayDate: displayDate);
+                displayDate: displayDate
+            );
 
             Assert.NotNull(result);
         }
@@ -43,9 +44,9 @@ public class MethodologyNoteRepositoryTests
         {
             Assert.Single(contentDbContext.MethodologyNotes);
 
-            var addedNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n =>
-                    n.MethodologyVersionId == methodologyVersion.Id);
+            var addedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.NotEqual(Guid.Empty, addedNote.Id);
             Assert.Equal(content, addedNote.Content);
@@ -65,15 +66,9 @@ public class MethodologyNoteRepositoryTests
         {
             Notes = new List<MethodologyNote>
             {
-                new()
-                {
-                    Content = "Note 1"
-                },
-                new()
-                {
-                    Content = "Note 2"
-                }
-            }
+                new() { Content = "Note 1" },
+                new() { Content = "Note 2" },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -108,7 +103,7 @@ public class MethodologyNoteRepositoryTests
             Created = DateTime.UtcNow,
             CreatedById = Guid.NewGuid(),
             DisplayDate = DateTime.Today.ToUniversalTime(),
-            MethodologyVersion = new MethodologyVersion()
+            MethodologyVersion = new MethodologyVersion(),
         };
 
         const string content = "Updating note";
@@ -131,7 +126,8 @@ public class MethodologyNoteRepositoryTests
                 methodologyNoteId: methodologyNote.Id,
                 updatedByUserId: updatedById,
                 content: content,
-                displayDate: displayDate);
+                displayDate: displayDate
+            );
 
             Assert.NotNull(result);
         }

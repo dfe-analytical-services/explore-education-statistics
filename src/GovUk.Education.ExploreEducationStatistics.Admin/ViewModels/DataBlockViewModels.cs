@@ -32,7 +32,7 @@ public record DataBlockViewModel : IContentBlockViewModel
 
     public string? HighlightDescription { get; set; }
 
-    public string Source { get; init; }  = string.Empty;
+    public string Source { get; init; } = string.Empty;
 
     public FullTableQuery Query { get; init; } = null!;
 

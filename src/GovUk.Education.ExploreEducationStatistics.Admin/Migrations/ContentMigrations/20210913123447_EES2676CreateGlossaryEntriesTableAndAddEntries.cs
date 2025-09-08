@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 public partial class EES2676CreateGlossaryEntriesTableAndAddEntries : Migration
 {
     private const string GlossaryEntriesSqlFile = "20210913123447_InitialGlossaryEntries.sql";
+
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
@@ -18,7 +19,7 @@ public partial class EES2676CreateGlossaryEntriesTableAndAddEntries : Migration
                 Slug = table.Column<string>(nullable: false),
                 Body = table.Column<string>(nullable: false),
                 Created = table.Column<DateTime>(nullable: false),
-                CreatedById = table.Column<Guid>(nullable: false)
+                CreatedById = table.Column<Guid>(nullable: false),
             },
             constraints: table =>
             {
@@ -27,20 +28,22 @@ public partial class EES2676CreateGlossaryEntriesTableAndAddEntries : Migration
                     name: "FK_GlossaryEntries_Users_CreatedById",
                     column: x => x.CreatedById,
                     principalTable: "Users",
-                    principalColumn: "Id");
-            });
+                    principalColumn: "Id"
+                );
+            }
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_GlossaryEntries_CreatedById",
             table: "GlossaryEntries",
-            column: "CreatedById");
+            column: "CreatedById"
+        );
 
         migrationBuilder.SqlFromFile(ContentMigrationsPath, GlossaryEntriesSqlFile);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "GlossaryEntries");
+        migrationBuilder.DropTable(name: "GlossaryEntries");
     }
 }

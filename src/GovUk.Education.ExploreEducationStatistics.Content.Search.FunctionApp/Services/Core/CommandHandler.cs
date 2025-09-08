@@ -5,9 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
 {
     public async Task<TResponse> Handle<TCommand, TResponse>(
-        Func<TCommand, CancellationToken, Task<TResponse>> commandHandler, 
+        Func<TCommand, CancellationToken, Task<TResponse>> commandHandler,
         TCommand commandMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         logger.LogDebug("Handling command: {@Command}", commandMessage);
         try
@@ -27,11 +28,12 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
             throw;
         }
     }
-    
+
     public async Task Handle<TCommand>(
-        Func<TCommand, CancellationToken, Task> commandHandler, 
+        Func<TCommand, CancellationToken, Task> commandHandler,
         TCommand commandMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         logger.LogDebug("Handling command: {@Command}", commandMessage);
         try
@@ -52,7 +54,8 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
 
     public async Task<TResponse> Handle<TResponse>(
         Func<CancellationToken, Task<TResponse>> commandHandler,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         logger.LogDebug("Handling command.");
         try
@@ -72,9 +75,8 @@ public class CommandHandler(ILogger<CommandHandler> logger) : ICommandHandler
             throw;
         }
     }
-    public async Task Handle(
-        Func<CancellationToken, Task> commandHandler,
-        CancellationToken cancellationToken)
+
+    public async Task Handle(Func<CancellationToken, Task> commandHandler, CancellationToken cancellationToken)
     {
         logger.LogDebug("Handling command.");
         try

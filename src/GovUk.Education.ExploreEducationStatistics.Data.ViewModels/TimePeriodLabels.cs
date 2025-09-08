@@ -7,9 +7,7 @@ public class TimePeriodLabels
     public string From { get; set; } = string.Empty;
     public string To { get; set; } = string.Empty;
 
-    public TimePeriodLabels()
-    {
-    }
+    public TimePeriodLabels() { }
 
     public TimePeriodLabels(string from, string to)
     {

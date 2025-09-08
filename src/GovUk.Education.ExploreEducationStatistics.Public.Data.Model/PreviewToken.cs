@@ -31,11 +31,9 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
     {
         public void Configure(EntityTypeBuilder<PreviewToken> builder)
         {
-            builder.Property(pt => pt.Id)
-                .HasValueGenerator<UuidV7ValueGenerator>();
+            builder.Property(pt => pt.Id).HasValueGenerator<UuidV7ValueGenerator>();
 
-            builder.Property(pt => pt.Label)
-                .HasMaxLength(100);
+            builder.Property(pt => pt.Label).HasMaxLength(100);
         }
     }
 }
@@ -43,5 +41,5 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 public enum PreviewTokenStatus
 {
     Active,
-    Expired
+    Expired,
 }

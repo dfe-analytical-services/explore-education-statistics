@@ -50,7 +50,8 @@ public class MethodologyService : IMethodologyService
         IMethodologyApprovalService methodologyApprovalService,
         IMethodologyCacheService methodologyCacheService,
         IRedirectsCacheService redirectsCacheService,
-        IUserService userService)
+        IUserService userService
+    )
     {
         _persistenceHelper = persistenceHelper;
         _context = context;
@@ -67,8 +68,7 @@ public class MethodologyService : IMethodologyService
     public async Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<Publication>(publicationId, q =>
-                q.Include(p => p.Methodologies))
+            .CheckEntityExists<Publication>(publicationId, q => q.Include(p => p.Methodologies))
             .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
             .OnSuccessCombineWith(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
             .OnSuccess<ActionResult, Tuple<Publication, Methodology>, Unit>(async tuple =>
@@ -85,11 +85,9 @@ public class MethodologyService : IMethodologyService
                     return ValidationActionResult(CannotAdoptMethodologyAlreadyLinkedToPublication);
                 }
 
-                publication.Methodologies.Add(new PublicationMethodology
-                {
-                    MethodologyId = methodologyId,
-                    Owner = false
-                });
+                publication.Methodologies.Add(
+                    new PublicationMethodology { MethodologyId = methodologyId, Owner = false }
+                );
 
                 _context.Publications.Update(publication);
                 await _context.SaveChangesAsync();
@@ -106,8 +104,8 @@ public class MethodologyService : IMethodologyService
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
             .OnSuccess(publication => ValidateMethodologySlug(publication.Slug))
-            .OnSuccess(_ => _methodologyVersionRepository
-                .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
+            .OnSuccess(_ =>
+                _methodologyVersionRepository.CreateMethodologyForPublication(publicationId, _userService.GetUserId())
             )
             .OnSuccess(BuildMethodologyVersionViewModel);
     }
@@ -116,8 +114,8 @@ public class MethodologyService : IMethodologyService
     {
         return await _persistenceHelper
             .CheckEntityExists<PublicationMethodology>(q =>
-                q.Where(link => link.PublicationId == publicationId
-                                && link.MethodologyId == methodologyId))
+                q.Where(link => link.PublicationId == publicationId && link.MethodologyId == methodologyId)
+            )
             .OnSuccess(link => _userService.CheckCanDropMethodologyLink(link))
             .OnSuccessVoid(async link =>
             {
@@ -129,19 +127,21 @@ public class MethodologyService : IMethodologyService
     }
 
     public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(
-        Guid publicationId)
+        Guid publicationId
+    )
     {
         return await _persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
             .OnSuccess(async publication =>
             {
-                var publishedMethodologies = await _methodologyRepository
-                    .GetPublishedMethodologiesUnrelatedToPublication(publication.Id);
+                var publishedMethodologies =
+                    await _methodologyRepository.GetPublishedMethodologiesUnrelatedToPublication(publication.Id);
                 var latestPublishedVersions = publishedMethodologies
                     .ToAsyncEnumerable()
                     .SelectAwait(async methodology =>
-                        await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id))
+                        await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id)
+                    )
                     .WhereNotNull();
                 return await latestPublishedVersions
                     .SelectAwait(async version => await BuildMethodologyVersionViewModel(version))
@@ -157,21 +157,25 @@ public class MethodologyService : IMethodologyService
             .OnSuccess(BuildMethodologyVersionViewModel);
     }
 
-    public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>>
-        ListLatestMethodologyVersions(
-            Guid publicationId,
-            bool isPrerelease = false)
+    public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
+        Guid publicationId,
+        bool isPrerelease = false
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<Publication>(publicationId,
-                q => q.Include(publication => publication.Methodologies)
-                    .ThenInclude(publicationMethodology => publicationMethodology.Methodology)
-                    .ThenInclude(methodology => methodology.Versions)
-                    .ThenInclude(versions => versions.PreviousVersion))
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(
+                publicationId,
+                q =>
+                    q.Include(publication => publication.Methodologies)
+                        .ThenInclude(publicationMethodology => publicationMethodology.Methodology)
+                        .ThenInclude(methodology => methodology.Versions)
+                        .ThenInclude(versions => versions.PreviousVersion)
+            )
             .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
             .OnSuccess(async publication =>
             {
-                return await publication.Methodologies
-                    .ToAsyncEnumerable()
+                return await publication
+                    .Methodologies.ToAsyncEnumerable()
                     .SelectAwait(async publicationMethodology =>
                     {
                         var methodologyVersion = publicationMethodology.Methodology.LatestVersion();
@@ -189,10 +193,11 @@ public class MethodologyService : IMethodologyService
                             methodologyVersion = methodologyVersion.PreviousVersion;
                         }
 
-                        var permissions =
-                            await PermissionsUtils.GetMethodologyVersionPermissions(_userService,
-                                methodologyVersion,
-                                publicationMethodology);
+                        var permissions = await PermissionsUtils.GetMethodologyVersionPermissions(
+                            _userService,
+                            methodologyVersion,
+                            publicationMethodology
+                        );
 
                         return new MethodologyVersionSummaryViewModel
                         {
@@ -214,28 +219,34 @@ public class MethodologyService : IMethodologyService
     }
 
     public async Task<Either<ActionResult, List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
-        Guid methodologyVersionId)
+        Guid methodologyVersionId
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId, queryable =>
-                queryable.Include(m => m.Methodology)
-                    .ThenInclude(mp => mp.Publications))
-            .OnSuccess(methodologyVersion => _userService.CheckCanApproveMethodologyVersion(methodologyVersion)
-                .OrElse(() => _userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion)))
+        return await _persistenceHelper
+            .CheckEntityExists<MethodologyVersion>(
+                methodologyVersionId,
+                queryable => queryable.Include(m => m.Methodology).ThenInclude(mp => mp.Publications)
+            )
+            .OnSuccess(methodologyVersion =>
+                _userService
+                    .CheckCanApproveMethodologyVersion(methodologyVersion)
+                    .OrElse(() => _userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion))
+            )
             .OnSuccess(async methodologyVersion =>
             {
                 // Get all Publications using the Methodology including adopting Publications
-                var publicationIds =
-                    methodologyVersion.Methodology.Publications.Select(pm => pm.PublicationId);
+                var publicationIds = methodologyVersion.Methodology.Publications.Select(pm => pm.PublicationId);
 
                 // Get the Releases of those publications
-                var releaseVersions = await _context.ReleaseVersions
-                    .Include(rv => rv.Release)
+                var releaseVersions = await _context
+                    .ReleaseVersions.Include(rv => rv.Release)
                     .ThenInclude(r => r.Publication)
                     .Where(rv => publicationIds.Contains(rv.PublicationId))
                     .ToListAsync();
 
                 // Return an ordered list of the Releases that are not published
-                return releaseVersions.Where(rv => !rv.Live)
+                return releaseVersions
+                    .Where(rv => !rv.Live)
                     .OrderBy(rv => rv.Release.Publication.Title)
                     .ThenByDescending(rv => rv.Release.Year)
                     .ThenByDescending(rv => rv.Release.TimePeriodCoverage)
@@ -244,20 +255,23 @@ public class MethodologyService : IMethodologyService
             });
     }
 
-    public async Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(Guid id,
-        MethodologyUpdateRequest request)
+    public async Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(
+        Guid id,
+        MethodologyUpdateRequest request
+    )
     {
         return await _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(id, q =>
-                q.Include(m => m.Methodology))
+            .CheckEntityExists<MethodologyVersion>(id, q => q.Include(m => m.Methodology))
             // NOTE: Permission checks nested within UpdateStatus and UpdateDetails
             .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
             .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
             .OnSuccess(BuildMethodologyVersionViewModel);
     }
 
-    public async Task<Either<ActionResult, Unit>> UpdateMethodologyPublished(Guid methodologyVersionId,
-        MethodologyPublishedUpdateRequest request)
+    public async Task<Either<ActionResult, Unit>> UpdateMethodologyPublished(
+        Guid methodologyVersionId,
+        MethodologyPublishedUpdateRequest request
+    )
     {
         return await _persistenceHelper
             .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
@@ -289,12 +303,14 @@ public class MethodologyService : IMethodologyService
     }
 
     public async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         var loadedMethodologyVersion = _context.AssertEntityLoaded(methodologyVersion);
-        await _context.Entry(loadedMethodologyVersion)
+        await _context
+            .Entry(loadedMethodologyVersion)
             .Reference(m => m.Methodology)
-            .Query()               
+            .Query()
             .Include(m => m.Publications)
             .ThenInclude(p => p.Publication)
             .ThenInclude(p => p.Contact)
@@ -306,7 +322,8 @@ public class MethodologyService : IMethodologyService
 
         var publicationLinks = loadedMethodologyVersion.Methodology.Publications;
         var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
-        var otherPublications = publicationLinks.Where(pm => !pm.Owner)
+        var otherPublications = publicationLinks
+            .Where(pm => !pm.Owner)
             .Select(BuildPublicationViewModel)
             .OrderBy(model => model.Title)
             .ToList();
@@ -320,7 +337,8 @@ public class MethodologyService : IMethodologyService
 
         if (loadedMethodologyVersion.ScheduledForPublishingWithRelease)
         {
-            await _context.Entry(loadedMethodologyVersion)
+            await _context
+                .Entry(loadedMethodologyVersion)
                 .Reference(m => m.ScheduledWithReleaseVersion)
                 .Query()
                 .Include(rv => rv.Release)
@@ -333,7 +351,8 @@ public class MethodologyService : IMethodologyService
                     $"{loadedMethodologyVersion.ScheduledWithReleaseVersion.Release.Publication.Title} - {loadedMethodologyVersion.ScheduledWithReleaseVersion.Release.Title}";
                 viewModel.ScheduledWithRelease = new IdTitleViewModel(
                     loadedMethodologyVersion.ScheduledWithReleaseVersion.Id,
-                    title);
+                    title
+                );
             }
         }
 
@@ -342,7 +361,8 @@ public class MethodologyService : IMethodologyService
 
     private async Task<Either<ActionResult, MethodologyVersion>> UpdateStatus(
         MethodologyVersion methodologyVersionToUpdate,
-        MethodologyUpdateRequest request)
+        MethodologyUpdateRequest request
+    )
     {
         if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
         {
@@ -352,20 +372,23 @@ public class MethodologyService : IMethodologyService
         if (methodologyVersionToUpdate.Title != request.Title) // EES-3789 Should also check for slug change here too?
         {
             throw new ArgumentException(
-                "Should not update status of MethodologyVersion while simultaneously updating it's title");
+                "Should not update status of MethodologyVersion while simultaneously updating it's title"
+            );
         }
 
         return await _methodologyApprovalService
             .UpdateApprovalStatus(methodologyVersionToUpdate.Id, request)
-            .OnSuccess(_ => _context
-                .MethodologyVersions
-                .Include(mv => mv.Methodology)
-                .SingleAsync(mv => mv.Id == methodologyVersionToUpdate.Id));
+            .OnSuccess(_ =>
+                _context
+                    .MethodologyVersions.Include(mv => mv.Methodology)
+                    .SingleAsync(mv => mv.Id == methodologyVersionToUpdate.Id)
+            );
     }
 
     private async Task<Either<ActionResult, MethodologyVersion>> UpdateDetails(
         MethodologyVersion methodologyVersionToUpdate,
-        MethodologyUpdateRequest request)
+        MethodologyUpdateRequest request
+    )
     {
         var newSlug = SlugFromTitle(request.Title);
 
@@ -383,11 +406,15 @@ public class MethodologyService : IMethodologyService
             throw new ArgumentException("Should not be updating details of an approved methodology");
         }
 
-        return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
-            .OnSuccessDo(async methodologyVersion => await ValidateMethodologySlug(
-                newSlug,
-                oldSlug: methodologyVersionToUpdate.Slug,
-                methodologyId: methodologyVersion.MethodologyId))
+        return await _userService
+            .CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
+            .OnSuccessDo(async methodologyVersion =>
+                await ValidateMethodologySlug(
+                    newSlug,
+                    oldSlug: methodologyVersionToUpdate.Slug,
+                    methodologyId: methodologyVersion.MethodologyId
+                )
+            )
             .OnSuccess(async methodologyVersion =>
             {
                 methodologyVersion.Updated = DateTime.UtcNow;
@@ -395,26 +422,25 @@ public class MethodologyService : IMethodologyService
                 if (titleChanged)
                 {
                     methodologyVersion.AlternativeTitle =
-                        request.Title != methodologyVersion.Methodology.OwningPublicationTitle
-                            ? request.Title
-                            : null;
+                        request.Title != methodologyVersion.Methodology.OwningPublicationTitle ? request.Title : null;
                 }
 
                 if (slugChanged)
                 {
                     var methodology = methodologyVersion.Methodology;
-                    await _context.Entry(methodology)
-                        .Collection(m => m.Versions)
-                        .LoadAsync();
+                    await _context.Entry(methodology).Collection(m => m.Versions).LoadAsync();
 
-                    if (methodology.LatestPublishedVersionId != null
+                    if (
+                        methodology.LatestPublishedVersionId != null
                         && methodologyVersion.Amendment
                         && !await _context.MethodologyRedirects.AnyAsync(mr =>
                             // no redirect needed for an unpublished amendment that already has a redirect
                             // as the new redirect would be for a slug that hasn't been live
                             mr.MethodologyVersionId == methodologyVersion.Id
                             // don't create if a redirect for this slug already exists
-                            || mr.Slug == methodologyVersion.Slug))
+                            || mr.Slug == methodologyVersion.Slug
+                        )
+                    )
                     {
                         var methodologyRedirect = new MethodologyRedirect
                         {
@@ -425,9 +451,7 @@ public class MethodologyService : IMethodologyService
                     }
 
                     methodologyVersion.AlternativeSlug =
-                        newSlug != methodologyVersion.Methodology.OwningPublicationSlug
-                            ? newSlug
-                            : null;
+                        newSlug != methodologyVersion.Methodology.OwningPublicationSlug ? newSlug : null;
                 }
 
                 await _context.SaveChangesAsync();
@@ -441,15 +465,14 @@ public class MethodologyService : IMethodologyService
     public async Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false)
     {
         return await _persistenceHelper
-            .CheckEntityExists<Methodology>(methodologyId,
-                query => query.Include(m => m.Versions))
+            .CheckEntityExists<Methodology>(methodologyId, query => query.Include(m => m.Versions))
             .OnSuccess(async methodology =>
             {
                 var methodologyVersionIds = methodology
-                    .Versions
-                    .Select(methodologyVersion => new IdAndPreviousVersionIdPair<string>(
+                    .Versions.Select(methodologyVersion => new IdAndPreviousVersionIdPair<string>(
                         methodologyVersion.Id.ToString(),
-                        methodologyVersion.PreviousVersionId?.ToString()))
+                        methodologyVersion.PreviousVersionId?.ToString()
+                    ))
                     .ToList();
 
                 var methodologyVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
@@ -457,7 +480,9 @@ public class MethodologyService : IMethodologyService
                     .Select(ids => Guid.Parse(ids.Id));
 
                 return await methodologyVersionIdsInDeleteOrder
-                    .Select(methodologyVersionId => methodology.Versions.Single(version => version.Id == methodologyVersionId))
+                    .Select(methodologyVersionId =>
+                        methodology.Versions.Single(version => version.Id == methodologyVersionId)
+                    )
                     .Select(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
                     .OnSuccessAll()
                     .OnSuccessVoid(async () =>
@@ -470,46 +495,45 @@ public class MethodologyService : IMethodologyService
 
     public Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(
         Guid methodologyVersionId,
-        bool forceDelete = false)
+        bool forceDelete = false
+    )
     {
         return _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId,
-                query => query.Include(m => m.Methodology))
+            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, query => query.Include(m => m.Methodology))
             .OnSuccessDo(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
             .OnSuccessVoid(DeleteMethodologyIfOrphaned);
     }
 
     public Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(
-        Guid methodologyVersionId)
+        Guid methodologyVersionId
+    )
     {
         return _persistenceHelper
             .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
             .OnSuccess(_userService.CheckCanViewMethodology)
             .OnSuccess(async methodologyVersion =>
             {
-                var methodologyVersionIds = await _context.MethodologyVersions
-                    .Where(mv => mv.MethodologyId == methodologyVersion.MethodologyId)
+                var methodologyVersionIds = await _context
+                    .MethodologyVersions.Where(mv => mv.MethodologyId == methodologyVersion.MethodologyId)
                     .Select(mv => mv.Id)
                     .ToListAsync();
 
-                var statuses = await _context.MethodologyStatus
-                    .Include(ms => ms.MethodologyVersion)
+                var statuses = await _context
+                    .MethodologyStatus.Include(ms => ms.MethodologyVersion)
                     .Include(ms => ms.CreatedBy)
                     .Where(status => methodologyVersionIds.Contains(status.MethodologyVersionId))
                     .ToListAsync();
 
                 return statuses
-                    .Select(status =>
-                        new MethodologyStatusViewModel
-                        {
-                            MethodologyStatusId = status.Id,
-                            InternalReleaseNote = status.InternalReleaseNote,
-                            ApprovalStatus = status.ApprovalStatus,
-                            Created = status.Created,
-                            CreatedByEmail = status.CreatedBy?.Email,
-                            MethodologyVersion = status.MethodologyVersion.Version,
-                        }
-                    )
+                    .Select(status => new MethodologyStatusViewModel
+                    {
+                        MethodologyStatusId = status.Id,
+                        InternalReleaseNote = status.InternalReleaseNote,
+                        ApprovalStatus = status.ApprovalStatus,
+                        Created = status.Created,
+                        CreatedByEmail = status.CreatedBy?.Email,
+                        MethodologyVersion = status.MethodologyVersion.Version,
+                    })
                     .OrderByDescending(vm => vm.Created)
                     .ToList();
             });
@@ -520,14 +544,12 @@ public class MethodologyService : IMethodologyService
         var userId = _userService.GetUserId();
 
         var directPublicationsWithApprovalRole = await _context
-            .UserPublicationRoles
-            .Where(role => role.UserId == userId && role.Role == PublicationRole.Allower)
+            .UserPublicationRoles.Where(role => role.UserId == userId && role.Role == PublicationRole.Allower)
             .Select(role => role.PublicationId)
             .ToListAsync();
 
         var indirectPublicationsWithApprovalRole = await _context
-            .UserReleaseRoles
-            .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
+            .UserReleaseRoles.Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
             .Select(role => role.ReleaseVersion.PublicationId)
             .ToListAsync();
 
@@ -536,31 +558,32 @@ public class MethodologyService : IMethodologyService
             .Distinct();
 
         var methodologiesToApprove = await _context
-            .MethodologyVersions
-            .Where(methodologyVersion =>
+            .MethodologyVersions.Where(methodologyVersion =>
                 methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
-                && methodologyVersion.Methodology.Publications.Any(
-                    publicationMethodology =>
-                        publicationMethodology.Owner
-                        && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)))
+                && methodologyVersion.Methodology.Publications.Any(publicationMethodology =>
+                    publicationMethodology.Owner
+                    && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)
+                )
+            )
             .ToListAsync();
 
-        return (await methodologiesToApprove
-                .SelectAsync(BuildMethodologyVersionViewModel))
-            .ToList();
+        return (await methodologiesToApprove.SelectAsync(BuildMethodologyVersionViewModel)).ToList();
     }
 
     // This method is responsible for keeping methodology titles and slugs and associated redirects in sync with
     // their owning publications. Methodologies keep track of their owning publication's titles and slugs for
     // optimisation purposes.
-    public async Task PublicationTitleOrSlugChanged(Guid publicationId, string originalSlug, string updatedTitle,
-        string updatedSlug)
+    public async Task PublicationTitleOrSlugChanged(
+        Guid publicationId,
+        string originalSlug,
+        string updatedTitle,
+        string updatedSlug
+    )
     {
         var slugChanged = originalSlug != updatedSlug;
 
         var ownedMethodology = await _context
-            .PublicationMethodologies
-            .Include(pm => pm.Methodology.LatestPublishedVersion)
+            .PublicationMethodologies.Include(pm => pm.Methodology.LatestPublishedVersion)
             .Include(pm => pm.Methodology.Versions)
             .Where(pm => pm.PublicationId == publicationId && pm.Owner)
             .Select(pm => pm.Methodology)
@@ -592,8 +615,8 @@ public class MethodologyService : IMethodologyService
 
                 // If redirects already exists from updatedSlug - i.e. we're changing back to a slug we've used
                 // previously. The redirect is redundant, as we're now using that slug. So remove
-                var redundantRedirects = await _context.MethodologyRedirects
-                    .Where(mr => mr.Slug == updatedSlug)
+                var redundantRedirects = await _context
+                    .MethodologyRedirects.Where(mr => mr.Slug == updatedSlug)
                     .ToListAsync();
                 if (redundantRedirects.Count > 0)
                 {
@@ -606,13 +629,12 @@ public class MethodologyService : IMethodologyService
                 // redirect for the unpublished amendment from updatedSlug. We need this redirect for when
                 // the amendment is published and the new AlternativeSlug goes live.
                 var latestVersion = ownedMethodology.LatestVersion();
-                if (latestVersion.Id != latestPublishedVersion.Id
-                    && latestVersion.AlternativeSlug != null)
+                if (latestVersion.Id != latestPublishedVersion.Id && latestVersion.AlternativeSlug != null)
                 {
-                    var unpublishedAmendmentRedirectsToRemove = await _context.MethodologyRedirects
-                        .Where(mr =>
-                            mr.MethodologyVersionId == latestVersion.Id
-                            && mr.Slug == originalSlug)
+                    var unpublishedAmendmentRedirectsToRemove = await _context
+                        .MethodologyRedirects.Where(mr =>
+                            mr.MethodologyVersionId == latestVersion.Id && mr.Slug == originalSlug
+                        )
                         .ToListAsync();
 
                     if (unpublishedAmendmentRedirectsToRemove.Count > 0)
@@ -638,10 +660,13 @@ public class MethodologyService : IMethodologyService
         }
     }
 
-    private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
-        bool forceDelete = false)
+    private async Task<Either<ActionResult, Unit>> DeleteVersion(
+        MethodologyVersion methodologyVersion,
+        bool forceDelete = false
+    )
     {
-        return await _userService.CheckCanDeleteMethodologyVersion(methodologyVersion, forceDelete)
+        return await _userService
+            .CheckCanDeleteMethodologyVersion(methodologyVersion, forceDelete)
             .OnSuccess(() => _methodologyImageService.DeleteAll(methodologyVersion.Id, forceDelete))
             .OnSuccessVoid(async () =>
             {
@@ -654,8 +679,8 @@ public class MethodologyService : IMethodologyService
     private async Task<string?> GetLatestInternalReleaseNote(Guid methodologyVersionId)
     {
         // NOTE: Gets latest internal note for this version, not for the entire methodology
-        return await _context.MethodologyStatus
-            .Where(ms => methodologyVersionId == ms.MethodologyVersionId)
+        return await _context
+            .MethodologyStatus.Where(ms => methodologyVersionId == ms.MethodologyVersionId)
             .OrderByDescending(ms => ms.Created)
             .Select(ms => ms.InternalReleaseNote)
             .FirstOrDefaultAsync();
@@ -664,8 +689,7 @@ public class MethodologyService : IMethodologyService
     private async Task DeleteMethodologyIfOrphaned(MethodologyVersion methodologyVersion)
     {
         var methodology = await _context
-            .Methodologies
-            .Include(p => p.Versions)
+            .Methodologies.Include(p => p.Versions)
             .SingleAsync(p => p.Id == methodologyVersion.MethodologyId);
 
         if (methodology.Versions.Count == 0)
@@ -685,12 +709,15 @@ public class MethodologyService : IMethodologyService
             Slug = publication.Slug,
             LatestReleaseSlug = publication.LatestPublishedReleaseVersion?.Release.Slug,
             Owner = publicationMethodology.Owner,
-            Contact = new ContactViewModel(publication.Contact)
+            Contact = new ContactViewModel(publication.Contact),
         };
     }
 
     public async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
-        string newSlug, string? oldSlug = null, Guid? methodologyId = null)
+        string newSlug,
+        string? oldSlug = null,
+        Guid? methodologyId = null
+    )
     {
         if (newSlug == oldSlug)
         {
@@ -705,11 +732,12 @@ public class MethodologyService : IMethodologyService
             return ValidationActionResult(MethodologySlugNotUnique);
         }
 
-        var redirectExistsToOtherMethodology = await _context.MethodologyRedirects
-            .Where(mr =>
+        var redirectExistsToOtherMethodology = await _context
+            .MethodologyRedirects.Where(mr =>
                 mr.Slug == newSlug
                 // we exclude redirects to the same methodology i.e. we allow the slug to be changed back
-                && (methodologyId != null && methodologyId != mr.MethodologyVersion.MethodologyId))
+                && (methodologyId != null && methodologyId != mr.MethodologyVersion.MethodologyId)
+            )
             .AnyAsync();
 
         if (redirectExistsToOtherMethodology)

@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class SearchIndexerClient(
     IAzureSearchIndexerClientFactory azureSearchIndexerClientFactory,
     IOptions<AzureSearchOptions> searchOptions,
-    ILogger<SearchIndexerClient> logger)
-    : ISearchIndexerClient
+    ILogger<SearchIndexerClient> logger
+) : ISearchIndexerClient
 {
     private const int IndexerAlreadyRunning = 409;
     private readonly string _indexerName = searchOptions.Value.IndexerName;
@@ -43,13 +43,13 @@ public class SearchIndexerClient(
         var client = azureSearchIndexerClientFactory.Create();
         return await client.IsIndexerRunningAsync(indexerName, cancellationToken);
     }
-    
+
     public async Task ResetIndexer(CancellationToken cancellationToken = default)
     {
         var client = azureSearchIndexerClientFactory.Create();
         await client.ResetIndexerAsync(_indexerName, cancellationToken);
     }
-    
+
     public async Task<bool> IndexerExists(CancellationToken cancellationToken = default)
     {
         var client = azureSearchIndexerClientFactory.Create();

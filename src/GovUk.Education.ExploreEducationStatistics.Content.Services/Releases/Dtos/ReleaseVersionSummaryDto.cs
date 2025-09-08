@@ -38,7 +38,8 @@ public record ReleaseVersionSummaryDto
         ReleaseVersion releaseVersion,
         bool isLatestRelease,
         PublishingOrganisationDto[] publishingOrganisations,
-        int updateCount) =>
+        int updateCount
+    ) =>
         new()
         {
             Id = releaseVersion.Id,
@@ -54,7 +55,7 @@ public record ReleaseVersionSummaryDto
             CoverageTitle = releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
             YearTitle = releaseVersion.Release.YearTitle,
             Type = releaseVersion.Type,
-            UpdateCount = updateCount
+            UpdateCount = updateCount,
         };
 }
 
@@ -71,6 +72,6 @@ public record PublishingOrganisationDto
         {
             Id = organisation.Id,
             Title = organisation.Title,
-            Url = organisation.Url
+            Url = organisation.Url,
         };
 }

@@ -39,7 +39,7 @@ public static class AnglesharpExtensions
         "table",
         "tfoot",
         "ul",
-        "video"
+        "video",
     };
 
     private static readonly IReadOnlySet<string> TableElements = new HashSet<string>
@@ -48,7 +48,7 @@ public static class AnglesharpExtensions
         "th",
         "tr",
         "thead",
-        "tbody"
+        "tbody",
     };
 
     public static bool IsBlockType(this IElement element) => BlockElements.Contains(element.LocalName);

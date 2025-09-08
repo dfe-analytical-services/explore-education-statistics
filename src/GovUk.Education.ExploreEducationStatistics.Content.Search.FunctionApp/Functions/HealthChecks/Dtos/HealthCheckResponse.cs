@@ -21,8 +21,10 @@ public record HealthCheckResultViewModel(string Description, string StrategyType
         : this(
             healthCheckResult.Strategy.Description,
             healthCheckResult.Strategy.GetType().Name,
-            healthCheckResult.IsHealthy, 
-            healthCheckResult.Message) { }
-    
-    public static implicit operator HealthCheckResultViewModel(HealthCheckResult healthCheckResult) => new(healthCheckResult); 
+            healthCheckResult.IsHealthy,
+            healthCheckResult.Message
+        ) { }
+
+    public static implicit operator HealthCheckResultViewModel(HealthCheckResult healthCheckResult) =>
+        new(healthCheckResult);
 };

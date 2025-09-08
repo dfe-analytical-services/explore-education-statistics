@@ -9,8 +9,13 @@ public class ContentBlockChartConverter : JsonConverter<IChart>
 {
     public override bool CanWrite => false;
 
-    public override IChart ReadJson(JsonReader reader, Type objectType,
-        IChart existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override IChart ReadJson(
+        JsonReader reader,
+        Type objectType,
+        IChart existingValue,
+        bool hasExistingValue,
+        JsonSerializer serializer
+    )
     {
         var jsonObject = JObject.Load(reader);
         var type = jsonObject["Type"] ?? jsonObject["type"];
@@ -23,7 +28,7 @@ public class ContentBlockChartConverter : JsonConverter<IChart>
             ChartType.VerticalBar => new VerticalBarChart(),
             ChartType.Map => new MapChart(),
             ChartType.Infographic => new InfographicChart(),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
 
         serializer.Populate(jsonObject.CreateReader(), contentBlock);

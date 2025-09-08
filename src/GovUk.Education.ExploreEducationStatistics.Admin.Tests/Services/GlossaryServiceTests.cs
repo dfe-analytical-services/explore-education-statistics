@@ -19,14 +19,14 @@ public class GlossaryServiceTests
             {
                 Title = "Exclusions",
                 Slug = "exclusions-slug",
-                Body = "Exclusions body"
+                Body = "Exclusions body",
             },
             new()
             {
                 Title = "Absence",
                 Slug = "absence-slug",
-                Body = "Absence body"
-            }
+                Body = "Absence body",
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -73,7 +73,7 @@ public class GlossaryServiceTests
         {
             Title = "Exclusions",
             Slug = "exclusions-slug",
-            Body = "Exclusions body"
+            Body = "Exclusions body",
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -112,11 +112,8 @@ public class GlossaryServiceTests
         Assert.Equal(glossaryEntry.Body, viewModel.Body);
     }
 
-    private static GlossaryService BuildService(
-        ContentDbContext? contentDbContext = null)
+    private static GlossaryService BuildService(ContentDbContext? contentDbContext = null)
     {
-        return new GlossaryService(
-            contentDbContext ?? InMemoryContentDbContext()
-        );
+        return new GlossaryService(contentDbContext ?? InMemoryContentDbContext());
     }
 }

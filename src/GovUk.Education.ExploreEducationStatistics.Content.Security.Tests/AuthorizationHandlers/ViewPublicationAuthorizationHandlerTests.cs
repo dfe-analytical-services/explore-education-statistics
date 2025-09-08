@@ -11,10 +11,7 @@ public class ViewPublicationAuthorizationHandlerTests
     [Fact]
     public async Task HasPublishedRelease()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseVersionId = Guid.NewGuid()
-        };
+        var publication = new Publication { LatestPublishedReleaseVersionId = Guid.NewGuid() };
 
         var handler = new ViewPublicationAuthorizationHandler();
         var authContext = CreateAnonymousAuthContext<ViewPublicationRequirement, Publication>(publication);

@@ -14,7 +14,7 @@ public static class PermissionTestUtils
         return new PolicyCheckBuilder<T>(userService);
     }
 
-    public static void AssertForbidden<T>(Either<ActionResult,T> result)
+    public static void AssertForbidden<T>(Either<ActionResult, T> result)
     {
         Assert.NotNull(result);
         Assert.True(result.IsLeft);

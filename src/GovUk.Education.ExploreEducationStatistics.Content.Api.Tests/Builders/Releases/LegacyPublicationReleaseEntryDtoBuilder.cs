@@ -7,11 +7,7 @@ public class LegacyPublicationReleaseEntryDtoBuilder
     private string _title = "Title";
     private string _url = "Url";
 
-    public LegacyPublicationReleaseEntryDto Build() => new()
-    {
-        Title = _title,
-        Url = _url
-    };
+    public LegacyPublicationReleaseEntryDto Build() => new() { Title = _title, Url = _url };
 
     public LegacyPublicationReleaseEntryDtoBuilder WithTitle(string title)
     {

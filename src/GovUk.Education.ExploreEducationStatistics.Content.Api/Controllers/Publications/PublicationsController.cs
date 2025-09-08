@@ -13,34 +13,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Pub
 public class PublicationsController(
     IPublicationMethodologiesService publicationMethodologiesService,
     IPublicationReleasesService publicationReleasesService,
-    IPublicationsService publicationsService) : ControllerBase
+    IPublicationsService publicationsService
+) : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}")]
     public async Task<ActionResult<PublicationDto>> GetPublication(
         string publicationSlug,
-        CancellationToken cancellationToken = default) =>
-        await publicationsService.GetPublication(
-                publicationSlug,
-                cancellationToken)
-            .HandleFailuresOrOk();
+        CancellationToken cancellationToken = default
+    ) => await publicationsService.GetPublication(publicationSlug, cancellationToken).HandleFailuresOrOk();
 
     [HttpGet("publications/{publicationSlug}/methodologies")]
     public async Task<ActionResult<PublicationMethodologiesDto>> GetPublicationMethodologies(
         string publicationSlug,
-        CancellationToken cancellationToken = default) =>
-        await publicationMethodologiesService.GetPublicationMethodologies(
-                publicationSlug,
-                cancellationToken)
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicationMethodologiesService
+            .GetPublicationMethodologies(publicationSlug, cancellationToken)
             .HandleFailuresOrOk();
 
     [HttpGet("publications/{publicationSlug}/release-entries")]
     public async Task<ActionResult<PaginatedListViewModel<IPublicationReleaseEntryDto>>> GetPublicationReleases(
         [FromQuery] GetPublicationReleasesRequest request,
-        CancellationToken cancellationToken = default) =>
-        await publicationReleasesService.GetPublicationReleases(
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicationReleasesService
+            .GetPublicationReleases(
                 request.PublicationSlug,
                 page: request.Page,
                 pageSize: request.PageSize,
-                cancellationToken)
+                cancellationToken
+            )
             .HandleFailuresOrOk();
 }

@@ -12,15 +12,13 @@ public class EducationInNumbersController(IEducationInNumbersService einService)
     [HttpGet("education-in-numbers-nav")]
     public async Task<ActionResult<List<EducationInNumbersViewModels.EinNavItemViewModel>>> List()
     {
-        return await einService.ListEinPages()
-            .HandleFailuresOrOk();
+        return await einService.ListEinPages().HandleFailuresOrOk();
     }
 
     [HttpGet("education-in-numbers")]
     [HttpGet("education-in-numbers/{slug}")]
     public async Task<ActionResult<EducationInNumbersViewModels.EinPageViewModel>> GetEinPage(string? slug)
     {
-        return await einService.GetEinPage(slug)
-            .HandleFailuresOrOk();
+        return await einService.GetEinPage(slug).HandleFailuresOrOk();
     }
 }

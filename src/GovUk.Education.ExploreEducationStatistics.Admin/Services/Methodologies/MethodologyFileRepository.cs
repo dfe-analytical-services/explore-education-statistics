@@ -16,22 +16,21 @@ public class MethodologyFileRepository : IMethodologyFileRepository
 {
     private readonly ContentDbContext _contentDbContext;
 
-    private static readonly List<FileType> SupportedFileTypes = new()
-    {
-        Image
-    };
+    private static readonly List<FileType> SupportedFileTypes = new() { Image };
 
     public MethodologyFileRepository(ContentDbContext contentDbContext)
     {
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<MethodologyFile> Create(Guid methodologyVersionId,
+    public async Task<MethodologyFile> Create(
+        Guid methodologyVersionId,
         string filename,
         long contentLength,
         string contentType,
         FileType type,
-        Guid createdById)
+        Guid createdById
+    )
     {
         if (!SupportedFileTypes.Contains(type))
         {
@@ -48,8 +47,8 @@ public class MethodologyFileRepository : IMethodologyFileRepository
                 Filename = filename,
                 ContentLength = contentLength,
                 ContentType = contentType,
-                Type = type
-            }
+                Type = type,
+            },
         };
 
         var created = (await _contentDbContext.MethodologyFiles.AddAsync(methodologyFile)).Entity;
@@ -57,9 +56,11 @@ public class MethodologyFileRepository : IMethodologyFileRepository
         return created;
     }
 
-    public async Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyVersionId,
+    public async Task<Either<ActionResult, File>> CheckFileExists(
+        Guid methodologyVersionId,
         Guid fileId,
-        params FileType[] allowedFileTypes)
+        params FileType[] allowedFileTypes
+    )
     {
         // Ensure file is linked to the version by getting the MethodologyFile first
         var methodologyFile = await Get(methodologyVersionId, fileId);
@@ -89,29 +90,26 @@ public class MethodologyFileRepository : IMethodologyFileRepository
 
     public async Task<MethodologyFile?> Get(Guid methodologyVersionId, Guid fileId)
     {
-        return await _contentDbContext.MethodologyFiles
-            .Include(methodologyFile => methodologyFile.File)
+        return await _contentDbContext
+            .MethodologyFiles.Include(methodologyFile => methodologyFile.File)
             .SingleOrDefaultAsync(methodologyFile =>
-                methodologyFile.MethodologyVersionId == methodologyVersionId
-                && methodologyFile.FileId == fileId);
+                methodologyFile.MethodologyVersionId == methodologyVersionId && methodologyFile.FileId == fileId
+            );
     }
 
     public async Task<List<MethodologyFile>> GetByFileType(Guid methodologyVersionId, params FileType[] types)
     {
-        return await _contentDbContext.MethodologyFiles
-            .Include(f => f.File)
+        return await _contentDbContext
+            .MethodologyFiles.Include(f => f.File)
             .Where(methodologyFile =>
                 methodologyFile.MethodologyVersionId == methodologyVersionId
-                && types.Contains(methodologyFile.File.Type))
+                && types.Contains(methodologyFile.File.Type)
+            )
             .ToListAsync();
     }
 
     public Task<List<MethodologyFile>> GetByFile(Guid fileId)
     {
-        return _contentDbContext
-            .MethodologyFiles
-            .AsQueryable()
-            .Where(f => f.FileId == fileId)
-            .ToListAsync();
+        return _contentDbContext.MethodologyFiles.AsQueryable().Where(f => f.FileId == fileId).ToListAsync();
     }
 }

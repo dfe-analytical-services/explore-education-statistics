@@ -22,7 +22,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         "2022",
         "2022/2023",
         "20222",
-        "|"
+        "|",
     };
 
     public static readonly TheoryData<string[]> InvalidTimePeriodFormatsMultiple = new()
@@ -55,9 +55,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Eq = timePeriod };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Eq)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Eq).Only();
         }
 
         [Theory]
@@ -66,9 +64,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Eq = timePeriod.ToTimePeriodString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Eq)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Eq).Only();
         }
     }
 
@@ -89,9 +85,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { NotEq = timePeriod };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.NotEq)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.NotEq).Only();
         }
 
         [Theory]
@@ -100,9 +94,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { NotEq = timePeriod.ToTimePeriodString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.NotEq)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.NotEq).Only();
         }
     }
 
@@ -112,10 +104,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         [MemberData(nameof(ValidTimePeriodQueriesMultiple))]
         public void Success(DataSetQueryTimePeriod[] timePeriods)
         {
-            var query = new DataSetGetQueryTimePeriods
-            {
-                In = [..timePeriods.Select(t => t.ToTimePeriodString())]
-            };
+            var query = new DataSetGetQueryTimePeriods { In = [.. timePeriods.Select(t => t.ToTimePeriodString())] };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
@@ -127,8 +116,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.In)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.In).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Theory]
@@ -148,10 +136,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         [MemberData(nameof(InvalidTimePeriodQueriesMultiple))]
         public void Failure_InvalidQueries(DataSetQueryTimePeriod[] timePeriods)
         {
-            var query = new DataSetGetQueryTimePeriods
-            {
-                In = [..timePeriods.Select(t => t.ToTimePeriodString())]
-            };
+            var query = new DataSetGetQueryTimePeriods { In = [.. timePeriods.Select(t => t.ToTimePeriodString())] };
 
             var result = _validator.TestValidate(query);
 
@@ -167,7 +152,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         [MemberData(nameof(ValidTimePeriodQueriesMultiple))]
         public void Success(DataSetQueryTimePeriod[] timePeriods)
         {
-            var query = new DataSetGetQueryTimePeriods { NotIn = [..timePeriods.Select(t => t.ToTimePeriodString())] };
+            var query = new DataSetGetQueryTimePeriods { NotIn = [.. timePeriods.Select(t => t.ToTimePeriodString())] };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
@@ -179,8 +164,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotIn).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Theory]
@@ -195,12 +179,12 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"NotIn[{index}]"));
         }
-        
+
         [Theory]
         [MemberData(nameof(InvalidTimePeriodQueriesMultiple))]
         public void Failure_InvalidQueries(DataSetQueryTimePeriod[] timePeriods)
         {
-            var query = new DataSetGetQueryTimePeriods { NotIn = [..timePeriods.Select(t => t.ToTimePeriodString())] };
+            var query = new DataSetGetQueryTimePeriods { NotIn = [.. timePeriods.Select(t => t.ToTimePeriodString())] };
 
             var result = _validator.TestValidate(query);
 
@@ -227,9 +211,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Gt = timePeriod };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Gt)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Gt).Only();
         }
 
         [Theory]
@@ -238,9 +220,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Gt = timePeriod.ToTimePeriodString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Gt)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Gt).Only();
         }
     }
 
@@ -261,11 +241,8 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Gte = timePeriod };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Gte)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Gte).Only();
         }
-
 
         [Theory]
         [MemberData(nameof(InvalidTimePeriodQueriesSingle))]
@@ -273,9 +250,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Gte = timePeriod.ToTimePeriodString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Gte)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Gte).Only();
         }
     }
 
@@ -296,11 +271,8 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Lt = timePeriod };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Lt)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Lt).Only();
         }
-
 
         [Theory]
         [MemberData(nameof(InvalidTimePeriodQueriesSingle))]
@@ -308,9 +280,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Lt = timePeriod.ToTimePeriodString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Lt)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Lt).Only();
         }
     }
 
@@ -331,11 +301,8 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Lte = timePeriod };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Lte)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Lte).Only();
         }
-
 
         [Theory]
         [MemberData(nameof(InvalidTimePeriodQueriesSingle))]
@@ -343,9 +310,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods { Lte = timePeriod.ToTimePeriodString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Lte)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Lte).Only();
         }
     }
 
@@ -363,29 +328,21 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
                 Gt = "",
                 Gte = "",
                 Lt = "",
-                Lte = ""
+                Lte = "",
             };
 
             var result = _validator.TestValidate(query);
 
             Assert.Equal(8, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor(q => q.Eq)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.In)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.Gt)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.Gte)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.Lt)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.Lte)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Eq).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotEq).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.In).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotIn).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Gt).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Gte).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Lt).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Lte).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Fact]
@@ -400,7 +357,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
                 Gt = "2019|M4",
                 Gte = "",
                 Lt = "",
-                Lte = "2030|M7"
+                Lte = "2030|M7",
             };
 
             var result = _validator.TestValidate(query);
@@ -412,14 +369,10 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
             result.ShouldNotHaveValidationErrorFor(q => q.Gt);
             result.ShouldNotHaveValidationErrorFor(q => q.Lte);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.Gte)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.Lt)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotEq).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotIn).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Gte).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.Lt).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
 }

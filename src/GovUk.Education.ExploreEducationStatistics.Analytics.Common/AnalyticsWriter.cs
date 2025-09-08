@@ -1,12 +1,12 @@
-
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 
 public class AnalyticsWriter(IEnumerable<IAnalyticsWriteStrategy> strategies) : IAnalyticsWriter
 {
-    private readonly Dictionary<Type, IAnalyticsWriteStrategy> _strategyByRequestType =
-        strategies.ToDictionary(strategy => strategy.RequestType);
+    private readonly Dictionary<Type, IAnalyticsWriteStrategy> _strategyByRequestType = strategies.ToDictionary(
+        strategy => strategy.RequestType
+    );
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {

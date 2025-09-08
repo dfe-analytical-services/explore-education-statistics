@@ -14,13 +14,14 @@ public partial class EES4480_AlterStoredProcRebuildIndexes : Migration
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{MigrationId}_Routine_RebuildIndexes.sql");
+        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath, $"{MigrationId}_Routine_RebuildIndexes.sql");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{PreviousRebuildIndexesMigrationId}_Routine_RebuildIndexes.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{PreviousRebuildIndexesMigrationId}_Routine_RebuildIndexes.sql"
+        );
     }
 }

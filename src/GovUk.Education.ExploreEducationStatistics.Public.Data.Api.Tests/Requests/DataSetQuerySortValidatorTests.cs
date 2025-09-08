@@ -30,11 +30,7 @@ public class DataSetQuerySortValidatorTests
     [MemberData(nameof(ValidSorts))]
     public void Success(string field, string direction)
     {
-        var sort = new DataSetQuerySort
-        {
-            Field = field,
-            Direction = direction
-        };
+        var sort = new DataSetQuerySort { Field = field, Direction = direction };
 
         _validator.TestValidate(sort).ShouldNotHaveAnyValidationErrors();
     }
@@ -46,31 +42,22 @@ public class DataSetQuerySortValidatorTests
     [InlineData("\n")]
     public void Failure_EmptyField(string field)
     {
-        var sort = new DataSetQuerySort
-        {
-            Field = field,
-            Direction = "Asc"
-        };
+        var sort = new DataSetQuerySort { Field = field, Direction = "Asc" };
 
         var result = _validator.TestValidate(sort);
 
-        result.ShouldHaveValidationErrorFor(s => s.Field)
-            .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
-            .Only();
+        result.ShouldHaveValidationErrorFor(s => s.Field).WithErrorCode(FluentValidationKeys.NotEmptyValidator).Only();
     }
 
     [Fact]
     public void Failure_InvalidFieldLength()
     {
-        var sort = new DataSetQuerySort
-        {
-            Field = new string('a', 41),
-            Direction = "Asc"
-        };
+        var sort = new DataSetQuerySort { Field = new string('a', 41), Direction = "Asc" };
 
         var result = _validator.TestValidate(sort);
 
-        result.ShouldHaveValidationErrorFor(s => s.Field)
+        result
+            .ShouldHaveValidationErrorFor(s => s.Field)
             .WithErrorCode(FluentValidationKeys.MaximumLengthValidator)
             .WithMessageArgument("MaxLength", 40)
             .Only();
@@ -82,20 +69,18 @@ public class DataSetQuerySortValidatorTests
     [InlineData("desc")]
     public void Failure_InvalidDirection(string direction)
     {
-        var sort = new DataSetQuerySort
-        {
-            Field = "timePeriod",
-            Direction = direction
-        };
+        var sort = new DataSetQuerySort { Field = "timePeriod", Direction = direction };
 
         var result = _validator.TestValidate(sort);
 
-        result.ShouldHaveValidationErrorFor(s => s.Direction)
+        result
+            .ShouldHaveValidationErrorFor(s => s.Direction)
             .WithErrorCode(ValidationMessages.AllowedValue.Code)
             .WithErrorMessage(ValidationMessages.AllowedValue.Message)
             .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s => s.Value == direction)
             .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
-                s.Allowed.SequenceEqual([SortDirection.Asc.ToString(), SortDirection.Desc.ToString()]))
+                s.Allowed.SequenceEqual([SortDirection.Asc.ToString(), SortDirection.Desc.ToString()])
+            )
             .Only();
     }
 }

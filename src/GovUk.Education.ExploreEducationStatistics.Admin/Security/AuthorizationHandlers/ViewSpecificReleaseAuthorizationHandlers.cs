@@ -8,8 +8,7 @@ public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<View
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public ViewSpecificReleaseAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+    public ViewSpecificReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
@@ -17,7 +16,8 @@ public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<View
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewReleaseRequirement requirement,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         if (await _authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, context.User))
         {

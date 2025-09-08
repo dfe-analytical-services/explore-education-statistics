@@ -28,7 +28,7 @@ public class ProblemDetailsResultFilter : IResultFilter
 
             context.Result = new ObjectResult(ProblemDetailsViewModel.Create(forbidProblemDetails))
             {
-                StatusCode = StatusCodes.Status403Forbidden
+                StatusCode = StatusCodes.Status403Forbidden,
             };
 
             return;
@@ -73,29 +73,32 @@ public class ProblemDetailsResultFilter : IResultFilter
         result.Value = ValidationProblemViewModel.Create(validationProblemDetails);
     }
 
-    public void OnResultExecuted(ResultExecutedContext context)
-    {
-    }
+    public void OnResultExecuted(ResultExecutedContext context) { }
 
     private static void ApplyValidationProblemDefaults(
         ResultExecutingContext context,
-        ValidationProblemViewModel validationProblem)
+        ValidationProblemViewModel validationProblem
+    )
     {
         if (context.Controller is not ControllerBase controllerBase)
         {
             return;
         }
 
-        var validationProblemDetails = controllerBase.ProblemDetailsFactory
-                .CreateValidationProblemDetails(context.HttpContext, new ModelStateDictionary());
+        var validationProblemDetails = controllerBase.ProblemDetailsFactory.CreateValidationProblemDetails(
+            context.HttpContext,
+            new ModelStateDictionary()
+        );
 
         validationProblem.Title ??= validationProblemDetails.Title;
         validationProblem.Type ??= validationProblemDetails.Type;
         validationProblem.Detail ??= validationProblemDetails.Detail;
         validationProblem.Instance ??= validationProblemDetails.Instance;
 
-        if (!validationProblem.Extensions.ContainsKey("traceId") &&
-            validationProblemDetails.Extensions.TryGetValue("traceId", out var traceId))
+        if (
+            !validationProblem.Extensions.ContainsKey("traceId")
+            && validationProblemDetails.Extensions.TryGetValue("traceId", out var traceId)
+        )
         {
             validationProblem.Extensions["traceId"] = traceId;
         }

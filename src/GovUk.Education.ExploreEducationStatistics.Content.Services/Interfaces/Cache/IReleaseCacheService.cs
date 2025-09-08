@@ -6,21 +6,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IReleaseCacheService
 {
-    Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
-        string? releaseSlug = null);
+    Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug, string? releaseSlug = null);
 
     Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
         Guid releaseVersionId,
         string publicationSlug,
-        string? releaseSlug = null);
+        string? releaseSlug = null
+    );
 
     Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
         Guid releaseVersionId,
         DateTime expectedPublishDate,
         string publicationSlug,
-        string? releaseSlug = null);
+        string? releaseSlug = null
+    );
 
-    Task<Either<ActionResult, Unit>> RemoveRelease(
-        string publicationSlug,
-        string releaseSlug);
+    Task<Either<ActionResult, Unit>> RemoveRelease(string publicationSlug, string releaseSlug);
 }

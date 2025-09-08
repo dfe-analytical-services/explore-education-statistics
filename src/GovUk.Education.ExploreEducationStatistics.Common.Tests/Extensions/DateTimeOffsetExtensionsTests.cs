@@ -8,38 +8,35 @@ public class DateTimeOffsetExtensionsTests
     public class TruncateNanosecondsTests
     {
         private static readonly DateTimeOffset DateWithoutNanoseconds = new(
-            year: 2024, 
-            month: 02, 
-            day: 03, 
-            hour: 4, 
-            minute: 5, 
-            second: 6, 
-            millisecond: 7, 
+            year: 2024,
+            month: 02,
+            day: 03,
+            hour: 4,
+            minute: 5,
+            second: 6,
+            millisecond: 7,
             microsecond: 8,
-            TimeSpan.Zero);
-        
+            TimeSpan.Zero
+        );
+
         private static readonly DateTimeOffset DateWithNanoseconds = DateWithoutNanoseconds.AddTicks(1);
 
         [Fact]
         public void EqualWithNanosecondDifference()
         {
-            Assert.Equal(
-                DateWithNanoseconds.TruncateNanoseconds(), 
-                DateWithoutNanoseconds);
+            Assert.Equal(DateWithNanoseconds.TruncateNanoseconds(), DateWithoutNanoseconds);
         }
-        
+
         [Fact]
         public void NotEqualWithMicrosecondDifference()
         {
-            Assert.NotEqual(
-                DateWithNanoseconds.AddMicroseconds(1).TruncateNanoseconds(), 
-                DateWithoutNanoseconds);
+            Assert.NotEqual(DateWithNanoseconds.AddMicroseconds(1).TruncateNanoseconds(), DateWithoutNanoseconds);
         }
-        
+
         [Fact]
         public void NullDate()
         {
-            Assert.Throws<ArgumentException>(() => ((DateTimeOffset?) null).TruncateNanoseconds());
+            Assert.Throws<ArgumentException>(() => ((DateTimeOffset?)null).TruncateNanoseconds());
         }
     }
 }

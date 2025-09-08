@@ -4,10 +4,7 @@ BEGIN
 INSERT INTO Observation (Id, SubjectId, LocationId, Year, TimeIdentifier, Measures, CsvRow)
 SELECT Id,
        SubjectId,
-       LocationId,
-       Year,
-       TimeIdentifier,
-       Measures,
-       CsvRow
+       LocationId, Year, TimeIdentifier, Measures, CsvRow
 FROM @Observations
+ORDER BY Id ASC
 END

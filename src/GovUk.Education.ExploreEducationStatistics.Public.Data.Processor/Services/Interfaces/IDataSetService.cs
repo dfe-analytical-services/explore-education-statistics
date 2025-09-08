@@ -9,5 +9,6 @@ public interface IDataSetService
     Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSet(
         DataSetCreateRequest request,
         Guid instanceId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

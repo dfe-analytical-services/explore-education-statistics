@@ -14,10 +14,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
-using ReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -37,7 +35,8 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         await AssertHandlerSucceedsWithCorrectClaims<Publication, ViewSpecificPublicationRequirement>(
             context => CreateHandler(context),
             _publication,
-            AccessAllPublications);
+            AccessAllPublications
+        );
     }
 
     [Fact]
@@ -45,7 +44,8 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<ViewSpecificPublicationRequirement>(
             contentDbContext => CreateHandler(contentDbContext),
-            [PublicationRole.Owner, PublicationRole.Allower]);
+            [PublicationRole.Owner, PublicationRole.Allower]
+        );
     }
 
     [Fact]
@@ -54,31 +54,32 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         var releaseVersionOnAnotherPublication = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            PublicationId = Guid.NewGuid()
+            PublicationId = Guid.NewGuid(),
         };
 
         var releaseVersionOnThisPublication = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            PublicationId = _publication.Id
+            PublicationId = _publication.Id,
         };
 
         var releaseRoleForDifferentPublication = new UserReleaseRole
         {
             UserId = _userId,
-            ReleaseVersion = releaseVersionOnAnotherPublication
+            ReleaseVersion = releaseVersionOnAnotherPublication,
         };
 
         var releaseRoleForDifferentUser = new UserReleaseRole
         {
             UserId = Guid.NewGuid(),
-            ReleaseVersion = releaseVersionOnThisPublication
+            ReleaseVersion = releaseVersionOnThisPublication,
         };
 
         await AssertHasRoleOnAnyChildReleaseHandlesOk(
             false,
             releaseRoleForDifferentPublication,
-            releaseRoleForDifferentUser);
+            releaseRoleForDifferentUser
+        );
     }
 
     [Fact]
@@ -87,20 +88,22 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         var releaseVersionOnThisPublication = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            PublicationId = _publication.Id
+            PublicationId = _publication.Id,
         };
 
         var roleOnThisPublication = new UserReleaseRole
         {
             UserId = _userId,
-            ReleaseVersion = releaseVersionOnThisPublication
+            ReleaseVersion = releaseVersionOnThisPublication,
         };
 
         await AssertHasRoleOnAnyChildReleaseHandlesOk(true, roleOnThisPublication);
     }
 
-    private async Task AssertHasRoleOnAnyChildReleaseHandlesOk(bool expectedToSucceed,
-        params UserReleaseRole[] releaseRoles)
+    private async Task AssertHasRoleOnAnyChildReleaseHandlesOk(
+        bool expectedToSucceed,
+        params UserReleaseRole[] releaseRoles
+    )
     {
         await using (var context = DbUtils.InMemoryApplicationDbContext())
         {
@@ -111,7 +114,9 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
 
             var authContext = new AuthorizationHandlerContext(
                 new IAuthorizationRequirement[] { new ViewSpecificPublicationRequirement() },
-                _fixture.AuthenticatedUser(userId: _userId), _publication);
+                _fixture.AuthenticatedUser(userId: _userId),
+                _publication
+            );
 
             await handler.HandleAsync(authContext);
 
@@ -124,17 +129,21 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IPreReleaseService? preReleaseService = null)
+        IPreReleaseService? preReleaseService = null
+    )
     {
         return new ViewSpecificPublicationAuthorizationHandler(
             context,
             new AuthorizationHandlerService(
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
-                userReleaseRoleRepository ?? new UserReleaseRoleRepository(
-                    contentDbContext: context,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
-                userPublicationRoleRepository ?? new UserPublicationRoleRepository(
-                    contentDbContext: context),
-                preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)));
+                userReleaseRoleRepository
+                    ?? new UserReleaseRoleRepository(
+                        contentDbContext: context,
+                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                    ),
+                userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext: context),
+                preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

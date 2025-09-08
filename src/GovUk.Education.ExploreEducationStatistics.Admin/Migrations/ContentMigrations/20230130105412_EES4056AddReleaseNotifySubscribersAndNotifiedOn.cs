@@ -13,31 +13,26 @@ public partial class EES4056AddReleaseNotifySubscribersAndNotifiedOn : Migration
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.AddColumn<DateTime>(
-            name: "NotifiedOn",
-            table: "Releases",
-            type: "datetime2",
-            nullable: true);
+        migrationBuilder.AddColumn<DateTime>(name: "NotifiedOn", table: "Releases", type: "datetime2", nullable: true);
 
         migrationBuilder.AddColumn<bool>(
             name: "NotifySubscribers",
             table: "Releases",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
 
-        migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_EES4056AddReleaseNotifySubscribersAndNotifiedOn.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.ContentMigrationsPath,
+            $"{MigrationId}_EES4056AddReleaseNotifySubscribersAndNotifiedOn.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "NotifiedOn",
-            table: "Releases");
+        migrationBuilder.DropColumn(name: "NotifiedOn", table: "Releases");
 
-        migrationBuilder.DropColumn(
-            name: "NotifySubscribers",
-            table: "Releases");
+        migrationBuilder.DropColumn(name: "NotifySubscribers", table: "Releases");
     }
 }

@@ -34,8 +34,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using IMethodologyService =
-    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
@@ -47,14 +46,16 @@ public static class PublisherHostBuilderExtensions
     public static IHostBuilder ConfigurePublisherHostBuilder(this IHostBuilder hostBuilder)
     {
         return hostBuilder
-            .ConfigureAppConfiguration((hostBuilderContext, configBuilder) =>
-            {
-                configBuilder
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
-                    .AddEnvironmentVariables()
-                    .AddConfiguration(hostBuilderContext.Configuration);
-            })
+            .ConfigureAppConfiguration(
+                (hostBuilderContext, configBuilder) =>
+                {
+                    configBuilder
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                        .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
+                        .AddEnvironmentVariables()
+                        .AddConfiguration(hostBuilderContext.Configuration);
+                }
+            )
             .ConfigureLogging(logging =>
             {
                 // TODO EES-5013 Why can't this be controlled through application settings?
@@ -62,11 +63,11 @@ public static class PublisherHostBuilderExtensions
             })
             .ConfigureServices();
     }
-    
+
     public static IHostBuilder ConfigureServices(this IHostBuilder hostBuilder)
     {
-        return hostBuilder
-            .ConfigureServices((hostContext, services) =>
+        return hostBuilder.ConfigureServices(
+            (hostContext, services) =>
             {
                 var configuration = hostContext.Configuration;
                 var hostEnvironment = hostContext.HostingEnvironment;
@@ -82,51 +83,61 @@ public static class PublisherHostBuilderExtensions
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                             providerOptions =>
-                                SqlServerDbContextOptionsBuilderExtensions.EnableCustomRetryOnFailure(providerOptions)))
+                                SqlServerDbContextOptionsBuilderExtensions.EnableCustomRetryOnFailure(providerOptions)
+                        )
+                    )
                     .AddDbContext<StatisticsDbContext>(options =>
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
-                            providerOptions => providerOptions.EnableCustomRetryOnFailure()))
+                            providerOptions => providerOptions.EnableCustomRetryOnFailure()
+                        )
+                    )
                     .AddSingleton(TimeProvider.System)
-                    .AddSingleton<IFileStorageService, FileStorageService>(provider =>
-                        new FileStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
+                    .AddSingleton<IFileStorageService, FileStorageService>(provider => new FileStorageService(
+                        provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString
+                    ))
                     .AddScoped<IPublishingService, PublishingService>()
                     .AddSingleton<IBlobSasService, BlobSasService>()
-                    .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-                        new PublicBlobStorageService(
+                    .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(
+                        provider => new PublicBlobStorageService(
                             connectionString: provider
                                 .GetRequiredService<IOptions<AppOptions>>()
-                                .Value
-                                .PublicStorageConnectionString,
+                                .Value.PublicStorageConnectionString,
                             logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                            sasService: provider.GetRequiredService<IBlobSasService>()))
-                    .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
-                        new PrivateBlobStorageService(
+                            sasService: provider.GetRequiredService<IBlobSasService>()
+                        )
+                    )
+                    .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(
+                        provider => new PrivateBlobStorageService(
                             connectionString: provider
                                 .GetRequiredService<IOptions<AppOptions>>()
-                                .Value
-                                .PrivateStorageConnectionString,
+                                .Value.PrivateStorageConnectionString,
                             logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                            sasService: provider.GetRequiredService<IBlobSasService>()))
-                    .AddScoped<IContentService, ContentService>(provider =>
-                        new ContentService(
-                            contentDbContext: provider.GetRequiredService<ContentDbContext>(),
-                            publicBlobStorageService: provider.GetRequiredService<IPublicBlobStorageService>(),
-                            privateBlobCacheService: new BlobCacheService(
-                                provider.GetRequiredService<IPrivateBlobStorageService>(),
-                                provider.GetRequiredService<ILogger<BlobCacheService>>()),
-                            publicBlobCacheService: new BlobCacheService(
-                                provider.GetRequiredService<IPublicBlobStorageService>(),
-                                provider.GetRequiredService<ILogger<BlobCacheService>>()),
-                            releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
-                            releaseService: provider.GetRequiredService<IReleaseService>(),
-                            methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                            publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
+                            sasService: provider.GetRequiredService<IBlobSasService>()
+                        )
+                    )
+                    .AddScoped<IContentService, ContentService>(provider => new ContentService(
+                        contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+                        publicBlobStorageService: provider.GetRequiredService<IPublicBlobStorageService>(),
+                        privateBlobCacheService: new BlobCacheService(
+                            provider.GetRequiredService<IPrivateBlobStorageService>(),
+                            provider.GetRequiredService<ILogger<BlobCacheService>>()
+                        ),
+                        publicBlobCacheService: new BlobCacheService(
+                            provider.GetRequiredService<IPublicBlobStorageService>(),
+                            provider.GetRequiredService<ILogger<BlobCacheService>>()
+                        ),
+                        releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
+                        releaseService: provider.GetRequiredService<IReleaseService>(),
+                        methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                        publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
+                    ))
                     .AddScoped<IReleaseService, ReleaseService>()
-                    .AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(provider =>
-                        new PublisherTableStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
+                    .AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
+                        provider => new PublisherTableStorageService(
+                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString
+                        )
+                    )
                     .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                     .AddScoped<IMethodologyRepository, MethodologyRepository>()
                     .AddScoped<IMethodologyService, MethodologyService>()
@@ -146,16 +157,19 @@ public static class PublisherHostBuilderExtensions
                     .AddEventGridClient(configuration)
                     .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
-                        provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
+                        provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString
+                    ))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(
-                        provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
+                        provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString
+                    ))
                     .AddSingleton<DateTimeProvider>()
                     .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)
                 {
-                    services.AddOptions<DataFilesOptions>()
+                    services
+                        .AddOptions<DataFilesOptions>()
                         .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
                     services.AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>();
                     services.AddScoped<IDataSetPublishingService, DataSetPublishingService>();
@@ -195,7 +209,8 @@ public static class PublisherHostBuilderExtensions
 
                 StartupUtils.AddPersistenceHelper<ContentDbContext>(services);
                 StartupUtils.AddPersistenceHelper<StatisticsDbContext>(services);
-            });
+            }
+        );
     }
 
     // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.

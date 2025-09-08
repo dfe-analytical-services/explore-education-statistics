@@ -11,9 +11,7 @@ public partial class EES5765_RemoveFileGeogLvlMigrationColumn : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataSetFileMetaGeogLvlMigrated",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "DataSetFileMetaGeogLvlMigrated", table: "Files");
     }
 
     /// <inheritdoc />
@@ -24,6 +22,7 @@ public partial class EES5765_RemoveFileGeogLvlMigrationColumn : Migration
             table: "Files",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
     }
 }

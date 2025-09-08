@@ -15,7 +15,7 @@ public class ContentApiOptions
             errorMessage = $"ContentApi base address is not configured. Ensure the {Section}:{nameof(Url)} is set.";
             return false;
         }
-        
+
         errorMessage = null;
         return true;
     }

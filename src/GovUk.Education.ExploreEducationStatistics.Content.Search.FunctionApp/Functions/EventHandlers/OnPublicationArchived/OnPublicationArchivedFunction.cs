@@ -12,7 +12,8 @@ public class OnPublicationArchivedFunction(IEventGridEventHandler eventGridEvent
     [QueueOutput("%RemovePublicationSearchableDocumentsQueueName%")]
     public async Task<RemovePublicationSearchableDocumentsDto[]> OnPublicationArchived(
         [QueueTrigger("%PublicationArchivedQueueName%")] EventGridEvent eventDto,
-        FunctionContext context) =>
+        FunctionContext context
+    ) =>
         await eventGridEventHandler.Handle<PublicationArchivedEventDto, RemovePublicationSearchableDocumentsDto[]>(
             context,
             eventDto,
@@ -20,5 +21,7 @@ public class OnPublicationArchivedFunction(IEventGridEventHandler eventGridEvent
                 Task.FromResult<RemovePublicationSearchableDocumentsDto[]>(
                     string.IsNullOrEmpty(payload.PublicationSlug)
                         ? []
-                        : [new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug }]));
+                        : [new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug }]
+                )
+        );
 }

@@ -22,8 +22,5 @@ public class DataBlockTableResultCacheKey : IBlobCacheKey
 
     public IBlobContainer Container => PrivateContent;
 
-    public string Key => PrivateContentDataBlockPath(
-        ReleaseVersionId,
-        DataBlockId
-    );
+    public string Key => PrivateContentDataBlockPath(ReleaseVersionId, DataBlockId);
 }

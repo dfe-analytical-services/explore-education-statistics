@@ -25,17 +25,17 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1),
             ReleaseTitle = "Academic year 2022",
-            PublicationTitle = "Publication title"
+            PublicationTitle = "Publication title",
         };
-        
-        await TestApp.AddTestData<ContentDbContext>(context =>
-            context.ReleasePublishingFeedback.Add(existingFeedback));
+
+        await TestApp.AddTestData<ContentDbContext>(context => context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: existingFeedback.EmailToken,
             Response: ReleasePublishingFeedbackResponse.Satisfied,
-            AdditionalFeedback: "Great publishing experience!");
-        
+            AdditionalFeedback: "Great publishing experience!"
+        );
+
         // Arrange
         var client = TestApp.CreateClient();
 
@@ -51,7 +51,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         Assert.Equal(request.Response, updatedFeedback.Response);
         Assert.Equal(request.AdditionalFeedback, updatedFeedback.AdditionalFeedback);
         updatedFeedback.FeedbackReceived.AssertUtcNow();
-        
+
         // Assert that other fields were left untouched.
         Assert.Equal(existingFeedback.EmailToken, updatedFeedback.EmailToken);
         Assert.Equal(existingFeedback.Created, updatedFeedback.Created);
@@ -72,16 +72,16 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1),
             ReleaseTitle = "Academic year 2022",
-            PublicationTitle = "Publication title"
+            PublicationTitle = "Publication title",
         };
-        
-        await TestApp.AddTestData<ContentDbContext>(context =>
-            context.ReleasePublishingFeedback.Add(existingFeedback));
+
+        await TestApp.AddTestData<ContentDbContext>(context => context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: "",
-            Response: (ReleasePublishingFeedbackResponse) 20,
-            AdditionalFeedback: new string('b', 2001));
+            Response: (ReleasePublishingFeedbackResponse)20,
+            AdditionalFeedback: new string('b', 2001)
+        );
 
         // Arrange
         var client = TestApp.CreateClient();
@@ -94,16 +94,15 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         Assert.Equal(3, validationProblems.Errors.Count);
 
         validationProblems.AssertHasNotEmptyError(
-            nameof(ReleasePublishingFeedbackUpdateRequest.EmailToken)
-                .ToLowerFirst());
-        validationProblems.AssertHasEnumError(
-            nameof(ReleasePublishingFeedbackUpdateRequest.Response)
-                .ToLowerFirst());
+            nameof(ReleasePublishingFeedbackUpdateRequest.EmailToken).ToLowerFirst()
+        );
+        validationProblems.AssertHasEnumError(nameof(ReleasePublishingFeedbackUpdateRequest.Response).ToLowerFirst());
         validationProblems.AssertHasMaximumLengthError(
-            nameof(ReleasePublishingFeedbackUpdateRequest.AdditionalFeedback)
-                .ToLowerFirst(), maxLength: 2000);
+            nameof(ReleasePublishingFeedbackUpdateRequest.AdditionalFeedback).ToLowerFirst(),
+            maxLength: 2000
+        );
     }
-    
+
     [Fact]
     public async Task UpdateFeedback_UnknownToken_ReturnsNotFound()
     {
@@ -115,15 +114,15 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1),
             ReleaseTitle = "Academic year 2022",
-            PublicationTitle = "Publication title"
+            PublicationTitle = "Publication title",
         };
-        
-        await TestApp.AddTestData<ContentDbContext>(context =>
-            context.ReleasePublishingFeedback.Add(existingFeedback));
+
+        await TestApp.AddTestData<ContentDbContext>(context => context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: Guid.NewGuid().ToString(),
-            Response: ReleasePublishingFeedbackResponse.Satisfied);
+            Response: ReleasePublishingFeedbackResponse.Satisfied
+        );
 
         // Arrange
         var client = TestApp.CreateClient();

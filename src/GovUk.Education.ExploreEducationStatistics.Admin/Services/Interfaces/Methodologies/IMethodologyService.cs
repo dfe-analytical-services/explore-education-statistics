@@ -21,28 +21,30 @@ public interface IMethodologyService
 
     Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId);
 
-    Task<Either<ActionResult, List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(
-        Guid publicationId);
+    Task<Either<ActionResult, List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(Guid publicationId);
 
     Task<Either<ActionResult, MethodologyVersionViewModel>> GetMethodology(Guid methodologyVersionId);
 
     Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
         Guid publicationId,
-        bool isPrerelease = false);
+        bool isPrerelease = false
+    );
 
     Task<Either<ActionResult, List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
-        Guid methodologyVersionId);
+        Guid methodologyVersionId
+    );
 
     Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(
         Guid methodologyVersionId,
-        MethodologyUpdateRequest request);
+        MethodologyUpdateRequest request
+    );
 
     Task<Either<ActionResult, Unit>> UpdateMethodologyPublished(
         Guid methodologyVersionId,
-        MethodologyPublishedUpdateRequest request);
+        MethodologyPublishedUpdateRequest request
+    );
 
-    Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
-        MethodologyVersion methodologyVersion);
+    Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(MethodologyVersion methodologyVersion);
 
     Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId);
 
@@ -52,8 +54,12 @@ public interface IMethodologyService
         Guid publicationId,
         string originalSlug,
         string updatedTitle,
-        string updatedSlug);
+        string updatedSlug
+    );
 
     Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
-        string newSlug, string? oldSlug = null, Guid? methodologyId = null);
+        string newSlug,
+        string? oldSlug = null,
+        Guid? methodologyId = null
+    );
 }

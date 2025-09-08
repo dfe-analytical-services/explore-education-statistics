@@ -13,31 +13,28 @@ public class ReleaseServiceMockBuilder
 
     public ReleaseServiceMockBuilder()
     {
-        _mock
-            .Setup(m => m.CompletePublishing(It.IsAny<Guid>(), It.IsAny<DateTime>()))
-            .Returns(Task.CompletedTask);
+        _mock.Setup(m => m.CompletePublishing(It.IsAny<Guid>(), It.IsAny<DateTime>())).Returns(Task.CompletedTask);
     }
 
     public ReleaseServiceMockBuilder WhereGetReturns(ReleaseVersion releaseVersion)
     {
-        _mock
-            .Setup(m => m.Get(releaseVersion.Id))
-            .ReturnsAsync(releaseVersion);
-        
+        _mock.Setup(m => m.Get(releaseVersion.Id)).ReturnsAsync(releaseVersion);
+
         return this;
     }
 
     public ReleaseServiceMockBuilder WherePublicationLatestPublishedReleaseVersionIs(
         Guid publicationId,
-        ReleaseVersion latestPublishedReleaseVersion)
+        ReleaseVersion latestPublishedReleaseVersion
+    )
     {
         _mock
             .Setup(m => m.GetLatestPublishedReleaseVersion(publicationId, It.IsAny<IReadOnlyList<Guid>?>()))
             .ReturnsAsync(() => latestPublishedReleaseVersion);
-        
+
         return this;
     }
-    
+
     public ReleaseVersion Get(Guid releaseVersionId) => _mock.Object.Get(releaseVersionId).Result;
 
     public class Asserter(Mock<IReleaseService> mock)

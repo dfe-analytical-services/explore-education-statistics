@@ -8,9 +8,7 @@ public partial class EES3908RemoveNotifyReleaseApproversFromReleaseStatus : Migr
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "NotifyReleaseApprovers",
-            table: "ReleaseStatus");
+        migrationBuilder.DropColumn(name: "NotifyReleaseApprovers", table: "ReleaseStatus");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -20,6 +18,7 @@ public partial class EES3908RemoveNotifyReleaseApproversFromReleaseStatus : Migr
             table: "ReleaseStatus",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
     }
 }

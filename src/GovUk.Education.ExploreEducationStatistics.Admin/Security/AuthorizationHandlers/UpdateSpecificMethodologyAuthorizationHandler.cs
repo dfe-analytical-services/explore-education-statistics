@@ -9,27 +9,28 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class UpdateSpecificMethodologyRequirement : IAuthorizationRequirement
-{
-}
+public class UpdateSpecificMethodologyRequirement : IAuthorizationRequirement { }
 
-public class UpdateSpecificMethodologyAuthorizationHandler :
-    AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+public class UpdateSpecificMethodologyAuthorizationHandler
+    : AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
 {
     private readonly IMethodologyRepository _methodologyRepository;
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public UpdateSpecificMethodologyAuthorizationHandler(
         IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _methodologyRepository = methodologyRepository;
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         UpdateSpecificMethodologyRequirement requirement,
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         if (methodologyVersion.Approved)
         {
@@ -42,15 +43,16 @@ public class UpdateSpecificMethodologyAuthorizationHandler :
             return;
         }
 
-        var owningPublication =
-            await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-        
-        if (await _authorizationHandlerService
-                .HasRolesOnPublicationOrAnyReleaseVersion(
-                    context.User.GetUserId(),
-                    owningPublication.Id,
-                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
-                    ReleaseEditorAndApproverRoles))
+        var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+
+        if (
+            await _authorizationHandlerService.HasRolesOnPublicationOrAnyReleaseVersion(
+                context.User.GetUserId(),
+                owningPublication.Id,
+                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                ReleaseEditorAndApproverRoles
+            )
+        )
         {
             context.Succeed(requirement);
         }

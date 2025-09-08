@@ -15,9 +15,6 @@ public record LocationGroupViewModel
 
     public static LocationGroupViewModel Create(LocationMeta meta)
     {
-        return new LocationGroupViewModel
-        {
-            Level = GeographicLevelViewModel.Create(meta.Level),
-        };
+        return new LocationGroupViewModel { Level = GeographicLevelViewModel.Create(meta.Level) };
     }
 }

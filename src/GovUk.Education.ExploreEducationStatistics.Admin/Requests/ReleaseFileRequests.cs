@@ -13,8 +13,7 @@ public record ReleaseDataFileUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Title)
-                .MaximumLength(120);
+            RuleFor(request => request.Title).MaximumLength(120);
         }
     }
 }
@@ -31,16 +30,11 @@ public record ReleaseAncillaryFileUploadRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Title)
-                .NotEmpty()
-                .MaximumLength(120);
+            RuleFor(request => request.Title).NotEmpty().MaximumLength(120);
 
-            RuleFor(request => request.Summary)
-                .NotEmpty()
-                .MaximumLength(250);
+            RuleFor(request => request.Summary).NotEmpty().MaximumLength(250);
 
-            RuleFor(request => request.File)
-                .NotEmpty();
+            RuleFor(request => request.File).NotEmpty();
         }
     }
 }
@@ -57,13 +51,9 @@ public record ReleaseAncillaryFileUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Title)
-                .NotEmpty()
-                .MaximumLength(120);
+            RuleFor(request => request.Title).NotEmpty().MaximumLength(120);
 
-            RuleFor(request => request.Summary)
-                .NotEmpty()
-                .MaximumLength(250);
+            RuleFor(request => request.Summary).NotEmpty().MaximumLength(250);
         }
     }
 }

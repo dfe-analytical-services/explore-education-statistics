@@ -11,7 +11,7 @@ public record ReleaseSummary
     public DateTimeOffset? Published { get; init; }
     public string? Type { get; init; }
     public bool? IsLatestRelease { get; init; }
-    
+
     public string? PublicationId { get; init; }
     public string? PublicationTitle { get; init; }
     public string? PublicationSlug { get; init; }

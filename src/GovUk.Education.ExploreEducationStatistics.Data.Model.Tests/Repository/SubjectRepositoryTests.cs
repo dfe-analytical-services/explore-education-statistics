@@ -19,8 +19,7 @@ public class SubjectRepositoryTests
         {
             ReleaseSubject releaseSubject = _dataFixture
                 .DefaultReleaseSubject()
-                .WithReleaseVersion(_dataFixture
-                    .DefaultStatsReleaseVersion());
+                .WithReleaseVersion(_dataFixture.DefaultStatsReleaseVersion());
 
             var contextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -41,8 +40,7 @@ public class SubjectRepositoryTests
         [Fact]
         public async Task ReleaseSubjectDoesNotExist_ReturnsNull()
         {
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
             var contextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -69,10 +67,8 @@ public class SubjectRepositoryTests
         }
     }
 
-    private static SubjectRepository BuildService(
-        StatisticsDbContext statisticsDbContext)
+    private static SubjectRepository BuildService(StatisticsDbContext statisticsDbContext)
     {
-        return new SubjectRepository(
-            statisticsDbContext);
+        return new SubjectRepository(statisticsDbContext);
     }
 }

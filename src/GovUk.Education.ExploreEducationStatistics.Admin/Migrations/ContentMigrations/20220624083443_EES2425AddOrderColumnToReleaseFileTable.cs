@@ -13,13 +13,12 @@ public partial class EES2425AddOrderColumnToReleaseFileTable : Migration
             table: "ReleaseFiles",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Order",
-            table: "ReleaseFiles");
+        migrationBuilder.DropColumn(name: "Order", table: "ReleaseFiles");
     }
 }

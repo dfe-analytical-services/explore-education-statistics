@@ -17,37 +17,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateDataSetFunction(
     ILogger<CreateDataSetFunction> logger,
     IDataSetService dataSetService,
-    IValidator<DataSetCreateRequest> requestValidator)
+    IValidator<DataSetCreateRequest> requestValidator
+)
 {
     [Function(nameof(CreateDataSet))]
     public async Task<IActionResult> CreateDataSet(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateDataSet))] [FromBody]
-        DataSetCreateRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateDataSet))]
+        [FromBody]
+            DataSetCreateRequest request,
         [DurableClient] DurableTaskClient client,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
 
-        return await requestValidator.Validate(request, cancellationToken)
-            .OnSuccess(() => dataSetService.CreateDataSet(
-                request,
-                instanceId,
-                cancellationToken: cancellationToken
-            ))
+        return await requestValidator
+            .Validate(request, cancellationToken)
+            .OnSuccess(() => dataSetService.CreateDataSet(request, instanceId, cancellationToken: cancellationToken))
             .OnSuccess(async tuple =>
             {
                 await ProcessInitialDataSetVersion(
                     client,
                     dataSetVersionId: tuple.dataSetVersionId,
                     instanceId: instanceId,
-                    cancellationToken);
+                    cancellationToken
+                );
 
                 return new ProcessDataSetVersionResponseViewModel
                 {
                     DataSetId = tuple.dataSetId,
                     DataSetVersionId = tuple.dataSetVersionId,
-                    InstanceId = instanceId
+                    InstanceId = instanceId,
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
@@ -57,10 +58,10 @@ public class CreateDataSetFunction(
         DurableTaskClient client,
         Guid dataSetVersionId,
         Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        const string orchestratorName =
-            nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion);
+        const string orchestratorName = nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
@@ -70,12 +71,9 @@ public class CreateDataSetFunction(
             "Scheduling '{OrchestratorName}' (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
             orchestratorName,
             instanceId,
-            dataSetVersionId);
+            dataSetVersionId
+        );
 
-        await client.ScheduleNewOrchestrationInstanceAsync(
-            orchestratorName,
-            input,
-            options,
-            cancellationToken);
+        await client.ScheduleNewOrchestrationInstanceAsync(orchestratorName, input, options, cancellationToken);
     }
 }

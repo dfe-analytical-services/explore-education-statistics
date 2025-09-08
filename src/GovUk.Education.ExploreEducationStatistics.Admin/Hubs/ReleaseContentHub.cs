@@ -30,8 +30,7 @@ public class ReleaseContentHub : Hub<IReleaseContentHubClient>
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, message.Id.ToString());
     }
 
-    public async Task<HubResult<ContentBlockLockViewModel>> LockContentBlock(
-        ContentBlockLockMessage lockMessage)
+    public async Task<HubResult<ContentBlockLockViewModel>> LockContentBlock(ContentBlockLockMessage lockMessage)
     {
         return await _contentBlockLockService
             .LockContentBlock(lockMessage.Id, lockMessage.Force)

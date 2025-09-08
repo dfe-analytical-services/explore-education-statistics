@@ -20,17 +20,20 @@ public class ReleaseVersionRepositoryTests
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021)
-                ]);
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
+                    ]
+                );
 
             var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var result =
-                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22");
+            var result = await repository.GetLatestPublishedReleaseVersionByReleaseSlug(
+                publication.Id,
+                releaseSlug: "2021-22"
+            );
 
             // Expect the result to be the latest published version for the 2021-22 release
             var expectedReleaseVersion = publication.Releases.Single(r => r is { Year: 2021 }).Versions[1];
@@ -51,8 +54,10 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var result =
-                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication1.Id, releaseSlug: "2021-22");
+            var result = await repository.GetLatestPublishedReleaseVersionByReleaseSlug(
+                publication1.Id,
+                releaseSlug: "2021-22"
+            );
 
             // Expect the result to be from the specified publication
             var expectedReleaseVersion = publication1.Releases.Single().Versions.Single();
@@ -73,7 +78,8 @@ public class ReleaseVersionRepositoryTests
             var repository = BuildRepository(contentDbContext);
 
             Assert.Null(
-                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22")
+            );
         }
 
         [Fact]
@@ -88,7 +94,8 @@ public class ReleaseVersionRepositoryTests
             var repository = BuildRepository(contentDbContext);
 
             Assert.Null(
-                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22")
+            );
         }
 
         [Fact]
@@ -101,7 +108,8 @@ public class ReleaseVersionRepositoryTests
             var repository = BuildRepository(contentDbContext);
 
             Assert.Null(
-                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22")
+            );
         }
 
         [Fact]
@@ -109,8 +117,12 @@ public class ReleaseVersionRepositoryTests
         {
             var repository = BuildRepository();
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publicationId: Guid.NewGuid(),
-                releaseSlug: "2021-22"));
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(
+                    publicationId: Guid.NewGuid(),
+                    releaseSlug: "2021-22"
+                )
+            );
         }
     }
 
@@ -122,11 +134,12 @@ public class ReleaseVersionRepositoryTests
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
-                ])
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                    ]
+                )
                 .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
             var contextId = await AddTestData(publication);
@@ -270,11 +283,12 @@ public class ReleaseVersionRepositoryTests
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
-                    ])
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        ]
+                    )
                     .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
                 var contextId = await AddTestData(publication);
@@ -288,7 +302,7 @@ public class ReleaseVersionRepositoryTests
                 [
                     publication.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
                     publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id,
-                    publication.Releases.Single(r => r is { Year: 2022 }).Versions[2].Id
+                    publication.Releases.Single(r => r is { Year: 2022 }).Versions[2].Id,
                 ];
 
                 Assert.Equal(expectedReleaseVersionIds, result.Select(rv => rv.Id));
@@ -300,10 +314,11 @@ public class ReleaseVersionRepositoryTests
                 var (publication1, publication2) = _dataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
-                    ])
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        ]
+                    )
                     .GenerateTuple2();
 
                 var contextId = await AddTestData(publication1, publication2);
@@ -316,9 +331,10 @@ public class ReleaseVersionRepositoryTests
                 AssertIdsAreEqualIgnoringOrder(
                     [
                         publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
-                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
                     ],
-                    result);
+                    result
+                );
             }
 
             [Fact]
@@ -343,7 +359,8 @@ public class ReleaseVersionRepositoryTests
 
             private static async Task<List<ReleaseVersion>> ListLatestReleaseVersions(
                 ReleaseVersionRepository repository,
-                Guid publicationId)
+                Guid publicationId
+            )
             {
                 return await repository.ListLatestReleaseVersions(publicationId, publishedOnly: false);
             }
@@ -357,11 +374,12 @@ public class ReleaseVersionRepositoryTests
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
-                    ])
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        ]
+                    )
                     .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
                 var contextId = await AddTestData(publication);
@@ -374,7 +392,7 @@ public class ReleaseVersionRepositoryTests
                 Guid[] expectedReleaseVersionIds =
                 [
                     publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id,
-                    publication.Releases.Single(r => r is { Year: 2022 }).Versions[1].Id
+                    publication.Releases.Single(r => r is { Year: 2022 }).Versions[1].Id,
                 ];
 
                 Assert.Equal(expectedReleaseVersionIds, result.Select(rv => rv.Id));
@@ -386,10 +404,11 @@ public class ReleaseVersionRepositoryTests
                 var (publication1, publication2) = _dataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021)
-                    ])
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                        ]
+                    )
                     .GenerateTuple2();
 
                 var contextId = await AddTestData(publication1, publication2);
@@ -402,9 +421,10 @@ public class ReleaseVersionRepositoryTests
                 AssertIdsAreEqualIgnoringOrder(
                     [
                         publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
-                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
                     ],
-                    result);
+                    result
+                );
             }
 
             [Fact]
@@ -443,7 +463,8 @@ public class ReleaseVersionRepositoryTests
 
             private static async Task<List<ReleaseVersion>> ListLatestReleaseVersions(
                 ReleaseVersionRepository repository,
-                Guid publicationId)
+                Guid publicationId
+            )
             {
                 return await repository.ListLatestReleaseVersions(publicationId, publishedOnly: true);
             }
@@ -460,11 +481,12 @@ public class ReleaseVersionRepositoryTests
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
-                    ]);
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        ]
+                    );
 
                 var contextId = await AddTestData(publication);
                 await using var contentDbContext = InMemoryContentDbContext(contextId);
@@ -477,9 +499,10 @@ public class ReleaseVersionRepositoryTests
                     [
                         publication.Releases.Single(r => r is { Year: 2022 }).Versions[2].Id,
                         publication.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
-                        publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id
+                        publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id,
                     ],
-                    result);
+                    result
+                );
             }
 
             [Fact]
@@ -488,10 +511,11 @@ public class ReleaseVersionRepositoryTests
                 var (publication1, publication2) = _dataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
-                    ])
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        ]
+                    )
                     .GenerateTuple2();
 
                 var contextId = await AddTestData(publication1, publication2);
@@ -504,9 +528,10 @@ public class ReleaseVersionRepositoryTests
                 AssertIdsAreEqualIgnoringOrder(
                     [
                         publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
-                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
                     ],
-                    result);
+                    result
+                );
             }
 
             [Fact]
@@ -531,7 +556,8 @@ public class ReleaseVersionRepositoryTests
 
             private static async Task<List<Guid>> ListLatestReleaseVersionIds(
                 ReleaseVersionRepository repository,
-                Guid publicationId)
+                Guid publicationId
+            )
             {
                 return await repository.ListLatestReleaseVersionIds(publicationId, publishedOnly: false);
             }
@@ -545,11 +571,12 @@ public class ReleaseVersionRepositoryTests
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
-                    ]);
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        ]
+                    );
 
                 var contextId = await AddTestData(publication);
                 await using var contentDbContext = InMemoryContentDbContext(contextId);
@@ -561,9 +588,10 @@ public class ReleaseVersionRepositoryTests
                 AssertIdsAreEqualIgnoringOrder(
                     [
                         publication.Releases.Single(r => r is { Year: 2022 }).Versions[1].Id,
-                        publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id
+                        publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id,
                     ],
-                    result);
+                    result
+                );
             }
 
             [Fact]
@@ -572,10 +600,11 @@ public class ReleaseVersionRepositoryTests
                 var (publication1, publication2) = _dataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021)
-                    ])
+                        [
+                            _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                            _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                        ]
+                    )
                     .GenerateTuple2();
 
                 var contextId = await AddTestData(publication1, publication2);
@@ -588,9 +617,10 @@ public class ReleaseVersionRepositoryTests
                 AssertIdsAreEqualIgnoringOrder(
                     [
                         publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
-                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
                     ],
-                    result);
+                    result
+                );
             }
 
             [Fact]
@@ -629,7 +659,8 @@ public class ReleaseVersionRepositoryTests
 
             private static async Task<List<Guid>> ListLatestReleaseVersionIds(
                 ReleaseVersionRepository repository,
-                Guid publicationId)
+                Guid publicationId
+            )
             {
                 return await repository.ListLatestReleaseVersionIds(publicationId, publishedOnly: true);
             }
@@ -638,16 +669,19 @@ public class ReleaseVersionRepositoryTests
 
     private List<ReleaseSeriesItem> GenerateReleaseSeries(IReadOnlyList<Release> releases, params int[] years)
     {
-        return years.Select(year =>
-        {
-            var release = releases.Single(r => r.Year == year);
-            return _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(release.Id).Generate();
-        }).ToList();
+        return years
+            .Select(year =>
+            {
+                var release = releases.Single(r => r.Year == year);
+                return _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(release.Id).Generate();
+            })
+            .ToList();
     }
 
     private static void AssertIdsAreEqualIgnoringOrder(
         IReadOnlyCollection<Guid> expectedIds,
-        IReadOnlyCollection<ReleaseVersion> actualReleaseVersions)
+        IReadOnlyCollection<ReleaseVersion> actualReleaseVersions
+    )
     {
         Assert.Equal(expectedIds.Count, actualReleaseVersions.Count);
         Assert.True(SequencesAreEqualIgnoringOrder(expectedIds, actualReleaseVersions.Select(rv => rv.Id)));
@@ -655,7 +689,8 @@ public class ReleaseVersionRepositoryTests
 
     private static void AssertIdsAreEqualIgnoringOrder(
         IReadOnlyCollection<Guid> expectedIds,
-        IReadOnlyCollection<Guid> actualIds)
+        IReadOnlyCollection<Guid> actualIds
+    )
     {
         Assert.Equal(expectedIds.Count, actualIds.Count);
         Assert.True(SequencesAreEqualIgnoringOrder(expectedIds, actualIds));
@@ -679,8 +714,6 @@ public class ReleaseVersionRepositoryTests
 
     private static ReleaseVersionRepository BuildRepository(ContentDbContext? contentDbContext = null)
     {
-        return new ReleaseVersionRepository(
-            contentDbContext: contentDbContext ?? InMemoryContentDbContext()
-        );
+        return new ReleaseVersionRepository(contentDbContext: contentDbContext ?? InMemoryContentDbContext());
     }
 }

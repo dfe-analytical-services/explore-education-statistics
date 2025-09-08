@@ -8,8 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseApprovalService
 {
-    Task<Either<ActionResult, Unit>> CreateReleaseStatus(Guid releaseVersionId,
-        ReleaseStatusCreateRequest request);
+    Task<Either<ActionResult, Unit>> CreateReleaseStatus(Guid releaseVersionId, ReleaseStatusCreateRequest request);
 
     Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId);
 }

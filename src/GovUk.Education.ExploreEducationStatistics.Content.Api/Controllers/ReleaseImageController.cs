@@ -18,8 +18,10 @@ public class ReleaseImageController : ControllerBase
     [HttpGet("releases/{releaseVersionId}/images/{fileId}")]
     public async Task<ActionResult> Stream(string releaseVersionId, string fileId)
     {
-        if (Guid.TryParse(releaseVersionId, out var releaseVersionIdAsGuid) &&
-            Guid.TryParse(fileId, out var fileIdAsGuid))
+        if (
+            Guid.TryParse(releaseVersionId, out var releaseVersionIdAsGuid)
+            && Guid.TryParse(fileId, out var fileIdAsGuid)
+        )
         {
             return await _releaseFileService
                 .StreamFile(releaseVersionId: releaseVersionIdAsGuid, fileId: fileIdAsGuid)

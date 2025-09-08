@@ -19,11 +19,9 @@ public class FilterOptionMetaLink
     {
         public void Configure(EntityTypeBuilder<FilterOptionMetaLink> builder)
         {
-            builder.Property(l => l.PublicId)
-                .HasMaxLength(10);
+            builder.Property(l => l.PublicId).HasMaxLength(10);
 
-            builder.HasIndex(l => new { l.MetaId, l.PublicId })
-                .IsUnique();
+            builder.HasIndex(l => new { l.MetaId, l.PublicId }).IsUnique();
         }
     }
 }

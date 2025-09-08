@@ -48,48 +48,37 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                     FileSize = "1 Mb",
                     Title = "Title of data set",
                     Content = "Summary of data set",
-                    Theme = new IdTitleViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Title of theme"
-                    },
+                    Theme = new IdTitleViewModel { Id = Guid.NewGuid(), Title = "Title of theme" },
                     Publication = new IdTitleSlugViewModel
                     {
                         Id = Guid.NewGuid(),
                         Title = "Title of publication",
-                        Slug = "publication-slug"
+                        Slug = "publication-slug",
                     },
                     Release = new IdTitleSlugViewModel
                     {
                         Id = Guid.NewGuid(),
                         Title = "Academic year 2001/02",
-                        Slug = "release-slug"
+                        Slug = "release-slug",
                     },
-                    Api = new DataSetFileApiViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Version = "1.0.0"
-                    },
+                    Api = new DataSetFileApiViewModel { Id = Guid.NewGuid(), Version = "1.0.0" },
                     Meta = new DataSetFileMetaViewModel
                     {
                         NumDataFileRows = 9393,
                         GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
-                        TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
-                        {
-                            From = "2000",
-                            To = "2001",
-                        },
+                        TimePeriodRange = new DataSetFileTimePeriodRangeViewModel { From = "2000", To = "2001" },
                         Filters = ["Filter 1"],
                         Indicators = ["Indicator 1"],
                     },
                     LatestData = true,
                     IsSuperseded = false,
                     Published = DateTime.UtcNow,
-                }
+                },
             ],
             totalResults: 1,
             page: 1,
-            pageSize: 10);
+            pageSize: 10
+        );
 
         [Fact]
         public async Task NoCachedEntryExists_CreatesCache()
@@ -97,35 +86,45 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
             var dataSetFileService = new Mock<IDataSetFileService>(Strict);
 
             MemoryCacheService
-                .Setup(s => s.GetItem(
-                    new ListDataSetFilesCacheKey(_query),
-                    typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
+                .Setup(s =>
+                    s.GetItem(
+                        new ListDataSetFilesCacheKey(_query),
+                        typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)
+                    )
+                )
                 .Returns((object?)null);
 
             var expectedCacheConfiguration = new MemoryCacheConfiguration(
-                10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
+                10,
+                CrontabSchedule.Parse(HalfHourlyExpirySchedule)
+            );
 
-            MemoryCacheService
-                .Setup(s => s.SetItem<object>(
+            MemoryCacheService.Setup(s =>
+                s.SetItem<object>(
                     new ListDataSetFilesCacheKey(_query),
                     _dataSetFiles,
                     ItIs.DeepEqualTo(expectedCacheConfiguration),
-                    null));
+                    null
+                )
+            );
 
             dataSetFileService
-                .Setup(s => s.ListDataSetFiles(
-                    _query.ThemeId,
-                    _query.PublicationId,
-                    _query.ReleaseId,
-                    _query.GeographicLevelEnum,
-                    _query.LatestOnly,
-                    _query.DataSetType,
-                    _query.SearchTerm,
-                    _query.Sort,
-                    _query.SortDirection,
-                    _query.Page,
-                    _query.PageSize,
-                    default))
+                .Setup(s =>
+                    s.ListDataSetFiles(
+                        _query.ThemeId,
+                        _query.PublicationId,
+                        _query.ReleaseId,
+                        _query.GeographicLevelEnum,
+                        _query.LatestOnly,
+                        _query.DataSetType,
+                        _query.SearchTerm,
+                        _query.Sort,
+                        _query.SortDirection,
+                        _query.Page,
+                        _query.PageSize,
+                        default
+                    )
+                )
                 .ReturnsAsync(_dataSetFiles);
 
             var controller = BuildController(dataSetFileService.Object);
@@ -141,9 +140,12 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
         public async Task CachedEntryExists_ReturnsCache()
         {
             MemoryCacheService
-                .Setup(s => s.GetItem(
-                    new ListDataSetFilesCacheKey(_query),
-                    typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
+                .Setup(s =>
+                    s.GetItem(
+                        new ListDataSetFilesCacheKey(_query),
+                        typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)
+                    )
+                )
                 .Returns(_dataSetFiles);
 
             var controller = BuildController();
@@ -159,7 +161,8 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
         public void PaginatedDataSetListViewModel_SerializeAndDeserialize_Success()
         {
             var converted = JsonConvert.DeserializeObject<PaginatedListViewModel<DataSetFileSummaryViewModel>>(
-                JsonConvert.SerializeObject(_dataSetFiles));
+                JsonConvert.SerializeObject(_dataSetFiles)
+            );
 
             converted.AssertDeepEqualTo(_dataSetFiles);
         }

@@ -20,9 +20,7 @@ public class ViewReleaseAuthorizationHandlerTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
@@ -50,9 +48,7 @@ public class ViewReleaseAuthorizationHandlerTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 2, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 1 });
 
@@ -80,9 +76,7 @@ public class ViewReleaseAuthorizationHandlerTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
@@ -110,9 +104,7 @@ public class ViewReleaseAuthorizationHandlerTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 2)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
@@ -142,10 +134,9 @@ public class ViewReleaseAuthorizationHandlerTests
 
         var handler = BuildHandler(contentDbContext);
 
-        var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        });
+        var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(
+            new ReleaseVersion { Id = Guid.NewGuid() }
+        );
 
         await handler.HandleAsync(authContext);
 
@@ -154,8 +145,6 @@ public class ViewReleaseAuthorizationHandlerTests
 
     private static ViewReleaseAuthorizationHandler BuildHandler(ContentDbContext contentDbContext)
     {
-        return new ViewReleaseAuthorizationHandler(
-            new ReleaseVersionRepository(contentDbContext)
-        );
+        return new ViewReleaseAuthorizationHandler(new ReleaseVersionRepository(contentDbContext));
     }
 }

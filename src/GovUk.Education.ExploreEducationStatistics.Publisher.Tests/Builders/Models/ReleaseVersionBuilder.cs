@@ -14,7 +14,7 @@ public class ReleaseVersionBuilder(Guid? releaseVersionId = null)
         {
             Id = releaseVersionId ?? Guid.NewGuid(),
             Release = _release ?? _releaseBuilder.Build(),
-            PublicationId = _publicationId // remove this line when EES-5818 removes ReleaseVersion.PublicationId
+            PublicationId = _publicationId, // remove this line when EES-5818 removes ReleaseVersion.PublicationId
         };
         return releaseVersion;
     }
@@ -25,13 +25,13 @@ public class ReleaseVersionBuilder(Guid? releaseVersionId = null)
         _publicationId = publicationId; // remove this line when EES-5818 removes ReleaseVersion.PublicationId
         return this;
     }
-    
+
     public ReleaseVersionBuilder ForRelease(Func<ReleaseBuilder, ReleaseBuilder> modifyRelease)
     {
         modifyRelease(_releaseBuilder);
         return this;
     }
-    
+
     public ReleaseVersionBuilder ForRelease(Release release)
     {
         _release = release;

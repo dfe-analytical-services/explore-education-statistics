@@ -41,9 +41,7 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
         {
             Release release = DataFixture.DefaultRelease();
 
-            await AssertHandlerSucceedsWithPublicationRoles<
-                Release,
-                UpdateSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithPublicationRoles<Release, UpdateSpecificReleaseRequirement>(
                 handlerSupplier: HandlerSupplier(release),
                 entity: release,
                 publicationId: release.PublicationId,
@@ -52,8 +50,7 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
         }
     }
 
-    private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
-        Release release)
+    private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(Release release)
     {
         return contentDbContext =>
         {
@@ -65,10 +62,14 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                     userReleaseRoleRepository: new UserReleaseRoleRepository(
                         contentDbContext: contentDbContext,
-                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                    ),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: contentDbContext),
-                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                        contentDbContext: contentDbContext
+                    ),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+                )
+            );
         };
     }
 }

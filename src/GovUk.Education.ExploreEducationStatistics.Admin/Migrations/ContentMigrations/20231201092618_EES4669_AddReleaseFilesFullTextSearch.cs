@@ -16,14 +16,18 @@ public partial class EES4669_AddReleaseFilesFullTextSearch : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         // Add a full-text catalog with an index on the ReleaseFiles Name and Summary columns
-        migrationBuilder.SqlFromFile(ContentMigrationsPath,
+        migrationBuilder.SqlFromFile(
+            ContentMigrationsPath,
             $"{MigrationId}_{nameof(EES4669_AddReleaseFilesFullTextSearch)}_FullTextIndex.sql",
-            suppressTransaction: true);
+            suppressTransaction: true
+        );
 
         // Add a database table-valued function wrapping the SQL Server built-in function freetexttable
         // which can be mapped to a queryable function in EF Core.
-        migrationBuilder.SqlFromFile(ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4669_AddReleaseFilesFullTextSearch)}_Routine_ReleaseFilesFreeTextTable.sql");
+        migrationBuilder.SqlFromFile(
+            ContentMigrationsPath,
+            $"{MigrationId}_{nameof(EES4669_AddReleaseFilesFullTextSearch)}_Routine_ReleaseFilesFreeTextTable.sql"
+        );
 
         migrationBuilder.Sql("GRANT SELECT ON dbo.ReleaseFilesFreeTextTable TO [content]");
     }

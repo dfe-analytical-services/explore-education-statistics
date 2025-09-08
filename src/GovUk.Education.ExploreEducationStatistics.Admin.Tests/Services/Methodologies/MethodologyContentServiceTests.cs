@@ -33,9 +33,9 @@ public class MethodologyContentServiceTests
                     PublishingStrategy = Immediately,
                     Status = MethodologyApprovalStatus.Approved,
                     Published = DateTime.UtcNow,
-                    AlternativeTitle = "Alternative title"
-                }
-            }
+                    AlternativeTitle = "Alternative title",
+                },
+            },
         };
         var methodologyVersion = methodology.Versions[0];
 
@@ -84,20 +84,20 @@ public class MethodologyContentServiceTests
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 2,
-                                Heading = "Annex 3 heading"
+                                Heading = "Annex 3 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 0,
-                                Heading = "Annex 1 heading"
+                                Heading = "Annex 1 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 1,
-                                Heading = "Annex 2 heading"
-                            }
+                                Heading = "Annex 2 heading",
+                            },
                         },
                         Content = new List<ContentSection>
                         {
@@ -105,28 +105,28 @@ public class MethodologyContentServiceTests
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 2,
-                                Heading = "Section 3 heading"
+                                Heading = "Section 3 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 0,
-                                Heading = "Section 1 heading"
+                                Heading = "Section 1 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 1,
-                                Heading = "Section 2 heading"
-                            }
+                                Heading = "Section 2 heading",
+                            },
                         },
                     },
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
                     Status = MethodologyApprovalStatus.Approved,
-                    AlternativeTitle = "Alternative title"
-                }
-            }
+                    AlternativeTitle = "Alternative title",
+                },
+            },
         };
         var methodologyVersion = methodology.Versions[0];
 
@@ -165,9 +165,7 @@ public class MethodologyContentServiceTests
         }
     }
 
-    private static void AssertContentSectionAndViewModelEqual(
-        ContentSection expected,
-        ContentSectionViewModel actual)
+    private static void AssertContentSectionAndViewModelEqual(ContentSection expected, ContentSectionViewModel actual)
     {
         Assert.Equal(expected.Id, actual.Id);
         Assert.Equal(expected.Heading, actual.Heading);
@@ -189,9 +187,9 @@ public class MethodologyContentServiceTests
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
                     Status = MethodologyApprovalStatus.Approved,
-                    AlternativeTitle = "Alternative title"
-                }
-            }
+                    AlternativeTitle = "Alternative title",
+                },
+            },
         };
         var methodologyVersion = methodology.Versions[0];
 
@@ -199,21 +197,21 @@ public class MethodologyContentServiceTests
         {
             DisplayDate = DateTime.Today.AddDays(-2).ToUniversalTime(),
             Content = "Other note",
-            MethodologyVersion = methodologyVersion
+            MethodologyVersion = methodologyVersion,
         };
 
         var earliestNote = new MethodologyNote
         {
             DisplayDate = DateTime.Today.AddDays(-3).ToUniversalTime(),
             Content = "Earliest note",
-            MethodologyVersion = methodologyVersion
+            MethodologyVersion = methodologyVersion,
         };
 
         var latestNote = new MethodologyNote
         {
             DisplayDate = DateTime.Today.AddDays(-1).ToUniversalTime(),
             Content = "Latest note",
-            MethodologyVersion = methodologyVersion
+            MethodologyVersion = methodologyVersion,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -241,7 +239,8 @@ public class MethodologyContentServiceTests
 
     private static void AssertMethodologyNoteAndViewModelEqual(
         MethodologyNote expected,
-        MethodologyNoteViewModel actual)
+        MethodologyNoteViewModel actual
+    )
     {
         Assert.Equal(expected.Id, actual.Id);
         Assert.Equal(expected.Content, actual.Content);
@@ -298,8 +297,8 @@ public class MethodologyContentServiceTests
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
-                        Order = 1
-                    }
+                        Order = 1,
+                    },
                 },
                 Content = new List<ContentSection>
                 {
@@ -307,10 +306,10 @@ public class MethodologyContentServiceTests
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
-                        Order = 2
-                    }
-                }
-            }
+                        Order = 2,
+                    },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -336,25 +335,13 @@ public class MethodologyContentServiceTests
     [Fact]
     public async Task GetContentBlocks()
     {
-        var annexHtmlBlock1 = new HtmlBlock
-        {
-            Id = Guid.NewGuid()
-        };
+        var annexHtmlBlock1 = new HtmlBlock { Id = Guid.NewGuid() };
 
-        var annexHtmlBlock2 = new HtmlBlock
-        {
-            Id = Guid.NewGuid()
-        };
+        var annexHtmlBlock2 = new HtmlBlock { Id = Guid.NewGuid() };
 
-        var contentHtmlBlock1 = new HtmlBlock
-        {
-            Id = Guid.NewGuid()
-        };
+        var contentHtmlBlock1 = new HtmlBlock { Id = Guid.NewGuid() };
 
-        var contentHtmlBlock2 = new HtmlBlock
-        {
-            Id = Guid.NewGuid()
-        };
+        var contentHtmlBlock2 = new HtmlBlock { Id = Guid.NewGuid() };
 
         var methodologyVersion = new MethodologyVersion
         {
@@ -370,11 +357,8 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             annexHtmlBlock1,
-                            new DataBlock
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
+                            new DataBlock { Id = Guid.NewGuid() },
+                        },
                     },
                     new()
                     {
@@ -384,12 +368,9 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             annexHtmlBlock2,
-                            new DataBlock
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
+                            new DataBlock { Id = Guid.NewGuid() },
+                        },
+                    },
                 },
                 Content = new List<ContentSection>
                 {
@@ -401,11 +382,8 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             contentHtmlBlock1,
-                            new DataBlock
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
+                            new DataBlock { Id = Guid.NewGuid() },
+                        },
                     },
                     new()
                     {
@@ -415,14 +393,11 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             contentHtmlBlock2,
-                            new DataBlock
-                            {
-                                Id = Guid.NewGuid()
-                            }
-                        }
-                    }
-                }
-            }
+                            new DataBlock { Id = Guid.NewGuid() },
+                        },
+                    },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -454,10 +429,7 @@ public class MethodologyContentServiceTests
     [Fact]
     public async Task AddContentSection()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Status = MethodologyApprovalStatus.Draft
-        };
+        var methodologyVersion = new MethodologyVersion { Status = MethodologyApprovalStatus.Draft };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -471,7 +443,8 @@ public class MethodologyContentServiceTests
             var result = await methodologyContentService.AddContentSection(
                 methodologyVersion.Id,
                 new ContentSectionAddRequest(),
-                MethodologyContentService.ContentListType.Content);
+                MethodologyContentService.ContentListType.Content
+            );
 
             var viewModel = result.AssertRight();
 
@@ -484,10 +457,7 @@ public class MethodologyContentServiceTests
     [Fact]
     public async Task AddContentSection_HigherLevelReview()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Status = MethodologyApprovalStatus.HigherLevelReview,
-        };
+        var methodologyVersion = new MethodologyVersion { Status = MethodologyApprovalStatus.HigherLevelReview };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -501,7 +471,8 @@ public class MethodologyContentServiceTests
             var result = await methodologyContentService.AddContentSection(
                 methodologyVersion.Id,
                 new ContentSectionAddRequest(),
-                MethodologyContentService.ContentListType.Content);
+                MethodologyContentService.ContentListType.Content
+            );
 
             result.AssertRight();
         }
@@ -510,10 +481,7 @@ public class MethodologyContentServiceTests
     [Fact]
     public async Task AddContentSection_Approved()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Status = MethodologyApprovalStatus.Approved
-        };
+        var methodologyVersion = new MethodologyVersion { Status = MethodologyApprovalStatus.Approved };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -527,7 +495,8 @@ public class MethodologyContentServiceTests
             var result = await methodologyContentService.AddContentSection(
                 methodologyVersion.Id,
                 new ContentSectionAddRequest(),
-                MethodologyContentService.ContentListType.Content);
+                MethodologyContentService.ContentListType.Content
+            );
 
             result.AssertForbidden();
         }
@@ -543,23 +512,11 @@ public class MethodologyContentServiceTests
                 Annexes = new List<ContentSection>(),
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 0
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 1
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 2
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Order = 0 },
+                    new() { Id = Guid.NewGuid(), Order = 1 },
+                    new() { Id = Guid.NewGuid(), Order = 2 },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -580,18 +537,9 @@ public class MethodologyContentServiceTests
                 methodologyVersion.Id,
                 new Dictionary<Guid, int>
                 {
-                    {
-                        contentSections[2].Id,
-                        0
-                    },
-                    {
-                        contentSections[0].Id,
-                        1
-                    },
-                    {
-                        contentSections[1].Id,
-                        2
-                    }
+                    { contentSections[2].Id, 0 },
+                    { contentSections[0].Id, 1 },
+                    { contentSections[1].Id, 2 },
                 }
             );
 
@@ -613,24 +561,12 @@ public class MethodologyContentServiceTests
             {
                 Annexes = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 0
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 1
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 2
-                    }
+                    new() { Id = Guid.NewGuid(), Order = 0 },
+                    new() { Id = Guid.NewGuid(), Order = 1 },
+                    new() { Id = Guid.NewGuid(), Order = 2 },
                 },
-                Content = new List<ContentSection>()
-            }
+                Content = new List<ContentSection>(),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -651,18 +587,9 @@ public class MethodologyContentServiceTests
                 methodologyVersion.Id,
                 new Dictionary<Guid, int>
                 {
-                    {
-                        annexeSections[2].Id,
-                        0
-                    },
-                    {
-                        annexeSections[0].Id,
-                        1
-                    },
-                    {
-                        annexeSections[1].Id,
-                        2
-                    }
+                    { annexeSections[2].Id, 0 },
+                    { annexeSections[0].Id, 1 },
+                    { annexeSections[1].Id, 2 },
                 }
             );
 
@@ -685,13 +612,9 @@ public class MethodologyContentServiceTests
                 Annexes = new List<ContentSection>(),
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 0
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Order = 0 },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -710,13 +633,7 @@ public class MethodologyContentServiceTests
 
             var result = await methodologyContentService.ReorderContentSections(
                 Guid.NewGuid(),
-                new Dictionary<Guid, int>
-                {
-                    {
-                        contentSections[0].Id,
-                        0
-                    }
-                }
+                new Dictionary<Guid, int> { { contentSections[0].Id, 0 } }
             );
 
             result.AssertNotFound();
@@ -733,18 +650,10 @@ public class MethodologyContentServiceTests
                 Annexes = new List<ContentSection>(),
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 0
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 1
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Order = 0 },
+                    new() { Id = Guid.NewGuid(), Order = 1 },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -763,13 +672,7 @@ public class MethodologyContentServiceTests
 
             var result = await methodologyContentService.ReorderContentSections(
                 methodologyVersion.Id,
-                new Dictionary<Guid, int>
-                {
-                    {
-                        contentSections[1].Id,
-                        0
-                    }
-                }
+                new Dictionary<Guid, int> { { contentSections[1].Id, 0 } }
             );
 
             result.AssertNotFound();
@@ -785,19 +688,11 @@ public class MethodologyContentServiceTests
             {
                 Annexes = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 0
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 1
-                    }
+                    new() { Id = Guid.NewGuid(), Order = 0 },
+                    new() { Id = Guid.NewGuid(), Order = 1 },
                 },
-                Content = new List<ContentSection>()
-            }
+                Content = new List<ContentSection>(),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -816,13 +711,7 @@ public class MethodologyContentServiceTests
 
             var result = await methodologyContentService.ReorderContentSections(
                 methodologyVersion.Id,
-                new Dictionary<Guid, int>
-                {
-                    {
-                        annexeSections[1].Id,
-                        0
-                    }
-                }
+                new Dictionary<Guid, int> { { annexeSections[1].Id, 0 } }
             );
 
             result.AssertNotFound();
@@ -839,13 +728,9 @@ public class MethodologyContentServiceTests
                 Annexes = new List<ContentSection>(),
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Order = 0
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Order = 0 },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -864,17 +749,7 @@ public class MethodologyContentServiceTests
 
             var result = await methodologyContentService.ReorderContentSections(
                 methodologyVersion.Id,
-                new Dictionary<Guid, int>
-                {
-                    {
-                        contentSections[0].Id,
-                        0
-                    },
-                    {
-                        Guid.NewGuid(),
-                        1
-                    }
-                }
+                new Dictionary<Guid, int> { { contentSections[0].Id, 0 }, { Guid.NewGuid(), 1 } }
             );
 
             result.AssertNotFound();
@@ -891,13 +766,9 @@ public class MethodologyContentServiceTests
                 Annexes = new List<ContentSection>(),
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Heading = "Section 1 heading"
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Heading = "Section 1 heading" },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -936,14 +807,10 @@ public class MethodologyContentServiceTests
             {
                 Annexes = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Heading = "Section 1 heading"
-                    }
+                    new() { Id = Guid.NewGuid(), Heading = "Section 1 heading" },
                 },
-                Content = new List<ContentSection>()
-            }
+                Content = new List<ContentSection>(),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -976,7 +843,8 @@ public class MethodologyContentServiceTests
     private static MethodologyContentService SetupMethodologyContentService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             contentDbContext,

@@ -9,19 +9,17 @@ public static class PrivateBlobStorageServiceExtensions
 {
     public static Func<Task<Stream>> GetDataFileStreamProvider(
         this IPrivateBlobStorageService service,
-        DataImport import)
+        DataImport import
+    )
     {
-        return async () => (await service
-            .GetDownloadStream(PrivateReleaseFiles, import.File.Path()))
-            .Right;
+        return async () => (await service.GetDownloadStream(PrivateReleaseFiles, import.File.Path())).Right;
     }
-    
+
     public static Func<Task<Stream>> GetMetadataFileStreamProvider(
         this IPrivateBlobStorageService service,
-        DataImport import)
+        DataImport import
+    )
     {
-        return async () => (await service
-            .GetDownloadStream(PrivateReleaseFiles, import.MetaFile.Path()))
-            .Right;
+        return async () => (await service.GetDownloadStream(PrivateReleaseFiles, import.MetaFile.Path())).Right;
     }
 }

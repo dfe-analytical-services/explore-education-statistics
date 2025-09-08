@@ -68,7 +68,7 @@ public abstract record LocationOptionViewModel
                 Urn = schoolOption.Urn,
                 LaEstab = schoolOption.LaEstab,
             },
-            _ => throw new NotImplementedException()
+            _ => throw new NotImplementedException(),
         };
     }
 
@@ -90,10 +90,8 @@ public record LocationCodedOptionViewModel : LocationOptionViewModel
     [JsonPropertyOrder(1)]
     public required string Code { get; init; }
 
-    public override bool HasMajorChange(LocationOptionViewModel otherOption)
-        => otherOption is not LocationCodedOptionViewModel codedOption
-           || Id != codedOption.Id
-           || Code != codedOption.Code;
+    public override bool HasMajorChange(LocationOptionViewModel otherOption) =>
+        otherOption is not LocationCodedOptionViewModel codedOption || Id != codedOption.Id || Code != codedOption.Code;
 }
 
 /// <summary>
@@ -115,11 +113,11 @@ public record LocationLocalAuthorityOptionViewModel : LocationOptionViewModel
     [JsonPropertyOrder(1)]
     public required string OldCode { get; init; }
 
-    public override bool HasMajorChange(LocationOptionViewModel otherOption)
-        => otherOption is not LocationLocalAuthorityOptionViewModel localAuthorityOption
-           || Id != localAuthorityOption.Id
-           || Code != localAuthorityOption.Code
-           || OldCode != localAuthorityOption.OldCode;
+    public override bool HasMajorChange(LocationOptionViewModel otherOption) =>
+        otherOption is not LocationLocalAuthorityOptionViewModel localAuthorityOption
+        || Id != localAuthorityOption.Id
+        || Code != localAuthorityOption.Code
+        || OldCode != localAuthorityOption.OldCode;
 }
 
 /// <summary>
@@ -134,10 +132,10 @@ public record LocationProviderOptionViewModel : LocationOptionViewModel
     [JsonPropertyOrder(1)]
     public required string Ukprn { get; init; }
 
-    public override bool HasMajorChange(LocationOptionViewModel otherOption)
-        => otherOption is not LocationProviderOptionViewModel providerOption
-           || Id != providerOption.Id
-           || Ukprn != providerOption.Ukprn;
+    public override bool HasMajorChange(LocationOptionViewModel otherOption) =>
+        otherOption is not LocationProviderOptionViewModel providerOption
+        || Id != providerOption.Id
+        || Ukprn != providerOption.Ukprn;
 }
 
 /// <summary>
@@ -145,9 +143,8 @@ public record LocationProviderOptionViewModel : LocationOptionViewModel
 /// </summary>
 public record LocationRscRegionOptionViewModel : LocationOptionViewModel
 {
-    public override bool HasMajorChange(LocationOptionViewModel otherOption)
-        => otherOption is not LocationRscRegionOptionViewModel rscOption
-           || Id != rscOption.Id;
+    public override bool HasMajorChange(LocationOptionViewModel otherOption) =>
+        otherOption is not LocationRscRegionOptionViewModel rscOption || Id != rscOption.Id;
 }
 
 /// <summary>
@@ -169,9 +166,9 @@ public record LocationSchoolOptionViewModel : LocationOptionViewModel
     [JsonPropertyOrder(1)]
     public required string LaEstab { get; init; }
 
-    public override bool HasMajorChange(LocationOptionViewModel otherOption)
-        => otherOption is not LocationSchoolOptionViewModel schoolOption
-           || Id != schoolOption.Id
-           || Urn != schoolOption.Urn
-           || LaEstab != schoolOption.LaEstab;
+    public override bool HasMajorChange(LocationOptionViewModel otherOption) =>
+        otherOption is not LocationSchoolOptionViewModel schoolOption
+        || Id != schoolOption.Id
+        || Urn != schoolOption.Urn
+        || LaEstab != schoolOption.LaEstab;
 }

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.14")
+                .HasAnnotation("ProductVersion", "8.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -618,6 +618,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("#IdTempTable", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:GovUk.Education.ExploreEducationStatistics.Data.Model.Database.MatchedFilterItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("#MatchedFilterItem", null, t =>
                         {
                             t.ExcludeFromMigrations();
                         });

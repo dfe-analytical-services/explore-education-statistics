@@ -20,9 +20,11 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     // be published and the Published date set.
     public DateTime? PublishScheduled { get; set; }
 
-    [NotMapped] public bool Live => Published.HasValue && UtcNow >= Published.Value;
+    [NotMapped]
+    public bool Live => Published.HasValue && UtcNow >= Published.Value;
 
-    [NotMapped] public bool Amendment => Version > 0 && !Live;
+    [NotMapped]
+    public bool Amendment => Version > 0 && !Live;
 
     [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
     public Guid PublicationId { get; set; }
@@ -92,9 +94,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
                 return new List<ContentSection>();
             }
 
-            return Content
-                .Where(section => section.Type == ContentSectionType.Generic)
-                .ToImmutableList();
+            return Content.Where(section => section.Type == ContentSectionType.Generic).ToImmutableList();
         }
         set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
     }
@@ -103,7 +103,8 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public ContentSection KeyStatisticsSecondarySection
     {
         get => FindSingleSectionByType(ContentSectionType.KeyStatisticsSecondary);
-        set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, new List<ContentSection> { value });
+        set =>
+            ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, new List<ContentSection> { value });
     }
 
     [NotMapped]
@@ -136,8 +137,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
             Content = new List<ContentSection>();
         }
 
-        return Content
-            .SingleOrDefault(section => section.Type == type);
+        return Content.SingleOrDefault(section => section.Type == type);
     }
 
     private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)

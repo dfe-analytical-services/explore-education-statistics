@@ -10,13 +10,9 @@ public partial class EES5079_RemoveSequenceColumnsFromReleaseSubject : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "FilterSequence",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "FilterSequence", table: "ReleaseSubject");
 
-        migrationBuilder.DropColumn(
-            name: "IndicatorSequence",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "IndicatorSequence", table: "ReleaseSubject");
     }
 
     /// <inheritdoc />
@@ -26,12 +22,14 @@ public partial class EES5079_RemoveSequenceColumnsFromReleaseSubject : Migration
             name: "FilterSequence",
             table: "ReleaseSubject",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "IndicatorSequence",
             table: "ReleaseSubject",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

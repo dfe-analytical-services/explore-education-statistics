@@ -7,9 +7,10 @@ public static class ContentDbUtils
 {
     public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions(string databaseName)
     {
-        var builder = new DbContextOptionsBuilder<ContentDbContext>()
-            .UseInMemoryDatabase(databaseName,
-                b => b.EnableNullChecks(false));
+        var builder = new DbContextOptionsBuilder<ContentDbContext>().UseInMemoryDatabase(
+            databaseName,
+            b => b.EnableNullChecks(false)
+        );
 
         return builder.Options;
     }

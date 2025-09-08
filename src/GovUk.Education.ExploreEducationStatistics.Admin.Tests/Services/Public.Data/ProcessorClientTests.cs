@@ -23,7 +23,7 @@ public class ProcessorClientTests
     {
         _mockHttp = new MockHttpMessageHandler();
     }
-    
+
     public class AuthenticationTests : ProcessorClientTests
     {
         private static readonly Uri Uri = new(BaseUri, "api/CreateDataSet");
@@ -35,27 +35,29 @@ public class ProcessorClientTests
             {
                 DataSetId = Guid.NewGuid(),
                 DataSetVersionId = Guid.NewGuid(),
-                InstanceId = Guid.NewGuid()
+                InstanceId = Guid.NewGuid(),
             };
 
-            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
+            _mockHttp
+                .Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
-            var authenticationManager =
-                new Mock<IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>>(MockBehavior.Strict);
+            var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>>(
+                MockBehavior.Strict
+            );
 
             authenticationManager
-                .Setup(m =>
-                    m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            
-            var processorClient = BuildService(
-                azureAuthenticationManager: authenticationManager.Object);
-            
+
+            var processorClient = BuildService(azureAuthenticationManager: authenticationManager.Object);
+
             var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
-            authenticationManager.Verify(m => 
-                m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()), Times.Once);
+            authenticationManager.Verify(
+                m => m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
 
             response.AssertRight();
         }
@@ -72,14 +74,15 @@ public class ProcessorClientTests
             {
                 DataSetId = Guid.NewGuid(),
                 DataSetVersionId = Guid.NewGuid(),
-                InstanceId = Guid.NewGuid()
+                InstanceId = Guid.NewGuid(),
             };
 
-            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
+            _mockHttp
+                .Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -93,21 +96,17 @@ public class ProcessorClientTests
         [Fact]
         public async Task HttpClientBadRequest_ReturnsBadRequest()
         {
-            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
+            _mockHttp
+                .Expect(HttpMethod.Post, Uri.AbsoluteUri)
                 .Respond(
                     HttpStatusCode.BadRequest,
-                    JsonContent.Create(new ValidationProblemViewModel
-                    {
-                        Errors =
-                        [
-                            new() {
-                               Code = Errors.Error1.ToString()
-                            }
-                        ]
-                    }));
+                    JsonContent.Create(
+                        new ValidationProblemViewModel { Errors = [new() { Code = Errors.Error1.ToString() }] }
+                    )
+                );
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -126,14 +125,12 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotFound)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task HttpClientFailureStatusCode_ThrowsException(
-            HttpStatusCode responseStatusCode)
+        public async Task HttpClientFailureStatusCode_ThrowsException(HttpStatusCode responseStatusCode)
         {
-            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri)
-                .Respond(responseStatusCode);
+            _mockHttp.Expect(HttpMethod.Post, Uri.AbsoluteUri).Respond(responseStatusCode);
 
             var processorClient = BuildService();
-            
+
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
@@ -152,11 +149,12 @@ public class ProcessorClientTests
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+            _mockHttp
+                .Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
                 .Respond(HttpStatusCode.NoContent);
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -169,21 +167,17 @@ public class ProcessorClientTests
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+            _mockHttp
+                .Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
                 .Respond(
                     HttpStatusCode.BadRequest,
-                    JsonContent.Create(new ValidationProblemViewModel
-                    {
-                        Errors =
-                        [
-                            new() {
-                               Code = Errors.Error1.ToString()
-                            }
-                        ]
-                    }));
+                    JsonContent.Create(
+                        new ValidationProblemViewModel { Errors = [new() { Code = Errors.Error1.ToString() }] }
+                    )
+                );
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -191,17 +185,18 @@ public class ProcessorClientTests
             var left = response.AssertLeft();
             left.AssertValidationProblem(Errors.Error1);
         }
-        
+
         [Fact]
         public async Task HttpClientNotFound_ReturnsNotFound()
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
+            _mockHttp
+                .Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
                 .Respond(HttpStatusCode.NotFound);
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -219,16 +214,14 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task HttpClientFailureStatusCode_ThrowsException(
-            HttpStatusCode responseStatusCode)
+        public async Task HttpClientFailureStatusCode_ThrowsException(HttpStatusCode responseStatusCode)
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}")
-                .Respond(responseStatusCode);
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{dataSetVersionId}").Respond(responseStatusCode);
 
             var processorClient = BuildService();
-            
+
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await processorClient.DeleteDataSetVersion(dataSetVersionId);
@@ -247,11 +240,12 @@ public class ProcessorClientTests
         {
             var releaseVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
+            _mockHttp
+                .Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
                 .Respond(HttpStatusCode.NoContent);
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -264,21 +258,17 @@ public class ProcessorClientTests
         {
             var releaseVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
+            _mockHttp
+                .Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
                 .Respond(
                     HttpStatusCode.BadRequest,
-                    JsonContent.Create(new ValidationProblemViewModel
-                    {
-                        Errors =
-                        [
-                            new() {
-                               Code = Errors.Error1.ToString()
-                            }
-                        ]
-                    }));
+                    JsonContent.Create(
+                        new ValidationProblemViewModel { Errors = [new() { Code = Errors.Error1.ToString() }] }
+                    )
+                );
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -297,16 +287,14 @@ public class ProcessorClientTests
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
         [InlineData(HttpStatusCode.NotFound)]
-        public async Task HttpClientFailureStatusCode_ThrowsException(
-            HttpStatusCode responseStatusCode)
+        public async Task HttpClientFailureStatusCode_ThrowsException(HttpStatusCode responseStatusCode)
         {
             var releaseVersionId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}")
-                .Respond(responseStatusCode);
+            _mockHttp.Expect(HttpMethod.Delete, $"{Uri.AbsoluteUri}/{releaseVersionId}").Respond(responseStatusCode);
 
             var processorClient = BuildService();
-            
+
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
@@ -317,18 +305,16 @@ public class ProcessorClientTests
     }
 
     private ProcessorClient BuildService(
-        IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>? azureAuthenticationManager = null)
+        IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>? azureAuthenticationManager = null
+    )
     {
         var client = _mockHttp.ToHttpClient();
         client.BaseAddress = BaseUri;
 
-        var authenticationManager = azureAuthenticationManager ??
-                                    Mock.Of<IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>>(
-                                        MockBehavior.Loose);
-        return new ProcessorClient(
-            Mock.Of<ILogger<ProcessorClient>>(),
-            client,
-            authenticationManager);
+        var authenticationManager =
+            azureAuthenticationManager
+            ?? Mock.Of<IHttpClientAzureAuthenticationManager<PublicDataProcessorOptions>>(MockBehavior.Loose);
+        return new ProcessorClient(Mock.Of<ILogger<ProcessorClient>>(), client, authenticationManager);
     }
 
     private enum Errors

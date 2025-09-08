@@ -15,12 +15,15 @@ public class ReleaseUpdatesController(IReleaseUpdatesService releaseUpdatesServi
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/updates")]
     public async Task<ActionResult<PaginatedListViewModel<ReleaseUpdateDto>>> GetReleaseUpdates(
         [FromQuery] GetReleaseUpdatesRequest request,
-        CancellationToken cancellationToken = default) =>
-        await releaseUpdatesService.GetReleaseUpdates(
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseUpdatesService
+            .GetReleaseUpdates(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: request.Page,
                 pageSize: request.PageSize,
-                cancellationToken)
+                cancellationToken
+            )
             .HandleFailuresOrOk();
 }

@@ -36,39 +36,26 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
     {
         public void Configure(EntityTypeBuilder<FilterMeta> builder)
         {
-            builder.Property(m => m.PublicId)
-                .HasMaxLength(10);
+            builder.Property(m => m.PublicId).HasMaxLength(10);
 
-            builder.Property(m => m.Column)
-                .HasMaxLength(50);
+            builder.Property(m => m.Column).HasMaxLength(50);
 
-            builder.Property(m => m.Label)
-                .HasMaxLength(100);
+            builder.Property(m => m.Label).HasMaxLength(100);
 
-            builder.Property(m => m.DefaultOptionId)
-                .HasMaxLength(120);
+            builder.Property(m => m.DefaultOptionId).HasMaxLength(120);
 
-            builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId })
-                .IsUnique();
+            builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId }).IsUnique();
 
-            builder.HasIndex(m => new { m.DataSetVersionId, m.Column })
-                .IsUnique();
+            builder.HasIndex(m => new { m.DataSetVersionId, m.Column }).IsUnique();
 
-            builder.HasOne(m => m.DefaultOption)
-                .WithMany()
-                .HasForeignKey(m => m.DefaultOptionId);
+            builder.HasOne(m => m.DefaultOption).WithMany().HasForeignKey(m => m.DefaultOptionId);
 
-            builder.HasMany(m => m.Options)
+            builder
+                .HasMany(m => m.Options)
                 .WithMany(o => o.Metas)
                 .UsingEntity<FilterOptionMetaLink>(
-                    b => b
-                        .HasOne(l => l.Option)
-                        .WithMany(o => o.MetaLinks)
-                        .HasForeignKey(l => l.OptionId),
-                    b => b
-                        .HasOne(l => l.Meta)
-                        .WithMany(m => m.OptionLinks)
-                        .HasForeignKey(l => l.MetaId)
+                    b => b.HasOne(l => l.Option).WithMany(o => o.MetaLinks).HasForeignKey(l => l.OptionId),
+                    b => b.HasOne(l => l.Meta).WithMany(m => m.OptionLinks).HasForeignKey(l => l.MetaId)
                 );
         }
     }

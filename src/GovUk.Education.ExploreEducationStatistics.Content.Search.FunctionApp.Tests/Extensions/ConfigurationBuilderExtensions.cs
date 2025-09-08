@@ -5,5 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public static class ConfigurationBuilderExtensions
 {
-    public static IConfigurationBuilder AddJsonString(this IConfigurationBuilder builder, string json) => builder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(json)));
+    public static IConfigurationBuilder AddJsonString(this IConfigurationBuilder builder, string json) =>
+        builder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(json)));
 }

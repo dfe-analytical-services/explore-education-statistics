@@ -15,6 +15,6 @@ public record RelatedInformationDto
         {
             Id = link.Id,
             Title = link.Description,
-            Url = link.Url
+            Url = link.Url,
         };
 }
