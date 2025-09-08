@@ -88,12 +88,11 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
 
             Assert.Equal(originalDataSetVersionImport.Id, updatedDataSetVersionImport.Id);
 
-            var updatedDataSetVersion = publicDataDbContext
+            var updatedDataSetVersion = await publicDataDbContext
                 .DataSetVersions
-                .Single(import => import.Id == nextVersion.Id);
+                .SingleAsync(dsv => dsv.Id == nextVersion.Id);
             
-            // Assert the updated data set version is set to status 'Finalising' by the `CompleteNextDataSetVersionImport` function.
-            Assert.Equal(nextVersion.Id, updatedDataSetVersion.Id);
+            // Assert the updated data set version is set to status 'Finalising'.
             Assert.Equal(DataSetVersionStatus.Finalising, updatedDataSetVersion.Status);
             
             // Assert that the InstanceId has been set to a new unique value.
