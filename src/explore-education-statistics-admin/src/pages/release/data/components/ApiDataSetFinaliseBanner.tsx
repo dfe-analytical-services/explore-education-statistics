@@ -29,7 +29,10 @@ export default function ApiDataSetFinaliseBanner({
   publicationId,
   onFinalise,
 }: Props) {
-  if (finalisingStatus === 'finalising') {
+  if (
+    finalisingStatus === 'finalising' ||
+    draftVersionStatus === 'Finalising'
+  ) {
     return (
       <NotificationBanner
         fullWidthContent

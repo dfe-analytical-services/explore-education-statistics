@@ -68,7 +68,8 @@ export default function ReleaseApiDataSetDetailsPage() {
   useEffect(() => {
     if (
       finalisingStatus === 'finalising' &&
-      dataSet?.draftVersion?.status !== 'Mapping'
+      dataSet?.draftVersion?.status !== 'Mapping' &&
+      dataSet?.draftVersion?.status !== 'Finalising'
     ) {
       setFinalisingStatus('finalised');
     }
@@ -111,6 +112,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     canUpdateRelease,
     dataSet,
   );
+
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.draftVersion}
@@ -169,27 +171,29 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </li>
               </>
             )}
-            {canUpdateRelease && !isPatch && (
-              <li>
-                <DeleteDraftVersionButton
-                  dataSet={dataSet}
-                  dataSetVersion={dataSet.draftVersion}
-                  onDeleted={() =>
-                    history.push(
-                      generatePath<ReleaseRouteParams>(
-                        releaseApiDataSetsRoute.path,
-                        {
-                          publicationId: releaseVersion.publicationId,
-                          releaseVersionId: releaseVersion.id,
-                        },
-                      ),
-                    )
-                  }
-                >
-                  Remove draft version
-                </DeleteDraftVersionButton>
-              </li>
-            )}
+            {canUpdateRelease &&
+              !isPatch &&
+              dataSet?.draftVersion?.status !== 'Finalising' && (
+                <li>
+                  <DeleteDraftVersionButton
+                    dataSet={dataSet}
+                    dataSetVersion={dataSet.draftVersion}
+                    onDeleted={() =>
+                      history.push(
+                        generatePath<ReleaseRouteParams>(
+                          releaseApiDataSetsRoute.path,
+                          {
+                            publicationId: releaseVersion.publicationId,
+                            releaseVersionId: releaseVersion.id,
+                          },
+                        ),
+                      )
+                    }
+                  >
+                    Remove draft version
+                  </DeleteDraftVersionButton>
+                </li>
+              )}
           </ul>
         )
       }
@@ -262,6 +266,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const showDraftVersionTasks =
     dataSet?.draftVersion?.status !== 'Processing' &&
+    dataSet?.draftVersion?.status !== 'Finalising' &&
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||

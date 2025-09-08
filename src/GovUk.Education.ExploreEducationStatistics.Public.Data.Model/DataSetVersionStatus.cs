@@ -11,6 +11,7 @@ public enum DataSetVersionStatus
     Failed,
     Mapping,
     Draft,
+    Finalising,
     Published,
     Deprecated,
     Withdrawn,
