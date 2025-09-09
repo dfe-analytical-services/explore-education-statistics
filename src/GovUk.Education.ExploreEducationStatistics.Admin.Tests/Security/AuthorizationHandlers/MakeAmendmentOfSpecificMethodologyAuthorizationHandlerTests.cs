@@ -28,8 +28,8 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
-        Id = Guid.NewGuid(),
-        PublishingStrategy = Immediately,
+        Id = Guid.NewGuid(), 
+        PublishingStrategy = Immediately, 
         MethodologyId = Guid.NewGuid()
     };
 
@@ -66,8 +66,8 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
+                        .ReturnsAsync([]);
                 }
 
                 var user = DataFixture
@@ -142,7 +142,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                         .ReturnsAsync(ListOf(role));
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -178,7 +178,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id, false))
                 .ReturnsAsync(new List<PublicationRole>());
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
