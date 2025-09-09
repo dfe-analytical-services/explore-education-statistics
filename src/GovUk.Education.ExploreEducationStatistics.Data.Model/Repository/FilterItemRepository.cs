@@ -50,10 +50,11 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
                 innerKeySelector: observationFilterItem => observationFilterItem.ObservationId,
                 resultSelector: (observation, observationFilterItem) => observationFilterItem.FilterItemId)
             .Distinct();
-        
-        var filterItems = await context
+
+        return await context
             .FilterItem
             .AsNoTracking()
+            .TagWith("WithOptions: OPTION(HASH JOIN)")
             .Include(filterItem => filterItem.FilterGroup)
             .ThenInclude(filterGroup => filterGroup.Filter)
             .Where(filterItem => EF.Constant(filterGroupIdsForSubject).Contains(filterItem.FilterGroupId))
@@ -63,14 +64,6 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
                 innerKeySelector: matchedFilterItem => matchedFilterItem,
                 resultSelector: (filterItem, matchedFilterItem) => filterItem)
             .ToListAsync();
-
-        // var filterGroupsById = filtersForSubject
-        //     .SelectMany(filter => filter.FilterGroups)
-        //     .ToDictionary(filterGroup => filterGroup.Id);
-        //
-        // filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
-
-        return filterItems;
     }
 
     public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)
