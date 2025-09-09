@@ -1,0 +1,37 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: govuk-spacing(4);
+  margin-bottom: govuk-spacing(8);
+  padding: govuk-spacing(2);
+  // N.b there is no govuk colour token for this yet -
+  // it has been introduced as part of the recent rebrand.
+  // We can swap it out for a token when available.
+  background-color: #f4f8fb;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: govuk-spacing(6);
+  row-gap: govuk-spacing(4);
+  margin-inline: govuk-spacing(2);
+}
+
+.listItemTerm {
+  font-weight: normal;
+  color: $govuk-secondary-text-colour;
+}
+
+.listItemTermHidden {
+  visibility: hidden;
+}
+
+.listItemDefinition {
+  margin: 0;
+}

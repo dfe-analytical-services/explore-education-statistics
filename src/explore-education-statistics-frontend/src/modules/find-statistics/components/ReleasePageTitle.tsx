@@ -1,0 +1,47 @@
+import { useMobileMedia } from '@common/hooks/useMedia';
+import { PublicationSummaryRedesign } from '@common/services/publicationService';
+import SubscribeLink from '@frontend/components/SubscribeLink';
+import styles from '@frontend/modules/find-statistics/components/ReleasePageTitle.module.scss';
+import classNames from 'classnames';
+import React from 'react';
+
+interface Props {
+  publicationSummary: PublicationSummaryRedesign;
+  releaseTitle: string;
+}
+
+const ReleasePageTitle = ({ publicationSummary, releaseTitle }: Props) => {
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
+  return (
+    <div
+      className={classNames(
+        'govuk-!-margin-bottom-8',
+        styles.releasePageTitleWrap,
+      )}
+    >
+      <div className={styles.releasePageTitle}>
+        <span className="govuk-caption-xl" data-testid="page-title-caption">
+          {releaseTitle}
+        </span>
+        <h1
+          className="govuk-heading-xl govuk-!-margin-bottom-2"
+          data-testid="page-title"
+        >
+          {publicationSummary.title}
+        </h1>
+        <p className="govuk-body-l govuk-!-margin-bottom-0">
+          {publicationSummary.summary}
+        </p>
+      </div>
+      {!isMobileMedia && (
+        <div className="govuk-!-margin-bottom-4">
+          <SubscribeLink
+            url={`/subscriptions/new-subscription/${publicationSummary.slug}`}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+export default ReleasePageTitle;
