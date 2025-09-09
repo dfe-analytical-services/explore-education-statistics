@@ -223,7 +223,7 @@ export const testPublicationSummary: PublicationSummaryRedesign = {
   summary:
     'Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE’s regular attendance data',
   latestRelease: {
-    slug: '2024',
+    slug: 'release-slug',
     title: 'Calendar year 2024 - Final',
     id: 'release-version-summary-1',
   },
@@ -245,7 +245,7 @@ export const testPublicationSummary: PublicationSummaryRedesign = {
 
 export const testReleaseVersionSummary: ReleaseVersionSummary = {
   id: 'release-version-summary-1',
-  slug: '2024',
+  slug: 'release-slug',
   type: 'AccreditedOfficialStatistics',
   title: 'Calendar year 2024 - Final',
   yearTitle: '2024',

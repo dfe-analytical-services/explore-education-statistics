@@ -269,43 +269,49 @@ export interface ReleaseSitemapItem {
 
 const publicationService = {
   getPublicationSummaryRedesign(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     publicationSlug: string,
   ): Promise<PublicationSummaryRedesign> {
     // return contentApi.get(`/publications/${publicationSlug}`);
+    const basePublicationSummary = {
+      id: 'publication-summary-1',
+      title: 'Pupil attendance in schools',
+      slug: 'publication-slug',
+      summary:
+        'Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE’s regular attendance data',
+      latestRelease: {
+        slug: 'release-slug',
+        title: 'Calendar year 2024 - Final',
+        id: 'release-version-summary-1',
+      },
+      nextReleaseDate: { year: 2026, month: 3 },
+      theme: {
+        id: '323e4567-e89b-12d3-a456-426614174000',
+        title: 'Pupils and schools',
+        summary:
+          'Including absence, application and offers, capacity, exclusion and special educational needs (SEN) statistics',
+      },
+      contact: {
+        teamName: 'Test team',
+        teamEmail: 'test@test.com',
+        contactName: 'Joe Bloggs',
+        contactTelNo: '01234 567890',
+        id: 'contact-id',
+      },
+    };
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve({
-          id: 'publication-summary-1',
-          title: 'Pupil attendance in schools',
-          slug: 'publication-slug',
-          summary:
-            'Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE’s regular attendance data',
-          // supersededByPublication: {
-          //   id: '223e4567-e89b-12d3-a456-426614174000',
-          //   title: 'Superseding publication',
-          //   slug: 'superseding-publication',
-          // },
-          latestRelease: {
-            slug: '2024',
-            title: 'Calendar year 2024 - Final',
-            id: 'release-version-summary-1',
-          },
-          nextReleaseDate: { year: 2026, month: 3 },
-          theme: {
-            id: '323e4567-e89b-12d3-a456-426614174000',
-            title: 'Pupils and schools',
-            summary:
-              'Including absence, application and offers, capacity, exclusion and special educational needs (SEN) statistics',
-          },
-          contact: {
-            teamName: 'Test team',
-            teamEmail: 'test@test.com',
-            contactName: 'Joe Bloggs',
-            contactTelNo: '01234 567890',
-            id: 'contact-id',
-          },
-        });
+        resolve(
+          publicationSlug === 'superseded-publication'
+            ? {
+                ...basePublicationSummary,
+                supersededByPublication: {
+                  id: '223e4567-e89b-12d3-a456-426614174000',
+                  title: 'Superseding publication',
+                  slug: 'superseding-publication',
+                },
+              }
+            : basePublicationSummary,
+        );
       }, 500);
     });
   },
@@ -345,7 +351,7 @@ const publicationService = {
       setTimeout(() => {
         resolve({
           id: 'release-version-summary-1',
-          slug: '2024',
+          slug: 'release-slug',
           type: 'AccreditedOfficialStatistics',
           title: 'Calendar year 2024 - Final',
           yearTitle: '2024',

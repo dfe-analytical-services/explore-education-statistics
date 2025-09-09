@@ -38,9 +38,7 @@ const PublicationReleasePage: NextPage<Props> = ({
       releaseVersionSummary={releaseVersionSummary}
     />
   ) : (
-    releaseVersion && (
-      <PublicationReleasePageCurrent releaseVersion={releaseVersion} />
-    )
+    <PublicationReleasePageCurrent releaseVersion={releaseVersion} />
   );
 };
 
