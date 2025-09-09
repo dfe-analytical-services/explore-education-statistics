@@ -1896,7 +1896,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentSection", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EducationInNumbersPage", "EducationInNumbersPage")
-                        .WithMany()
+                        .WithMany("Content")
                         .HasForeignKey("EducationInNumbersPageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2502,6 +2502,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", b =>
                 {
                     b.Navigation("Errors");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EducationInNumbersPage", b =>
+                {
+                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentSection", b =>
