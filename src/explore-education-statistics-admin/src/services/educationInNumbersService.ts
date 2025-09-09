@@ -1,6 +1,6 @@
 import client from '@admin/services/utils/service';
 
-export interface EducationInNumbersSummary {
+export interface EinSummary {
   id: string;
   title: string;
   slug?: string;
@@ -9,8 +9,7 @@ export interface EducationInNumbersSummary {
   published?: string;
 }
 
-export interface EducationInNumbersSummaryWithPrevVersion
-  extends EducationInNumbersSummary {
+export interface EinSummaryWithPrevVersion extends EinSummary {
   previousVersionId?: string;
 }
 
@@ -25,34 +24,30 @@ export interface UpdateEducationInNumbersPageRequest {
 }
 
 const educationInNumbersService = {
-  getEducationInNumbersPage(id: string): Promise<EducationInNumbersSummary> {
+  getEducationInNumbersPage(id: string): Promise<EinSummary> {
     return client.get(`/education-in-numbers/${id}`);
   },
-  listLatestPages(): Promise<EducationInNumbersSummaryWithPrevVersion[]> {
+  listLatestPages(): Promise<EinSummaryWithPrevVersion[]> {
     return client.get('/education-in-numbers');
   },
   createEducationInNumbersPage(
     page: CreateEducationInNumbersPageRequest,
-  ): Promise<EducationInNumbersSummary> {
+  ): Promise<EinSummary> {
     return client.post('/education-in-numbers', page);
   },
   updateEducationInNumbersPage(
     educationInNumbersPageId: string,
     page: UpdateEducationInNumbersPageRequest,
-  ): Promise<EducationInNumbersSummary> {
+  ): Promise<EinSummary> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}`,
       page,
     );
   },
-  publishEducationInNumbersPage(
-    id: string,
-  ): Promise<EducationInNumbersSummary> {
+  publishEducationInNumbersPage(id: string): Promise<EinSummary> {
     return client.patch(`/education-in-numbers/${id}/publish`);
   },
-  createEducationInNumbersPageAmendment(
-    id: string,
-  ): Promise<EducationInNumbersSummary> {
+  createEducationInNumbersPageAmendment(id: string): Promise<EinSummary> {
     return client.post(`/education-in-numbers/${id}/amendment`);
   },
   deleteEducationInNumbersPage(id: string): Promise<void> {

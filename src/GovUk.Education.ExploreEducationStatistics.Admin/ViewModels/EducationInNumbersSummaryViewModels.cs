@@ -1,10 +1,9 @@
 #nullable enable
-using System;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class EducationInNumbersSummaryViewModel
+public class EinSummaryViewModel
 {
     public Guid Id { get; set; }
 
@@ -22,7 +21,7 @@ public class EducationInNumbersSummaryViewModel
     public int Order { get; set; }
 }
 
-public class EducationInNumbersSummaryWithPrevVersionViewModel :  EducationInNumbersSummaryViewModel
+public class EinSummaryWithPrevVersionViewModel :  EinSummaryViewModel
 {
     public Guid? PreviousVersionId { get; set; }
 }

@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -6,10 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class EducationInNumbersExtensions
 {
-    public static EducationInNumbersSummaryViewModel ToViewModel(
+    public static EinSummaryViewModel ToSummaryViewModel(
         this EducationInNumbersPage page)
     {
-            return new EducationInNumbersSummaryViewModel
+            return new EinSummaryViewModel
             {
                 Id = page.Id,
                 Title = page.Title,
@@ -21,11 +20,11 @@ public static class EducationInNumbersExtensions
             };
     }
 
-    public static EducationInNumbersSummaryWithPrevVersionViewModel ToViewModel(
+    public static EinSummaryWithPrevVersionViewModel ToViewModel(
         this EducationInNumbersPage page,
         Guid? previousVersionId)
     {
-        return new EducationInNumbersSummaryWithPrevVersionViewModel
+        return new EinSummaryWithPrevVersionViewModel
         {
             Id = page.Id,
             Title = page.Title,

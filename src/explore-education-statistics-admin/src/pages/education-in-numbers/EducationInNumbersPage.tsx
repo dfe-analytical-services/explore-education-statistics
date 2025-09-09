@@ -17,7 +17,7 @@ import {
   educationInNumbersSummaryRoute,
 } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService, {
-  EducationInNumbersSummary,
+  EinSummary,
 } from '@admin/services/educationInNumbersService';
 import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 
@@ -152,7 +152,7 @@ const EducationInNumbersPage = ({
   );
 };
 
-function GetStatusTag({ published, version }: EducationInNumbersSummary) {
+function GetStatusTag({ published, version }: EinSummary) {
   if (published === undefined) {
     return version === 0 ? <Tag>Draft</Tag> : <Tag>Draft amendment</Tag>;
   }

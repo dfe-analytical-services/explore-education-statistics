@@ -1,6 +1,6 @@
 import _educationInNumbersService, {
-  EducationInNumbersSummary,
-  EducationInNumbersSummaryWithPrevVersion,
+  EinSummary,
+  EinSummaryWithPrevVersion,
 } from '@admin/services/educationInNumbersService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
@@ -24,7 +24,7 @@ const educationInNumbersService = _educationInNumbersService as jest.Mocked<
 const useQueryMock = useQuery as jest.Mock;
 
 describe('EducationInNumbersListPage', () => {
-  const testDraftPage: EducationInNumbersSummaryWithPrevVersion = {
+  const testDraftPage: EinSummaryWithPrevVersion = {
     id: 'draft-page-id',
     title: 'Draft page',
     slug: 'draft-page',
@@ -32,7 +32,7 @@ describe('EducationInNumbersListPage', () => {
     version: 0,
   };
 
-  const testDraftAmendmentPage: EducationInNumbersSummaryWithPrevVersion = {
+  const testDraftAmendmentPage: EinSummaryWithPrevVersion = {
     id: 'draft-amendment-id',
     title: 'Draft amendment page',
     slug: 'draft-amendment-page',
@@ -41,7 +41,7 @@ describe('EducationInNumbersListPage', () => {
     previousVersionId: 'prev-version-id',
   };
 
-  const testPublishedPage: EducationInNumbersSummaryWithPrevVersion = {
+  const testPublishedPage: EinSummaryWithPrevVersion = {
     id: 'published-page-id',
     title: 'Published page',
     slug: 'published-page',
@@ -193,7 +193,7 @@ describe('EducationInNumbersListPage', () => {
   });
 
   test("'Create amendment' button calls service and navigates to the new summary page", async () => {
-    const newAmendment: EducationInNumbersSummary = {
+    const newAmendment: EinSummary = {
       id: 'new-amendment-id',
       title: 'Published page',
       slug: 'published-page',

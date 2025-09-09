@@ -1,28 +1,25 @@
-import methodologyContentService from '@admin/services/methodologyContentService';
-import { ContentBlockPostModel } from '@admin/services/types/content';
-import { Dictionary } from '@admin/types';
-import { useMethodologyContentDispatch } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
-import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
+import educationInNumbersContentService, {
+  EinContentBlockAddRequest,
+  EinEditableContentBlock,
+} from '@admin/services/educationInNumbersContentService';
+import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 
-export default function useMethodologyContentActions() {
-  const dispatch = useMethodologyContentDispatch();
+export default function useEducationInNumbersPageContentActions() {
+  const dispatch = useEducationInNumbersPageContentDispatch();
 
   async function deleteContentSectionBlock({
-    methodologyId,
+    educationInNumbersPageId,
     sectionId,
     blockId,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
-    sectionKey: ContentSectionKeys;
   }) {
-    await methodologyContentService.deleteContentSectionBlock({
-      methodologyId,
+    await educationInNumbersContentService.deleteContentSectionBlock({
+      educationInNumbersPageId,
       sectionId,
       blockId,
-      sectionKey,
     });
     dispatch({
       type: 'REMOVE_BLOCK_FROM_SECTION',
@@ -30,32 +27,28 @@ export default function useMethodologyContentActions() {
         meta: {
           sectionId,
           blockId,
-          sectionKey,
         },
       },
     });
   }
 
   async function updateContentSectionBlock({
-    methodologyId,
+    educationInNumbersPageId,
     sectionId,
     blockId,
     bodyContent,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
     bodyContent: string;
-    sectionKey: ContentSectionKeys;
   }) {
     const updateBlock =
-      await methodologyContentService.updateContentSectionBlock({
-        methodologyId,
+      await educationInNumbersContentService.updateContentSectionHtmlBlock({
+        educationInNumbersPageId,
         sectionId,
         blockId,
         block: { body: bodyContent },
-        sectionKey,
       });
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
@@ -63,68 +56,61 @@ export default function useMethodologyContentActions() {
         meta: {
           sectionId,
           blockId,
-          sectionKey,
         },
-        block: updateBlock,
+        block: updateBlock as EinEditableContentBlock,
       },
     });
   }
 
-  // NOTE: `order` could be removed from ContentBlockPostModel, as
+  // NOTE: `order` could be removed from EinContentBlockAddRequest, as
   // we only ever add new blocks to the end of all existing blocks. If
   // someone ever did provide an order that clashed with an existing block,
   // currently the frontend doesn't adjust the `order`s of existing blocks.
   async function addContentSectionBlock({
-    methodologyId,
+    educationInNumbersPageId,
     sectionId,
     block,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     sectionId: string;
-
-    block: ContentBlockPostModel;
-    sectionKey: ContentSectionKeys;
+    block: EinContentBlockAddRequest;
   }) {
-    const newBlock = await methodologyContentService.addContentSectionBlock({
-      methodologyId,
-      sectionId,
-      block,
-      sectionKey,
-    });
+    const newBlock =
+      await educationInNumbersContentService.addContentSectionBlock({
+        educationInNumbersPageId,
+        sectionId,
+        block,
+      });
     dispatch({
       type: 'ADD_BLOCK_TO_SECTION',
       payload: {
-        meta: { sectionId, sectionKey },
-        block: newBlock,
+        meta: { sectionId },
+        block: newBlock as EinEditableContentBlock,
       },
     });
     return newBlock;
   }
 
   async function updateSectionBlockOrder({
-    methodologyId,
+    educationInNumbersPageId,
     sectionId,
     order,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     sectionId: string;
-    order: Dictionary<number>;
-    sectionKey: ContentSectionKeys;
+    order: string[];
   }) {
-    const sectionContent =
-      await methodologyContentService.updateContentSectionBlocksOrder({
-        methodologyId,
+    const sectionBlocks =
+      await educationInNumbersContentService.updateContentSectionBlocksOrder({
+        educationInNumbersPageId,
         sectionId,
         order,
-        sectionKey,
       });
     dispatch({
       type: 'UPDATE_SECTION_CONTENT',
       payload: {
-        meta: { sectionId, sectionKey },
-        sectionContent,
+        meta: { sectionId },
+        sectionContent: sectionBlocks as EinEditableContentBlock[],
       },
     });
   }
@@ -134,23 +120,21 @@ export default function useMethodologyContentActions() {
   // someone ever did provide an order that clashed with an existing section,
   // currently the frontend doesn't adjust the `order`s of existing sections.
   async function addContentSection({
-    methodologyId,
+    educationInNumbersPageId,
     order,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     order: number;
-    sectionKey: ContentSectionKeys;
   }) {
-    const newSection = await methodologyContentService.addContentSection({
-      methodologyId,
-      order,
-      sectionKey,
-    });
+    const newSection = await educationInNumbersContentService.addContentSection(
+      {
+        educationInNumbersPageId,
+        order,
+      },
+    );
     dispatch({
       type: 'ADD_CONTENT_SECTION',
       payload: {
-        sectionKey,
         section: newSection,
       },
     });
@@ -158,47 +142,42 @@ export default function useMethodologyContentActions() {
   }
 
   async function updateContentSectionsOrder({
-    methodologyId,
+    educationInNumbersPageId,
     order,
-    sectionKey,
   }: {
-    methodologyId: string;
-    order: Dictionary<number>;
-    sectionKey: ContentSectionKeys;
+    educationInNumbersPageId: string;
+    order: string[];
   }) {
-    const content = await methodologyContentService.updateContentSectionsOrder({
-      methodologyId,
-      order,
-      sectionKey,
-    });
+    const content =
+      await educationInNumbersContentService.updateContentSectionsOrder({
+        educationInNumbersPageId,
+        order,
+      });
     dispatch({
       type: 'SET_CONTENT',
       payload: {
         content,
-        sectionKey,
       },
     });
   }
 
   async function removeContentSection({
-    methodologyId,
+    educationInNumbersPageId,
     sectionId,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     sectionId: string;
-    sectionKey: ContentSectionKeys;
   }) {
-    const content = await methodologyContentService.removeContentSection({
-      methodologyId,
-      sectionId,
-      sectionKey,
-    });
+    const content = await educationInNumbersContentService.removeContentSection(
+      {
+        educationInNumbersPageId,
+        sectionId,
+      },
+    );
     dispatch({
       type: 'SET_CONTENT',
       payload: {
         content,
-        sectionKey,
       },
     });
 
@@ -206,29 +185,25 @@ export default function useMethodologyContentActions() {
   }
 
   async function updateContentSectionHeading({
-    methodologyId,
+    educationInNumbersPageId,
     sectionId,
     heading,
-    sectionKey,
   }: {
-    methodologyId: string;
+    educationInNumbersPageId: string;
     sectionId: string;
     heading: string;
-    sectionKey: ContentSectionKeys;
   }) {
-    const section = await methodologyContentService.updateContentSectionHeading(
-      {
-        methodologyId,
+    const section =
+      await educationInNumbersContentService.updateContentSectionHeading({
+        educationInNumbersPageId,
         sectionId,
         heading,
-        sectionKey,
-      },
-    );
+      });
 
     dispatch({
       type: 'UPDATE_CONTENT_SECTION',
       payload: {
-        meta: { sectionId, sectionKey },
+        meta: { sectionId },
         section,
       },
     });

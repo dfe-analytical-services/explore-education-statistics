@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -28,4 +27,6 @@ public class EducationInNumbersPage
     public DateTimeOffset? Updated { get; set; }
 
     public Guid? UpdatedById { get; set; }
+
+    public List<EinContentSection> Content { get; set; } = new();
 }
