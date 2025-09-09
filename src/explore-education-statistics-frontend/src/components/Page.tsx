@@ -4,6 +4,7 @@ import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
+import Link from './Link';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
@@ -26,6 +27,7 @@ type Props = {
   customBannerContent?: ReactNode;
   width?: PageWidth;
   isHomepage?: boolean;
+  backLinkDestination?: string; // Back link overrides breadcrumbs if provided
 } & BreadcrumbsProps;
 
 const Page = ({
@@ -43,6 +45,7 @@ const Page = ({
   width,
   isHomepage = false,
   breadcrumbs = [],
+  backLinkDestination,
 }: Props) => {
   return (
     <>
@@ -67,13 +70,19 @@ const Page = ({
 
         {customBannerContent}
 
-        <Breadcrumbs
-          breadcrumbs={
-            isHomepage
-              ? undefined
-              : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
-          }
-        />
+        {backLinkDestination ? (
+          <Link className="govuk-back-link" to={backLinkDestination}>
+            Back
+          </Link>
+        ) : (
+          <Breadcrumbs
+            breadcrumbs={
+              isHomepage
+                ? undefined
+                : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
+            }
+          />
+        )}
 
         <main
           className="govuk-main-wrapper app-main-class"
