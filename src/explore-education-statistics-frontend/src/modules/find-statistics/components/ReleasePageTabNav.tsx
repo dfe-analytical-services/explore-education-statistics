@@ -1,6 +1,13 @@
+import { Dictionary } from '@common/types';
+import ensureTrailingSlash from '@common/utils/string/ensureTrailingSlash';
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageTabNav.module.scss';
 import React from 'react';
+
+type ReleasePageItem = Dictionary<{
+  title: string;
+  slug: string;
+}>;
 
 export const releasePageItems = {
   home: {
@@ -12,17 +19,17 @@ export const releasePageItems = {
     slug: 'explore',
   },
   methodology: {
-    title: 'Methodology and guidance',
+    title: 'Methodology',
     slug: 'methodology',
   },
   help: {
     title: 'Help and related information',
     slug: 'help',
   },
-} as const;
+} as const satisfies ReleasePageItem;
 
-export type ReleasePageItem = typeof releasePageItems;
-export type ReleasePageKey = keyof ReleasePageItem;
+export type ReleasePageItems = typeof releasePageItems;
+export type ReleasePageKey = keyof ReleasePageItems;
 
 interface Props {
   activePage: ReleasePageKey;
@@ -37,7 +44,7 @@ const ReleasePageTabNav = ({ activePage, releaseUrlBase }: Props) => {
           <li key={key}>
             <Link
               className={styles.navItem}
-              to={`${releaseUrlBase}${slug}`}
+              to={`${ensureTrailingSlash(releaseUrlBase)}${slug}`}
               aria-current={activePage === key ? 'page' : undefined}
               unvisited
             >

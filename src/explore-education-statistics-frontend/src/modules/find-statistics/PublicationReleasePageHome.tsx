@@ -23,7 +23,7 @@ const PublicationReleasePage: NextPage<Props> = ({
     >
       <ReleasePageTabNav
         activePage="home"
-        releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}/`}
+        releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
       />
       <p>Home</p>
     </ReleasePageShell>

@@ -36,7 +36,7 @@ describe('ReleasePageIntro', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not render latest release tag when publication is superseded', () => {
+  test('does not render latest/not latest release tag when publication is superseded', () => {
     const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
       ...testPublicationSummary,
       supersededByPublication: {
@@ -53,6 +53,9 @@ describe('ReleasePageIntro', () => {
     );
 
     expect(screen.queryByText('Latest release')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Not the latest release'),
+    ).not.toBeInTheDocument();
   });
 
   test('renders not latest release link and tag when publication is not the latest', () => {

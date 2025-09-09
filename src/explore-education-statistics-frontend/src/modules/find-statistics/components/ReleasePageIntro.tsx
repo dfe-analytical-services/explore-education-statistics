@@ -54,18 +54,22 @@ const ReleasePageIntro = ({
       )}
 
       <div className={styles.container}>
-        {!supersededByPublication && releaseVersionSummary.isLatestRelease ? (
-          <Tag>Latest release</Tag>
-        ) : (
+        {!supersededByPublication && (
           <>
-            <Tag colour="orange">Not the latest release</Tag>
-            <Link
-              className="govuk-!-display-none-print"
-              unvisited
-              to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}?redesign=true`} // TODO EES-6449 remove query param when live
-            >
-              View latest release: {latestRelease.title}
-            </Link>
+            {releaseVersionSummary.isLatestRelease ? (
+              <Tag>Latest release</Tag>
+            ) : (
+              <>
+                <Tag colour="orange">Not the latest release</Tag>
+                <Link
+                  className="govuk-!-display-none-print"
+                  unvisited
+                  to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}?redesign=true`} // TODO EES-6449 remove query param when live
+                >
+                  View latest release: {latestRelease.title}
+                </Link>
+              </>
+            )}
           </>
         )}
 

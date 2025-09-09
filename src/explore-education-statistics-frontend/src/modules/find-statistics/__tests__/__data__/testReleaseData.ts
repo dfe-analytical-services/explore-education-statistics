@@ -222,11 +222,6 @@ export const testPublicationSummary: PublicationSummaryRedesign = {
   slug: 'publication-slug',
   summary:
     'Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE’s regular attendance data',
-  // supersededByPublication: {
-  //   id: '223e4567-e89b-12d3-a456-426614174000',
-  //   title: 'Superseding publication',
-  //   slug: 'superseding-publication',
-  // },
   latestRelease: {
     slug: '2024',
     title: 'Calendar year 2024 - Final',
@@ -258,18 +253,6 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
   label: 'Final',
   published: '2025-08-10T09:30:00+01:00',
   lastUpdated: '2025-08-11T14:30:00+01:00',
-  // publishingOrganisations: [
-  //   {
-  //     id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
-  //     title: 'Department for Education',
-  //     url: 'https://www.gov.uk/government/organisations/department-for-education',
-  //   },
-  //   {
-  //     id: '5e089801-ce1a-e274-9915-e83f3e978699',
-  //     title: 'Skills England',
-  //     url: 'https://www.gov.uk/government/organisations/skills-england',
-  //   },
-  // ],
   isLatestRelease: true,
   updateCount: 5,
 };

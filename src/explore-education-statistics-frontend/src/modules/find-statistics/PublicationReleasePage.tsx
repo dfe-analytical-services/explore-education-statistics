@@ -10,12 +10,21 @@ import React from 'react';
 import PublicationReleasePageHome from './PublicationReleasePageHome';
 import PublicationReleasePageCurrent from './PublicationReleasePageCurrent';
 
-interface Props {
-  publicationSummary?: PublicationSummaryRedesign;
-  releaseVersionSummary?: ReleaseVersionSummary;
-  releaseVersion?: ReleaseVersion;
-  previewRedesign?: boolean;
+interface PreviewRedesignProps {
+  previewRedesign: true;
+  publicationSummary: PublicationSummaryRedesign;
+  releaseVersionSummary: ReleaseVersionSummary;
+  releaseVersion?: never;
 }
+
+interface CurrentReleaseProps {
+  previewRedesign?: never;
+  releaseVersion: ReleaseVersion;
+  publicationSummary?: never;
+  releaseVersionSummary?: never;
+}
+
+type Props = PreviewRedesignProps | CurrentReleaseProps;
 
 const PublicationReleasePage: NextPage<Props> = ({
   publicationSummary,
@@ -23,7 +32,7 @@ const PublicationReleasePage: NextPage<Props> = ({
   releaseVersionSummary,
   previewRedesign,
 }) => {
-  return previewRedesign && releaseVersionSummary && publicationSummary ? (
+  return previewRedesign ? (
     <PublicationReleasePageHome
       publicationSummary={publicationSummary}
       releaseVersionSummary={releaseVersionSummary}
@@ -43,19 +52,14 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
       redesign,
     } = query as Dictionary<string>;
 
-    if (
-      redesign &&
-      redesign === 'true' &&
-      process.env.APP_ENV !== 'Production'
-    ) {
-      const publicationSummary = await publicationService.getPublicationSummary(
-        publicationSlug,
-      );
+    if (redesign === 'true' && process.env.APP_ENV !== 'Production') {
+      const publicationSummary =
+        await publicationService.getPublicationSummaryRedesign(publicationSlug);
 
       if (!releaseSlug) {
         return {
           redirect: {
-            destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}`,
+            destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}?redesign=true`, // TODO EES-6449 remove redesign query param
             permanent: true,
           },
         };

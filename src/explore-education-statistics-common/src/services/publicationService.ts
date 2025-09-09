@@ -193,6 +193,7 @@ export interface ReleaseVersion<
   hasDataGuidance: boolean;
 }
 
+// Used for the redesigned release pages
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
@@ -267,7 +268,7 @@ export interface ReleaseSitemapItem {
 }
 
 const publicationService = {
-  getPublicationSummary(
+  getPublicationSummaryRedesign(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     publicationSlug: string,
   ): Promise<PublicationSummaryRedesign> {
@@ -340,9 +341,6 @@ const publicationService = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     releaseSlug: string,
   ): Promise<ReleaseVersionSummary> {
-    // return contentApi.get(
-    //   `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
-    // );
     return new Promise(resolve => {
       setTimeout(() => {
         resolve({
@@ -355,18 +353,18 @@ const publicationService = {
           label: 'Final',
           published: '2025-08-10T09:30:00+01:00',
           lastUpdated: '2025-08-11T14:30:00+01:00',
-          // publishingOrganisations: [
-          //   {
-          //     id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
-          //     title: 'Department for Education',
-          //     url: 'https://www.gov.uk/government/organisations/department-for-education',
-          //   },
-          //   {
-          //     id: '5e089801-ce1a-e274-9915-e83f3e978699',
-          //     title: 'Skills England',
-          //     url: 'https://www.gov.uk/government/organisations/skills-england',
-          //   },
-          // ],
+          publishingOrganisations: [
+            {
+              id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
+              title: 'Department for Education',
+              url: 'https://www.gov.uk/government/organisations/department-for-education',
+            },
+            {
+              id: '5e089801-ce1a-e274-9915-e83f3e978699',
+              title: 'Skills England',
+              url: 'https://www.gov.uk/government/organisations/skills-england',
+            },
+          ],
           isLatestRelease: true,
           updateCount: 5,
         });

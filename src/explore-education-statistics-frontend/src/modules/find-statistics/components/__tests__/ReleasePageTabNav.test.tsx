@@ -8,7 +8,7 @@ describe('ReleasePageTabNav', () => {
     render(
       <ReleasePageTabNav
         activePage="explore"
-        releaseUrlBase="/find-statistics/test-publication/test-slug/"
+        releaseUrlBase="/find-statistics/test-publication/test-slug"
       />,
     );
 
@@ -19,6 +19,7 @@ describe('ReleasePageTabNav', () => {
     expect(
       within(heading).getByRole('link', { name: 'Release home' }),
     ).not.toHaveAttribute('aria-current', 'page');
+
     expect(
       within(heading).getByRole('link', { name: 'Explore and download data' }),
     ).toHaveAttribute(
@@ -28,5 +29,29 @@ describe('ReleasePageTabNav', () => {
     expect(
       within(heading).getByRole('link', { name: 'Explore and download data' }),
     ).toHaveAttribute('aria-current', 'page');
+
+    expect(
+      within(heading).getByRole('link', { name: 'Methodology' }),
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/test-slug/methodology',
+    );
+    expect(
+      within(heading).getByRole('link', { name: 'Methodology' }),
+    ).not.toHaveAttribute('aria-current', 'page');
+
+    expect(
+      within(heading).getByRole('link', {
+        name: 'Help and related information',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/test-slug/help',
+    );
+    expect(
+      within(heading).getByRole('link', {
+        name: 'Help and related information',
+      }),
+    ).not.toHaveAttribute('aria-current', 'page');
   });
 });
