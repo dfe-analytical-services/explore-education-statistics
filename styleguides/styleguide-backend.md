@@ -38,7 +38,6 @@
 C# is the backend language used in this repository. This style guide is a list
 of agreed coding standards to conform to when writing C# code for this repository.
 
-
 <a id="s2"></a>
 ## 2 C# Language Rules 
 
@@ -52,9 +51,10 @@ of agreed coding standards to conform to when writing C# code for this repositor
 - Change existing files to use file scoped namespace declarations only if there are significant line changes or if files are small, to minimise the impact on readability of pull requests.
 
 <a id="s2.1.2"></a>
-#### 2.1.2 Implicitly Typed Local Variables
+#### 2.1.2 Implicitly Typed Local Variables and Constants
 
-- Prefer using the `var` keyword to declare local variables without specifying an explicit type.
+- Prefer using the `var` keyword to declare local variables without specifying an explicit type when the type is obvious from the right-hand side.
+- Use the `const` keyword to declare local numbers, Boolean values, strings, or null values as compile-time constants if they are not expected to change.
 
 <a id="s2.1.3"></a>
 #### 2.1.3 Named Parameters
@@ -119,7 +119,6 @@ of agreed coding standards to conform to when writing C# code for this repositor
     * The asynchronous versions appear to only be useful in specialist situations. The Microsoft documentation suggests that it is only useful when using the [`HiLoValueGenerator`](https://miro.com/app/board/o9J_ly21jhs=/?moveToWidget=3458764574909560501&cot=14)
 - Prefer to use `context.{EntityType}.Add` over `context.Add`
 
-
 <a id="s3"></a>
 ## 3 C# Testing Rules 
 
@@ -149,13 +148,13 @@ of agreed coding standards to conform to when writing C# code for this repositor
       public class SignInControllerTests : IntegrationTest<TestStartup>
       {
           public SignInControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp) {}
-    
+
               public class RegistrationTests : SignInControllerTests
               {
                   public RegistrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
                   {
                   }
-  
+
                   [Fact]
                   public async Task Success()
                   {
@@ -166,17 +165,17 @@ of agreed coding standards to conform to when writing C# code for this repositor
 <a id="s3.1.2"></a>
 #### 3.1.2 Separating common aspects of tests from the main test suites
 
-There are common aspects that crosscut certain layers of the application code, and for these aspects, it is often cleaner and clearer for us to 
+There are common aspects that crosscut certain layers of the application code, and for these aspects, it is often cleaner and clearer for us to
 separate those subsets of tests into separate test suites. Examples of this include Service Permissions
 (such as [ReleaseServicePermissionTests](src/GovUk.Education.ExploreEducationStatistics.Admin.Tests/Services/ReleaseServicePermissionTests.cs))
-and Caching-specific functionality 
+and Caching-specific functionality
 (such as [ReleaseControllerCachingTests](src/GovUk.Education.ExploreEducationStatistics.Content.Api.Tests/Controllers/ReleaseControllerCachingTests.cs)).
 
-Typically, these themes can be identified when they follow a very similar style of test setup, execution and verification, and may also leverage 
+Typically, these themes can be identified when they follow a very similar style of test setup, execution and verification, and may also leverage
 helper classes / utilities to reduce the boilerplate of these common patterns.
 
 - Observe the current codebase conventions of separating out groups of tests from main test suite classes if they fall into the following categories:
-  - Permission tests that use [UserService](src/GovUk.Education.ExploreEducationStatistics.Common/Services/Security/UserService.cs) as a basis for making 
+  - Permission tests that use [UserService](src/GovUk.Education.ExploreEducationStatistics.Common/Services/Security/UserService.cs) as a basis for making
   decisions. These will typically be separated into test suite classes named `<Class>PermissionsTests` e.g. `ReleaseServicePermissionsTests`.
   - Caching tests that use an implementation of [ICacheService](src/GovUk.Education.ExploreEducationStatistics.Common/Services/Interfaces/ICacheService.cs)
   or test methods annotated with a [CacheAttribute](src/GovUk.Education.ExploreEducationStatistics.Common/Cache/CacheAttribute.cs). These will typically be
@@ -218,7 +217,6 @@ of usage.
 #### 3.2.2.2 When To Use Mocks
 
 - Prefer using real dependencies rather than mocks for non-integration tests - unless the circumstances make this difficult.
-
 
 <a id="s3.3"></a>
 ### 3.3 Best Practices 
