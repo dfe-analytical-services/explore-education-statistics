@@ -35,7 +35,6 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
     {
         var filterGroupIdsForSubject = await context
             .Filter
-            .AsNoTracking()
             .Include(filter => filter.FilterGroups)
             .Where(filter => filter.SubjectId == subjectId)
             .SelectMany(filter => filter.FilterGroups)
@@ -43,7 +42,6 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
             .ToListAsync();
         
         var matchedFilterItemIds = matchedObservations
-            .AsNoTracking()
             .Join(
                 inner: context.ObservationFilterItem,
                 outerKeySelector: observation => observation.Id,
@@ -54,7 +52,7 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
         return await context
             .FilterItem
             .AsNoTracking()
-            .TagWith("WithOptions: OPTION(HASH JOIN)")
+            .WithSqlOptions("OPTION(HASH JOIN)")
             .Include(filterItem => filterItem.FilterGroup)
             .ThenInclude(filterGroup => filterGroup.Filter)
             .Where(filterItem => EF.Constant(filterGroupIdsForSubject).Contains(filterItem.FilterGroupId))
