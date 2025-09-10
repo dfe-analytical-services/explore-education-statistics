@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-public class QueryOptionsInterceptor(
+public class SqlServerQueryOptionsInterceptor(
     IQueryOptionsInterceptorSqlProcessor sqlProcessor) : DbCommandInterceptor
 {
     public override InterceptionResult<DbDataReader> ReaderExecuting(
@@ -63,7 +63,7 @@ public interface IQueryOptionsInterceptorSqlProcessor
     string Process(string sql);
 }
 
-public partial class QueryOptionsInterceptorSqlProcessor : IQueryOptionsInterceptorSqlProcessor
+public partial class SqlServerQueryOptionsInterceptorSqlProcessor : IQueryOptionsInterceptorSqlProcessor
 {
     /// <summary>
     /// A Regex for locating any line or block comments at the start of the SQL statement.

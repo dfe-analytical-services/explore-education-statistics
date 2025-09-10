@@ -229,7 +229,7 @@ public class Startup(
                             .AddBulkOperationSupport()
                             .EnableCustomRetryOnFailure()
                 )
-                .AddInterceptors(new QueryOptionsInterceptor(new QueryOptionsInterceptorSqlProcessor()))
+                .EnableSqlServerQueryOptionsInterceptor()
                 .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
         );
 
