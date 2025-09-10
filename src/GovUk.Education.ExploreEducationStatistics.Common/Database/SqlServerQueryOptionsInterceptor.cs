@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 /// <summary>
-/// A SQL Server-based SQL interceptor to pick up requested "OPTION" hints and convert them
+/// A SQL Server-based SQL interceptor to pick up requested OPTION hints and convert them
 /// into an actual OPTION clause.
 ///
-/// "OPTION" hints can be requested for specific queries by using the
-/// <see cref="EntityFrameworkQueryableExtensions.WithSqlServerOptions{T}"/> method.
+/// OPTION hints can be requested for specific queries by using the
+/// <see cref="EfQueryableExtensions.WithSqlServerOptions{T}"/> method.
 ///
 /// Note that in order for this interceptor to take effect, it must be registered with
 /// a SQL Server-based DbContext using
