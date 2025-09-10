@@ -11,8 +11,12 @@ public static class EntityFrameworkQueryableExtensions
     /// execution plans of preferred execution paths.
     ///
     /// The hints are added as comments to the generated SQL statement, which
-    /// are then picked up by <see cref="QueryOptionsInterceptor"/> and added
+    /// are then picked up by <see cref="SqlServerQueryOptionsInterceptor"/> and added
     /// to the end of the query.
+    ///
+    /// In order for the interceptor to take effect, it must be registered
+    /// with the matching DbContext at startup. Note that this can only be used with
+    /// a SQL Server-specific DbContext. 
     /// </summary>
     /// <param name="source">A SQL Server-based Linq query.</param>
     /// <param name="sqlOptionsString">
@@ -20,7 +24,7 @@ public static class EntityFrameworkQueryableExtensions
     /// </param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static IQueryable<T> WithSqlOptions<T>(
+    public static IQueryable<T> WithSqlServerOptions<T>(
         this IQueryable<T> source, string sqlOptionsString) where T : class?
         => source.TagWith($"WithOptions: {sqlOptionsString}");
 }

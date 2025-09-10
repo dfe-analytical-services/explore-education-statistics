@@ -8,9 +8,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Database;
 
-public abstract class QueryOptionsInterceptorTests
+public abstract class SqlServerQueryOptionsInterceptorTests
 {
-    public class QueryOptionsInterceptorSqlProcessorDependencyTests : QueryOptionsInterceptorTests
+    public class SqlServerQueryOptionsInterceptorSqlProcessorDependencyTests : SqlServerQueryOptionsInterceptorTests
     {
         [Fact]
         public void GivenSqlProcessor_WhenReaderExecutingCalled_ThenSqlProcessorIsCalled()
@@ -73,7 +73,7 @@ public abstract class QueryOptionsInterceptorTests
         }
 
         private static async Task AssertSqlProcessorCalledAsync<T>(
-            Func<QueryOptionsInterceptor, DbCommand, ValueTask<InterceptionResult<T>>> sqlInvokingMethod)
+            Func<SqlServerQueryOptionsInterceptor, DbCommand, ValueTask<InterceptionResult<T>>> sqlInvokingMethod)
         {
             var sqlProcessor = new Mock<IQueryOptionsInterceptorSqlProcessor>(MockBehavior.Strict);
             
@@ -81,7 +81,7 @@ public abstract class QueryOptionsInterceptorTests
                 .Setup(s => s.Process("sql string"))
                 .Returns("processed sql string");
             
-            var sut = new QueryOptionsInterceptor(sqlProcessor.Object);
+            var sut = new SqlServerQueryOptionsInterceptor(sqlProcessor.Object);
             
             var dbCommand = new FakeCommand
             {
@@ -93,7 +93,7 @@ public abstract class QueryOptionsInterceptorTests
             Assert.Equal("processed sql string", dbCommand.CommandText);
         }
         
-        private static void AssertSqlProcessorCalled(Action<QueryOptionsInterceptor, DbCommand> sqlInvokingMethod)
+        private static void AssertSqlProcessorCalled(Action<SqlServerQueryOptionsInterceptor, DbCommand> sqlInvokingMethod)
         {
             AssertSqlProcessorCalledAsync((interceptor, dbCommand) =>
             {
@@ -103,7 +103,7 @@ public abstract class QueryOptionsInterceptorTests
         }
     }
     
-    public class QueryOptionsInterceptorSqlProcessorTests : QueryOptionsInterceptorTests
+    public class SqlServerSqlServerQueryOptionsInterceptorSqlProcessorTests : SqlServerQueryOptionsInterceptorTests
     {
         [Fact]
         public void GivenExistingSqlHasNoOptionClause_WhenWithOptionsPresent_ThenOptionsAddedToQuery()
@@ -215,7 +215,7 @@ public abstract class QueryOptionsInterceptorTests
 
         private static string ProcessSql(string sql)
         {
-            return new QueryOptionsInterceptorSqlProcessor().Process(sql);
+            return new SqlServerQueryOptionsInterceptorSqlProcessor().Process(sql);
         }
     }
 }

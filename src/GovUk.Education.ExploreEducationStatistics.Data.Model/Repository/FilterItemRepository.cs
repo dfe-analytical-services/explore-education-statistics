@@ -52,7 +52,7 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
         return await context
             .FilterItem
             .AsNoTracking()
-            .WithSqlOptions("OPTION(HASH JOIN)")
+            .WithSqlServerOptions("OPTION(HASH JOIN)")
             .Include(filterItem => filterItem.FilterGroup)
             .ThenInclude(filterGroup => filterGroup.Filter)
             .Where(filterItem => EF.Constant(filterGroupIdsForSubject).Contains(filterItem.FilterGroupId))
