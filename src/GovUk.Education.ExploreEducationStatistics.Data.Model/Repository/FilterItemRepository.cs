@@ -33,14 +33,6 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
         Guid subjectId,
         IQueryable<MatchedObservation> matchedObservations)
     {
-        var filterGroupIdsForSubject = await context
-            .Filter
-            .Include(filter => filter.FilterGroups)
-            .Where(filter => filter.SubjectId == subjectId)
-            .SelectMany(filter => filter.FilterGroups)
-            .Select(filterGroup => filterGroup.Id)
-            .ToListAsync();
-        
         var matchedFilterItemIds = matchedObservations
             .Join(
                 inner: context.ObservationFilterItem,
@@ -49,13 +41,20 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
                 resultSelector: (observation, observationFilterItem) => observationFilterItem.FilterItemId)
             .Distinct();
 
+        var filterGroupIdsForSubject = context
+            .Filter
+            .Include(filter => filter.FilterGroups)
+            .Where(filter => filter.SubjectId == subjectId)
+            .SelectMany(filter => filter.FilterGroups)
+            .Select(filterGroup => filterGroup.Id);
+        
         return await context
             .FilterItem
             .AsNoTracking()
             .WithSqlServerOptions("OPTION(HASH JOIN)")
             .Include(filterItem => filterItem.FilterGroup)
             .ThenInclude(filterGroup => filterGroup.Filter)
-            .Where(filterItem => EF.Constant(filterGroupIdsForSubject).Contains(filterItem.FilterGroupId))
+            .Where(filterItem => filterGroupIdsForSubject.Contains(filterItem.FilterGroupId))
             .Join(
                 inner: matchedFilterItemIds,
                 outerKeySelector: filterItem => filterItem.Id,
