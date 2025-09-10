@@ -1,5 +1,3 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
 public class SmallCsvStage1Scenario : IProcessorStage1TestScenario

@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -135,11 +130,8 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
 
         permalinkService
             .Setup(s => s
-                .DownloadCsvToStream(permalinkId, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Unit.Instance)
-            .Callback<Guid, Stream, CancellationToken>(
-                (_, stream, _) => { stream.WriteText("Test csv"); }
-            );
+                .GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("Test csv".ToStream());
 
         var client = SetupApp(permalinkService: permalinkService.Object)
             .CreateClient();
@@ -166,7 +158,7 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
 
         permalinkService
             .Setup(s => s
-                .DownloadCsvToStream(permalinkId, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         var client = SetupApp(permalinkService: permalinkService.Object)

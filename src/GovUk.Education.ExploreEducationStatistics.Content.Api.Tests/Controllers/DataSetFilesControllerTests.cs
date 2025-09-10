@@ -1,4 +1,4 @@
-#nullable enable
+using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -20,20 +20,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Xunit;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -1741,8 +1734,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     () => Assert.Equal(releaseFile.Summary, viewModel.Content),
                     () => Assert.Equal(releaseVersion.Id, viewModel.Release.Id),
                     () => Assert.Equal(release.Title, viewModel.Release.Title),
+                    () => Assert.Equal(release.Slug, viewModel.Release.Slug),
                     () => Assert.Equal(publication.Id, viewModel.Publication.Id),
                     () => Assert.Equal(publication.Title, viewModel.Publication.Title),
+                    () => Assert.Equal(publication.Slug, viewModel.Publication.Slug),
                     () => Assert.Equal(theme.Id, viewModel.Theme.Id),
                     () => Assert.Equal(theme.Title, viewModel.Theme.Title),
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId,
@@ -1753,7 +1748,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
                     () => Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api?.Id),
                     () => Assert.Equal(releaseFile.PublicApiDataSetVersionString, viewModel.Api?.Version)
-                );
+                    );
             });
         }
 

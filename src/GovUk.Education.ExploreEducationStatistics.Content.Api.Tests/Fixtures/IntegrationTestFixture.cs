@@ -1,22 +1,17 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using DotNet.Testcontainers.Containers;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Testcontainers.Azurite;
-using Xunit;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Services;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Testcontainers.Azurite;
+using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 
@@ -111,7 +106,8 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                     services.ReplaceService<IPublicBlobStorageService>(sp =>
                         new PublicBlobStorageService(
                             _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                 });

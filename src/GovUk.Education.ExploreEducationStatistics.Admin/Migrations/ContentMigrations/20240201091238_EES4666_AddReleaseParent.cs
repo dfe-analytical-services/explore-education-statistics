@@ -1,8 +1,7 @@
-﻿using System;
+﻿#nullable disable
+
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 

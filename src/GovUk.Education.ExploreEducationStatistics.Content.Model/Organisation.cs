@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using Generator.Equals;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;

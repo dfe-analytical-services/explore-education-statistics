@@ -1,4 +1,5 @@
 #nullable enable
+using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -20,12 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -130,12 +125,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -357,12 +352,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -488,12 +483,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -637,12 +632,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -772,12 +767,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -933,12 +928,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -1074,12 +1069,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -1344,12 +1339,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -1511,12 +1506,12 @@ public class ProcessorStage3Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources", import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);

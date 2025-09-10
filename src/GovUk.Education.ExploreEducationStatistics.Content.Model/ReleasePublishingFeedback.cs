@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
@@ -14,7 +13,11 @@ public record ReleasePublishingFeedback : ICreatedTimestamp<DateTime>
     public required Guid ReleaseVersionId { get; set; }
 
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
-    
+
+    public required string PublicationTitle { get; set; }
+
+    public required string ReleaseTitle { get; set; }
+
     public required PublicationRole UserPublicationRole { get; set; }
     
     public ReleasePublishingFeedbackResponse? Response { get; set; }

@@ -3,7 +3,6 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
-using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 

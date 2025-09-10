@@ -1,5 +1,3 @@
-#nullable enable
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -91,7 +89,5 @@ public class MappingProfiles : CommonMappingProfile
                     embedBlockLink.EmbedBlock.Url));
 
         CreateMap<HtmlBlock, HtmlBlockViewModel>();
-
-        CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
     }
 }

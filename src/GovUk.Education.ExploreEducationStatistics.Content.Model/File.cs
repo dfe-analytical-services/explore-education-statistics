@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using Generator.Equals;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 

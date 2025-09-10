@@ -310,19 +310,11 @@ Upload data files
     user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user clicks link    Replace data
-
-    user waits until h2 is visible    Data file details
-    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
+    user uploads subject replacement    Dates test subject    dates-replacement.csv    dates-replacement.meta.csv
+    user waits until page contains element    testid:Data file replacements table
 
 Navigate to data replacement page
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
-    user clicks button    Upload data files
-
-    user waits until page contains element    testid:Replacement Title
-    user reloads page
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
     user checks headed table body row cell contains    Data file import status    1    Complete

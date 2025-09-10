@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -78,6 +77,14 @@ public static class EitherTestExtensions
     {
         var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
         badRequest.AssertValidationProblem(expectedValidationErrors);
+        return either.Left;
+    }
+    
+    public static ActionResult AssertBadRequestWithErrorViewModels<TRight>(this Either<ActionResult, TRight> either,
+        List<ErrorViewModel> expectedErrorViewModels)
+    {
+        var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
+        badRequest.AssertBadRequestWithValidationErrors(expectedErrorViewModels);
         return either.Left;
     }
 

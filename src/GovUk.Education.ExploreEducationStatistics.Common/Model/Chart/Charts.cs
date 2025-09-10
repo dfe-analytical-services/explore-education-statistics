@@ -3,8 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.ChartType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;

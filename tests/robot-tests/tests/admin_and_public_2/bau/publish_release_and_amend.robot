@@ -191,7 +191,7 @@ Add embedded dashboard to third accordion section
 
     user updates embedded URL details in modal
     ...    Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics
+    ...    https://dfe-analytical-services.github.io/analysts-guide
 
     user presses keys    TAB
     user waits until page does not contain    URL must be on a permitted domain
@@ -200,7 +200,7 @@ Add embedded dashboard to third accordion section
 
     user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
 
 User navigates to Data blocks page to edit block
@@ -488,7 +488,7 @@ Verify embedded dashboard accordion section contains dashboard
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
 
 Return to Admin and create first amendment
@@ -509,24 +509,15 @@ Change the Release type
     ...    3000-01
     ...    Official statistics in development
 
-Navigate to data replacement page
-    user clicks link    Data and files
-    user waits until page contains data uploads table
-    user clicks link    Replace data
+Upload a replacement data set
+    user uploads subject replacement    Dates test subject    dates-replacement.csv    dates-replacement.meta.csv
+    user waits until page contains element    testid:Data file replacements table
 
-    user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Title    Dates test subject
-    user checks headed table body row contains    Data file    dates.csv
-    user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
-
-Upload replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
-    user clicks button    Upload data files
+Confirm data replacement details on replacement page
+    user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
+    user checks table cell contains    1    2    17 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
@@ -724,7 +715,7 @@ Update embedded dashboard title and url
 
     user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    https://dfe-analytical-services.github.io/dfeshiny
     ...    Edit embedded URL
 
     user presses keys    TAB
@@ -734,7 +725,7 @@ Update embedded dashboard title and url
 
     user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
+    user waits until h1 is visible    dfeshiny    %{WAIT_SMALL}
     unselect frame
 
     user closes accordion section    Test embedded dashboard section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}

@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using System;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;

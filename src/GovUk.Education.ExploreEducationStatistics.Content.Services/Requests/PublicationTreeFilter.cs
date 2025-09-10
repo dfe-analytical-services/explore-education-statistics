@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 

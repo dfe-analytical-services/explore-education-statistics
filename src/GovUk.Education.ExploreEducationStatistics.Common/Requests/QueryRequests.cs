@@ -1,8 +1,6 @@
 #nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using System;
-using System.Collections.Generic;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Requests;

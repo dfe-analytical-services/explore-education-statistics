@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -47,6 +43,7 @@ public class ReleaseNoteService : IReleaseNoteService
             {
                 _context.Update.Add(new Update
                 {
+                    // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
                     On = saveRequest.On ?? DateTime.Now,
                     Reason = saveRequest.Reason,
                     ReleaseVersionId = releaseVersion.Id,

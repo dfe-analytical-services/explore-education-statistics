@@ -1,9 +1,6 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -17,7 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 [JsonConverter(typeof(JsonKnownTypesConverter<ContentBlock>))]
 [JsonDiscriminator(Name = "Type")]
-[KnownType(typeof(MarkDownBlock))]
 [KnownType(typeof(DataBlock))]
 [KnownType(typeof(HtmlBlock))]
 [KnownType(typeof(EmbedBlockLink))]
@@ -55,15 +51,6 @@ public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTi
 
     [ConcurrencyCheck]
     public Guid? LockedById { get; set; }
-}
-
-public class MarkDownBlock : ContentBlock
-{
-    public MarkDownBlock()
-    {
-    }
-
-    public string Body { get; set; }
 }
 
 public class HtmlBlock : ContentBlock

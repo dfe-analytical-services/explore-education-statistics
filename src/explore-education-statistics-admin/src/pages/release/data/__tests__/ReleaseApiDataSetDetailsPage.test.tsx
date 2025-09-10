@@ -976,7 +976,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText(
-          'This API data set can not be published because it has incomplete location or filter manual mapping.',
+          'This API data set can not be published because location or filter mappings are not yet complete.',
         ),
       ).toThrow('Unable to find an element');
     });
@@ -1004,7 +1004,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it has incomplete location or filter manual mapping.',
+          'This API data set can not be published because location or filter mappings are not yet complete.',
           {
             selector: 'h2',
           },
@@ -1045,7 +1045,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it has incomplete location or filter manual mapping.',
+          'This API data set can not be published because location or filter mappings are not yet complete.',
           {
             selector: 'h2',
           },
@@ -1094,7 +1094,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because it has incomplete location or filter manual mapping.',
+          'This API data set can not be published because location or filter mappings are not yet complete.',
           {
             selector: 'h2',
           },

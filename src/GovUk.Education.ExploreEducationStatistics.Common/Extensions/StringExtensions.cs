@@ -1,15 +1,11 @@
 #nullable enable
-using AngleSharp.Text;
-using NaturalSort.Extension;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using AngleSharp.Text;
+using NaturalSort.Extension;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -197,5 +193,43 @@ public static class StringExtensions
         return BitConverter.ToString(md5.ComputeHash(inputBytes))
             .Replace("-", string.Empty)
             .ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Decodes a Base64 encoded string back to its original representation.
+    /// </summary>
+    /// <param name="input">The Base64 encoded string to be decoded. If null, the method returns null.</param>
+    /// <returns>
+    /// The original string decoded from the Base64 input, or null if the input is null.
+    /// </returns>
+    [return: NotNullIfNotNull(nameof(input))]
+    public static string? FromBase64String(this string? input)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+
+        var bytes = Convert.FromBase64String(input);
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    /// <summary>
+    /// Converts a string to its Base64 encoded representation.
+    /// </summary>
+    /// <param name="input">The input string to be encoded. If null, the method returns null.</param>
+    /// <returns>
+    /// A Base64 encoded string representation of the input, or null if the input is null.
+    /// </returns>
+    [return: NotNullIfNotNull(nameof(input))]
+    public static string? ToBase64String(this string? input)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(input);
+        return Convert.ToBase64String(bytes);
     }
 }

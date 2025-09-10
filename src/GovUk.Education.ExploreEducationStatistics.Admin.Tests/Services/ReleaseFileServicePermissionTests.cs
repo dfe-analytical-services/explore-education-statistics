@@ -15,12 +15,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -148,7 +146,7 @@ public class ReleaseFileServicePermissionTests
     }
 
     [Fact]
-    public async Task Stream()
+    public async Task GetDownloadToken()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
@@ -156,8 +154,10 @@ public class ReleaseFileServicePermissionTests
                 userService =>
                 {
                     var service = SetupReleaseFileService(userService: userService.Object);
-                    return service.Stream(releaseVersionId: _releaseVersion.Id,
-                        fileId: Guid.NewGuid());
+                    return service.GetBlobDownloadToken(
+                        releaseVersionId: _releaseVersion.Id,
+                        fileId: Guid.NewGuid(),
+                        cancellationToken: default);
                 }
             );
     }

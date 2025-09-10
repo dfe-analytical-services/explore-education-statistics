@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -238,7 +235,6 @@ public class UserRoleServicePermissionTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null)
     {
@@ -255,7 +251,6 @@ public class UserRoleServicePermissionTests
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
-            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
             userManager ?? MockUserManager().Object);
     }
 }

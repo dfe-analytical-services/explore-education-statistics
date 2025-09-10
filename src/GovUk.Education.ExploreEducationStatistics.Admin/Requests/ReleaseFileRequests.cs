@@ -1,6 +1,5 @@
 #nullable enable
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 

@@ -1,10 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
@@ -40,7 +35,7 @@ public record PaginatedListViewModel<T>
     /// <param name="allResults">All of the un-paginated results</param>
     /// <param name="page">The current page</param>
     /// <param name="pageSize">The size of each page</param>
-    public static Either<ActionResult, PaginatedListViewModel<T>> Paginate(
+    public static PaginatedListViewModel<T> Paginate(
         List<T> allResults,
         int page,
         int pageSize)
@@ -50,19 +45,12 @@ public record PaginatedListViewModel<T>
             .Take(pageSize)
             .ToList();
 
-        var paginatedViewModel = new PaginatedListViewModel<T>(
+        return new PaginatedListViewModel<T>(
             results: pagedResults,
             totalResults: allResults.Count,
             page: page,
             pageSize: pageSize
         );
-
-        if (paginatedViewModel.Paging.Page > paginatedViewModel.Paging.TotalPages)
-        {
-            return new NotFoundResult();
-        }
-
-        return paginatedViewModel;
     }
 }
 
@@ -87,7 +75,7 @@ public record PagingViewModel
         {
             throw new ArgumentException("Page size cannot be less than 1");
         }
-        
+
         Page = page;
         PageSize = pageSize;
         TotalResults = totalResults;

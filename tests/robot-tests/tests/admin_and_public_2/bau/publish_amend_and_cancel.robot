@@ -139,14 +139,14 @@ Add embedded dashboard to third accordion section
 
     ${modal}=    user updates embedded URL details in modal
     ...    Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics
+    ...    https://dfe-analytical-services.github.io/analysts-guide
 
     user clicks button    Save    ${modal}
     user waits until modal is not visible    Embed a URL
 
     user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame
 
 Add public prerelease access list
@@ -213,28 +213,41 @@ Change the Release type
     ...    3000-01
     ...    Official statistics in development
 
-Navigate to data replacement page
+Upload a replacement data set
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user clicks link    Replace data
+    user uploads subject replacement    Dates test subject    dates-replacement.csv
+    ...    dates-replacement.meta.csv
 
-Upload replacement data
-    user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
-    user clicks button    Upload data files
+Confirm data replacement via quick action
+    user waits until page contains element    testid:Data file replacements table
+    user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
+    user checks table cell contains    1    2    17 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
 
-    user waits until page contains element    testid:Replacement Title
-    user checks table column heading contains    1    1    Original file
-    user checks table column heading contains    1    2    Replacement file
-    user checks headed table body row cell contains    Data file import status    2    Complete
-    ...    wait=%{WAIT_DATA_FILE_IMPORT}
+    user clicks button    Confirm replacement
+    user waits until page contains data uploads table
+    user checks table cell contains    1    1    Dates test subject    testid:Data files table
+    user checks table cell contains    1    2    17 Kb    testid:Data files table
+    user checks table cell contains    1    3    Complete    testid:Data files table
 
-Confirm data replacement
-    user waits until page contains    Data blocks: OK
-    user waits until page contains    Footnotes: OK
-    user clicks button    Confirm data replacement
-    user waits until h2 is visible    Data replacement complete
+Upload a replacement data set using the button
+    user clicks button    Replace data
+    user chooses file    id:dataFileReplacementUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
+    user chooses file    id:dataFileReplacementUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
+    user clicks element    testid:upload-replacement-files-button
+
+Confirm data replacement via quick action
+    user waits until page contains element    testid:Data file replacements table
+    user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
+    user checks table cell contains    1    2    17 Kb    testid:Data file replacements table
+    user checks table cell contains    1    3    Ready    testid:Data file replacements table
+
+    user clicks button    Confirm replacement
+    user waits until page contains data uploads table
+    user checks table cell contains    1    1    Dates test subject    testid:Data files table
+    user checks table cell contains    1    2    17 Kb    testid:Data files table
+    user checks table cell contains    1    3    Complete    testid:Data files table
 
 Edit ancillary file and replace data
     [Documentation]    EES-4315
@@ -355,7 +368,7 @@ Update embedded dashboard title
 
     ${modal}=    user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
-    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    https://dfe-analytical-services.github.io/dfeshiny
     ...    Edit embedded URL
 
     user clicks button    Save    ${modal}
@@ -363,7 +376,7 @@ Update embedded dashboard title
 
     user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
+    user waits until h1 is visible    dfeshiny    %{WAIT_SMALL}
     unselect frame
 
 Cancel the release amendment
@@ -491,5 +504,5 @@ Verify that the Embedded URL accordion section is unchanged
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
+    user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
     unselect frame

@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;

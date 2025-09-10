@@ -1,10 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -96,7 +90,9 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
                     cancellationToken: cancellationToken
                 );
 
-            return await _releaseFileBlobService.StreamBlob(releaseFile, cancellationToken: cancellationToken);
+            return (await _releaseFileBlobService
+                .GetDownloadStream(releaseFile, cancellationToken: cancellationToken))
+                .Right;
         }
         catch (Exception exception)
         {

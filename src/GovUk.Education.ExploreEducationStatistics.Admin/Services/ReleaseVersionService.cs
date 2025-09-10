@@ -32,7 +32,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -55,6 +54,7 @@ public class ReleaseVersionService(
     IReleaseFileRepository releaseFileRepository,
     IReleaseDataFileService releaseDataFileService,
     IReleaseFileService releaseFileService,
+    IDataSetUploadRepository dataSetUploadRepository,
     IDataImportService dataImportService,
     IFootnoteRepository footnoteRepository,
     IDataBlockService dataBlockService,
@@ -64,6 +64,8 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
+    IUserReleaseInviteRepository userReleaseInviteRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<ReleaseVersionService> logger) : IReleaseVersionService
@@ -192,6 +194,9 @@ public class ReleaseVersionService(
             .OnSuccessDo(() => releaseFileService.DeleteAll(
                 releaseVersionId: releaseVersion.Id,
                 forceDelete: forceDeleteRelatedData))
+            .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(
+                releaseVersion.Id,
+                cancellationToken))
             .OnSuccessDo(async _ =>
             {
                 if (hardDeleteContentReleaseVersion)
@@ -260,9 +265,7 @@ public class ReleaseVersionService(
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        // We suspect this is only necessary for the unit tests, as the in-memory database doesn't perform a cascade delete
-        await DeleteRoles(releaseVersion.Id, hardDelete: true, cancellationToken);
-        await DeleteInvites(releaseVersion.Id, hardDelete: true, cancellationToken);
+        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
     }
 
     private async Task SoftDeleteReleaseVersion(
@@ -272,54 +275,19 @@ public class ReleaseVersionService(
         releaseVersion.SoftDeleted = true;
         context.ReleaseVersions.Update(releaseVersion);
 
-        await DeleteRoles(releaseVersion.Id, hardDelete: false, cancellationToken);
-        await DeleteInvites(releaseVersion.Id, hardDelete: false, cancellationToken);
+        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
     }
 
-    // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-    private async Task DeleteRoles(
-        Guid releaseVersionId,
-        bool hardDelete,
-        CancellationToken cancellationToken)
+    private async Task RemoveRolesAndInvites(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
-        var roles = await context
-            .UserReleaseRoles
-            .AsQueryable()
-            .Where(r => r.ReleaseVersionId == releaseVersionId)
-            .ToListAsync(cancellationToken);
+        // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
+        await userReleaseRoleRepository.RemoveForReleaseVersion(
+            releaseVersionId: releaseVersion.Id,
+            cancellationToken: cancellationToken);
 
-        if (hardDelete)
-        {
-            context.UserReleaseRoles.RemoveRange(roles);
-        }
-        else
-        {
-            roles.ForEach(r => r.SoftDeleted = true);
-            context.UpdateRange(roles);
-        }
-    }
-
-    // TODO: UserReleaseInvites deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-    private async Task DeleteInvites(
-        Guid releaseVersionId,
-        bool hardDelete,
-        CancellationToken cancellationToken)
-    {
-        var invites = await context
-            .UserReleaseInvites
-            .AsQueryable()
-            .Where(r => r.ReleaseVersionId == releaseVersionId)
-            .ToListAsync(cancellationToken);
-
-        if (hardDelete)
-        {
-            context.UserReleaseInvites.RemoveRange(invites);
-        }
-        else
-        {
-            invites.ForEach(r => r.SoftDeleted = true);
-            context.UpdateRange(invites);
-        }
+        await userReleaseInviteRepository.RemoveByReleaseVersion(
+            releaseVersionId: releaseVersion.Id,
+            cancellationToken: cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(
@@ -510,7 +478,7 @@ public class ReleaseVersionService(
                     .ToAsyncEnumerable()
                     .SelectAwait(async releaseVersion => mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion) with
                     {
-                        Permissions = await PermissionsUtils.GetReleasePermissions(userService, releaseVersion) 
+                        Permissions = await PermissionsUtils.GetReleasePermissions(userService, releaseVersion)
                     }).ToListAsync();
             });
     }
@@ -611,7 +579,7 @@ public class ReleaseVersionService(
                         Id = tuple.apiDataSetVersion.Id,
                         Version = tuple.apiDataSetVersion.PublicVersion,
                         Status = tuple.apiDataSetVersion.Status,
-                        Valid = ShouldAllowApiDataSetDeletion(tuple.apiDataSetVersion.Status) 
+                        Valid = ShouldAllowApiDataSetDeletion(tuple.apiDataSetVersion.Status)
                     };
 
                 return new DeleteDataFilePlanViewModel
@@ -653,7 +621,7 @@ public class ReleaseVersionService(
             throw new InvalidOperationException(
                 "A DRAFT release version's file cannot be linked to a PUBLISHED API.");
         }
-        
+
         return Unit.Instance;
     }
 
@@ -693,16 +661,16 @@ public class ReleaseVersionService(
 
     private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(DeleteDataFilePlanViewModel deletePlan)
     {
-         // Skip when Status == DataSetVersionStatus.Published;  
-         if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets
-             || deletePlan.ApiDataSetVersionPlan is null or { Valid: false })
-         {
-             return Unit.Instance;
-         }
-         
-         return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
+        // Skip when Status == DataSetVersionStatus.Published;  
+        if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            || deletePlan.ApiDataSetVersionPlan is null or { Valid: false })
+        {
+            return Unit.Instance;
+        }
+
+        return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
     }
-    
+
     public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
         Guid releaseVersionId,
         Guid fileId)
@@ -838,7 +806,7 @@ public class ReleaseVersionService(
         }
         return Unit.Instance;
     }
-    
+
     private async Task<DataSetVersionStatus?> GetDataSetVersionStatus(ReleaseFile releaseFile)
     {
         if (releaseFile.PublicApiDataSetId == null)
@@ -861,7 +829,7 @@ public class ReleaseVersionService(
                         $" Details: Data set id: {releaseFile.PublicApiDataSetId.Value} and the data set version number: {releaseFile.PublicApiDataSetVersionString}.");
                     throw notFoundException;
                 }).OnSuccess(dsv => versionStatus = dsv.Status);
-        
+
         return versionStatus;
     }
 

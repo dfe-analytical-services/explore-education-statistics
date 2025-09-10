@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record DataSetUploadViewModel

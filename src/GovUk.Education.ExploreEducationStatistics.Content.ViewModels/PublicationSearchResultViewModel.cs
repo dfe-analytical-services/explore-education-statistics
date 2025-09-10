@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -14,7 +15,7 @@ public record PublicationSearchResultViewModel
     public DateTime Published { get; init; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     public ReleaseType Type { get; init; }
 
     public int Rank { get; set; }

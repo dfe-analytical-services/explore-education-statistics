@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,11 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 using Semver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -70,7 +68,6 @@ public class ContentDbContext : DbContext
     public virtual DbSet<DataImport> DataImports { get; set; }
     public virtual DbSet<DataImportError> DataImportErrors { get; set; }
     public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
-    public virtual DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
     public virtual DbSet<EmbedBlock> EmbedBlocks { get; set; }
     public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
     public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
@@ -91,6 +88,9 @@ public class ContentDbContext : DbContext
     public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
     public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
+    public virtual DbSet<EducationInNumbersPage> EducationInNumbersPages { get; set; }
+    public virtual DbSet<EinContentSection> EinContentSections { get; set; }
+    public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -125,7 +125,6 @@ public class ContentDbContext : DbContext
         ConfigureDataBlock(modelBuilder);
         ConfigureHtmlBlock(modelBuilder);
         ConfigureEmbedBlockLink(modelBuilder);
-        ConfigureMarkdownBlock(modelBuilder);
         ConfigureFeaturedTable(modelBuilder);
         ConfigurePermalink(modelBuilder);
         ConfigureUser(modelBuilder);
@@ -140,6 +139,7 @@ public class ContentDbContext : DbContext
         ConfigureDataBlockVersion(modelBuilder);
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
+        ConfigureEinContentBlock(modelBuilder);
 
         // Apply model configuration for types which implement IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -166,8 +166,14 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<DataSetUpload>()
             .Property(upload => upload.ScreenerResult)
             .HasConversion(
-                r => System.Text.Json.JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
-                r => System.Text.Json.JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
+                r => JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                r => JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null));
+
+        modelBuilder.Entity<DataSetUpload>()
+            .Property(m => m.Created)
+            .HasConversion(
+                d => d,
+                d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
     }
 
     private static void ConfigureDataImport(ModelBuilder modelBuilder)
@@ -656,13 +662,6 @@ public class ContentDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
     }
 
-    private static void ConfigureMarkdownBlock(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<MarkDownBlock>()
-            .Property(block => block.Body)
-            .HasColumnName("Body");
-    }
-
     private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FeaturedTable>()
@@ -729,7 +728,7 @@ public class ContentDbContext : DbContext
         };
 
         modelBuilder.Entity<UserPublicationRole>()
-            .HasQueryFilter(upr => upr.Deleted == null && !unusedRoles.Contains(upr.Role));
+            .HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)
@@ -743,21 +742,13 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<UserReleaseRole>()
             .Property(r => r.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder.Entity<UserReleaseRole>()
-            .HasQueryFilter(r =>
-                !r.SoftDeleted
-                && r.Deleted == null);
     }
 
     private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserReleaseInvite>()
-            .Property(r => r.Role)
+            .Property(uri => uri.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder.Entity<UserReleaseInvite>()
-            .HasQueryFilter(r => !r.SoftDeleted);
 
         modelBuilder.Entity<UserReleaseInvite>()
             .Property(invite => invite.Created)
@@ -770,12 +761,21 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+        modelBuilder.Entity<UserReleaseInvite>()
+            .HasIndex(uri => new
+            {
+                uri.ReleaseVersionId,
+                uri.Email,
+                uri.Role
+            })
+            .IsUnique();
     }
 
     private static void ConfigureUserPublicationInvite(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserPublicationInvite>()
-            .Property(r => r.Role)
+            .Property(upi => upi.Role)
             .HasConversion(new EnumToStringConverter<PublicationRole>());
 
         modelBuilder.Entity<UserPublicationInvite>()
@@ -783,6 +783,15 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<UserPublicationInvite>()
+            .HasIndex(upi => new
+                {
+                    upi.PublicationId,
+                    upi.Email,
+                    upi.Role
+                })
+            .IsUnique();
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)
@@ -900,7 +909,7 @@ public class ContentDbContext : DbContext
             .IsRequired()
             .HasMaxLength(50);
     }
-    
+
     private static void ConfigureReleasePublishingFeedback(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ReleasePublishingFeedback>()
@@ -912,12 +921,12 @@ public class ContentDbContext : DbContext
             .Property(feedback => feedback.EmailToken)
             .IsRequired()
             .HasMaxLength(55);
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.UserPublicationRole)
             .HasConversion(new EnumToStringConverter<PublicationRole>())
             .IsRequired();
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.Response)
             .HasConversion(new EnumToStringConverter<ReleasePublishingFeedbackResponse>())
@@ -927,11 +936,11 @@ public class ContentDbContext : DbContext
             .Property(feedback => feedback.EmailToken)
             .IsRequired()
             .HasMaxLength(55);
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .HasIndex(feedback => feedback.EmailToken)
             .IsUnique();
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.Created)
             .HasConversion(
@@ -943,10 +952,17 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 v => v,
                 v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-        
+
         modelBuilder.Entity<ReleasePublishingFeedback>()
             .Property(feedback => feedback.AdditionalFeedback)
             .HasMaxLength(2000);
+    }
+
+    private static void ConfigureEinContentBlock(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<EinContentBlock>()
+            .HasDiscriminator<string>("Type")
+            .HasValue<EinHtmlBlock>("HtmlBlock");
     }
 }
 

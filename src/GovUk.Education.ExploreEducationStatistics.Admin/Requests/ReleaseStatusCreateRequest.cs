@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;

@@ -1,13 +1,9 @@
 #nullable enable
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
@@ -32,16 +28,16 @@ public class PermalinkController : ControllerBase
     {
         if (Request.AcceptsCsv(exact: true))
         {
-            Response.ContentDispositionAttachment(
-                contentType: ContentTypes.Csv,
-                filename: $"permalink-{permalinkId}.csv");
-
-            return await _permalinkService.DownloadCsvToStream( // TODO EES-5976 analytics
+            return await _permalinkService
+                .GetCsvDownloadStream( // TODO EES-5976 analytics
                     permalinkId: permalinkId,
-                    stream: Response.BodyWriter.AsStream(),
-                    cancellationToken: cancellationToken
-                )
-                .HandleFailuresOrNoOp();
+                    cancellationToken: cancellationToken)
+                .HandleFailuresOr(stream => new FileStreamResult(
+                    fileStream: stream,
+                    contentType: ContentTypes.Csv)
+                {
+                    FileDownloadName = $"permalink-{permalinkId}.csv"
+                });
         }
 
         return await _permalinkService

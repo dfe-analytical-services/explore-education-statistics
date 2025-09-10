@@ -102,7 +102,7 @@ export default function ReleaseDataUploadsSection({
 
         setAllDataFiles(currentDataFiles =>
           currentDataFiles.map(file =>
-            file.fileName !== dataFile.fileName
+            file.id !== dataFile.id
               ? file
               : {
                   ...dataFile,
@@ -129,7 +129,7 @@ export default function ReleaseDataUploadsSection({
 
         setAllDataFiles(currentDataFiles =>
           currentDataFiles.map(file =>
-            file.fileName !== updatedDataFile.fileName
+            file.id !== updatedDataFile.id
               ? file
               : {
                   ...updatedDataFile,
@@ -176,50 +176,10 @@ export default function ReleaseDataUploadsSection({
     );
   }, []);
 
-  const handleSubmit = useCallback(
-    async (values: DataFileUploadFormValues) => {
-      switch (values.uploadType) {
-        case 'csv': {
-          if (!values.title) {
-            return;
-          }
-
-          await releaseDataFileService.uploadDataSetFilePair(releaseVersionId, {
-            title: values.title,
-            dataFile: values.dataFile as File,
-            metadataFile: values.metadataFile as File,
-          });
-          break;
-        }
-        case 'zip': {
-          if (!values.title) {
-            return;
-          }
-          await releaseDataFileService.uploadZippedDataSetFilePair(
-            releaseVersionId,
-            {
-              title: values.title,
-              zipFile: values.zipFile as File,
-            },
-          );
-          break;
-        }
-        case 'bulkZip': {
-          await releaseDataFileService.uploadBulkZipDataSetFile(
-            releaseVersionId,
-            values.bulkZipFile!,
-          );
-          break;
-        }
-        default:
-          break;
-      }
-
-      await refetchDataFiles();
-      await refetchDataSetUploads();
-    },
-    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
-  );
+  const handleSubmit = async () => {
+    await refetchDataFiles();
+    await refetchDataSetUploads();
+  };
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
@@ -257,8 +217,12 @@ export default function ReleaseDataUploadsSection({
         <ul>
           <li>
             your data files have passed the checks in our{' '}
-            <a href="https://rsconnect/rsc/dfe-published-data-qa/">
-              screening app
+            <a
+              href="https://rsconnect/rsc/dfe-published-data-qa/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
+            >
+              screening app (opens in new tab)
             </a>
           </li>
           <li>
@@ -273,9 +237,21 @@ export default function ReleaseDataUploadsSection({
             </a>
           </li>
         </ul>
+        <h4>Data replacement</h4>
+        <p>
+          Files are expected to have a unique title, any files that are uploaded
+          with a title that matches an existing file will start a data
+          replacement instead of importing as a separate file.
+        </p>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={allDataFiles} onSubmit={handleSubmit} />
+        <DataFileUploadForm
+          dataSetFileTitles={dataFilesExcludingReplacements.map(
+            file => file.title,
+          )}
+          releaseVersionId={releaseVersionId}
+          onSubmit={handleSubmit}
+        />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
@@ -340,6 +316,7 @@ export default function ReleaseDataUploadsSection({
                     onDeleteFile={handleDeleteConfirm}
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
+                    onReplaceFile={handleSubmit}
                     onStatusChange={handleStatusChange}
                   />
                 )}

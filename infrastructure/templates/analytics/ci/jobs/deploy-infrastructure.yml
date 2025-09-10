@@ -21,8 +21,7 @@ jobs:
           steps:
             - checkout: self
 
-            - script: az upgrade --yes
-              displayName: Upgrade Azure CLI and extensions
+            - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

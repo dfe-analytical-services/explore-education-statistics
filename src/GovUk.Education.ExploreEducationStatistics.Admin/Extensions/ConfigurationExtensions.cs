@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Configuration;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class ConfigurationExtensions

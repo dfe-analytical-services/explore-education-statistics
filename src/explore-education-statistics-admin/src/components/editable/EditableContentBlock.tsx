@@ -11,7 +11,6 @@ import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import toHtml from '@admin/utils/markdown/toHtml';
 import ContentHtml from '@common/components/ContentHtml';
 import Tooltip from '@common/components/Tooltip';
 import { Dictionary } from '@common/types';
@@ -44,7 +43,6 @@ interface EditableContentBlockProps {
   transformImageAttributes?: (
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
-  useMarkdown?: boolean;
   value: string;
   onActive?: () => void;
   onAutoSave?: (value: string) => void;
@@ -72,7 +70,6 @@ const EditableContentBlock = ({
   hideLabel = false,
   toolbarConfig,
   transformImageAttributes,
-  useMarkdown,
   value,
   onActive,
   onAutoSave,
@@ -87,11 +84,6 @@ const EditableContentBlock = ({
 }: EditableContentBlockProps) => {
   const { comments } = useCommentsContext();
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const content = useMemo(
-    () => (useMarkdown ? toHtml(value) : value),
-    [useMarkdown, value],
-  );
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
     const commentTagFilter: TagFilter = frame =>
@@ -126,7 +118,7 @@ const EditableContentBlock = ({
       <EditableContentForm
         actionThrottle={actionThrottle}
         allowComments={allowComments}
-        content={content ? sanitizeHtml(content, sanitizeOptions) : ''}
+        content={value ? sanitizeHtml(value, sanitizeOptions) : ''}
         label={label}
         hideLabel={hideLabel}
         id={id}
@@ -184,7 +176,7 @@ const EditableContentBlock = ({
               <div inert="" ref={contentRef}>
                 <ContentHtml
                   getGlossaryEntry={glossaryService.getEntry}
-                  html={content || '<p>This section is empty</p>'}
+                  html={value || '<p>This section is empty</p>'}
                   sanitizeOptions={sanitizeOptions}
                 />
               </div>

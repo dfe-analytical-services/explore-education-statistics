@@ -1,10 +1,9 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+
 // ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;

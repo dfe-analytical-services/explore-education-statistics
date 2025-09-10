@@ -1,4 +1,3 @@
-using System;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;

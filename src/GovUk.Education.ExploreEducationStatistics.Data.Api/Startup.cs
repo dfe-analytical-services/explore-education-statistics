@@ -1,8 +1,12 @@
 #nullable enable
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
+using System.Text;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -22,36 +26,24 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationH
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json.Serialization;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
@@ -144,9 +136,12 @@ public class Startup
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
+        services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+            new PublicBlobStorageService(
+                connectionString: Configuration.GetValue<string>("PublicStorage")!,
+                logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()
@@ -183,6 +178,7 @@ public class Startup
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
         services.AddTransient<ILocationService, LocationService>();
+        services.AddSingleton<DateTimeProvider>();
         services.AddAnalytics(Configuration);
         
         services

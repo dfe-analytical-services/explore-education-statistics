@@ -1,16 +1,19 @@
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import React from 'react';
 import Link from './Link';
+import { PageWidth } from './Page';
 
 interface Props {
-  wide?: boolean;
+  width?: PageWidth;
 }
 
-const PageFooter = ({ wide }: Props) => (
+const PageFooter = ({ width }: Props) => (
   <footer className="govuk-footer" role="contentinfo">
     <div
       className={classNames('govuk-width-container', {
-        'dfe-width-container--wide': wide,
+        'dfe-width-container--wide': width === 'wide',
+        'dfe-width-container--full': width === 'full',
       })}
     >
       <svg
@@ -52,9 +55,12 @@ const PageFooter = ({ wide }: Props) => (
               <Link
                 className="govuk-footer__link"
                 to="https://www.gov.uk/government/organisations/department-for-education/about/personal-information-charter"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
                 data-testid="footer--privacy-notice-link"
               >
-                Privacy notice
+                Privacy notice{' '}
+                <VisuallyHidden>(opens in new tab)</VisuallyHidden>
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">
@@ -99,8 +105,11 @@ const PageFooter = ({ wide }: Props) => (
             <Link
               className="govuk-footer__link"
               to="https://www.gov.uk/government/organisations/department-for-education"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
             >
-              Department for Education
+              Department for Education{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>
           </div>
           <div className="govuk-footer__meta-custom">
@@ -108,8 +117,11 @@ const PageFooter = ({ wide }: Props) => (
             <Link
               className="govuk-footer__link"
               to="https://osr.statisticsauthority.gov.uk/what-we-do/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
             >
-              Office for Statistics Regulation
+              Office for Statistics Regulation{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>{' '}
             (OSR)
           </div>
@@ -132,9 +144,11 @@ const PageFooter = ({ wide }: Props) => (
             <Link
               className="govuk-footer__link"
               to="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-              rel="license"
+              rel="license noopener noreferrer nofollow"
+              target="_blank"
             >
-              Open Government Licence v3.0
+              Open Government Licence v3.0{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>
             , except where otherwise stated
           </span>
@@ -152,8 +166,11 @@ const PageFooter = ({ wide }: Props) => (
           <Link
             className="govuk-footer__link govuk-footer__copyright-logo"
             to="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+            rel="noopener noreferrer nofollow"
+            target="_blank"
           >
-            © Crown copyright
+            © Crown copyright{' '}
+            <VisuallyHidden>(opens in new tab)</VisuallyHidden>
           </Link>
         </div>
       </div>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;

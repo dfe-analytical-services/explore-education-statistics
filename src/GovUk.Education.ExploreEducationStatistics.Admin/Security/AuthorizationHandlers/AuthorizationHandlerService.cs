@@ -1,9 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -14,7 +10,11 @@ using IReleaseVersionRepository =
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class AuthorizationHandlerService
+public class AuthorizationHandlerService(
+    IReleaseVersionRepository releaseVersionRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IPreReleaseService preReleaseService)
 {
     private static readonly ReleaseRole[] ReleaseEditorRoles =
     {
@@ -32,23 +32,6 @@ public class AuthorizationHandlerService
             .Append(ReleaseRole.Approver)
             .ToList();
 
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
-    private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
-    private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
-    private readonly IPreReleaseService _preReleaseService;
-
-    public AuthorizationHandlerService(
-        IReleaseVersionRepository releaseVersionRepository,
-        IUserReleaseRoleRepository userReleaseRoleRepository,
-        IUserPublicationRoleRepository userPublicationRoleRepository,
-        IPreReleaseService preReleaseService)
-    {
-        _releaseVersionRepository = releaseVersionRepository;
-        _userReleaseRoleRepository = userReleaseRoleRepository;
-        _userPublicationRoleRepository = userPublicationRoleRepository;
-        _preReleaseService = preReleaseService;
-    }
-
     public Task<bool> HasRolesOnPublicationOrReleaseVersion(
         Guid userId,
         Guid publicationId,
@@ -59,7 +42,7 @@ public class AuthorizationHandlerService
         return HasRolesOnPublicationOrReleaseVersion(
             userId,
             publicationId,
-            () => Task.FromResult((Guid?) releaseVersionId),
+            () => Task.FromResult((Guid?)releaseVersionId),
             publicationRoles,
             releaseRoles);
     }
@@ -71,7 +54,7 @@ public class AuthorizationHandlerService
         IEnumerable<PublicationRole> publicationRoles,
         IEnumerable<ReleaseRole> releaseRoles)
     {
-        var usersPublicationRoles = await _userPublicationRoleRepository
+        var usersPublicationRoles = await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         if (usersPublicationRoles.Any(publicationRoles.Contains))
@@ -86,8 +69,8 @@ public class AuthorizationHandlerService
             return false;
         }
 
-        var usersReleaseRoles = await _userReleaseRoleRepository
-            .GetAllRolesByUserAndRelease(userId: userId,
+        var usersReleaseRoles = await userReleaseRoleRepository
+            .GetAllRolesByUserAndReleaseVersion(userId: userId,
                 releaseVersionId: releaseVersionId.Value);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
@@ -99,7 +82,7 @@ public class AuthorizationHandlerService
         IEnumerable<PublicationRole> publicationRoles,
         IEnumerable<ReleaseRole> releaseRoles)
     {
-        var usersPublicationRoles = await _userPublicationRoleRepository
+        var usersPublicationRoles = await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         if (usersPublicationRoles.Any(publicationRoles.Contains))
@@ -107,7 +90,7 @@ public class AuthorizationHandlerService
             return true;
         }
 
-        var usersReleaseRoles = await _userReleaseRoleRepository
+        var usersReleaseRoles = await userReleaseRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
@@ -118,7 +101,7 @@ public class AuthorizationHandlerService
         Guid publicationId,
         params PublicationRole[] publicationRoles)
     {
-        var usersPublicationRoles = await _userPublicationRoleRepository
+        var usersPublicationRoles = await userPublicationRoleRepository
             .GetAllRolesByUserAndPublication(userId, publicationId);
 
         return usersPublicationRoles.Any(publicationRoles.Contains);
@@ -129,8 +112,8 @@ public class AuthorizationHandlerService
         Guid releaseVersionId,
         params ReleaseRole[] releaseRoles)
     {
-        var usersReleaseRoles = await _userReleaseRoleRepository
-            .GetAllRolesByUserAndRelease(userId: userId,
+        var usersReleaseRoles = await userReleaseRoleRepository
+            .GetAllRolesByUserAndReleaseVersion(userId: userId,
                 releaseVersionId: releaseVersionId);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
@@ -175,7 +158,7 @@ public class AuthorizationHandlerService
                     releaseVersionId: releaseVersion.Id,
                     ReleaseRole.PrereleaseViewer))
         {
-            var windowStatus = _preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTime.UtcNow);
+            var windowStatus = preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTime.UtcNow);
             if (windowStatus.Access == PreReleaseAccess.Within)
             {
                 return true;
@@ -183,6 +166,6 @@ public class AuthorizationHandlerService
         }
 
         // If the release version is public, anyone can see it.
-        return await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id);
+        return await releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id);
     }
 }

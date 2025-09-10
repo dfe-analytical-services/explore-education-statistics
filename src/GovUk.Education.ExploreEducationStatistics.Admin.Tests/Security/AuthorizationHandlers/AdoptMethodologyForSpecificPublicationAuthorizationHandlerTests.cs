@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -56,8 +53,7 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var authContext =
                     CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
-                            Publication>
-                        (user, Publication);
+                    Publication>(user, Publication);
 
                 await handler.HandleAsync(authContext);
 

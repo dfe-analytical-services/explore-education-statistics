@@ -1,8 +1,6 @@
 #nullable enable
-using System;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;

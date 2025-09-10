@@ -1,7 +1,4 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -15,12 +12,29 @@ public interface IUserPublicationRoleRepository
 
     Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
 
-    Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId,
+    Task<List<PublicationRole>> GetAllRolesByUserAndPublication(
+        Guid userId,
         Guid publicationId);
 
-    Task<bool> UserHasRoleOnPublication(Guid userId,
+    Task<UserPublicationRole?> GetUserPublicationRole(
+        Guid userId,
         Guid publicationId,
         PublicationRole role);
-    
-    Task RemoveMany(List<UserPublicationRole> userPublicationRoles, Guid deletedById);
+
+    Task<bool> UserHasRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role);
+
+    Task Remove(
+        UserPublicationRole userPublicationRole,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveMany(
+        IReadOnlyList<UserPublicationRole> userPublicationRoles,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveForUser(
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

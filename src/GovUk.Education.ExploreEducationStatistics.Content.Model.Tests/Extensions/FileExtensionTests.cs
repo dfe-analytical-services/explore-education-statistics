@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions.FileExtensions;
@@ -163,5 +162,55 @@ public class FileExtensionTests
         string expectedDisplaySize)
     {
         Assert.Equal(expectedDisplaySize, contentLength.DisplaySize());
+    }
+
+    [Fact]
+    public void ZipFileEntryName_DataFile_ReturnsExpectedFileName()
+    {
+        // Arrange
+        var file = new File
+        {
+            Type = Data,
+            Filename = "data.csv",
+        };
+
+        // Act
+        var fileName = file.ZipFileEntryName();
+
+        // Assert
+        Assert.Equal($"data/{file.Filename}", fileName);
+    }
+
+    [Fact]
+    public void ZipFileEntryName_AncillaryFile_ReturnsExpectedFileName()
+    {
+        // Arrange
+        var file = new File
+        {
+            Type = Ancillary,
+            Filename = "test.jpg",
+        };
+
+        // Act
+        var fileName = file.ZipFileEntryName();
+
+        // Assert
+        Assert.Equal($"supporting-files/{file.Filename}", fileName);
+    }
+
+    [Fact]
+    public void ZipFileEntryName_InvalidType_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var file = new File
+        {
+            Type = Chart,
+            Filename = "chart.png",
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(file.ZipFileEntryName);
+
+        Assert.Equal("Unexpected file type (Parameter 'Type')", exception.Message);
     }
 }

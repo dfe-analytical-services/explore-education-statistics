@@ -30,7 +30,7 @@ describe('showDraftVersionActions', () => {
     ${false} | ${false}         | ${'both isPatch and canUpdateRelease are disabled'}
   `(
     'hides the actions section if draftVersion is undefined when $testCase',
-    ({ isPatch, canUpdateRelease, testCase }) => {
+    ({ isPatch, canUpdateRelease }) => {
       expect(
         shouldShowDraftActions(isPatch, canUpdateRelease, {
           ...testApiDatafile,

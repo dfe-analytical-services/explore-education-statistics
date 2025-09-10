@@ -8,7 +8,7 @@ describe('AccreditedOfficialStatisticsSection', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Office for Statistics Regulation',
+        name: 'Office for Statistics Regulation (opens in new tab)',
       }),
     ).toBeInTheDocument();
   });
@@ -43,7 +43,7 @@ describe('AccreditedOfficialStatisticsSection', () => {
 
     expect(
       screen.queryAllByRole('link', {
-        name: 'Code of Practice for Statistics',
+        name: 'Code of Practice for Statistics (opens in new tab)',
       })[0],
     ).toHaveAttribute(
       'href',
@@ -54,9 +54,8 @@ describe('AccreditedOfficialStatisticsSection', () => {
       screen.getByRole('link', { name: 'regulation@statistics.gov.uk' }),
     ).toHaveAttribute('href', 'mailto:regulation@statistics.gov.uk');
 
-    expect(screen.getByRole('link', { name: 'OSR website' })).toHaveAttribute(
-      'href',
-      'https://osr.statisticsauthority.gov.uk/',
-    );
+    expect(
+      screen.getByRole('link', { name: 'OSR website (opens in new tab)' }),
+    ).toHaveAttribute('href', 'https://osr.statisticsauthority.gov.uk/');
   });
 });

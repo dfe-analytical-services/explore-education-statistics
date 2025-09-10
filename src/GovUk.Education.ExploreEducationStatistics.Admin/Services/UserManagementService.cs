@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -19,59 +15,38 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserManagementService : IUserManagementService
+
+public class UserManagementService(
+    UsersAndRolesDbContext usersAndRolesDbContext,
+    ContentDbContext contentDbContext,
+    IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
+    IEmailTemplateService emailTemplateService,
+    IUserRoleService userRoleService,
+    IUserRepository userRepository,
+    IUserService userService,
+    IUserInviteRepository userInviteRepository,
+    IUserReleaseInviteRepository userReleaseInviteRepository,
+    IUserPublicationInviteRepository userPublicationInviteRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    UserManager<ApplicationUser> userManager) : IUserManagementService
 {
-    private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
-    private readonly IEmailTemplateService _emailTemplateService;
-    private readonly IUserRoleService _userRoleService;
-    private readonly IUserService _userService;
-    private readonly IUserInviteRepository _userInviteRepository;
-    private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
-    private readonly IUserPublicationInviteRepository _userPublicationInviteRepository;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public UserManagementService(
-        UsersAndRolesDbContext usersAndRolesDbContext,
-        ContentDbContext contentDbContext,
-        IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
-        IEmailTemplateService emailTemplateService,
-        IUserRoleService userRoleService,
-        IUserService userService,
-        IUserInviteRepository userInviteRepository,
-        IUserReleaseInviteRepository userReleaseInviteRepository,
-        IUserPublicationInviteRepository userPublicationInviteRepository,
-        UserManager<ApplicationUser> userManager)
-    {
-        _usersAndRolesDbContext = usersAndRolesDbContext;
-        _contentDbContext = contentDbContext;
-        _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
-        _emailTemplateService = emailTemplateService;
-        _userRoleService = userRoleService;
-        _userService = userService;
-        _userInviteRepository = userInviteRepository;
-        _userReleaseInviteRepository = userReleaseInviteRepository;
-        _userPublicationInviteRepository = userPublicationInviteRepository;
-        _userManager = userManager;
-    }
-
     public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                var roles = await _usersAndRolesDbContext.Roles.ToListAsync();
+                var roles = await usersAndRolesDbContext.Roles.ToListAsync();
                 var prereleaseRole = roles
                     .Single(role => role.Name == RoleNames.PrereleaseUser);
-                var users = _usersAndRolesDbContext.Users;
-                var userRoles = _usersAndRolesDbContext.UserRoles;
+                var users = usersAndRolesDbContext.Users;
+                var userRoles = usersAndRolesDbContext.UserRoles;
                 var nonPrereleaseUsers = users
                     .Where(user => !userRoles.Any(userRole =>
                         userRole.UserId == user.Id && userRole.RoleId == prereleaseRole.Id));
@@ -103,31 +78,22 @@ public class UserManagementService : IUserManagementService
 
     public async Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases()
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(async () => await _contentDbContext.Releases
-                .Select(r => new IdTitleViewModel
-                {
-                    Id = r.Id,
-                    Title = $"{r.Publication.Title} - {r.Title}"
-                })
+            .OnSuccess(async () => await contentDbContext.Releases
+                .Select(r => new IdTitleViewModel { Id = r.Id, Title = $"{r.Publication.Title} - {r.Title}" })
                 .ToListAsync());
     }
 
     public async Task<Either<ActionResult, List<RoleViewModel>>> ListRoles()
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await _usersAndRolesDbContext.Roles
+                return await usersAndRolesDbContext.Roles
                     .AsQueryable()
-                    .Select(r => new RoleViewModel
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        NormalizedName = r.NormalizedName
-                    })
+                    .Select(r => new RoleViewModel { Id = r.Id, Name = r.Name, NormalizedName = r.NormalizedName })
                     .OrderBy(x => x.Name)
                     .ToListAsync();
             });
@@ -135,20 +101,16 @@ public class UserManagementService : IUserManagementService
 
     public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
     {
-        return await _usersAndRolesDbContext.Users
+        return await usersAndRolesDbContext.Users
             .AsQueryable()
             .Join(
-                _usersAndRolesDbContext.UserRoles,
+                usersAndRolesDbContext.UserRoles,
                 user => user.Id,
                 userRole => userRole.UserId,
-                (user, userRole) => new
-                {
-                    user,
-                    userRoleId = userRole.RoleId
-                }
+                (user, userRole) => new { user, userRoleId = userRole.RoleId }
             )
             .Join(
-                _usersAndRolesDbContext.Roles,
+                usersAndRolesDbContext.Roles,
                 prev => prev.userRoleId,
                 role => role.Id,
                 (prev, role) => new UserViewModel
@@ -166,17 +128,17 @@ public class UserManagementService : IUserManagementService
 
     public async Task<Either<ActionResult, UserViewModel>> GetUser(Guid id)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await _usersAndRolesPersistenceHelper
+                return await usersAndRolesPersistenceHelper
                     .CheckEntityExists<ApplicationUser, string>(id.ToString())
                     .OnSuccess(async user =>
                     {
-                        return await _userRoleService.GetGlobalRoles(user.Id)
-                            .OnSuccessCombineWith(_ => _userRoleService.GetPublicationRolesForUser(id))
-                            .OnSuccessCombineWith(_ => _userRoleService.GetReleaseRoles(id))
+                        return await userRoleService.GetGlobalRoles(user.Id)
+                            .OnSuccessCombineWith(_ => userRoleService.GetPublicationRolesForUser(id))
+                            .OnSuccessCombineWith(_ => userRoleService.GetReleaseRoles(id))
                             .OnSuccess(tuple =>
                             {
                                 var (globalRoles, publicationRoles, releaseRoles) = tuple;
@@ -202,11 +164,11 @@ public class UserManagementService : IUserManagementService
 
     public async Task<Either<ActionResult, List<PendingInviteViewModel>>> ListPendingInvites()
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
                 {
-                    var pendingInvites = await _usersAndRolesDbContext.UserInvites
+                    var pendingInvites = await usersAndRolesDbContext.UserInvites
                         .AsQueryable()
                         .Where(ui => !ui.Accepted)
                         .OrderBy(ui => ui.Email)
@@ -217,7 +179,7 @@ public class UserManagementService : IUserManagementService
                         .ToAsyncEnumerable()
                         .SelectAwait(async invite =>
                         {
-                            var userReleaseInvites = await _contentDbContext
+                            var userReleaseInvites = await contentDbContext
                                 .UserReleaseInvites
                                 .Include(uri => uri.ReleaseVersion)
                                 .ThenInclude(rv => rv.Release)
@@ -236,7 +198,7 @@ public class UserManagementService : IUserManagementService
                                     }
                                 ).ToList();
 
-                            var userPublicationInvites = await _contentDbContext
+                            var userPublicationInvites = await contentDbContext
                                 .UserPublicationInvites
                                 .Include(upi => upi.Publication)
                                 .Where(upi => upi.Email.ToLower().Equals(invite.Email.ToLower()))
@@ -270,12 +232,12 @@ public class UserManagementService : IUserManagementService
         var sanitisedEmail = email.Trim().ToLower();
         var roleId = request.RoleId;
 
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(() => ValidateUserDoesNotExist(email))
             .OnSuccess<ActionResult, Unit, UserInvite>(async () =>
             {
-                var role = await _usersAndRolesDbContext.Roles
+                var role = await usersAndRolesDbContext.Roles
                     .AsQueryable()
                     .FirstOrDefaultAsync(r => r.Id == roleId);
 
@@ -284,51 +246,43 @@ public class UserManagementService : IUserManagementService
                     return ValidationActionResult(InvalidUserRole);
                 }
 
-                var userInvite = await _userInviteRepository.CreateOrUpdate(
+                var userInvite = await userInviteRepository.CreateOrUpdate(
                     email: sanitisedEmail,
                     roleId: roleId,
-                    createdById: _userService.GetUserId(),
+                    createdById: userService.GetUserId(),
                     request.CreatedDate);
 
                 // Clear out any pre-existing Release or Publication invites prior to adding
                 // new ones.
-                var existingReleaseInvites = _contentDbContext
-                    .UserReleaseInvites
-                    .Where(invite => invite.Email.ToLower() == sanitisedEmail);
-
-                var existingPublicationInvites = _contentDbContext
-                    .UserPublicationInvites
-                    .Where(invite => invite.Email.ToLower() == sanitisedEmail);
-
-                _contentDbContext.RemoveRange(existingReleaseInvites);
-                _contentDbContext.RemoveRange(existingPublicationInvites);
+                await userReleaseInviteRepository.RemoveByUserEmail(sanitisedEmail);
+                await userPublicationInviteRepository.RemoveByUserEmail(sanitisedEmail);
 
                 foreach (var userReleaseRole in request.UserReleaseRoles)
                 {
-                    var latestReleaseVersion = await _contentDbContext.ReleaseVersions
+                    var latestReleaseVersion = await contentDbContext.ReleaseVersions
                         .LatestReleaseVersion(releaseId: userReleaseRole.ReleaseId)
                         .SingleAsync();
 
-                    await _userReleaseInviteRepository.Create(
+                    await userReleaseInviteRepository.Create(
                         releaseVersionId: latestReleaseVersion!.Id,
                         email: sanitisedEmail,
                         releaseRole: userReleaseRole.ReleaseRole,
                         emailSent: true,
-                        createdById: _userService.GetUserId(),
+                        createdById: userService.GetUserId(),
                         request.CreatedDate);
                 }
 
-                await _userPublicationInviteRepository.CreateManyIfNotExists(
+                await userPublicationInviteRepository.CreateManyIfNotExists(
                     request.UserPublicationRoles,
                     sanitisedEmail,
-                    _userService.GetUserId(),
+                    userService.GetUserId(),
                     request.CreatedDate);
 
                 return userInvite;
             })
             .OnSuccess(async userInvite =>
             {
-                var userReleaseInvites = await _contentDbContext
+                var userReleaseInvites = await contentDbContext
                     .UserReleaseInvites
                     .Include(uri => uri.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
@@ -336,13 +290,13 @@ public class UserManagementService : IUserManagementService
                     .Where(uri => uri.Email.ToLower() == sanitisedEmail)
                     .ToListAsync();
 
-                var userPublicationInvites = await _contentDbContext
+                var userPublicationInvites = await contentDbContext
                     .UserPublicationInvites
                     .Include(upi => upi.Publication)
                     .Where(upi => upi.Email.ToLower() == sanitisedEmail)
                     .ToListAsync();
 
-                return _emailTemplateService
+                return emailTemplateService
                     .SendInviteEmail(sanitisedEmail, userReleaseInvites, userPublicationInvites)
                     .OnSuccess(() => userInvite);
             });
@@ -350,135 +304,112 @@ public class UserManagementService : IUserManagementService
 
     public async Task<Either<ActionResult, Unit>> CancelInvite(string email)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess<ActionResult, Unit, Unit>(async () =>
+            .OnSuccess(async () => await GetPendingUserInvite(email))
+            .OnSuccessVoid(async invite =>
             {
-                var invite = await _usersAndRolesDbContext.UserInvites
-                    .AsQueryable()
-                    .FirstOrDefaultAsync(i => i.Email.ToLower() == email.ToLower());
-
-                if (invite == null)
+                await contentDbContext.RequireTransaction(async () =>
                 {
-                    return ValidationActionResult(InviteNotFound);
-                }
+                    await userReleaseInviteRepository.RemoveByUserEmail(email);
+                    await userPublicationInviteRepository.RemoveByUserEmail(email);
 
-                if (invite.Accepted)
-                {
-                    return ValidationActionResult(InviteAlreadyAccepted);
-                }
-
-                _usersAndRolesDbContext.UserInvites.Remove(invite);
-                await _usersAndRolesDbContext.SaveChangesAsync();
-
-                return Unit.Instance;
-            })
-            .OnSuccess(async () =>
-            {
-                var releaseInvites = await _contentDbContext.UserReleaseInvites
-                    .AsQueryable()
-                    .Where(i => i.Email.ToLower() == email.ToLower())
-                    .ToListAsync();
-                _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
-
-                var publicationInvites = await _contentDbContext.UserPublicationInvites
-                    .AsQueryable()
-                    .Where(i => i.Email.ToLower() == email.ToLower())
-                    .ToListAsync();
-                _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
-
-                await _contentDbContext.SaveChangesAsync();
-
-                return Unit.Instance;
+                    usersAndRolesDbContext.UserInvites.Remove(invite);
+                    await usersAndRolesDbContext.SaveChangesAsync();
+                });
             });
     }
 
     public async Task<Either<ActionResult, Unit>> UpdateUser(string userId, string roleId)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => _userRoleService.SetGlobalRole(userId, roleId));
+            .OnSuccess(() => userRoleService.SetGlobalRole(userId, roleId));
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteUser(string email)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(async () =>
+            .OnSuccess(async () => await GetIdentityUser(email))
+            .OnSuccess(async identityUser =>
             {
-                // Delete the Identity Framework user, if found.
-                var identityUser = await _usersAndRolesDbContext
-                    .Users
-                    .SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+                var internalUser = await userRepository.FindByEmail(email);
 
-                if (identityUser != null)
-                {
-                    await _userManager.DeleteAsync(identityUser);
-                }
-
-                var internalUser = await _contentDbContext
-                    .Users
-                    .SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
-
-                if (identityUser == null && internalUser == null)
-                {
-                    return new Either<ActionResult, Unit>(new NotFoundResult());
-                }
-
-                var globalInvites = await _usersAndRolesDbContext
+                return (identityUser, internalUser);
+            })
+            .OnSuccessDo(tuple =>
+            {
+                return tuple.identityUser is null && tuple.internalUser is null
+                    ? (Either<ActionResult, Unit>)new NotFoundResult()
+                    : Unit.Instance;
+            })
+            .OnSuccessVoid(async tuple =>
+            {
+                var globalInvites = await usersAndRolesDbContext
                     .UserInvites
                     .Where(invite => invite.Email.ToLower() == email.ToLower())
                     .ToListAsync();
 
-                var releaseInvites = await _contentDbContext
-                    .UserReleaseInvites
-                    .Where(invite => invite.Email.ToLower() == email.ToLower())
-                    .ToListAsync();
-
-                var publicationInvites = await _contentDbContext
-                    .UserPublicationInvites
-                    .Where(invite => invite.Email.ToLower() == email.ToLower())
-                    .ToListAsync();
-
-                var userReleaseRoles = await _contentDbContext
-                    .UserReleaseRoles
-                    .Where(urr => internalUser != null && urr.UserId == internalUser.Id)
-                    .ToListAsync();
-
-                var userPublicationRoles = await _contentDbContext
-                    .UserPublicationRoles
-                    .Where(upr => internalUser != null && upr.UserId == internalUser.Id)
-                    .ToListAsync();
-
-                if (internalUser is { SoftDeleted: null })
+                await contentDbContext.RequireTransaction(async () =>
                 {
-                    internalUser.SoftDeleted = DateTime.UtcNow;
-                    internalUser.DeletedById = _userService.GetUserId();
-                }
+                    // Delete the Identity Framework user, if found.
+                    if (tuple.identityUser is not null)
+                    {
+                        await userManager.DeleteAsync(tuple.identityUser);
+                    }
 
-                // Delete any invites that they may have had.
-                _usersAndRolesDbContext.UserInvites.RemoveRange(globalInvites);
-                _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
-                _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
-                _contentDbContext.UserReleaseRoles.RemoveRange(userReleaseRoles);
-                _contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
+                    // Delete any invites that they may have had.
+                    usersAndRolesDbContext.UserInvites.RemoveRange(globalInvites);
 
-                await _contentDbContext.SaveChangesAsync();
-                await _usersAndRolesDbContext.SaveChangesAsync();
+                    if (tuple.internalUser is not null)
+                    {
+                        await userPublicationInviteRepository.RemoveByUserEmail(email);
+                        await userReleaseInviteRepository.RemoveByUserEmail(email);
+                        await userReleaseRoleRepository.RemoveForUser(tuple.internalUser.Id);
+                        await userPublicationRoleRepository.RemoveForUser(tuple.internalUser.Id);
+                    }
 
-                return Unit.Instance;
+                    if (tuple.internalUser is { SoftDeleted: null })
+                    {
+                        tuple.internalUser.SoftDeleted = DateTime.UtcNow;
+                        tuple.internalUser.DeletedById = userService.GetUserId();
+                    }
+
+                    await contentDbContext.SaveChangesAsync();
+                    await usersAndRolesDbContext.SaveChangesAsync();
+                });
             });
+    }
+
+    private async Task<ApplicationUser?> GetIdentityUser(string email)
+    {
+        return await usersAndRolesDbContext
+            .Users
+            .SingleOrDefaultAsync(user => user.Email == email);
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
     {
-        if (await _usersAndRolesDbContext.Users
-                .AsQueryable()
-                .AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+        if (await usersAndRolesDbContext.Users
+            .AsQueryable()
+            .AnyAsync(u => u.Email!.ToLower() == email.ToLower()))
         {
             return ValidationActionResult(UserAlreadyExists);
         }
 
         return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, UserInvite>> GetPendingUserInvite(string email)
+    {
+        var invite = await usersAndRolesDbContext.UserInvites
+            .FirstOrDefaultAsync(i => i.Email == email);
+
+        return invite is null
+            ? ValidationActionResult(InviteNotFound)
+            : invite.Accepted
+                ? ValidationActionResult(InviteAlreadyAccepted)
+                : invite;
     }
 }

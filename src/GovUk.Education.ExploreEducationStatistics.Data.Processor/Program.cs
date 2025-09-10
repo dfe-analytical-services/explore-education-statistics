@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Threading.Tasks;
 using Azure.Storage.Queues;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -16,8 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 var host = new HostBuilder()
@@ -42,10 +42,15 @@ var host = new HostBuilder()
             .AddDbContext<ContentDbContext>(options =>
                 options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                     providerOptions => providerOptions.EnableCustomRetryOnFailure()))
+            .AddSingleton<IBlobSasService, BlobSasService>()
             .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                 new PrivateBlobStorageService(
-                    provider.GetRequiredService<IOptions<AppOptions>>().Value.PrivateStorageConnectionString,
-                    provider.GetRequiredService<ILogger<IBlobStorageService>>())
+                    connectionString: provider
+                        .GetRequiredService<IOptions<AppOptions>>()
+                        .Value
+                        .PrivateStorageConnectionString,
+                    logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    sasService: provider.GetRequiredService<IBlobSasService>())
             )
             .AddTransient<IFileImportService, FileImportService>()
             .AddTransient<IImporterService, ImporterService>()
@@ -59,6 +64,7 @@ var host = new HostBuilder()
             .AddSingleton<IDatabaseHelper, DatabaseHelper>()
             .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
             .AddSingleton<IDbContextSupplier, DbContextSupplier>()
+            .AddSingleton<DateTimeProvider>()
             .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section));
     })
     .Build();

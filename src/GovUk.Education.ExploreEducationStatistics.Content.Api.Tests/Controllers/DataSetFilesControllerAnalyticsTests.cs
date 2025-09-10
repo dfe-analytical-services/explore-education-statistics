@@ -1,6 +1,5 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
+using System.Net;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -11,20 +10,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
-using Microsoft.AspNetCore.Hosting;
 using Snapshooter.Xunit;
 using Xunit;
+using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
@@ -81,7 +75,7 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
                 .ToList();
 
             var requestFile = Assert.Single(analyticsRequestFiles);
-            var requestFileContents = await System.IO.File.ReadAllTextAsync(requestFile);
+            var requestFileContents = await File.ReadAllTextAsync(requestFile);
             Snapshot.Match(
                 currentResult: requestFileContents,
                 snapshotName: $"{nameof(DownloadDataSetFileAnalyticsTests)}.{nameof(DownloadDataSetFile_RecordAnalytics)}.snap");

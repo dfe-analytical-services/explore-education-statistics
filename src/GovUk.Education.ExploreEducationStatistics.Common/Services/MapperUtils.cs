@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 

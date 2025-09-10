@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Collections.Generic;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests;

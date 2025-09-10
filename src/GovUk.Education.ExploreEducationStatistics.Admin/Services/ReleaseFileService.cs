@@ -1,11 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -19,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -175,22 +168,21 @@ public class ReleaseFileService : IReleaseFileService
             .OnSuccess(releaseFile => releaseFile.ToFileInfo());
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId, Guid fileId)
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
+        Guid releaseVersionId,
+        Guid fileId,
+        CancellationToken cancellationToken)
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
-            .OnSuccessCombineWith(file =>
-                _privateBlobStorageService.GetDownloadStream(PrivateReleaseFiles, file.Path()))
-            .OnSuccess(fileAndStream =>
-            {
-                var (file, stream) = fileAndStream;
-                return new FileStreamResult(stream, file.ContentType)
-                {
-                    FileDownloadName = file.Filename
-                };
-            });
+            .OnSuccess(file => _privateBlobStorageService
+                .GetBlobDownloadToken(
+                    container: PrivateReleaseFiles,
+                    filename: file.Filename,
+                    path: file.Path(),
+                    cancellationToken: cancellationToken));
     }
 
     public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
@@ -234,33 +226,28 @@ public class ReleaseFileService : IReleaseFileService
         var releaseFilesWithZipEntries = new List<ReleaseFile>();
         foreach (var releaseFile in releaseFiles)
         {
+            var streamResult = await _privateBlobStorageService.GetDownloadStream(
+                containerName: PrivateReleaseFiles,
+                path: releaseFile.Path(),
+                cancellationToken: cancellationToken);
+            
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
-
-            var blobExists = await _privateBlobStorageService.CheckBlobExists(
-                PrivateReleaseFiles,
-                releaseFile.Path()
-            );
-
-            // Ignore files which do not exist in blob storage
-            if (!blobExists)
+            
+            // Ignore files where we cannot successfully get their blob download streams.
+            if (streamResult.IsLeft)
             {
                 continue;
             }
+            
+            await using var blobStream = streamResult.Right;
 
             var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
-
             await using var entryStream = entry.Open();
-
-            await _privateBlobStorageService.DownloadToStream(
-                containerName: PrivateReleaseFiles,
-                path: releaseFile.Path(),
-                stream: entryStream,
-                cancellationToken: cancellationToken
-            );
+            await blobStream.CopyToAsync(entryStream, cancellationToken);
 
             releaseFilesWithZipEntries.Add(releaseFile);
         }

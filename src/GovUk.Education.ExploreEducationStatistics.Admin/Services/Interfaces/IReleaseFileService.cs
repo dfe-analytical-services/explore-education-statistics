@@ -1,20 +1,15 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseFileService
 {
-    public Task<Either<ActionResult, Content.Model.File>> CheckFileExists(Guid releaseVersionId,
+    public Task<Either<ActionResult, File>> CheckFileExists(Guid releaseVersionId,
         Guid fileId,
         params FileType[] allowedFileTypes);
 
@@ -33,9 +28,6 @@ public interface IReleaseFileService
         params FileType[] types);
 
     Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseVersionId,
-        Guid fileId);
-
-    Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId,
         Guid fileId);
 
     Task<Either<ActionResult, Unit>> ZipFilesToStream(Guid releaseVersionId,
@@ -59,4 +51,9 @@ public interface IReleaseFileService
     Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseVersionId,
         IFormFile formFile,
         Guid? replacingId = null);
+
+    Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
+        Guid releaseVersionId,
+        Guid fileId,
+        CancellationToken cancellationToken);
 }

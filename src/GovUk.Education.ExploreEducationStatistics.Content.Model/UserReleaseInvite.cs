@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -25,6 +24,4 @@ public class UserReleaseInvite : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     public User CreatedBy { get; set; } = null!;
 
     public Guid CreatedById { get; set; }
-
-    public bool SoftDeleted { get; set; }
 }

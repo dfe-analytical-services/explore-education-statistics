@@ -6,302 +6,585 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class UserPublicationRoleRepositoryTests
+public abstract class UserPublicationRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
 
-    [Fact]
-    public async Task Create()
+    public class CreateTests : UserPublicationRoleRepositoryTests
     {
-        var user = new User();
-
-        var createdBy = new User();
-
-        var publication = new Publication();
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        [Fact]
+        public async Task Create()
         {
-            await contentDbContext.Users.AddRangeAsync(user, createdBy);
-            await contentDbContext.Publications.AddAsync(publication);
-            await contentDbContext.SaveChangesAsync();
-        }
+            var user = new User();
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var service = SetupUserPublicationRoleRepository(contentDbContext);
+            var createdBy = new User();
 
-            var result = await service.Create(user.Id, publication.Id, Owner, createdBy.Id);
+            var publication = new Publication();
 
-            Assert.NotEqual(Guid.Empty, result.Id);
-            Assert.Equal(user.Id, result.UserId);
-            Assert.Equal(publication.Id, result.PublicationId);
-            Assert.Equal(Owner, result.Role);
-            result.Created.AssertUtcNow();
-            Assert.Equal(createdBy.Id, result.CreatedById);
-        }
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
-            Assert.Single(userPublicationRoles);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddRangeAsync(user, createdBy);
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
-            Assert.Equal(user.Id, userPublicationRoles[0].UserId);
-            Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
-            Assert.Equal(Owner, userPublicationRoles[0].Role);
-            userPublicationRoles[0].Created.AssertUtcNow();
-            Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result = await repository.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(PublicationRole.Owner, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                var userPublicationRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, userPublicationRole.Id);
+                Assert.Equal(user.Id, userPublicationRole.UserId);
+                Assert.Equal(publication.Id, userPublicationRole.PublicationId);
+                Assert.Equal(PublicationRole.Owner, userPublicationRole.Role);
+                userPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, userPublicationRole.CreatedById);
+            }
         }
     }
 
-    [Fact]
-    public async Task UserHasRoleOnPublication_TrueIfRoleExists()
+    public class UserHasRoleOnPublication_TrueIfRoleExistsTests : UserPublicationRoleRepositoryTests
     {
-        var userPublicationRole = new UserPublicationRole
+        [Fact]
+        public async Task UserHasRoleOnPublication_TrueIfRoleExists()
         {
-            User = new User(),
-            Publication = new Publication(),
-            Role = Owner
-        };
+            var userPublicationRole = new UserPublicationRole
+            {
+                User = new User(),
+                Publication = new Publication(),
+                Role = PublicationRole.Owner
+            };
 
-        var contentDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(await repository.UserHasRoleOnPublication(
+                    userPublicationRole.UserId,
+                    userPublicationRole.PublicationId,
+                    PublicationRole.Owner));
+            }
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        [Fact]
+        public async Task UserHasRoleOnPublication_FalseIfRoleDoesNotExist()
         {
-            var service = SetupUserPublicationRoleRepository(contentDbContext);
+            var publication = new Publication();
 
-            Assert.True(await service.UserHasRoleOnPublication(
-                userPublicationRole.UserId,
-                userPublicationRole.PublicationId,
-                Owner));
+            // Setup a role but for a different publication to make sure it has no influence
+            var userPublicationRoleOtherPublication = new UserPublicationRole
+            {
+                User = new User(),
+                Publication = new Publication(),
+                Role = PublicationRole.Owner
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRoleOtherPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(await repository.UserHasRoleOnPublication(
+                    userPublicationRoleOtherPublication.UserId,
+                    publication.Id,
+                    PublicationRole.Owner));
+            }
         }
     }
 
-    [Fact]
-    public async Task UserHasRoleOnPublication_FalseIfRoleDoesNotExist()
+    public class GetDistinctRolesByUserTests : UserPublicationRoleRepositoryTests
     {
-        var publication = new Publication();
-
-        // Setup a role but for a different publication to make sure it has no influence
-        var userPublicationRoleOtherPublication = new UserPublicationRole
+        [Fact]
+        public async Task GetDistinctRolesByUser()
         {
-            User = new User(),
-            Publication = new Publication(),
-            Role = Owner
-        };
+            var user1 = new User();
+            var user2 = new User();
 
-        var contentDbContextId = Guid.NewGuid().ToString();
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            await contentDbContext.Publications.AddAsync(publication);
-            await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRoleOtherPublication);
-            await contentDbContext.SaveChangesAsync();
+            var userPublicationRoles = new List<UserPublicationRole> {
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+                // Roles for different publication. One duplicate role.
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication2)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication2)
+                    .WithRole(PublicationRole.Allower)
+                    .Generate(),
+                // Role for different user
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user2)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result = await repository.GetDistinctRolesByUser(user1.Id);
+
+                // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
+                Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+            }
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        // This test will be changed when we start introducing the use of the NEW publication roles in the 
+        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+        // filter out any usage of the NEW roles.
+        [Fact]
+        public async Task GetDistinctRolesByUser_InvalidRolesNotReturned()
         {
-            var service = SetupUserPublicationRoleRepository(contentDbContext);
+            var user = new User();
 
-            Assert.False(await service.UserHasRoleOnPublication(
-                userPublicationRoleOtherPublication.UserId,
-                publication.Id,
-                Owner));
+            var publication = _fixture.DefaultPublication()
+                .Generate();
+
+            var userPublicationRoles = new List<UserPublicationRole> {
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate(),
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Drafter)
+                    .Generate(),
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result = await repository.GetDistinctRolesByUser(user.Id);
+
+                Assert.Empty(result);
+            }
         }
     }
 
-    [Fact]
-    public async Task GetDistinctRolesByUser()
+    public class GetAllRolesByUserAndPublicationTests : UserPublicationRoleRepositoryTests
     {
-        var user1 = new User();
-        var user2 = new User();
+        [Fact]
+        public async Task GetAllRolesByUserAndPublication()
+        {
+            var user1 = new User();
+            var user2 = new User();
 
-        var publication1 = _fixture.DefaultPublication()
-            .Generate();
-        var publication2 = _fixture.DefaultPublication()
-            .Generate();
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
 
-        var userPublicationRoles = new List<UserPublicationRole> {
-            _fixture.DefaultUserPublicationRole()
+            var userPublicationRoles = new List<UserPublicationRole> {
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate(),
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Allower)
+                    .Generate(),
+                // Different role for different publication.
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user1)
+                    .WithPublication(publication2)
+                    .WithRole(PublicationRole.Allower)
+                    .Generate(),
+                // Different role for different user
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user2)
+                    .WithPublication(publication1)
+                    .WithRole(PublicationRole.Allower)
+                    .Generate(),
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result = await repository.GetAllRolesByUserAndPublication(
+                    userId: user1.Id,
+                    publicationId: publication1.Id);
+
+                Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+            }
+        }
+
+        // This test will be changed when we start introducing the use of the NEW publication roles in the 
+        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
+        // filter out any usage of the NEW roles.
+        [Fact]
+        public async Task GetAllRolesByUserAndPublication_InvalidRolesNotReturned()
+        {
+            var user = new User();
+
+            var publication = _fixture.DefaultPublication()
+                .Generate();
+
+            var userPublicationRoles = new List<UserPublicationRole> {
+                // Invalid role
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate(),
+                // Invalid role
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Drafter)
+                    .Generate(),
+                // Valid role
+                _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Allower)
+                    .Generate(),
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result = await repository.GetAllRolesByUserAndPublication(
+                    userId: user.Id,
+                    publicationId: publication.Id);
+
+                Assert.Equal([PublicationRole.Allower], result);
+            }
+        }
+    }
+
+    public class RemoveTests : UserPublicationRoleRepositoryTests
+    {
+        [Theory]
+        // Valid roles
+        [InlineData(PublicationRole.Allower)]
+        [InlineData(PublicationRole.Owner)]
+        // Invalid roles
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task Success(PublicationRole publicationRole)
+        {
+            var email = "test@test.com";
+
+            var userPublicationRole = _fixture.DefaultUserPublicationRole()
+                .WithUser(new User
+                {
+                    Email = email
+                })
+                .WithPublication(_fixture.DefaultPublication())
+                .WithRole(publicationRole)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles
+                    .IgnoreQueryFilters()
+                    .SingleAsync(urr => urr.Id == userPublicationRole.Id);
+
+                await repository.Remove(userPublicationRoleToRemove);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedPublicationRole = await contentDbContext.UserPublicationRoles
+                    .SingleOrDefaultAsync(urr => urr.Id == userPublicationRole.Id);
+
+                Assert.Null(updatedPublicationRole);
+            }
+        }
+    }
+
+    public class RemoveManyTests : UserPublicationRoleRepositoryTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            var user1 = new User { Email = "test1@test.com" };
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var userPublicationRole1 = _fixture.DefaultUserPublicationRole()
                 .WithUser(user1)
                 .WithPublication(publication1)
-                .WithRole(Owner)
-                .Generate(),
-            // Roles for different pulication. One duplicate role.
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication2)
-                .WithRole(Owner)
-                .Generate(),
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication2)
-                .WithRole(Allower)
-                .Generate(),
-            // Role for different user
-            _fixture.DefaultUserPublicationRole()
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+            var userPublicationInvite1 = _fixture.DefaultUserPublicationInvite()
+                .WithEmail(user1.Email)
+                .WithPublication(publication1)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+
+            var user2 = new User { Email = "test2@test.com" };
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
+            var userPublicationRole2 = _fixture.DefaultUserPublicationRole()
                 .WithUser(user2)
-                .WithPublication(publication1)
-                .WithRole(Owner)
-                .Generate(),
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await contentDbContext.AddRangeAsync(userPublicationRoles);
-        await contentDbContext.SaveChangesAsync();
-
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
-
-        var result = await service.GetDistinctRolesByUser(user1.Id);
-
-        // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
-        Assert.Equal(2, result.Count);
-        Assert.Equal(Owner, result[0]);
-        Assert.Equal(Allower, result[1]);
-    }
-
-    // This test will be changed when we start introducing the use of the NEW publication roles in the 
-    // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
-    // filter out any usage of the NEW roles.
-    [Fact]
-    public async Task GetDistinctRolesByUser_InvalidRolesNotReturned()
-    {
-        var user = new User();
-
-        var publication = _fixture.DefaultPublication()
-            .Generate();
-
-        var userPublicationRoles = new List<UserPublicationRole> {
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user)
-                .WithPublication(publication)
-                .WithRole(Approver)
-                .Generate(),
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user)
-                .WithPublication(publication)
-                .WithRole(Drafter)
-                .Generate(),
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await contentDbContext.AddRangeAsync(userPublicationRoles);
-        await contentDbContext.SaveChangesAsync();
-
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
-
-        var result = await service.GetDistinctRolesByUser(user.Id);
-
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public async Task GetAllRolesByUserAndPublication()
-    {
-        var user1 = new User();
-        var user2 = new User();
-
-        var publication1 = _fixture.DefaultPublication()
-            .Generate();
-        var publication2 = _fixture.DefaultPublication()
-            .Generate();
-
-        var userPublicationRoles = new List<UserPublicationRole> {
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication1)
-                .WithRole(Owner)
-                .Generate(),
-            // Different role for different pulication.
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user1)
                 .WithPublication(publication2)
-                .WithRole(Allower)
-                .Generate(),
-            // Different role for different user
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user2)
-                .WithPublication(publication1)
-                .WithRole(Allower)
-                .Generate(),
-        };
+                .WithRole(PublicationRole.Owner)
+                .Generate();
+            var userPublicationInvite2 = _fixture.DefaultUserPublicationInvite()
+                .WithEmail(user2.Email)
+                .WithPublication(publication2)
+                .WithRole(PublicationRole.Owner)
+                .Generate();
 
-        var contentDbContextId = Guid.NewGuid().ToString();
+            var user3 = new User { Email = "test3@test.com" };
+            var publication3 = _fixture.DefaultPublication()
+                .Generate();
+            var userPublicationRole3 = _fixture.DefaultUserPublicationRole()
+                .WithUser(user3)
+                .WithPublication(publication3)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
+            var userPublicationInvite3 = _fixture.DefaultUserPublicationInvite()
+                .WithEmail(user3.Email)
+                .WithPublication(publication3)
+                .WithRole(PublicationRole.Allower)
+                .Generate();
 
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await contentDbContext.AddRangeAsync(userPublicationRoles);
-        await contentDbContext.SaveChangesAsync();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRole1, userPublicationRole2, userPublicationRole3);
+                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvite1, userPublicationInvite2, userPublicationInvite3);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-        var result = await service.GetAllRolesByUserAndPublication(
-            userId: user1.Id,
-            publicationId: publication1.Id);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-        var role = Assert.Single(result);
-        Assert.Equal(Owner, role);
+                await repository.RemoveMany([userPublicationRole1, userPublicationRole2]);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRole = await contentDbContext.UserPublicationRoles
+                    .SingleAsync();
+
+                Assert.Equal(userPublicationRole3.Id, userPublicationRole.Id);
+            }
+        }
     }
 
-    // This test will be changed when we start introducing the use of the NEW publication roles in the 
-    // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
-    // filter out any usage of the NEW roles.
-    [Fact]
-    public async Task GetAllRolesByUserAndPublication_InvalidRolesNotReturned()
+    public class RemoveForUserTests : UserPublicationRoleRepositoryTests
     {
-        var user = new User();
+        [Fact]
+        public async Task TargetUserHasRoles_RemovesTargetRoles()
+        {
+            var targetUser = new User { Email = "test1@test.com" };
+            var otherUser = new User { Email = "test2@test.com" };
+            var role1 = PublicationRole.Allower;
+            var role2 = PublicationRole.Owner;
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
 
-        var publication = _fixture.DefaultPublication()
-            .Generate();
+            var userPublicationRoles = _fixture.DefaultUserPublicationRole()
+                // These 2 roles should be removed
+                .ForIndex(0, s => s.SetPublication(publication1))
+                .ForIndex(0, s => s.SetUser(targetUser))
+                .ForIndex(0, s => s.SetRole(role1))
+                .ForIndex(1, s => s.SetPublication(publication2))
+                .ForIndex(1, s => s.SetUser(targetUser))
+                .ForIndex(1, s => s.SetRole(role2))
+                // These roles are for a different email and should not be removed
+                .ForIndex(2, s => s.SetPublication(publication1))
+                .ForIndex(2, s => s.SetUser(otherUser))
+                .ForIndex(2, s => s.SetRole(role1))
+                .ForIndex(3, s => s.SetPublication(publication2))
+                .ForIndex(3, s => s.SetUser(otherUser))
+                .ForIndex(3, s => s.SetRole(role2))
+                .GenerateList(4);
 
-        var userPublicationRoles = new List<UserPublicationRole> {
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user)
-                .WithPublication(publication)
-                .WithRole(Approver)
-                .Generate(),
-            _fixture.DefaultUserPublicationRole()
-                .WithUser(user)
-                .WithPublication(publication)
-                .WithRole(Drafter)
-                .Generate(),
-        };
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-        var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await contentDbContext.AddRangeAsync(userPublicationRoles);
-        await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
 
-        var service = SetupUserPublicationRoleRepository(contentDbContext);
+                await repository.RemoveForUser(targetUser.Id);
+            }
 
-        var result = await service.GetAllRolesByUserAndPublication(
-            userId: user.Id,
-            publicationId: publication.Id);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserPublicationRoles
+                    .Include(upr => upr.User)
+                    .ToListAsync();
 
-        Assert.Empty(result);
+                Assert.Equal(2, remainingRoles.Count);
+
+                Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
+                Assert.Equal(role1, remainingRoles[0].Role);
+
+                Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
+                Assert.Equal(role2, remainingRoles[1].Role);
+            }
+        }
+
+        [Fact]
+        public async Task TargetUserHasNoRoles_DoesNothing()
+        {
+            var targetUser = new User { Email = "test1@test.com" };
+            var otherUser = new User { Email = "test2@test.com" };
+            var role1 = PublicationRole.Allower;
+            var role2 = PublicationRole.Owner;
+            var publication1 = _fixture.DefaultPublication()
+                .Generate();
+            var publication2 = _fixture.DefaultPublication()
+                .Generate();
+
+            var userPublicationRoles = _fixture.DefaultUserPublicationRole()
+                // These roles are for a different email and should not be removed
+                .ForIndex(0, s => s.SetPublication(publication1))
+                .ForIndex(0, s => s.SetUser(otherUser))
+                .ForIndex(0, s => s.SetRole(role1))
+                .ForIndex(1, s => s.SetPublication(publication2))
+                .ForIndex(1, s => s.SetUser(otherUser))
+                .ForIndex(1, s => s.SetRole(role2))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(targetUser, otherUser);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var manager = CreateRepository(contentDbContext);
+
+                await manager.RemoveForUser(targetUser.Id);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingRoles = await contentDbContext.UserPublicationRoles
+                    .Include(upr => upr.User)
+                    .ToListAsync();
+
+                Assert.Equal(2, remainingRoles.Count);
+
+                Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
+                Assert.Equal(role1, remainingRoles[0].Role);
+
+                Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
+                Assert.Equal(role2, remainingRoles[1].Role);
+            }
+        }
     }
 
-    private static UserPublicationRoleRepository SetupUserPublicationRoleRepository(
+    private static UserPublicationRoleRepository CreateRepository(
         ContentDbContext contentDbContext)
     {
         return new(contentDbContext);

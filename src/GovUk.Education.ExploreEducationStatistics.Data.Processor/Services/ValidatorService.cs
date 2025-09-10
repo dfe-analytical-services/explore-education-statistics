@@ -6,16 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -88,11 +82,8 @@ public class ValidatorService : IValidatorService
 
         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
-        var dataFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
-            import.File.Path());
-
-        var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
-            import.MetaFile.Path());
+        var dataFileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
+        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
         return await
             ValidateCsvFileType(metaFileStreamProvider, isMetaFile: true)

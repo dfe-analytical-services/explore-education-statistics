@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
@@ -52,9 +48,7 @@ public class NotificationsService(
                 var publicationRoles = await context
                     .UserPublicationRoles
                     .Include(upr => upr.User)
-                    .Where(upr =>
-                        upr.PublicationId == releaseVersion.Release.PublicationId
-                        && upr.Deleted == null)
+                    .Where(upr => upr.PublicationId == releaseVersion.Release.PublicationId)
                     .ToListAsync();
 
                 return publicationRoles
@@ -65,6 +59,8 @@ public class NotificationsService(
                         {
                             ReleaseVersion = releaseVersion,
                             ReleaseVersionId = releaseVersion.Id,
+                            ReleaseTitle = releaseVersion.Release.Title,
+                            PublicationTitle = releaseVersion.Release.Publication.Title,
                             UserPublicationRole = upr.Role,
                             EmailToken = Guid.NewGuid().ToString()
                         };

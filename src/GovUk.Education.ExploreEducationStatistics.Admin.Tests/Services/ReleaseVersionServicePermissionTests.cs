@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -378,6 +376,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseDataFileService>(),
             Mock.Of<IReleaseFileService>(),
+            Mock.Of<IDataSetUploadRepository>(),
             Mock.Of<IDataImportService>(),
             Mock.Of<IFootnoteRepository>(),
             Mock.Of<IDataBlockService>(),
@@ -387,6 +386,8 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),
             new OrganisationsValidatorMockBuilder().Build(),
+            Mock.Of<IUserReleaseInviteRepository>(),
+            Mock.Of<IUserReleaseRoleRepository>(),
             Mock.Of<IReleaseSlugValidator>(),
              featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
              {

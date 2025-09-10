@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
@@ -34,9 +29,9 @@ public class MethodologyControllerTests
         var controller = new MethodologyController(methodologyService.Object);
 
         var result = await controller.GetLatestMethodologyBySlug("test-slug");
-        var methodologyViewModel = result.Value;
+        var methodologyVersionViewModel = result.AssertOkResult();
 
-        Assert.Equal(methodologyId, methodologyViewModel.Id);
+        Assert.Equal(methodologyId, methodologyVersionViewModel.Id);
 
         MockUtils.VerifyAllMocks(methodologyService);
     }

@@ -1,0 +1,22 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.table {
+  margin-bottom: #{govuk-spacing(8)};
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+.title {
+  width: 400px;
+  overflow-wrap: break-word;
+}
+
+.actions {
+  --verticalSpacing: #{govuk-spacing(1)};
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+  white-space: nowrap;
+}

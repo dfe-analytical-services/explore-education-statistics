@@ -54,4 +54,4 @@ param recoveryVaultImmutable = true
 
 param enableThemeDeletion = false
 
-param enableReplacementOfPublicApiDataSets = false
+param enableReplacementOfPublicApiDataSets = true

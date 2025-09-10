@@ -2,7 +2,6 @@ import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
 import { DataFilePermissions } from '@admin/services/permissionService';
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
-import downloadFile from '@common/utils/file/downloadFile';
 
 interface DataFileInfo extends FileInfo {
   type: 'Data';
@@ -19,28 +18,6 @@ interface DataFileInfo extends FileInfo {
 
 interface ReplacementDataFileInfo extends DataFileInfo {
   hasValidReplacementPlan?: boolean;
-}
-
-export interface DataSetInfo {
-  id: string | undefined;
-  extension: string;
-  summary: string | undefined;
-  dataSetTitle: string;
-  dataFileId: string;
-  dataFileName: string;
-  dataFileSize: number;
-  rows: number | undefined;
-  metaFileId: string;
-  metaFileName: string;
-  metaFileSize: number;
-  status: ImportStatusCode;
-  permissions: DataFilePermissions;
-  publicApiDataSetId: string | undefined;
-  publicApiDataSetVersion: string | undefined;
-  dataSetUpload: DataSetUpload | undefined;
-  created: string;
-  userName: string;
-  replacedBy?: string;
 }
 
 export interface DataSetUpload {
@@ -113,13 +90,11 @@ export type UploadDataFilesRequest = {
   title: string;
   dataFile: File;
   metadataFile: File;
-  replacingFileId?: string;
 };
 
 export type UploadZipDataFileRequest = {
   title: string;
   zipFile: File;
-  replacingFileId?: string;
 };
 
 export type FileType = 'data' | 'metadata';
@@ -207,57 +182,17 @@ const releaseDataFileService = {
       `/release/${releaseVersionId}/data/${fileId}/accoutrements-summary`,
     );
   },
-  async uploadDataSetFilePairForReplacement(
-    releaseId: string,
-    request: UploadDataFilesRequest,
-  ): Promise<DataFile> {
-    const { dataFile, metadataFile, title, replacingFileId } = request;
-
-    const data = new FormData();
-    data.append('releaseVersionId', releaseId);
-    data.append('title', title);
-    data.append('dataFile', dataFile);
-    data.append('metaFile', metadataFile);
-    data.append('replacingFileId', replacingFileId ?? '');
-
-    const file = await client.post<DataFileInfo>(
-      '/releaseVersions/replacement-data',
-      data,
-    );
-
-    return mapFile(file);
-  },
-  async uploadZippedDataSetFilePairForReplacement(
-    releaseId: string,
-    request: UploadZipDataFileRequest,
-  ): Promise<DataFile> {
-    const { zipFile, title, replacingFileId } = request;
-
-    const data = new FormData();
-    data.append('releaseVersionId', releaseId);
-    data.append('title', title);
-    data.append('zipFile', zipFile);
-    data.append('replacingFileId', replacingFileId ?? '');
-
-    const file = await client.post<DataFileInfo>(
-      '/releaseVersions/replacement-zip-data',
-      data,
-    );
-
-    return mapFile(file);
-  },
   async uploadDataSetFilePair(
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<void> {
-    const { dataFile, metadataFile, title, replacingFileId } = request;
+    const { dataFile, metadataFile, title } = request;
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('title', title);
     data.append('dataFile', dataFile);
     data.append('metaFile', metadataFile);
-    data.append('replacingFileId', replacingFileId ?? '');
 
     return client.post('/releaseVersions/data', data);
   },
@@ -265,13 +200,12 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<void> {
-    const { zipFile, title, replacingFileId } = request;
+    const { zipFile, title } = request;
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('title', title);
     data.append('zipFile', zipFile);
-    data.append('replacingFileId', replacingFileId ?? '');
 
     return client.post('/releaseVersions/zip-data', data);
   },
@@ -319,7 +253,6 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFileId}/import/status`,
     );
   },
-
   getDeleteDataFilePlan(
     releaseId: string,
     dataFileId: string,
@@ -331,32 +264,6 @@ const releaseDataFileService = {
   deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
-  async downloadFile(
-    releaseId: string,
-    id: string,
-    fileName: string,
-  ): Promise<void> {
-    await client
-      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
-        responseType: 'blob',
-      })
-      .then(response => downloadFile({ file: response, fileName }));
-  },
-  async downloadTemporaryFile(
-    releaseId: string,
-    fileType: FileType,
-    dataSetUploadId: string,
-    fileName: string,
-  ): Promise<void> {
-    await client
-      .get<Blob>(
-        `/releaseVersions/${releaseId}/${fileType}/${dataSetUploadId}/download`,
-        {
-          responseType: 'blob',
-        },
-      )
-      .then(response => downloadFile({ file: response, fileName }));
-  },
   updateFile(
     releaseId: string,
     fileId: string,
@@ -366,6 +273,23 @@ const releaseDataFileService = {
   },
   cancelImport(releaseId: string, fileId: string): Promise<void> {
     return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);
+  },
+  getDownloadBlobToken(
+    releaseVersionId: string,
+    fileId: string,
+  ): Promise<string> {
+    return client.get(
+      `/release/${releaseVersionId}/file/${fileId}/download/blob-token`,
+    );
+  },
+  getDownloadTemporaryBlobToken(
+    releaseVersionId: string,
+    dataSetUploadId: string,
+    fileType: FileType,
+  ): Promise<string> {
+    return client.get(
+      `/releaseVersions/${releaseVersionId}/${fileType}/${dataSetUploadId}/download-temporary-file/blob-token`,
+    );
   },
 };
 

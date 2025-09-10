@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;

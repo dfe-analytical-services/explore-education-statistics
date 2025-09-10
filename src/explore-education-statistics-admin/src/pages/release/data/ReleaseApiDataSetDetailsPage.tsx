@@ -68,7 +68,8 @@ export default function ReleaseApiDataSetDetailsPage() {
   useEffect(() => {
     if (
       finalisingStatus === 'finalising' &&
-      dataSet?.draftVersion?.status !== 'Mapping'
+      dataSet?.draftVersion?.status !== 'Mapping' &&
+      dataSet?.draftVersion?.status !== 'Finalising'
     ) {
       setFinalisingStatus('finalised');
     }
@@ -111,6 +112,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     canUpdateRelease,
     dataSet,
   );
+
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.draftVersion}
@@ -169,27 +171,29 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </li>
               </>
             )}
-            {canUpdateRelease && !isPatch && (
-              <li>
-                <DeleteDraftVersionButton
-                  dataSet={dataSet}
-                  dataSetVersion={dataSet.draftVersion}
-                  onDeleted={() =>
-                    history.push(
-                      generatePath<ReleaseRouteParams>(
-                        releaseApiDataSetsRoute.path,
-                        {
-                          publicationId: releaseVersion.publicationId,
-                          releaseVersionId: releaseVersion.id,
-                        },
-                      ),
-                    )
-                  }
-                >
-                  Remove draft version
-                </DeleteDraftVersionButton>
-              </li>
-            )}
+            {canUpdateRelease &&
+              !isPatch &&
+              dataSet?.draftVersion?.status !== 'Finalising' && (
+                <li>
+                  <DeleteDraftVersionButton
+                    dataSet={dataSet}
+                    dataSetVersion={dataSet.draftVersion}
+                    onDeleted={() =>
+                      history.push(
+                        generatePath<ReleaseRouteParams>(
+                          releaseApiDataSetsRoute.path,
+                          {
+                            publicationId: releaseVersion.publicationId,
+                            releaseVersionId: releaseVersion.id,
+                          },
+                        ),
+                      )
+                    }
+                  >
+                    Remove draft version
+                  </DeleteDraftVersionButton>
+                </li>
+              )}
           </ul>
         )
       }
@@ -262,6 +266,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const showDraftVersionTasks =
     dataSet?.draftVersion?.status !== 'Processing' &&
+    dataSet?.draftVersion?.status !== 'Finalising' &&
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
@@ -290,7 +295,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <InsetText variant="error">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
         {incompletesFound
-          ? 'This API data set can not be published because it has incomplete location or filter manual mapping.'
+          ? 'This API data set can not be published because location or filter mappings are not yet complete.'
           : 'This API data set can not be published because it has major changes that are not allowed.'}
       </h2>
       <div className="govuk-error-summary__body">
@@ -306,7 +311,7 @@ export default function ReleaseApiDataSetDetailsPage() {
           </li>
           <li>
             Alternatively{' '}
-            <Link to={replaceTabRoute} test-id="cancel-replacement-link">
+            <Link to={replaceTabRoute} data-testid="cancel-replacement-link">
               {' '}
               cancel the ongoing replacement
             </Link>{' '}

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -204,7 +199,9 @@ public abstract class NotificationsServiceTests
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: ownerFeedbackEntry,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Owner);
+                    expectedRole: PublicationRole.Owner,
+                    expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
+                    expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title);
                 
                 var approverFeedbackEntry1 = feedbackEntries
                     .First(f => f.UserPublicationRole == PublicationRole.Allower);
@@ -212,7 +209,9 @@ public abstract class NotificationsServiceTests
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: approverFeedbackEntry1,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Allower);
+                    expectedRole: PublicationRole.Allower,
+                    expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
+                    expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title);
                 
                 var approverFeedbackEntry2 = feedbackEntries
                     .Last(f => f.UserPublicationRole == PublicationRole.Allower);
@@ -220,7 +219,9 @@ public abstract class NotificationsServiceTests
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: approverFeedbackEntry2,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Allower);
+                    expectedRole: PublicationRole.Allower,
+                    expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
+                    expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title);
 
                 notifierClient.Verify(mock => mock.NotifyReleasePublishingFeedbackUsers(
                         new List<ReleasePublishingFeedbackMessage>
@@ -303,7 +304,9 @@ public abstract class NotificationsServiceTests
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: release1OwnerFeedbackEntry,
                     expectedReleaseVersionId: release1Version.Id,
-                    expectedRole: PublicationRole.Owner);
+                    expectedRole: PublicationRole.Owner,
+                    expectedReleaseTimePeriod: release1Version.Release.Title,
+                    expectedPublicationTitle: release1Version.Release.Publication.Title);
 
                 var release2OwnerFeedbackEntry = feedbackEntries
                     .Single(f => f.ReleaseVersionId == release2Version.Id);
@@ -311,7 +314,9 @@ public abstract class NotificationsServiceTests
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: release2OwnerFeedbackEntry,
                     expectedReleaseVersionId: release2Version.Id,
-                    expectedRole: PublicationRole.Owner);
+                    expectedRole: PublicationRole.Owner,
+                    expectedReleaseTimePeriod: release2Version.Release.Title,
+                    expectedPublicationTitle: release2Version.Release.Publication.Title);
 
                 notifierClient.Verify(mock => mock.NotifyReleasePublishingFeedbackUsers(
                         new List<ReleasePublishingFeedbackMessage>
@@ -326,56 +331,6 @@ public abstract class NotificationsServiceTests
             }
 
             VerifyAllMocks(notifierClient);
-        }
-        
-        [Fact]
-        public async Task UserPublicationRoleDeleted_NoEmailSent()
-        {
-            var publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => _dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1))
-                .Generate();
-
-            var publicationOwner = _dataFixture
-                .DefaultUserPublicationRole()
-                .WithPublication(publication)
-                .WithRole(PublicationRole.Owner)
-                .WithUser(new User { Email = "publication-owner@example.com" })
-                .WithDeleted(DateTime.UtcNow)
-                .Generate();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.AddRange(publication);
-                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var notificationsService = BuildNotificationsService(
-                    contentDbContext,
-                    notifierClient: notifierClient.Object);
-
-                await notificationsService.SendReleasePublishingFeedbackEmails([
-                    publication.Releases[0].Versions[0].Id
-                ]);
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var feedbackEntries = contentDbContext
-                    .ReleasePublishingFeedback
-                    .ToList();
-
-                Assert.Empty(feedbackEntries);
-            }
         }
         
         [Fact]
@@ -434,7 +389,9 @@ public abstract class NotificationsServiceTests
         private static void AssertNewFeedbackRecordCreatedOk(
             ReleasePublishingFeedback feedbackEntry,
             Guid expectedReleaseVersionId,
-            PublicationRole expectedRole)
+            PublicationRole expectedRole,
+            string expectedReleaseTimePeriod,
+            string expectedPublicationTitle)
         {
             feedbackEntry.Created.AssertUtcNow();
             Assert.NotEmpty(feedbackEntry.EmailToken);
@@ -442,6 +399,8 @@ public abstract class NotificationsServiceTests
             Assert.Null(feedbackEntry.AdditionalFeedback);
             Assert.Equal(expectedReleaseVersionId, feedbackEntry.ReleaseVersionId);
             Assert.Equal(expectedRole, feedbackEntry.UserPublicationRole);
+            Assert.Equal(expectedReleaseTimePeriod, feedbackEntry.ReleaseTitle);
+            Assert.Equal(expectedPublicationTitle, feedbackEntry.PublicationTitle);
         }
     }
 

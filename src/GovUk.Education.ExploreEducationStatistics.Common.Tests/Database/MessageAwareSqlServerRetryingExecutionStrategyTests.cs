@@ -1,6 +1,5 @@
 #nullable enable
 #pragma warning disable EF1001
-using System;
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using Microsoft.Data.SqlClient;

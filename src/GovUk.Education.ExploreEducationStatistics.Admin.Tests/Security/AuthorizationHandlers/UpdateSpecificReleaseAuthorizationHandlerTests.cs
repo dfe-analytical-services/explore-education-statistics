@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -9,9 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.Extensions.Logging;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
@@ -64,10 +62,13 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
 
             return new UpdateSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    new ReleaseVersionRepository(contentDbContext),
-                    new UserReleaseRoleRepository(contentDbContext),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
+                    releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(
+                        contentDbContext: contentDbContext,
+                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                    userPublicationRoleRepository: new UserPublicationRoleRepository(
+                        contentDbContext: contentDbContext),
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
         };
     }
 }

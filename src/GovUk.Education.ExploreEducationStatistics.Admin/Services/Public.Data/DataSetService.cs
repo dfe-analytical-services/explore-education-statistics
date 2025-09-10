@@ -12,11 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -78,6 +73,18 @@ internal class DataSetService(
                 .OnSuccess(userService.CheckCanViewPublication)
             )
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
+    }
+    
+    public async Task<Either<ActionResult, bool>> HasDraftVersion(
+        Guid dataSetId,
+        CancellationToken cancellationToken = default)
+    {
+        return await QueryDataSet(dataSetId)
+            .SingleOrNotFoundAsync(cancellationToken)
+            .OnSuccessDo(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken)
+                .OnSuccess(userService.CheckCanViewPublication)
+            )
+            .OnSuccess(dataSet => dataSet.LatestDraftVersion is not null);
     }
 
     public async Task<Either<ActionResult, DataSetViewModel>> CreateDataSet(

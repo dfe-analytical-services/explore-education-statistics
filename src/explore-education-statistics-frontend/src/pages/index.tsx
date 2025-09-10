@@ -1,3 +1,4 @@
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -49,9 +50,12 @@ function HomePage() {
           <h3 className="govuk-!-margin-bottom-1">
             <Link
               to="https://www.gov.uk/search/research-and-statistics?content_store_document_type=upcoming_statistics&organisations%5B%5D=department-for-education&order=updated-newest"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('Statistics release calendar')}
             >
-              Statistics release calendar
+              Statistics release calendar{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>
           </h3>
           <p className="govuk-caption-m">
@@ -82,9 +86,12 @@ function HomePage() {
           <h3 className="govuk-!-margin-bottom-1">
             <Link
               to="https://api.education.gov.uk/statistics/docs"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('API documentation')}
             >
-              API documentation
+              API documentation{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>
           </h3>
           <p className="govuk-caption-m">
@@ -102,14 +109,18 @@ function HomePage() {
         <div className="govuk-grid-column-two-thirds">
           <p>
             Use these services to find related information and other statistical
-            services provided by the Department for Education (DfE):
+            services provided by the Department for Education (DfE), these links
+            will open in a new tab:
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://www.gov.uk/government/organisations/department-for-education/about/statistics"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('Statistics at DfE')}
             >
-              Statistics at DfE
+              Statistics at DfE{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -119,11 +130,14 @@ function HomePage() {
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://www.gov.uk/school-performance-tables"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() =>
                 logLinkClick('Compare school and college performance')
               }
             >
-              Compare school and college performance
+              Compare school and college performance{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -133,9 +147,12 @@ function HomePage() {
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://www.get-information-schools.service.gov.uk/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('Get information about schools')}
             >
-              Get information about schools
+              Get information about schools{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -145,11 +162,14 @@ function HomePage() {
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://financial-benchmarking-and-insights-tool.education.gov.uk/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() =>
                 logLinkClick('Financial Benchmarking and Insights Tool')
               }
             >
-              Financial Benchmarking and Insights Tool
+              Financial Benchmarking and Insights Tool{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">

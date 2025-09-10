@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -94,14 +92,23 @@ public static class PublisherHostBuilderExtensions
                         new FileStorageService(
                             provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
                     .AddScoped<IPublishingService, PublishingService>()
+                    .AddSingleton<IBlobSasService, BlobSasService>()
                     .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                         new PublicBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublicStorageConnectionString,
-                            provider.GetRequiredService<ILogger<IBlobStorageService>>()))
+                            connectionString: provider
+                                .GetRequiredService<IOptions<AppOptions>>()
+                                .Value
+                                .PublicStorageConnectionString,
+                            logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: provider.GetRequiredService<IBlobSasService>()))
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                         new PrivateBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PrivateStorageConnectionString,
-                            provider.GetRequiredService<ILogger<IBlobStorageService>>()))
+                            connectionString: provider
+                                .GetRequiredService<IOptions<AppOptions>>()
+                                .Value
+                                .PrivateStorageConnectionString,
+                            logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: provider.GetRequiredService<IBlobSasService>()))
                     .AddScoped<IContentService, ContentService>(provider =>
                         new ContentService(
                             contentDbContext: provider.GetRequiredService<ContentDbContext>(),
@@ -142,6 +149,7 @@ public static class PublisherHostBuilderExtensions
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
+                    .AddSingleton<DateTimeProvider>()
                     .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.

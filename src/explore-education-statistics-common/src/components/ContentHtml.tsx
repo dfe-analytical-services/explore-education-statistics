@@ -1,6 +1,7 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
-import formatContentLink from '@common/utils/url/formatContentLink';
+import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
+import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -55,48 +56,63 @@ export default function ContentHtml({
       if (!(node instanceof Element)) {
         return undefined;
       }
-      if (
-        getGlossaryEntry &&
-        node.name === 'a' &&
-        typeof node.attribs['data-glossary'] !== 'undefined'
-      ) {
-        return isMounted ? (
-          <GlossaryEntryButton
-            getEntry={getGlossaryEntry}
-            href={node.attribs.href}
-            onToggle={trackGlossaryLinks}
-          >
-            {domToReact(node.children)}
-          </GlossaryEntryButton>
-        ) : undefined;
-      }
 
-      if (
-        transformFeaturedTableLinks &&
-        node.name === 'a' &&
-        typeof node.attribs['data-featured-table'] !== 'undefined'
-      ) {
-        const text = domToReact(node.children);
-        return isMounted && typeof text === 'string'
-          ? transformFeaturedTableLinks(node.attribs.href, text)
-          : undefined;
-      }
-
-      if (formatLinks && node.name === 'a') {
-        const url = formatContentLink(node.attribs.href);
+      // Links
+      if (node.name === 'a') {
         const text = domToReact(node.children);
 
-        return !url?.includes('explore-education-statistics.service.gov.uk') &&
-          !url?.startsWith('mailto:') &&
-          typeof node.attribs['data-featured-table'] === 'undefined' ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {text} (opens in a new tab)
-          </a>
-        ) : (
-          <a href={url}>{text}</a>
-        );
+        // Glossary links
+        if (
+          getGlossaryEntry &&
+          typeof node.attribs['data-glossary'] !== 'undefined'
+        ) {
+          return isMounted ? (
+            <GlossaryEntryButton
+              getEntry={getGlossaryEntry}
+              href={node.attribs.href}
+              onToggle={trackGlossaryLinks}
+            >
+              {text}
+            </GlossaryEntryButton>
+          ) : undefined;
+        }
+
+        // Featured table links
+        if (
+          transformFeaturedTableLinks &&
+          typeof node.attribs['data-featured-table'] !== 'undefined'
+        ) {
+          return isMounted && typeof text === 'string'
+            ? transformFeaturedTableLinks(node.attribs.href, text)
+            : undefined;
+        }
+
+        // Standard links
+        if (formatLinks) {
+          // This is done when content is saved, but do here again to cover links that were
+          // added before that change was made.
+          const urlString = formatContentLinkUrl(node.attribs.href);
+
+          const urlAttributes = getUrlAttributes(urlString);
+
+          if (urlAttributes && urlAttributes.isExternal) {
+            const rel = 'noopener noreferrer nofollow';
+            return (
+              // eslint-disable-next-line react/jsx-no-target-blank
+              <a
+                href={urlString}
+                target="_blank"
+                rel={urlAttributes.isTrusted ? rel : `${rel} external`}
+              >
+                {text} (opens in new tab)
+              </a>
+            );
+          }
+          return <a href={urlString}>{text}</a>;
+        }
       }
 
+      // Tables
       if (node.name === 'figure' && node.attribs.class === 'table') {
         return renderTable(node);
       }

@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 

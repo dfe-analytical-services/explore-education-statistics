@@ -1,13 +1,10 @@
 #nullable enable
-using System.Collections.Generic;
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Xunit;
-using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using AngleSharp.Text;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters.SystemJson;
 

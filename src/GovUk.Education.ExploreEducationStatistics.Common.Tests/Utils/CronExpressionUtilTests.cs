@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using System;
+using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 using Xunit.Abstractions;
@@ -80,7 +80,7 @@ public abstract class CronExpressionUtilTests(ITestOutputHelper output)
             const string cronExpression = "* * * *"; // Not enough fields
             var from = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
 
-            Assert.Throws<Cronos.CronFormatException>(() =>
+            Assert.Throws<CronFormatException>(() =>
                 CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc));
         }
     }

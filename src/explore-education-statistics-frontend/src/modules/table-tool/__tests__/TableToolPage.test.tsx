@@ -5,11 +5,12 @@ import {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import TableToolPage from '@frontend/modules/table-tool/TableToolPage';
 import React from 'react';
+import render from '@common-test/render';
 
 describe('TableToolPage', () => {
   const testPublicationId = '536154f5-7f82-4dc7-060a-08d9097c1945';

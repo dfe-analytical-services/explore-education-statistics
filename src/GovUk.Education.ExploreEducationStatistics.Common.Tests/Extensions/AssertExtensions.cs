@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using KellermanSoftware.CompareNetObjects;
@@ -13,9 +12,9 @@ public static class AssertExtensions
     public const int TimeWithinMillis = 10000;
 
     /**
-     * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
-     * other testing frameworks.
-     */
+        * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
+        * other testing frameworks.
+        */
     public static XunitException AssertFail(string message)
     {
         throw new XunitException(message);
@@ -80,6 +79,17 @@ public static class AssertExtensions
     {
         Assert.NotNull(dateTimeOffset);
         dateTimeOffset.Value.AssertUtcNow(withinMillis: withinMillis);
+    }
+
+    /// <summary>
+    /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
+    /// </summary>
+    public static void AssertEqual(
+        this DateTime dateTime,
+        DateTime expectedDateTime,
+        int withinMillis = TimeWithinMillis)
+    {
+        Assert.Equal(expectedDateTime, dateTime, TimeSpan.FromMilliseconds(withinMillis));
     }
 
     /// <summary>

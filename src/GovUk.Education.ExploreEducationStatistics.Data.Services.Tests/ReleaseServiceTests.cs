@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -24,6 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
@@ -35,7 +33,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects()
     {
-        var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statisticsReleaseVersion = new Model.ReleaseVersion();
 
         var releaseSubject1 = new ReleaseSubject
         {
@@ -252,7 +250,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_NoSubjects()
     {
-        var statsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statsReleaseVersion = new Model.ReleaseVersion();
 
         var contentReleaseVersion = new ReleaseVersion
         {
@@ -278,7 +276,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_StatsDbHasMissingSubject()
     {
-        Data.Model.ReleaseVersion statisticsReleaseVersion = _fixture.DefaultStatsReleaseVersion();
+        Model.ReleaseVersion statisticsReleaseVersion = _fixture.DefaultStatsReleaseVersion();
 
         ReleaseSubject releaseSubject1 = _fixture.DefaultReleaseSubject()
             .WithReleaseVersion(statisticsReleaseVersion)
@@ -343,7 +341,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FiltersPendingReplacementSubjects()
     {
-        var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statisticsReleaseVersion = new Model.ReleaseVersion();
 
         var releaseSubject1 = new ReleaseSubject
         {
@@ -474,7 +472,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FiltersImportingSubjects()
     {
-        var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statisticsReleaseVersion = new Model.ReleaseVersion();
 
         var releaseSubject1 = new ReleaseSubject
         {
@@ -584,7 +582,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FiltersSubjectsWithNoImport()
     {
-        var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statisticsReleaseVersion = new Model.ReleaseVersion();
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = statisticsReleaseVersion,
@@ -690,7 +688,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FilterOrder()
     {
-        var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statisticsReleaseVersion = new Model.ReleaseVersion();
 
         var subject1Filter1Id = Guid.NewGuid();
         var subject1Filter2Id = Guid.NewGuid();
@@ -816,7 +814,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_IndicatorOrder()
     {
-        var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
+        var statisticsReleaseVersion = new Model.ReleaseVersion();
 
         var subject1Indicator1 = new Indicator
         {
@@ -948,7 +946,7 @@ public class ReleaseServiceTests
     {
         var releaseVersionId = Guid.NewGuid();
         var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
-        var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseVersionId };
+        var statsReleaseVersion = new Model.ReleaseVersion { Id = releaseVersionId };
 
         var releaseSubject1 = new ReleaseSubject
         {
@@ -1091,7 +1089,7 @@ public class ReleaseServiceTests
 
         var releaseSubject1 = new ReleaseSubject
         {
-            ReleaseVersion = new Data.Model.ReleaseVersion
+            ReleaseVersion = new Model.ReleaseVersion
             {
                 Id = releaseVersionId
             },
@@ -1173,7 +1171,7 @@ public class ReleaseServiceTests
 
         var releaseSubject1 = new ReleaseSubject
         {
-            ReleaseVersion = new Data.Model.ReleaseVersion
+            ReleaseVersion = new Model.ReleaseVersion
             {
                 Id = releaseVersionId
             },
@@ -1255,7 +1253,7 @@ public class ReleaseServiceTests
 
         var releaseSubject1 = new ReleaseSubject
         {
-            ReleaseVersion = new Data.Model.ReleaseVersion
+            ReleaseVersion = new Model.ReleaseVersion
             {
                 Id = releaseVersionId
             },

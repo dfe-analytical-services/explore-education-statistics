@@ -1,0 +1,16 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.releasePageTitleWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: govuk-spacing(4);
+}
+
+.releasePageTitle {
+  flex: 1 1 66%;
+
+  @include govuk-media-query($from: tablet) {
+    flex-grow: 0;
+  }
+}

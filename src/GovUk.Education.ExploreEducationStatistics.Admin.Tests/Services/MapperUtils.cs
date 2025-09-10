@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Reflection;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;

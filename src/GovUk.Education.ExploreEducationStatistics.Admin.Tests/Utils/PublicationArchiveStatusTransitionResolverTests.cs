@@ -1,9 +1,7 @@
 ﻿#nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Utils.PublicationArchiveStatusTransitionResolver.
-    PublicationArchiveStatusTransition;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Utils.PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 

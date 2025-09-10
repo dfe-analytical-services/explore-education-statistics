@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -41,29 +37,12 @@ public interface IReleaseDataFileService
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
         string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken);
-
-    Task<Either<ActionResult, DataFileInfo>> UploadForReplacement(
-        Guid releaseVersionId,
-        IManagedStreamFile dataFile,
-        IManagedStreamFile metaFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
         Guid releaseVersionId,
         IManagedStreamZipFile zipFile,
         string dataSetTitle,
-        Guid? replacingFileId,
-        CancellationToken cancellationToken);
-
-    Task<Either<ActionResult, DataFileInfo>> UploadFromZipForReplacement(
-        Guid releaseVersionId,
-        IManagedStreamZipFile zipFormFile,
-        string dataSetTitle,
-        Guid? replacingFileId,
         CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromBulkZip(

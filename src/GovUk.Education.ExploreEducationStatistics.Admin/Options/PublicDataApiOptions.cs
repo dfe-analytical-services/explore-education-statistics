@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Options;
 
 public class PublicDataApiOptions : IAzureAuthenticationOptions

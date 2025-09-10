@@ -1,7 +1,4 @@
-#nullable enable
-using System;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
@@ -26,7 +23,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             EmailToken = Guid.NewGuid().ToString(),
             UserPublicationRole = PublicationRole.Owner,
             ReleaseVersionId = Guid.NewGuid(),
-            Created = DateTime.UtcNow.AddDays(-1)
+            Created = DateTime.UtcNow.AddDays(-1),
+            ReleaseTitle = "Academic year 2022",
+            PublicationTitle = "Publication title"
         };
         
         await TestApp.AddTestData<ContentDbContext>(context =>
@@ -58,6 +57,8 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         Assert.Equal(existingFeedback.Created, updatedFeedback.Created);
         Assert.Equal(existingFeedback.UserPublicationRole, updatedFeedback.UserPublicationRole);
         Assert.Equal(existingFeedback.ReleaseVersionId, updatedFeedback.ReleaseVersionId);
+        Assert.Equal(existingFeedback.ReleaseTitle, updatedFeedback.ReleaseTitle);
+        Assert.Equal(existingFeedback.PublicationTitle, updatedFeedback.PublicationTitle);
     }
 
     [Fact]
@@ -69,7 +70,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             EmailToken = Guid.NewGuid().ToString(),
             UserPublicationRole = PublicationRole.Owner,
             ReleaseVersionId = Guid.NewGuid(),
-            Created = DateTime.UtcNow.AddDays(-1)
+            Created = DateTime.UtcNow.AddDays(-1),
+            ReleaseTitle = "Academic year 2022",
+            PublicationTitle = "Publication title"
         };
         
         await TestApp.AddTestData<ContentDbContext>(context =>
@@ -110,7 +113,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             EmailToken = Guid.NewGuid().ToString(),
             UserPublicationRole = PublicationRole.Owner,
             ReleaseVersionId = Guid.NewGuid(),
-            Created = DateTime.UtcNow.AddDays(-1)
+            Created = DateTime.UtcNow.AddDays(-1),
+            ReleaseTitle = "Academic year 2022",
+            PublicationTitle = "Publication title"
         };
         
         await TestApp.AddTestData<ContentDbContext>(context =>

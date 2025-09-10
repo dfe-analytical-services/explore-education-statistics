@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record DataSetFileFilterHierarchyTierViewModel(

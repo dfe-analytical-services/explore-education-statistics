@@ -1,4 +1,10 @@
 #nullable enable
+using System.IO.Compression;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Net.Mime;
+using System.Reflection;
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -20,18 +26,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Net.Mime;
-using System.Reflection;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -63,23 +57,21 @@ public class ReleaseVersionsControllerUnitTests
                 ItIsFileMatch(dataFile),
                 ItIsFileMatch(metaFile),
                 "Data set title",
-                null,
                 default))
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-        var response = await controller.UploadDataSet(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                Title = "Data set title",
-                DataFile = dataFile,
-                MetaFile = metaFile,
-                ReplacingFileId = null
-            },
-            cancellationToken: default);
+            var response = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                },
+                cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -103,23 +95,21 @@ public class ReleaseVersionsControllerUnitTests
                 ItIsFileMatch(dataFile),
                 ItIsFileMatch(metaFile),
                 "Data set title",
-                null,
                 default))
             .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-        // Act
-        var result = await controller.UploadDataSet(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                Title = "Data set title",
-                DataFile = dataFile,
-                MetaFile = metaFile,
-                ReplacingFileId = null
-            },
-            cancellationToken: default);
+            // Act
+            var result = await controller.UploadDataSet(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    DataFile = dataFile,
+                    MetaFile = metaFile,
+                },
+                cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -141,22 +131,20 @@ public class ReleaseVersionsControllerUnitTests
                 _releaseVersionId,
                 It.IsAny<IManagedStreamZipFile>(),
                 "Data set title",
-                null,
                 default))
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-        var response = await controller.UploadDataSetAsZip(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                Title = "Data set title",
-                ZipFile = dataSetZipFile,
-                ReplacingFileId = null
-            },
-            cancellationToken: default);
+            var response = await controller.UploadDataSetAsZip(
+                new()
+                {
+                    ReleaseVersionId = _releaseVersionId,
+                    Title = "Data set title",
+                    ZipFile = dataSetZipFile,
+                },
+                cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -1506,7 +1494,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                 multipartContent.Add(fileContent, "ZipFile", fileName);
             }
@@ -1536,7 +1524,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             try
             {
-                var fileContent = new ByteArrayContent(await System.IO.File.ReadAllBytesAsync(filePath));
+                var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Zip);
                 multipartContent.Add(fileContent, "ZipFile", fileName);
             }

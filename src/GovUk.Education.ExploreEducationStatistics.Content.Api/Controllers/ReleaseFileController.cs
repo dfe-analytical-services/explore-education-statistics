@@ -1,9 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -87,7 +83,7 @@ public class ReleaseFileController(
                         contentType: MediaTypeNames.Application.Octet,
                         filename: $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip");
 
-                    // We start the response immediately, before all of the files have
+                    // We start the response immediately, before all the files have
                     // even downloaded from blob storage. As we download them, they are
                     // appended in-flight to the user's download.
                     // This is more efficient and means the user doesn't have

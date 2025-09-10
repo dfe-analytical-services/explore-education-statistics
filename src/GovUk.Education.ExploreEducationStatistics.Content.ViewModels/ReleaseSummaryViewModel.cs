@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -28,7 +29,7 @@ public record ReleaseSummaryViewModel
     public PartialDate? NextReleaseDate { get; init; }
 
     [JsonConverter(typeof(JsonStringEnumConverter<ReleaseType>))]
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     public required ReleaseType Type { get; init; }
 
     public required bool LatestRelease { get; init; }

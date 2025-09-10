@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 

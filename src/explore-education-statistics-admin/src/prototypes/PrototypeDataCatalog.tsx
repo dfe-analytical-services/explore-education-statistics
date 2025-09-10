@@ -1014,9 +1014,9 @@ const PrototypeDataCatalogue = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href={`./data-selected?dataType=${dataType}`}>
+                        <Link to={`./data-selected?dataType=${dataType}`}>
                           Apprenticeship Achievement Rates Detailed Series
-                        </a>
+                        </Link>
                       </h3>
                       <p className="govuk-!-margin-bottom-2">
                         Apprenticeship national achievement rate tables
@@ -1615,9 +1615,9 @@ const PrototypeDataCatalogue = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href={`./data-selected?dataType=${dataType}`}>
+                        <Link to={`./data-selected?dataType=${dataType}`}>
                           Apprenticeship Achievement Rates Detailed Series
-                        </a>
+                        </Link>
                       </h3>
                       <p className="govuk-!-margin-bottom-2">
                         Apprenticeship national achievement rate tables
@@ -2172,9 +2172,9 @@ const PrototypeDataCatalogue = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href={`./data-selected?dataType=${dataType}`}>
+                    <Link to={`./data-selected?dataType=${dataType}`}>
                       Apprenticeship Achievement Rates Detailed Series
-                    </a>
+                    </Link>
                   </h3>
                   <p className="govuk-!-margin-bottom-2">
                     Apprenticeship national achievement rate tables

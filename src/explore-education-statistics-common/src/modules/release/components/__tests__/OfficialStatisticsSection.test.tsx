@@ -8,7 +8,7 @@ describe('OfficialStatisticsSection', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Code of Practice for Official Statistics',
+        name: 'Code of Practice for Official Statistics (opens in new tab)',
       }),
     ).toBeInTheDocument();
   });
@@ -42,7 +42,9 @@ describe('OfficialStatisticsSection', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Code of Practice for Statistics' }),
+      screen.getByRole('link', {
+        name: 'Code of Practice for Statistics (opens in new tab)',
+      }),
     ).toHaveAttribute(
       'href',
       'https://code.statisticsauthority.gov.uk/the-code/',
@@ -52,9 +54,8 @@ describe('OfficialStatisticsSection', () => {
       screen.getByRole('link', { name: 'regulation@statistics.gov.uk' }),
     ).toHaveAttribute('href', 'mailto:regulation@statistics.gov.uk');
 
-    expect(screen.getByRole('link', { name: 'OSR website' })).toHaveAttribute(
-      'href',
-      'https://osr.statisticsauthority.gov.uk/',
-    );
+    expect(
+      screen.getByRole('link', { name: 'OSR website (opens in new tab)' }),
+    ).toHaveAttribute('href', 'https://osr.statisticsauthority.gov.uk/');
   });
 });

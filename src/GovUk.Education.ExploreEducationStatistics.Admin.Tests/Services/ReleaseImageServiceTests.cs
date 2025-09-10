@@ -15,8 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -66,7 +64,7 @@ public class ReleaseImageServiceTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -75,8 +73,6 @@ public class ReleaseImageServiceTests
 
             var result = await service.Stream(releaseVersionId: releaseVersion.Id,
                 fileId: releaseFile.File.Id);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             var fileStreamResult = result.AssertRight();
 
@@ -170,7 +166,7 @@ public class ReleaseImageServiceTests
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -179,8 +175,6 @@ public class ReleaseImageServiceTests
 
             var result = await service.Stream(releaseVersionId: releaseVersion.Id,
                 fileId: releaseFile.File.Id);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertNotFound();
         }

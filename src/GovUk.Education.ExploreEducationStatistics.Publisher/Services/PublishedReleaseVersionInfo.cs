@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 public record PublishedReleaseVersionInfo
 {

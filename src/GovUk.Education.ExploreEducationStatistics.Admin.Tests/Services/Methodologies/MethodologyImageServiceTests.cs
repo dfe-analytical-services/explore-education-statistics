@@ -16,8 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -575,7 +573,7 @@ public class MethodologyImageServiceTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
+            .SetupGetDownloadStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -583,8 +581,6 @@ public class MethodologyImageServiceTests
                 privateBlobStorageService: privateBlobStorageService.Object);
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             var fileStreamResult = result.AssertRight();
 
@@ -677,7 +673,7 @@ public class MethodologyImageServiceTests
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 
-        privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateMethodologyFiles, methodologyFile.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateMethodologyFiles, methodologyFile.Path());
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -685,8 +681,6 @@ public class MethodologyImageServiceTests
                 privateBlobStorageService: privateBlobStorageService.Object);
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertNotFound();
         }

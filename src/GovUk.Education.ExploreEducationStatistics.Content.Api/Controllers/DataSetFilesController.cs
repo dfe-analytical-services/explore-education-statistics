@@ -1,9 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -53,10 +49,11 @@ public class DataSetFilesController : ControllerBase
 
     [HttpGet("data-set-files/{dataSetFileId:guid}")]
     public async Task<ActionResult<DataSetFileViewModel>> GetDataSetFile(
-        Guid dataSetFileId)
+        Guid dataSetFileId,
+        CancellationToken cancellationToken)
     {
         return await _dataSetFileService
-            .GetDataSetFile(dataSetFileId)
+            .GetDataSetFile(dataSetFileId, cancellationToken)
             .HandleFailuresOrOk();
     }
 

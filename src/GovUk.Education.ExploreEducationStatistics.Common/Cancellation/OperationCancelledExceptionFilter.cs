@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc.Filters;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;

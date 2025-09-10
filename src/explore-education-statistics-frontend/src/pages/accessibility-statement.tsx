@@ -15,11 +15,11 @@ function AcccessibilityStatementPage() {
             explore-education-statistics.service.gov.uk website. This website is
             run by the{' '}
             <a
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               target="_blank"
               href="https://www.gov.uk/government/organisations/department-for-education"
             >
-              Department for Education (DfE) (opens in a new tab)
+              Department for Education (DfE) (opens in new tab)
             </a>
             . This statement does not cover any other services run by the
             Department for Education (DfE) or GOV.UK.
@@ -50,11 +50,11 @@ function AcccessibilityStatementPage() {
           </p>
           <p>
             <a
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               target="_blank"
               href="https://mcmw.abilitynet.org.uk/"
             >
-              AbilityNet (opens in a new tab)
+              AbilityNet (opens in new tab)
             </a>{' '}
             has advice on making your device easier to use if you have a
             disability.
@@ -104,10 +104,10 @@ function AcccessibilityStatementPage() {
             the{' '}
             <a
               href="https://www.equalityadvisoryservice.com/"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               target="_blank"
             >
-              Equality Advisory and Support Service (EASS) (opens in a new tab)
+              Equality Advisory and Support Service (EASS) (opens in new tab)
             </a>
             .
           </p>
@@ -123,7 +123,7 @@ function AcccessibilityStatementPage() {
             This website is partially compliant with the{' '}
             <a
               href="https://www.w3.org/TR/WCAG22/"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               target="_blank"
             >
               Web Content Accessibility Guidelines version 2.2 (opens in a new
@@ -173,10 +173,10 @@ function AcccessibilityStatementPage() {
             This website was last tested on 12 March 2024 against{' '}
             <a
               href="https://www.w3.org/TR/WCAG22/"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               target="_blank"
             >
-              Accessibility Guidelines WCAG2.2 (opens in a new tab)
+              Accessibility Guidelines WCAG2.2 (opens in new tab)
             </a>
             .
           </p>
@@ -184,10 +184,10 @@ function AcccessibilityStatementPage() {
             The test was carried out by the{' '}
             <a
               href="https://digitalaccessibilitycentre.org/"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               target="_blank"
             >
-              Digital accessibility centre (DAC) (opens in a new tab)
+              Digital accessibility centre (DAC) (opens in new tab)
             </a>
             .
           </p>

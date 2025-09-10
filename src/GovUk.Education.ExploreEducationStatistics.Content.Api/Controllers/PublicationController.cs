@@ -1,21 +1,13 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
@@ -50,41 +42,6 @@ public class PublicationController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [MemoryCache(typeof(ListPublicationsGetCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    [HttpGet("publications")]
-    public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-        [FromQuery] PublicationsListGetRequest request)
-    {
-        return await _publicationService
-            .ListPublications(
-                request.ReleaseType,
-                request.ThemeId,
-                request.Search,
-                request.Sort,
-                request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize)
-            .HandleFailuresOrOk();
-    }
-
-    [MemoryCache(typeof(ListPublicationsPostCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    [HttpPost("publications")]
-    public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-        [FromBody] PublicationsListPostRequest request)
-    {
-        return await _publicationService
-            .ListPublications(
-                request.ReleaseType,
-                request.ThemeId,
-                request.Search,
-                request.Sort,
-                request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize,
-                publicationIds: request.PublicationIds)
-            .HandleFailuresOrOk();
-    }
-
     [HttpGet("publications/{publicationId:guid}/summary")]
     public async Task<ActionResult<PublishedPublicationSummaryViewModel>> GetPublicationSummary(Guid publicationId)
     {
@@ -104,12 +61,6 @@ public class PublicationController : ControllerBase
             })
             .HandleFailuresOrOk();
     }
-
-    [HttpGet("publications/sitemap-items")]
-    public async Task<ActionResult<List<PublicationSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await _publicationService.ListSitemapItems(cancellationToken)
-            .HandleFailuresOrOk();
     
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(

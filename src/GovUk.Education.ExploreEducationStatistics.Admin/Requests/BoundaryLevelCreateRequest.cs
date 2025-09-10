@@ -2,9 +2,6 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 

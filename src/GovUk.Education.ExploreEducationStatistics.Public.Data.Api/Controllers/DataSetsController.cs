@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 

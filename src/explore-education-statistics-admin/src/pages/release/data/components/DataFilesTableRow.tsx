@@ -1,14 +1,11 @@
 import Link from '@admin/components/Link';
 import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import ImporterStatus, {
   terminalImportStatuses,
 } from '@admin/pages/release/data/components/ImporterStatus';
 import {
   releaseApiDataSetDetailsRoute,
-  releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
   releaseDataFileRoute,
   ReleaseDataFileRouteParams,
   ReleaseDataSetRouteParams,
@@ -20,11 +17,12 @@ import {
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
+import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import { generatePath } from 'react-router';
-import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import styles from './DataFilesTable.module.scss';
 import DeleteDataFileModal from './DeleteDataFileModal';
+import DataFileUploadForm from './DataFileUploadForm';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -32,6 +30,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmDelete: (deletedFileId: string) => void;
+  onReplaceFile: () => void;
   onStatusChange: (
     dataFile: DataFile,
     importStatus: DataFileImportStatus,
@@ -43,16 +42,11 @@ export default function DataFilesTableRow({
   dataFile,
   publicationId,
   releaseVersionId,
+  onReplaceFile,
   onConfirmDelete,
   onStatusChange,
 }: Props) {
-  const {
-    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
-  } = useConfig();
-  const { releaseVersion } = useReleaseVersionContext();
-  const allowReplacementOfDataFile = isNewReplaceDsvFeatureEnabled
-    ? true
-    : dataFile.publicApiDataSetId == null;
+  const [showReplacementModal, toggleReplacementModal] = useToggle(false);
   return (
     <tr key={dataFile.title}>
       <td data-testid="Title" className={styles.title}>
@@ -100,17 +94,26 @@ export default function DataFilesTableRow({
                     >
                       Edit title
                     </Link>
-                    <ReplaceDataButtonOrModal
-                      allowReplacementOfDataFile={allowReplacementOfDataFile}
-                      releaseIsNotAmendmentAndIsLinkedToApi={
-                        !releaseVersion.amendment &&
-                        dataFile.publicApiDataSetId != null
+                    <Modal
+                      open={showReplacementModal}
+                      title="Replace data"
+                      triggerButton={
+                        <ButtonText onClick={toggleReplacementModal.on}>
+                          Replace data
+                        </ButtonText>
                       }
-                      publicationId={publicationId}
-                      dataFileId={dataFile.id}
-                      publicApiDataSetId={dataFile.publicApiDataSetId}
-                      releaseVersionId={releaseVersionId}
-                    />
+                    >
+                      <DataFileUploadForm
+                        isDataReplacement
+                        releaseVersionId={releaseVersionId}
+                        dataFileTitle={dataFile.title}
+                        onCancel={toggleReplacementModal.off}
+                        onSubmit={() => {
+                          toggleReplacementModal.off();
+                          onReplaceFile();
+                        }}
+                      />
+                    </Modal>
                   </>
                 )}
                 {dataFile.publicApiDataSetId ? (
@@ -158,95 +161,5 @@ export default function DataFilesTableRow({
         </ButtonGroup>
       </td>
     </tr>
-  );
-}
-
-function CannotReplaceDataModal({ children }: { children: React.ReactNode }) {
-  return (
-    <Modal
-      showClose
-      title="Cannot replace data"
-      triggerButton={<ButtonText>Replace data</ButtonText>}
-    >
-      {children}
-    </Modal>
-  );
-}
-
-function ReplaceDataButtonOrModal({
-  allowReplacementOfDataFile,
-  releaseIsNotAmendmentAndIsLinkedToApi,
-  dataFileId,
-  publicApiDataSetId,
-  publicationId,
-  releaseVersionId,
-}: {
-  allowReplacementOfDataFile: boolean;
-  releaseIsNotAmendmentAndIsLinkedToApi: boolean;
-  dataFileId: string;
-  publicApiDataSetId: string | undefined;
-  publicationId: string;
-  releaseVersionId: string;
-}) {
-  if (!allowReplacementOfDataFile) {
-    return (
-      <CannotReplaceDataModal>
-        <p>
-          This data file has an API data set linked to it. Please remove the API
-          data set before replacing the data.
-        </p>
-        <p>
-          <Link
-            to={
-              publicApiDataSetId
-                ? generatePath<ReleaseDataSetRouteParams>(
-                    releaseApiDataSetDetailsRoute.path,
-                    {
-                      publicationId,
-                      releaseVersionId,
-                      dataSetId: publicApiDataSetId,
-                    },
-                  )
-                : {}
-            }
-          >
-            Go to API data set
-          </Link>
-        </p>
-      </CannotReplaceDataModal>
-    );
-  }
-
-  if (releaseIsNotAmendmentAndIsLinkedToApi) {
-    return (
-      <CannotReplaceDataModal>
-        <p>
-          This data replacement can not be completed as it is targeting an
-          existing draft API data set.
-        </p>
-        <p>
-          Please contact the explore statistics team at{' '}
-          <a href="mailto:explore.statistics@education.gov.uk">
-            explore.statistics@education.gov.uk
-          </a>{' '}
-          for support on completing this replacement.
-        </p>
-      </CannotReplaceDataModal>
-    );
-  }
-
-  return (
-    <Link
-      to={generatePath<ReleaseDataFileReplaceRouteParams>(
-        releaseDataFileReplaceRoute.path,
-        {
-          publicationId,
-          releaseVersionId,
-          fileId: dataFileId,
-        },
-      )}
-    >
-      Replace data
-    </Link>
   );
 }

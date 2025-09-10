@@ -31,8 +31,13 @@ export default function ExperimentalStatisticsSection({
       <p>
         Find out more about the standards we follow to produce these statistics
         through our{' '}
-        <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-          Standards for official statistics published by DfE guidance
+        <a
+          href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+          rel="noopener noreferrer nofollow"
+          target="_blank"
+        >
+          Standards for official statistics published by DfE guidance (opens in
+          new tab)
         </a>
         .
       </p>

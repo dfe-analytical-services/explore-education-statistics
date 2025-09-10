@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -27,6 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -37,8 +33,10 @@ public class ReleaseChecklistServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    [Fact]
-    public async Task GetChecklist_AllErrors()
+    [Theory]
+    [InlineData(DataSetVersionStatus.Mapping)]
+    [InlineData(DataSetVersionStatus.Finalising)]
+    public async Task GetChecklist_AllErrors(DataSetVersionStatus mappingStatus)
     {
         Release release = _dataFixture.DefaultRelease()
             .WithPublication(_dataFixture.DefaultPublication());
@@ -144,26 +142,29 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
+            List<DataSetVersionStatusSummary> dataSetVersionStatusSummaries =
+            [
+                new(
+                    Id: Guid.NewGuid(),
+                    Title: "Data set 1",
+                    Status: DataSetVersionStatus.Cancelled),
+                new(
+                    Id: Guid.NewGuid(),
+                    Title: "Data set 2",
+                    Status: mappingStatus),
+                new(
+                    Id: Guid.NewGuid(),
+                    Title: "Data set 3",
+                    Status: DataSetVersionStatus.Processing),
+                new(
+                    Id: Guid.NewGuid(),
+                    Title: "Data set 4",
+                    Status: DataSetVersionStatus.Failed)
+            ];
+            
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
-                .ReturnsAsync([
-                    new DataSetVersionStatusSummary(
-                        Id: Guid.NewGuid(),
-                        Title: "Data set 1",
-                        Status: DataSetVersionStatus.Cancelled),
-                    new DataSetVersionStatusSummary(
-                        Id: Guid.NewGuid(),
-                        Title: "Data set 2",
-                        Status: DataSetVersionStatus.Mapping),
-                    new DataSetVersionStatusSummary(
-                        Id: Guid.NewGuid(),
-                        Title: "Data set 3",
-                        Status: DataSetVersionStatus.Processing),
-                    new DataSetVersionStatusSummary(
-                        Id: Guid.NewGuid(),
-                        Title: "Data set 4",
-                        Status: DataSetVersionStatus.Failed),
-                ]);
+                .ReturnsAsync(dataSetVersionStatusSummaries);
 
             var service = BuildReleaseChecklistService(
                 context,
@@ -191,7 +192,6 @@ public class ReleaseChecklistServiceTests
                 .ToList();
 
             Assert.Equal(13, errors.Count);
-
             Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
             Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
             Assert.Equal(PublicDataGuidanceRequired, errors[2]);

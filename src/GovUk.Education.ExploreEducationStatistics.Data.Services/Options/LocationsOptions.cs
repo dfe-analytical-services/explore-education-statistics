@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Options;

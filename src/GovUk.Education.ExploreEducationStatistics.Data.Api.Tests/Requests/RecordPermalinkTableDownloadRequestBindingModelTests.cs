@@ -1,6 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics;
+﻿using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 using Xunit;
 

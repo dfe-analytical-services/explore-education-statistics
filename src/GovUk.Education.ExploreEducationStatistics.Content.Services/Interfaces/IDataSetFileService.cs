@@ -1,8 +1,3 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -28,7 +23,9 @@ public interface IDataSetFileService
         int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId);
+    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
+        Guid dataSetFileId,
+        CancellationToken cancellationToken);
 
     Task<ActionResult> DownloadDataSetFile(
         Guid dataSetFileId,

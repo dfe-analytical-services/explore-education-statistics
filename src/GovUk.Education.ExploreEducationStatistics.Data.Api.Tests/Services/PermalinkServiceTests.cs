@@ -1,11 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -1098,27 +1092,22 @@ public class PermalinkServiceTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService.SetupDownloadToStream(
+        publicBlobStorageService.SetupGetDownloadStream(
             container: BlobContainers.PermalinkSnapshots,
             path: $"{permalink.Id}.csv.zst",
             content: "Test csv");
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            using var stream = new MemoryStream();
-
             var service = BuildService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object
             );
 
-            var result = await service.DownloadCsvToStream(permalink.Id, stream);
+            var result = await service.GetCsvDownloadStream(permalink.Id);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
+            await using var stream = result.AssertRight();
 
-            result.AssertRight();
-
-            stream.SeekToBeginning();
             var csv = stream.ReadToEnd();
 
             Assert.Equal("Test csv", csv);
@@ -1129,7 +1118,7 @@ public class PermalinkServiceTests
     public async Task DownloadCsvToStream_PermalinkNotFound()
     {
         var service = BuildService();
-        var result = await service.DownloadCsvToStream(Guid.NewGuid(), new MemoryStream());
+        var result = await service.GetCsvDownloadStream(Guid.NewGuid());
 
         result.AssertNotFound();
     }
@@ -1148,7 +1137,7 @@ public class PermalinkServiceTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService.SetupDownloadToStreamNotFound(
+        publicBlobStorageService.SetupGetDownloadStreamNotFound(
             container: BlobContainers.PermalinkSnapshots,
             path: $"{permalink.Id}.csv.zst");
 
@@ -1157,9 +1146,7 @@ public class PermalinkServiceTests
             var service = BuildService(contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await service.DownloadCsvToStream(permalink.Id, new MemoryStream());
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
+            var result = await service.GetCsvDownloadStream(permalink.Id);
 
             result.AssertNotFound();
         }

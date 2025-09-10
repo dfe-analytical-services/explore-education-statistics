@@ -140,51 +140,6 @@ describe('ReleaseDataFileReplacePage', () => {
     });
   });
 
-  test('renders replacement upload form', async () => {
-    releaseDataFileService.getDataFile.mockResolvedValueOnce(testOriginalFile);
-    releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'COMPLETE',
-      percentageComplete: 100,
-      stagePercentageComplete: 100,
-      totalRows: 100,
-    });
-    dataReplacementService.getReplacementPlan.mockResolvedValue(
-      testValidReplacementPlan,
-    );
-
-    renderWithTestConfig(
-      <MemoryRouter
-        initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(
-            releaseDataFileReplaceRoute.path,
-            {
-              releaseVersionId: 'release-1',
-              publicationId: 'publication-1',
-              fileId: 'file-1',
-            },
-          ),
-        ]}
-      >
-        <Route
-          path={releaseDataFileReplaceRoute.path}
-          component={ReleaseDataFileReplacePage}
-        />
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Upload replacement data')).toBeInTheDocument();
-
-      expect(screen.getByLabelText('CSV files')).toBeInTheDocument();
-      expect(screen.getByLabelText('Upload data file')).toBeInTheDocument();
-      expect(screen.getByLabelText('Upload metadata file')).toBeInTheDocument();
-      expect(screen.getByLabelText('ZIP file')).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Upload data files' }),
-      ).toBeInTheDocument();
-    });
-  });
-
   test('renders replacement and original data file details', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,

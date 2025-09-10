@@ -1,11 +1,6 @@
 import Link from '@admin/components/Link';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
-import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
-import DataFileUploadForm, {
-  DataFileUploadFormValues,
-} from '@admin/pages/release/data/components/DataFileUploadForm';
 import {
-  releaseDataFileReplacementCompleteRoute,
   ReleaseDataFileReplaceRouteParams,
   releaseDataRoute,
   ReleaseRouteParams,
@@ -15,14 +10,13 @@ import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
-import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import PendingDataReplacementSection from '@admin/pages/release/data/components/PendingDataReplacementSection';
 
 const ReleaseDataFileReplacePage = ({
   history,
@@ -90,130 +84,6 @@ const ReleaseDataFileReplacePage = ({
     });
   };
 
-  const handleSubmit = async (
-    currentFile: DataFile,
-    values: DataFileUploadFormValues,
-  ) => {
-    let file: DataFile;
-
-    if (values.uploadType === 'csv') {
-      file = await releaseDataFileService.uploadDataSetFilePairForReplacement(
-        releaseVersionId,
-        {
-          title: values.title ?? dataFile!.title,
-          replacingFileId: currentFile.id,
-          dataFile: values.dataFile as File,
-          metadataFile: values.metadataFile as File,
-        },
-      );
-    } else {
-      file =
-        await releaseDataFileService.uploadZippedDataSetFilePairForReplacement(
-          releaseVersionId,
-          {
-            title: values.title ?? dataFile!.title,
-            replacingFileId: currentFile.id,
-            zipFile: values.zipFile as File,
-          },
-        );
-    }
-
-    setDataFile({
-      value: {
-        ...currentFile,
-        replacedBy: file.id,
-      },
-    });
-    setReplacementDataFile({
-      value: {
-        ...file,
-        permissions: await permissionService.getDataFilePermissions(
-          releaseVersionId,
-          file.id,
-        ),
-      },
-    });
-  };
-  const cancelBodyText = dataFile?.publicApiDataSetId ? (
-    <>
-      <p>
-        Are you sure you want to cancel this data replacement and remove the
-        attached draft API version?
-      </p>
-      <p>
-        Note that this data replacement has an associated draft API data set
-        version update. The API data set update will also be cancelled and
-        removed by this action.
-      </p>
-    </>
-  ) : (
-    <>
-      By cancelling this replacement you will delete the replacement file. This
-      action cannot be reversed.
-    </>
-  );
-  const replacementCancelButton = (
-    <ModalConfirm
-      title={
-        dataFile?.publicApiDataSetId
-          ? 'Cancel data replacement and remove draft API'
-          : 'Cancel data replacement'
-      }
-      triggerButton={
-        <Button variant="secondary">Cancel data replacement</Button>
-      }
-      onConfirm={async () => {
-        if (replacementDataFile?.id) {
-          await releaseDataFileService.deleteDataFiles(
-            releaseVersionId,
-            replacementDataFile.id,
-          );
-        }
-
-        fetchDataFile();
-      }}
-    >
-      <p>{cancelBodyText}</p>
-    </ModalConfirm>
-  );
-
-  const getReplacementPlanMessage = () => {
-    if (replacementDataFile?.status === 'COMPLETE') {
-      return null;
-    }
-
-    if (replacementDataFileError) {
-      return (
-        <>
-          <WarningMessage>
-            There was a problem loading the data replacement information.
-          </WarningMessage>
-
-          {replacementCancelButton}
-        </>
-      );
-    }
-
-    if (replacementDataFile?.status === 'FAILED') {
-      return (
-        <>
-          <WarningMessage>
-            Replacement data file import failed. Please cancel and try again.
-          </WarningMessage>
-
-          {replacementCancelButton}
-        </>
-      );
-    }
-
-    return (
-      <WarningMessage>
-        The replacement data file is still being processed. Data replacement
-        cannot continue until it has completed.
-      </WarningMessage>
-    );
-  };
-
   return (
     <>
       <Link
@@ -247,53 +117,16 @@ const ReleaseDataFileReplacePage = ({
                 onReplacementStatusChange={handleReplacementStatusChange}
               />
             </section>
-
-            {!dataFile.replacedBy ? (
-              <section>
-                <h2>Upload replacement data</h2>
-
-                <DataFileUploadForm
-                  isDataReplacement
-                  onSubmit={values => handleSubmit(dataFile, values)}
-                  onCancel={() =>
-                    history.push(
-                      generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
-                        publicationId,
-                        releaseVersionId,
-                      }),
-                    )
-                  }
-                />
-              </section>
-            ) : (
-              <section>
-                <h2>Pending data replacement</h2>
-
-                {getReplacementPlanMessage()}
-
-                {replacementDataFile?.status === 'COMPLETE' && (
-                  <DataFileReplacementPlan
-                    cancelButton={replacementCancelButton}
-                    publicationId={publicationId}
-                    releaseVersionId={releaseVersionId}
-                    fileId={dataFile.id}
-                    replacementFileId={replacementDataFile.id}
-                    onReplacement={() => {
-                      history.push(
-                        generatePath<ReleaseDataFileReplaceRouteParams>(
-                          releaseDataFileReplacementCompleteRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            fileId: replacementDataFile.id,
-                          },
-                        ),
-                      );
-                    }}
-                  />
-                )}
-              </section>
-            )}
+            <PendingDataReplacementSection
+              dataFileId={dataFile.id}
+              replacementDataFileError={replacementDataFileError}
+              replacementDataFile={replacementDataFile}
+              publicationId={publicationId}
+              releaseVersionId={releaseVersionId}
+              history={history}
+              fetchDataFile={fetchDataFile}
+              publicApiDataSetId={dataFile.publicApiDataSetId}
+            />
           </>
         )}
       </LoadingSpinner>

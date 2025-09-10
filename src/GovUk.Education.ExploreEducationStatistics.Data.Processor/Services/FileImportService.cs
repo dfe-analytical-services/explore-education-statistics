@@ -1,15 +1,12 @@
 # nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -62,8 +59,8 @@ public class FileImportService : IFileImportService
 
         var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
 
-        var datafileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
-        var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
+        var datafileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
+        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
         await _importerService.ImportObservations(
             import,
@@ -84,7 +81,7 @@ public class FileImportService : IFileImportService
     {
         var import = await _dataImportService.GetImport(importId);
 
-        var datafileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
+        var datafileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
 
         await _importerService.ImportFiltersAndLocations(
             import,

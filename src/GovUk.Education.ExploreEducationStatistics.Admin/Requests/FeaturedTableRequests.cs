@@ -1,6 +1,5 @@
 #nullable enable
 using FluentValidation;
-using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 

@@ -114,9 +114,10 @@ export default function ReleaseFileUploadsSection({
           <a
             href="https://www.legislation.gov.uk/uksi/2018/852/contents/made"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
           >
-            Public Sector Bodies accessibility regulations 2018
+            Public Sector Bodies accessibility regulations 2018 (opens in new
+            tab)
           </a>
           .
         </p>
@@ -126,9 +127,10 @@ export default function ReleaseFileUploadsSection({
           <a
             href="https://analysisfunction.civilservice.gov.uk/policy-store/making-spreadsheets-accessible-a-brief-checklist-of-the-basics/"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
           >
-            Analytical Function checklist for accessible spreadsheets
+            Analytical Function checklist for accessible spreadsheets (opens in
+            new tab)
           </a>
           .
         </p>

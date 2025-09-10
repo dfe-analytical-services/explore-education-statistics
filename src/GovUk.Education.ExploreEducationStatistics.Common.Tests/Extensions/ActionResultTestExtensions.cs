@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
@@ -173,5 +170,33 @@ public static class ActionResultTestUtils
 
         expectedErrorCodes.ForEach(errorCode =>
             Assert.Contains(errorCode.ToString(), errorCodes));
+    }
+
+    public static FileStreamResult AssertFileStreamResult(
+        this IActionResult result,
+        FileStreamResult expectedResult)
+    {
+        var fileStreamResult = Assert.IsAssignableFrom<FileStreamResult>(result);
+        Assert.Equal(expectedResult, fileStreamResult);
+        return fileStreamResult;
+    }
+
+    public static FileStreamResult AssertFileStreamResult(
+        this IActionResult result,
+        string expectedFilename,
+        string expectedContentType,
+        Stream? expectedStream = null)
+    {
+        var fileStreamResult = Assert.IsAssignableFrom<FileStreamResult>(result);
+
+        Assert.Equal(expectedFilename, fileStreamResult.FileDownloadName);
+        Assert.Equal(expectedContentType, fileStreamResult.ContentType);
+
+        if (expectedStream != null)
+        {
+            Assert.Equal(expectedStream, fileStreamResult.FileStream);
+        }
+
+        return fileStreamResult;
     }
 }
