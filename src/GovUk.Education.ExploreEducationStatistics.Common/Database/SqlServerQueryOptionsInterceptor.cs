@@ -103,7 +103,8 @@ public partial class SqlServerQueryOptionsInterceptorSqlProcessor : IQueryOption
         RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant)]
     private static partial Regex WithOptionsMarkerRegexCompile();
 
-    // Pulls out everything after a "WithOptions: " marker inside the leading comments
+    // Given a "WithOptions: OPTION(...)" tag Captures the contents of the "OPTION(...)" part of 
+    // tag within the SQL statement's leading comments section.
     private static readonly Regex WithOptionsMarkerRegex =
         WithOptionsMarkerRegexCompile();
 

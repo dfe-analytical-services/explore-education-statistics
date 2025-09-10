@@ -41,25 +41,14 @@ public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepo
                 resultSelector: (observation, observationFilterItem) => observationFilterItem.FilterItemId)
             .Distinct();
 
-        var filterGroupIdsForSubject = context
-            .Filter
-            .Include(filter => filter.FilterGroups)
-            .Where(filter => filter.SubjectId == subjectId)
-            .SelectMany(filter => filter.FilterGroups)
-            .Select(filterGroup => filterGroup.Id);
-        
-        return await context
-            .FilterItem
+        return await context.FilterItem
             .AsNoTracking()
             .WithSqlServerOptions("OPTION(HASH JOIN)")
-            .Include(filterItem => filterItem.FilterGroup)
-            .ThenInclude(filterGroup => filterGroup.Filter)
-            .Where(filterItem => filterGroupIdsForSubject.Contains(filterItem.FilterGroupId))
-            .Join(
-                inner: matchedFilterItemIds,
-                outerKeySelector: filterItem => filterItem.Id,
-                innerKeySelector: matchedFilterItem => matchedFilterItem,
-                resultSelector: (filterItem, matchedFilterItem) => filterItem)
+            .Include(fi => fi.FilterGroup)
+            .ThenInclude(fg => fg.Filter)
+            .Where(fi =>
+                fi.FilterGroup.Filter.SubjectId == subjectId &&
+                matchedFilterItemIds.Contains(fi.Id))
             .ToListAsync();
     }
 

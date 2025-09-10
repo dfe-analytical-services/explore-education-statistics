@@ -103,7 +103,7 @@ public abstract class SqlServerQueryOptionsInterceptorTests
         }
     }
     
-    public class SqlServerSqlServerQueryOptionsInterceptorSqlProcessorTests : SqlServerQueryOptionsInterceptorTests
+    public class SqlServerQueryOptionsInterceptorSqlProcessorTests : SqlServerQueryOptionsInterceptorTests
     {
         [Fact]
         public void GivenExistingSqlHasNoOptionClause_WhenWithOptionsPresent_ThenOptionsAddedToQuery()
