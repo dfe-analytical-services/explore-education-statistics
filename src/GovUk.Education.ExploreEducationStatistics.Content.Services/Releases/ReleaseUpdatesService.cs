@@ -27,7 +27,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
                     cancellationToken))
             .OnSuccess(async releaseVersion =>
                 await GetPaginatedUpdatesForReleaseVersion(
-                    releaseVersion.Id,
+                    releaseVersion,
                     page,
                     pageSize,
                     cancellationToken));
@@ -53,25 +53,39 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
     }
 
     private async Task<PaginatedListViewModel<ReleaseUpdateDto>> GetPaginatedUpdatesForReleaseVersion(
-        Guid releaseVersionId,
+        ReleaseVersion releaseVersion,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var updatesQuery = contentDbContext.Update
-            .Where(u => u.ReleaseVersionId == releaseVersionId)
-            .OrderByDescending(u => u.On);
-
-        var totalResults = await updatesQuery.CountAsync(cancellationToken);
-
-        var updates = await updatesQuery
-            .Paginate(page: page, pageSize: pageSize)
+        var updates = await contentDbContext.Update
+            .Where(u => u.ReleaseVersionId == releaseVersion.Id)
+            .Select(u => ReleaseUpdateDto.FromUpdate(u))
             .ToListAsync(cancellationToken);
 
-        return new PaginatedListViewModel<ReleaseUpdateDto>(
-            page: page,
-            pageSize: pageSize,
-            results: updates.Select(ReleaseUpdateDto.FromUpdate).ToList(),
-            totalResults: totalResults);
+        var firstPublishedUpdate = new ReleaseUpdateDto
+        {
+            Date = await GetReleaseFirstPublishedDate(releaseVersion),
+            Summary = "First published"
+        };
+
+        var allUpdates = updates
+            .Append(firstPublishedUpdate)
+            .OrderByDescending(u => u.Date)
+            .ToList();
+
+        // Pagination is applied in-memory since the 'First published' entry is combined with database results
+        return PaginatedListViewModel<ReleaseUpdateDto>.Paginate(allUpdates, page, pageSize);
+    }
+
+    private async Task<DateTime> GetReleaseFirstPublishedDate(ReleaseVersion releaseVersion)
+    {
+        var published = releaseVersion.Version == 0
+            ? releaseVersion.Published
+            : await contentDbContext.ReleaseVersions
+                .Where(rv => rv.ReleaseId == releaseVersion.ReleaseId && rv.Version == 0)
+                .Select(rv => rv.Published)
+                .SingleAsync();
+        return published!.Value;
     }
 }

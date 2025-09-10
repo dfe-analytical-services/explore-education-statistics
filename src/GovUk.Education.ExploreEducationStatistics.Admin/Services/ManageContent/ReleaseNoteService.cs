@@ -43,6 +43,7 @@ public class ReleaseNoteService : IReleaseNoteService
             {
                 _context.Update.Add(new Update
                 {
+                    // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
                     On = saveRequest.On ?? DateTime.Now,
                     Reason = saveRequest.Reason,
                     ReleaseVersionId = releaseVersion.Id,
