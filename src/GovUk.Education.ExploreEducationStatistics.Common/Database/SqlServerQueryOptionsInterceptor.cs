@@ -1,9 +1,27 @@
 using System.Data.Common;
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Database;
 
+/// <summary>
+/// A SQL Server-based SQL interceptor to pick up requested "OPTION" hints and convert them
+/// into an actual OPTION clause.
+///
+/// "OPTION" hints can be requested for specific queries by using the
+/// <see cref="EntityFrameworkQueryableExtensions.WithSqlServerOptions{T}"/> method.
+///
+/// Note that in order for this interceptor to take effect, it must be registered with
+/// a SQL Server-based DbContext using
+/// <see cref="DbContextOptionsBuilderExtensions.EnableSqlServerQueryOptionsInterceptor"/>.
+/// </summary>
+/// <param name="sqlProcessor">
+/// The implementation of <see cref="IQueryOptionsInterceptorSqlProcessor"/> that will analyse
+/// the current SQL query and determine if it needs changing. By default, this should be an
+/// instance of <see cref="SqlServerQueryOptionsInterceptor"/>, but is exposed as a parameter to
+/// aid with testing.
+/// </param>
 public class SqlServerQueryOptionsInterceptor(
     IQueryOptionsInterceptorSqlProcessor sqlProcessor) : DbCommandInterceptor
 {

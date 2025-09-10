@@ -15,15 +15,20 @@ public static class EntityFrameworkQueryableExtensions
     /// to the end of the query.
     ///
     /// In order for the interceptor to take effect, it must be registered
-    /// with the matching DbContext at startup. Note that this can only be used with
-    /// a SQL Server-specific DbContext. 
+    /// with the matching DbContext at startup using
+    /// <see cref="DbContextOptionsBuilderExtensions.EnableSqlServerQueryOptionsInterceptor"/>.
+    ///
+    /// Note that this can only be used with a SQL Server-specific DbContext. 
     /// </summary>
     /// <param name="source">A SQL Server-based Linq query.</param>
     /// <param name="sqlOptionsString">
     /// The OPTION string to include e.g. OPTION(HASH JOIN).
     /// </param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="T">The type of the IQueryable.</typeparam>
+    /// <returns>
+    /// An IQueryable with the additional OPTION hints added as tags /
+    /// leading comments.
+    /// </returns>
     public static IQueryable<T> WithSqlServerOptions<T>(
         this IQueryable<T> source, string sqlOptionsString) where T : class?
         => source.TagWith($"WithOptions: {sqlOptionsString}");
