@@ -90,7 +90,7 @@
       "value": "GeneralPurpose"
     },
     "capacityStatisticsDb": {
-      "value": 12
+      "value": 10
     },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
