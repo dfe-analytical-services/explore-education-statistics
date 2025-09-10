@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
-public static class EntityFrameworkQueryableExtensions
+public static class EfQueryableExtensions
 {
     /// <summary>
-    /// Allows Linq queries to add SQL "OPTIONS()" hints to inform SQL Server
+    /// Allows Linq queries to add SQL "OPTION()" hints to inform SQL Server
     /// execution plans of preferred execution paths.
     ///
     /// The hints are added as comments to the generated SQL statement, which
