@@ -241,8 +241,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             [
                 () => Assert.Equal(expectedList.Count, actualList.Count),
                 .. expectedList
-                    .Zip(actualList, (e, a) => (Expected: e, Actual: a))
-                    .Select(x1 => (Action)(() => Assert.Equal(x1.Expected, x1.Actual)))
+                    .Zip(actualList, (expected, actual) => (Action)(() => Assert.Equal(expected, actual)))
                     .ToArray()
             ];
         }

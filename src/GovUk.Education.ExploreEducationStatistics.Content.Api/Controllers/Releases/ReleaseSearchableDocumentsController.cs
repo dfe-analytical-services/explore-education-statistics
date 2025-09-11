@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases;
 
+/// <summary>
+/// Provides an endpoint to retrieve a searchable document representation of releases. This is used by the
+/// Search Docs Function App to create searchable documents for Azure AI Search indexing.
+/// </summary>
 [Route("api")]
 [ApiController]
 public class ReleaseSearchableDocumentsController(IReleaseSearchableDocumentsService releaseSearchableDocumentsService)
