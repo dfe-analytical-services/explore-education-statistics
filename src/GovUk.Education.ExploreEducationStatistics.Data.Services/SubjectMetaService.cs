@@ -211,11 +211,9 @@ public class SubjectMetaService(
 
                 var filterItems = await
                     filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations);
-
-                var filters = ExcludeFiltersUsedForGrouping(
+                var filters =
                     FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
-                        filterItems, releaseFile.FilterSequence));
-
+                        filterItems, releaseFile.FilterSequence);
                 logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
@@ -234,17 +232,6 @@ public class SubjectMetaService(
                 throw new ArgumentOutOfRangeException($"{nameof(subjectMetaStep)}",
                     "Unable to determine which SubjectMeta information has requested");
         }
-    }
-
-    public static Dictionary<string, FilterMetaViewModel> ExcludeFiltersUsedForGrouping(
-        Dictionary<string, FilterMetaViewModel> filters)
-    {
-        var filtersUsedForGrouping = filters
-            .Select(fi => fi.Value.GroupCsvColumn)
-            .Where(g => !string.IsNullOrEmpty(g))
-            .ToList();
-
-        return filters.Filter(f => !filtersUsedForGrouping.Contains(f.Value.Name)); 
     }
 
     private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(
