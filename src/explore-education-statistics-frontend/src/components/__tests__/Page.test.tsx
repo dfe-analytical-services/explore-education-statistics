@@ -4,36 +4,35 @@ import { screen } from '@testing-library/react';
 import React from 'react';
 
 describe('Page', () => {
-  test('renders breadcrumbs if back link not provided', () => {
-    render(<Page title="Page Title" />);
+  test('renders the caption outside the h1 by default, if provided', () => {
+    render(<Page title="Page Title" caption="Page Title Caption" />);
     expect(
-      screen.getByRole('navigation', {
-        name: 'Breadcrumb',
+      screen.queryByRole('heading', {
+        name: 'Page Title',
+        level: 1,
       }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', {
-        name: 'Back',
+      screen.queryByRole('heading', {
+        name: 'Page Title Caption Page Title',
+        level: 1,
       }),
     ).not.toBeInTheDocument();
   });
 
-  test('renders back link instead of breadcrumbs if provided', () => {
-    render(<Page title="Page Title" backLinkDestination="/back-destination" />);
+  test('renders the caption inside h1 if required', () => {
+    render(
+      <Page
+        title="Page Title"
+        caption="Page Title Caption"
+        captionInsideTitle
+      />,
+    );
     expect(
-      screen.queryByRole('navigation', {
-        name: 'Breadcrumb',
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', {
-        name: 'Back',
+      screen.queryByRole('heading', {
+        name: 'Page Title Caption Page Title',
+        level: 1,
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', {
-        name: 'Back',
-      }),
-    ).toHaveAttribute('href', '/back-destination');
   });
 });
