@@ -1,3 +1,4 @@
+import InsetText from '@common/components/InsetText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
@@ -181,29 +182,47 @@ function HomePage() {
 
       <hr />
 
-      <h2 className="govuk-!-margin-top-9">Contact us</h2>
+      <h2 className="govuk-!-margin-top-9">Contact us for help and support</h2>
+      <div className="govuk-grid-row govuk-!-margin-bottom-3">
+        <div className="govuk-grid-column-two-thirds">
+          <p className="govuk-!-margin-top-1">
+            The Explore education statistics service is operated by the
+            Department for Education (DfE).
+          </p>
 
-      <p className="govuk-!-margin-top-1">
-        The Explore education statistics service is operated by the Department
-        for Education (DfE).
-      </p>
+          <h3>
+            Need help using this service or have a question about the data?
+          </h3>
+          <p>
+            If you have any specific statistical or subject-related queries,
+            contact the team or named statistician listed in the 'Contact us'
+            sections of the pages found under{' '}
+            <Link to="/find-statistics">Find statistics and data</Link>.
+          </p>
+          <p>
+            For any further queries, contact the Explore education statistics
+            team:
+          </p>
+          <InsetText>
+            Email:{' '}
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
+          </InsetText>
 
-      <p className="govuk-!-margin-top-1">
-        If you need help and support or have a question about Explore education
-        statistics contact:
-      </p>
-
-      <p className="govuk-!-margin-top-1">
-        <strong>Explore education statistics team</strong>
-      </p>
-
-      <p className="govuk-caption-m govuk-!-margin-top-1">
-        Email
-        <br />
-        <a href="mailto:explore.statistics@education.gov.uk">
-          explore.statistics@education.gov.uk
-        </a>
-      </p>
+          <h3>
+            Have a general question about education or the Department for
+            Education?
+          </h3>
+          <p>Call the DfE public enquiries line:</p>
+          <InsetText>
+            Phone: <a href="tel:03700002288">0370 000 2288</a>
+            <br />
+            Opening hours: Monday to Friday, 9.30am to 5pm (closed on bank
+            holidays)
+          </InsetText>
+        </div>
+      </div>
     </Page>
   );
 }

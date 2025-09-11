@@ -1,3 +1,5 @@
+import InsetText from '@common/components/InsetText';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
 
@@ -10,37 +12,37 @@ function ContactPage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <section>
-            <h2 className="govuk-heading-m">General enquiries</h2>
-
+            <h2 className="govuk-heading-m">
+              Need help using this service or have a question about the data?
+            </h2>
             <p>
-              The Explore education statistics service is operated by the
-              Department for Education (DfE).
+              If you have any specific statistical or subject-related queries,
+              contact the team or named statistician listed in the 'Contact us'
+              sections of the pages found under{' '}
+              <Link to="/find-statistics">Find statistics and data</Link>.
             </p>
-
             <p>
-              If you need help and support using the service or have any general
-              questions about education statistics and data contact:
+              For any further queries, contact the Explore education statistics
+              team:
             </p>
-
-            <h3 className="govuk-heading-s">
-              Explore education statistics team
-            </h3>
-
-            <p>
+            <InsetText>
               Email:{' '}
               <a href="mailto:explore.statistics@education.gov.uk">
                 explore.statistics@education.gov.uk
               </a>
-            </p>
-          </section>
+            </InsetText>
 
-          <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-m">Data and methodology enquiries</h2>
-            <p>
-              If you have a question about the data or methods used in a
-              specific set of our statistics contact the team or statistician
-              listed within the ‘Contact us’ section of the relevant page.
-            </p>
+            <h2 className="govuk-heading-m">
+              Have a general question about education or the Department for
+              Education?
+            </h2>
+            <p>Call the DfE public enquiries line:</p>
+            <InsetText>
+              Phone: <a href="tel:03700002288">0370 000 2288</a>
+              <br />
+              Opening hours: Monday to Friday, 9.30am to 5pm (closed on bank
+              holidays)
+            </InsetText>
           </section>
 
           <section className="govuk-section-break--xl">
