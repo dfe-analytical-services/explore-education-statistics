@@ -94,7 +94,7 @@ const Page = ({
         </main>
       </div>
 
-      <PageFeedback />
+      <PageFeedback width={width} />
       <PageFooter width={width} />
     </>
   );
