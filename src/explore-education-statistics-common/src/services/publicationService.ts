@@ -52,6 +52,7 @@ export interface PublicationSummary {
   contact: Contact;
 }
 
+// TODO EES-6449 - rename to remove 'redesign'
 export interface PublicationSummaryRedesign {
   contact: Contact;
   id: string;
@@ -271,6 +272,7 @@ const publicationService = {
   getPublicationSummaryRedesign(
     publicationSlug: string,
   ): Promise<PublicationSummaryRedesign> {
+    // TODO EES-6404 - remove dummy data and reinstate API call
     // return contentApi.get(`/publications/${publicationSlug}`);
     const basePublicationSummary = {
       id: 'publication-summary-1',
@@ -341,6 +343,7 @@ const publicationService = {
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
     );
   },
+  // TODO EES-6404 - remove dummy data and reinstate API call
   getReleaseVersionSummary(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     publicationSlug: string,
