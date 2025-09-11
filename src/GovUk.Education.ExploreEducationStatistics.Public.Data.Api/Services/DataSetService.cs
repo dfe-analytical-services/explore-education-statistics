@@ -150,14 +150,14 @@ internal class DataSetService(
                 cancellationToken: cancellationToken))
             .OnSuccess(async dataSet =>
             {
-               var showLatestDraftVersion = await authorizationHandlerService
+               var includeDraftVersion = await authorizationHandlerService
                    .RequestHasValidPreviewToken(dataSet);
 
                return await ListPaginatedVersions(
                     dataSet: dataSet,
                     page: page,
                     pageSize: pageSize,
-                    showLatestDraftVersion: showLatestDraftVersion,
+                    includeDraftVersion: includeDraftVersion,
                     cancellationToken: cancellationToken);
             });
     }
@@ -189,14 +189,14 @@ internal class DataSetService(
         DataSet dataSet,
         int page,
         int pageSize,
-        bool showLatestDraftVersion = false,
+        bool includeDraftVersion = false,
         CancellationToken cancellationToken = default)
     {
         var queryable = publicDataDbContext
             .DataSetVersions
             .AsNoTracking()
             .Where(ds => ds.DataSetId == dataSet.Id);
-        queryable = showLatestDraftVersion
+        queryable = includeDraftVersion
             ? queryable.WherePublicStatusOrSpecifiedId(dataSet.LatestDraftVersionId!.Value)
             : queryable.WherePublicStatus();
 
