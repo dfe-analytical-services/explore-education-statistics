@@ -23,7 +23,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
     public class GetLatestReleaseAsSearchableDocumentTests : ReleaseSearchableDocumentsServiceTests
     {
         [Fact]
-        public async Task GetLatestReleaseAsSearchable()
+        public async Task WhenPublicationAndReleaseExist_ReturnsExpectedSearchableDocument()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
