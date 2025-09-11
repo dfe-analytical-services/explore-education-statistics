@@ -10,6 +10,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
+import styles from '@frontend/modules/find-statistics/ReleaseUpdatesPage.module.scss';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { Dictionary } from '@frontend/types';
 import { GetServerSideProps } from 'next';
@@ -32,62 +33,72 @@ const ReleaseUpdatesPage = ({
   return (
     <Page
       title={publicationSummary.title}
-      metaTitle={`${publicationSummary.title} - ${
+      metaTitle={`Updates - ${publicationSummary.title} - ${
         releaseVersionSummary.title
-      } - updates ${page ? `- page ${page}` : ''}`}
-      description={`Table showing updates to ${publicationSummary.title.toLocaleLowerCase()} ${releaseVersionSummary.title.toLocaleLowerCase()}.`}
-      caption={releaseVersionSummary.title}
-      backLinkDestination={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}?redesign=true`} // TODO EES-6449 remove redesign query param
+      } - ${page ? `- page ${page}` : ''}`}
+      description={`Updates to ${publicationSummary.title.toLocaleLowerCase()} ${releaseVersionSummary.title.toLocaleLowerCase()}.`}
+      caption={`Updates to ${releaseVersionSummary.title}`}
+      captionInsideTitle
       width="wide"
+      breadcrumbs={[
+        { name: 'Find statistics and data', link: '/find-statistics' },
+        {
+          name: publicationSummary.title,
+          link: `/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`,
+        },
+      ]}
+      breadcrumbLabel="Updates"
     >
-      <Link
-        to={`/find-statistics/${publicationSummary.slug}/releases`}
-        className="govuk-!-margin-bottom-6 govuk-!-display-inline-block"
-      >
-        All releases in this series
-      </Link>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <Link
+            to={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
+            className="govuk-!-margin-bottom-6 govuk-!-display-inline-block"
+          >
+            Release home
+          </Link>
 
-      <table className="govuk-table" data-testid="release-updates-table">
-        <caption className="govuk-table__caption--m">
-          Table showing updates to this release
-        </caption>
+          <table data-testid="release-updates-table">
+            <caption className="govuk-table__caption--m">
+              Table showing updates to this release
+            </caption>
 
-        <thead className="govuk-table__head">
-          <tr className="govuk-table__row">
-            <th scope="col" className="govuk-table__header">
-              Date updated
-            </th>
-            <th scope="col" className="govuk-table__header">
-              Summary of update
-            </th>
-          </tr>
-        </thead>
+            <thead>
+              <tr>
+                <th className={styles.dateColumn} scope="col">
+                  Date updated
+                </th>
+                <th scope="col">Summary of update</th>
+              </tr>
+            </thead>
 
-        <tbody className="govuk-table__body">
-          {results.map(update => (
-            <tr className="govuk-table__row" key={update.date}>
-              <td className="govuk-table__cell">
-                <FormattedDate>{update.date}</FormattedDate>
-              </td>
-              <td className="govuk-table__cell">{update.summary}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            <tbody>
+              {results.map(update => (
+                <tr key={update.date}>
+                  <td>
+                    <FormattedDate>{update.date}</FormattedDate>
+                  </td>
+                  <td>{update.summary}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {page && !!totalPages && (
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onClick={pageNumber => {
-            logEvent({
-              category: 'Publication updates',
-              action: `Pagination clicked`,
-              label: `Page ${pageNumber}`,
-            });
-          }}
-        />
-      )}
+          {page && !!totalPages && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onClick={pageNumber => {
+                logEvent({
+                  category: 'Publication updates',
+                  action: `Pagination clicked`,
+                  label: `Page ${pageNumber}`,
+                });
+              }}
+            />
+          )}
+        </div>
+      </div>
     </Page>
   );
 };
@@ -106,10 +117,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
 
   if (process.env.APP_ENV === 'Production') {
     return {
-      redirect: {
-        destination: `/find-statistics/${publicationSlug}/${releaseSlug}`,
-        permanent: true,
-      },
+      notFound: true,
     };
   }
 

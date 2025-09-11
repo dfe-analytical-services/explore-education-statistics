@@ -4,7 +4,6 @@ import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
-import Link from './Link';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
@@ -18,6 +17,7 @@ type Props = {
   title: string;
   metaTitle?: string;
   caption?: string;
+  captionInsideTitle?: boolean; // Use when caption should be part of `h1` too
   description?: string;
   breadcrumbLabel?: string;
   pageMeta?: PageMetaProps;
@@ -27,7 +27,6 @@ type Props = {
   customBannerContent?: ReactNode;
   width?: PageWidth;
   isHomepage?: boolean;
-  backLinkDestination?: string; // Back link overrides breadcrumbs if provided
 } & BreadcrumbsProps;
 
 const Page = ({
@@ -35,6 +34,7 @@ const Page = ({
   title,
   metaTitle,
   caption = '',
+  captionInsideTitle = false,
   description,
   breadcrumbLabel = '',
   pageMeta,
@@ -45,7 +45,6 @@ const Page = ({
   width,
   isHomepage = false,
   breadcrumbs = [],
-  backLinkDestination,
 }: Props) => {
   return (
     <>
@@ -70,26 +69,26 @@ const Page = ({
 
         {customBannerContent}
 
-        {backLinkDestination ? (
-          <Link className="govuk-back-link" to={backLinkDestination}>
-            Back
-          </Link>
-        ) : (
-          <Breadcrumbs
-            breadcrumbs={
-              isHomepage
-                ? undefined
-                : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
-            }
-          />
-        )}
+        <Breadcrumbs
+          breadcrumbs={
+            isHomepage
+              ? undefined
+              : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
+          }
+        />
 
         <main
           className="govuk-main-wrapper app-main-class"
           id="main-content"
           role="main"
         >
-          {pageTitleComponent || <PageTitle title={title} caption={caption} />}
+          {pageTitleComponent || (
+            <PageTitle
+              title={title}
+              caption={caption}
+              captionInsideTitle={captionInsideTitle}
+            />
+          )}
           {children}
         </main>
       </div>

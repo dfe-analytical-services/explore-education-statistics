@@ -42,28 +42,9 @@ describe('Release updates page', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'All releases in this series',
+        name: 'Release home',
       }),
-    ).toHaveAttribute('href', '/find-statistics/publication-slug/releases');
-  });
-
-  test('renders correct back link', () => {
-    render(
-      <ReleaseUpdatesPage
-        releaseVersionSummary={testReleaseVersionSummary}
-        publicationSummary={testPublicationSummary}
-        releaseUpdates={testReleaseUpdates}
-      />,
-    );
-
-    expect(
-      screen.getByRole('link', {
-        name: 'Back',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/find-statistics/publication-slug/release-slug?redesign=true',
-    ); // TODO EES-6449 remove redesign query param
+    ).toHaveAttribute('href', '/find-statistics/publication-slug/release-slug');
   });
 
   test('renders table data correctly', () => {
