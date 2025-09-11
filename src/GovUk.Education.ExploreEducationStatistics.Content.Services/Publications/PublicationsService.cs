@@ -36,6 +36,7 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
         CancellationToken cancellationToken = default)
     {
         var query = contentDbContext.Publications
+            .AsNoTracking()
             .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue);
 
         if (includeContact)
@@ -61,6 +62,7 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
         CancellationToken cancellationToken = default)
     {
         return await contentDbContext.Publications
+            .AsNoTracking()
             .Where(p => p.Id == publicationId &&
                         p.SupersededBy != null &&
                         p.SupersededBy.LatestPublishedReleaseVersionId.HasValue)

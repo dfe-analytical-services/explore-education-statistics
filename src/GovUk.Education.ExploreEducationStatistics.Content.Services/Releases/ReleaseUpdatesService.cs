@@ -38,6 +38,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         CancellationToken cancellationToken = default)
     {
         return contentDbContext.Publications
+            .AsNoTracking()
             .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue)
             .SingleOrNotFoundAsync(cancellationToken);
     }
@@ -48,6 +49,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         CancellationToken cancellationToken = default)
     {
         return contentDbContext.ReleaseVersions
+            .AsNoTracking()
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
     }
@@ -59,6 +61,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         CancellationToken cancellationToken = default)
     {
         var updates = await contentDbContext.Update
+            .AsNoTracking()
             .Where(u => u.ReleaseVersionId == releaseVersion.Id)
             .Select(u => ReleaseUpdateDto.FromUpdate(u))
             .ToListAsync(cancellationToken);
