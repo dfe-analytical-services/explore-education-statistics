@@ -31,7 +31,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
     public abstract class ListDataSetVersionsTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
     {
-        public abstract class PublicDataSetVersionsTests(TestApplicationFactory testApp) : ListDataSetVersionsTests(testApp)
+        public class PublicDataSetVersionsTests(TestApplicationFactory testApp) : ListDataSetVersionsTests(testApp)
         {
             [Theory]
             [InlineData(1, 2, 1)]
@@ -410,6 +410,75 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
                 response.AssertNotFound();
             }
+
+            [Theory]
+            [InlineData(true)]
+            [InlineData(false)]
+            public async Task IncludesLatestDraft_WhenValidTokenProvided_OtherwiseReturnsPublicOnly(bool validTokenProvided)
+            {
+                // Arrange
+                var dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished()
+                    .Generate();
+                var expiredtoken = (Id:Guid.Parse("6fcb65b8-f2f4-4e7b-9a5d-83c70d213c13"),
+                    Expiry: DateTimeOffset.UtcNow.AddDays(-1));
+                var validToken = (Id: Guid.Parse("d93a5cea-d59c-4c57-8399-c9c9c7088938"),
+                    Expiry: DateTimeOffset.UtcNow.AddDays(1));
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var tokens = 2;
+                var versions = 8;
+                var dataSetVersions = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                    .WithDataSetId(dataSet.Id)
+                    .WithStatusPublished()
+                    .ForIndex(0, v => v.SetVersionNumber(1, 0))
+                    .ForIndex(1, v => v.SetVersionNumber(1, 1))
+                    .ForIndex(2, v => v.SetVersionNumber(2, 0))
+                    .ForIndex(3, v => v.SetVersionNumber(2, 1))
+                    .ForIndex(4, v => v.SetVersionNumber(3, 0))
+                    .ForIndex(5, v => v.SetVersionNumber(4, 0))
+                    .ForIndex(6, v => v.SetVersionNumber(4, 1))
+                    .ForIndex(7, v => v.SetVersionNumber(4, 2)
+                        .SetStatusDraft()
+                        .SetPreviewTokens(() =>
+                        {
+                            return DataFixture
+                                .DefaultPreviewToken(expired: false)
+                                .ForIndex(0, t =>
+                                    t.Set(s => s.Id, expiredtoken.Id)
+                                        .SetCreatedByUserId(expiredtoken.Id)
+                                        .SetExpiry(expiredtoken.Expiry))
+                                .ForIndex(1, t =>
+                                    t.Set(s => s.Id, validToken.Id)
+                                        .SetCreatedByUserId(validToken.Id)
+                                        .SetExpiry(validToken.Expiry))
+                                .GenerateList(tokens);
+                        }))
+                    .GenerateList(versions);
+                dataSet.LatestDraftVersion = dataSetVersions.Last();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersions);
+                    context.DataSets.Update(dataSet);
+                });
+
+                //Act
+                var response = await ListDataSetVersions(
+                    dataSetId: dataSet.Id,
+                    page: 1,
+                    pageSize: 10,
+                    previewTokenId: validTokenProvided ? validToken.Id : expiredtoken.Id);
+                var viewModel = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+                // Assert
+                Assert.NotNull(viewModel);
+                Assert.Equal(validTokenProvided ? versions : versions - 1, // latest draft is excluded if token is invalid
+                    viewModel.Results.Count);
+            }
+
         }
         
         public class AnalyticsEnabledTests : ListDataSetVersionsTests, IDisposable

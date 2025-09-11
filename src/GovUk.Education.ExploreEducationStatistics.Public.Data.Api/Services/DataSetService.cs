@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -22,7 +23,8 @@ internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IUserService userService,
-    IAnalyticsService analyticsService)
+    IAnalyticsService analyticsService,
+    IAuthorizationHandlerService authorizationHandlerService)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
@@ -146,11 +148,18 @@ internal class DataSetService(
                 type: DataSetCallType.GetVersions,
                 parameters: new PaginationParameters(Page: page, PageSize: pageSize),
                 cancellationToken: cancellationToken))
-            .OnSuccess(dataSet => ListPaginatedVersions(
-                dataSet: dataSet,
-                page: page,
-                pageSize: pageSize,
-                cancellationToken: cancellationToken));
+            .OnSuccess(async dataSet =>
+            {
+               var showLatestDraftVersion = await authorizationHandlerService
+                   .RequestHasValidPreviewToken(dataSet);
+
+               return await ListPaginatedVersions(
+                    dataSet: dataSet,
+                    page: page,
+                    pageSize: pageSize,
+                    showLatestDraftVersion: showLatestDraftVersion,
+                    cancellationToken: cancellationToken);
+            });
     }
 
     public async Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
@@ -180,13 +189,16 @@ internal class DataSetService(
         DataSet dataSet,
         int page,
         int pageSize,
+        bool showLatestDraftVersion = false,
         CancellationToken cancellationToken = default)
     {
         var queryable = publicDataDbContext
             .DataSetVersions
             .AsNoTracking()
-            .Where(ds => ds.DataSetId == dataSet.Id)
-            .WherePublicStatus();
+            .Where(ds => ds.DataSetId == dataSet.Id);
+        queryable = showLatestDraftVersion
+            ? queryable.WherePublicStatusOrSpecifiedId(dataSet.LatestDraftVersionId!.Value)
+            : queryable.WherePublicStatus();
 
         var totalResults = await queryable.CountAsync(cancellationToken: cancellationToken);
 
