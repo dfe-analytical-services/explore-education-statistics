@@ -1,14 +1,17 @@
+import { SelectOption } from '@common/components/form/FormSelect';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { FormGroup, FormSelect } from '@common/components/form';
 import { ThemeSummary } from '@common/services/themeService';
-import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import { ReleaseType } from '@common/services/types/releaseType';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
 import { PublicationFilter } from '@frontend/modules/find-statistics/utils/publicationFilters';
+import { SortOption } from '@frontend/components/SortControls';
 import React from 'react';
+import { PublicationSortOption } from '../utils/publicationSortOptions';
 
 const formId = 'filters-form';
 
@@ -20,26 +23,51 @@ export type FilterChangeHandler = ({
   nextValue: string;
 }) => void;
 
+type SortOptionType = PublicationSortOption;
+
 interface Props {
   releaseType?: ReleaseType;
+  releaseTypesWithResultCounts: SelectOption[];
   showResetFiltersButton?: boolean;
+  sortBy: SortOptionType;
+  sortOptions: SortOption[];
   themeId?: string;
   themes: ThemeSummary[];
+  themesWithResultCounts: SelectOption[];
   onChange: FilterChangeHandler;
   onResetFilters?: () => void;
+  onSortChange: (nextSortBy: SortOptionType) => void;
 }
 
 export default function Filters({
   releaseType,
+  releaseTypesWithResultCounts,
   showResetFiltersButton,
+  sortBy,
+  sortOptions,
   themeId,
   themes,
+  themesWithResultCounts,
   onChange,
   onResetFilters,
+  onSortChange,
 }: Props) {
   return (
     <form className={styles.form} id={formId}>
-      <h2 className="govuk-heading-m">Filter publications</h2>
+      <h2 className="govuk-heading-m">Sort and filter publications</h2>
+      <FormGroup>
+        <FormSelect
+          className="govuk-!-width-full govuk-!-margin-bottom-1"
+          id={`${formId}-sortBy`}
+          label="Sort by"
+          name="sortBy"
+          options={sortOptions}
+          value={sortBy}
+          order={[]}
+          onChange={event => onSortChange(event.target.value as SortOptionType)}
+        />
+      </FormGroup>
+
       <FormGroup>
         <FormSelect
           className="govuk-!-width-full govuk-!-margin-bottom-1"
@@ -52,10 +80,7 @@ export default function Filters({
           name="themeId"
           options={[
             { label: 'All themes', value: 'all' },
-            ...themes.map(theme => ({
-              label: theme.title,
-              value: theme.id,
-            })),
+            ...themesWithResultCounts,
           ]}
           value={themeId ?? 'all'}
           order={[]}
@@ -78,10 +103,7 @@ export default function Filters({
           name="releaseType"
           options={[
             { label: 'All release types', value: 'all' },
-            ...Object.keys(releaseTypes).map(type => ({
-              label: releaseTypes[type as ReleaseType],
-              value: type,
-            })),
+            ...releaseTypesWithResultCounts,
           ]}
           value={releaseType ?? 'all'}
           order={[]}

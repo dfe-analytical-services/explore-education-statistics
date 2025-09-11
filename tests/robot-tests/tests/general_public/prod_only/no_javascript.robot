@@ -17,4 +17,6 @@ Parse Find Statistics page HTML
 
 Validate Seed Data Theme 1 Publication 1 publication on page
     ${list}=    user_gets_publications_list    ${parsed_page}
+
+    Skip    Skipping as not compatible with azure search
     user_checks_list_contains_publication    ${list}    Pupil absence in schools in England

@@ -10,13 +10,17 @@ interface Props {
 
 const FilterResetButton = ({ filterType, name, onClick }: Props) => {
   return (
-    <button className={styles.button} type="button" onClick={onClick}>
-      <span aria-hidden>✕</span>
-      <div className="govuk-!-margin-left-1">
+    <button
+      className={styles.button}
+      type="button"
+      onClick={onClick}
+      data-testid="filter-reset"
+    >
+      <span>
         <VisuallyHidden>Remove filter:</VisuallyHidden>
-        {filterType && <span className={styles.filterType}>{filterType}</span>}
+        {filterType && <span className={styles.filterType}>{filterType}:</span>}
         {name}
-      </div>
+      </span>
     </button>
   );
 };
