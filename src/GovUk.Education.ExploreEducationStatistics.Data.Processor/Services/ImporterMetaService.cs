@@ -52,6 +52,7 @@ public class ImporterMetaService : IImporterMetaService
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+
         var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, subject);
         var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, subject);
 
@@ -90,7 +91,9 @@ public class ImporterMetaService : IImporterMetaService
         StatisticsDbContext context)
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
-        var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+        var metaRowsRaw = metaFileReader.GetMetaRows(metaFileRows);
+        var metaRows = ExcludeFiltersUsedForGrouping(metaRowsRaw);
+        
         var filters = (await GetFilters(metaRows, subject, context)).ToList();
         var indicators = GetIndicators(metaRows, subject, context).ToList();
 
@@ -118,6 +121,22 @@ public class ImporterMetaService : IImporterMetaService
                 filter: filters.Single(f => f.Name == filter.ColumnName),
                 column: filter.ColumnName))
             .ToList();
+    }
+
+    private static List<MetaRow> ExcludeFiltersUsedForGrouping(List<MetaRow> metaRows)
+    {
+        return
+        [
+            .. metaRows
+                .Where(mr => mr.ColumnType != ColumnType.Filter)
+            ,
+            ..  metaRows
+                .Where(mr => mr.ColumnType == ColumnType.Filter
+                             && !metaRows
+                                 .Select(fi => fi.FilterGroupingColumn)
+                                 .Where(g => !string.IsNullOrEmpty(g))
+                                 .Contains(mr.FilterGroupingColumn))
+        ]; 
     }
 
     private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
