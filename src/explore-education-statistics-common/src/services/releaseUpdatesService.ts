@@ -6,7 +6,7 @@ export interface ReleaseUpdate {
   summary: string;
 }
 
-const releaseDataGuidanceService = {
+const releaseUpdatesService = {
   getReleaseUpdates(
     publicationSlug: string,
     releaseSlug: string,
@@ -19,4 +19,4 @@ const releaseDataGuidanceService = {
   },
 };
 
-export default releaseDataGuidanceService;
+export default releaseUpdatesService;
