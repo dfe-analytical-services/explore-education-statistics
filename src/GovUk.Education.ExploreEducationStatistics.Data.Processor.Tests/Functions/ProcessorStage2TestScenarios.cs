@@ -5,19 +5,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
-public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
+public abstract class ScenarioWithFilterGrouping(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
-    private readonly Guid _subjectId;
+    private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
-    public OrderingCsvStage2Scenario(Guid? subjectId = null)
-    {
-        _subjectId = subjectId ?? Guid.NewGuid();
-    }
-
-    public string GetFilenameUnderTest()
-    {
-        return "ordering-test-4.csv";
-    }
+    public abstract string GetFilenameUnderTest();
 
     public Guid GetSubjectId()
     {
@@ -175,6 +167,14 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
         new AutoSelectFilterValue("Filter one", "Total"),
         new AutoSelectFilterValue("Filter three", "Total"),
     ];
+}
+
+public class OrderingCsvStage2Scenario(Guid? subjectId = null) : ScenarioWithFilterGrouping(subjectId)
+{
+    public override string GetFilenameUnderTest()
+    {
+        return "ordering-test-4.csv";
+    }
 }
 
 public class AdditionalFiltersAndIndicatorsScenario : IProcessorStage2TestScenario
@@ -522,6 +522,17 @@ public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenari
 }
 
 public record AutoSelectFilterValue(string FilterLabel, string AutoSelectFilterItemLabel);
+
+public class GroupingFiltersAsRowsInMetaFileScenario(Guid? subjectId = null) : ScenarioWithFilterGrouping(subjectId)
+{
+    public override string GetFilenameUnderTest()
+    { 
+        // This file contains two rows "filter_four_group" and
+        // "filter_two_group" which are not treated as filters
+        // by the test data set up by OrderingCsvStage2Scenario.
+        return "grouping_filters_as_rows.csv";
+    }
+}
 
 public interface IProcessorStage2TestScenario
 {

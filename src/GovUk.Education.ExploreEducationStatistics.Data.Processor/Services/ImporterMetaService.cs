@@ -52,6 +52,10 @@ public class ImporterMetaService : IImporterMetaService
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+
+        metaRows = ExcludeFiltersUsedForGrouping(metaRows);
+        metaFileRows = ExcludeMetaFileRowsUsedForGrouping(metaFileRows, metaRows);
+
         var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, subject);
         var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, subject);
 
@@ -90,7 +94,9 @@ public class ImporterMetaService : IImporterMetaService
         StatisticsDbContext context)
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
-        var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+        var metaRowsRaw = metaFileReader.GetMetaRows(metaFileRows);
+        var metaRows = ExcludeFiltersUsedForGrouping(metaRowsRaw);
+        
         var filters = (await GetFilters(metaRows, subject, context)).ToList();
         var indicators = GetIndicators(metaRows, subject, context).ToList();
 
@@ -118,6 +124,61 @@ public class ImporterMetaService : IImporterMetaService
                 filter: filters.Single(f => f.Name == filter.ColumnName),
                 column: filter.ColumnName))
             .ToList();
+    }
+
+    private static List<MetaRow> ExcludeFiltersUsedForGrouping(List<MetaRow> metaRows)
+    {
+        var groupingColumns = metaRows
+            .Select(mr => mr.FilterGroupingColumn)
+            .Where(g => !string.IsNullOrWhiteSpace(g))
+            .Select(g => g!.Trim())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return
+        [
+            .. metaRows
+                .Where(row =>
+                {
+                    if (row.ColumnType != ColumnType.Filter)
+                    {
+                        return true; // Keep non-filter rows
+                    }
+
+                    return !groupingColumns.Contains(row.ColumnName.Trim());
+                })
+        ];
+    }
+
+    private static List<List<string>> ExcludeMetaFileRowsUsedForGrouping(List<List<string>> metaFileRows, List<MetaRow> metaRows)
+    {
+        const int colNameIndex = 0;
+        const int colTypeIndex = 1;
+
+        bool IsFilterRow(IReadOnlyList<string> row)
+            => row.Count > colTypeIndex
+               && string.Equals(row[colTypeIndex]?.Trim(), "Filter", StringComparison.OrdinalIgnoreCase);
+
+        string? GetColumnName(IReadOnlyList<string> row)
+            => row.Count > colNameIndex ? row[colNameIndex]?.Trim() : null;
+
+        var groupingColumns = metaRows
+            .Select(c => c.FilterGroupingColumn)
+            .Where(g => !string.IsNullOrWhiteSpace(g))
+            .Select(g => g!.Trim())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return [.. metaFileRows
+            .Where(row =>
+            {
+                if (!IsFilterRow(row))
+                {
+                    return true; // Keep non-filter rows
+                }
+
+                var name = GetColumnName(row);
+                // Keep filter rows only if not used as grouping columns
+                return !string.IsNullOrWhiteSpace(name) && !groupingColumns.Contains(name);
+            })];
     }
 
     private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
