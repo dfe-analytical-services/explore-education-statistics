@@ -40,7 +40,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.3.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.3.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.7.1" />
-    <PackageReference Include="System.Memory.Data" Version="7.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.6" />
   </ItemGroup>
 
