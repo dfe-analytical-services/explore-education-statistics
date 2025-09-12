@@ -24,6 +24,11 @@ public static class DataSetVersionAuthExtensions
     public static IQueryable<DataSetVersion> WherePublicStatus(this IQueryable<DataSetVersion> queryable)
         => queryable.Where(IsPublicStatus());
 
+    public static IQueryable<DataSetVersion> WherePublicStatusOrSpecifiedId(this IQueryable<DataSetVersion> queryable, Guid versionId)
+        => queryable.Where(dataSetVersion =>
+            PublicStatuses.Contains(dataSetVersion.Status)
+            || dataSetVersion.Id == versionId);
+
     public static IQueryable<DataSetVersion> WherePublishedStatus(this IQueryable<DataSetVersion> queryable)
         => queryable.Where(dv => dv.Status == DataSetVersionStatus.Published);
     
