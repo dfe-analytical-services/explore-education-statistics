@@ -43,7 +43,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         .Build();
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
         .WithInMemoryPersistence()
         .Build();
 
