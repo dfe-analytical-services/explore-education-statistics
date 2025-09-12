@@ -61,7 +61,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
     public class GetPublicationsByGetRequestTests : PublicationsSearchControllerCachingTests
     {
         [Fact]
-        public async Task GetPublications_WhenNoCacheEntryExists_InvokesServiceAndCreateCache()
+        public async Task WhenNoCacheEntryExists_InvokesServiceAndCreateCache()
         {
             // Arrange
             MemoryCacheService
@@ -81,7 +81,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
         }
 
         [Fact]
-        public async Task GetPublications_WhenCachedEntryExists_ReturnsCachedSearchResults()
+        public async Task WhenCachedEntryExists_ReturnsCachedSearchResults()
         {
             // Arrange
             MemoryCacheService
@@ -114,7 +114,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
     public class GetPublicationsByPostRequestTests : PublicationsSearchControllerCachingTests
     {
         [Fact]
-        public async Task GetPublications_WhenNoCacheEntryExists_InvokesServiceAndCreatesCache()
+        public async Task WhenNoCacheEntryExists_InvokesServiceAndCreatesCache()
         {
             // Arrange
             MemoryCacheService
@@ -134,7 +134,7 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
         }
 
         [Fact]
-        public async Task GetPublications_WhenCachedEntryExists_ReturnsCachedSearchResults()
+        public async Task WhenCachedEntryExists_ReturnsCachedSearchResults()
         {
             // Arrange
             MemoryCacheService

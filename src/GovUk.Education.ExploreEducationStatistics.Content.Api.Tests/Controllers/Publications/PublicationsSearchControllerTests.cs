@@ -35,7 +35,7 @@ public abstract class PublicationsSearchControllerTests
     public class GetPublicationsByGetRequestTests : PublicationsSearchControllerTests
     {
         [Fact]
-        public async Task GetPublications_WhenServiceReturnsPublications_ReturnsSearchResults()
+        public async Task WhenServiceReturnsPublications_ReturnsSearchResults()
         {
             // Arrange
             var request = new PublicationsListGetRequest(
@@ -62,7 +62,7 @@ public abstract class PublicationsSearchControllerTests
     public class GetPublicationsByPostRequestTests : PublicationsSearchControllerTests
     {
         [Fact]
-        public async Task GetPublications_WhenServiceReturnsPublications_ReturnsSearchResults()
+        public async Task WhenServiceReturnsPublications_ReturnsSearchResults()
         {
             // Arrange
             var request = new PublicationsListPostRequest(

@@ -16,7 +16,7 @@ public abstract class RelatedInformationControllerTests
     public class GetRelatedInformationForReleaseTests : RelatedInformationControllerTests
     {
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenServiceReturnsRelatedInformation_ReturnsOk()
+        public async Task WhenServiceReturnsRelatedInformation_ReturnsOk()
         {
             // Arrange
             RelatedInformationDto[] relatedInformation =
@@ -51,7 +51,7 @@ public abstract class RelatedInformationControllerTests
         }
 
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenServiceReturnsNotFound_ReturnsNotFound()
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
         {
             // Arrange
             _relatedInformationService.WhereGetRelatedInformationForReleaseReturnsNotFound(

@@ -19,8 +19,7 @@ public abstract class RelatedInformationServiceTests
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(10)]
-        public async Task GetRelatedInformationForRelease_WhenPublicationAndReleaseExist_ReturnsRelatedInformation(
-            int numRelatedInformation)
+        public async Task WhenPublicationAndReleaseExist_ReturnsRelatedInformation(int numRelatedInformation)
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
@@ -61,7 +60,7 @@ public abstract class RelatedInformationServiceTests
         }
 
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenPublicationDoesNotExist_ReturnsNotFound()
+        public async Task WhenPublicationDoesNotExist_ReturnsNotFound()
         {
             // Arrange
             const string publicationSlug = "publication-that-does-not-exist";
@@ -78,7 +77,7 @@ public abstract class RelatedInformationServiceTests
         }
 
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenReleaseDoesNotExist_ReturnsNotFound()
+        public async Task WhenReleaseDoesNotExist_ReturnsNotFound()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication();
@@ -106,7 +105,7 @@ public abstract class RelatedInformationServiceTests
         }
 
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
+        public async Task WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
