@@ -26,7 +26,6 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
-using Filter = GovUk.Education.ExploreEducationStatistics.Data.Model.Filter;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;

@@ -5,14 +5,9 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
-public abstract class ScenarioWithFilterGrouping() : IProcessorStage2TestScenario
+public abstract class ScenarioWithFilterGrouping(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
-    private readonly Guid _subjectId;
-
-    protected ScenarioWithFilterGrouping(Guid? subjectId = null) : this()
-    {
-        _subjectId = subjectId ?? Guid.NewGuid();
-    }
+    private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
     public abstract string GetFilenameUnderTest();
 
