@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Security;
