@@ -1,5 +1,8 @@
-col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column,filter_default
-enrollment_count,Indicator,Number of students enrolled,,,,,,
-qualification_level,Filter,Level of qualification,,,,,,
-subject_area,Filter,Sector subject area,,,,,qualification_level,
-course_title,Filter,Name of course being studied,,,,,subject_area,Forestry
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+ind_one,Indicator,Indicator one,,,,,
+filter_one,Filter,Filter one,,,,,
+filter_two,Filter,Filter two,,,,,filter_two_group
+filter_three,Filter,Filter three,,,,,
+filter_four,Filter,Filter four,,,,,filter_four_group
+filter_two_group,Filter,Filter two group,,,,,
+filter_four_group,Filter,Filter four group,,,,,

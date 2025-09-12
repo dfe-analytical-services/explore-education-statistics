@@ -14,7 +14,7 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
         _subjectId = subjectId ?? Guid.NewGuid();
     }
 
-    public string GetFilenameUnderTest()
+    public virtual string GetFilenameUnderTest()
     {
         return "ordering-test-4.csv";
     }
@@ -523,97 +523,15 @@ public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenari
 
 public record AutoSelectFilterValue(string FilterLabel, string AutoSelectFilterItemLabel);
 
-public class GroupingFiltersAsRowsInMetaFileScenario : IProcessorStage2TestScenario
+public class GroupingFiltersAsRowsInMetaFileScenario : OrderingCsvStage2Scenario
 {
-    private readonly Guid _subjectId;
-
-    public GroupingFiltersAsRowsInMetaFileScenario(Guid? subjectId = null)
-    {
-        _subjectId = subjectId ?? Guid.NewGuid();
-    }
-
-    public string GetFilenameUnderTest()
-    {
+    public override string GetFilenameUnderTest()
+    { 
+        // This file contains two rows "filter_four_group" and
+        // "filter_two_group" which are not treated as filters
+        // by the test data set up by OrderingCsvStage2Scenario.
         return "grouping_filters_as_rows.csv";
     }
-
-    public Guid GetSubjectId()
-    {
-        return _subjectId;
-    }
-
-    public List<Filter> GetExpectedFilters()
-    {
-        return ListOf(
-            new Filter
-            {
-                Label = "Name of course being studied",
-                Name = "course_title",
-                GroupCsvColumn = "subject_area",
-                FilterGroups = ListOf(
-                    new FilterGroup
-                    {
-                        Label = "",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Construction"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Horticulture"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Science"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Engineering"
-                            })
-                    }),
-                SubjectId = _subjectId
-            });
-    }
-
-    public List<IndicatorGroup> GetExpectedIndicatorGroups()
-    {
-        return ListOf(
-            new IndicatorGroup
-            {
-                Label = "Default",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Number of students enrolled"
-                    }),
-                SubjectId = _subjectId
-            });
-    }
-
-    public List<Location> GetExpectedLocations()
-    {
-        return ListOf(
-            new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
-            },
-            new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
-            });
-    }
-
-    public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
-        [new("Name of course being studied", "Forestry")];
 }
 
 public interface IProcessorStage2TestScenario
