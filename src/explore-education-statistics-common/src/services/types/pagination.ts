@@ -9,3 +9,8 @@ export interface Paging {
   totalResults: number;
   totalPages: number;
 }
+
+export interface PaginationRequestParams {
+  page?: number;
+  pageSize?: number;
+}

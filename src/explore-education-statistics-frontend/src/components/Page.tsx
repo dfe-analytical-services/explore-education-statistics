@@ -17,6 +17,7 @@ type Props = {
   title: string;
   metaTitle?: string;
   caption?: string;
+  captionInsideTitle?: boolean; // Use when caption should be part of `h1` too
   description?: string;
   breadcrumbLabel?: string;
   pageMeta?: PageMetaProps;
@@ -33,6 +34,7 @@ const Page = ({
   title,
   metaTitle,
   caption = '',
+  captionInsideTitle = false,
   description,
   breadcrumbLabel = '',
   pageMeta,
@@ -80,12 +82,18 @@ const Page = ({
           id="main-content"
           role="main"
         >
-          {pageTitleComponent || <PageTitle title={title} caption={caption} />}
+          {pageTitleComponent || (
+            <PageTitle
+              title={title}
+              caption={caption}
+              captionInsideTitle={captionInsideTitle}
+            />
+          )}
           {children}
         </main>
       </div>
 
-      <PageFeedback />
+      <PageFeedback width={width} />
       <PageFooter width={width} />
     </>
   );

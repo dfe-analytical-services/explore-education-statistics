@@ -13,23 +13,30 @@
   background-color: #f4f8fb;
 }
 
-.list {
+.innerWrap {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-start;
+  column-gap: govuk-spacing(6);
+  row-gap: govuk-spacing(4);
+  margin-inline: govuk-spacing(2);
+  padding-block: govuk-spacing(4);
+}
+
+.list {
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
   column-gap: govuk-spacing(6);
   row-gap: govuk-spacing(4);
-  margin-inline: govuk-spacing(2);
+  margin-block: 0;
 }
 
 .listItemTerm {
   font-weight: normal;
   color: $govuk-secondary-text-colour;
-}
-
-.listItemTermHidden {
-  visibility: hidden;
 }
 
 .listItemDefinition {

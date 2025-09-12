@@ -1,4 +1,5 @@
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { PageWidth } from '@frontend/components/Page';
 import styles from '@frontend/components/PageFeedback.module.scss';
 import Button from '@common/components/Button';
 import classNames from 'classnames';
@@ -16,6 +17,9 @@ import { ObjectSchema } from 'yup';
 
 type BannerState = 'initial' | 'notUseful' | 'problemEncountered' | 'thanks';
 
+interface Props {
+  width?: PageWidth;
+}
 interface FormValues {
   context?: string;
   issue?: string;
@@ -24,7 +28,7 @@ interface FormValues {
 
 const feedbackLimit = 2000;
 
-export default function PageFeedback() {
+export default function PageFeedback({ width }: Props) {
   const [bannerState, setBannerState] = useState<BannerState>('initial');
   const [response, setResponse] = useState<PageFeedbackResponse | undefined>();
 
@@ -78,7 +82,16 @@ export default function PageFeedback() {
   }, []);
 
   return (
-    <div className={classNames('govuk-width-container', styles.container)}>
+    <div
+      className={classNames(
+        'govuk-width-container',
+        {
+          'dfe-width-container--wide': width === 'wide',
+          'dfe-width-container--full': width === 'full',
+        },
+        styles.container,
+      )}
+    >
       <div className={styles.banner}>
         {bannerState === 'initial' && (
           <>
