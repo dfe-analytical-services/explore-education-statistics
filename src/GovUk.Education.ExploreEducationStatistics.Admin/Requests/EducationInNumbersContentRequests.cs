@@ -24,3 +24,25 @@ public record EinHtmlBlockUpdateRequest
 {
     public string Body { get; set; } = string.Empty;
 }
+
+public record EinTileGroupBlockUpdateRequest
+{
+    public string? Title { get; set; } = string.Empty;
+}
+
+public record EinTileAddRequest
+{
+    public EinTileType Type { get; set; }
+
+    public int? Order { get; set; }
+}
+
+public record EinFreeTextStatTileUpdateRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public string Statistic { get; set; } = string.Empty;
+    public string Trend { get; set; } = string.Empty;
+    public string LinkUrl { get; set; } = string.Empty;
+    public string LinkText { get; set; } = string.Empty;
+}
+

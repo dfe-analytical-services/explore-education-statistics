@@ -91,6 +91,7 @@ public class ContentDbContext : DbContext
     public virtual DbSet<EducationInNumbersPage> EducationInNumbersPages { get; set; }
     public virtual DbSet<EinContentSection> EinContentSections { get; set; }
     public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
+    public virtual DbSet<EinTile> EinTiles { get; set; }
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -140,6 +141,7 @@ public class ContentDbContext : DbContext
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
         ConfigureEinContentBlock(modelBuilder);
+        ConfigureEinTile(modelBuilder);
 
         // Apply model configuration for types which implement IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -962,7 +964,15 @@ public class ContentDbContext : DbContext
     {
         modelBuilder.Entity<EinContentBlock>()
             .HasDiscriminator<string>("Type")
-            .HasValue<EinHtmlBlock>("HtmlBlock");
+            .HasValue<EinHtmlBlock>("HtmlBlock")
+            .HasValue<EinTileGroupBlock>("TileGroupBlock");
+    }
+
+    private static void ConfigureEinTile(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<EinTile>()
+            .HasDiscriminator<string>("Type")
+            .HasValue<EinFreeTextStatTile>("FreeTextStatTile");
     }
 }
 

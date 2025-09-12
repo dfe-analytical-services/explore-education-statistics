@@ -162,7 +162,7 @@ public class ReleaseControllerTests : CacheServiceTestFixture
 
         var actual = result.Value;
         Assert.NotNull(actual);
-        
+
         AssertAll(
             [
                 () => Assert.Equal(releaseId, actual.ReleaseId),

@@ -1,57 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class EducationInNumbersContentExtensions
 {
-    public static EinContentViewModel ToContentViewModel(
-        this EducationInNumbersPage page)
-    {
-        return new EinContentViewModel
-        {
-            Id = page.Id,
-            Title = page.Title,
-            Slug = page.Slug,
-            Published = page.Published,
-            Content = page.Content
-                .Select(section => section.ToViewModel())
-                .OrderBy(section => section.Order)
-                .ToList(),
-        };
-    }
-
-    public static EinContentSectionViewModel ToViewModel(
-        this EinContentSection section)
-    {
-            return new EinContentSectionViewModel
-            {
-                Id = section.Id,
-                Order = section.Order,
-                Heading = section.Heading,
-                Caption = section.Caption,
-                Content = section.Content
-                    .Select(block => block.ToViewModel())
-                    .OrderBy(block => block.Order)
-                    .ToList(),
-            };
-    }
-
-    public static EinContentBlockViewModel ToViewModel(this EinContentBlock block)
-    {
-        return block switch
-        {
-            EinHtmlBlock htmlBlock => new EinHtmlBlockViewModel
-            {
-                Id = htmlBlock.Id,
-                Order = htmlBlock.Order,
-                Type = EinBlockType.HtmlBlock,
-                Body = htmlBlock.Body,
-            },
-            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
-        };
-    }
-
     public static EinContentSection Clone(this EinContentSection section, Guid newPageId)
     {
         var newSectionId = Guid.NewGuid();
@@ -78,10 +30,35 @@ public static class EducationInNumbersContentExtensions
             {
                 Id = Guid.NewGuid(),
                 Order = htmlBlock.Order,
-                Body = htmlBlock.Body,
                 EinContentSectionId = newSectionId,
+                Body = htmlBlock.Body,
+            },
+            EinTileGroupBlock groupBlock => new EinTileGroupBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = groupBlock.Order,
+                EinContentSectionId = newSectionId,
+                Tiles = groupBlock.Tiles
+                    .Select(tile => tile.Clone(groupBlock.Id))
+                    .OrderBy(tile => tile.Order)
+                    .ToList(),
             },
             _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
+        };
+    }
+
+    private static EinTile Clone(this EinTile tile, Guid groupBlockId)
+    {
+        return tile switch
+        {
+            EinFreeTextStatTile statTile => new EinFreeTextStatTile
+            {
+                Id = Guid.NewGuid(),
+                Order = statTile.Order,
+                EinParentBlockId = groupBlockId,
+                Statistic = "Over 9000!",
+            },
+            _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found")
         };
     }
 }
