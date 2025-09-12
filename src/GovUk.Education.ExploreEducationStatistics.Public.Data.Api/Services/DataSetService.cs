@@ -195,7 +195,7 @@ internal class DataSetService(
         var queryable = publicDataDbContext
             .DataSetVersions
             .AsNoTracking()
-            .Where(ds => ds.DataSetId == dataSet.Id);
+            .Where(dsv => dsv.DataSetId == dataSet.Id);
         queryable = includeDraftVersion
             ? queryable.WherePublicStatusOrSpecifiedId(dataSet.LatestDraftVersionId!.Value)
             : queryable.WherePublicStatus();
