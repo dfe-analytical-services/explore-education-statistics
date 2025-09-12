@@ -22,7 +22,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     IAsyncLifetime
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
         .Build();
 
     protected readonly DataFixture DataFixture = new();
