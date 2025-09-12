@@ -130,4 +130,5 @@ public enum ValidationErrorMessages
     EinProvidedPageIdsDifferFromActualPageIds,
     EinProvidedSectionIdsDifferFromActualSectionIds,
     EinProvidedBlockIdsDifferFromActualBlockIds,
+    EinProvidedTileIdsDifferFromActualTileIds,
 }

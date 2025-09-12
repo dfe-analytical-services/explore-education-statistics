@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,7 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
             var latestPage = await contentDbContext.EducationInNumbersPages
                 .Where(page => page.Slug == slug && page.Published != null)
                 .OrderByDescending(page => page.Version)
-                .Select(page => page.ToNavItemViewModel())
+                .Select(page => EinNavItemViewModel.FromModel(page))
                 .FirstAsync();
 
             latestPages.Add(latestPage);
@@ -41,9 +41,10 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
         return await contentDbContext.EducationInNumbersPages
             .Include(page => page.Content)
             .ThenInclude(section => section.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .Where(page => page.Slug == slug && page.Published != null)
             .OrderByDescending(page => page.Version)
-            .Select(page => page.ToPageViewModel())
+            .Select(page => EinPageViewModel.FromModel(page))
             .FirstOrNotFoundAsync();
     }
 }

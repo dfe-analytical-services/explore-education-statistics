@@ -37,8 +37,14 @@ public interface IEducationInNumbersContentService
     Task<Either<ActionResult, EinContentBlockViewModel>> UpdateHtmlBlock(
         Guid pageId,
         Guid sectionId,
-        Guid blockId,
+        Guid htmlBlockId,
         EinHtmlBlockUpdateRequest request);
+
+    Task<Either<ActionResult, EinContentBlockViewModel>> UpdateTileGroupBlock(
+        Guid pageId,
+        Guid sectionId,
+        Guid tileGroupBlockId,
+        EinTileGroupBlockUpdateRequest request);
 
     Task<Either<ActionResult, List<EinContentBlockViewModel>>> ReorderBlocks(
         Guid pageId,
@@ -49,4 +55,25 @@ public interface IEducationInNumbersContentService
         Guid pageId,
         Guid sectionId,
         Guid blockId);
+
+    Task<Either<ActionResult, EinTileViewModel>> AddTile(
+        Guid pageId,
+        Guid parentBlockId,
+        EinTileType type,
+        int? order);
+
+    Task<Either<ActionResult, EinTileViewModel>> UpdateFreeTextStatTile(
+        Guid pageId,
+        Guid tileId,
+        EinFreeTextStatTileUpdateRequest request);
+
+    Task<Either<ActionResult, List<EinTileViewModel>>> ReorderTiles(
+        Guid pageId,
+        Guid parentBlockId,
+        List<Guid> newTileOrder);
+
+    Task<Either<ActionResult, Unit>> DeleteTile(
+        Guid pageId,
+        Guid blockId,
+        Guid tileId);
 }
