@@ -98,10 +98,6 @@ Check cannot create a methodology for archive-publication
     user waits until h2 is visible    Manage methodologies
     user checks page does not contain button    Create new methodology
 
-Validate that archive-publication appears correctly on Find stats page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
-
 Verify that archive-publication is publicly accessible
     user navigates to public release page
     ...    ${PUBLICATION_URL_ARCHIVE}
@@ -223,12 +219,6 @@ Go to "Sign off" page and approve superseding-publication release
 Get superseding-release link
     ${PUBLICATION_URL_SUPERSEDE}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLICATION_URL_SUPERSEDE}
-
-Check archive-publication is now archived and superseding-publication now appears on Find stats page
-    # TODO EES-6063 - Remove this
-    sleep    1    # Prevent intermittent failure where Find Stats page loads before cache is cleared
-    user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
-    user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
 Check public superseding-publication release page displays correctly
     user navigates to public release page
@@ -367,10 +357,6 @@ Check can create a methodology for archive-publication which is no longer archiv
 Check public Find stats page and check archive-publication is no longer archived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
-
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
-    user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
 
 Check public archive-publication release page displays correctly after being unarchived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269

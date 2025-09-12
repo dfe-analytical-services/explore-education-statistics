@@ -5,7 +5,7 @@ Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Dev    PreProd    Prod
+Force Tags          GeneralPublic    Dev    PreProd    Prod
 
 
 *** Test Cases ***
