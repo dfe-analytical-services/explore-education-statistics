@@ -12,9 +12,8 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
 {
     public async Task<Either<ActionResult, PublicationDto>> GetPublication(
         string publicationSlug,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetPublicationBySlug(publicationSlug,
+        CancellationToken cancellationToken = default) =>
+        await GetPublicationBySlug(publicationSlug,
                 includeContact: true,
                 includeLatestPublishedRelease: true,
                 includeTheme: true,
@@ -26,7 +25,6 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
                     publication: publication,
                     supersededByPublication: supersededByPublication);
             });
-    }
 
     private async Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
@@ -59,14 +57,12 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
 
     private async Task<Publication?> GetSupersededByPublication(
         Guid publicationId,
-        CancellationToken cancellationToken)
-    {
-        return await contentDbContext.Publications
+        CancellationToken cancellationToken) =>
+        await contentDbContext.Publications
             .AsNoTracking()
             .Where(p => p.Id == publicationId &&
                         p.SupersededBy != null &&
                         p.SupersededBy.LatestPublishedReleaseVersionId.HasValue)
             .Select(p => p.SupersededBy)
             .SingleOrDefaultAsync(cancellationToken);
-    }
 }

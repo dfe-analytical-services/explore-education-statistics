@@ -14,9 +14,8 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
     public async Task<Either<ActionResult, RelatedInformationDto[]>> GetRelatedInformationForRelease(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetPublicationBySlug(publicationSlug, cancellationToken)
+        CancellationToken cancellationToken = default) =>
+        await GetPublicationBySlug(publicationSlug, cancellationToken)
             .OnSuccess(publication =>
                 GetLatestPublishedReleaseVersionByReleaseSlug(
                     publication,
@@ -25,26 +24,21 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
             .OnSuccess(releaseVersion => releaseVersion.RelatedInformation
                 .Select(RelatedInformationDto.FromLink)
                 .ToArray());
-    }
 
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
-        CancellationToken cancellationToken)
-    {
-        return contentDbContext.Publications
+        CancellationToken cancellationToken) =>
+        contentDbContext.Publications
             .AsNoTracking()
             .SingleOrNotFoundAsync(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue,
                 cancellationToken);
-    }
 
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,
         string releaseSlug,
-        CancellationToken cancellationToken)
-    {
-        return contentDbContext.ReleaseVersions
+        CancellationToken cancellationToken) =>
+        contentDbContext.ReleaseVersions
             .AsNoTracking()
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
-    }
 }

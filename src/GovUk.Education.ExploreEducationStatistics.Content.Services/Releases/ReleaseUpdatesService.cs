@@ -17,9 +17,8 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         string releaseSlug,
         int page = 1,
         int pageSize = 10,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetPublicationBySlug(publicationSlug, cancellationToken)
+        CancellationToken cancellationToken = default) =>
+        await GetPublicationBySlug(publicationSlug, cancellationToken)
             .OnSuccess(publication =>
                 GetLatestPublishedReleaseVersionByReleaseSlug(
                     publication,
@@ -31,28 +30,23 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
                     page,
                     pageSize,
                     cancellationToken));
-    }
 
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
-        CancellationToken cancellationToken)
-    {
-        return contentDbContext.Publications
+        CancellationToken cancellationToken) =>
+        contentDbContext.Publications
             .AsNoTracking()
             .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue)
             .SingleOrNotFoundAsync(cancellationToken);
-    }
 
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,
         string releaseSlug,
-        CancellationToken cancellationToken)
-    {
-        return contentDbContext.ReleaseVersions
+        CancellationToken cancellationToken) =>
+        contentDbContext.ReleaseVersions
             .AsNoTracking()
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
-    }
 
     private async Task<PaginatedListViewModel<ReleaseUpdateDto>> GetPaginatedUpdatesForReleaseVersion(
         ReleaseVersion releaseVersion,
