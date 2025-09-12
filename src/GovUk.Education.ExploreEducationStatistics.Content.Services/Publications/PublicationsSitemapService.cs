@@ -33,7 +33,7 @@ public class PublicationsSitemapService(ContentDbContext contentDbContext) : IPu
             .ToArray();
     }
 
-    private Task<ReleaseVersion[]> GetLatestPublishedReleaseVersions(CancellationToken cancellationToken = default) =>
+    private Task<ReleaseVersion[]> GetLatestPublishedReleaseVersions(CancellationToken cancellationToken) =>
         contentDbContext.ReleaseVersions
             .AsNoTracking()
             .Include(rv => rv.Release.Publication)

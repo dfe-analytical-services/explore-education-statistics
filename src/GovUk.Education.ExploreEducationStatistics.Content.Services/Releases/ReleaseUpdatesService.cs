@@ -35,7 +35,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
 
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return contentDbContext.Publications
             .AsNoTracking()
@@ -46,7 +46,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,
         string releaseSlug,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return contentDbContext.ReleaseVersions
             .AsNoTracking()
@@ -58,7 +58,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         ReleaseVersion releaseVersion,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var updates = await contentDbContext.Update
             .AsNoTracking()

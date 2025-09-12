@@ -29,7 +29,7 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
 
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return contentDbContext.Publications
             .AsNoTracking()
@@ -40,7 +40,7 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,
         string releaseSlug,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return contentDbContext.ReleaseVersions
             .AsNoTracking()

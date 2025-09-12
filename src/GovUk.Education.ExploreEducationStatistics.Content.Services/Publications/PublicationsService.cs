@@ -59,7 +59,7 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
 
     private async Task<Publication?> GetSupersededByPublication(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return await contentDbContext.Publications
             .AsNoTracking()
