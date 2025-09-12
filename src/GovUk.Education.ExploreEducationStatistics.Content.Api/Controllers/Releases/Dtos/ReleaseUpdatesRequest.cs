@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿#nullable enable
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases.Dtos;
