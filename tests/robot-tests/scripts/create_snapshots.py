@@ -106,7 +106,7 @@ class SnapshotService:
         total_pages = math.ceil(int(total_results) / self.page_size)
 
         # A-Z sort in order to get all the publications
-        driver.find_element(By.CSS_SELECTOR, "input[value='title']").click()
+        Select(driver.find_element(By.XPATH, '//select[@id="filters-form-sortBy"]')).select_by_value("title")
         driver.find_element(By.CSS_SELECTOR, "body").click()
         publications = []
 
@@ -114,8 +114,8 @@ class SnapshotService:
             print(f"Adding page {page + 1} of {total_pages} to find statistics snapshot")
 
             WebDriverWait(driver, self.timeout).until(
-                lambda driver: driver.find_element(By.CSS_SELECTOR, "form[id='sortControlsForm']"),
-                message=f"Failed to find sort controls form on page {page + 1}",
+                lambda driver: driver.find_element(By.CSS_SELECTOR, "form[id='filters-form']"),
+                message=f"Failed to find filters form on page {page + 1}",
             )
 
             WebDriverWait(driver, self.timeout).until(

@@ -264,7 +264,7 @@ const FindStatisticsPage: NextPage = () => {
           </a>
 
           <div className="govuk-!-margin-top-3 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
-            <p className="govuk-!-margin-bottom-0">
+            <p className="govuk-!-margin-bottom-0" data-testid="total-results">
               {`${totalResultsMessage}, ${
                 totalResults ? `page ${page} of ${totalPages}` : '0 pages'
               }, ${isFiltered ? 'filtered by: ' : 'showing all publications'}`}
