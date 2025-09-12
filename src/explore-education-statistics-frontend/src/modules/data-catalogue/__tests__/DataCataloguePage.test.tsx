@@ -354,7 +354,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
@@ -567,17 +567,17 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 3',
+          name: 'Remove filter: Release: Release title 3',
         }),
       ).toBeInTheDocument();
       expect(
@@ -716,17 +716,17 @@ describe('DataCataloguePage', () => {
       expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).toBeInTheDocument();
       expect(
@@ -892,7 +892,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Search find me',
+          name: 'Remove filter: Search: find me',
         }),
       ).toBeInTheDocument();
       expect(
@@ -974,7 +974,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
@@ -1035,17 +1035,17 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 3',
+          name: 'Remove filter: Release: Release title 3',
         }),
       ).toBeInTheDocument();
 
@@ -1107,17 +1107,17 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).toBeInTheDocument();
 
@@ -1182,17 +1182,17 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 3',
+          name: 'Remove filter: Release: Release title 3',
         }),
       ).toBeInTheDocument();
 
@@ -1248,7 +1248,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Search find me',
+          name: 'Remove filter: Search: find me',
         }),
       ).toBeInTheDocument();
 
@@ -1312,7 +1312,7 @@ describe('DataCataloguePage', () => {
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       );
 
@@ -1327,7 +1327,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Theme Theme 2',
+          name: 'Remove filter: Theme: Theme 2',
         }),
       ).not.toBeInTheDocument();
 
@@ -1373,19 +1373,19 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       );
 
@@ -1405,17 +1405,17 @@ describe('DataCataloguePage', () => {
       );
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).not.toBeInTheDocument();
 
@@ -1457,13 +1457,13 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       );
 
@@ -1478,12 +1478,12 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).not.toBeInTheDocument();
 
@@ -1520,7 +1520,7 @@ describe('DataCataloguePage', () => {
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       );
 
@@ -1535,7 +1535,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).not.toBeInTheDocument();
 
@@ -1563,7 +1563,7 @@ describe('DataCataloguePage', () => {
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Remove filter: Search find me',
+          name: 'Remove filter: Search: find me',
         }),
       );
 
@@ -1578,7 +1578,7 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Search find me',
+          name: 'Remove filter: Search: find me',
         }),
       ).not.toBeInTheDocument();
     });
@@ -1607,19 +1607,19 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).toBeInTheDocument();
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).toBeInTheDocument();
 
       expect(
         screen.getByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).toBeInTheDocument();
 
@@ -1640,19 +1640,19 @@ describe('DataCataloguePage', () => {
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Publication Publication title 2',
+          name: 'Remove filter: Publication: Publication title 2',
         }),
       ).not.toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Theme Theme title 2',
+          name: 'Remove filter: Theme: Theme title 2',
         }),
       ).not.toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', {
-          name: 'Remove filter: Release Release title 1',
+          name: 'Remove filter: Release: Release title 1',
         }),
       ).not.toBeInTheDocument();
 
@@ -1745,7 +1745,7 @@ describe('DataCataloguePage', () => {
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Remove filter: Search Find me',
+          name: 'Remove filter: Search: Find me',
         }),
       );
 

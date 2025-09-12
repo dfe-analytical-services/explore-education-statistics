@@ -200,10 +200,6 @@ Get public second release link
     ${PUBLIC_RELEASE_2_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_2_LINK}
 
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
-
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_2_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 

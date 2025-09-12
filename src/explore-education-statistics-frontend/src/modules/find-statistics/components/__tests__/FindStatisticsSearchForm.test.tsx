@@ -1,4 +1,4 @@
-import SearchFormAzure from '@frontend/components/SearchFormAzure';
+import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import _publicationService from '@frontend/services/azurePublicationService';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
@@ -17,9 +17,9 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-describe('SearchFormAzure', () => {
+describe('FindStatisticsSearchForm', () => {
   test('renders correctly', () => {
-    render(<SearchFormAzure onSubmit={noop} />);
+    render(<FindStatisticsSearchForm onSubmit={noop} />);
     expect(screen.getByRole('combobox')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveAttribute('type', 'search');
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('SearchFormAzure', () => {
       testPublicationSuggestions,
     );
     const handleSubmit = jest.fn();
-    render(<SearchFormAzure onSubmit={handleSubmit} />);
+    render(<FindStatisticsSearchForm onSubmit={handleSubmit} />);
     await userEvent.type(screen.getByRole('combobox'), 'find me');
     await userEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(handleSubmit).toHaveBeenCalledWith('find me');
@@ -44,7 +44,7 @@ describe('SearchFormAzure', () => {
     publicationService.suggestPublications.mockResolvedValue(
       testPublicationSuggestions,
     );
-    render(<SearchFormAzure onSubmit={noop} />);
+    render(<FindStatisticsSearchForm onSubmit={noop} />);
     await userEvent.type(screen.getByRole('combobox'), 'find me');
     expect(screen.getByRole('listbox')).not.toHaveClass(
       'autocomplete__menu--hidden',
@@ -53,7 +53,7 @@ describe('SearchFormAzure', () => {
 
   test('shows suggestions when entered term is at least 3 characters with no results', async () => {
     publicationService.suggestPublications.mockResolvedValue([]);
-    render(<SearchFormAzure onSubmit={noop} />);
+    render(<FindStatisticsSearchForm onSubmit={noop} />);
     await userEvent.type(screen.getByRole('combobox'), 'find me');
     expect(screen.getByRole('listbox')).toHaveClass(
       'autocomplete__menu--hidden',
@@ -61,7 +61,7 @@ describe('SearchFormAzure', () => {
   });
 
   test("doesn't show suggestions when entered term is less than 3 characters", async () => {
-    render(<SearchFormAzure onSubmit={noop} />);
+    render(<FindStatisticsSearchForm onSubmit={noop} />);
     await userEvent.type(screen.getByRole('combobox'), 'fi');
     expect(screen.getByRole('listbox')).toHaveClass(
       'autocomplete__menu--hidden',
@@ -73,7 +73,7 @@ describe('SearchFormAzure', () => {
       testPublicationSuggestions,
     );
     const handleSubmit = jest.fn();
-    render(<SearchFormAzure onSubmit={handleSubmit} />);
+    render(<FindStatisticsSearchForm onSubmit={handleSubmit} />);
     await userEvent.type(screen.getByRole('combobox'), 'find me');
     await userEvent.keyboard('[Enter]');
     expect(handleSubmit).toHaveBeenCalledWith('find me');

@@ -2,7 +2,6 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import TryNewSearchBanner from '@frontend/components/TryNewSearchBanner';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
@@ -15,11 +14,7 @@ function HomePage() {
     });
 
   return (
-    <Page
-      title="Explore our statistics and data"
-      isHomepage
-      customBannerContent={<TryNewSearchBanner />}
-    >
+    <Page title="Explore our statistics and data" isHomepage>
       <div className="govuk-grid-row dfe-card__container">
         <HomepageCard
           title="Find statistics and data"

@@ -15,7 +15,7 @@ describe('FilterResetButton', () => {
     );
 
     const button = within(screen.getByRole('button'));
-    expect(button.getByText('Test type')).toBeInTheDocument();
+    expect(button.getByText('Test type:')).toBeInTheDocument();
     expect(button.getByText('Test name')).toBeInTheDocument();
   });
 

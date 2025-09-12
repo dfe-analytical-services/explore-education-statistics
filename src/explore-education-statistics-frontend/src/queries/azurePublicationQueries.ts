@@ -1,4 +1,4 @@
-import createAzurePublicationListRequest from '@frontend/modules/find-statistics/utils/createAzurePublicationListRequest';
+import createPublicationListRequest from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import { ParsedUrlQuery } from 'querystring';
 import { UseQueryOptions } from '@tanstack/react-query';
 import { PublicationListSummary } from '@common/services/publicationService';
@@ -7,14 +7,14 @@ import azurePublicationService, {
 } from '@frontend/services/azurePublicationService';
 
 const azurePublicationQueries = {
-  listAzure(
+  list(
     query: ParsedUrlQuery,
   ): UseQueryOptions<PaginatedListWithAzureFacets<PublicationListSummary>> {
     return {
-      queryKey: ['listPublicationsAzure', query],
+      queryKey: ['listPublications', query],
       queryFn: async () =>
         azurePublicationService.listPublications(
-          createAzurePublicationListRequest(query),
+          createPublicationListRequest(query),
         ),
     };
   },

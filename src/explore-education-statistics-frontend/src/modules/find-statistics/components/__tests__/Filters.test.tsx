@@ -4,10 +4,58 @@ import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/
 import { screen, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
+import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import { SortOption } from '@frontend/components/SortControls';
+
+const releaseTypesForSelect = Object.keys(releaseTypes).map(type => {
+  const title = releaseTypes[type as ReleaseType];
+  return {
+    label: title,
+    value: type,
+  };
+});
+const themesForSelect = testThemeSummaries.map(theme => ({
+  label: theme.title,
+  value: theme.id,
+}));
+const sortOptions = [
+  { label: 'Newest', value: 'newest' },
+  { label: 'Oldest', value: 'oldest' },
+  { label: 'A to Z', value: 'title' },
+] as SortOption[];
 
 describe('Filters', () => {
   test('renders the filters', () => {
-    render(<Filters themes={testThemeSummaries} onChange={noop} />);
+    render(
+      <Filters
+        themes={testThemeSummaries}
+        onChange={noop}
+        sortBy="newest"
+        onSortChange={noop}
+        sortOptions={[
+          { label: 'Newest', value: 'newest' },
+          { label: 'Oldest', value: 'oldest' },
+          { label: 'A to Z', value: 'title' },
+        ]}
+        releaseTypesWithResultCounts={releaseTypesForSelect}
+        themesWithResultCounts={themesForSelect}
+      />,
+    );
+
+    const sortSelect = screen.getByLabelText('Sort by');
+    const sortSelectOptions = within(sortSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(sortSelectOptions).toHaveLength(3);
+    expect(sortSelectOptions[0]).toHaveTextContent('Newest');
+    expect(sortSelectOptions[0]).toHaveValue('newest');
+    expect(sortSelectOptions[0].selected).toBe(true);
+    expect(sortSelectOptions[1]).toHaveTextContent('Oldest');
+    expect(sortSelectOptions[1]).toHaveValue('oldest');
+    expect(sortSelectOptions[1].selected).toBe(false);
+    expect(sortSelectOptions[2]).toHaveTextContent('A to Z');
+    expect(sortSelectOptions[2]).toHaveValue('title');
+    expect(sortSelectOptions[2].selected).toBe(false);
 
     const themesSelect = screen.getByLabelText('Filter by Theme');
     const themes = within(themesSelect).getAllByRole(
@@ -19,63 +67,71 @@ describe('Filters', () => {
     expect(themes[0]).toHaveValue('all');
     expect(themes[0].selected).toBe(true);
 
-    expect(themes[1]).toHaveTextContent('Theme 1');
     expect(themes[1]).toHaveValue('theme-1');
     expect(themes[1].selected).toBe(false);
 
-    expect(themes[2]).toHaveTextContent('Theme 2');
     expect(themes[2]).toHaveValue('theme-2');
     expect(themes[2].selected).toBe(false);
 
-    expect(themes[3]).toHaveTextContent('Theme 3');
     expect(themes[3]).toHaveValue('theme-3');
     expect(themes[3].selected).toBe(false);
 
-    expect(themes[4]).toHaveTextContent('Theme 4');
     expect(themes[4]).toHaveValue('theme-4');
     expect(themes[4].selected).toBe(false);
 
     const releaseTypesSelect = screen.getByLabelText('Filter by Release type');
-    const releaseTypes = within(releaseTypesSelect).getAllByRole(
+    const releaseTypeOptions = within(releaseTypesSelect).getAllByRole(
       'option',
     ) as HTMLOptionElement[];
-    expect(releaseTypes).toHaveLength(7);
+    expect(releaseTypeOptions).toHaveLength(7);
 
-    expect(releaseTypes[0]).toHaveTextContent('All release types');
-    expect(releaseTypes[0]).toHaveValue('all');
-    expect(releaseTypes[0].selected).toBe(true);
+    expect(releaseTypeOptions[0]).toHaveTextContent('All release types');
+    expect(releaseTypeOptions[0]).toHaveValue('all');
+    expect(releaseTypeOptions[0].selected).toBe(true);
 
-    expect(releaseTypes[1]).toHaveTextContent('Accredited official statistics');
-    expect(releaseTypes[1]).toHaveValue('AccreditedOfficialStatistics');
-    expect(releaseTypes[1].selected).toBe(false);
+    expect(releaseTypeOptions[1]).toHaveTextContent(
+      'Accredited official statistics',
+    );
+    expect(releaseTypeOptions[1]).toHaveValue('AccreditedOfficialStatistics');
+    expect(releaseTypeOptions[1].selected).toBe(false);
 
-    expect(releaseTypes[2]).toHaveTextContent('Official statistics');
-    expect(releaseTypes[2]).toHaveValue('OfficialStatistics');
-    expect(releaseTypes[2].selected).toBe(false);
+    expect(releaseTypeOptions[2]).toHaveTextContent('Official statistics');
+    expect(releaseTypeOptions[2]).toHaveValue('OfficialStatistics');
+    expect(releaseTypeOptions[2].selected).toBe(false);
 
-    expect(releaseTypes[3]).toHaveTextContent(
+    expect(releaseTypeOptions[3]).toHaveTextContent(
       'Official statistics in development',
     );
-    expect(releaseTypes[3]).toHaveValue('OfficialStatisticsInDevelopment');
-    expect(releaseTypes[3].selected).toBe(false);
+    expect(releaseTypeOptions[3]).toHaveValue(
+      'OfficialStatisticsInDevelopment',
+    );
+    expect(releaseTypeOptions[3].selected).toBe(false);
 
-    expect(releaseTypes[4]).toHaveTextContent('Experimental statistics');
-    expect(releaseTypes[4]).toHaveValue('ExperimentalStatistics');
-    expect(releaseTypes[4].selected).toBe(false);
+    expect(releaseTypeOptions[4]).toHaveTextContent('Experimental statistics');
+    expect(releaseTypeOptions[4]).toHaveValue('ExperimentalStatistics');
+    expect(releaseTypeOptions[4].selected).toBe(false);
 
-    expect(releaseTypes[5]).toHaveTextContent('Ad hoc statistics');
-    expect(releaseTypes[5]).toHaveValue('AdHocStatistics');
-    expect(releaseTypes[5].selected).toBe(false);
+    expect(releaseTypeOptions[5]).toHaveTextContent('Ad hoc statistics');
+    expect(releaseTypeOptions[5]).toHaveValue('AdHocStatistics');
+    expect(releaseTypeOptions[5].selected).toBe(false);
 
-    expect(releaseTypes[6]).toHaveTextContent('Management information');
-    expect(releaseTypes[6]).toHaveValue('ManagementInformation');
-    expect(releaseTypes[6].selected).toBe(false);
+    expect(releaseTypeOptions[6]).toHaveTextContent('Management information');
+    expect(releaseTypeOptions[6]).toHaveValue('ManagementInformation');
+    expect(releaseTypeOptions[6].selected).toBe(false);
   });
 
   test('calls the onChange handler when the theme filter is changed', async () => {
     const handleChange = jest.fn();
     const { user } = render(
-      <Filters themes={testThemeSummaries} onChange={handleChange} />,
+      <Filters
+        themes={testThemeSummaries}
+        onChange={handleChange}
+        sortBy="newest"
+        onSortChange={noop}
+        sortOptions={sortOptions}
+        releaseTypesWithResultCounts={releaseTypesForSelect}
+        themesWithResultCounts={themesForSelect}
+      />,
     );
 
     expect(handleChange).not.toHaveBeenCalled();
@@ -93,7 +149,15 @@ describe('Filters', () => {
   test('calls the onChange handler when the release type filter is changed', async () => {
     const handleChange = jest.fn();
     const { user } = render(
-      <Filters themes={testThemeSummaries} onChange={handleChange} />,
+      <Filters
+        themes={testThemeSummaries}
+        onChange={handleChange}
+        sortBy="newest"
+        onSortChange={noop}
+        sortOptions={sortOptions}
+        releaseTypesWithResultCounts={releaseTypesForSelect}
+        themesWithResultCounts={themesForSelect}
+      />,
     );
 
     expect(handleChange).not.toHaveBeenCalled();
@@ -110,7 +174,16 @@ describe('Filters', () => {
 
   test('sets the initial value for the theme filter', () => {
     render(
-      <Filters themes={testThemeSummaries} themeId="theme-2" onChange={noop} />,
+      <Filters
+        themes={testThemeSummaries}
+        themeId="theme-2"
+        onChange={noop}
+        sortBy="newest"
+        onSortChange={noop}
+        sortOptions={sortOptions}
+        releaseTypesWithResultCounts={releaseTypesForSelect}
+        themesWithResultCounts={themesForSelect}
+      />,
     );
 
     expect(screen.getByLabelText('Filter by Theme')).toHaveValue('theme-2');
@@ -122,6 +195,11 @@ describe('Filters', () => {
         themes={testThemeSummaries}
         releaseType="ManagementInformation"
         onChange={noop}
+        sortBy="newest"
+        onSortChange={noop}
+        sortOptions={sortOptions}
+        releaseTypesWithResultCounts={releaseTypesForSelect}
+        themesWithResultCounts={themesForSelect}
       />,
     );
 

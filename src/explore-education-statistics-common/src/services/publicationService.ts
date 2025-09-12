@@ -407,13 +407,6 @@ const publicationService = {
       params: { publicationFilter },
     });
   },
-  listPublications(
-    params: PublicationListRequest,
-  ): Promise<PaginatedList<PublicationListSummary>> {
-    return contentApi.get(`/publications`, {
-      params,
-    });
-  },
   listSitemapItems(): Promise<PublicationSitemapItem[]> {
     return contentApi.get('/publications/sitemap-items');
   },
