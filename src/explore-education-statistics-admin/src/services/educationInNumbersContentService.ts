@@ -1,11 +1,11 @@
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
-import { HtmlBlock } from '@common/services/types/blocks';
 import { EditableContentBlock } from '@admin/services/types/content';
-
-// Generic Ein block types
-export type EinBlockType = 'HtmlBlock';
-export type EinContentBlock = EinHtmlBlock;
+import {
+  EinBlockType,
+  EinContentBlock,
+  EinHtmlBlock,
+} from '@common/services/types/einBlocks';
 
 // This is a hack to make the EiN stuff work with preexisting block/section
 // content code used for release/methodology pages, while keeping a separate
@@ -15,11 +15,7 @@ export type EinContentBlock = EinHtmlBlock;
 // For now, we're avoiding this.
 export type EinEditableContentBlock = EinContentBlock & EditableContentBlock;
 // ContentSection is shared with release/methodology too
-export type EinContentSection = ContentSection<EinEditableContentBlock>;
-// WARN: Even though they share the same type, data is returned from two different db tables:
-// - HtmlBlock come from the table ContentBlocks (used for releases/methodologies)
-// - EinHtmlBlock comes from EinContentBlocks (used for EiN exclusively)
-type EinHtmlBlock = HtmlBlock;
+export type EinEditableContentSection = ContentSection<EinEditableContentBlock>;
 
 export interface EinContentBlockAddRequest {
   type: EinBlockType;
@@ -35,7 +31,7 @@ export interface EinContent {
   title: string;
   slug: string;
   published?: string;
-  content: EinContentSection[];
+  content: EinEditableContentSection[];
 }
 
 const educationInNumbersContentService = {
@@ -53,7 +49,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     order: number;
-  }): Promise<EinContentSection> {
+  }): Promise<EinEditableContentSection> {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/add`,
       {
@@ -70,7 +66,7 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     sectionId: string;
     heading: string;
-  }): Promise<EinContentSection> {
+  }): Promise<EinEditableContentSection> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/heading`,
       { heading },
@@ -83,7 +79,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     order: string[];
-  }): Promise<EinContentSection[]> {
+  }): Promise<EinEditableContentSection[]> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/order`,
       order,
@@ -96,7 +92,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-  }): Promise<EinContentSection[]> {
+  }): Promise<EinEditableContentSection[]> {
     return client.delete(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}`,
     );
