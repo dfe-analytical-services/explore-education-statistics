@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/> <!-- Required to execute unit tests in IDE -->
-    <PackageReference Include="MSTest.TestFramework" Version="3.8.3"/>
+    <PackageReference Include="MSTest.TestFramework" Version="3.9.3"/>
   </ItemGroup>
 
   <ItemGroup>
