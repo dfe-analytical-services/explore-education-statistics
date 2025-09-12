@@ -52,7 +52,7 @@ public class ImporterMetaService : IImporterMetaService
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
-
+        metaRows = ExcludeFiltersUsedForGrouping(metaRows);
         var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, subject);
         var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, subject);
 
@@ -62,7 +62,16 @@ public class ImporterMetaService : IImporterMetaService
         var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 &&
                                         await context.IndicatorGroup.AnyAsync(indicator =>
                                             indicator.SubjectId == subject.Id);
-
+        // Exclude rows containing filters that are used for grouping
+        metaFileRows =
+        [
+            .. metaFileRows.Where(mfr => mfr[1] != "Filter"), // index 1 is the column type
+            .. metaFileRows.Where(mfr => mfr[1] == "Filter"
+                                         && metaRows
+                                             .Where(c => c.ColumnType == ColumnType.Filter)
+                                             .Select(c => c.ColumnName)
+                                             .Contains(mfr[0])) // index 0 is the column name
+        ]; 
         if (!filtersAlreadyImported || !indicatorsAlreadyImported)
         {
             var filters = filtersAndMeta.Select(f => f.Filter).ToList();
@@ -127,15 +136,15 @@ public class ImporterMetaService : IImporterMetaService
     {
         return
         [
-            .. metaRows
+            ..metaRows
                 .Where(mr => mr.ColumnType != ColumnType.Filter)
             ,
-            ..  metaRows
+            ..metaRows
                 .Where(mr => mr.ColumnType == ColumnType.Filter
-                             && !metaRows
+                             && metaRows
                                  .Select(fi => fi.FilterGroupingColumn)
                                  .Where(g => !string.IsNullOrEmpty(g))
-                                 .Contains(mr.FilterGroupingColumn))
+                                 .All(a => a != mr.ColumnName))
         ]; 
     }
 
