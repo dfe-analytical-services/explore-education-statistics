@@ -1,22 +1,22 @@
+import Page from '@frontend/components/Page';
+import SubNav from '@frontend/components/SubNav';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import EducationInNumbersContentSection from '@frontend/modules/education-in-numbers/components/EducationInNumbersContentSection';
 import educationInNumbersService, {
   EinNavItem,
   EinPage,
 } from '@frontend/services/educationInNumbersService';
-import Page from '@frontend/components/Page';
-import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import { format } from 'date-fns';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
-import SubNav from '@frontend/components/SubNav';
 import Head from 'next/head';
-import EducationInNumbersContentSection from './components/EducationInNumbersContentSection';
+import React from 'react';
 
 interface Props {
   pageData: EinPage;
   educationInNumbersPageList: EinNavItem[];
 }
 
-const EducationInNumbersPageComponent: NextPage<Props> = ({
+const EducationInNumbersPage: NextPage<Props> = ({
   pageData,
   educationInNumbersPageList,
 }) => {
@@ -84,4 +84,4 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   },
 );
 
-export default EducationInNumbersPageComponent;
+export default EducationInNumbersPage;

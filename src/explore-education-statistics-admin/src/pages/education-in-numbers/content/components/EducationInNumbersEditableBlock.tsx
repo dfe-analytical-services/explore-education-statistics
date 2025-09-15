@@ -1,14 +1,17 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { educationInNumbersToolbarConfig } from '@admin/config/ckEditorConfig';
-import { EditableContentBlock as EditableContentBlockType } from '@admin/services/types/content';
 import useToggle from '@common/hooks/useToggle';
+import {
+  EinBlockType,
+  EinContentBlock,
+} from '@common/services/types/einBlocks';
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
 
 interface Props {
-  block: EditableContentBlockType;
+  block: EinContentBlock;
   editable?: boolean;
-  onSave: (blockId: string, content: string) => void;
+  onSave: (blockId: string, content: string, blockType: EinBlockType) => void;
   onDelete: (blockId: string) => void;
 }
 
@@ -24,10 +27,10 @@ const EducationInNumbersEditableBlock = ({
 
   const handleSave = useCallback(
     (content: string) => {
-      onSave(block.id, content);
+      onSave(block.id, content, block.type);
       toggleEditing.off();
     },
-    [block.id, onSave, toggleEditing],
+    [block.type, block.id, onSave, toggleEditing],
   );
 
   const handleDelete = useCallback(() => {
@@ -50,6 +53,13 @@ const EducationInNumbersEditableBlock = ({
           onSubmit={handleSave}
           onDelete={handleDelete}
         />
+      );
+    case 'TileGroupBlock':
+      return (
+        <div>
+          <p>{block.title}</p>
+          <p>{block.id}</p>
+        </div>
       );
     default:
       return <div>Unable to edit content</div>;

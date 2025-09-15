@@ -1,7 +1,7 @@
 import educationInNumbersContentService, {
   EinContentBlockAddRequest,
-  EinEditableContentBlock,
 } from '@admin/services/educationInNumbersContentService';
+import { EinBlockType } from '@common/services/types/einBlocks';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 
 export default function useEducationInNumbersPageContentActions() {
@@ -36,20 +36,31 @@ export default function useEducationInNumbersPageContentActions() {
     educationInNumbersPageId,
     sectionId,
     blockId,
-    bodyContent,
+    content,
+    type,
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
-    bodyContent: string;
+    content: string;
+    type: EinBlockType;
   }) {
     const updateBlock =
-      await educationInNumbersContentService.updateContentSectionHtmlBlock({
-        educationInNumbersPageId,
-        sectionId,
-        blockId,
-        block: { body: bodyContent },
-      });
+      type === 'HtmlBlock'
+        ? await educationInNumbersContentService.updateContentSectionHtmlBlock({
+            educationInNumbersPageId,
+            sectionId,
+            blockId,
+            block: { body: content },
+          })
+        : await educationInNumbersContentService.updateContentSectionGroupBlock(
+            {
+              educationInNumbersPageId,
+              sectionId,
+              blockId,
+              block: { title: content },
+            },
+          );
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: {
@@ -57,7 +68,7 @@ export default function useEducationInNumbersPageContentActions() {
           sectionId,
           blockId,
         },
-        block: updateBlock as EinEditableContentBlock,
+        block: updateBlock,
       },
     });
   }
@@ -85,7 +96,7 @@ export default function useEducationInNumbersPageContentActions() {
       type: 'ADD_BLOCK_TO_SECTION',
       payload: {
         meta: { sectionId },
-        block: newBlock as EinEditableContentBlock,
+        block: newBlock,
       },
     });
     return newBlock;
@@ -110,7 +121,7 @@ export default function useEducationInNumbersPageContentActions() {
       type: 'UPDATE_SECTION_CONTENT',
       payload: {
         meta: { sectionId },
-        sectionContent: sectionBlocks as EinEditableContentBlock[],
+        sectionContent: sectionBlocks,
       },
     });
   }

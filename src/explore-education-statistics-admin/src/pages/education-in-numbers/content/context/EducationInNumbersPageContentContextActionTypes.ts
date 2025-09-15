@@ -1,7 +1,5 @@
-import {
-  EinEditableContentSection,
-  EinEditableContentBlock,
-} from '@admin/services/educationInNumbersContentService';
+import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
+import { EinContentBlock } from '@common/services/types/einBlocks';
 
 type BlockMeta = {
   sectionId: string;
@@ -15,10 +13,11 @@ export type RemoveBlockFromSection = {
     meta: BlockMeta;
   };
 };
+
 export type UpdateBlockFromSection = {
   type: 'UPDATE_BLOCK_FROM_SECTION';
   payload: {
-    block: EinEditableContentBlock;
+    block: EinContentBlock;
     meta: BlockMeta;
   };
 };
@@ -26,7 +25,7 @@ export type UpdateBlockFromSection = {
 export type AddBlockToSection = {
   type: 'ADD_BLOCK_TO_SECTION';
   payload: {
-    block: EinEditableContentBlock;
+    block: EinContentBlock;
     meta: SectionMeta;
   };
 };
@@ -34,7 +33,7 @@ export type AddBlockToSection = {
 export type UpdateSectionContent = {
   type: 'UPDATE_SECTION_CONTENT';
   payload: {
-    sectionContent: EinEditableContentBlock[];
+    sectionContent: EinContentBlock[];
     meta: SectionMeta;
   };
 };

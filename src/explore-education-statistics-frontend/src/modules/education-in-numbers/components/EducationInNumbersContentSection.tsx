@@ -1,10 +1,10 @@
-import { ContentBlock } from '@common/services/types/blocks';
+import { EinContentBlock } from '@common/services/types/einBlocks';
 import SectionBreak from '@common/components/SectionBreak';
 import React from 'react';
 import EducationInNumbersSectionBlocks from './EducationInNumbersSectionBlocks';
 
 interface EducationInNumbersSectionProps {
-  content: ContentBlock[];
+  content: EinContentBlock[];
   heading?: string;
   isLastSection?: boolean;
 }

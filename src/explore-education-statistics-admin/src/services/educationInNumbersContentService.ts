@@ -1,21 +1,14 @@
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
-import { EditableContentBlock } from '@admin/services/types/content';
 import {
   EinBlockType,
   EinContentBlock,
   EinHtmlBlock,
+  EinTileGroupBlock,
 } from '@common/services/types/einBlocks';
 
-// This is a hack to make the EiN stuff work with preexisting block/section
-// content code used for release/methodology pages, while keeping a separate
-// EiN type. We need to use EditableContentBlock rather than just
-// EinContentBlock - despite not needing `comments`, `locked`, etc. - as
-// otherwise we'd need to create an alternate version of `EditableContentBlock`.
-// For now, we're avoiding this.
-export type EinEditableContentBlock = EinContentBlock & EditableContentBlock;
 // ContentSection is shared with release/methodology too
-export type EinEditableContentSection = ContentSection<EinEditableContentBlock>;
+export type EinEditableContentSection = ContentSection<EinContentBlock>;
 
 export interface EinContentBlockAddRequest {
   type: EinBlockType;
@@ -24,6 +17,10 @@ export interface EinContentBlockAddRequest {
 
 export interface EinHtmlBlockUpdateRequest {
   body: string;
+}
+
+export interface EinGroupBlockUpdateRequest {
+  title?: string;
 }
 
 export interface EinContent {
@@ -126,6 +123,23 @@ const educationInNumbersContentService = {
   }): Promise<EinHtmlBlock> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}/html`,
+      block,
+    );
+  },
+
+  updateContentSectionGroupBlock({
+    educationInNumbersPageId,
+    sectionId,
+    blockId,
+    block,
+  }: {
+    educationInNumbersPageId: string;
+    sectionId: string;
+    blockId: string;
+    block: EinGroupBlockUpdateRequest;
+  }): Promise<EinTileGroupBlock> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}/tile-group`,
       block,
     );
   },

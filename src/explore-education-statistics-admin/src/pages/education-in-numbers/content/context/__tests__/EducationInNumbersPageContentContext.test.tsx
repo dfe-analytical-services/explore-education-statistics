@@ -1,14 +1,14 @@
-import { produce } from 'immer';
 import testEinPageVersion, {
   testEinPageContent,
 } from '@admin/pages/education-in-numbers/__tests__/__data__/testEducationInNumbersPageAndContent';
-import { HtmlBlock } from '@common/services/types/blocks';
 import {
   EducationInNumbersPageContextState,
   educationInNumbersPageReducer as originalEinPageReducer,
 } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import { EducationInNumbersPageDispatchAction } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContextActionTypes';
-import { EinEditableContentBlock } from '@admin/services/educationInNumbersContentService';
+import { HtmlBlock } from '@common/services/types/blocks';
+import { EinContentBlock } from '@common/services/types/einBlocks';
+import { produce } from 'immer';
 
 const einPageReducer = (
   initial: EducationInNumbersPageContextState,
@@ -48,7 +48,7 @@ describe('EducationInNumbersPageContentContext', () => {
 
   test('UPDATE_BLOCK_FROM_SECTION updates a block from section', () => {
     const section = testEinPageContent.content[0];
-    const blockToUpdate = (section.content as EinEditableContentBlock[])[0];
+    const blockToUpdate = section.content[0] as HtmlBlock;
 
     const newBody = 'This is some updated text!';
 
@@ -79,12 +79,11 @@ describe('EducationInNumbersPageContentContext', () => {
 
   test('ADD_BLOCK_TO_SECTION adds a block to a section', () => {
     const section = testEinPageContent.content[0];
-    const newBlock: EinEditableContentBlock = {
+    const newBlock: EinContentBlock = {
       id: '123',
       order: 1,
       body: 'This section is empty...',
       type: 'HtmlBlock',
-      comments: [],
     };
 
     const originalLength = section.content?.length || 0;
