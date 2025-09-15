@@ -47,6 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "IX_EinTiles_EinParentBlockId",
                 table: "EinTiles",
                 column: "EinParentBlockId");
+
+            migrationBuilder.Sql("GRANT SELECT ON dbo.EinTiles TO [content]");
         }
 
         /// <inheritdoc />
