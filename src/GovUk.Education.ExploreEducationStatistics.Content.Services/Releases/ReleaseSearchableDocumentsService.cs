@@ -25,6 +25,7 @@ public class ReleaseSearchableDocumentsService(
         string publicationSlug,
         CancellationToken cancellationToken) =>
         await contentDbContext.Publications
+            .AsNoTracking()
             .Include(p => p.Theme)
             .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue)
             .SingleOrNotFoundAsync(cancellationToken);

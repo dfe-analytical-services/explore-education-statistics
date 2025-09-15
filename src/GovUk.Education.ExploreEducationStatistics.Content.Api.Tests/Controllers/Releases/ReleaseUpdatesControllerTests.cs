@@ -21,7 +21,7 @@ public abstract class ReleaseUpdatesControllerTests
     public class GetPaginatedUpdatesForReleaseTests : ReleaseUpdatesControllerTests
     {
         [Fact]
-        public async Task GetPaginatedUpdatesForRelease_WhenServiceReturnsPaginatedUpdates_ReturnsOk()
+        public async Task WhenServiceReturnsPaginatedUpdates_ReturnsOk()
         {
             // Arrange
             var paginatedUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
@@ -92,7 +92,7 @@ public abstract class ReleaseUpdatesControllerTests
         }
 
         [Fact]
-        public async Task GetPaginatedUpdatesForRelease_WhenServiceReturnsNotFound_ReturnsNotFound()
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
         {
             // Arrange
             var request = new GetReleaseUpdatesRequest

@@ -15,7 +15,7 @@ public abstract class PublicationsControllerTests
     public class GetPublicationTests : PublicationsControllerTests
     {
         [Fact]
-        public async Task GetPublication_WhenServiceReturnsPublication_ReturnsOk()
+        public async Task WhenServiceReturnsPublication_ReturnsOk()
         {
             // Arrange
             var publication = new PublicationDtoBuilder().Build();
@@ -32,7 +32,7 @@ public abstract class PublicationsControllerTests
         }
 
         [Fact]
-        public async Task GetPublication_WhenServiceReturnsNotFound_ReturnsNotFound()
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
         {
             // Arrange
             _publicationsService.WhereGetPublicationReturnsNotFound(PublicationSlug);

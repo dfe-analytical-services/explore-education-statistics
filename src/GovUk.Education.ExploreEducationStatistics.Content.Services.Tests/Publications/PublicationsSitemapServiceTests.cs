@@ -16,7 +16,7 @@ public abstract class PublicationsSitemapServiceTests
     public class GetSitemapItemsTests : PublicationsSitemapServiceTests
     {
         [Fact]
-        public async Task GetSitemapItems_MultiplePublicationsAndReleases_ReturnsExpectedSitemapItems()
+        public async Task MultiplePublicationsAndReleases_ReturnsExpectedSitemapItems()
         {
             // Arrange
             var (publication1, publication2) = _dataFixture.DefaultPublication()
@@ -75,7 +75,7 @@ public abstract class PublicationsSitemapServiceTests
         }
 
         [Fact]
-        public async Task GetSitemapItems_PublicationWithUpdatedDate_UpdatedDateIsReflectedInSitemapItem()
+        public async Task PublicationWithUpdatedDate_UpdatedDateIsReflectedInSitemapItem()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
@@ -103,7 +103,7 @@ public abstract class PublicationsSitemapServiceTests
         }
 
         [Fact]
-        public async Task GetSitemapItems_SupersededPublications_SupersedingPublicationHasPublishedRelease_AreExcluded()
+        public async Task SupersededPublications_SupersedingPublicationHasPublishedRelease_AreExcluded()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
@@ -135,8 +135,7 @@ public abstract class PublicationsSitemapServiceTests
         }
 
         [Fact]
-        public async Task
-            GetSitemapItems_SupersededPublications_SupersedingPublicationHasNoPublishedRelease_AreIncluded()
+        public async Task SupersededPublications_SupersedingPublicationHasNoPublishedRelease_AreIncluded()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
@@ -166,7 +165,7 @@ public abstract class PublicationsSitemapServiceTests
         }
 
         [Fact]
-        public async Task GetSitemapItems_ReleasesWithMultipleVersions_LatestPublishedVersionIsReturned()
+        public async Task ReleasesWithMultipleVersions_LatestPublishedVersionIsReturned()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
@@ -197,7 +196,7 @@ public abstract class PublicationsSitemapServiceTests
         }
 
         [Fact]
-        public async Task GetSitemapItems_PublicationsWithoutPublishedReleases_AreExcluded()
+        public async Task PublicationsWithoutPublishedReleases_AreExcluded()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication()
@@ -223,7 +222,7 @@ public abstract class PublicationsSitemapServiceTests
         }
 
         [Fact]
-        public async Task GetSitemapItems_PublicationsWithoutReleases_AreExcluded()
+        public async Task PublicationsWithoutReleases_AreExcluded()
         {
             // Arrange
             Publication publication = _dataFixture.DefaultPublication();
