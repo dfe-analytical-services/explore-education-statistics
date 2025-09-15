@@ -16,7 +16,7 @@ describe('EducationInNumbersPage', () => {
       published: '2000-01-01',
     },
     {
-      id: 'attendence-id',
+      id: 'attendance-id',
       order: 1,
       title: 'Attendance',
       slug: 'attendance',
