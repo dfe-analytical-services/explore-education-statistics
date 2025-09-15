@@ -1,17 +1,18 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
-import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import EducationInNumbersBlock from '@admin/pages/education-in-numbers/components/EducationInNumbersBlock';
-import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import EducationInNumbersEditableBlock from '@admin/pages/education-in-numbers/content/components/EducationInNumbersEditableBlock';
-import Button from '@common/components/Button';
+import EditableSectionBlocks from '@admin/pages/education-in-numbers/content/components/EducationInNumbersEditableSectionBlocks';
+import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
+import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import Button from '@common/components/Button';
+import EinContentBlockRenderer from '@common/modules/education-in-numbers/EinContentBlockRenderer';
 import {
-  EinEditableContentSection,
-  EinEditableContentBlock,
-} from '@admin/services/educationInNumbersContentService';
+  EinBlockType,
+  EinContentBlock,
+} from '@common/services/types/einBlocks';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 interface EducationInNumbersAccordionSectionProps {
   id: string;
@@ -40,8 +41,7 @@ const EducationInNumbersAccordionSection = ({
   } = useEducationInNumbersPageContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
-  const [blocks, setBlocks] =
-    useState<EinEditableContentBlock[]>(sectionContent);
+  const [blocks, setBlocks] = useState<EinContentBlock[]>(sectionContent);
 
   const addTextBlockButton = useRef<HTMLButtonElement>(null);
 
@@ -49,31 +49,35 @@ const EducationInNumbersAccordionSection = ({
     setBlocks(sectionContent);
   }, [sectionContent]);
 
-  const addBlockToAccordionSection = useCallback(async () => {
-    const newBlock = await addContentSectionBlock({
+  const addBlockToAccordionSection = useCallback(
+    async (blockType: EinBlockType) => {
+      const newBlock = await addContentSectionBlock({
+        educationInNumbersPageId,
+        sectionId,
+        block: {
+          type: blockType,
+          order: sectionContent.length,
+        },
+      });
+
+      focusAddedSectionBlockButton(newBlock.id);
+    },
+    [
+      addContentSectionBlock,
       educationInNumbersPageId,
       sectionId,
-      block: {
-        type: 'HtmlBlock',
-        order: sectionContent.length,
-      },
-    });
-
-    focusAddedSectionBlockButton(newBlock.id);
-  }, [
-    addContentSectionBlock,
-    educationInNumbersPageId,
-    sectionId,
-    sectionContent.length,
-  ]);
+      sectionContent.length,
+    ],
+  );
 
   const updateBlockInAccordionSection = useCallback(
-    async (blockId: string, bodyContent: string) => {
+    async (blockId: string, content: string, type: EinBlockType) => {
       await updateContentSectionBlock({
         educationInNumbersPageId,
         sectionId,
         blockId,
-        bodyContent,
+        content,
+        type,
       });
     },
     [educationInNumbersPageId, sectionId, updateContentSectionBlock],
@@ -148,11 +152,11 @@ const EducationInNumbersAccordionSection = ({
       onHeadingChange={handleHeadingChange}
       onRemoveSection={() => onRemoveSection(sectionId)}
     >
-      <EditableSectionBlocks<EinEditableContentBlock>
+      <EditableSectionBlocks<EinContentBlock>
         blocks={blocks}
         isReordering={isReordering}
         onBlocksChange={setBlocks}
-        renderBlock={block => <EducationInNumbersBlock block={block} />}
+        renderBlock={block => <EinContentBlockRenderer block={block} />}
         renderEditableBlock={block => (
           <EducationInNumbersEditableBlock
             block={block}
@@ -163,13 +167,19 @@ const EducationInNumbersAccordionSection = ({
         )}
       />
       {editingMode === 'edit' && !isReordering && (
-        <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+        <div className="govuk-!-margin-bottom-8 dfe-flex dfe-gap-3 dfe-justify-content--center">
           <Button
             variant="secondary"
-            onClick={addBlockToAccordionSection}
+            onClick={() => addBlockToAccordionSection('HtmlBlock')}
             ref={addTextBlockButton}
           >
             Add text block
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => addBlockToAccordionSection('TileGroupBlock')}
+          >
+            Add group block
           </Button>
         </div>
       )}

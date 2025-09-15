@@ -45,7 +45,7 @@ const EducationInNumbersSummaryForm = ({
       title: Yup.string().required('Enter a title'),
       description: Yup.string().required('Enter a description'),
     });
-  }, [isEditForm]);
+  }, []);
 
   return (
     <FormProvider
