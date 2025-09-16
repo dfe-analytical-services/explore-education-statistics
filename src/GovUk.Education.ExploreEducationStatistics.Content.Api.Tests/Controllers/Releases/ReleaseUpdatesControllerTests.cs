@@ -56,7 +56,7 @@ public abstract class ReleaseUpdatesControllerTests
         }
 
         [Fact]
-        public async Task GetReleaseUpdates_WhenNoQueryParameters_UsesPaginationDefaults()
+        public async Task WhenNoQueryParameters_UsesPaginationDefaults()
         {
             // Arrange
             const int defaultPage = 1;
