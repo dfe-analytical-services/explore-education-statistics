@@ -180,6 +180,7 @@ public class Startup(
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
         services.AddTransient<IReleaseSearchableDocumentsService, ReleaseSearchableDocumentsService>();
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
+        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
         services.AddAnalytics(configuration);
 

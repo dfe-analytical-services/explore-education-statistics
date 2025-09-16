@@ -9,13 +9,13 @@ import Button from '@common/components/Button';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
-  EinContentSection,
+  EinEditableContentSection,
   EinEditableContentBlock,
 } from '@admin/services/educationInNumbersContentService';
 
 interface EducationInNumbersAccordionSectionProps {
   id: string;
-  section: EinContentSection;
+  section: EinEditableContentSection;
   educationInNumbersPageId: string;
   educationInNumbersPageSlug: string;
   onRemoveSection: (sectionId: string) => void;

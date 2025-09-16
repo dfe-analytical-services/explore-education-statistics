@@ -455,7 +455,7 @@ public class Startup(
         services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
         services.AddTransient<IPreReleaseService, PreReleaseService>();
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
-        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
+        services.AddTransient<Admin.Services.Interfaces.IEducationInNumbersService, Admin.Services.EducationInNumbersService>();
         services.AddTransient<IEducationInNumbersContentService, EducationInNumbersContentService>();
 
         services.AddTransient<IManageContentPageService, ManageContentPageService>();
