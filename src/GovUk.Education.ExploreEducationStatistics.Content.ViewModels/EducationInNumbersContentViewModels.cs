@@ -115,8 +115,8 @@ public class EducationInNumbersContentViewModels
         public string Title { get; set; } = string.Empty;
         public string Statistic { get; set; } = string.Empty;
         public string Trend { get; set; } = string.Empty;
-        public string LinkUrl { get; set; } = string.Empty;
-        public string LinkText { get; set; } = string.Empty;
+        public string? LinkUrl { get; set; }
+        public string? LinkText { get; set; }
 
         public static EinFreeTextStatTileViewModel FromModel(EinFreeTextStatTile statTile)
         {

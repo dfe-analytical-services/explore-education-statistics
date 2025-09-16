@@ -332,8 +332,8 @@ public class EducationInNumbersContentService(
                 Title = "",
                 Statistic = "",
                 Trend = "",
-                LinkUrl = "",
-                LinkText = "",
+                LinkUrl = null,
+                LinkText = null,
             },
             _ => throw new Exception($"{nameof(EinTile)} type {type} not found")
         };

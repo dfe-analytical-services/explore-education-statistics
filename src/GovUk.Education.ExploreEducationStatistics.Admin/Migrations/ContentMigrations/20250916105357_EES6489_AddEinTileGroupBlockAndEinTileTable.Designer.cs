@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20250912151038_EES6489_AddEinTileGroupBlockAndEinTileTable")]
+    [Migration("20250916105357_EES6489_AddEinTileGroupBlockAndEinTileTable")]
     partial class EES6489_AddEinTileGroupBlockAndEinTileTable
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.14")
+                .HasAnnotation("ProductVersion", "8.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1750,11 +1750,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTile");
 
                     b.Property<string>("LinkText")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LinkUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Statistic")
