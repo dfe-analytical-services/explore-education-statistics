@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,6 @@ public class ReleaseSearchableDocumentsService(
         await contentDbContext.Publications
             .AsNoTracking()
             .Include(p => p.Theme)
-            .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue)
-            .SingleOrNotFoundAsync(cancellationToken);
+            .WhereHasPublishedRelease()
+            .SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);
 }
