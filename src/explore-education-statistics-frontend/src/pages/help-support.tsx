@@ -154,7 +154,7 @@ function HelpSupportPage() {
             </h3>
             <p>Call the DfE public enquiries line:</p>
             <InsetText>
-              Phone: <a href="tel:03700002288">0370 000 2288</a>
+              Phone: 0370 000 2288
               <br />
               Opening hours: Monday to Friday, 9.30am to 5pm (closed on bank
               holidays)
