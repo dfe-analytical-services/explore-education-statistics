@@ -31,6 +31,9 @@ param storageIpRules IpRange[]
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+@description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
+param logAnalyticsWorkspaceId string
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
@@ -63,6 +66,7 @@ module searchServiceModule '../components/searchService.bicep' = {
       alertsGroupName: resourceNames.existingResources.alertsGroup
     }
     tagValues: tagValues
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
 }
 
