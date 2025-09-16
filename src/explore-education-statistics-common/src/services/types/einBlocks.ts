@@ -18,8 +18,8 @@ export type EinFreeTextStatTile = {
   title: string;
   statistic: string;
   trend: string;
-  linkUrl: string;
-  linkText: string;
+  linkUrl?: string;
+  linkText?: string;
 };
 
 export interface EinTileGroupBlock extends BaseBlock {

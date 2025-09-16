@@ -159,6 +159,7 @@ const EducationInNumbersAccordionSection = ({
         renderBlock={block => <EinContentBlockRenderer block={block} />}
         renderEditableBlock={block => (
           <EducationInNumbersEditableBlock
+            sectionId={sectionId}
             block={block}
             editable={!isReordering}
             onSave={updateBlockInAccordionSection}

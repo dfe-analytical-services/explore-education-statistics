@@ -220,7 +220,31 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
+  async function addFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+  }) {
+    const newTile = await educationInNumbersContentService.addFreeTextStatTile({
+      educationInNumbersPageId,
+      blockId,
+    });
+    dispatch({
+      type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK',
+      payload: {
+        meta: { blockId, sectionId },
+        tile: newTile,
+      },
+    });
+    return newTile;
+  }
+
   return {
+    addFreeTextStatTile,
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,
