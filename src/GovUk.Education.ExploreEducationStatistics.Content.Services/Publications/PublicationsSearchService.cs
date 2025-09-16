@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -30,8 +31,8 @@ public class PublicationsSearchService(ContentDbContext contentDbContext) : IPub
 
         // Publications must have a published release and not be superseded
         var baseQueryable = contentDbContext.Publications
-            .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
-                        (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue));
+            .WhereHasPublishedRelease()
+            .Where(p => p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue);
 
         // Retrieve only requested publication IDs if specified
         if (publicationIds is not null)
