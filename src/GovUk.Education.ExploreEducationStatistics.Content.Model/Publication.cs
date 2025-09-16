@@ -47,4 +47,11 @@ public class Publication
     public ReleaseVersion? LatestPublishedReleaseVersion { get; set; }
 
     public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = [];
+
+    /// <summary>
+    /// Converts release series items to either ReleaseEntry or LegacyReleaseEntry.
+    /// </summary>
+    public List<IPublicationReleaseEntry> ReleaseEntries => ReleaseSeries
+        .Select(item => item.ToPublicationReleaseEntry())
+        .ToList();
 }
