@@ -7,10 +7,12 @@ import {
 } from '@common/services/types/einBlocks';
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
+import EditableTileGroupBlock from './EditableTileGroupBlock';
 
 interface Props {
   block: EinContentBlock;
   editable?: boolean;
+  sectionId: string;
   onSave: (blockId: string, content: string, blockType: EinBlockType) => void;
   onDelete: (blockId: string) => void;
 }
@@ -18,6 +20,7 @@ interface Props {
 const EducationInNumbersEditableBlock = ({
   block,
   editable = true,
+  sectionId,
   onSave,
   onDelete,
 }: Props) => {
@@ -25,6 +28,8 @@ const EducationInNumbersEditableBlock = ({
 
   const [isEditing, toggleEditing] = useToggle(false);
 
+  // Handles saving both block types, with content
+  // being either the HTML body or the TileGroup title
   const handleSave = useCallback(
     (content: string) => {
       onSave(block.id, content, block.type);
@@ -56,10 +61,13 @@ const EducationInNumbersEditableBlock = ({
       );
     case 'TileGroupBlock':
       return (
-        <div>
-          <p>{block.title}</p>
-          <p>{block.id}</p>
-        </div>
+        <EditableTileGroupBlock
+          block={block}
+          editable={editable && !isBrowser('IE')}
+          sectionId={sectionId}
+          onDelete={handleDelete}
+          onSave={handleSave}
+        />
       );
     default:
       return <div>Unable to edit content</div>;

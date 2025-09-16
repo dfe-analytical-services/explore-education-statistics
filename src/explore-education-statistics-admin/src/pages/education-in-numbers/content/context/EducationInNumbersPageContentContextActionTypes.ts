@@ -1,5 +1,8 @@
 import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
-import { EinContentBlock } from '@common/services/types/einBlocks';
+import {
+  EinContentBlock,
+  EinFreeTextStatTile,
+} from '@common/services/types/einBlocks';
 
 type BlockMeta = {
   sectionId: string;
@@ -27,6 +30,14 @@ export type AddBlockToSection = {
   payload: {
     block: EinContentBlock;
     meta: SectionMeta;
+  };
+};
+
+export type AddFreeTextStatTileToBlock = {
+  type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK';
+  payload: {
+    tile: EinFreeTextStatTile;
+    meta: BlockMeta;
   };
 };
 
@@ -64,6 +75,7 @@ export type EducationInNumbersPageDispatchAction =
   | RemoveBlockFromSection
   | UpdateBlockFromSection
   | AddBlockToSection
+  | AddFreeTextStatTileToBlock
   | UpdateSectionContent
   | AddContentSection
   | SetEducationInNumbersPageContent

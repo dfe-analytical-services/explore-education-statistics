@@ -3,6 +3,7 @@ import { ContentSection } from '@common/services/publicationService';
 import {
   EinBlockType,
   EinContentBlock,
+  EinFreeTextStatTile,
   EinHtmlBlock,
   EinTileGroupBlock,
 } from '@common/services/types/einBlocks';
@@ -107,6 +108,19 @@ const educationInNumbersContentService = {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/blocks/add`,
       block,
+    );
+  },
+
+  addFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+  }): Promise<EinFreeTextStatTile> {
+    return client.post(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/add`,
+      { type: 'FreeTextStatTile' },
     );
   },
 
