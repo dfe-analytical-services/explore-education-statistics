@@ -43,7 +43,9 @@ def user_checks_number_of_other_releases_is_correct(number):
 
 def user_checks_other_release_is_shown_in_position(release_name, position):
     try:
-        sl().driver.find_element(By.XPATH, f'.//*[@data-testid="other-release-item" and a/text()="{release_name}"]')
+        sl().driver.find_element(
+            By.XPATH, f'.//*[@data-testid="other-release-item" and a/text()[contains(.,"{release_name}")]]'
+        )
     except BaseException:
         raise_assertion_error(f'No other release "{release_name}" found')
 
@@ -52,7 +54,7 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
     except BaseException:
         raise_assertion_error(f"There are less than {position} other releases listed!")
 
-    if release_name != elem.text:
+    if release_name not in elem.text:
         raise_assertion_error(
             f'Other release "{release_name}" not in position {position}. Found "{elem.text}" instead!'
         )

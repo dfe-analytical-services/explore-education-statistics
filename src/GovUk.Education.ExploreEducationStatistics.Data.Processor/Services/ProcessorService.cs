@@ -2,13 +2,12 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
@@ -67,7 +66,7 @@ public class ProcessorService : IProcessorService
 
         var subject = await statisticsDbContext.Subject.SingleAsync(subject => subject.Id == import.SubjectId);
 
-        var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
+        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);

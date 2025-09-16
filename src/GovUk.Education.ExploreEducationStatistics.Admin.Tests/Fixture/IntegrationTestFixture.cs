@@ -25,7 +25,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     IAsyncLifetime
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
         .Build();
 
     protected readonly DataFixture DataFixture = new();
@@ -97,14 +97,16 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                 {
                     services.ReplaceService<IPublicBlobStorageService>(sp =>
                         new PublicBlobStorageService(
-                            _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            connectionString: _azuriteContainer.GetConnectionString(),
+                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                     services.ReplaceService<IPrivateBlobStorageService>(sp =>
                         new PrivateBlobStorageService(
-                            _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            connectionString: _azuriteContainer.GetConnectionString(),
+                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                     services.ReplaceService<IPublisherTableStorageService>(_ =>

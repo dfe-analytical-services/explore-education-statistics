@@ -1377,7 +1377,7 @@ public class ReleaseFileServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task Stream()
+    public async Task GetDownloadToken()
     {
         var releaseVersion = new ReleaseVersion();
 
@@ -1387,7 +1387,7 @@ public class ReleaseFileServiceTests : IDisposable
             File = new File
             {
                 RootPath = Guid.NewGuid(),
-                Filename = "ancillary.pdf",
+                Filename = "Ancillary.pdf",
                 ContentType = "application/pdf",
                 Type = Ancillary
             }
@@ -1405,79 +1405,36 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
+            .SetupGetDownloadToken(
+                container: PrivateReleaseFiles,
+                filename: releaseFile.File.Filename,
+                path: releaseFile.Path(),
+                contentType: releaseFile.File.ContentType);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object);
 
-            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                fileId: releaseFile.File.Id);
+            var result = await service.GetBlobDownloadToken(
+                releaseVersionId: releaseVersion.Id,
+                fileId: releaseFile.File.Id,
+                cancellationToken: default);
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
-            var fileStreamResult = result.AssertRight();
+            var token = result.AssertRight();
 
-            Assert.Equal("application/pdf", fileStreamResult.ContentType);
-            Assert.Equal("ancillary.pdf", fileStreamResult.FileDownloadName);
-            Assert.IsType<MemoryStream>(fileStreamResult.FileStream);
-            Assert.Equal("Test file content", fileStreamResult.FileStream.ReadToEnd());
+            Assert.Equal("application/pdf", token.ContentType);
+            Assert.Equal("Ancillary.pdf", token.Filename);
+            Assert.Equal("token", token.Token);
+            Assert.Equal(releaseFile.Path(), token.Path);
+            Assert.Equal(PrivateReleaseFiles.Name, token.ContainerName);
         }
     }
 
     [Fact]
-    public async Task Stream_MixedCaseFilename()
-    {
-        var releaseVersion = new ReleaseVersion();
-
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "Ancillary 1.pdf",
-                ContentType = "application/pdf",
-                Type = Ancillary
-            }
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.ReleaseFiles.Add(releaseFile);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
-
-            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                fileId: releaseFile.File.Id);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
-
-            var fileStreamResult = result.AssertRight();
-
-            Assert.Equal("application/pdf", fileStreamResult.ContentType);
-            Assert.Equal("Ancillary 1.pdf", fileStreamResult.FileDownloadName);
-            Assert.IsType<MemoryStream>(fileStreamResult.FileStream);
-            Assert.Equal("Test file content", fileStreamResult.FileStream.ReadToEnd());
-        }
-    }
-
-    [Fact]
-    public async Task Stream_ReleaseNotFound()
+    public async Task GetDownloadToken_ReleaseNotFound()
     {
         var releaseVersion = new ReleaseVersion();
 
@@ -1505,14 +1462,17 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-            var result = await service.Stream(Guid.NewGuid(), releaseFile.File.Id);
+            var result = await service.GetBlobDownloadToken(
+                releaseVersionId: Guid.NewGuid(),
+                fileId: releaseFile.File.Id,
+                cancellationToken: default);
 
             result.AssertNotFound();
         }
     }
 
     [Fact]
-    public async Task Stream_FileNotFound()
+    public async Task GetDownloadToken_FileNotFound()
     {
         var releaseVersion = new ReleaseVersion();
 
@@ -1528,15 +1488,17 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                fileId: Guid.NewGuid());
+            var result = await service.GetBlobDownloadToken(
+                releaseVersionId: releaseVersion.Id,
+                fileId: Guid.NewGuid(),
+                cancellationToken: default);
 
             result.AssertNotFound();
         }
     }
 
     [Fact]
-    public async Task Stream_BlobDoesNotExist()
+    public async Task GetDownloadToken_BlobDoesNotExist()
     {
         var releaseVersion = new ReleaseVersion();
 
@@ -1563,15 +1525,21 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+        privateBlobStorageService.SetupGetDownloadTokenNotFound(
+            container: PrivateReleaseFiles,
+            filename: releaseFile.File.Filename,
+            path: releaseFile.Path(),
+            cancellationToken: default);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object);
 
-            var result = await service.Stream(releaseVersionId: releaseVersion.Id,
-                fileId: releaseFile.File.Id);
+            var result = await service.GetBlobDownloadToken(
+                releaseVersionId: releaseVersion.Id,
+                fileId: releaseFile.File.Id,
+                cancellationToken: default);
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -1624,9 +1592,9 @@ public class ReleaseFileServiceTests : IDisposable
         privateBlobStorageService
             .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test ancillary blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test ancillary blob");
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
@@ -1645,7 +1613,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = System.IO.File.OpenWrite(path);
+            await using var stream = System.IO.File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -1660,7 +1628,7 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds
             );
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -1726,9 +1694,9 @@ public class ReleaseFileServiceTests : IDisposable
         privateBlobStorageService
             .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data 1 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data 1 blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test data 2 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test data 2 blob");
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
@@ -1747,7 +1715,7 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var path = GenerateZipFilePath();
-            var stream = System.IO.File.OpenWrite(path);
+            await using var stream = System.IO.File.OpenWrite(path);
 
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
@@ -1762,7 +1730,7 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds
             );
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService, dataGuidanceFileWriter);
+            MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
             result.AssertRight();
 
@@ -1833,7 +1801,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -1844,11 +1812,11 @@ public class ReleaseFileServiceTests : IDisposable
         privateBlobStorageService
             .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile3.Path(), true);
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test 2 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test 2 blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");
         privateBlobStorageService
-            .SetupDownloadToStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");
+            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -1863,8 +1831,6 @@ public class ReleaseFileServiceTests : IDisposable
                 outputStream: stream,
                 fileIds: fileIds
             );
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertRight();
 
@@ -1943,7 +1909,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2011,13 +1977,13 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         // Files do not exist in blob storage
-        privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), false);
-        privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), false);
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile1.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile2.Path());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -2084,7 +2050,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2128,7 +2094,7 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -2192,23 +2158,28 @@ public class ReleaseFileServiceTests : IDisposable
         }
 
         var path = GenerateZipFilePath();
-        var stream = System.IO.File.OpenWrite(path);
+        await using var stream = System.IO.File.OpenWrite(path);
 
         var tokenSource = new CancellationTokenSource();
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        // After the first file has completed, we cancel the request
-        // to prevent the next file from being fetched.
         privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
-        privateBlobStorageService
-            .SetupDownloadToStream(
+            .SetupGetDownloadStream(
                 container: PrivateReleaseFiles,
                 path: releaseFile1.Path(),
                 content: "Test ancillary blob",
-                cancellationToken: tokenSource.Token)
-            .Callback(() => tokenSource.Cancel());
+                cancellationToken: tokenSource.Token);
+        
+        // After the first file has completed, we cancel the request
+        // to prevent the next file from being fetched.
+        privateBlobStorageService
+            .SetupGetDownloadStream(
+                container: PrivateReleaseFiles,
+                path: releaseFile2.Path(),
+                content: "Test ancillary blob 2",
+                cancellationToken: tokenSource.Token,
+                callback: tokenSource.Cancel);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -2224,8 +2195,6 @@ public class ReleaseFileServiceTests : IDisposable
                 fileIds: fileIds,
                 cancellationToken: tokenSource.Token
             );
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             result.AssertRight();
 

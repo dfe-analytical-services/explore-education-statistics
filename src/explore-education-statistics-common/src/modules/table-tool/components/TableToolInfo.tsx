@@ -21,7 +21,7 @@ const TableToolInfo = ({
 }: Props) => {
   return (
     <>
-      <h3>Related information</h3>
+      <h2 className="govuk-heading-m">Related information</h2>
 
       <ul className="govuk-list">
         {releaseType && (

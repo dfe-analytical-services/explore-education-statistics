@@ -30,9 +30,6 @@ public interface IReleaseFileService
     Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseVersionId,
         Guid fileId);
 
-    Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId,
-        Guid fileId);
-
     Task<Either<ActionResult, Unit>> ZipFilesToStream(Guid releaseVersionId,
         Stream outputStream,
         IEnumerable<Guid>? fileIds = null,
@@ -54,4 +51,9 @@ public interface IReleaseFileService
     Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseVersionId,
         IFormFile formFile,
         Guid? replacingId = null);
+
+    Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
+        Guid releaseVersionId,
+        Guid fileId,
+        CancellationToken cancellationToken);
 }

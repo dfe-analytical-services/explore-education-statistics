@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
         .WithInMemoryPersistence()
         .Build();
 
@@ -77,8 +77,9 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                 {
                     services.ReplaceService<IPublicBlobStorageService>(sp =>
                         new PublicBlobStorageService(
-                            _azuriteContainer.GetConnectionString(),
-                            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+                            connectionString: _azuriteContainer.GetConnectionString(),
+                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                            sasService: sp.GetRequiredService<IBlobSasService>()
                         )
                     );
                 });

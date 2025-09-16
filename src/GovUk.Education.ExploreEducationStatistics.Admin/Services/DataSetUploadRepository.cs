@@ -12,6 +12,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+// TODO - EES-6480.
 public class DataSetUploadRepository(
     ContentDbContext contentDbContext,
     IPrivateBlobStorageService privateBlobStorageService,
@@ -47,5 +48,34 @@ public class DataSetUploadRepository(
                 await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, dataSetUpload.DataFilePath);
                 await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, dataSetUpload.MetaFilePath);
             });
+    }
+
+    public async Task<Either<ActionResult, Unit>> DeleteAll(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var uploads = await contentDbContext.DataSetUploads
+                .Where(d => d.ReleaseVersionId == releaseVersionId)
+                .ToListAsync(cancellationToken);
+
+            await uploads
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async upload =>
+            {
+                await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, upload.DataFilePath);
+                await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, upload.MetaFilePath);
+            }, cancellationToken);
+
+            contentDbContext.DataSetUploads.RemoveRange(uploads);
+            await contentDbContext.SaveChangesAsync(cancellationToken);
+
+            return Unit.Instance;
+        }
+        catch (Exception ex)
+        {
+            return new BadRequestObjectResult(ex.Message);
+        }
     }
 }

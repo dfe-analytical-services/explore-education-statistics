@@ -35,12 +35,12 @@ Validate homepage
     user checks page contains element    link:Methodology
     user checks page contains element    link:Glossary
     user waits until h2 is visible    Related services
-    user checks page contains element    link:Statistics at DfE
-    user checks page contains element    link:Compare school and college performance
-    user checks page contains element    link:Get information about schools
-    user checks page contains element    link:Financial Benchmarking and Insights Tool
+    user checks page contains link    Statistics at DfE (opens in new tab)
+    user checks page contains link    Compare school and college performance (opens in new tab)
+    user checks page contains link    Get information about schools (opens in new tab)
+    user checks page contains link    Financial Benchmarking and Insights Tool (opens in new tab)
 
-    user checks page contains element    xpath://h2[text()="Contact us"]
+    user checks page contains element    xpath://h2[text()="Contact us for help and support"]
 
     user checks page contains link with text and url    explore.statistics@education.gov.uk
     ...    mailto:explore.statistics@education.gov.uk
@@ -98,7 +98,7 @@ Validate Cookies Details page
 Validate Contact page
     user clicks link    Contact us
     user waits until page contains    Contact Explore education statistics
-    user waits until page contains    General enquiries
+    user waits until page contains    Need help using this service or have a question about the data?
     user waits until page contains    explore.statistics@education.gov.uk
     user waits until page contains    DfE Head of Profession for Statistics
     user waits until page contains    hop.statistics@education.gov.uk
@@ -132,7 +132,7 @@ Validate Help and support page
 
 Validate Feedback page
     [Documentation]    EES-942
-    user clicks link    feedback
+    user clicks link    feedback (opens in new tab)
     user selects newly opened window
     user waits until page contains element    xpath://span[text()="Explore Education Statistics"]    %{WAIT_MEDIUM}
     user waits until page contains element    xpath://span[text()="Beta Feedback Survey"]

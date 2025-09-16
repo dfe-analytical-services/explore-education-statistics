@@ -217,8 +217,12 @@ export default function ReleaseDataUploadsSection({
         <ul>
           <li>
             your data files have passed the checks in our{' '}
-            <a href="https://rsconnect/rsc/dfe-published-data-qa/">
-              screening app
+            <a
+              href="https://rsconnect/rsc/dfe-published-data-qa/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
+            >
+              screening app (opens in new tab)
             </a>
           </li>
           <li>

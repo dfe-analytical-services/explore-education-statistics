@@ -16,7 +16,6 @@ import {
   preReleaseAccessListRoute,
   releaseDataGuidanceRoute,
 } from '@admin/routes/routes';
-import releaseDataFileService from '@admin/services/releaseDataFileService';
 import releaseFileService from '@admin/services/releaseFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -29,6 +28,7 @@ import ReleaseSummarySection from '@common/modules/release/components/ReleaseSum
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
+import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import PrototypeReleaseEditableBlock from './PrototypeReleaseEditableBlock';
 import PrototypeReleaseContentAccordion from './PrototypeReleaseContentAccordion';
 import PrototypeReleaseHeadlines from './PrototypeReleaseHeadlines';
@@ -390,11 +390,11 @@ const PrototypeReleaseContent = ({
           renderDownloadLink={file => (
             <ButtonText
               onClick={() =>
-                releaseDataFileService.downloadFile(
-                  release.id,
-                  file.id,
-                  file.fileName,
-                )
+                downloadReleaseFileSecurely({
+                  releaseVersionId: release.id,
+                  fileId: file.id,
+                  fileName: file.fileName,
+                })
               }
             >
               {`${file.name} (${file.extension}, ${file.size})`}

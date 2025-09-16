@@ -29,9 +29,9 @@ public class MethodologyControllerTests
         var controller = new MethodologyController(methodologyService.Object);
 
         var result = await controller.GetLatestMethodologyBySlug("test-slug");
-        var methodologyViewModel = result.Value;
+        var methodologyVersionViewModel = result.AssertOkResult();
 
-        Assert.Equal(methodologyId, methodologyViewModel.Id);
+        Assert.Equal(methodologyId, methodologyVersionViewModel.Id);
 
         MockUtils.VerifyAllMocks(methodologyService);
     }

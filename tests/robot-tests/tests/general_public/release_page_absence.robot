@@ -12,25 +12,13 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 
 *** Test Cases ***
 Navigate to Absence publication
-    user navigates to public site homepage
-    user waits until page contains    Explore our statistics and data
-
-    user clicks link    Explore
-    user waits until page contains
-    ...    Find statistics and data
-    ...    %{WAIT_MEDIUM}
-
-    user clicks radio    Oldest
-    user waits until page contains link    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user clicks link    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    environment variable should be set    PUBLIC_URL
+    user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
 Validate title
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
     user waits until page contains title caption    Academic year 2016/17
-
-Validate URL
-    user checks url contains    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
 Validate Published date
     [Tags]    NotAgainstPreProd

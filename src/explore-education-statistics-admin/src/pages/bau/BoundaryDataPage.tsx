@@ -74,8 +74,12 @@ const BoundaryDataPage = () => {
           <ol>
             <li>
               Visit{' '}
-              <a href="https://mapshaper.org/" target="_blank" rel="noreferrer">
-                https://mapshaper.org/
+              <a
+                href="https://mapshaper.org/"
+                target="_blank"
+                rel="noreferrer noopener nofollow"
+              >
+                https://mapshaper.org/ (opens in new tab)
               </a>
             </li>
             <li>Import the original GeoJSON file</li>

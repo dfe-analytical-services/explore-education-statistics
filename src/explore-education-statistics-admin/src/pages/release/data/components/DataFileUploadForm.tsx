@@ -68,6 +68,7 @@ const fileErrorMappings = {
   DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
   AnalystCannotReplaceApiDataSet: 'AnalystCannotReplaceApiDataSet',
   CannotCreateMultipleDraftApiDataSet: 'CannotCreateMultipleDraftApiDataSet',
+  DataSetImportInProgress: 'DataSetImportInProgress',
 };
 
 function baseErrorMappings(

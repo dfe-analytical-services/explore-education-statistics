@@ -8,22 +8,30 @@
   box-shadow: none;
   display: flex;
   line-height: 1;
-  margin: 0 govuk-spacing(1) govuk-spacing(1) 0;
-  padding: 8px;
+  margin: 0;
+  padding: 5px 10px;
   text-align: left;
+  @include govuk-font-size(19);
+
+  &::before {
+    margin-top: 1px;
+    content: '×';
+    padding-right: 5px;
+    font-size: 22px;
+  }
 
   &:focus {
     background: $govuk-focus-colour;
   }
 
   &:hover {
-    background: darken(govuk-colour('light-grey'), 4);
+    outline: 1px $govuk-text-colour solid;
+    outline-offset: 0;
+    border-color: $govuk-text-colour;
     cursor: pointer;
   }
 }
 
 .filterType {
-  @include govuk-font($size: 16);
-  display: block;
-  text-transform: uppercase;
+  margin-right: govuk-spacing(1);
 }

@@ -1,17 +1,13 @@
 #nullable enable
 using System.Net.Mime;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
@@ -43,41 +39,6 @@ public class PublicationController : ControllerBase
 
         return await _publicationCacheService
             .GetPublicationTree(filter.Value)
-            .HandleFailuresOrOk();
-    }
-
-    [MemoryCache(typeof(ListPublicationsGetCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    [HttpGet("publications")]
-    public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-        [FromQuery] PublicationsListGetRequest request)
-    {
-        return await _publicationService
-            .ListPublications(
-                request.ReleaseType,
-                request.ThemeId,
-                request.Search,
-                request.Sort,
-                request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize)
-            .HandleFailuresOrOk();
-    }
-
-    [MemoryCache(typeof(ListPublicationsPostCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    [HttpPost("publications")]
-    public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-        [FromBody] PublicationsListPostRequest request)
-    {
-        return await _publicationService
-            .ListPublications(
-                request.ReleaseType,
-                request.ThemeId,
-                request.Search,
-                request.Sort,
-                request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize,
-                publicationIds: request.PublicationIds)
             .HandleFailuresOrOk();
     }
 

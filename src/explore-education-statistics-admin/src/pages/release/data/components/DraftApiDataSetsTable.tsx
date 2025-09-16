@@ -147,6 +147,7 @@ export default function DraftApiDataSetsTable({
                       <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
                     </Link>
                     {draftVersion.status !== 'Processing' &&
+                      draftVersion.status !== 'Finalising' &&
                       canUpdateRelease &&
                       !isPatch && (
                         <DeleteDraftVersionButton

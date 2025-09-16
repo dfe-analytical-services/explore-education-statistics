@@ -388,7 +388,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
             </div>
 
             {isFiltered && (
-              <div className="govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap ">
+              <div className="govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap dfe-gap-2">
                 {searchTerm && (
                   <FilterResetButton
                     filterType="Search"

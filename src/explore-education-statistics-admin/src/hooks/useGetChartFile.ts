@@ -1,10 +1,13 @@
-import releaseChartFileService from '@admin/services/releaseChartFileService';
 import { useCallback } from 'react';
+import streamReleaseFileSecurely from '@admin/pages/release/data/components/utils/streamReleaseFileSecurely';
 
 export default function useGetChartFile(releaseVersionId: string) {
   return useCallback(
     (fileId: string) =>
-      releaseChartFileService.getChartFile(releaseVersionId, fileId),
+      streamReleaseFileSecurely({
+        releaseVersionId,
+        fileId,
+      }),
     [releaseVersionId],
   );
 }

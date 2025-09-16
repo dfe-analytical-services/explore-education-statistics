@@ -167,7 +167,7 @@ describe('DataSetFilePage', () => {
       screen.getByRole('link', { name: 'View or create your own tables' }),
     ).toHaveAttribute(
       'href',
-      '/data-tables/publication-slug/release-slug?subjectId=subject-id',
+      '/data-tables/publication-1-slug/release-1-slug?subjectId=subject-id',
     );
   });
 

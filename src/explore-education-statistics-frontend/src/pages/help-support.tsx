@@ -1,3 +1,4 @@
+import InsetText from '@common/components/InsetText';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
@@ -15,8 +16,12 @@ function HelpSupportPage() {
             <h2 className="govuk-heading-m">About the service</h2>
             <p>
               Explore education statistics has been built by{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education">
-                the Department for Education (DfE)
+              <a
+                href="https://www.gov.uk/government/organisations/department-for-education"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
+              >
+                the Department for Education (DfE) (opens in new tab)
               </a>{' '}
               to make it easier for you to find, access, navigate and understand
               the range of education-related statistics and data it provides.
@@ -24,12 +29,20 @@ function HelpSupportPage() {
             <p>
               All the statistics and data published this service are produced in
               line with the UK Statistical Authority's{' '}
-              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/">
-                Code of Practice for Official Statistics
+              <a
+                href="https://www.statisticsauthority.gov.uk/code-of-practice/"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
+              >
+                Code of Practice for Official Statistics (opens in new tab)
               </a>{' '}
               and DfE's{' '}
-              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                Standards for official statistics
+              <a
+                href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+                rel="noopener noreferrer nofollow"
+                target="_blank"
+              >
+                Standards for official statistics (opens in new tab)
               </a>
               .
             </p>
@@ -110,28 +123,42 @@ function HelpSupportPage() {
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Contact us for help and support</h2>
-            <p>
-              If you have any technical issues using the service contact our
-              Explore Education Statistics team:
+            <p className="govuk-!-margin-top-1">
+              The Explore education statistics service is operated by the
+              Department for Education (DfE).
             </p>
-            <p className="govuk-hint">
-              For example, problems downloading any data files or using our
-              table tool
-            </p>
-            <div className="govuk-inset-text">
-              <p className="govuk-!-margin-top-0">
-                Email:{' '}
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  explore.statistics@education.gov.uk
-                </a>
-              </p>
-            </div>
+
+            <h3 className="govuk-!-margin-top-8 govuk-heading-s">
+              Need help using this service or have a question about the data?
+            </h3>
             <p>
               If you have any specific statistical or subject-related queries,
               contact the team or named statistician listed in the 'Contact us'
               sections of the pages found under{' '}
               <Link to="/find-statistics">Find statistics and data</Link>.
             </p>
+            <p>
+              For any further queries, contact the Explore education statistics
+              team:
+            </p>
+            <InsetText>
+              Email:{' '}
+              <a href="mailto:explore.statistics@education.gov.uk">
+                explore.statistics@education.gov.uk
+              </a>
+            </InsetText>
+
+            <h3 className="govuk-!-margin-top-8 govuk-heading-s">
+              Have a general question about education or the Department for
+              Education?
+            </h3>
+            <p>Call the DfE public enquiries line:</p>
+            <InsetText>
+              Phone: 0370 000 2288
+              <br />
+              Opening hours: Monday to Friday, 9.30am to 5pm (closed on bank
+              holidays)
+            </InsetText>
           </section>
         </div>
       </div>

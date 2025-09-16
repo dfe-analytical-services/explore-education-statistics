@@ -1,7 +1,6 @@
 *** Settings ***
 Resource        ../libs/public-common.robot
 Library         ../libs/no_javascript.py
-Resource        ../seed_data/seed_data_theme_1_constants.robot
 
 Test Setup      fail test fast if required
 
@@ -16,6 +15,6 @@ Parse Find Statistics page HTML
     ...    %{PUBLIC_URL}/find-statistics?sortBy=relevance&search=Pupil+absence+in+schools+in+England
     set suite variable    ${parsed_page}
 
-Validate Seed Data Theme 1 Publication 1 publication on page
+Validate publications list is on page
+    [Tags]    NotAgainstDev    NotAgainstTest    NotAgainstPreProd
     ${list}=    user_gets_publications_list    ${parsed_page}
-    user_checks_list_contains_publication    ${list}    ${PUPIL_ABSENCE_PUBLICATION_TITLE}

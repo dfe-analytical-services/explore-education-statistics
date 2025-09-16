@@ -113,7 +113,7 @@ public class MessageAwareSqlServerRetryingExecutionStrategyTests
             errorMessage, // Message
             "proc", // Procedure
             100, // LineNumber
-            (uint)1, // Win32ErrorCode
+            1, // Win32ErrorCode
             null!); // Exception
 
         typeof(SqlErrorCollection)

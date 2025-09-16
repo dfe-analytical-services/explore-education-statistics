@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -54,15 +53,17 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                         Id = Guid.NewGuid(),
                         Title = "Title of theme"
                     },
-                    Publication = new IdTitleViewModel
+                    Publication = new IdTitleSlugViewModel
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Title of publication"
+                        Title = "Title of publication",
+                        Slug = "publication-slug"
                     },
-                    Release = new IdTitleViewModel
+                    Release = new IdTitleSlugViewModel
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Academic year 2001/02"
+                        Title = "Academic year 2001/02",
+                        Slug = "release-slug"
                     },
                     Api = new DataSetFileApiViewModel
                     {

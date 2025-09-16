@@ -10,13 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 public interface IBlobStorageService
 {
-    public Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path = null);
+    Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
-    public Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
-
-    public Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
-
-    public Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);
+    Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);
 
     public record DeleteBlobsOptions
     {
@@ -24,25 +20,25 @@ public interface IBlobStorageService
         public Regex? IncludeRegex { get; set; }
     }
 
-    public Task DeleteBlobs(
+    Task DeleteBlobs(
         IBlobContainer containerName,
         string? directoryPath = null,
         DeleteBlobsOptions? options = null);
 
-    public Task DeleteBlob(IBlobContainer containerName, string path);
+    Task DeleteBlob(IBlobContainer containerName, string path);
 
-    public Task<bool> MoveBlob(
+    Task<bool> MoveBlob(
         IBlobContainer sourceContainer,
         string sourcePath,
         string destinationPath,
         IBlobContainer? destinationContainer = null);
 
-    public Task UploadFile(
+    Task UploadFile(
         IBlobContainer containerName,
         string path,
         IFormFile file);
 
-    public Task UploadStream(
+    Task UploadStream(
         IBlobContainer containerName,
         string path,
         Stream sourceStream,
@@ -50,29 +46,12 @@ public interface IBlobStorageService
         string? contentEncoding = null,
         CancellationToken cancellationToken = default);
 
-    public Task UploadAsJson<T>(
+    Task UploadAsJson<T>(
         IBlobContainer containerName,
         string path,
         T content,
         string? contentEncoding = null,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Download the entirety of a blob to a target stream.
-    /// </summary>
-    /// <param name="containerName">name of the blob container</param>
-    /// <param name="path">path to the blob within the container</param>
-    /// <param name="stream">stream to output blob to</param>
-    /// <param name="decompress">if true, checks the content encoding and decompresses the blob if necessary</param>
-    /// <param name="cancellationToken">used to cancel the download</param>
-    /// <returns>the stream that the blob has been output to</returns>
-    [Obsolete("Use GetDownloadStream instead to create a download stream with no intermediary Streams necessary.")]
-    public Task<Either<ActionResult, Stream>> DownloadToStream(
-        IBlobContainer containerName,
-        string path,
-        Stream stream,
-        bool decompress = true,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -88,29 +67,42 @@ public interface IBlobStorageService
         string path,
         bool decompress = true,
         CancellationToken cancellationToken = default);
-
+    
     /// <summary>
-    /// Stream a blob in chunks.
+    /// Obtain a secure,short-lived download token for use with <see cref="StreamWithToken"/>.
+    /// Any relevant permission checks for the current business process situation should be
+    /// carried out prior to obtaining this token.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// This differs from <see cref="DownloadToStream">DownloadToStream</see> in
-    /// that it does not download the entirety of the blob beforehand. This causes
-    /// differences in how the outputted stream behaves that you may or may not want.
-    /// </para>
-    /// </remarks>
-    /// <param name="containerName">Name of the blob container</param>
+    /// <param name="container">The blob container</param>
+    /// <param name="filename">The requested filename for the download token to include,
+    /// for use when performing the actual download with <see cref="StreamWithToken"/>
+    /// </param>
     /// <param name="path">Path to the blob within the container</param>
-    /// <param name="bufferSize">Size of the stream buffer</param>
     /// <param name="cancellationToken">Token to cancel the request</param>
-    /// <returns>The chunked blob stream</returns>
-    public Task<Stream> StreamBlob(
-        IBlobContainer containerName,
+    /// <returns>
+    /// A <see cref="BlobDownloadToken"/> that can be used with <see cref="StreamWithToken"/>
+    /// to stream a file securely from Blob Storage using SAS.
+    /// </returns>
+    Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
+        IBlobContainer container,
+        string filename,
         string path,
-        int? bufferSize = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
+    
+    /// <summary>
+    /// Use a secure, short-lived <see cref="BlobDownloadToken"/> obtained from
+    /// <see cref="GetBlobDownloadToken"/> to stream a Blob from storage.
+    /// </summary>
+    /// <param name="token">
+    /// A secure, short-lived <see cref="BlobDownloadToken"/> obtained from <see cref="GetBlobDownloadToken"/>
+    /// </param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
+        BlobDownloadToken token,
+        CancellationToken cancellationToken);
 
-    public Task<Either<ActionResult, string>> DownloadBlobText(
+    Task<Either<ActionResult, string>> DownloadBlobText(
         IBlobContainer containerName,
         string path,
         CancellationToken cancellationToken = default);
@@ -137,7 +129,7 @@ public interface IBlobStorageService
         public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
     }
 
-    public Task<List<BlobInfo>> CopyDirectory(
+    Task<List<BlobInfo>> CopyDirectory(
         IBlobContainer sourceContainerName,
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
@@ -152,7 +144,7 @@ public interface IBlobStorageService
         public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
     }
 
-    public Task MoveDirectory(
+    Task MoveDirectory(
         IBlobContainer sourceContainerName,
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,

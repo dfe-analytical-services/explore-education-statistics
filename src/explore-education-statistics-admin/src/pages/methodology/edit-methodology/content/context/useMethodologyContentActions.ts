@@ -70,6 +70,10 @@ export default function useMethodologyContentActions() {
     });
   }
 
+  // NOTE: `order` could be removed from ContentBlockPostModel, as
+  // we only ever add new blocks to the end of all existing blocks. If
+  // someone ever did provide an order that clashed with an existing block,
+  // currently the frontend doesn't adjust the `order`s of existing blocks.
   async function addContentSectionBlock({
     methodologyId,
     sectionId,
@@ -125,6 +129,10 @@ export default function useMethodologyContentActions() {
     });
   }
 
+  // NOTE: `order` could be removed from addContentSection as an argument, as
+  // we only ever add new sections to the end of all existing sections. If
+  // someone ever did provide an order that clashed with an existing section,
+  // currently the frontend doesn't adjust the `order`s of existing sections.
   async function addContentSection({
     methodologyId,
     order,

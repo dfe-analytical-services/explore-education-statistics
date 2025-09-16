@@ -52,6 +52,27 @@ export interface PublicationSummary {
   contact: Contact;
 }
 
+// TODO EES-6449 - rename to remove 'redesign'
+export interface PublicationSummaryRedesign {
+  contact: Contact;
+  id: string;
+  latestRelease: {
+    id: string;
+    slug: string;
+    title: string;
+  };
+  nextReleaseDate?: PartialDate;
+  slug: string;
+  summary: string;
+  supersededByPublication?: PublicationSupersededBy;
+  title: string;
+  theme: {
+    id: string;
+    title: string;
+    summary: string;
+  };
+}
+
 export interface PublicationListSummary {
   id: string;
   published: Date | string;
@@ -72,6 +93,7 @@ export interface Contact {
   teamEmail: string;
   contactName: string;
   contactTelNo?: string;
+  id?: string;
 }
 
 export interface PublicationTitle {
@@ -172,6 +194,22 @@ export interface ReleaseVersion<
   hasDataGuidance: boolean;
 }
 
+// Used for the redesigned release pages
+export interface ReleaseVersionSummary {
+  coverageTitle: string;
+  id: string;
+  isLatestRelease?: boolean;
+  label?: string;
+  lastUpdated: string;
+  published: string;
+  publishingOrganisations?: Organisation[];
+  slug: string;
+  title: string;
+  type: ReleaseType;
+  updateCount: number;
+  yearTitle: string;
+}
+
 export interface ReleaseSummary {
   id: string;
   title: string;
@@ -231,6 +269,54 @@ export interface ReleaseSitemapItem {
 }
 
 const publicationService = {
+  getPublicationSummaryRedesign(
+    publicationSlug: string,
+  ): Promise<PublicationSummaryRedesign> {
+    // TODO EES-6404 - remove dummy data and reinstate API call
+    // return contentApi.get(`/publications/${publicationSlug}`);
+    const basePublicationSummary = {
+      id: 'publication-summary-1',
+      title: 'Pupil attendance in schools',
+      slug: 'publication-slug',
+      summary:
+        'Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE’s regular attendance data',
+      latestRelease: {
+        slug: 'release-slug',
+        title: 'Calendar year 2024 - Final',
+        id: 'release-version-summary-1',
+      },
+      nextReleaseDate: { year: 2026, month: 3 },
+      theme: {
+        id: '323e4567-e89b-12d3-a456-426614174000',
+        title: 'Pupils and schools',
+        summary:
+          'Including absence, application and offers, capacity, exclusion and special educational needs (SEN) statistics',
+      },
+      contact: {
+        teamName: 'Test team',
+        teamEmail: 'test@test.com',
+        contactName: 'Joe Bloggs',
+        contactTelNo: '01234 567890',
+        id: 'contact-id',
+      },
+    };
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(
+          publicationSlug === 'superseded-publication'
+            ? {
+                ...basePublicationSummary,
+                supersededByPublication: {
+                  id: '223e4567-e89b-12d3-a456-426614174000',
+                  title: 'Superseding publication',
+                  slug: 'superseding-publication',
+                },
+              }
+            : basePublicationSummary,
+        );
+      }, 500);
+    });
+  },
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
   },
@@ -256,6 +342,43 @@ const publicationService = {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
     );
+  },
+  // TODO EES-6404 - remove dummy data and reinstate API call
+  getReleaseVersionSummary(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    publicationSlug: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    releaseSlug: string,
+  ): Promise<ReleaseVersionSummary> {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve({
+          id: 'release-version-summary-1',
+          slug: 'release-slug',
+          type: 'AccreditedOfficialStatistics',
+          title: 'Calendar year 2024 - Final',
+          yearTitle: '2024',
+          coverageTitle: 'Calendar year',
+          label: 'Final',
+          published: '2025-08-10T09:30:00+01:00',
+          lastUpdated: '2025-08-11T14:30:00+01:00',
+          publishingOrganisations: [
+            {
+              id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
+              title: 'Department for Education',
+              url: 'https://www.gov.uk/government/organisations/department-for-education',
+            },
+            {
+              id: '5e089801-ce1a-e274-9915-e83f3e978699',
+              title: 'Skills England',
+              url: 'https://www.gov.uk/government/organisations/skills-england',
+            },
+          ],
+          isLatestRelease: true,
+          updateCount: 5,
+        });
+      }, 500);
+    });
   },
   getPublicationReleaseSummary(
     publicationSlug: string,
@@ -285,13 +408,6 @@ const publicationService = {
   }: PublicationTreeOptions = {}): Promise<Theme[]> {
     return contentApi.get('/publication-tree', {
       params: { publicationFilter },
-    });
-  },
-  listPublications(
-    params: PublicationListRequest,
-  ): Promise<PaginatedList<PublicationListSummary>> {
-    return contentApi.get(`/publications`, {
-      params,
     });
   },
   listSitemapItems(): Promise<PublicationSitemapItem[]> {

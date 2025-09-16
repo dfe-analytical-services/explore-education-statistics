@@ -467,10 +467,9 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.StreamBlob(
+                .Setup(s => s.GetDownloadStream(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
-                    null,
                     default
                 ))
                 .ReturnsAsync(csv.ToStream());
@@ -674,10 +673,9 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.StreamBlob(
+                .Setup(s => s.GetDownloadStream(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId),
-                    null,
                     default
                 ))
                 .ReturnsAsync(csv.ToStream());
@@ -905,10 +903,9 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.StreamBlob(
+                .Setup(s => s.GetDownloadStream(
                     It.Is<ReleaseFile>(rf =>
                         rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
-                    null,
                     default
                 ))
                 .ThrowsAsync(new FileNotFoundException("File not found"));

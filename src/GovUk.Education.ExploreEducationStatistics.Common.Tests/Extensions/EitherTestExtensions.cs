@@ -79,6 +79,14 @@ public static class EitherTestExtensions
         badRequest.AssertValidationProblem(expectedValidationErrors);
         return either.Left;
     }
+    
+    public static ActionResult AssertBadRequestWithErrorViewModels<TRight>(this Either<ActionResult, TRight> either,
+        List<ErrorViewModel> expectedErrorViewModels)
+    {
+        var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
+        badRequest.AssertBadRequestWithValidationErrors(expectedErrorViewModels);
+        return either.Left;
+    }
 
     public static ValidationProblemViewModel AssertBadRequestWithValidationProblem<TRight>(this Either<ActionResult, TRight> either)
     {

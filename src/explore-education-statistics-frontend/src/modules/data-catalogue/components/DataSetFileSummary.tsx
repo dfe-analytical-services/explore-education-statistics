@@ -143,6 +143,11 @@ export default function DataSetFileSummary({
             </TagGroup>
           </SummaryListItem>
         )}
+        <SummaryListItem term="Release">
+          <Link to={`/find-statistics/${publication.slug}/${release.slug}`}>
+            {release.title}
+          </Link>
+        </SummaryListItem>
         <SummaryListItem term="Theme">{theme.title}</SummaryListItem>
         <SummaryListItem term="Published">
           <FormattedDate format="d MMM yyyy">{published}</FormattedDate>
@@ -150,7 +155,6 @@ export default function DataSetFileSummary({
         <SummaryListItem term="Last updated">
           <FormattedDate format="d MMM yyyy">{lastUpdated}</FormattedDate>
         </SummaryListItem>
-        <SummaryListItem term="Release">{release.title}</SummaryListItem>
         {numDataFileRows && (
           <SummaryListItem
             className={classNames({ 'dfe-js-hidden': !showDetails })}

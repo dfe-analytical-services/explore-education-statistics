@@ -38,7 +38,7 @@ public interface IDataSetFileStorage
         List<DataSet> dataSets,
         CancellationToken cancellationToken);
 
-    Task<Either<ActionResult, FileStreamResult>> RetrieveDataSetFileFromTemporaryStorage(
+    Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
         Guid releaseVersionId,
         Guid dataSetUploadId,
         FileType fileType,

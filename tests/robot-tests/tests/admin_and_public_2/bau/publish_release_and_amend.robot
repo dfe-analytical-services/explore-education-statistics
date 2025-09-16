@@ -278,10 +278,6 @@ Publish the scheduled release
     ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
-
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
@@ -765,11 +761,6 @@ Approve amendment for scheduled release
 
     ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
-
-Verify amendment is on Find Statistics page again
-    # TODO EES-6063 - Remove this
-    user waits for caches to expire
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to amendment release page
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}

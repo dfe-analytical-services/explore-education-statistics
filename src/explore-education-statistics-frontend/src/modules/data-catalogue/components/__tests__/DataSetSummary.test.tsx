@@ -34,6 +34,27 @@ describe('DataSetFileSummary', () => {
     ).toBeInTheDocument();
   });
 
+  it("renders 'Release 1' link as the second item in the summary list", () => {
+    render(<DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />);
+    const releaseLink = within(screen.getByTestId('Release')).getByText(
+      'Release 1',
+    );
+    // Get all rows in the summary list
+    const rows = screen.getAllByRole('term');
+
+    // Second row should be "Release"
+    const releaseRow = rows[1]; // index 1 = second item
+    expect(releaseRow).toHaveTextContent('Release');
+    expect(releaseRow).toHaveAttribute('data-testId', 'Release-key');
+
+    expect(releaseLink).toBeInTheDocument();
+    // Assert it is a link
+    expect(releaseLink).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-1-slug/release-1-slug',
+    );
+  });
+
   test('renders the expanded view when show more details is clicked', async () => {
     const { user } = render(
       <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />,

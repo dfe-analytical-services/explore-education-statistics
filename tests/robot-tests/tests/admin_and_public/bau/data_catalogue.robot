@@ -15,6 +15,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    Data catalogue %{RUN_IDENTIFIER}
+${PUBLICATION_URL}=     /find-statistics/data-catalogue-%{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Academic year Q1
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -100,10 +101,6 @@ Get public release link
     ${PUBLIC_RELEASE_2_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_2_LINK}
 
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
-
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_2_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
@@ -132,13 +129,16 @@ Validate data sets list
     user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    10
 
     ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
-
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3}
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3} data guidance content
     user checks element contains    ${dataSet}    UI test theme
     user checks element contains    ${dataSet}    This is the latest data
     user checks element contains    ${dataSet}    ${PUBLICATION_NAME}
-    user checks element contains    ${dataSet}    ${RELEASE_NAME}
+
+    user checks page contains link with text and url
+    ...    ${RELEASE_NAME} 2021/22
+    ...    ${PUBLICATION_URL}/2021-22-q1
+    ...    ${dataSet}
 
     user clicks button    Show more details    ${dataSet}
     user clicks button containing text    Download data set    ${dataSet}

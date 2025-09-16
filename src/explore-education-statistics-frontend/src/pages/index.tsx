@@ -1,7 +1,8 @@
+import InsetText from '@common/components/InsetText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import HomepageCard from '@frontend/components/HomepageCard';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import TryNewSearchBanner from '@frontend/components/TryNewSearchBanner';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
@@ -14,11 +15,7 @@ function HomePage() {
     });
 
   return (
-    <Page
-      title="Explore our statistics and data"
-      isHomepage
-      customBannerContent={<TryNewSearchBanner />}
-    >
+    <Page title="Explore our statistics and data" isHomepage>
       <div className="govuk-grid-row dfe-card__container">
         <HomepageCard
           title="Find statistics and data"
@@ -49,9 +46,12 @@ function HomePage() {
           <h3 className="govuk-!-margin-bottom-1">
             <Link
               to="https://www.gov.uk/search/research-and-statistics?content_store_document_type=upcoming_statistics&organisations%5B%5D=department-for-education&order=updated-newest"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('Statistics release calendar')}
             >
-              Statistics release calendar
+              Statistics release calendar{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>
           </h3>
           <p className="govuk-caption-m">
@@ -82,9 +82,12 @@ function HomePage() {
           <h3 className="govuk-!-margin-bottom-1">
             <Link
               to="https://api.education.gov.uk/statistics/docs"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('API documentation')}
             >
-              API documentation
+              API documentation{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </Link>
           </h3>
           <p className="govuk-caption-m">
@@ -102,14 +105,18 @@ function HomePage() {
         <div className="govuk-grid-column-two-thirds">
           <p>
             Use these services to find related information and other statistical
-            services provided by the Department for Education (DfE):
+            services provided by the Department for Education (DfE), these links
+            will open in a new tab:
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://www.gov.uk/government/organisations/department-for-education/about/statistics"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('Statistics at DfE')}
             >
-              Statistics at DfE
+              Statistics at DfE{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -119,11 +126,14 @@ function HomePage() {
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://www.gov.uk/school-performance-tables"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() =>
                 logLinkClick('Compare school and college performance')
               }
             >
-              Compare school and college performance
+              Compare school and college performance{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -133,9 +143,12 @@ function HomePage() {
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://www.get-information-schools.service.gov.uk/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() => logLinkClick('Get information about schools')}
             >
-              Get information about schools
+              Get information about schools{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -145,11 +158,14 @@ function HomePage() {
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
               href="https://financial-benchmarking-and-insights-tool.education.gov.uk/"
+              rel="noopener noreferrer nofollow"
+              target="_blank"
               onClick={() =>
                 logLinkClick('Financial Benchmarking and Insights Tool')
               }
             >
-              Financial Benchmarking and Insights Tool
+              Financial Benchmarking and Insights Tool{' '}
+              <VisuallyHidden>(opens in new tab)</VisuallyHidden>
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
@@ -161,29 +177,47 @@ function HomePage() {
 
       <hr />
 
-      <h2 className="govuk-!-margin-top-9">Contact us</h2>
+      <h2 className="govuk-!-margin-top-9">Contact us for help and support</h2>
+      <div className="govuk-grid-row govuk-!-margin-bottom-3">
+        <div className="govuk-grid-column-two-thirds">
+          <p className="govuk-!-margin-top-1">
+            The Explore education statistics service is operated by the
+            Department for Education (DfE).
+          </p>
 
-      <p className="govuk-!-margin-top-1">
-        The Explore education statistics service is operated by the Department
-        for Education (DfE).
-      </p>
+          <h3>
+            Need help using this service or have a question about the data?
+          </h3>
+          <p>
+            If you have any specific statistical or subject-related queries,
+            contact the team or named statistician listed in the 'Contact us'
+            sections of the pages found under{' '}
+            <Link to="/find-statistics">Find statistics and data</Link>.
+          </p>
+          <p>
+            For any further queries, contact the Explore education statistics
+            team:
+          </p>
+          <InsetText>
+            Email:{' '}
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
+          </InsetText>
 
-      <p className="govuk-!-margin-top-1">
-        If you need help and support or have a question about Explore education
-        statistics contact:
-      </p>
-
-      <p className="govuk-!-margin-top-1">
-        <strong>Explore education statistics team</strong>
-      </p>
-
-      <p className="govuk-caption-m govuk-!-margin-top-1">
-        Email
-        <br />
-        <a href="mailto:explore.statistics@education.gov.uk">
-          explore.statistics@education.gov.uk
-        </a>
-      </p>
+          <h3>
+            Have a general question about education or the Department for
+            Education?
+          </h3>
+          <p>Call the DfE public enquiries line:</p>
+          <InsetText>
+            Phone: 0370 000 2288
+            <br />
+            Opening hours: Monday to Friday, 9.30am to 5pm (closed on bank
+            holidays)
+          </InsetText>
+        </div>
+      </div>
     </Page>
   );
 }

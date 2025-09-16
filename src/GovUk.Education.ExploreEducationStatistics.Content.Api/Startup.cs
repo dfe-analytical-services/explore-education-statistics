@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -122,9 +123,12 @@ public class Startup(
             .Bind(configuration.GetSection(AnalyticsOptions.Section));
 
         // Services
-        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
-                provider.GetRequiredService<ILogger<IBlobStorageService>>()));
+        services.AddSingleton<IBlobSasService, BlobSasService>();
+        services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
+            new PublicBlobStorageService(
+                connectionString: configuration.GetRequiredValue("PublicStorage"),
+                logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                sasService: provider.GetRequiredService<IBlobSasService>()));
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()));
@@ -148,6 +152,7 @@ public class Startup(
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
+        services.AddTransient<IPublicationsService, PublicationsService>();
         services.AddTransient<ITimePeriodService, TimePeriodService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
@@ -169,9 +174,13 @@ public class Startup(
         services.AddTransient<IGlossaryService, GlossaryService>();
         services.AddTransient<IThemeService, ThemeService>();
         services.AddTransient<IPublicationsSitemapService, PublicationsSitemapService>();
+        services.AddTransient<IPublicationsSearchService, PublicationsSearchService>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+        services.AddTransient<IReleaseSearchableDocumentsService, ReleaseSearchableDocumentsService>();
+        services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
+        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
         services.AddAnalytics(configuration);
 

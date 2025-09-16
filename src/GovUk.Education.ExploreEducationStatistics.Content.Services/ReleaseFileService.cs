@@ -102,12 +102,12 @@ public class ReleaseFileService(
                 .Include(rf => rf.ReleaseVersion)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
             )
-            .OnSuccessDo(rf => userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
-            .OnSuccessCombineWith(rf =>
-                publicBlobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
-            .OnSuccess(tuple =>
+            .OnSuccessDo(releaseFile => userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion))
+            .OnSuccessCombineWith(releaseFile => publicBlobStorageService
+                .GetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath()))
+            .OnSuccess(releaseFileAndStream =>
             {
-                var (releaseFile, stream) = tuple;
+                var (releaseFile, stream) = releaseFileAndStream;
 
                 return new FileStreamResult(stream, releaseFile.File.ContentType)
                 {
@@ -174,16 +174,19 @@ public class ReleaseFileService(
         if (allFilesZip?.Updated is not null
             && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
         {
-            var result = await publicBlobStorageService.DownloadToStream(
+            var streamResult = await publicBlobStorageService.GetDownloadStream(
                 containerName: PublicReleaseFiles,
                 path: path,
-                stream: outputStream,
-                cancellationToken: cancellationToken
-            );
+                cancellationToken: cancellationToken);
 
-            await outputStream.DisposeAsync();
+            if (streamResult.IsLeft)
+            {
+                return false;
+            }
 
-            return result.IsRight;
+            await using var blobStream = streamResult.Right;
+            await blobStream.CopyToAsync(outputStream, cancellationToken);
+            return true;
         }
 
         return false;
@@ -235,33 +238,31 @@ public class ReleaseFileService(
 
         foreach (var releaseFile in releaseFiles)
         {
+            var streamResult = await publicBlobStorageService
+                .GetDownloadStream(
+                    containerName: PublicReleaseFiles,
+                    path: releaseFile.PublicPath(),
+                    cancellationToken: cancellationToken);
+                
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
-
-            var blobExists = await publicBlobStorageService.CheckBlobExists(
-                PublicReleaseFiles,
-                releaseFile.PublicPath()
-            );
-
-            // Ignore files which do not exist in blob storage
-            if (!blobExists)
+            
+            // Ignore files where we cannot successfully get their blob download streams.
+            if (streamResult.IsLeft)
             {
                 continue;
             }
-
+            
+            await using var blobStream = streamResult.Right;
+            
             var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
-
             await using var entryStream = entry.Open();
-
-            await publicBlobStorageService.DownloadToStream(
-                containerName: PublicReleaseFiles,
-                path: releaseFile.PublicPath(),
-                stream: entryStream,
-                cancellationToken: cancellationToken
-            );
+            await blobStream.CopyToAsync(
+                destination: entryStream,
+                cancellationToken: cancellationToken);
 
             releaseFilesWithZipEntries.Add(releaseFile);
         }

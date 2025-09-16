@@ -48,10 +48,6 @@ public class ReleaseController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("publications/{publicationSlug}/releases/latest/searchable")]
-    public async Task<ActionResult<ReleaseSearchViewModel>> GetLatestReleaseAsSearchableDocument(string publicationSlug) => 
-        await GetLatestReleaseSearchViewModel(publicationSlug).HandleFailuresOrOk();
-
     [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
     public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
     {
@@ -90,15 +86,6 @@ public class ReleaseController : ControllerBase
                     release,
                     new PublicationViewModel(publication, methodologySummaries)
                 );
-            });
-    
-    private Task<Either<ActionResult, ReleaseSearchViewModel>> GetLatestReleaseSearchViewModel(string publicationSlug) =>
-        _publicationCacheService.GetPublication(publicationSlug)
-            .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug))
-            .OnSuccess(tuple =>
-            {
-                var (publication, release) = tuple;
-                return new ReleaseSearchViewModel(release, publication);
             });
 
     private Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryViewModel(

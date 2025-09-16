@@ -1,9 +1,5 @@
-import {
-  PublicationListRequest,
-  PublicationSortParam,
-} from '@common/services/publicationService';
+import { odata } from '@azure/search-documents';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
-import { SortDirection } from '@common/services/types/sort';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
@@ -12,11 +8,15 @@ import {
   PublicationSortOption,
   publicationSortOptions,
 } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import {
+  AzurePublicationListRequest,
+  AzurePublicationOrderByParam,
+} from '@frontend/services/azurePublicationService';
 import omitBy from 'lodash/omitBy';
 
 export default function createPublicationListRequest(
   query: FindStatisticsPageQuery,
-): PublicationListRequest {
+): AzurePublicationListRequest {
   const {
     releaseType,
     search: searchParam,
@@ -24,7 +24,16 @@ export default function createPublicationListRequest(
     themeId,
   } = getParamsFromQuery(query);
 
-  const { sortDirection, sort } = getSortParams(sortBy);
+  const orderBy = getSortParam(sortBy);
+
+  let filter: string | undefined;
+  if (releaseType && themeId) {
+    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
+  } else if (releaseType) {
+    filter = odata`releaseType eq ${releaseType}`;
+  } else if (themeId) {
+    filter = odata`themeId eq ${themeId}`;
+  }
 
   const minSearchCharacters = 3;
   const search =
@@ -32,43 +41,56 @@ export default function createPublicationListRequest(
 
   return omitBy(
     {
+      filter,
       page: parseNumber(query.page) ?? 1,
       releaseType,
       search,
-      sort,
-      sortDirection,
+      orderBy,
       themeId,
     },
     value => typeof value === 'undefined',
   );
 }
 
-function getSortParams(sortBy: PublicationSortOption): {
-  sortDirection?: SortDirection;
-  sort?: PublicationSortParam;
-} {
-  if (sortBy === 'relevance') {
-    return {
-      sort: 'relevance',
-      sortDirection: 'Desc',
-    };
+export function createPublicationSuggestRequest(
+  query: FindStatisticsPageQuery,
+  searchTerm: string,
+): AzurePublicationListRequest {
+  const { releaseType, themeId } = getParamsFromQuery(query);
+
+  let filter: string | undefined;
+  if (releaseType && themeId) {
+    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
+  } else if (releaseType) {
+    filter = odata`releaseType eq ${releaseType}`;
+  } else if (themeId) {
+    filter = odata`themeId eq ${themeId}`;
   }
-  if (sortBy === 'title') {
-    return {
-      sort: 'title',
-      sortDirection: 'Asc',
-    };
+
+  return omitBy(
+    {
+      filter,
+      releaseType,
+      search: searchTerm,
+      themeId,
+    },
+    value => typeof value === 'undefined',
+  );
+}
+
+function getSortParam(
+  sortBy: PublicationSortOption,
+): AzurePublicationOrderByParam {
+  switch (sortBy) {
+    case 'relevance':
+      return undefined;
+    case 'title':
+      return 'title asc';
+    case 'oldest':
+      return 'published asc';
+    default:
+      return 'published desc';
   }
-  if (sortBy === 'oldest') {
-    return {
-      sort: 'published',
-      sortDirection: 'Asc',
-    };
-  }
-  return {
-    sort: 'published',
-    sortDirection: 'Desc',
-  };
 }
 
 export function getParamsFromQuery(query: FindStatisticsPageQuery) {
