@@ -1,0 +1,65 @@
+DECLARE @DeletedUserId UNIQUEIDENTIFIER = NEWID();
+DECLARE @AnalystRoleId NVARCHAR(450);
+
+-- Store the ID of the 'Analyst' role for later use
+SELECT @AnalystRoleId = Id
+FROM AspNetRoles AS r
+WHERE r.Name = 'Analyst';
+
+-- Insert a dummy 'Deleted User' record. 
+-- This will be used as a placeholder for any existing records where we don't know who created/modified them.
+INSERT INTO Users (
+    Id,
+    FirstName,
+    LastName,
+    Email,
+    Active,
+    RoleId,
+    Created,
+    CreatedById
+)
+VALUES (
+    @DeletedUserId,
+    'Deleted',
+    'User',
+    'deleted.user@doesnotexist.com',
+    0,
+    @AnalystRoleId,
+    SYSUTCDATETIME(),
+    @DeletedUserId
+);
+
+-- Update existing Users records to have the same RoleId associated with their linked AspNetUser record (if it exists).
+UPDATE [Users]
+SET RoleId = ur.RoleId
+FROM [Users]
+INNER JOIN [AspNetUsers] AS au
+    ON au.Email = [Users].Email
+INNER JOIN [AspNetUserRoles] AS ur
+    ON ur.UserId = au.Id
+WHERE [Users].RoleId IS NULL;
+
+-- For any remaining Users records that don't have a linked AspNetUser record, set their RoleId to the 'Analyst' role ID.
+UPDATE [Users]
+SET RoleId = @AnalystRoleId
+WHERE [Users].RoleId IS NULL;
+
+-- Update existing Users records to have the same Created date associated with their linked UserInvite record (if it exists).
+UPDATE [Users]
+SET Created = ui.Created
+FROM [Users]
+INNER JOIN [UserInvites] AS ui
+    ON ui.Email = [Users].Email;
+
+-- Update existing Users records to have the same CreatedById associated with their linked UserInvite record (if it exists).
+UPDATE [Users]
+SET CreatedById = ui.CreatedById
+FROM [Users]
+INNER JOIN [UserInvites] AS ui
+    ON ui.Email = [Users].Email
+WHERE [Users].CreatedById IS NULL;
+
+-- For any remaining Users records that don't have a linked UserInvite record, set their CreatedById to the new dummy 'Deleted' user.
+UPDATE [Users]
+SET CreatedById = @DeletedUserId
+WHERE [Users].CreatedById IS NULL;
