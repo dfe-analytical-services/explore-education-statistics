@@ -22,7 +22,8 @@ public class SignInService(
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
-    IUserPublicationInviteRepository userPublicationInviteRepository) : ISignInService
+    IUserPublicationInviteRepository userPublicationInviteRepository,
+    IUserRepository userRepository) : ISignInService
 {
     public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
     {
@@ -102,6 +103,11 @@ public class SignInService(
             return new StatusCodeResult(500);
         }
 
+        // This line is temporary - once we have removed the UserInvites table, we can remove this.
+        var createdById = string.IsNullOrEmpty(inviteToSystem.CreatedById)
+            ? await GetDeletedUserId()
+            : Guid.Parse(inviteToSystem.CreatedById);
+
         // Now we have created Identity Framework user records, we can create internal User and Role records
         // for the application itself.
 
@@ -112,6 +118,10 @@ public class SignInService(
             existingInternalUser.FirstName = newAspNetUser.FirstName;
             existingInternalUser.LastName = newAspNetUser.LastName;
             existingInternalUser.SoftDeleted = null;
+            existingInternalUser.Active = true;
+            existingInternalUser.RoleId = inviteToSystem.RoleId;
+            existingInternalUser.Created = DateTimeOffset.UtcNow;
+            existingInternalUser.CreatedById = createdById;
             await HandleReleaseInvites(existingInternalUser.Id, existingInternalUser.Email);
             await HandlePublicationInvites(existingInternalUser.Id, existingInternalUser.Email);
         }
@@ -123,7 +133,11 @@ public class SignInService(
                 Id = Guid.Parse(newAspNetUser.Id),
                 FirstName = newAspNetUser.FirstName,
                 LastName = newAspNetUser.LastName,
-                Email = newAspNetUser.Email
+                Email = newAspNetUser.Email,
+                Active = true,
+                RoleId = inviteToSystem.RoleId,
+                Created = DateTimeOffset.UtcNow,
+                CreatedById = createdById
             };
 
             await contentDbContext.Users.AddAsync(newInternalUser);
@@ -184,4 +198,7 @@ public class SignInService(
             await usersAndRolesDbContext.SaveChangesAsync();
         });
     }
+
+    private async Task<Guid> GetDeletedUserId() =>
+        (await userRepository.FindDeletedUserPlaceholder())!.Id;
 }
