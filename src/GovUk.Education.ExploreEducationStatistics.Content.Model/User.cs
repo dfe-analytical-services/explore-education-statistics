@@ -37,11 +37,6 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public string DisplayName => $"{FirstName} {LastName}";
 
-    /// <remarks>
-    /// Note that this logic is also present in <see cref="UsersAndRolesDbContext.OnModelCreating"/>.
-    /// It is implemented there as well as EF is not able to translate this computed field for use in
-    /// a QueryFilter.
-    /// </remarks>
     [NotMapped]
     public bool Expired => !Active &&
                             !SoftDeleted.HasValue &&

@@ -721,12 +721,9 @@ public class ContentDbContext : DbContext
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Note that this logic is also present in User.Expired.
-        // It is implemented here as well because EF is not able to translate the "Expired" computed field for
-        // use in this QueryFilter.
         modelBuilder.Entity<User>()
-            .HasQueryFilter(invite => invite.Active ||
-                                      invite.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays));
+            .HasQueryFilter(invite => !invite.SoftDeleted.HasValue &&
+                                      (invite.Active || invite.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays)));
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
