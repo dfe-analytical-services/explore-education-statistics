@@ -8,14 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 {
-    public const string DeletedUserPlaceholderEmail = "deleted.user@doesnotexist.com";
-
     public async Task<User?> FindById(Guid userId, CancellationToken cancellationToken = default)
     {
         return await contentDbContext.Users
             .SingleOrDefaultAsync(u =>
-                u.Id == userId
-                && u.SoftDeleted == null,
+                u.Id == userId,
                 cancellationToken);
     }
 
@@ -23,13 +20,12 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
     {
         return await contentDbContext.Users
                 .SingleOrDefaultAsync(u =>
-                    u.Email.ToLower().Equals(email.ToLower())
-                    && u.SoftDeleted == null);
+                    u.Email.ToLower().Equals(email.ToLower()));
     }
 
     public async Task<User> FindDeletedUserPlaceholder()
     {
         // This user should be seeded in the ContentDbContext as part of the migrations, so should always exist.
-        return (await FindByEmail(DeletedUserPlaceholderEmail))!;
+        return (await FindByEmail(User.DeletedUserPlaceholderEmail))!;
     }
 }

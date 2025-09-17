@@ -722,8 +722,9 @@ public class ContentDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>()
-            .HasQueryFilter(invite => !invite.SoftDeleted.HasValue &&
-                                      (invite.Active || invite.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays)));
+            .HasQueryFilter(u => u.Email == User.DeletedUserPlaceholderEmail ||
+                                 (!u.SoftDeleted.HasValue &&
+                                 (u.Active || u.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays))));
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)

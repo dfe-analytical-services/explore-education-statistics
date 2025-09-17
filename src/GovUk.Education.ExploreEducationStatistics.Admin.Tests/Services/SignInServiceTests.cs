@@ -564,6 +564,7 @@ public class SignInServiceTests
                 Assert.Equal(updatedLastName, newIdentityUser.LastName);
 
                 var newUser = await contentDbContext.Users
+                    .IgnoreQueryFilters() // Make sure we didn't create an ADDITIONAL user, but just reactivated the existing one
                     .SingleAsync(u => u.Email == email.ToLower());
 
                 Assert.Equal(email.ToLower(), newUser.Email);
@@ -691,6 +692,7 @@ public class SignInServiceTests
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var newUser = await contentDbContext.Users
+                    .IgnoreQueryFilters() // Make sure we didn't create an ADDITIONAL user, but just reactivated the existing one
                     .SingleAsync(u => u.Email == email.ToLower());
 
                 Assert.Equal(deletedUserPlaceholderId, newUser.CreatedById);

@@ -100,6 +100,33 @@ public abstract class UserRepositoryTests
     }
 
     [Fact]
+    public async Task FindByEmail_ExpiredUser()
+    {
+        var user = new User
+        {
+            Email = "test@test.com",
+            SoftDeleted = null,
+            Active = false,
+            Created = DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1)
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Users.AddAsync(user);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var repository = SetupUserRepository(contentDbContext);
+            var result = await repository.FindByEmail("test@test.com");
+            Assert.Null(result);
+        }
+    }
+
+    [Fact]
     public async Task FindDeletedUserPlaceholder()
     {
         var user = new User
