@@ -1011,6 +1011,7 @@ public class UserManagementServiceTests
             Assert.NotNull(dbInternalUser.SoftDeleted);
             dbInternalUser.SoftDeleted.AssertUtcNow();
             Assert.Equal(CreatedById, dbInternalUser.DeletedById);
+            Assert.False(dbInternalUser.Active);
         }
 
         VerifyAllMocks(
