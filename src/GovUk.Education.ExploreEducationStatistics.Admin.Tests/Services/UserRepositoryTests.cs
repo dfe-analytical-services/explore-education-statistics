@@ -6,14 +6,15 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class UserRepositoryTests
+public class UserRepositoryTests
 {
     [Fact]
     public async Task FindByEmail()
     {
         var user = new User
         {
-            Email = "test@test.com"
+            Email = "test@test.com",
+            Active = true
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -38,7 +39,8 @@ public abstract class UserRepositoryTests
     {
         var user = new User
         {
-            Email = "test@test.com"
+            Email = "test@test.com",
+            Active = true
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -75,39 +77,12 @@ public abstract class UserRepositoryTests
     }
 
     [Fact]
-    public async Task FindByEmail_SoftDeletedUser()
+    public async Task FindByEmail_InactiveUser()
     {
         var user = new User
         {
             Email = "test@test.com",
-            SoftDeleted = DateTime.UtcNow,
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            await contentDbContext.Users.AddAsync(user);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var repository = SetupUserRepository(contentDbContext);
-            var result = await repository.FindByEmail("test@test.com");
-            Assert.Null(result);
-        }
-    }
-
-    [Fact]
-    public async Task FindByEmail_ExpiredUser()
-    {
-        var user = new User
-        {
-            Email = "test@test.com",
-            SoftDeleted = null,
             Active = false,
-            Created = DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1)
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -131,7 +106,10 @@ public abstract class UserRepositoryTests
     {
         var user = new User
         {
-            Email = UserRepository.DeletedUserPlaceholderEmail
+            Email = User.DeletedUserPlaceholderEmail,
+            Active = false,
+            SoftDeleted = DateTime.UtcNow,
+            Created = DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays -1)
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -150,7 +128,7 @@ public abstract class UserRepositoryTests
 
             Assert.NotNull(result);
             Assert.Equal(user.Id, result.Id);
-            Assert.Equal(UserRepository.DeletedUserPlaceholderEmail, result.Email);
+            Assert.Equal(User.DeletedUserPlaceholderEmail, result.Email);
         }
     }
 
@@ -161,7 +139,7 @@ public abstract class UserRepositoryTests
 
         var repository = SetupUserRepository(contentDbContext);
 
-        await Assert.ThrowsAsync<NullReferenceException>(repository.FindDeletedUserPlaceholder);
+        await Assert.ThrowsAsync<InvalidOperationException>(repository.FindDeletedUserPlaceholder);
     }
 
     private static UserRepository SetupUserRepository(
