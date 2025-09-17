@@ -154,9 +154,9 @@ public class ProcessorStage2Tests
     }
     
     [Fact]
-    public async Task ProcessStage2_GroupingFiltersAsRowsInMetaFile()
+    public async Task ProcessStage2_IgnoresFilterRowsWithGroupingColumnNamesOfOtherFilters()
     {
-        await AssertStage2ItemsImportedCorrectly(new GroupingFiltersAsRowsInMetaFileScenario());
+        await AssertStage2ItemsImportedCorrectly(new IgnoresFilterRowsInMetaFileScenario());
     }
     
     private async Task AssertStage2ItemsImportedCorrectly(

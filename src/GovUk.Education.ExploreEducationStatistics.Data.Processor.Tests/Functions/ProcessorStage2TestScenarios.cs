@@ -5,11 +5,15 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
-public abstract class ScenarioWithFilterGrouping(Guid? subjectId = null) : IProcessorStage2TestScenario
+public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
     private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
-    public abstract string GetFilenameUnderTest();
+    public string GetFilenameUnderTest()
+    {
+        return "ordering-test-4.csv";
+    }
+
 
     public Guid GetSubjectId()
     {
@@ -169,22 +173,9 @@ public abstract class ScenarioWithFilterGrouping(Guid? subjectId = null) : IProc
     ];
 }
 
-public class OrderingCsvStage2Scenario(Guid? subjectId = null) : ScenarioWithFilterGrouping(subjectId)
+public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
-    public override string GetFilenameUnderTest()
-    {
-        return "ordering-test-4.csv";
-    }
-}
-
-public class AdditionalFiltersAndIndicatorsScenario : IProcessorStage2TestScenario
-{
-    private readonly Guid _subjectId;
-
-    public AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null)
-    {
-        _subjectId = subjectId ?? Guid.NewGuid();
-    }
+    private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
     public string GetFilenameUnderTest()
     {
@@ -287,14 +278,9 @@ public class AdditionalFiltersAndIndicatorsScenario : IProcessorStage2TestScenar
         [new AutoSelectFilterValue("Filter one", "Total")];
 }
 
-public class SpecialFilterItemsScenario : IProcessorStage2TestScenario
+public class SpecialFilterItemsScenario(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
-    private readonly Guid _subjectId;
-
-    public SpecialFilterItemsScenario(Guid? subjectId = null)
-    {
-        _subjectId = subjectId ?? Guid.NewGuid();
-    }
+    private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
     public string GetFilenameUnderTest()
     {
@@ -377,14 +363,9 @@ public class SpecialFilterItemsScenario : IProcessorStage2TestScenario
     public List<AutoSelectFilterValue> GetAutoSelectFilterValues() => [];
 }
 
-public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenario
+public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
-    private readonly Guid _subjectId;
-
-    public AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null)
-    {
-        _subjectId = subjectId ?? Guid.NewGuid();
-    }
+    private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
     public string GetFilenameUnderTest()
     {
@@ -523,15 +504,140 @@ public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenari
 
 public record AutoSelectFilterValue(string FilterLabel, string AutoSelectFilterItemLabel);
 
-public class GroupingFiltersAsRowsInMetaFileScenario(Guid? subjectId = null) : ScenarioWithFilterGrouping(subjectId)
+public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProcessorStage2TestScenario
 {
-    public override string GetFilenameUnderTest()
+    private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
+
+    public string GetFilenameUnderTest()
     { 
-        // This file contains two rows "filter_four_group" and
-        // "filter_two_group" which are not treated as filters
-        // by the test data set up by OrderingCsvStage2Scenario.
-        return "grouping_filters_as_rows.csv";
+        return "ignored-filter-rows.csv";
     }
+
+    public Guid GetSubjectId()
+    {
+        return _subjectId;
+    }
+
+    public List<Filter> GetExpectedFilters()
+    {
+        return ListOf(
+            new Filter
+            {
+                Label = "Filter one",
+                Name = "filter_one",
+                GroupCsvColumn = null,
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Default",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "Filter 1 Choice 1"
+                            })
+                    }),
+                SubjectId = _subjectId
+            },
+            new Filter
+            {
+                Label = "Filter two",
+                Name = "filter_two",
+                GroupCsvColumn = "filter_two_group",
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Default",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "Filter 2 Choice 1"
+                            })
+                    }
+                ),
+                SubjectId = _subjectId
+            },
+            new Filter
+            {
+                Label = "Filter three",
+                Name = "filter_three",
+                GroupCsvColumn = null,
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Default",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "Filter 3 Choice 1"
+                            })
+                    }),
+                SubjectId = _subjectId
+            },
+            new Filter
+            {
+                Label = "Filter four",
+                Name = "filter_four",
+                GroupCsvColumn = "filter_four_group",
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Filter 4 Group 1",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "Filter 4 Choice 1"
+                            })
+                    }
+                ),
+                SubjectId = _subjectId
+            });
+    }
+
+    public List<IndicatorGroup> GetExpectedIndicatorGroups()
+    {
+        return ListOf(
+            new IndicatorGroup
+            {
+                Label = "Default",
+                Indicators = ListOf(
+                    new Indicator
+                    {
+                        Label = "Indicator one"
+                    }),
+                SubjectId = _subjectId
+            });
+    }
+
+    public List<Location> GetExpectedLocations()
+    {
+        return ListOf(
+            new Location
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = new Country("E92000001", "England"),
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+            },
+            new Location
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = new Country("E92000001", "England"),
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+            },
+            new Location
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = new Country("E92000001", "England"),
+                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
+            },
+            new Location
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = new Country("E92000001", "England"),
+                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
+            });
+    }
+
+    public List<AutoSelectFilterValue> GetAutoSelectFilterValues() => [];
 }
 
 public interface IProcessorStage2TestScenario
