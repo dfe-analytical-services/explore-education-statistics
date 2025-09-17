@@ -6,7 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class UserRepositoryTests
+public abstract class UserRepositoryTests
 {
     [Fact]
     public async Task FindByEmail()
@@ -97,6 +97,44 @@ public class UserRepositoryTests
             var result = await repository.FindByEmail("test@test.com");
             Assert.Null(result);
         }
+    }
+
+    [Fact]
+    public async Task FindDeletedUserPlaceholder()
+    {
+        var user = new User
+        {
+            Email = UserRepository.DeletedUserPlaceholderEmail
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Users.AddAsync(user);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var repository = SetupUserRepository(contentDbContext);
+
+            var result = await repository.FindDeletedUserPlaceholder();
+
+            Assert.NotNull(result);
+            Assert.Equal(user.Id, result.Id);
+            Assert.Equal(UserRepository.DeletedUserPlaceholderEmail, result.Email);
+        }
+    }
+
+    [Fact]
+    public async Task FindDeletedUserPlaceholder_DeletedUserDoesNotExist_Throws()
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        var repository = SetupUserRepository(contentDbContext);
+
+        await Assert.ThrowsAsync<NullReferenceException>(repository.FindDeletedUserPlaceholder);
     }
 
     private static UserRepository SetupUserRepository(
