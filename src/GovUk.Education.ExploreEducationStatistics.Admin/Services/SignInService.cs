@@ -75,10 +75,10 @@ public class SignInService(
 
         inviteToSystem.Accepted = true;
 
-        // This will also fetch soft-deleted users
+        // This will also fetch soft-deleted & expired users
         var existingInternalUser = await contentDbContext
             .Users
-            .AsQueryable()
+            .IgnoreQueryFilters()
             .SingleOrDefaultAsync(u => u.Email.ToLower() == profile.Email.ToLower());
 
         // Create a new set of AspNetUser records for the Identity Framework.

@@ -69,5 +69,32 @@ public abstract class ContentDbContextTests
                 }
             }
         }
+
+        [Fact]
+        public async Task GlobalQueryFilter_DoesNotFilterPlaceholderDeletedUser()
+        {
+            var placeholderDeletedUser = new User
+            {
+                Email = User.DeletedUserPlaceholderEmail,
+                Active = false,
+                SoftDeleted = DateTime.UtcNow,
+                Created = DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1)
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(placeholderDeletedUser);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var user = await contentDbContext.Users.SingleAsync();
+
+                Assert.Equal(User.DeletedUserPlaceholderEmail, user.Email);
+            }
+        }
     }
 }

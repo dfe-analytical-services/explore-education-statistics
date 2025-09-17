@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class User : ICreatedTimestamp<DateTimeOffset>
 {
+    public const string DeletedUserPlaceholderEmail = "deleted.user@doesnotexist.com";
     public const int InviteExpiryDurationDays = 14;
 
     public Guid Id { get; set; }
