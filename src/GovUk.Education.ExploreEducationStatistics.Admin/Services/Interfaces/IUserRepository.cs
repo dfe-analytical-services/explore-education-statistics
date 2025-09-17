@@ -7,4 +7,5 @@ public interface IUserRepository
 {
     Task<User?> FindById(Guid userId, CancellationToken cancellationToken = default);
     Task<User?> FindByEmail(string email);
+    Task<User> FindDeletedUserPlaceholder();
 }

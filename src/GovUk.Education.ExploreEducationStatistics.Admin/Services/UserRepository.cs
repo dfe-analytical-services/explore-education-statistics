@@ -24,4 +24,10 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
                     u.Email.ToLower().Equals(email.ToLower())
                     && u.SoftDeleted == null);
     }
+
+    public async Task<User> FindDeletedUserPlaceholder()
+    {
+        // This user should be seeded in the ContentDbContext as part of the migrations, so should always exist.
+        return (await FindByEmail("deleted.user@doesnotexist.com"))!;
+    }
 }
