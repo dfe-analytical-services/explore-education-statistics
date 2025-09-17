@@ -721,10 +721,14 @@ public class ContentDbContext : DbContext
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Filters out only those users who have genuinely expired.
+        // i.e. not active, not soft-deleted, not created within the invite expiry duration,
+        // nor the placeholder deleted user we have seeded the database with.
         modelBuilder.Entity<User>()
-            .HasQueryFilter(u => u.Email == User.DeletedUserPlaceholderEmail ||
-                                 (!u.SoftDeleted.HasValue &&
-                                 (u.Active || u.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays))));
+            .HasQueryFilter(u => u.Active ||
+                                 u.SoftDeleted.HasValue || 
+                                 u.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays) ||
+                                 u.Email == User.DeletedUserPlaceholderEmail);
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)

@@ -11,14 +11,16 @@ public abstract class ContentDbContextTests
         public static TheoryData<bool, DateTime?, DateTimeOffset, bool> GlobalQueryFilterData => new()
     {
         // active, softDeletedDate, createdDate, expectedToBeReturned
+
+        // This is the only case where the user has genuinely expired and should be filtered out
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), true },
-        { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
-        { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
+        { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), true },
+        { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), true },
         { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), true },
         { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), true },
-        { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
-        { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
+        { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), true },
+        { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), true },
     };
 
         [Theory]
