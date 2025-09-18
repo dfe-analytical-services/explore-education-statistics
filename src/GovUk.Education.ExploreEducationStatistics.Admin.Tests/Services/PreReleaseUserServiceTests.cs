@@ -57,7 +57,6 @@ public class PreReleaseUserServiceTests
                     Role = ReleaseRole.PrereleaseViewer,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("existing.1@test.com")
-                        .Generate()
                 },
                 new UserReleaseRole
                 {
@@ -65,7 +64,6 @@ public class PreReleaseUserServiceTests
                     Role = ReleaseRole.PrereleaseViewer,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("existing.2@test.com")
-                        .Generate()
                 }
             );
 
@@ -131,7 +129,6 @@ public class PreReleaseUserServiceTests
                     Role = ReleaseRole.PrereleaseViewer,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("existing.2@test.com")
-                        .Generate()
                 },
                 new UserReleaseRole
                 {
@@ -139,7 +136,6 @@ public class PreReleaseUserServiceTests
                     Role = ReleaseRole.PrereleaseViewer,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("existing.1@test.com")
-                        .Generate()
                 }
             );
 
@@ -200,7 +196,6 @@ public class PreReleaseUserServiceTests
                     Role = ReleaseRole.Contributor,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("existing.1@test.com")
-                        .Generate()
                 },
                 // Different release user
                 new UserReleaseRole
@@ -209,7 +204,6 @@ public class PreReleaseUserServiceTests
                     Role = ReleaseRole.PrereleaseViewer,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("existing.2@test.com")
-                        .Generate()
                 }
             );
 

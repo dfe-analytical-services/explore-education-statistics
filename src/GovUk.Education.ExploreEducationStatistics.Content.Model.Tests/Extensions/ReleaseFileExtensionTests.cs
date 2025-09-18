@@ -63,7 +63,6 @@ public class ReleaseFileExtensionTests
                 Created = new DateTime(),
                 CreatedBy = _dataFixture.DefaultUser()
                     .WithEmail("test@test.com")
-                    .Generate()
             }
         };
 

@@ -1521,8 +1521,7 @@ public class ReleaseApprovalServiceTests
         var userReleaseRole1 = new UserReleaseRole
         {
             User = _fixture.DefaultUser()
-                .WithEmail("test@test.com")
-                .Generate(),
+                .WithEmail("test@test.com"),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
@@ -1530,8 +1529,7 @@ public class ReleaseApprovalServiceTests
         var userReleaseRole2 = new UserReleaseRole
         {
             User = _fixture.DefaultUser()
-                .WithEmail("test2@test.com")
-                .Generate(),
+                .WithEmail("test2@test.com"),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
@@ -1617,8 +1615,7 @@ public class ReleaseApprovalServiceTests
         var userPublicationApproverRole = new UserPublicationRole
         {
             User = _fixture.DefaultUser()
-                .WithEmail("test@test.com")
-                .Generate(),
+                .WithEmail("test@test.com"),
             Publication = releaseVersion.Release.Publication,
             Role = PublicationRole.Allower
         };
@@ -1702,8 +1699,7 @@ public class ReleaseApprovalServiceTests
         var userReleaseRole1 = new UserReleaseRole
         {
             User = _fixture.DefaultUser()
-                .WithEmail("test@test.com")
-                .Generate(),
+                .WithEmail("test@test.com"),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
@@ -1711,8 +1707,7 @@ public class ReleaseApprovalServiceTests
         var userReleaseRole2 = new UserReleaseRole
         {
             User = _fixture.DefaultUser()
-                .WithEmail("test2@test.com")
-                .Generate(),
+                .WithEmail("test2@test.com"),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
@@ -1788,9 +1783,8 @@ public class ReleaseApprovalServiceTests
     public class ListReleaseStatuses : ReleaseApprovalServiceTests
     {
         private static readonly User User = new DataFixture()
-        .DefaultUser()
-        .WithEmail("test@test.com")
-        .Generate();
+            .DefaultUser()
+            .WithEmail("test@test.com");
 
         [Fact]
         public async Task Success()

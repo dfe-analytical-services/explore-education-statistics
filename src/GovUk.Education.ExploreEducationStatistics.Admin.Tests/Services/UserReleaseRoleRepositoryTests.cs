@@ -404,8 +404,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 // Role for different user
                 new()
                 {
-                    User = _fixture.DefaultUser()
-                        .Generate(),
+                    User = _fixture.DefaultUser(),
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.Approver
                 }
@@ -561,8 +560,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 // Role for different user
                 new()
                 {
-                    User = _fixture.DefaultUser()
-                        .Generate(),
+                    User = _fixture.DefaultUser(),
                     ReleaseVersion = release1,
                     Role = ReleaseRole.Approver
                 }
@@ -598,8 +596,7 @@ public abstract class UserReleaseRoleRepositoryTests
         {
             var userReleaseRole = new UserReleaseRole
             {
-                User = _fixture.DefaultUser()
-                    .Generate(),
+                User = _fixture.DefaultUser(),
                 ReleaseVersion = new ReleaseVersion(),
                 Role = ReleaseRole.Contributor
             };

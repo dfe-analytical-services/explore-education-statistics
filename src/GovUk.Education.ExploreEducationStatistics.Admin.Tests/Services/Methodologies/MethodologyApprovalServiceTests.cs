@@ -1224,7 +1224,6 @@ public class MethodologyApprovalServiceTests
             Role = PublicationRole.Allower,
             User = _dataFixture.DefaultUser()
                 .WithEmail("publication-approver@email.com")
-                .Generate()
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1259,7 +1258,6 @@ public class MethodologyApprovalServiceTests
                     Role = ReleaseRole.Approver,
                     User = _dataFixture.DefaultUser()
                         .WithEmail("release-approver@email.com")
-                        .Generate()
                 },
             });
 
