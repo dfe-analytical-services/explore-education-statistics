@@ -50,6 +50,14 @@ export type UpdateFreeTextStatTileInBlock = {
   };
 };
 
+export type ReorderFreeTextStatTilesInBlock = {
+  type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK';
+  payload: {
+    tiles: EinFreeTextStatTile[];
+    meta: BlockMeta;
+  };
+};
+
 export type DeleteFreeTextStatTileFromBlock = {
   type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK';
   payload: {
@@ -93,6 +101,7 @@ export type EducationInNumbersPageDispatchAction =
   | AddBlockToSection
   | AddFreeTextStatTileToBlock
   | UpdateFreeTextStatTileInBlock
+  | ReorderFreeTextStatTilesInBlock
   | DeleteFreeTextStatTileFromBlock
   | UpdateSectionContent
   | AddContentSection
