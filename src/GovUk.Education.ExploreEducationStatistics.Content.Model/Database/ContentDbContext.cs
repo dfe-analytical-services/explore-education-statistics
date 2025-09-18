@@ -717,17 +717,6 @@ public class ContentDbContext : DbContext
             .HasOne(e => e.Role)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
-
-        // Filters out only those users who have genuinely expired.
-        // i.e. not active, not soft-deleted, not created within the invite expiry duration,
-        // nor the placeholder deleted user we have seeded the database with.
-        // Note: the logic is repeated in User.Expired because EF Core cannot translate
-        // the User.Expired computed field for use in this QueryFilter.
-        modelBuilder.Entity<User>()
-            .HasQueryFilter(u => u.Active ||
-                                 u.SoftDeleted.HasValue ||
-                                 u.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays) ||
-                                 u.Email == User.DeletedUserPlaceholderEmail);
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
