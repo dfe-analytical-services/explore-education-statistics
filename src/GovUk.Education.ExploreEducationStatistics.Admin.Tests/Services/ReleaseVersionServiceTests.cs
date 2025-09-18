@@ -58,7 +58,8 @@ public abstract class ReleaseVersionServiceTests
     private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
     private static readonly User User = new DataFixture()
-        .DefaultUser();
+        .DefaultUser()
+        .WithId(Guid.NewGuid());
 
     public class GetDeleteDataFilePlanTests : ReleaseVersionServiceTests
     {
