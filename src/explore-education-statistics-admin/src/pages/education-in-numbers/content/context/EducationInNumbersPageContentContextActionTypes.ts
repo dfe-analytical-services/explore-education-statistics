@@ -9,6 +9,7 @@ type BlockMeta = {
   blockId: string;
 };
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
+type TileMeta = BlockMeta & { tileId: string };
 
 export type RemoveBlockFromSection = {
   type: 'REMOVE_BLOCK_FROM_SECTION';
@@ -38,6 +39,21 @@ export type AddFreeTextStatTileToBlock = {
   payload: {
     tile: EinFreeTextStatTile;
     meta: BlockMeta;
+  };
+};
+
+export type UpdateFreeTextStatTileInBlock = {
+  type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK';
+  payload: {
+    tile: EinFreeTextStatTile;
+    meta: TileMeta;
+  };
+};
+
+export type DeleteFreeTextStatTileFromBlock = {
+  type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK';
+  payload: {
+    meta: TileMeta;
   };
 };
 
@@ -76,6 +92,8 @@ export type EducationInNumbersPageDispatchAction =
   | UpdateBlockFromSection
   | AddBlockToSection
   | AddFreeTextStatTileToBlock
+  | UpdateFreeTextStatTileInBlock
+  | DeleteFreeTextStatTileFromBlock
   | UpdateSectionContent
   | AddContentSection
   | SetEducationInNumbersPageContent

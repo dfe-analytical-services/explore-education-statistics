@@ -44,7 +44,7 @@ const EducationInNumbersContentPage = ({
           >
             {canUpdateContent && <EditablePageModeToggle />}
 
-            <div className="govuk-width-container">
+            <div className="govuk-width-container dfe-width-container--wide">
               <h2
                 aria-hidden
                 className="govuk-heading-lg"

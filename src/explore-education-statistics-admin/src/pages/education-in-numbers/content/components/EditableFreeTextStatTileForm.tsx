@@ -52,7 +52,7 @@ export default function EditableFreeTextStatTileForm({
             is: (val: string) => val !== '',
             then: s => s.required('Enter the link text'),
           }),
-          linkUrl: Yup.string(),
+          linkUrl: Yup.string().url(),
         })}
       >
         {({ formState }) => {
@@ -90,7 +90,7 @@ export default function EditableFreeTextStatTileForm({
                 />
               </div>
 
-              <ButtonGroup>
+              <ButtonGroup className="govuk-!-margin-top-2">
                 <Button disabled={formState.isSubmitting} type="submit">
                   Save
                 </Button>

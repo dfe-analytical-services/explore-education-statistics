@@ -7,7 +7,7 @@ import useEducationInNumbersPageContentActions from '@admin/pages/education-in-n
 import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
-import EinContentBlockRenderer from '@common/modules/education-in-numbers/EinContentBlockRenderer';
+import EinContentBlockRenderer from '@common/modules/education-in-numbers/components/EinContentBlockRenderer';
 import {
   EinBlockType,
   EinContentBlock,

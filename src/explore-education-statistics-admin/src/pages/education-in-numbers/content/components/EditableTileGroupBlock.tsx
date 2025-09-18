@@ -10,6 +10,8 @@ import React, { useCallback, useState } from 'react';
 import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
 import { useEducationInNumbersPageContentState } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import InsetText from '@common/components/InsetText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
 
 interface Props {
   block: EinTileGroupBlock;
@@ -29,13 +31,18 @@ const EditableTileGroupBlock = ({
   onSave,
 }: Props) => {
   const { pageVersion } = useEducationInNumbersPageContentState();
-  const { addFreeTextStatTile } = useEducationInNumbersPageContentActions();
+  const {
+    addFreeTextStatTile,
+    updateFreeTextStatTile,
+    deleteFreeTextStatTile,
+  } = useEducationInNumbersPageContentActions();
 
   const [isEditingHeading, toggleEditingHeading] = useToggle(false);
   const [isEditingStatTile, setIsEditingStatTile] = useState<string | null>(
     null,
   );
 
+  const { id: educationInNumbersPageId } = pageVersion;
   const { title, tiles } = block;
 
   const [newHeading, setNewHeading] = useState(title);
@@ -50,7 +57,7 @@ const EditableTileGroupBlock = ({
 
   const handleAddStatTile = async () => {
     const newTile = await addFreeTextStatTile({
-      educationInNumbersPageId: pageVersion.id,
+      educationInNumbersPageId,
       blockId: block.id,
       sectionId,
     });
@@ -117,33 +124,50 @@ const EditableTileGroupBlock = ({
           )}
         </ButtonGroup>
 
-        {/* Reorderable buttons */}
+        {/* TODO Reorderable buttons */}
 
-        {/* EditableTiles with edit, remove */}
         {tiles.length ? (
           tiles.map(tile => (
-            <div key={tile.id}>
+            <div key={tile.id} className="govuk-!-margin-bottom-3">
               {isEditingStatTile === tile.id ? (
                 <EditableFreeTextStatTileForm
+                  statTile={tile}
                   testId="freeTextStatTile-editForm"
-                  onSubmit={values =>
-                    // addFreeTextStatTile({
-                    //   educationInNumbersPageId: pageVersion.id,
-                    //   blockId: block.id,
-                    //   sectionId,
-                    // })
-                    console.log(values)
-                  }
+                  onSubmit={async values => {
+                    await updateFreeTextStatTile({
+                      educationInNumbersPageId,
+                      blockId: block.id,
+                      sectionId,
+                      tileId: tile.id,
+                      values,
+                    });
+                    setIsEditingStatTile(null);
+                  }}
                   onCancel={() => setIsEditingStatTile(null)}
                 />
               ) : (
                 <>
-                  <div style={{ padding: '8px', border: '1px solid #b1b4b6' }}>
-                    <strong>{tile.trend}</strong>
-                  </div>
-                  <Button onClick={() => setIsEditingStatTile(tile.id)}>
-                    Edit tile
-                  </Button>
+                  <FreeTextStatTile key={tile.id} tile={tile} />
+                  {!isEditingStatTile && (
+                    <div className="dfe-flex dfe-gap-2 govuk-!-margin-top-2">
+                      <Button onClick={() => setIsEditingStatTile(tile.id)}>
+                        Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
+                      </Button>
+                      <Button
+                        variant="warning"
+                        onClick={async () => {
+                          await deleteFreeTextStatTile({
+                            educationInNumbersPageId,
+                            blockId: block.id,
+                            sectionId,
+                            tileId: tile.id,
+                          });
+                        }}
+                      >
+                        Delete tile<VisuallyHidden>: {title}</VisuallyHidden>
+                      </Button>
+                    </div>
+                  )}
                 </>
               )}
             </div>

@@ -1,3 +1,4 @@
+import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
 import React from 'react';
 
@@ -11,15 +12,7 @@ const TileGroupBlock = ({ block }: TileGroupBlockProps) => {
   return (
     <div>
       {title && <h2>{title}</h2>}
-      {tiles?.map(tile => (
-        <div key={tile.id}>
-          <h3>{tile.title}</h3>
-          <p>{tile.trend}</p>
-          <p>{tile.statistic}</p>
-          <p>{tile.linkText}</p>
-          <p>{tile.linkUrl}</p>
-        </div>
-      ))}
+      {tiles?.map(tile => <FreeTextStatTile key={tile.id} tile={tile} />)}
     </div>
   );
 };

@@ -1,0 +1,11 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.tile {
+  background-color: govuk-colour('light-grey');
+  padding: govuk-spacing(4);
+
+  * {
+    padding-top: 0;
+    margin-bottom: govuk-spacing(1);
+  }
+}
