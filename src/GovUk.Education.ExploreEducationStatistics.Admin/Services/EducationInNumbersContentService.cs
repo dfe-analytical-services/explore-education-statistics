@@ -247,6 +247,7 @@ public class EducationInNumbersContentService(
     {
         var section = contentDbContext.EinContentSections
             .Include(p => p.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .SingleOrDefault(s => s.Id == sectionId
                 && s.EducationInNumbersPageId == pageId);
 
