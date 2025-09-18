@@ -32,8 +32,16 @@ public class SignInServiceTests
         public async Task RegisterOrSignIn_Invited_CreatesNewUser()
         {
             var email = "test@test.com";
+            var createdByEmail = "test2@test.com";
             var firstName = "Bill";
             var lastName = "Piper";
+
+            var createdByAspNetUser = new ApplicationUser
+            {
+                Id = CreatedById.ToString(),
+                Email = createdByEmail.ToLower(),
+                UserName = createdByEmail.ToLower()
+            };
 
             var userInvite = new UserInvite
             {
@@ -44,10 +52,14 @@ public class SignInServiceTests
                     Name = "Role",
                     NormalizedName = "ROLE"
                 },
-                CreatedById = CreatedById.ToString(),
+                CreatedBy = createdByAspNetUser,
                 Created = DateTime.UtcNow,
                 Accepted = false
             };
+
+            var createdByInternalUser = _dataFixture.DefaultUser()
+                .WithEmail(createdByEmail.ToLower())
+                .Generate();
 
             var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
                 .WithEmail(email)
@@ -73,6 +85,12 @@ public class SignInServiceTests
             {
                 usersAndRolesDbContext.UserInvites.Add(userInvite);
                 await usersAndRolesDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdByInternalUser);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var userService = new Mock<IUserService>(Strict);
@@ -170,7 +188,7 @@ public class SignInServiceTests
                 Assert.True(newUser.Active);
                 Assert.Equal(userInvite.RoleId, newUser.RoleId);
                 newUser.Created.AssertUtcNow();
-                Assert.Equal(Guid.Parse(userInvite.CreatedById), newUser.CreatedById);
+                Assert.Equal(createdByInternalUser.Id, newUser.CreatedById);
             }
         }
 
@@ -385,10 +403,18 @@ public class SignInServiceTests
         public async Task RegisterOrSignIn_ReactivatesUser()
         {
             var email = "test@test.com";
+            var createdByEmail = "test2@test.com";
             var firstName = "Bill";
             var lastName = "Piper";
             var updatedFirstName = $"{firstName}-UPDATED";
             var updatedLastName = $"{lastName}-UPDATED";
+
+            var createdByAspNetUser = new ApplicationUser
+            {
+                Id = CreatedById.ToString(),
+                Email = createdByEmail.ToLower(),
+                UserName = createdByEmail.ToLower()
+            };
 
             var userInvite = new UserInvite
             {
@@ -399,10 +425,14 @@ public class SignInServiceTests
                     Name = "Role",
                     NormalizedName = "ROLE"
                 },
-                CreatedById = CreatedById.ToString(),
+                CreatedBy = createdByAspNetUser,
                 Created = DateTime.UtcNow,
                 Accepted = false
             };
+
+            var createdByInternalUser = _dataFixture.DefaultUser()
+                .WithEmail(createdByEmail.ToLower())
+                .Generate();
 
             var existingUser = _dataFixture.DefaultUser()
                 .WithEmail(email.ToLower())
@@ -441,7 +471,7 @@ public class SignInServiceTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Users.Add(existingUser);
+                contentDbContext.Users.AddRange(createdByInternalUser, existingUser);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -542,7 +572,7 @@ public class SignInServiceTests
                 Assert.True(newUser.Active); // Reset back to active state
                 Assert.Equal(userInvite.RoleId, newUser.RoleId); // Updated to the new Role from the invite
                 newUser.Created.AssertUtcNow(); // Updated to now
-                Assert.Equal(Guid.Parse(userInvite.CreatedById), newUser.CreatedById); // Updated to the new CreatedById from the invite
+                Assert.Equal(createdByInternalUser.Id, newUser.CreatedById); // Updated to the new CreatedById from the invite
             }
         }
 
