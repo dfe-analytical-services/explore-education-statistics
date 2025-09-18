@@ -128,12 +128,12 @@ public class ImporterMetaService : IImporterMetaService
     private static List<MetaRow> IgnoreFiltersUsedForGrouping(List<MetaRow> metaRows)
     {
         var groupingColumns = metaRows
-            .Select(mr => mr.FilterGroupingColumn)
-            .WhereNotNull();
+            .Select(mr => mr.FilterGroupingColumn?.ToLower())
+            .WhereNotNull() ;
 
         return metaRows
             .Where(r => r.ColumnType != ColumnType.Filter 
-                    || !groupingColumns.Contains(r.ColumnName))
+                    || !groupingColumns.Contains(r.ColumnName.ToLower()))
             .ToList();
     }
 
