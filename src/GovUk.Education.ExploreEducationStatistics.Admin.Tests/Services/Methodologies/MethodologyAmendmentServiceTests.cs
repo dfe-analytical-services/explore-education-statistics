@@ -37,8 +37,7 @@ public class MethodologyAmendmentServiceTests
 
             // creation and update fields
             Created = DateTime.Today.AddDays(-2),
-            CreatedBy = _dataFixture.DefaultUser()
-                .Generate(),
+            CreatedBy = _dataFixture.DefaultUser(),
             CreatedById = Guid.NewGuid(),
             Updated = DateTime.Today.AddDays(-10),
 
@@ -164,7 +163,6 @@ public class MethodologyAmendmentServiceTests
                                     CreatedById = Guid.NewGuid(),
                                     Updated = DateTime.Today.AddDays(-3),
                                     CreatedBy = _dataFixture.DefaultUser()
-                                        .Generate()
                                 }
                             }
                         })
@@ -246,7 +244,6 @@ public class MethodologyAmendmentServiceTests
                                     CreatedById = Guid.NewGuid(),
                                     Updated = DateTime.Today.AddDays(-3),
                                     CreatedBy = _dataFixture.DefaultUser()
-                                        .Generate()
                                 }
                             }
                         })
@@ -351,12 +348,10 @@ public class MethodologyAmendmentServiceTests
                 MethodologyVersion = originalVersion,
                 MethodologyVersionId = originalVersion.Id,
                 Created = DateTime.Today.AddDays(-6).ToUniversalTime(),
-                CreatedBy = _dataFixture.DefaultUser()
-                    .Generate(),
+                CreatedBy = _dataFixture.DefaultUser(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-5).ToUniversalTime(),
-                UpdatedBy = _dataFixture.DefaultUser()
-                    .Generate(),
+                UpdatedBy = _dataFixture.DefaultUser(),
                 UpdatedById = Guid.NewGuid()
             },
             new()
@@ -367,12 +362,10 @@ public class MethodologyAmendmentServiceTests
                 MethodologyVersion = originalVersion,
                 MethodologyVersionId = originalVersion.Id,
                 Created = DateTime.Today.AddDays(-4).ToUniversalTime(),
-                CreatedBy = _dataFixture.DefaultUser()
-                    .Generate(),
+                CreatedBy = _dataFixture.DefaultUser(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-3).ToUniversalTime(),
-                UpdatedBy = _dataFixture.DefaultUser()
-                    .Generate(),
+                UpdatedBy = _dataFixture.DefaultUser(),
                 UpdatedById = Guid.NewGuid()
             },
             new()
@@ -383,12 +376,10 @@ public class MethodologyAmendmentServiceTests
                 MethodologyVersion = originalVersion,
                 MethodologyVersionId = originalVersion.Id,
                 Created = DateTime.Today.AddDays(-2).ToUniversalTime(),
-                CreatedBy = _dataFixture.DefaultUser()
-                    .Generate(),
+                CreatedBy = _dataFixture.DefaultUser(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-1).ToUniversalTime(),
-                UpdatedBy = _dataFixture.DefaultUser()
-                    .Generate(),
+                UpdatedBy = _dataFixture.DefaultUser(),
                 UpdatedById = Guid.NewGuid()
             }
         };

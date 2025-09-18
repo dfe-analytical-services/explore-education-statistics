@@ -31,8 +31,7 @@ public class ReleaseImageServiceTests
 {
     private readonly User _user = new DataFixture()
         .DefaultUser()
-        .WithEmail("test@test.com")
-        .Generate();
+        .WithEmail("test@test.com");
 
     [Fact]
     public async Task Stream()

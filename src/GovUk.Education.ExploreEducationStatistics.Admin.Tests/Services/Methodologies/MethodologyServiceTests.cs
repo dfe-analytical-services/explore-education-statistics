@@ -33,8 +33,7 @@ public class MethodologyServiceTests
 
     private static readonly User User = new DataFixture()
         .DefaultUser()
-        .WithId(Guid.NewGuid())
-        .Generate();
+        .WithId(Guid.NewGuid());
 
     private static readonly Contact MockContact = new()
     {

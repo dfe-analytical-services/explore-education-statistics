@@ -48,8 +48,7 @@ public class ReleaseFileServiceTests : IDisposable
     private readonly User _user = new DataFixture()
         .DefaultUser()
         .WithId(Guid.NewGuid())
-        .WithEmail("test@test.com")
-        .Generate();
+        .WithEmail("test@test.com");
 
     [Fact]
     public async Task Delete()
@@ -1043,8 +1042,7 @@ public class ReleaseFileServiceTests : IDisposable
                 ContentLength = 10240,
                 Type = Ancillary,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary1@test.com")
-                    .Generate(),
+                    .WithEmail("ancillary1@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1060,8 +1058,7 @@ public class ReleaseFileServiceTests : IDisposable
                 ContentLength = 10240,
                 Type = Ancillary,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary2@test.com")
-                    .Generate(),
+                    .WithEmail("ancillary2@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1076,8 +1073,7 @@ public class ReleaseFileServiceTests : IDisposable
                 ContentLength = 20480,
                 Type = Chart,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("chart@test.com")
-                    .Generate(),
+                    .WithEmail("chart@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1092,8 +1088,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("dataFile@test.com")
-                    .Generate(),
+                    .WithEmail("dataFile@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1108,8 +1103,7 @@ public class ReleaseFileServiceTests : IDisposable
                 ContentLength = 30720,
                 Type = Image,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("image@test.com")
-                    .Generate(),
+                    .WithEmail("image@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1181,8 +1175,7 @@ public class ReleaseFileServiceTests : IDisposable
                 ContentLength = 10240,
                 Type = Ancillary,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary1@test.com")
-                    .Generate(),
+                    .WithEmail("ancillary1@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1198,8 +1191,7 @@ public class ReleaseFileServiceTests : IDisposable
                 ContentLength = 10240,
                 Type = Ancillary,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary2@test.com")
-                    .Generate(),
+                    .WithEmail("ancillary2@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1213,8 +1205,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "chart.png",
                 Type = Chart,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("chart@test.com")
-                    .Generate(),
+                    .WithEmail("chart@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1228,8 +1219,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "data.csv",
                 Type = FileType.Data,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("dataFile@test.com")
-                    .Generate(),
+                    .WithEmail("dataFile@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1243,8 +1233,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "image.png",
                 Type = Image,
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("image@test.com")
-                    .Generate(),
+                    .WithEmail("image@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -2216,8 +2205,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Type = FileType.Data,
                 Created = new DateTime(),
                 CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("test@test.com")
-                    .Generate(),
+                    .WithEmail("test@test.com"),
             }
         };
 

@@ -33,8 +33,7 @@ public class UserRoleServiceTests
     private readonly User _user = new DataFixture()
         .DefaultUser()
         .WithId(Guid.NewGuid())
-        .WithEmail("test@test.com")
-        .Generate();
+        .WithEmail("test@test.com");
 
     [Fact]
     public async Task SetGlobalRole()
@@ -1481,8 +1480,7 @@ public class UserRoleServiceTests
         // Role assignment for a different user
         var userPublicationRole3 = new UserPublicationRole
         {
-            User = _dataFixture.DefaultUser()
-                .Generate(),
+            User = _dataFixture.DefaultUser(),
             Publication = new Publication
             {
                 Title = "Test Publication 3"

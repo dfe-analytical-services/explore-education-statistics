@@ -26,36 +26,31 @@ public class UserReleaseRoleServiceTests
 
         var userReleaseRole1 = new UserReleaseRole
         {
-            User = _dataFixture.DefaultUser()
-                .Generate(),
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Contributor,
         };
         var userReleaseRole2 = new UserReleaseRole
         {
-            User = _dataFixture.DefaultUser()
-                .Generate(),
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Contributor,
         };
         var userReleaseRole3 = new UserReleaseRole
         {
-            User = _dataFixture.DefaultUser()
-                .Generate(),
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[1],
             Role = Contributor,
         };
         var userReleaseRoleIgnored1 = new UserReleaseRole // Ignored because not Contributor role
         {
-            User = _dataFixture.DefaultUser()
-                .Generate(),
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Approver,
         };
         var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored due to release under different publication
         {
-            User = _dataFixture.DefaultUser()
-                .Generate(),
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publicationIgnored.ReleaseVersions[0],
             Role = Contributor,
         };
