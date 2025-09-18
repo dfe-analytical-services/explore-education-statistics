@@ -57,7 +57,9 @@ public abstract class ReleaseVersionServiceTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
-    private static readonly User User = new() { Id = Guid.NewGuid() };
+    private static readonly User User = new DataFixture()
+        .DefaultUser()
+        .Generate();
 
     public class GetDeleteDataFilePlanTests : ReleaseVersionServiceTests
     {

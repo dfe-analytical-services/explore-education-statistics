@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -12,11 +11,11 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public Guid Id { get; set; }
 
-    public string FirstName { get; set; } = null!;
+    public required string FirstName { get; set; }
 
-    public string LastName { get; set; } = null!;
+    public required string LastName { get; set; }
 
-    public string Email { get; set; } = null!;
+    public required string Email { get; set; }
 
     public Guid? DeletedById { get; set; }
 
@@ -24,22 +23,21 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public DateTime? SoftDeleted { get; set; }
 
-    public bool Active { get; set; }
+    public required bool Active { get; set; }
 
     public IdentityRole Role { get; set; } = null!;
 
-    public string RoleId { get; set; } = string.Empty;
+    public required string RoleId { get; set; }
 
-    public DateTimeOffset Created { get; set; }
+    public required DateTimeOffset Created { get; set; }
 
     public User CreatedBy { get; set; } = null!;
 
-    public Guid CreatedById { get; set; }
+    public required Guid CreatedById { get; set; }
 
     public string DisplayName => $"{FirstName} {LastName}";
 
-    [NotMapped]
     public bool Expired => !Active &&
-                            !SoftDeleted.HasValue &&
-                            Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
+                           !SoftDeleted.HasValue &&
+                           Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
 }

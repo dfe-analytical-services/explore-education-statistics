@@ -199,7 +199,12 @@ public class MappingProfiles : CommonMappingProfile
 #pragma warning disable 612
                             FirstName = comment.LegacyCreatedBy ?? "",
 #pragma warning restore 612
-                            LastName = ""
+                            LastName = "",
+                            Email = "",
+                            Active = false,
+                            RoleId = "",
+                            Created = DateTimeOffset.MinValue,
+                            CreatedById = Guid.Empty,
                         }
                         : comment.CreatedBy));
 

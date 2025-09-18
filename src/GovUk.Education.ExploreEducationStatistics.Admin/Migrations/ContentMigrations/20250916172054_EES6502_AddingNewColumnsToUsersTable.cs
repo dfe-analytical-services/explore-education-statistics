@@ -43,20 +43,21 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             oldType: "nvarchar(max)",
             oldNullable: true);
 
-        // Add 'Active' as non-nullable with a default of 'true' for existing rows
+        // Add 'Active' as non-nullable with a default of 'false'.
+        // For existing users, we will set this to 'true' in the data migration step below IF they are not soft-deleted.
         migrationBuilder.AddColumn<bool>(
             name: "Active",
             table: "Users",
             type: "bit",
             nullable: false,
-            defaultValue: true);
+            defaultValue: false);
 
         migrationBuilder.AddColumn<DateTimeOffset>(
             name: "Created",
             table: "Users",
             type: "datetimeoffset",
             nullable: false,
-            defaultValue: new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)));
+            defaultValue: DateTimeOffset.MinValue);
 
         // Add 'CreatedById' as nullable first, so that we don't break foreign key constraints while we populate existing rows
         migrationBuilder.AddColumn<Guid>(
@@ -76,14 +77,6 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
         migrationBuilder.SqlFromFile(
             MigrationConstants.ContentMigrationsPath,
             $"{MigrationId}_{nameof(EES6502_AddingNewColumnsToUsersTable)}.sql");
-
-        // Change the default for 'Active' back to false for future inserts
-        migrationBuilder.AlterColumn<bool>(
-            name: "Active",
-            table: "Users",
-            type: "bit",
-            nullable: false,
-            defaultValue: false);
 
         // Alter 'RoleId' to non-nullable now that existing rows are populated
         migrationBuilder.AlterColumn<string>(

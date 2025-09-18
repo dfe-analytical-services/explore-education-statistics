@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -27,11 +28,10 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 
     private static readonly ClaimsPrincipal BauUser = new DataFixture().BauUser();
 
-    private static readonly User CreatedByBauUser = new()
-    {
-        Id = BauUser.GetUserId(),
-        Email = "bau.user@test.com"
-    };
+    private static readonly User CreatedByBauUser = new DataFixture().DefaultUser()
+        .WithId(BauUser.GetUserId())
+        .WithEmail("bau.user@test.com")
+        .Generate();
 
     public class CreatePreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
     {
