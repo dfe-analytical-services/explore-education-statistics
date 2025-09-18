@@ -81,6 +81,7 @@ public class UserRepositoryTests
     {
         var user = _dataFixture.DefaultUser()
             .WithEmail("test@test.com")
+            .WithActive(false)
             .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
