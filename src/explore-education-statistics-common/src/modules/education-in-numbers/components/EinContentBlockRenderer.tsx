@@ -1,5 +1,5 @@
 import ContentHtml from '@common/components/ContentHtml';
-import TileGroupBlock from '@common/modules/education-in-numbers/TileGroupBlock';
+import TileGroupBlock from '@common/modules/education-in-numbers/components/TileGroupBlock';
 import { EinContentBlock } from '@common/services/types/einBlocks';
 import React from 'react';
 

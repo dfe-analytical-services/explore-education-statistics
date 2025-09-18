@@ -1,3 +1,4 @@
+import { FreeTextStatTileFormValues } from '@admin/pages/education-in-numbers/content/components/EditableFreeTextStatTileForm';
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
 import {
@@ -121,6 +122,35 @@ const educationInNumbersContentService = {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/add`,
       { type: 'FreeTextStatTile' },
+    );
+  },
+
+  updateFreeTextStatTile({
+    educationInNumbersPageId,
+    tileId,
+    values,
+  }: {
+    educationInNumbersPageId: string;
+    tileId: string;
+    values: FreeTextStatTileFormValues;
+  }): Promise<EinFreeTextStatTile> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/tile/${tileId}/free-text-stat`,
+      values,
+    );
+  },
+
+  deleteFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+    tileId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    tileId: string;
+  }): Promise<EinFreeTextStatTile> {
+    return client.delete(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tile/${tileId}`,
     );
   },
 
