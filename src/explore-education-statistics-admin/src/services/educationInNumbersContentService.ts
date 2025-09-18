@@ -140,6 +140,21 @@ const educationInNumbersContentService = {
     );
   },
 
+  reorderFreeTextStatTiles({
+    educationInNumbersPageId,
+    blockId,
+    order,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    order: string[];
+  }): Promise<EinFreeTextStatTile[]> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/order`,
+      order,
+    );
+  },
+
   deleteFreeTextStatTile({
     educationInNumbersPageId,
     blockId,

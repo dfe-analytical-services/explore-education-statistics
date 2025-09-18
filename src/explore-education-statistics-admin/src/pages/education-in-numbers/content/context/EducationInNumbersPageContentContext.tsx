@@ -173,6 +173,27 @@ export const educationInNumbersPageReducer: Reducer<
       );
       return draft;
     }
+    case 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK': {
+      const { tiles: newTiles, meta } = action.payload;
+      const { blockId, sectionId } = meta;
+      if (!draft.pageContent.content) {
+        throw new Error(
+          `${action.type}: Error - Section "content" could not be found.`,
+        );
+      }
+      const matchingSection = draft.pageContent.content.find(
+        section => section.id === sectionId,
+      );
+      if (!matchingSection) return draft;
+      const matchingBlock = matchingSection.content.find(
+        block => block.id === blockId,
+      );
+      if (matchingBlock?.type !== 'TileGroupBlock' || !matchingBlock.tiles) {
+        return draft;
+      }
+      matchingBlock.tiles = newTiles;
+      return draft;
+    }
     case 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK': {
       const { meta } = action.payload;
       const { blockId, sectionId, tileId } = meta;

@@ -7,12 +7,14 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { FormTextInput } from '@common/components/form';
 import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
+import ReorderableList from '@common/components/ReorderableList';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
 import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
-import React, { useCallback, useState } from 'react';
+import reorder from '@common/utils/reorder';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface Props {
   block: EinTileGroupBlock;
@@ -36,8 +38,16 @@ const EditableTileGroupBlock = ({
     addFreeTextStatTile,
     updateFreeTextStatTile,
     deleteFreeTextStatTile,
+    reorderFreeTextStatTiles,
   } = useEducationInNumbersPageContentActions();
 
+  const [groupTiles, setGroupTiles] = useState(block.tiles);
+
+  useEffect(() => {
+    setGroupTiles(block.tiles);
+  }, [block]);
+
+  const [isReordering, toggleIsReordering] = useToggle(false);
   const [isEditingHeading, toggleEditingHeading] = useToggle(false);
   const [isEditingStatTile, setIsEditingStatTile] = useState<string | null>(
     null,
@@ -105,7 +115,8 @@ const EditableTileGroupBlock = ({
           {isEditingHeading ? (
             <Button onClick={saveHeading}>Save group title</Button>
           ) : (
-            !isEditingStatTile && (
+            !isEditingStatTile &&
+            !isReordering && (
               <>
                 <Button
                   type="button"
@@ -123,61 +134,108 @@ const EditableTileGroupBlock = ({
                 >
                   Add stat tile
                 </Button>
+
+                {groupTiles.length > 1 && !isReordering && (
+                  <Button variant="secondary" onClick={toggleIsReordering.on}>
+                    Reorder tiles
+                  </Button>
+                )}
               </>
             )
           )}
         </ButtonGroup>
 
-        {/* TODO Reorderable buttons */}
-
-        {tiles.length ? (
-          <FreeTextStatTileWrapper>
-            {tiles.map(tile => (
-              <div key={tile.id}>
-                {isEditingStatTile === tile.id ? (
-                  <EditableFreeTextStatTileForm
-                    statTile={tile}
-                    testId="freeTextStatTile-editForm"
-                    onSubmit={async values => {
-                      await updateFreeTextStatTile({
-                        educationInNumbersPageId,
-                        blockId: block.id,
-                        sectionId,
-                        tileId: tile.id,
-                        values,
-                      });
-                      setIsEditingStatTile(null);
-                    }}
-                    onCancel={() => setIsEditingStatTile(null)}
-                  />
-                ) : (
-                  <>
-                    <FreeTextStatTile key={tile.id} tile={tile} />
-                    {!isEditingStatTile && (
-                      <ButtonGroup className="govuk-!-margin-top-2">
-                        <Button onClick={() => setIsEditingStatTile(tile.id)}>
-                          Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
-                        </Button>
-                        <Button
-                          variant="warning"
-                          onClick={async () => {
-                            await deleteFreeTextStatTile({
-                              educationInNumbersPageId,
-                              blockId: block.id,
-                              sectionId,
-                              tileId: tile.id,
-                            });
-                          }}
-                        >
-                          Delete tile<VisuallyHidden>: {title}</VisuallyHidden>
-                        </Button>
-                      </ButtonGroup>
+        {groupTiles.length ? (
+          <>
+            {isReordering ? (
+              <ReorderableList
+                heading="Reorder tiles"
+                id="reorder-stat-tiles"
+                list={groupTiles.map(tile => {
+                  return {
+                    id: tile.id,
+                    label: `${tile.title} ${tile.statistic} ${tile.trend}`,
+                  };
+                })}
+                onCancel={() => {
+                  setGroupTiles(block.tiles);
+                  toggleIsReordering.off();
+                }}
+                onConfirm={async () => {
+                  await reorderFreeTextStatTiles({
+                    educationInNumbersPageId,
+                    blockId: block.id,
+                    sectionId,
+                    tiles: groupTiles,
+                  });
+                  toggleIsReordering.off();
+                }}
+                onMoveItem={({ prevIndex, nextIndex }) => {
+                  const reorderedGroupTiles = reorder(
+                    groupTiles,
+                    prevIndex,
+                    nextIndex,
+                  );
+                  setGroupTiles(reorderedGroupTiles);
+                }}
+                onReverse={() => {
+                  setGroupTiles(groupTiles.toReversed());
+                }}
+              />
+            ) : (
+              <FreeTextStatTileWrapper>
+                {tiles.map(tile => (
+                  <div key={tile.id}>
+                    {isEditingStatTile === tile.id ? (
+                      <EditableFreeTextStatTileForm
+                        statTile={tile}
+                        testId="freeTextStatTile-editForm"
+                        onSubmit={async values => {
+                          await updateFreeTextStatTile({
+                            educationInNumbersPageId,
+                            blockId: block.id,
+                            sectionId,
+                            tileId: tile.id,
+                            values,
+                          });
+                          setIsEditingStatTile(null);
+                        }}
+                        onCancel={() => setIsEditingStatTile(null)}
+                      />
+                    ) : (
+                      <>
+                        <FreeTextStatTile key={tile.id} tile={tile} />
+                        {!isEditingStatTile && (
+                          <ButtonGroup className="govuk-!-margin-top-2">
+                            <Button
+                              onClick={() => setIsEditingStatTile(tile.id)}
+                            >
+                              Edit{' '}
+                              <VisuallyHidden> tile: {title}</VisuallyHidden>
+                            </Button>
+                            <Button
+                              variant="warning"
+                              onClick={async () => {
+                                await deleteFreeTextStatTile({
+                                  educationInNumbersPageId,
+                                  blockId: block.id,
+                                  sectionId,
+                                  tileId: tile.id,
+                                });
+                              }}
+                            >
+                              Delete tile
+                              <VisuallyHidden>: {title}</VisuallyHidden>
+                            </Button>
+                          </ButtonGroup>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              </div>
-            ))}
-          </FreeTextStatTileWrapper>
+                  </div>
+                ))}
+              </FreeTextStatTileWrapper>
+            )}
+          </>
         ) : (
           <InsetText className="govuk-!-margin-top-2">
             No statistic tiles have been added.

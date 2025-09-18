@@ -1,7 +1,10 @@
 import educationInNumbersContentService, {
   EinContentBlockAddRequest,
 } from '@admin/services/educationInNumbersContentService';
-import { EinBlockType } from '@common/services/types/einBlocks';
+import {
+  EinBlockType,
+  EinFreeTextStatTile,
+} from '@common/services/types/einBlocks';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 import { FreeTextStatTileFormValues } from '../components/EditableFreeTextStatTileForm';
 
@@ -273,6 +276,32 @@ export default function useEducationInNumbersPageContentActions() {
     return newTile;
   }
 
+  async function reorderFreeTextStatTiles({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+    tiles,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+    tiles: EinFreeTextStatTile[];
+  }) {
+    const newTiles =
+      await educationInNumbersContentService.reorderFreeTextStatTiles({
+        educationInNumbersPageId,
+        blockId,
+        order: tiles.map(tile => tile.id),
+      });
+    dispatch({
+      type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK',
+      payload: {
+        meta: { blockId, sectionId },
+        tiles: newTiles,
+      },
+    });
+  }
+
   async function deleteFreeTextStatTile({
     educationInNumbersPageId,
     blockId,
@@ -301,6 +330,7 @@ export default function useEducationInNumbersPageContentActions() {
     addFreeTextStatTile,
     updateFreeTextStatTile,
     deleteFreeTextStatTile,
+    reorderFreeTextStatTiles,
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,

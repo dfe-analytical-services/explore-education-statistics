@@ -33,6 +33,20 @@ const EditableSectionBlocks = <T extends EinContentBlock = EinContentBlock>({
     [blocks, onBlocksChange],
   );
 
+  const renderReorderableBlockPreview = useCallback(
+    (block: T) => {
+      switch (block.type) {
+        case 'HtmlBlock':
+          return block.body ? renderBlock(block) : 'This section is empty';
+        case 'TileGroupBlock':
+          return renderBlock(block);
+        default:
+          return 'This section is empty';
+      }
+    },
+    [renderBlock],
+  );
+
   if (editingMode !== 'edit') {
     return blocks.length > 0 ? (
       <>
@@ -63,9 +77,7 @@ const EditableSectionBlocks = <T extends EinContentBlock = EinContentBlock>({
           id: block.id,
           label: (
             <div className={styles.draggable}>
-              {block.type === 'HtmlBlock' && block.body
-                ? renderBlock(block)
-                : 'This section is empty'}
+              {renderReorderableBlockPreview(block)}
             </div>
           ),
         }))}
