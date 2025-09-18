@@ -60,10 +60,14 @@ INNER JOIN [UserInvites] AS ui
 
 -- Update existing Users records to have the same CreatedById associated with their linked UserInvite record (if it exists).
 UPDATE [Users]
-SET CreatedById = ui.CreatedById
+SET CreatedById = TargetUser.Id
 FROM [Users]
-INNER JOIN [UserInvites] AS ui
-    ON ui.Email = [Users].Email
+INNER JOIN [UserInvites] AS UI
+    ON UI.Email = [Users].Email
+INNER JOIN [AspNetUsers] AS AU
+    ON AU.Id = UI.CreatedById
+INNER JOIN [Users] AS TargetUser
+    ON TargetUser.Email = AU.Email
 WHERE [Users].CreatedById IS NULL;
 
 -- For any remaining Users records that don't have a linked UserInvite record, set their CreatedById to the new dummy 'Deleted' user.
