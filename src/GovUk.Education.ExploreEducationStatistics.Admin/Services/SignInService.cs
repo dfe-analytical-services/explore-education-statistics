@@ -104,9 +104,7 @@ public class SignInService(
         }
 
         // This line is temporary - once we have removed the UserInvites table, we can remove this.
-        var createdById = string.IsNullOrEmpty(inviteToSystem.CreatedById)
-            ? await GetDeletedUserId()
-            : Guid.Parse(inviteToSystem.CreatedById);
+        var createdById = await GetCorrespondingCreatedByUserId(inviteToSystem);
 
         // Now we have created Identity Framework user records, we can create internal User and Role records
         // for the application itself.
@@ -201,4 +199,33 @@ public class SignInService(
 
     private async Task<Guid> GetDeletedUserId() =>
         (await userRepository.FindDeletedUserPlaceholder())!.Id;
+
+    private async Task<Guid> GetCorrespondingCreatedByUserId(UserInvite inviteToSystem)
+    {
+        if (string.IsNullOrEmpty(inviteToSystem.CreatedById))
+        {
+            return await GetDeletedUserId();
+        }
+
+        var createdByAspNetUserEmail = await usersAndRolesDbContext
+            .Users
+            .Where(u => u.Id == inviteToSystem.CreatedById)
+            .Select(u => u.Email)
+            .SingleOrDefaultAsync();
+
+        if (createdByAspNetUserEmail is null)
+        {
+            return await GetDeletedUserId();
+        }
+
+        var createdByInternalUserId = await contentDbContext
+            .Users
+            .Where(u => u.Email == createdByAspNetUserEmail)
+            .Select(u => u.Id)
+            .SingleOrDefaultAsync();
+
+        return createdByInternalUserId == Guid.Empty 
+            ? await GetDeletedUserId() 
+            : createdByInternalUserId;
+    }
 }
