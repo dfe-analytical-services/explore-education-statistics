@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 
-public class FilterItemRepository : IFilterItemRepository
+public class FilterItemRepository(StatisticsDbContext context) : IFilterItemRepository
 {
-    private readonly StatisticsDbContext _context;
-
-    public FilterItemRepository(StatisticsDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Dictionary<Guid, int>> CountFilterItemsByFilter(IEnumerable<Guid> filterItemIds)
     {
-        var filterItems = await _context.FilterItem
+        var filterItems = await context.FilterItem
             .Include(filterItem => filterItem.FilterGroup)
             .Where(filterItem => filterItemIds.Contains(filterItem.Id))
             .ToListAsync();
@@ -40,35 +33,23 @@ public class FilterItemRepository : IFilterItemRepository
         Guid subjectId,
         IQueryable<MatchedObservation> matchedObservations)
     {
-        var matchedObservationIds = matchedObservations.Select(o => o.Id);
+        var matchedFilterItemIds = matchedObservations
+            .Join(
+                inner: context.ObservationFilterItem,
+                outerKeySelector: observation => observation.Id,
+                innerKeySelector: observationFilterItem => observationFilterItem.ObservationId,
+                resultSelector: (observation, observationFilterItem) => observationFilterItem.FilterItemId)
+            .Distinct();
 
-        var filtersForSubject = await _context
-            .Filter
+        return await context.FilterItem
             .AsNoTracking()
-            .Include(filter => filter.FilterGroups)
-            .Where(filter => filter.SubjectId == subjectId)
+            .WithSqlServerOptions("OPTION(HASH JOIN)")
+            .Include(fi => fi.FilterGroup)
+            .ThenInclude(fg => fg.Filter)
+            .Where(fi =>
+                fi.FilterGroup.Filter.SubjectId == subjectId &&
+                matchedFilterItemIds.Contains(fi.Id))
             .ToListAsync();
-
-        var filterGroupIds = filtersForSubject
-            .SelectMany(filter => filter.FilterGroups)
-            .Select(filterGroup => filterGroup.Id);
-
-        var filterItems = await _context
-            .FilterItem
-            .AsNoTracking()
-            .Where(filterItem =>
-                filterGroupIds.Contains(filterItem.FilterGroupId) &&
-                _context.ObservationFilterItem.Any(ofi =>
-                    ofi.FilterItemId == filterItem.Id && matchedObservationIds.Contains(ofi.ObservationId)))
-            .ToListAsync();
-
-        var filterGroupsById = filtersForSubject
-            .SelectMany(filter => filter.FilterGroups)
-            .ToDictionary(filterGroup => filterGroup.Id);
-
-        filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
-
-        return filterItems;
     }
 
     public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)
@@ -80,7 +61,7 @@ public class FilterItemRepository : IFilterItemRepository
                 .Distinct()
                 .ToList();
 
-        return await _context
+        return await context
             .FilterItem
             .AsNoTracking()
             .Include(fi => fi.FilterGroup)
