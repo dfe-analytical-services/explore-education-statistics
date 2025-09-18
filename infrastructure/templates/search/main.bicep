@@ -161,6 +161,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges
+    logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     tagValues: tagValues
   }
 }
