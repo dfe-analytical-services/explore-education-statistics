@@ -1,0 +1,15 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(3);
+
+  > * {
+    flex: 1 1;
+    flex-basis: calc(33% - 15px);
+    min-width: 200px;
+    // Removing max-width for now but if we want to limit in future, can reinstate.
+    // max-width: calc(50% - #{govuk-spacing(3) / 2});
+  }
+}
