@@ -1787,11 +1787,10 @@ public class ReleaseApprovalServiceTests
 
     public class ListReleaseStatuses : ReleaseApprovalServiceTests
     {
-        private static readonly User User = new()
-        {
-            Id = Guid.NewGuid(),
-            Email = "test@test.com"
-        };
+        private static readonly User User = new DataFixture()
+        .DefaultUser()
+        .WithEmail("test@test.com")
+        .Generate();
 
         [Fact]
         public async Task Success()

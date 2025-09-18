@@ -31,6 +31,11 @@ VALUES (
     @DeletedUserId
 );
 
+-- Update existing Users records to have Active = 1 (true) if they are not soft deleted.
+UPDATE [Users]
+SET Active = 1
+WHERE SoftDeleted IS NULL;
+
 -- Update existing Users records to have the same RoleId associated with their linked AspNetUser record (if it exists).
 UPDATE [Users]
 SET RoleId = ur.RoleId

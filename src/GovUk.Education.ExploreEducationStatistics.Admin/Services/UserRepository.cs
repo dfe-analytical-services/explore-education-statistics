@@ -8,15 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 {
-    public async Task<User?> FindById(Guid userId, CancellationToken cancellationToken = default)
-    {
-        return await contentDbContext.Users
-            .SingleOrDefaultAsync(u =>
-                u.Id == userId
-                && u.Active,
-                cancellationToken);
-    }
-
     public async Task<User?> FindByEmail(string email)
     {
         return await contentDbContext.Users

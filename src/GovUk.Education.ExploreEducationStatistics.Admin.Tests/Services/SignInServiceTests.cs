@@ -77,36 +77,29 @@ public class SignInServiceTests
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
-                .Returns(new UserProfileFromClaims(email, firstName, lastName))
-                .Verifiable();
+                .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
             userManager.Setup(mock => mock.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null)
-                .Verifiable();
+                .ReturnsAsync((ApplicationUser?)null);
             userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
-                .ReturnsAsync(IdentityResult.Success)
-                .Verifiable();
+                .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(userReleaseInvites)
-                .Verifiable();
+                .ReturnsAsync(userReleaseInvites);
             userReleaseInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(userPublicationInvites)
-                .Verifiable();
+                .ReturnsAsync(userPublicationInvites);
             userPublicationInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             foreach (var userReleaseInvite in userReleaseInvites)
@@ -117,8 +110,7 @@ public class SignInServiceTests
                         userReleaseInvite.ReleaseVersionId,
                         userReleaseInvite.Role,
                         CreatedById))
-                    .ReturnsAsync(new UserReleaseRole())
-                    .Verifiable();
+                    .ReturnsAsync(new UserReleaseRole());
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -130,8 +122,7 @@ public class SignInServiceTests
                         userPublicationInvite.PublicationId,
                         userPublicationInvite.Role,
                         CreatedById))
-                    .ReturnsAsync(new UserPublicationRole())
-                    .Verifiable();
+                    .ReturnsAsync(new UserPublicationRole());
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -232,25 +223,21 @@ public class SignInServiceTests
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
-                .Returns(new UserProfileFromClaims(email, firstName, lastName))
-                .Verifiable();
+                .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
             userManager.Setup(mock => mock.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null)
-                .Verifiable();
+                .ReturnsAsync((ApplicationUser?)null);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(email, default))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(email, default))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -327,44 +314,36 @@ public class SignInServiceTests
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
-                .Returns(new UserProfileFromClaims(email, firstName, lastName))
-                .Verifiable();
+                .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
             userManager.Setup(mock => mock.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null)
-                .Verifiable();
+                .ReturnsAsync((ApplicationUser?)null);
             userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
-                .ReturnsAsync(IdentityResult.Success)
-                .Verifiable();
+                .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([])
-                .Verifiable();
+                .ReturnsAsync([]);
             userReleaseInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([])
-                .Verifiable();
+                .ReturnsAsync([]);
             userPublicationInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository.Setup(mock => mock.FindDeletedUserPlaceholder())
                .ReturnsAsync(_dataFixture.DefaultUser()
                     .WithId(deletedUserPlaceholderId)
-                    .Generate())
-               .Verifiable();
+                    .Generate());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -468,36 +447,29 @@ public class SignInServiceTests
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
-                .Returns(new UserProfileFromClaims(email, updatedFirstName, updatedLastName))
-                .Verifiable();
+                .Returns(new UserProfileFromClaims(email, updatedFirstName, updatedLastName));
 
             var userManager = MockUserManager();
             userManager.Setup(mock => mock.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null)
-                .Verifiable();
+                .ReturnsAsync((ApplicationUser?)null);
             userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
-                .ReturnsAsync(IdentityResult.Success)
-                .Verifiable();
+                .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(userReleaseInvites)
-                .Verifiable();
+                .ReturnsAsync(userReleaseInvites);
             userReleaseInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(userPublicationInvites)
-                .Verifiable();
+                .ReturnsAsync(userPublicationInvites);
             userPublicationInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             foreach (var userReleaseInvite in userReleaseInvites)
@@ -508,8 +480,7 @@ public class SignInServiceTests
                         userReleaseInvite.ReleaseVersionId,
                         userReleaseInvite.Role,
                         CreatedById))
-                    .ReturnsAsync(new UserReleaseRole())
-                    .Verifiable();
+                    .ReturnsAsync(new UserReleaseRole());
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -521,8 +492,7 @@ public class SignInServiceTests
                         userPublicationInvite.PublicationId,
                         userPublicationInvite.Role,
                         CreatedById))
-                    .ReturnsAsync(new UserPublicationRole())
-                    .Verifiable();
+                    .ReturnsAsync(new UserPublicationRole());
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -622,44 +592,36 @@ public class SignInServiceTests
 
             var userService = new Mock<IUserService>(Strict);
             userService.Setup(mock => mock.GetProfileFromClaims())
-                .Returns(new UserProfileFromClaims(email, firstName, lastName))
-                .Verifiable();
+                .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
             userManager.Setup(mock => mock.FindByEmailAsync(email))
-                .ReturnsAsync((ApplicationUser?)null)
-                .Verifiable();
+                .ReturnsAsync((ApplicationUser?)null);
             userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
-                .ReturnsAsync(IdentityResult.Success)
-                .Verifiable();
+                .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([])
-                .Verifiable();
+                .ReturnsAsync([]);
             userReleaseInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([])
-                .Verifiable();
+                .ReturnsAsync([]);
             userPublicationInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Returns(Task.CompletedTask);
 
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository.Setup(mock => mock.FindDeletedUserPlaceholder())
                .ReturnsAsync(_dataFixture.DefaultUser()
                    .WithId(deletedUserPlaceholderId)
-                   .Generate())
-               .Verifiable();
+                   .Generate());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))

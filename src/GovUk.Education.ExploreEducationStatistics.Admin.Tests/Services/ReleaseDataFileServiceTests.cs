@@ -37,11 +37,10 @@ public class ReleaseDataFileServiceTests
 {
     private readonly DataFixture _fixture = new();
 
-    private readonly User _user = new()
-    {
-        Id = Guid.NewGuid(),
-        Email = "test@test.com"
-    };
+    private readonly User _user = new DataFixture()
+        .DefaultUser()
+        .WithEmail("test@test.com")
+        .Generate();
 
     [Fact]
     public async Task Delete()
