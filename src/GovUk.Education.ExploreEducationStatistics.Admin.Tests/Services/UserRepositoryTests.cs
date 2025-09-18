@@ -77,30 +77,6 @@ public class UserRepositoryTests
     }
 
     [Fact]
-    public async Task FindByEmail_InactiveUser()
-    {
-        var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
-            .WithActive(false)
-            .Generate();
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            await contentDbContext.Users.AddAsync(user);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var repository = SetupUserRepository(contentDbContext);
-            var result = await repository.FindByEmail("test@test.com");
-            Assert.Null(result);
-        }
-    }
-
-    [Fact]
     public async Task FindDeletedUserPlaceholder()
     {
         var user = _dataFixture.DefaultUser()

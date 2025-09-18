@@ -6,14 +6,18 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
 public class SignInControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
+    private readonly DataFixture _dataFixture = new();
+
     public class RegistrationTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
         [Theory]
@@ -44,7 +48,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var email = "";
             var firstName = "";
             var lastName = "";
-            var createdById = Guid.NewGuid().ToString();
+
+            var placeholderDeletedUser = CreatePlaceHolderDeletedUser();
 
             var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
@@ -105,12 +110,13 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                     // Change the case of the email address in the invite to test this scenario.
                     Email = email.ToLower(),
                     Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                    Created = DateTime.UtcNow.AddDays(-1),
-                    CreatedById = createdById
+                    Created = DateTime.UtcNow.AddDays(-1)
                 });
             });
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
+                context.Users.Add(placeholderDeletedUser);
+
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
@@ -205,13 +211,12 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             await using (var context = TestApp.GetDbContext<ContentDbContext>())
             {
                 // Verify that the new internal user is created.
-                var newInternalUser = Assert.Single(context.Users);
+                var newInternalUser = Assert.Single(context.Users, u => u.Email == email);
                 Assert.Equal(firstName, newInternalUser.FirstName);
                 Assert.Equal(lastName, newInternalUser.LastName);
-                Assert.Equal(email, newInternalUser.Email);
                 Assert.Equal($"{firstName} {lastName}", newInternalUser.DisplayName);
                 Assert.Equal(userProfile.Id, newInternalUser.Id);
-                Assert.Equal(createdById, newInternalUser.CreatedById.ToString());
+                Assert.Equal(placeholderDeletedUser.Id, newInternalUser.CreatedById);
 
                 if (releaseRoleInInvite != null)
                 {
@@ -241,6 +246,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         {
             const string email = "user@education.gov.uk";
 
+            var placeholderDeletedUser = CreatePlaceHolderDeletedUser();
+
             var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
@@ -251,6 +258,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
+                context.Users.Add(placeholderDeletedUser);
+
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
@@ -289,8 +298,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                     // Change the case of the email address in the invite to test this scenario.
                     Email = email.ToLower(),
                     Role = globalRoles.First(),
-                    Created = DateTime.UtcNow.AddDays(-daysOld),
-                    CreatedById = Guid.NewGuid().ToString()
+                    Created = DateTime.UtcNow.AddDays(-daysOld)
                 });
             });
 
@@ -321,7 +329,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 await using (var context = TestApp.GetDbContext<ContentDbContext>())
                 {
                     // Assert that no internal user got created.
-                    Assert.Empty(context.Users);
+                    // Should just be the placeholder deleted user.
+                    Assert.Single(context.Users, u => u.Email == User.DeletedUserPlaceholderEmail);
 
                     // Assert that the release and publication invites were deleted.
                     Assert.Empty(context.UserReleaseInvites);
@@ -503,6 +512,10 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             response.AssertForbidden();
         }
     }
+
+    private User CreatePlaceHolderDeletedUser() => _dataFixture
+        .DefaultUser()
+        .WithEmail(User.DeletedUserPlaceholderEmail);
 
     private static List<IdentityRole> GetGlobalRoles() =>
     [

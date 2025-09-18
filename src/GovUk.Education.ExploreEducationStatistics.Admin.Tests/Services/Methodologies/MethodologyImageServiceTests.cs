@@ -33,6 +33,7 @@ public class MethodologyImageServiceTests
 {
     private readonly User _user = new DataFixture()
         .DefaultUser()
+        .WithId(Guid.NewGuid())
         .WithEmail("test@test.com");
 
     [Fact]
