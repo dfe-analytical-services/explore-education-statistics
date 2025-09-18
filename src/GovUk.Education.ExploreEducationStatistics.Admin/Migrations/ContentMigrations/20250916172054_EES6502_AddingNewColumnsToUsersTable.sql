@@ -6,7 +6,7 @@ SELECT @AnalystRoleId = Id
 FROM AspNetRoles AS r
 WHERE r.Name = 'Analyst';
 
--- Insert a dummy 'Deleted User' record. 
+-- Insert a placeholder 'Deleted User' record. 
 -- This will be used as a placeholder for any existing records where we don't know who created/modified them.
 INSERT INTO Users (
     Id,
@@ -58,7 +58,7 @@ FROM [Users]
 INNER JOIN [UserInvites] AS ui
     ON ui.Email = [Users].Email;
 
--- Update existing Users records to have the same CreatedById associated with their linked UserInvite record (if it exists).
+-- Update existing Users records so that CreatedById points to the correct Users.Id based on the CreatedById from their linked UserInvite record (if one exists).
 UPDATE [Users]
 SET CreatedById = TargetUser.Id
 FROM [Users]
@@ -70,7 +70,7 @@ INNER JOIN [Users] AS TargetUser
     ON TargetUser.Email = AU.Email
 WHERE [Users].CreatedById IS NULL;
 
--- For any remaining Users records that don't have a linked UserInvite record, set their CreatedById to the new dummy 'Deleted' user.
+-- For any remaining Users records where we couldn't resolve a matching CreatedById, assign the placeholder 'Deleted' user's Id.
 UPDATE [Users]
 SET CreatedById = @DeletedUserId
 WHERE [Users].CreatedById IS NULL;
