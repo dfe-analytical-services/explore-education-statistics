@@ -93,8 +93,8 @@ public class ImporterMetaService : IImporterMetaService
         StatisticsDbContext context)
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
-        var metaRowsRaw = metaFileReader.GetMetaRows(metaFileRows);
-        var metaRows = IgnoreFiltersUsedForGrouping(metaRowsRaw);
+        var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+        metaRows = IgnoreFiltersUsedForGrouping(metaRows);
         
         var filters = (await GetFilters(metaRows, subject, context)).ToList();
         var indicators = GetIndicators(metaRows, subject, context).ToList();
@@ -131,12 +131,10 @@ public class ImporterMetaService : IImporterMetaService
             .Select(mr => mr.FilterGroupingColumn)
             .WhereNotNull();
 
-        return
-        [
-            .. metaRows
-                .Where(r => r.ColumnType != ColumnType.Filter 
+        return metaRows
+            .Where(r => r.ColumnType != ColumnType.Filter 
                     || !groupingColumns.Contains(r.ColumnName))
-        ];
+            .ToList();
     }
 
     private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
