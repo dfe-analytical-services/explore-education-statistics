@@ -223,6 +223,7 @@ public class EducationInNumbersContentService(
         EinTileGroupBlockUpdateRequest request)
     {
         var tileGroupBlockToUpdate = contentDbContext.EinContentBlocks
+            .Include(block => (block as EinTileGroupBlock)!.Tiles)
             .OfType<EinTileGroupBlock>()
             .SingleOrDefault(tileGroupBlock => tileGroupBlock.Id == tileGroupBlockId
                                                && tileGroupBlock.EinContentSectionId == sectionId
