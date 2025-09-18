@@ -1,4 +1,3 @@
-#nullable enable
 using System.Reflection;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
