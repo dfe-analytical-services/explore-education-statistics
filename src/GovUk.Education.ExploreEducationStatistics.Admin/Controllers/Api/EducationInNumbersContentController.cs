@@ -81,8 +81,19 @@ public class EducationInNumbersContentController(
             .HandleFailuresOrOk();
     }
 
+    [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}/tile-group")]
+    public async Task<ActionResult<EinContentBlockViewModel>> UpdateTileGroupBlock(
+        [FromRoute] Guid pageId,
+        [FromRoute] Guid sectionId,
+        [FromRoute] Guid blockId,
+        [FromBody] EinTileGroupBlockUpdateRequest request)
+    {
+        return await einContentService.UpdateTileGroupBlock(pageId, sectionId, blockId, request)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/blocks/order")]
-    public async Task<ActionResult<List<EinContentBlockViewModel>>> UpdateSectionBlocksOrder(
+    public async Task<ActionResult<List<EinContentBlockViewModel>>> ReorderBlocks(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromBody] List<Guid> order)
@@ -90,7 +101,6 @@ public class EducationInNumbersContentController(
         return await einContentService.ReorderBlocks(pageId, sectionId, order)
             .HandleFailuresOrOk();
     }
-
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
     public async Task<ActionResult> DeleteBlock(
@@ -103,4 +113,43 @@ public class EducationInNumbersContentController(
     }
 
 
+    [HttpPost("education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tiles/add")]
+    public async Task<ActionResult<EinTileViewModel>> AddTile(
+        [FromRoute] Guid pageId,
+        [FromRoute] Guid blockId,
+        [FromBody] EinTileAddRequest request)
+    {
+        return await einContentService.AddTile(pageId, blockId, request.Type, request.Order)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpPut("education-in-numbers/{pageId:guid}/content/tile/{tileId:guid}/free-text-stat")]
+    public async Task<ActionResult<EinTileViewModel>> UpdateFreeTextStatTile(
+        [FromRoute] Guid pageId,
+        [FromRoute] Guid tileId,
+        [FromBody] EinFreeTextStatTileUpdateRequest request)
+    {
+        return await einContentService.UpdateFreeTextStatTile(pageId, tileId, request)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpPut("education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tiles/order")]
+    public async Task<ActionResult<List<EinTileViewModel>>> ReorderTiles(
+        [FromRoute] Guid pageId,
+        [FromRoute] Guid blockId,
+        [FromBody] List<Guid> order)
+    {
+        return await einContentService.ReorderTiles(pageId, blockId, order)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpDelete("education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tile/{tileId:guid}")]
+    public async Task<ActionResult> DeleteTile(
+        [FromRoute] Guid pageId,
+        [FromRoute] Guid blockId,
+        [FromRoute] Guid tileId)
+    {
+        return await einContentService.DeleteTile(pageId, blockId, tileId)
+            .HandleFailuresOrNoContent();
+    }
 }

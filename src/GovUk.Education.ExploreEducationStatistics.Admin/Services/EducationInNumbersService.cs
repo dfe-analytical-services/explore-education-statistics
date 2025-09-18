@@ -111,6 +111,7 @@ public class EducationInNumbersService(
         return await contentDbContext.EducationInNumbersPages
             .Include(p => p.Content)
             .ThenInclude(section => section.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .FirstOrNotFoundAsync(page => page.Id == id)
             .OnSuccess(async page =>
             {

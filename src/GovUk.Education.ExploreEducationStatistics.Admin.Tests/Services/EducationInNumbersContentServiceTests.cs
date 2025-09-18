@@ -17,6 +17,8 @@ public class EducationInNumbersContentServiceTests
     private readonly Guid _sectionBId = Guid.NewGuid();
     private readonly Guid _blockAId = Guid.NewGuid();
     private readonly Guid _blockBId = Guid.NewGuid();
+    private readonly Guid _tileAId = Guid.NewGuid();
+    private readonly Guid _tileBId = Guid.NewGuid();
 
     [Fact]
     public async Task GetPageContent_Success()
@@ -53,11 +55,24 @@ public class EducationInNumbersContentServiceTests
                         Heading = "Section A",
                         Content =
                         [
-                            new EinHtmlBlock
+                            new EinTileGroupBlock()
                             {
                                 Id = _blockAId,
                                 Order = 0,
-                                Body = "Block A Body"
+                                Title = "TileGroupBlock title",
+                                Tiles =
+                                [
+                                    new EinFreeTextStatTile
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Title = "Tile title",
+                                        Statistic = "Over 9000!",
+                                        Trend = "It's up",
+                                        Order = 0,
+                                        LinkText = "Link text",
+                                        LinkUrl = "http://link.url",
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -85,10 +100,19 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal("Section B", viewModel.Content[1].Heading);
 
             var blockAGenericType = Assert.Single(viewModel.Content[0].Content);
-            var blockA = Assert.IsType<EinHtmlBlockViewModel>(blockAGenericType);
+            var blockA = Assert.IsType<EinTileGroupBlockViewModel>(blockAGenericType);
             Assert.Equal(_blockAId, blockA.Id);
             Assert.Equal(0, blockA.Order);
-            Assert.Equal("Block A Body", blockA.Body);
+            Assert.Equal("TileGroupBlock title", blockA.Title);
+
+            var tile = Assert.Single(blockA.Tiles);
+            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(tile);
+            Assert.Equal("Tile title", freeTextStatTile.Title);
+            Assert.Equal("Over 9000!", freeTextStatTile.Statistic);
+            Assert.Equal("It's up", freeTextStatTile.Trend);
+            Assert.Equal(0, freeTextStatTile.Order);
+            Assert.Equal("Link text", freeTextStatTile.LinkText);
+            Assert.Equal("http://link.url", freeTextStatTile.LinkUrl);
 
             var blockBGenericType = Assert.Single(viewModel.Content[1].Content);
             var blockB = Assert.IsType<EinHtmlBlockViewModel>(blockBGenericType);
@@ -351,6 +375,8 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal(2, sections.Count);
             Assert.Equal(0, sections.Single(s => s.Id == _sectionAId).Order);
             Assert.Equal(1, sections.Single(s => s.Id == sectionCId).Order);
+
+            // NOTE: Blocks and Tiles are deleted by DB cascade delete, so cannot be tested with inmemorydb.
         }
     }
 
@@ -373,7 +399,7 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
-    public async Task AddBlock_OrderProvided_Success()
+    public async Task AddBlock_HtmlBlock_OrderProvided_Success()
     {
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -404,7 +430,7 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
-    public async Task AddBlock_OrderNotProvided_Success()
+    public async Task AddBlock_HtmlBlock_OrderNotProvided_Success()
     {
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -430,12 +456,49 @@ public class EducationInNumbersContentServiceTests
 
             var dbBlocks = await context.EinContentBlocks.ToListAsync();
             Assert.Equal(2, dbBlocks.Count);
-            Assert.Equal(1, dbBlocks.Single(b => b.Id == viewModel.Id).Order);
+
+            var htmlBlock = dbBlocks.Single(b => b.Id == viewModel.Id);
+            Assert.IsType<EinHtmlBlock>(htmlBlock);
+            Assert.Equal(1, htmlBlock.Order);
         }
     }
 
     [Fact]
-    public async Task AddBlock_OrderProvidedClashesWithExistingBlock_Success()
+    public async Task AddBlock_TileGroupBlock_OrderNotProvided_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentSections.AddAsync(new EinContentSection
+            {
+                Id = _sectionAId,
+                EducationInNumbersPageId = _pageId,
+                Content = [new EinHtmlBlock { Id = _blockAId, Order = 0 }]
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            // order is null, so should be added to the end
+            var result = await service.AddBlock(
+                _pageId, _sectionAId, EinBlockType.TileGroupBlock, null);
+
+            var viewModel = result.AssertRight();
+            Assert.Equal(1, viewModel.Order);
+
+            var dbBlocks = await context.EinContentBlocks.ToListAsync();
+            Assert.Equal(2, dbBlocks.Count);
+
+            var tileGroupBlock = dbBlocks.Single(b => b.Id == viewModel.Id);
+            Assert.IsType<EinTileGroupBlock>(tileGroupBlock);
+            Assert.Equal(1, tileGroupBlock.Order);
+        }
+    }
+
+    [Fact]
+    public async Task AddBlock_HtmlBlock_OrderProvidedClashesWithExistingBlock_Success()
     {
         var preExistingBlockId = Guid.NewGuid();
         var contextId = Guid.NewGuid().ToString();
@@ -529,6 +592,71 @@ public class EducationInNumbersContentServiceTests
 
         var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
         result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task UpdateTileGroupBlock_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                Title = "Old title",
+                EinContentSection = new EinContentSection
+                {
+                    Id = _sectionAId,
+                    EducationInNumbersPageId = _pageId
+                },
+                Tiles = [],
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var request = new EinTileGroupBlockUpdateRequest
+            {
+                Title = "New title"
+            };
+            var result = await service.UpdateTileGroupBlock(
+                _pageId, _sectionAId, _blockAId, request);
+
+            var viewModel = result.AssertRight();
+            var tileGroupBlock = Assert.IsType<EinTileGroupBlockViewModel>(viewModel);
+            Assert.Equal(_blockAId, tileGroupBlock.Id);
+            Assert.Equal("New title", tileGroupBlock.Title);
+
+            var dbBlock = await context.EinContentBlocks.OfType<EinTileGroupBlock>().SingleAsync();
+            Assert.Equal(_blockAId, dbBlock.Id);
+            Assert.Equal("New title", dbBlock.Title);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateTileGroupBlock_NotFound()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.EinContentSections.Add(new EinContentSection
+            {
+                Id = _sectionAId,
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
+
+            var result = await service.UpdateTileGroupBlock(
+                _pageId, _sectionAId, Guid.NewGuid(), request);
+            result.AssertNotFound();
+        }
     }
 
     [Fact]
@@ -669,6 +797,307 @@ public class EducationInNumbersContentServiceTests
         {
             var service = new EducationInNumbersContentService(context);
             var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid());
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task AddTile_OrderProvided_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                EinContentSection = new EinContentSection
+                {
+                    Id = _sectionAId,
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var result = await service.AddTile(
+                _pageId, _blockAId, EinTileType.FreeTextStatTile, 1);
+
+            var viewModel = result.AssertRight();
+            var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
+            Assert.Equal(1, freeTextTile.Order);
+            Assert.Equal("", freeTextTile.Title);
+            Assert.Equal("", freeTextTile.Statistic);
+
+            var dbTile = await context.EinTiles.SingleAsync();
+            Assert.Equal(viewModel.Id, dbTile.Id);
+            Assert.Equal(1, dbTile.Order);
+            Assert.Equal(_blockAId, dbTile.EinParentBlockId);
+        }
+    }
+
+    [Fact]
+    public async Task AddTile_OrderNotProvided_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                Tiles = [new EinFreeTextStatTile { Id = _tileAId, Order = 0 }],
+                EinContentSection = new EinContentSection
+                {
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            // order is null, so should be added to the end of the list
+            var result = await service.AddTile(
+                _pageId, _blockAId, EinTileType.FreeTextStatTile, null);
+
+            var viewModel = result.AssertRight();
+            Assert.Equal(1, viewModel.Order);
+
+            var dbTiles = await context.EinTiles.ToListAsync();
+            Assert.Equal(2, dbTiles.Count);
+            Assert.Equal(1, dbTiles.Single(b => b.Id == viewModel.Id).Order);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFreeTextStatTile_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                Tiles =
+                [
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileAId,
+                        Title = "Old title",
+                        Statistic = "Old stat",
+                        Trend = "Old trend",
+                        LinkUrl = "http://old.url",
+                        LinkText = "Old link text",
+                    },
+                ],
+                EinContentSection = new EinContentSection
+                {
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var request = new EinFreeTextStatTileUpdateRequest
+            {
+                Title = "New title",
+                Statistic = "New stat",
+                Trend = "New trend",
+                LinkUrl = "http://new.url",
+                LinkText = "New link text",
+            };
+            var result = await service.UpdateFreeTextStatTile(_pageId, _tileAId, request);
+
+            var viewModel = result.AssertRight();
+            var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
+            Assert.Equal(_tileAId, freeTextTile.Id);
+            Assert.Equal("New title", freeTextTile.Title);
+            Assert.Equal("New stat", freeTextTile.Statistic);
+            Assert.Equal("New trend", freeTextTile.Trend);
+            Assert.Equal("http://new.url", freeTextTile.LinkUrl);
+            Assert.Equal("New link text", freeTextTile.LinkText);
+
+            var dbTile = await context.EinTiles
+                .OfType<EinFreeTextStatTile>()
+                .SingleAsync();
+
+            Assert.Equal(_tileAId, dbTile.Id);
+            Assert.Equal("New title", dbTile.Title);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFreeTextStatTile_NotFound()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryApplicationDbContext(contextId);
+        var service = new EducationInNumbersContentService(context);
+        var request = new EinFreeTextStatTileUpdateRequest();
+
+        var result = await service.UpdateFreeTextStatTile(
+            _pageId, Guid.NewGuid(), request);
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task ReorderTiles_Success()
+    {
+        var tileCId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                Tiles =
+                [
+                    new EinFreeTextStatTile { Id = _tileAId, Order = 0 },
+                    new EinFreeTextStatTile { Id = _tileBId, Order = 1 },
+                    new EinFreeTextStatTile { Id = tileCId, Order = 2 },
+                ],
+                EinContentSection = new EinContentSection
+                {
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var newOrder = new List<Guid> { _tileBId, tileCId, _tileAId };
+            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
+
+            var viewModels = result.AssertRight();
+            Assert.Equal(3, viewModels.Count);
+            Assert.Equal(_tileBId, viewModels[0].Id);
+            Assert.Equal(0, viewModels[0].Order);
+            Assert.Equal(tileCId, viewModels[1].Id);
+            Assert.Equal(1, viewModels[1].Order);
+            Assert.Equal(_tileAId, viewModels[2].Id);
+            Assert.Equal(2, viewModels[2].Order);
+
+            var tiles = await context.EinTiles.ToListAsync();
+            Assert.Equal(0, tiles.Single(s => s.Id == _tileBId).Order);
+            Assert.Equal(1, tiles.Single(s => s.Id == tileCId).Order);
+            Assert.Equal(2, tiles.Single(s => s.Id == _tileAId).Order);
+        }
+    }
+
+    [Fact]
+    public async Task ReorderTiles_IdsDoNotMatch_ValidationError()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                Tiles = [new EinFreeTextStatTile { Id = _tileAId, Order = 0 },],
+                EinContentSection = new EinContentSection
+                {
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+
+            var newOrder = new List<Guid> { _tileAId, _tileBId }; // _tileBId does not exist
+            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
+
+            var validationResult = result.AssertBadRequestWithValidationProblem();
+            validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedTileIdsDifferFromActualTileIds);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteTile_Success()
+    {
+        var tileCId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                Tiles =
+                [
+                    new EinFreeTextStatTile { Id = _tileAId, Order = 0 },
+                    new EinFreeTextStatTile { Id = _tileBId, Order = 1 },
+                    new EinFreeTextStatTile { Id = tileCId, Order = 2 },
+                ],
+                EinContentSection = new EinContentSection
+                {
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var result = await service.DeleteTile(_pageId, _blockAId, _tileBId);
+
+            result.AssertRight();
+
+            var block = await context.EinContentBlocks
+                .OfType<EinTileGroupBlock>()
+                .Include(b => b.Tiles)
+                .SingleAsync();
+
+            Assert.Equal(2, block.Tiles.Count);
+            Assert.DoesNotContain(block.Tiles, t => t.Id == _tileBId);
+
+            // Assert remaining tiles are reordered
+            Assert.Equal(0, block.Tiles.Single(b => b.Id == _tileAId).Order);
+            Assert.Equal(1, block.Tiles.Single(b => b.Id == tileCId).Order);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteTile_ParentBlockNotFound()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryApplicationDbContext(contextId);
+        var service = new EducationInNumbersContentService(context);
+
+        var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId);
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task DeleteTile_TileNotFound()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
+            {
+                Id = _blockAId,
+                EinContentSection = new EinContentSection
+                {
+                    EducationInNumbersPageId = _pageId
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = new EducationInNumbersContentService(context);
+            var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid());
             result.AssertNotFound();
         }
     }
