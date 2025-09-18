@@ -3,9 +3,12 @@
 .tile {
   background-color: govuk-colour('light-grey');
   padding: govuk-spacing(4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   * {
-    padding-top: 0;
+    padding-top: 0 !important;
     margin-bottom: govuk-spacing(1);
   }
 }

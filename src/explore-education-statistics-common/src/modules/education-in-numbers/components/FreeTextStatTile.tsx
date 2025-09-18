@@ -15,13 +15,10 @@ const FreeTextStatTile = ({
 
   return (
     <div className={styles.tile}>
-      <h3 className="govuk-body-l" data-testid={`${testId}-title`}>
+      <h4 className="govuk-body-l" data-testid={`${testId}-title`}>
         {title}
-      </h3>
-      <p
-        className="govuk-heading-l govuk-!-margin-top-none"
-        data-testid={`${testId}-statistic`}
-      >
+      </h4>
+      <p className="govuk-heading-m" data-testid={`${testId}-statistic`}>
         {statistic}
       </p>
       <p className="govuk-body" data-testid={`${testId}-trend`}>

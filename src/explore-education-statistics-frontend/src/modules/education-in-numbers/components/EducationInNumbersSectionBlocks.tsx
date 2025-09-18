@@ -1,5 +1,5 @@
 import InsetText from '@common/components/InsetText';
-import EinContentBlockRenderer from '@common/modules/education-in-numbers/EinContentBlockRenderer';
+import EinContentBlockRenderer from '@common/modules/education-in-numbers/components/EinContentBlockRenderer';
 import { EinContentBlock } from '@common/services/types/einBlocks';
 import React from 'react';
 

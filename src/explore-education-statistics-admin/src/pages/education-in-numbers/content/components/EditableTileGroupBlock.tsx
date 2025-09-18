@@ -1,17 +1,18 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableFreeTextStatTileForm from '@admin/pages/education-in-numbers/content/components/EditableFreeTextStatTileForm';
+import { useEducationInNumbersPageContentState } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
+import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormTextInput } from '@common/components/form';
 import Gate from '@common/components/Gate';
-import useToggle from '@common/hooks/useToggle';
-import { EinTileGroupBlock } from '@common/services/types/einBlocks';
-import React, { useCallback, useState } from 'react';
-import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
-import { useEducationInNumbersPageContentState } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import InsetText from '@common/components/InsetText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import useToggle from '@common/hooks/useToggle';
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
+import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
+import { EinTileGroupBlock } from '@common/services/types/einBlocks';
+import React, { useCallback, useState } from 'react';
 
 interface Props {
   block: EinTileGroupBlock;
@@ -69,6 +70,7 @@ const EditableTileGroupBlock = ({
       <Gate condition={!!visible}>
         {isEditingHeading ? (
           <FormTextInput
+            className="govuk-!-margin-bottom-2"
             id={`${block.id}-editHeading`}
             name="heading"
             label="Edit Heading"
@@ -94,7 +96,9 @@ const EditableTileGroupBlock = ({
             }}
           />
         ) : (
-          title && <h3>{title}</h3>
+          title && (
+            <h3 className="govuk-heading-l govuk-!-margin-top-none">{title}</h3>
+          )
         )}
 
         <ButtonGroup>
@@ -127,51 +131,53 @@ const EditableTileGroupBlock = ({
         {/* TODO Reorderable buttons */}
 
         {tiles.length ? (
-          tiles.map(tile => (
-            <div key={tile.id} className="govuk-!-margin-bottom-3">
-              {isEditingStatTile === tile.id ? (
-                <EditableFreeTextStatTileForm
-                  statTile={tile}
-                  testId="freeTextStatTile-editForm"
-                  onSubmit={async values => {
-                    await updateFreeTextStatTile({
-                      educationInNumbersPageId,
-                      blockId: block.id,
-                      sectionId,
-                      tileId: tile.id,
-                      values,
-                    });
-                    setIsEditingStatTile(null);
-                  }}
-                  onCancel={() => setIsEditingStatTile(null)}
-                />
-              ) : (
-                <>
-                  <FreeTextStatTile key={tile.id} tile={tile} />
-                  {!isEditingStatTile && (
-                    <div className="dfe-flex dfe-gap-2 govuk-!-margin-top-2">
-                      <Button onClick={() => setIsEditingStatTile(tile.id)}>
-                        Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
-                      </Button>
-                      <Button
-                        variant="warning"
-                        onClick={async () => {
-                          await deleteFreeTextStatTile({
-                            educationInNumbersPageId,
-                            blockId: block.id,
-                            sectionId,
-                            tileId: tile.id,
-                          });
-                        }}
-                      >
-                        Delete tile<VisuallyHidden>: {title}</VisuallyHidden>
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          ))
+          <FreeTextStatTileWrapper>
+            {tiles.map(tile => (
+              <div key={tile.id}>
+                {isEditingStatTile === tile.id ? (
+                  <EditableFreeTextStatTileForm
+                    statTile={tile}
+                    testId="freeTextStatTile-editForm"
+                    onSubmit={async values => {
+                      await updateFreeTextStatTile({
+                        educationInNumbersPageId,
+                        blockId: block.id,
+                        sectionId,
+                        tileId: tile.id,
+                        values,
+                      });
+                      setIsEditingStatTile(null);
+                    }}
+                    onCancel={() => setIsEditingStatTile(null)}
+                  />
+                ) : (
+                  <>
+                    <FreeTextStatTile key={tile.id} tile={tile} />
+                    {!isEditingStatTile && (
+                      <ButtonGroup className="govuk-!-margin-top-2">
+                        <Button onClick={() => setIsEditingStatTile(tile.id)}>
+                          Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
+                        </Button>
+                        <Button
+                          variant="warning"
+                          onClick={async () => {
+                            await deleteFreeTextStatTile({
+                              educationInNumbersPageId,
+                              blockId: block.id,
+                              sectionId,
+                              tileId: tile.id,
+                            });
+                          }}
+                        >
+                          Delete tile<VisuallyHidden>: {title}</VisuallyHidden>
+                        </Button>
+                      </ButtonGroup>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </FreeTextStatTileWrapper>
         ) : (
           <InsetText className="govuk-!-margin-top-2">
             No statistic tiles have been added.

@@ -31,6 +31,7 @@ const EducationInNumbersPage: NextPage<Props> = ({
           : undefined
       }
       caption={format(new Date(pageData.published), 'MMMM yyyy')}
+      width="wide"
     >
       <Head>
         {/* EES-6497 Remove Head so EiN pages are indexed by search engines */}
@@ -56,7 +57,7 @@ const EducationInNumbersPage: NextPage<Props> = ({
               <EducationInNumbersContentSection
                 content={content}
                 heading={heading}
-                isLastSection={index === pageData.content.length - 1}
+                isFirstSection={index === 0}
                 key={order}
               />
             );
