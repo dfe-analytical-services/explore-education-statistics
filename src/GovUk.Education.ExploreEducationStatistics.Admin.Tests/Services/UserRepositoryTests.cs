@@ -137,7 +137,7 @@ public class UserRepositoryTests
 
         var repository = SetupUserRepository(contentDbContext);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(repository.FindDeletedUserPlaceholder);
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.FindDeletedUserPlaceholder());
     }
 
     private static UserRepository SetupUserRepository(
