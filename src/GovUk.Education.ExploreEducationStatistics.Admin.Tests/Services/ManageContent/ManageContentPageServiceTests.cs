@@ -473,18 +473,17 @@ public class ManageContentPageServiceTests
     [Fact]
     public async Task GetManageContentPageViewModel_MapsBlocksCorrectly()
     {
-        var user1 = new User
-        {
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
-        var user2 = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
+        var user1 = _dataFixture.DefaultUser()
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
+
+        var user2 = _dataFixture.DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
 
         Publication publication = _dataFixture.DefaultPublication()
             .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])

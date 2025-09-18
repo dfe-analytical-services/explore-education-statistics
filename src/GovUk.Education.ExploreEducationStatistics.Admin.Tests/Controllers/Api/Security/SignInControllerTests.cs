@@ -44,6 +44,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             var email = "";
             var firstName = "";
             var lastName = "";
+            var createdById = Guid.NewGuid().ToString();
 
             var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
@@ -104,7 +105,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                     // Change the case of the email address in the invite to test this scenario.
                     Email = email.ToLower(),
                     Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                    Created = DateTime.UtcNow.AddDays(-1)
+                    Created = DateTime.UtcNow.AddDays(-1),
+                    CreatedById = createdById
                 });
             });
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -209,6 +211,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 Assert.Equal(email, newInternalUser.Email);
                 Assert.Equal($"{firstName} {lastName}", newInternalUser.DisplayName);
                 Assert.Equal(userProfile.Id, newInternalUser.Id);
+                Assert.Equal(createdById, newInternalUser.CreatedById.ToString());
 
                 if (releaseRoleInInvite != null)
                 {
@@ -287,6 +290,7 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                     Email = email.ToLower(),
                     Role = globalRoles.First(),
                     Created = DateTime.UtcNow.AddDays(-daysOld),
+                    CreatedById = Guid.NewGuid().ToString()
                 });
             });
 

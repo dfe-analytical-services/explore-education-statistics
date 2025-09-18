@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Moq;
+using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -139,20 +140,28 @@ public abstract class NotificationsServiceTests
                 .WithPublication(affectedPublication)
                 .ForIndex(0, s => s
                     .SetRole(PublicationRole.Owner)
-                    .SetUser(new User { Email = "affected-publication-owner@example.com" }))
+                    .SetUser(_dataFixture.DefaultUser()
+                        .WithEmail("affected-publication-owner@example.com")
+                        .Generate()))
                 .ForIndex(1, s => s
                     .SetRole(PublicationRole.Allower)
-                    .SetUser(new User { Email = "affected-publication-approver1@example.com" }))
+                    .SetUser(_dataFixture.DefaultUser()
+                        .WithEmail("affected-publication-approver1@example.com")
+                        .Generate()))
                 .ForIndex(2, s => s
                     .SetRole(PublicationRole.Allower)
-                    .SetUser(new User { Email = "affected-publication-approver2@example.com" }))
+                    .SetUser(_dataFixture.DefaultUser()
+                        .WithEmail("affected-publication-approver2@example.com")
+                        .Generate()))
                 .GenerateList();
 
             var otherPublicationTeam = _dataFixture
                 .DefaultUserPublicationRole()
                 .WithPublication(otherPublication)
                 .WithRole(PublicationRole.Owner)
-                .WithUser(new User { Email = "other-publication-owner@example.com" })
+                .WithUser(_dataFixture.DefaultUser()
+                    .WithEmail("other-publication-owner@example.com")
+                    .Generate())
                 .GenerateList(1);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -257,7 +266,9 @@ public abstract class NotificationsServiceTests
                 .DefaultUserPublicationRole()
                 .WithPublication(publication)
                 .WithRole(PublicationRole.Owner)
-                .WithUser(new User { Email = "publication-owner@example.com" })
+                .WithUser(_dataFixture.DefaultUser()
+                    .WithEmail("publication-owner@example.com")
+                    .Generate())
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -348,10 +359,14 @@ public abstract class NotificationsServiceTests
                 .WithPublication(publication)
                 .ForIndex(0, s => s
                     .SetRole(PublicationRole.Approver)
-                    .SetUser(new User { Email = "affected-publication-old-approver@example.com" }))
+                    .SetUser(_dataFixture.DefaultUser()
+                        .WithEmail("affected-publication-old-approver@example.com")
+                        .Generate()))
                 .ForIndex(1, s => s
                     .SetRole(PublicationRole.Drafter)
-                    .SetUser(new User { Email = "affected-publication-drafter@example.com" }))
+                    .SetUser(_dataFixture.DefaultUser()
+                        .WithEmail("affected-publication-drafter@example.com")
+                        .Generate()))
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();

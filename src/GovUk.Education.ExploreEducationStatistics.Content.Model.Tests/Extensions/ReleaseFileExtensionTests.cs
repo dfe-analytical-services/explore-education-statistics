@@ -1,4 +1,6 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
@@ -6,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
 public class ReleaseFileExtensionTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public void Path()
     {
@@ -57,10 +61,9 @@ public class ReleaseFileExtensionTests
                 ContentLength = 10240,
                 Type = Ancillary,
                 Created = new DateTime(),
-                CreatedBy = new User
-                {
-                    Email = "test@test.com"
-                }
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("test@test.com")
+                    .Generate()
             }
         };
 

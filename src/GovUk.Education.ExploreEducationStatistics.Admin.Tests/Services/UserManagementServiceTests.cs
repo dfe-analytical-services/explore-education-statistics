@@ -912,11 +912,9 @@ public class UserManagementServiceTests
     [Fact]
     public async Task DeleteUser()
     {
-        var internalUser = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = "test@test.com",
-        };
+        var internalUser = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var identityUser = new ApplicationUser
         {

@@ -646,10 +646,9 @@ public class ReleaseApprovalServiceTests
             .WithRelease(_fixture.DefaultRelease()
                 .WithPublication(_fixture.DefaultPublication()));
 
-        var existingUser1 = new User
-        {
-            Email = "test@test.com",
-        };
+        var existingUser1 = _fixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var existingUser1Invite = new UserReleaseInvite
         {
@@ -659,7 +658,9 @@ public class ReleaseApprovalServiceTests
             EmailSent = false,
         };
 
-        var existingUser2 = new User { Email = "test2@test.com" };
+        var existingUser2 = _fixture.DefaultUser()
+            .WithEmail("test2@test.com")
+            .Generate();
 
         var existingUser2SentInvite = new UserReleaseInvite
         {
@@ -669,10 +670,9 @@ public class ReleaseApprovalServiceTests
             EmailSent = true,
         };
 
-        var existingUser3 = new User
-        {
-            Email = "test3@test.com",
-        };
+        var existingUser3 = _fixture.DefaultUser()
+            .WithEmail("test3@test.com")
+            .Generate();
 
         var existingUser3NonPreReleaseInvite = new UserReleaseInvite
         {
@@ -1520,22 +1520,18 @@ public class ReleaseApprovalServiceTests
 
         var userReleaseRole1 = new UserReleaseRole
         {
-            User = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "test@test.com"
-            },
+            User = _fixture.DefaultUser()
+                .WithEmail("test@test.com")
+                .Generate(),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
 
         var userReleaseRole2 = new UserReleaseRole
         {
-            User = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "test2@test.com"
-            },
+            User = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate(),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
@@ -1620,11 +1616,9 @@ public class ReleaseApprovalServiceTests
 
         var userPublicationApproverRole = new UserPublicationRole
         {
-            User = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "test@test.com"
-            },
+            User = _fixture.DefaultUser()
+                .WithEmail("test@test.com")
+                .Generate(),
             Publication = releaseVersion.Release.Publication,
             Role = PublicationRole.Allower
         };
@@ -1707,22 +1701,18 @@ public class ReleaseApprovalServiceTests
 
         var userReleaseRole1 = new UserReleaseRole
         {
-            User = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "test@test.com"
-            },
+            User = _fixture.DefaultUser()
+                .WithEmail("test@test.com")
+                .Generate(),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };
 
         var userReleaseRole2 = new UserReleaseRole
         {
-            User = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = "test2@test.com"
-            },
+            User = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate(),
             ReleaseVersion = releaseVersion,
             Role = ReleaseRole.Approver,
         };

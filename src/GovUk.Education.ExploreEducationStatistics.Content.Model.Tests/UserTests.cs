@@ -1,9 +1,13 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests;
 
 public class UserTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     public static TheoryData<bool, DateTime?, DateTimeOffset, bool> ExpiryData => new()
     {
         // active, softDeletedDate, createdDate, expectedHasExpired
@@ -25,12 +29,11 @@ public class UserTests
         DateTimeOffset createdDate, 
         bool expectedHasExpired)
     {
-        var user = new User
-        {
-            Active = active,
-            SoftDeleted = softDeletedDate,
-            Created = createdDate
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithActive(active)
+            .WithSoftDeleted(softDeletedDate)
+            .WithCreated(createdDate)
+            .Generate();
 
         Assert.Equal(expectedHasExpired, user.Expired);
     }

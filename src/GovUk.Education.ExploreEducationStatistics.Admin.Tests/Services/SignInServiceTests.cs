@@ -361,7 +361,9 @@ public class SignInServiceTests
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository.Setup(mock => mock.FindDeletedUserPlaceholder())
-               .ReturnsAsync(new User { Id = deletedUserPlaceholderId })
+               .ReturnsAsync(_dataFixture.DefaultUser()
+                    .WithId(deletedUserPlaceholderId)
+                    .Generate())
                .Verifiable();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -423,18 +425,14 @@ public class SignInServiceTests
                 Accepted = false
             };
 
-            var existingUser = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = email.ToLower(),
-                FirstName = firstName,
-                LastName = lastName,
-                SoftDeleted = DateTime.UtcNow.AddDays(-1),
-                Active = false,
-                RoleId = Guid.NewGuid().ToString(),
-                Created = DateTime.UtcNow.AddDays(-2),
-                CreatedById = Guid.NewGuid()
-            };
+            var existingUser = _dataFixture.DefaultUser()
+                .WithEmail(email.ToLower())
+                .WithFirstName(firstName)
+                .WithLastName(lastName)
+                .WithSoftDeleted(DateTime.UtcNow.AddDays(-1))
+                .WithActive(false)
+                .WithCreated(DateTime.UtcNow.AddDays(-2))
+                .Generate();
 
             var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
                 .WithEmail(email)
@@ -598,18 +596,14 @@ public class SignInServiceTests
                 Accepted = false
             };
 
-            var existingUser = new User
-            {
-                Id = Guid.NewGuid(),
-                Email = email.ToLower(),
-                FirstName = firstName,
-                LastName = lastName,
-                SoftDeleted = DateTime.UtcNow.AddDays(-1),
-                Active = false,
-                RoleId = Guid.NewGuid().ToString(),
-                Created = DateTime.UtcNow.AddDays(-2),
-                CreatedById = Guid.NewGuid()
-            };
+            var existingUser = _dataFixture.DefaultUser()
+                .WithEmail(email.ToLower())
+                .WithFirstName(firstName)
+                .WithLastName(lastName)
+                .WithSoftDeleted(DateTime.UtcNow.AddDays(-1))
+                .WithActive(false)
+                .WithCreated(DateTime.UtcNow.AddDays(-2))
+                .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -662,7 +656,9 @@ public class SignInServiceTests
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository.Setup(mock => mock.FindDeletedUserPlaceholder())
-               .ReturnsAsync(new User { Id = deletedUserPlaceholderId })
+               .ReturnsAsync(_dataFixture.DefaultUser()
+                   .WithId(deletedUserPlaceholderId)
+                   .Generate())
                .Verifiable();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

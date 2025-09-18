@@ -1,4 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -6,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Databas
 
 public abstract class ContentDbContextTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     public class UserTests : ContentDbContextTests
     {
         public static TheoryData<bool, DateTime?, DateTimeOffset, bool> GlobalQueryFilterData => new()
@@ -31,19 +36,14 @@ public abstract class ContentDbContextTests
             DateTimeOffset createdDate,
             bool expectedToBeReturned)
         {
-            var validUser = new User
-            {
-                Active = true,
-                SoftDeleted = null,
-                Created = DateTimeOffset.UtcNow
-            };
+            var validUser = _dataFixture.DefaultUser()
+                .Generate();
 
-            var otherUser = new User
-            {
-                Active = active,
-                SoftDeleted = softDeletedDate,
-                Created = createdDate
-            };
+            var otherUser = _dataFixture.DefaultUser()
+                .WithActive(active)
+                .WithSoftDeleted(softDeletedDate)
+                .WithCreated(createdDate)
+                .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -75,13 +75,12 @@ public abstract class ContentDbContextTests
         [Fact]
         public async Task GlobalQueryFilter_DoesNotFilterPlaceholderDeletedUser()
         {
-            var placeholderDeletedUser = new User
-            {
-                Email = User.DeletedUserPlaceholderEmail,
-                Active = false,
-                SoftDeleted = DateTime.UtcNow,
-                Created = DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1)
-            };
+            var placeholderDeletedUser = _dataFixture.DefaultUser()
+                .WithEmail(User.DeletedUserPlaceholderEmail)
+                .WithActive(false)
+                .WithSoftDeleted(DateTime.UtcNow)
+                .WithCreated(DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1))
+                .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 

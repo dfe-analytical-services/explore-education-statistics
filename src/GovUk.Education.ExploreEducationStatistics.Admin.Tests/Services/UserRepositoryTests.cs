@@ -1,21 +1,23 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class UserRepositoryTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public async Task FindByEmail()
     {
-        var user = new User
-        {
-            Email = "test@test.com",
-            Active = true
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -37,11 +39,9 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindByEmail_DifferentCase()
     {
-        var user = new User
-        {
-            Email = "test@test.com",
-            Active = true
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -79,11 +79,9 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindByEmail_InactiveUser()
     {
-        var user = new User
-        {
-            Email = "test@test.com",
-            Active = false,
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -104,13 +102,12 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindDeletedUserPlaceholder()
     {
-        var user = new User
-        {
-            Email = User.DeletedUserPlaceholderEmail,
-            Active = false,
-            SoftDeleted = DateTime.UtcNow,
-            Created = DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays -1)
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail(User.DeletedUserPlaceholderEmail)
+            .WithActive(false)
+            .WithSoftDeleted(DateTime.UtcNow)
+            .WithCreated(DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1))
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 

@@ -19,9 +19,11 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task Create()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
 
-            var createdBy = new User();
+            var createdBy = _fixture.DefaultUser()
+                .Generate();
 
             var publication = new Publication();
 
@@ -70,7 +72,8 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             var userPublicationRole = new UserPublicationRole
             {
-                User = new User(),
+                User = _fixture.DefaultUser()
+                    .Generate(),
                 Publication = new Publication(),
                 Role = PublicationRole.Owner
             };
@@ -102,7 +105,8 @@ public abstract class UserPublicationRoleRepositoryTests
             // Setup a role but for a different publication to make sure it has no influence
             var userPublicationRoleOtherPublication = new UserPublicationRole
             {
-                User = new User(),
+                User = _fixture.DefaultUser()
+                    .Generate(),
                 Publication = new Publication(),
                 Role = PublicationRole.Owner
             };
@@ -133,8 +137,10 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task GetDistinctRolesByUser()
         {
-            var user1 = new User();
-            var user2 = new User();
+            var user1 = _fixture.DefaultUser()
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .Generate();
 
             var publication1 = _fixture.DefaultPublication()
                 .Generate();
@@ -191,7 +197,8 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task GetDistinctRolesByUser_InvalidRolesNotReturned()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
 
             var publication = _fixture.DefaultPublication()
                 .Generate();
@@ -233,8 +240,10 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task GetAllRolesByUserAndPublication()
         {
-            var user1 = new User();
-            var user2 = new User();
+            var user1 = _fixture.DefaultUser()
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .Generate();
 
             var publication1 = _fixture.DefaultPublication()
                 .Generate();
@@ -292,7 +301,8 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task GetAllRolesByUserAndPublication_InvalidRolesNotReturned()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
 
             var publication = _fixture.DefaultPublication()
                 .Generate();
@@ -353,10 +363,9 @@ public abstract class UserPublicationRoleRepositoryTests
             var email = "test@test.com";
 
             var userPublicationRole = _fixture.DefaultUserPublicationRole()
-                .WithUser(new User
-                {
-                    Email = email
-                })
+                .WithUser(_fixture.DefaultUser()
+                    .WithEmail(email)
+                    .Generate())
                 .WithPublication(_fixture.DefaultPublication())
                 .WithRole(publicationRole)
                 .Generate();
@@ -395,7 +404,9 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user1 = new User { Email = "test1@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
             var publication1 = _fixture.DefaultPublication()
                 .Generate();
             var userPublicationRole1 = _fixture.DefaultUserPublicationRole()
@@ -409,7 +420,9 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithRole(PublicationRole.Allower)
                 .Generate();
 
-            var user2 = new User { Email = "test2@test.com" };
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var publication2 = _fixture.DefaultPublication()
                 .Generate();
             var userPublicationRole2 = _fixture.DefaultUserPublicationRole()
@@ -423,7 +436,9 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithRole(PublicationRole.Owner)
                 .Generate();
 
-            var user3 = new User { Email = "test3@test.com" };
+            var user3 = _fixture.DefaultUser()
+                .WithEmail("test3@test.com")
+                .Generate();
             var publication3 = _fixture.DefaultPublication()
                 .Generate();
             var userPublicationRole3 = _fixture.DefaultUserPublicationRole()
@@ -468,8 +483,12 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var role1 = PublicationRole.Allower;
             var role2 = PublicationRole.Owner;
             var publication1 = _fixture.DefaultPublication()
@@ -530,8 +549,12 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task TargetUserHasNoRoles_DoesNothing()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var role1 = PublicationRole.Allower;
             var role2 = PublicationRole.Owner;
             var publication1 = _fixture.DefaultPublication()

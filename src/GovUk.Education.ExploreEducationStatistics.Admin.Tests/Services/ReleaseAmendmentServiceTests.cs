@@ -34,9 +34,12 @@ public class ReleaseAmendmentServiceTests
     [Fact]
     public async Task CreateReleaseAmendment()
     {
-        var originalCreatedBy = new User { Id = Guid.NewGuid() };
+        var originalCreatedBy = _fixture.DefaultUser()
+            .Generate();
 
-        var amendmentCreator = new User { Id = _userId };
+        var amendmentCreator = _fixture.DefaultUser()
+            .WithId(_userId)
+            .Generate();
 
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()
@@ -785,7 +788,9 @@ public class ReleaseAmendmentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
-            contentDbContext.Users.Add(new User { Id = _userId });
+            contentDbContext.Users.Add(_fixture.DefaultUser()
+                .WithId(_userId)
+                .Generate());
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -850,7 +855,9 @@ public class ReleaseAmendmentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
-            contentDbContext.Users.Add(new User { Id = _userId });
+            contentDbContext.Users.Add(_fixture.DefaultUser()
+                .WithId(_userId)
+                .Generate());
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -893,7 +900,9 @@ public class ReleaseAmendmentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
-            contentDbContext.Users.Add(new User { Id = _userId });
+            contentDbContext.Users.Add(_fixture.DefaultUser()
+                .WithId(_userId)
+                .Generate());
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -975,7 +984,9 @@ public class ReleaseAmendmentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
             contentDbContext.ReleaseVersions.AddRange(originalReleaseVersion);
-            contentDbContext.Users.AddRange(new User { Id = _userId });
+            contentDbContext.Users.AddRange(_fixture.DefaultUser()
+                .WithId(_userId)
+                .Generate());
 
             await contentDbContext.SaveChangesAsync();
 

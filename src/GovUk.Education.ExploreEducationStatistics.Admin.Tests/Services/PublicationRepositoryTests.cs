@@ -15,7 +15,8 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser()
     {
-        var user = new User { Id = Guid.NewGuid() };
+        var user = _dataFixture.DefaultUser()
+            .Generate();
 
         Theme theme = _dataFixture.DefaultTheme();
 
@@ -84,7 +85,8 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_NoThemeIdProvided()
     {
-        var user = new User { Id = Guid.NewGuid() };
+        var user = _dataFixture.DefaultUser()
+            .Generate();
 
         // Set up publication and release roles for the user
         // Publications are all in different themes
@@ -145,7 +147,8 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_NoPublicationsForTheme()
     {
-        var user = new User { Id = Guid.NewGuid() };
+        var user = _dataFixture.DefaultUser()
+            .Generate();
 
         Theme theme = _dataFixture.DefaultTheme();
 
@@ -188,20 +191,23 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_NoPublicationsForUser()
     {
-        var user = new User { Id = Guid.NewGuid() };
+        var user = _dataFixture.DefaultUser()
+            .Generate();
 
         Theme theme = _dataFixture.DefaultTheme();
 
         // Set up other publication and release roles unrelated to this user
 
         UserPublicationRole userPublicationRole = _dataFixture.DefaultUserPublicationRole()
-            .WithUser(new User { Id = Guid.NewGuid() })
+            .WithUser(_dataFixture.DefaultUser()
+                .Generate())
             .WithPublication(_dataFixture.DefaultPublication()
                 .WithTheme(theme))
             .WithRole(PublicationRole.Owner);
 
         UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(new User { Id = Guid.NewGuid() })
+            .WithUser(_dataFixture.DefaultUser()
+                .Generate())
             .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
                 .WithRelease(_dataFixture.DefaultRelease()
                     .WithPublication(_dataFixture.DefaultPublication()
@@ -231,7 +237,8 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_PublicationGrantedByBothPublicationAndReleaseRoles()
     {
-        var user = new User { Id = Guid.NewGuid() };
+        var user = _dataFixture.DefaultUser()
+            .Generate();
 
         Publication publication = _dataFixture.DefaultPublication()
             .WithTheme(_dataFixture.DefaultTheme());
