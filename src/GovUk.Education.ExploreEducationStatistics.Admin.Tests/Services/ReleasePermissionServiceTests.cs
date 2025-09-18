@@ -32,22 +32,20 @@ public class ReleasePermissionServiceTests
                 .WithPublication(_dataFixture.DefaultPublication()));
 
         UserReleaseRole user1ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            })
+            .WithUser(_dataFixture.DefaultUser()
+                .WithFirstName("User1")
+                .WithLastName("One")
+                .WithEmail("user1@test.com")
+                .Generate())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
         UserReleaseRole user2ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            })
+            .WithUser(_dataFixture.DefaultUser()
+                .WithFirstName("User2")
+                .WithLastName("Two")
+                .WithEmail("user2@test.com")
+                .Generate())
             .WithReleaseVersion(releaseVersion)
             .WithRole(PrereleaseViewer);
 
@@ -281,12 +279,11 @@ public class ReleasePermissionServiceTests
             .DefaultPublication()
             .WithReleases(ListOf(release1, release2));
 
-        var user1 = new User
-        {
-            FirstName = "User1",
-            LastName = "One",
-            Email = "user1@test.com",
-        };
+        var user1 = _dataFixture.DefaultUser()
+            .WithFirstName("User1")
+            .WithLastName("One")
+            .WithEmail("user1@test.com")
+            .Generate();
         var user1ReleaseRole1 = new UserReleaseRole
         {
             User = user1,
@@ -294,12 +291,12 @@ public class ReleasePermissionServiceTests
             Role = Contributor,
         };
 
-        var user2 = new User
-        {
-            FirstName = "User2",
-            LastName = "Two",
-            Email = "user2@test.com",
-        };
+        var user2 = _dataFixture.DefaultUser()
+            .WithFirstName("User2")
+            .WithLastName("Two")
+            .WithEmail("user2@test.com")
+            .Generate();
+
         var user2ReleaseRole1 = new UserReleaseRole
         {
             User = user2,
@@ -307,7 +304,8 @@ public class ReleasePermissionServiceTests
             Role = Contributor,
         };
 
-        var user3 = new User();
+        var user3 = _dataFixture.DefaultUser()
+            .Generate();
         var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
         {
             User = user3,
@@ -428,16 +426,20 @@ public class ReleasePermissionServiceTests
                 .WithPublication(_dataFixture.DefaultPublication()));
 
         UserReleaseRole user1ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(new User { Id = Guid.NewGuid() })
+            .WithUser(_dataFixture.DefaultUser()
+                .Generate())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
         UserReleaseRole user2ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(new User { Id = Guid.NewGuid(), Email = "test@test.com" })
+            .WithUser(_dataFixture.DefaultUser()
+                .WithEmail("test@test.com")
+                .Generate())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
-        var user3 = new User { Id = Guid.NewGuid() };
+        var user3 = _dataFixture.DefaultUser()
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 

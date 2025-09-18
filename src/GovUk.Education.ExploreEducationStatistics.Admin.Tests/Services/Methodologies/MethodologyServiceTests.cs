@@ -31,10 +31,9 @@ public class MethodologyServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    private static readonly User User = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly User User = new DataFixture()
+        .DefaultUser()
+        .WithId(Guid.NewGuid());
 
     private static readonly Contact MockContact = new()
     {
@@ -2758,11 +2757,10 @@ public class MethodologyServiceTests
             }
         };
 
-        var user = new User
-        {
-            Id = User.Id,
-            Email = "test@test.com",
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithId(User.Id)
+            .WithEmail("test@test.com")
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3074,7 +3072,8 @@ public class MethodologyServiceTests
         public async Task DifferentUserIsApproverOnOwningPublication_NotIncluded()
         {
             // Set up a different User as the Approver for the owning Publication.
-            var otherUser = new User();
+            var otherUser = _fixture.DefaultUser()
+                .Generate();
 
             var publication = _fixture
                 .DefaultPublication()
@@ -3357,7 +3356,8 @@ public class MethodologyServiceTests
         public async Task DifferentUserIsApproverOnOwningPublicationRelease_NotIncluded()
         {
             // Set up a different User as the Approver for the owning Publication.
-            var otherUser = new User();
+            var otherUser = _fixture.DefaultUser()
+                .Generate();
 
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 

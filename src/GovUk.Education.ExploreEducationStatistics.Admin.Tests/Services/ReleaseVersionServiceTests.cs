@@ -57,7 +57,9 @@ public abstract class ReleaseVersionServiceTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
-    private static readonly User User = new() { Id = Guid.NewGuid() };
+    private static readonly User User = new DataFixture()
+        .DefaultUser()
+        .WithId(Guid.NewGuid());
 
     public class GetDeleteDataFilePlanTests : ReleaseVersionServiceTests
     {
@@ -2564,7 +2566,8 @@ public abstract class ReleaseVersionServiceTests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var otherUser = new User();
+            var otherUser = _fixture.DefaultUser()
+                .Generate();
 
             var publications = _fixture
                 .DefaultPublication()
@@ -2654,7 +2657,8 @@ public abstract class ReleaseVersionServiceTests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var otherUser = new User();
+            var otherUser = _fixture.DefaultUser()
+                .Generate();
 
             var publications = _fixture
                 .DefaultPublication()
