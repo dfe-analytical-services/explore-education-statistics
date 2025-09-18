@@ -112,6 +112,7 @@ public class EinTileGroupBlockViewModel : EinContentBlockViewModel
             Title = groupBlock.Title,
             Tiles = groupBlock.Tiles
                 .Select(EinTileViewModel.FromModel)
+                .OrderBy(tile => tile.Order)
                 .ToList(),
         };
     }

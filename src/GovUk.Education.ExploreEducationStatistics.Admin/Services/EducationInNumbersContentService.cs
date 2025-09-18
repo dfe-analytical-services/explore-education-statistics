@@ -21,6 +21,7 @@ public class EducationInNumbersContentService(
         return await contentDbContext.EducationInNumbersPages
             .Include(page => page.Content)
             .ThenInclude(section => section.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .Where(page => page.Id == pageId)
             .FirstOrNotFoundAsync()
             .OnSuccess(EinContentViewModel.FromModel);
@@ -80,6 +81,7 @@ public class EducationInNumbersContentService(
         var page = contentDbContext.EducationInNumbersPages
             .Include(p => p.Content)
             .ThenInclude(s => s.Content)
+            .ThenInclude(b => (b as EinTileGroupBlock)!.Tiles)
             .SingleOrDefault(p => p.Id == pageId);
 
         if (page == null)
@@ -117,6 +119,7 @@ public class EducationInNumbersContentService(
         var page = contentDbContext.EducationInNumbersPages
             .Include(p => p.Content)
             .ThenInclude(section => section.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .SingleOrDefault(p => p.Id == pageId);
 
         if (page == null)
@@ -282,7 +285,8 @@ public class EducationInNumbersContentService(
         Guid blockId)
     {
         var section = contentDbContext.EinContentSections
-            .Include(p => p.Content)
+            .Include(section => section.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .SingleOrDefault(s => s.Id == sectionId
                 && s.EducationInNumbersPageId == pageId);
 

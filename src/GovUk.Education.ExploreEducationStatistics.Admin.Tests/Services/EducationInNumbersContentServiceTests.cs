@@ -55,11 +55,24 @@ public class EducationInNumbersContentServiceTests
                         Heading = "Section A",
                         Content =
                         [
-                            new EinHtmlBlock
+                            new EinTileGroupBlock()
                             {
                                 Id = _blockAId,
                                 Order = 0,
-                                Body = "Block A Body"
+                                Title = "TileGroupBlock title",
+                                Tiles =
+                                [
+                                    new EinFreeTextStatTile
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Title = "Tile title",
+                                        Statistic = "Over 9000!",
+                                        Trend = "It's up",
+                                        Order = 0,
+                                        LinkText = "Link text",
+                                        LinkUrl = "http://link.url",
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -87,10 +100,19 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal("Section B", viewModel.Content[1].Heading);
 
             var blockAGenericType = Assert.Single(viewModel.Content[0].Content);
-            var blockA = Assert.IsType<EinHtmlBlockViewModel>(blockAGenericType);
+            var blockA = Assert.IsType<EinTileGroupBlockViewModel>(blockAGenericType);
             Assert.Equal(_blockAId, blockA.Id);
             Assert.Equal(0, blockA.Order);
-            Assert.Equal("Block A Body", blockA.Body);
+            Assert.Equal("TileGroupBlock title", blockA.Title);
+
+            var tile = Assert.Single(blockA.Tiles);
+            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(tile);
+            Assert.Equal("Tile title", freeTextStatTile.Title);
+            Assert.Equal("Over 9000!", freeTextStatTile.Statistic);
+            Assert.Equal("It's up", freeTextStatTile.Trend);
+            Assert.Equal(0, freeTextStatTile.Order);
+            Assert.Equal("Link text", freeTextStatTile.LinkText);
+            Assert.Equal("http://link.url", freeTextStatTile.LinkUrl);
 
             var blockBGenericType = Assert.Single(viewModel.Content[1].Content);
             var blockB = Assert.IsType<EinHtmlBlockViewModel>(blockBGenericType);
