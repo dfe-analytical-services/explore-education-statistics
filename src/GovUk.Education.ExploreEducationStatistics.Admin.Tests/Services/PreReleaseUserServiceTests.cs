@@ -55,19 +55,17 @@ public class PreReleaseUserServiceTests
                 {
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.1@test.com"
-                    }
+                    User = _dataFixture.DefaultUser()
+                        .WithEmail("existing.1@test.com")
+                        .Generate()
                 },
                 new UserReleaseRole
                 {
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.2@test.com"
-                    }
+                    User = _dataFixture.DefaultUser()
+                        .WithEmail("existing.2@test.com")
+                        .Generate()
                 }
             );
 
@@ -131,19 +129,17 @@ public class PreReleaseUserServiceTests
                 {
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.2@test.com",
-                    }
+                    User = _dataFixture.DefaultUser()
+                        .WithEmail("existing.2@test.com")
+                        .Generate()
                 },
                 new UserReleaseRole
                 {
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.1@test.com",
-                    }
+                    User = _dataFixture.DefaultUser()
+                        .WithEmail("existing.1@test.com")
+                        .Generate()
                 }
             );
 
@@ -202,20 +198,18 @@ public class PreReleaseUserServiceTests
                 {
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.Contributor,
-                    User = new User
-                    {
-                        Email = "existing.1@test.com",
-                    }
+                    User = _dataFixture.DefaultUser()
+                        .WithEmail("existing.1@test.com")
+                        .Generate()
                 },
                 // Different release user
                 new UserReleaseRole
                 {
                     ReleaseVersion = otherReleaseVersion,
                     Role = ReleaseRole.PrereleaseViewer,
-                    User = new User
-                    {
-                        Email = "existing.2@test.com",
-                    }
+                    User = _dataFixture.DefaultUser()
+                        .WithEmail("existing.2@test.com")
+                        .Generate()
                 }
             );
 
@@ -643,10 +637,9 @@ public class PreReleaseUserServiceTests
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -827,10 +820,9 @@ public class PreReleaseUserServiceTests
 
         var existingUsersByEmail = existingEmailsWithNoRolesOrInvites
             .Concat(emailsWithExistingRoles)
-            .Select(email => new User
-            {
-                Email = email
-            })
+            .Select(email => _dataFixture.DefaultUser()
+                .WithEmail(email)
+                .Generate())
             .ToDictionary(u => u.Email);
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1018,10 +1010,9 @@ public class PreReleaseUserServiceTests
 
         var existingUsersByEmail = existingEmailsWithNoRolesOrInvites
             .Concat(emailsWithExistingRoles)
-            .Select(email => new User
-            {
-                Email = email
-            })
+            .Select(email => _dataFixture.DefaultUser()
+                .WithEmail(email)
+                .Generate())
             .ToDictionary(u => u.Email);
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1203,10 +1194,9 @@ public class PreReleaseUserServiceTests
     [Fact]
     public async Task RemovePreReleaseUser_NoRemainingReleaseInvites_AcceptedInvite()
     {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var unacceptedUserInvite = new UserInvite
         {
@@ -1298,10 +1288,9 @@ public class PreReleaseUserServiceTests
     [Fact]
     public async Task RemovePreReleaseUser_RemainingReleaseInvites()
     {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var unacceptedUserInvite = new UserInvite
         {
@@ -1405,10 +1394,9 @@ public class PreReleaseUserServiceTests
     [Fact]
     public async Task RemovePreReleaseUser_NoRemainingReleaseInvites()
     {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var unacceptedUserInvite = new UserInvite
         {
