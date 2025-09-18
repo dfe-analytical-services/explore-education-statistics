@@ -358,7 +358,7 @@ public class SignInServiceTests
 
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
-            userRepository.Setup(mock => mock.FindDeletedUserPlaceholder())
+            userRepository.Setup(mock => mock.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
                .ReturnsAsync(_dataFixture.DefaultUser()
                     .WithId(deletedUserPlaceholderId)
                     .Generate());
@@ -648,7 +648,7 @@ public class SignInServiceTests
 
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
-            userRepository.Setup(mock => mock.FindDeletedUserPlaceholder())
+            userRepository.Setup(mock => mock.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
                .ReturnsAsync(_dataFixture.DefaultUser()
                    .WithId(deletedUserPlaceholderId)
                    .Generate());
