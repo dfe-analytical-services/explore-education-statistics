@@ -10,24 +10,27 @@ public class UserTests
 
     public static TheoryData<bool, DateTime?, DateTimeOffset, bool> ExpiryData => new()
     {
-        // active, softDeletedDate, createdDate, expectedHasExpired
+        // active, softDeletedDate, createdDate, expectShouldExpire
+
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), true },
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
         { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
         { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
         { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
         { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
+        // These two cases should be impossible in reality as a soft-deleted user cannot be active. However,
+        // they are included here for completeness.
         { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
         { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
     };
 
     [Theory]
     [MemberData(nameof(ExpiryData))]
-    public void Expired(
+    public void ShouldExpire(
         bool active, 
         DateTime? softDeletedDate, 
         DateTimeOffset createdDate, 
-        bool expectedHasExpired)
+        bool expectShouldExpire)
     {
         var user = _dataFixture.DefaultUser()
             .WithActive(active)
@@ -35,6 +38,6 @@ public class UserTests
             .WithCreated(createdDate)
             .Generate();
 
-        Assert.Equal(expectedHasExpired, user.Expired);
+        Assert.Equal(expectShouldExpire, user.ShouldExpire);
     }
 }
