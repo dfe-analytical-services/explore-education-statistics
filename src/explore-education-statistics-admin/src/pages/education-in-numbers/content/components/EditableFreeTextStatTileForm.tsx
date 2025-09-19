@@ -45,8 +45,8 @@ export default function EditableFreeTextStatTileForm({
           linkUrl: statTile?.linkUrl,
         }}
         validationSchema={Yup.object<FreeTextStatTileFormValues>({
-          title: Yup.string().required('Enter a title').max(60),
-          statistic: Yup.string().required('Enter a statistic').max(12),
+          title: Yup.string().required('Enter a title').max(100),
+          statistic: Yup.string().required('Enter a statistic').max(30),
           trend: Yup.string().required('Enter a trend').max(230),
           linkText: Yup.string().when('linkUrl', {
             is: (val: string) => val !== '',

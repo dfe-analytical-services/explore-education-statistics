@@ -14,7 +14,7 @@ const FreeTextStatTile = ({
   const { title, trend, statistic, linkUrl, linkText } = tile;
 
   return (
-    <div className={styles.tile}>
+    <div className={styles.tile} data-testid={`${testId}-tile`}>
       <h4 className="govuk-body-l" data-testid={`${testId}-title`}>
         {title}
       </h4>
