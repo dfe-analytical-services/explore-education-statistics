@@ -18,13 +18,13 @@ public abstract class ReleaseUpdatesControllerTests
     private const int Page = 5;
     private const int PageSize = 50;
 
-    public class GetPaginatedUpdatesForReleaseTests : ReleaseUpdatesControllerTests
+    public class GetReleaseUpdatesTests : ReleaseUpdatesControllerTests
     {
         [Fact]
-        public async Task WhenServiceReturnsPaginatedUpdates_ReturnsOk()
+        public async Task WhenServiceReturnsReleaseUpdates_ReturnsOk()
         {
             // Arrange
-            var paginatedUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
+            var releaseUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
                     new ReleaseUpdateDtoBuilder().Build()
                 ],
                 totalResults: 1,
@@ -39,20 +39,20 @@ public abstract class ReleaseUpdatesControllerTests
                 PageSize = PageSize
             };
 
-            _releaseUpdatesService.WhereHasPaginatedUpdates(paginatedUpdates);
+            _releaseUpdatesService.WhereHasReleaseUpdates(releaseUpdates);
 
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetPaginatedUpdatesForRelease(request);
+            var result = await sut.GetReleaseUpdates(request);
 
             // Assert
-            _releaseUpdatesService.Assert.GetPaginatedUpdatesForReleaseWasCalled(
+            _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: request.Page,
                 pageSize: request.PageSize);
-            result.AssertOkResult(paginatedUpdates);
+            result.AssertOkResult(releaseUpdates);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ public abstract class ReleaseUpdatesControllerTests
             // Arrange
             const int defaultPage = 1;
             const int defaultPageSize = 10;
-            var paginatedUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
+            var releaseUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
                     new ReleaseUpdateDtoBuilder().Build()
                 ],
                 totalResults: 1,
@@ -75,20 +75,20 @@ public abstract class ReleaseUpdatesControllerTests
                 ReleaseSlug = ReleaseSlug
             };
 
-            _releaseUpdatesService.WhereHasPaginatedUpdates(paginatedUpdates);
+            _releaseUpdatesService.WhereHasReleaseUpdates(releaseUpdates);
 
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetPaginatedUpdatesForRelease(request);
+            var result = await sut.GetReleaseUpdates(request);
 
             // Assert
-            _releaseUpdatesService.Assert.GetPaginatedUpdatesForReleaseWasCalled(
+            _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: defaultPage,
                 pageSize: defaultPageSize);
-            result.AssertOkResult(paginatedUpdates);
+            result.AssertOkResult(releaseUpdates);
         }
 
         [Fact]
@@ -101,15 +101,15 @@ public abstract class ReleaseUpdatesControllerTests
                 ReleaseSlug = ReleaseSlug
             };
 
-            _releaseUpdatesService.WhereGetPaginatedUpdatesForReleaseReturnsNotFound();
+            _releaseUpdatesService.WhereGetReleaseUpdatesReturnsNotFound();
 
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetPaginatedUpdatesForRelease(request);
+            var result = await sut.GetReleaseUpdates(request);
 
             // Assert
-            _releaseUpdatesService.Assert.GetPaginatedUpdatesForReleaseWasCalled(
+            _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug);
             result.AssertNotFoundResult();

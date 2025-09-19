@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 
 public interface IReleaseUpdatesService
 {
-    Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetPaginatedUpdatesForRelease(
+    Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetReleaseUpdates(
         string publicationSlug,
         string releaseSlug,
         int page = 1,

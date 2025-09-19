@@ -13,7 +13,7 @@ public abstract class ReleaseUpdatesServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetPaginatedUpdatesForReleaseTests : ReleaseUpdatesServiceTests
+    public class GetReleaseUpdatesTests : ReleaseUpdatesServiceTests
     {
         [Theory]
         [InlineData(0, 1, 10)]
@@ -48,7 +48,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug,
                     page: page,
@@ -93,7 +93,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug);
 
@@ -153,7 +153,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug);
 
@@ -211,7 +211,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug);
 
@@ -254,7 +254,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug);
 
@@ -295,7 +295,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug);
 
@@ -323,7 +323,7 @@ public abstract class ReleaseUpdatesServiceTests
             var sut = BuildService(context);
 
             // Act
-            var outcome = await sut.GetPaginatedUpdatesForRelease(
+            var outcome = await sut.GetReleaseUpdates(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug);
 
@@ -350,7 +350,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: releaseSlug);
 
@@ -379,7 +379,7 @@ public abstract class ReleaseUpdatesServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPaginatedUpdatesForRelease(
+                var outcome = await sut.GetReleaseUpdates(
                     publicationSlug: publication.Slug,
                     releaseSlug: release.Slug);
 
