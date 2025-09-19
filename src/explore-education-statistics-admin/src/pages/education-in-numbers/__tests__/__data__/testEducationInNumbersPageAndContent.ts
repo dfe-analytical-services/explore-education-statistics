@@ -1,5 +1,6 @@
 import { EinContent } from '@admin/services/educationInNumbersContentService';
 import { EinSummaryWithPrevVersion } from '@admin/services/educationInNumbersService';
+import testTile from '../../content/__tests__/__data__/testTile';
 
 const testEinPageVersion: EinSummaryWithPrevVersion = {
   id: 'test-ein-page',
@@ -40,6 +41,33 @@ export const testEinPageContent: EinContent = {
       order: 1,
       heading: 'New section',
       content: [],
+      caption: '',
+    },
+    {
+      id: 'content-section-2',
+      order: 2,
+      heading: 'New section',
+      content: [
+        {
+          id: 'content-section-0-content-0',
+          title: 'Test tile group',
+          type: 'TileGroupBlock',
+          order: 0,
+          tiles: [
+            testTile,
+            {
+              id: 'tile-2',
+              type: 'FreeTextStatTile',
+              order: 1,
+              title: 'Tile 2 title',
+              statistic: '2000',
+              trend: 'Tile 2 trend',
+              linkText: 'Tile 2 link text',
+              linkUrl: 'https://example.com/tile-2',
+            },
+          ],
+        },
+      ],
       caption: '',
     },
   ],
