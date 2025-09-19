@@ -15,8 +15,8 @@ public abstract class ReleaseUpdatesControllerTests
 
     private const string PublicationSlug = "test-publication";
     private const string ReleaseSlug = "test-release";
-    private const int Page = 5;
-    private const int PageSize = 50;
+    private const int Page = 1;
+    private const int PageSize = 10;
 
     public class GetReleaseUpdatesTests : ReleaseUpdatesControllerTests
     {
@@ -24,12 +24,11 @@ public abstract class ReleaseUpdatesControllerTests
         public async Task WhenServiceReturnsReleaseUpdates_ReturnsOk()
         {
             // Arrange
-            var releaseUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
+            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate([
                     new ReleaseUpdateDtoBuilder().Build()
                 ],
-                totalResults: 1,
-                page: 1,
-                pageSize: 10);
+                page: Page,
+                pageSize: PageSize);
 
             var request = new GetReleaseUpdatesRequest
             {
@@ -61,12 +60,11 @@ public abstract class ReleaseUpdatesControllerTests
             // Arrange
             const int defaultPage = 1;
             const int defaultPageSize = 10;
-            var releaseUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
+            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate([
                     new ReleaseUpdateDtoBuilder().Build()
                 ],
-                totalResults: 1,
-                page: 1,
-                pageSize: 10);
+                page: defaultPage,
+                pageSize: defaultPageSize);
 
             // No page or pageSize query parameters set on request
             var request = new GetReleaseUpdatesRequest

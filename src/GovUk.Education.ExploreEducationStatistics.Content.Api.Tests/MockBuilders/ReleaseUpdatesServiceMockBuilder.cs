@@ -26,7 +26,7 @@ public class ReleaseUpdatesServiceMockBuilder
     public ReleaseUpdatesServiceMockBuilder()
     {
         _mock.Setup(GetReleaseUpdates)
-            .ReturnsAsync(() => _releaseUpdates ?? new PaginatedListViewModel<ReleaseUpdateDto>([], 0, 1, 10));
+            .ReturnsAsync(() => _releaseUpdates ?? PaginatedListViewModel<ReleaseUpdateDto>.Paginate([], 1, 10));
     }
 
     public IReleaseUpdatesService Build() => _mock.Object;
