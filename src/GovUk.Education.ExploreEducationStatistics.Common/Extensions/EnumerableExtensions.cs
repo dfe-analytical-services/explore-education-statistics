@@ -170,6 +170,28 @@ public static class EnumerableExtensions
         return string.Join(delimiter, source);
     }
 
+    /// <summary>
+    /// Apply offset pagination to <see cref="IEnumerable{T}"/> collections in-memory.
+    /// </summary>
+    /// <remarks>
+    /// This method uses deferred execution and does not enumerate the source sequence
+    /// until the returned sequence is enumerated.
+    /// </remarks>
+    /// <typeparam name="T">The type of elements in the source sequence</typeparam>
+    /// <param name="source">The source sequence to paginate</param>
+    /// <param name="page">The page number to return</param>
+    /// <param name="pageSize">The number of elements that should be returned</param>
+    /// <returns>
+    /// A sequence containing the elements of the specified page.
+    /// </returns>
+    public static IEnumerable<T> Paginate<T>(
+        this IEnumerable<T> source,
+        int page,
+        int pageSize)
+    {
+        return source.Skip((page - 1) * pageSize).Take(pageSize);
+    }
+
     public static IEnumerable<TResult> SelectNullSafe<TSource, TResult>(
         this IEnumerable<TSource>? source, Func<TSource, TResult> selector)
     {
