@@ -5,16 +5,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 
-public class ReleasesService(ContentDbContext contentDbContext) : IReleasesService
+public class PublicationReleasesService(ContentDbContext contentDbContext) : IPublicationReleasesService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<IReleaseEntryDto>>>
-        GetPaginatedReleaseEntriesForPublication(
+    public async Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>>
+        GetPublicationReleases(
             string publicationSlug,
             int page = 1,
             int pageSize = 10,
@@ -29,16 +29,16 @@ public class ReleasesService(ContentDbContext contentDbContext) : IReleasesServi
                     GetPublishedOrLegacyReleaseEntries(publication, publishedReleaseVersions);
 
                 var latestReleaseEntry = releaseEntries
-                    .OfType<ReleaseEntry>()
+                    .OfType<PublicationReleaseEntry>()
                     .FirstOrDefault();
 
                 // Map to DTO's in the same order as the publication's release entries, before paginating in-memory
-                var summaries = MapToReleaseEntryDtos(
+                var entryDtos = MapToPublicationReleaseEntryDtos(
                     releaseEntries,
                     publishedReleaseVersions,
                     latestReleaseEntry);
 
-                return PaginatedListViewModel<IReleaseEntryDto>.Paginate(summaries, page, pageSize);
+                return PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(entryDtos, page, pageSize);
             });
 
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
@@ -63,23 +63,23 @@ public class ReleasesService(ContentDbContext contentDbContext) : IReleasesServi
         Publication publication,
         Dictionary<Guid, ReleaseVersion> publishedReleaseVersionsByReleaseId) =>
         publication.ReleaseEntries
-            .Where(e => e is LegacyReleaseEntry ||
-                        (e is ReleaseEntry release &&
+            .Where(e => e is LegacyPublicationReleaseEntry ||
+                        (e is PublicationReleaseEntry release &&
                          publishedReleaseVersionsByReleaseId.ContainsKey(release.ReleaseId)))
             .ToList();
 
-    private static List<IReleaseEntryDto> MapToReleaseEntryDtos(
+    private static List<IPublicationReleaseEntryDto> MapToPublicationReleaseEntryDtos(
         List<IPublicationReleaseEntry> releaseEntries,
         Dictionary<Guid, ReleaseVersion> releaseVersionsByReleaseId,
-        ReleaseEntry? latestReleaseEntry) =>
+        PublicationReleaseEntry? latestReleaseEntry) =>
         releaseEntries
-            .Select<IPublicationReleaseEntry, IReleaseEntryDto>(e => e switch
+            .Select<IPublicationReleaseEntry, IPublicationReleaseEntryDto>(e => e switch
             {
-                LegacyReleaseEntry legacyReleaseEntry =>
-                    LegacyReleaseEntryDto.FromLegacyReleaseEntry(legacyReleaseEntry),
+                LegacyPublicationReleaseEntry releaseEntry =>
+                    LegacyPublicationReleaseEntryDto.FromLegacyPublicationReleaseEntry(releaseEntry),
 
-                ReleaseEntry releaseEntry =>
-                    ReleaseEntryDto.FromRelease(
+                PublicationReleaseEntry releaseEntry =>
+                    PublicationReleaseEntryDto.FromRelease(
                         releaseVersionsByReleaseId[releaseEntry.ReleaseId].Release,
                         isLatestRelease: releaseEntry == latestReleaseEntry,
                         lastUpdated: releaseVersionsByReleaseId[releaseEntry.ReleaseId].Published!.Value,

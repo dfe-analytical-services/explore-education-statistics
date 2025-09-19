@@ -49,7 +49,9 @@ public class Publication
     public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = [];
 
     /// <summary>
-    /// Converts release series items to either ReleaseEntry or LegacyReleaseEntry.
+    /// Provides a polymorphic list of the release series entries for this publication,
+    /// allowing consumers to interact with types of the <see cref="IPublicationReleaseEntry"/> interface
+    /// rather than directly with <see cref="ReleaseSeriesItem"/>.
     /// </summary>
     public List<IPublicationReleaseEntry> ReleaseEntries => ReleaseSeries
         .Select(item => item.ToPublicationReleaseEntry())

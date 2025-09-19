@@ -17,20 +17,20 @@ public record ReleaseSeriesItem
     public bool IsLegacyLink => ReleaseId == null;
 
     /// <summary>
-    /// Converts the ReleaseSeriesItem to either a LegacyReleaseEntry or a ReleaseEntry,
-    /// to allow polymorphic handling of the types of release series items.
-    /// Ideally ReleaseSeriesItem should be replaced with this polymorphic model and JSON polymorphic serialization be
-    /// added.
+    /// Converts the instance to either a <see cref="LegacyPublicationReleaseEntry"/> or
+    /// a <see cref="PublicationReleaseEntry"/>, allowing consumers to interact with these types, rather than directly
+    /// with <see cref="ReleaseSeriesItem"/>. Ideally <see cref="ReleaseSeriesItem"/> should be replaced with this
+    /// polymorphic model and JSON polymorphic serialization be added to the database configuration.
     /// </summary>
     public IPublicationReleaseEntry ToPublicationReleaseEntry()
     {
         return IsLegacyLink
-            ? new LegacyReleaseEntry
+            ? new LegacyPublicationReleaseEntry
             {
                 Id = Id,
                 Title = LegacyLinkDescription ?? string.Empty,
                 Url = LegacyLinkUrl ?? string.Empty
             }
-            : new ReleaseEntry { ReleaseId = ReleaseId!.Value };
+            : new PublicationReleaseEntry { ReleaseId = ReleaseId!.Value };
     }
 }

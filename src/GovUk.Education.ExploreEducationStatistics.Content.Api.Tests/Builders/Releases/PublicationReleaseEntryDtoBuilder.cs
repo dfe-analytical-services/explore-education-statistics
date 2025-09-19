@@ -1,8 +1,8 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
 
-public class ReleaseEntryDtoBuilder
+public class PublicationReleaseEntryDtoBuilder
 {
     private Guid _releaseId = Guid.NewGuid();
     private bool _isLatestRelease;
@@ -14,7 +14,7 @@ public class ReleaseEntryDtoBuilder
     private string _coverageTitle = "Calendar year";
     private string _yearTitle = "2024";
 
-    public ReleaseEntryDto Build() => new()
+    public PublicationReleaseEntryDto Build() => new()
     {
         ReleaseId = _releaseId,
         IsLatestRelease = _isLatestRelease,
@@ -27,55 +27,55 @@ public class ReleaseEntryDtoBuilder
         YearTitle = _yearTitle
     };
 
-    public ReleaseEntryDtoBuilder WithReleaseId(Guid releaseId)
+    public PublicationReleaseEntryDtoBuilder WithReleaseId(Guid releaseId)
     {
         _releaseId = releaseId;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithIsLatestRelease(bool isLatestRelease)
+    public PublicationReleaseEntryDtoBuilder WithIsLatestRelease(bool isLatestRelease)
     {
         _isLatestRelease = isLatestRelease;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithLabel(string? label)
+    public PublicationReleaseEntryDtoBuilder WithLabel(string? label)
     {
         _label = label;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithLastUpdated(DateTime lastUpdated)
+    public PublicationReleaseEntryDtoBuilder WithLastUpdated(DateTime lastUpdated)
     {
         _lastUpdated = lastUpdated;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithPublished(DateTime published)
+    public PublicationReleaseEntryDtoBuilder WithPublished(DateTime published)
     {
         _published = published;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithSlug(string slug)
+    public PublicationReleaseEntryDtoBuilder WithSlug(string slug)
     {
         _slug = slug;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithTitle(string title)
+    public PublicationReleaseEntryDtoBuilder WithTitle(string title)
     {
         _title = title;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithCoverageTitle(string coverageTitle)
+    public PublicationReleaseEntryDtoBuilder WithCoverageTitle(string coverageTitle)
     {
         _coverageTitle = coverageTitle;
         return this;
     }
 
-    public ReleaseEntryDtoBuilder WithYearTitle(string yearTitle)
+    public PublicationReleaseEntryDtoBuilder WithYearTitle(string yearTitle)
     {
         _yearTitle = yearTitle;
         return this;

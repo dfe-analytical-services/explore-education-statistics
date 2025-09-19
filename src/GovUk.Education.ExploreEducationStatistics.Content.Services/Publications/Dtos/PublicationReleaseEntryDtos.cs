@@ -1,16 +1,16 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
-public interface IReleaseEntryDto;
+public interface IPublicationReleaseEntryDto;
 
-public abstract record ReleaseEntryBaseDto : IReleaseEntryDto
+public abstract record PublicationReleaseEntryBaseDto : IPublicationReleaseEntryDto
 {
     public required string Title { get; init; }
 }
 
-public record ReleaseEntryDto : ReleaseEntryBaseDto
+public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
 {
     public required Guid ReleaseId { get; init; }
 
@@ -28,7 +28,7 @@ public record ReleaseEntryDto : ReleaseEntryBaseDto
 
     public required string YearTitle { get; init; }
 
-    public static ReleaseEntryDto FromRelease(
+    public static PublicationReleaseEntryDto FromRelease(
         Release release,
         bool isLatestRelease,
         DateTime lastUpdated,
@@ -47,14 +47,15 @@ public record ReleaseEntryDto : ReleaseEntryBaseDto
         };
 }
 
-public record LegacyReleaseEntryDto : ReleaseEntryBaseDto
+public record LegacyPublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
 {
     public required string Url { get; init; }
 
-    public static LegacyReleaseEntryDto FromLegacyReleaseEntry(LegacyReleaseEntry legacyRelease) =>
+    public static LegacyPublicationReleaseEntryDto FromLegacyPublicationReleaseEntry(
+        LegacyPublicationReleaseEntry legacyPublicationReleaseEntry) =>
         new()
         {
-            Title = legacyRelease.Title,
-            Url = legacyRelease.Url
+            Title = legacyPublicationReleaseEntry.Title,
+            Url = legacyPublicationReleaseEntry.Url
         };
 }

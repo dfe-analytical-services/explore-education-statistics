@@ -2,12 +2,12 @@
 
 public interface IPublicationReleaseEntry;
 
-public class ReleaseEntry : IPublicationReleaseEntry
+public class PublicationReleaseEntry : IPublicationReleaseEntry
 {
     public required Guid ReleaseId { get; init; }
 }
 
-public class LegacyReleaseEntry : IPublicationReleaseEntry
+public class LegacyPublicationReleaseEntry : IPublicationReleaseEntry
 {
     /// <summary>
     /// Unique identifier for referencing a legacy link in the UI, used when selecting one to edit or delete.
