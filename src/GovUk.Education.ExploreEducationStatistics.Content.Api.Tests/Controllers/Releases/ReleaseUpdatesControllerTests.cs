@@ -15,21 +15,20 @@ public abstract class ReleaseUpdatesControllerTests
 
     private const string PublicationSlug = "test-publication";
     private const string ReleaseSlug = "test-release";
-    private const int Page = 5;
-    private const int PageSize = 50;
+    private const int Page = 1;
+    private const int PageSize = 10;
 
-    public class GetPaginatedUpdatesForReleaseTests : ReleaseUpdatesControllerTests
+    public class GetReleaseUpdatesTests : ReleaseUpdatesControllerTests
     {
         [Fact]
-        public async Task WhenServiceReturnsPaginatedUpdates_ReturnsOk()
+        public async Task WhenServiceReturnsReleaseUpdates_ReturnsOk()
         {
             // Arrange
-            var paginatedUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
+            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate([
                     new ReleaseUpdateDtoBuilder().Build()
                 ],
-                totalResults: 1,
-                page: 1,
-                pageSize: 10);
+                page: Page,
+                pageSize: PageSize);
 
             var request = new GetReleaseUpdatesRequest
             {
@@ -39,34 +38,33 @@ public abstract class ReleaseUpdatesControllerTests
                 PageSize = PageSize
             };
 
-            _releaseUpdatesService.WhereHasPaginatedUpdates(paginatedUpdates);
+            _releaseUpdatesService.WhereHasReleaseUpdates(releaseUpdates);
 
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetPaginatedUpdatesForRelease(request);
+            var result = await sut.GetReleaseUpdates(request);
 
             // Assert
-            _releaseUpdatesService.Assert.GetPaginatedUpdatesForReleaseWasCalled(
+            _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: request.Page,
                 pageSize: request.PageSize);
-            result.AssertOkResult(paginatedUpdates);
+            result.AssertOkResult(releaseUpdates);
         }
 
         [Fact]
-        public async Task GetReleaseUpdates_WhenNoQueryParameters_UsesPaginationDefaults()
+        public async Task WhenNoQueryParameters_UsesPaginationDefaults()
         {
             // Arrange
             const int defaultPage = 1;
             const int defaultPageSize = 10;
-            var paginatedUpdates = new PaginatedListViewModel<ReleaseUpdateDto>([
+            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate([
                     new ReleaseUpdateDtoBuilder().Build()
                 ],
-                totalResults: 1,
-                page: 1,
-                pageSize: 10);
+                page: defaultPage,
+                pageSize: defaultPageSize);
 
             // No page or pageSize query parameters set on request
             var request = new GetReleaseUpdatesRequest
@@ -75,20 +73,20 @@ public abstract class ReleaseUpdatesControllerTests
                 ReleaseSlug = ReleaseSlug
             };
 
-            _releaseUpdatesService.WhereHasPaginatedUpdates(paginatedUpdates);
+            _releaseUpdatesService.WhereHasReleaseUpdates(releaseUpdates);
 
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetPaginatedUpdatesForRelease(request);
+            var result = await sut.GetReleaseUpdates(request);
 
             // Assert
-            _releaseUpdatesService.Assert.GetPaginatedUpdatesForReleaseWasCalled(
+            _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: defaultPage,
                 pageSize: defaultPageSize);
-            result.AssertOkResult(paginatedUpdates);
+            result.AssertOkResult(releaseUpdates);
         }
 
         [Fact]
@@ -101,15 +99,15 @@ public abstract class ReleaseUpdatesControllerTests
                 ReleaseSlug = ReleaseSlug
             };
 
-            _releaseUpdatesService.WhereGetPaginatedUpdatesForReleaseReturnsNotFound();
+            _releaseUpdatesService.WhereGetReleaseUpdatesReturnsNotFound();
 
             var sut = BuildController();
 
             // Act
-            var result = await sut.GetPaginatedUpdatesForRelease(request);
+            var result = await sut.GetReleaseUpdates(request);
 
             // Assert
-            _releaseUpdatesService.Assert.GetPaginatedUpdatesForReleaseWasCalled(
+            _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug);
             result.AssertNotFoundResult();

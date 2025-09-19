@@ -24,9 +24,8 @@ public class PublicationsSearchController(IPublicationsSearchService publication
         expiryScheduleCron: HalfHourlyExpirySchedule)]
     public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> GetPublications(
         [FromQuery] PublicationsListGetRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        return await publicationsSearchService
+        CancellationToken cancellationToken = default) =>
+        await publicationsSearchService
             .GetPublications(
                 request.ReleaseType,
                 request.ThemeId,
@@ -36,7 +35,6 @@ public class PublicationsSearchController(IPublicationsSearchService publication
                 page: request.Page,
                 pageSize: request.PageSize,
                 cancellationToken: cancellationToken);
-    }
 
     [MemoryCache(typeof(ListPublicationsPostCacheKey),
         durationInSeconds: 10,
@@ -44,9 +42,8 @@ public class PublicationsSearchController(IPublicationsSearchService publication
     [HttpPost]
     public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> GetPublications(
         [FromBody] PublicationsListPostRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        return await publicationsSearchService
+        CancellationToken cancellationToken = default) =>
+        await publicationsSearchService
             .GetPublications(
                 request.ReleaseType,
                 request.ThemeId,
@@ -57,5 +54,4 @@ public class PublicationsSearchController(IPublicationsSearchService publication
                 pageSize: request.PageSize,
                 publicationIds: request.PublicationIds,
                 cancellationToken: cancellationToken);
-    }
 }

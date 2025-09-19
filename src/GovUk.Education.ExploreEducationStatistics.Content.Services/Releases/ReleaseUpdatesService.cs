@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 
 public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IReleaseUpdatesService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetPaginatedUpdatesForRelease(
+    public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetReleaseUpdates(
         string publicationSlug,
         string releaseSlug,
         int page = 1,

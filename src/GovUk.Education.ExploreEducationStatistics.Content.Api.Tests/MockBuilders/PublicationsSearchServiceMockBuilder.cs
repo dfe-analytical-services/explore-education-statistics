@@ -32,7 +32,7 @@ public class PublicationsSearchServiceMockBuilder
     {
         _mock.Setup(GetPublications)
             .ReturnsAsync(() =>
-                _publications ?? new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, 1, 10));
+                _publications ?? PaginatedListViewModel<PublicationSearchResultViewModel>.Paginate([], 1, 10));
     }
 
     public IPublicationsSearchService Build() => _mock.Object;
