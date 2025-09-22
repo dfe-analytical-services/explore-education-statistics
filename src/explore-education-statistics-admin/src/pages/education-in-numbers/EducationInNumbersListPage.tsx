@@ -58,25 +58,27 @@ const EducationInNumbersListPage = () => {
         <p className="govuk-!-margin-bottom-8">No pages created yet.</p>
       )}
 
-      <ButtonGroup>
-        <ButtonLink to={educationInNumbersCreateRoute.path}>
-          Add new page
-        </ButtonLink>
-        {/* Only show reorder button if there are at least two *subpages* */}
-        {pages.length > 2 && (
-          <ModalConfirm
-            confirmText="OK"
-            title="Reorder pages"
-            triggerButton={<Button variant="secondary">Reorder pages</Button>}
-            onConfirm={toggleReordering.on}
-          >
-            <WarningMessage>
-              All changes made to page order appear immediately on the public
-              website.
-            </WarningMessage>
-          </ModalConfirm>
-        )}
-      </ButtonGroup>
+      {!isReordering && (
+        <ButtonGroup>
+          <ButtonLink to={educationInNumbersCreateRoute.path}>
+            Add new page
+          </ButtonLink>
+          {/* Only show reorder button if there are at least two *subpages* */}
+          {pages.length > 2 && (
+            <ModalConfirm
+              confirmText="OK"
+              title="Reorder pages"
+              triggerButton={<Button variant="secondary">Reorder pages</Button>}
+              onConfirm={toggleReordering.on}
+            >
+              <WarningMessage>
+                All changes made to page order appear immediately on the public
+                website.
+              </WarningMessage>
+            </ModalConfirm>
+          )}
+        </ButtonGroup>
+      )}
     </Page>
   );
 };
