@@ -6,10 +6,10 @@ import {
   educationInNumbersPageReducer as originalEinPageReducer,
 } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import { EducationInNumbersPageDispatchAction } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContextActionTypes';
-import { HtmlBlock } from '@common/services/types/blocks';
 import {
   EinContentBlock,
   EinFreeTextStatTile,
+  EinHtmlBlock,
   EinTileGroupBlock,
 } from '@common/services/types/einBlocks';
 import { produce } from 'immer';
@@ -53,7 +53,7 @@ describe('EducationInNumbersPageContentContext', () => {
 
   test('UPDATE_BLOCK_FROM_SECTION updates an HTML block from section', () => {
     const section = testEinPageContent.content[0];
-    const blockToUpdate = section.content[0] as HtmlBlock;
+    const blockToUpdate = section.content[0] as EinHtmlBlock;
 
     const newBody = 'This is some updated text!';
 
@@ -77,7 +77,7 @@ describe('EducationInNumbersPageContentContext', () => {
       },
     );
 
-    expect((pageContent.content[0].content as HtmlBlock[])[0].body).toEqual(
+    expect((pageContent.content[0].content as EinHtmlBlock[])[0].body).toEqual(
       newBody,
     );
   });
@@ -142,7 +142,7 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(pageContent.content[0].content).toHaveLength(originalLength + 1);
 
     expect(
-      (pageContent.content[0].content as HtmlBlock[])[originalLength].id,
+      (pageContent.content[0].content as EinHtmlBlock[])[originalLength].id,
     ).toEqual(newBlock.id);
   });
 

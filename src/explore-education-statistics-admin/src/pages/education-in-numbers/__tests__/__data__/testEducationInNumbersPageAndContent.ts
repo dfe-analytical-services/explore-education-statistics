@@ -1,6 +1,6 @@
+import testTile from '@admin/pages/education-in-numbers/content/__tests__/__data__/testTile';
 import { EinContent } from '@admin/services/educationInNumbersContentService';
 import { EinSummaryWithPrevVersion } from '@admin/services/educationInNumbersService';
-import testTile from '../../content/__tests__/__data__/testTile';
 
 const testEinPageVersion: EinSummaryWithPrevVersion = {
   id: 'test-ein-page',

@@ -7,11 +7,7 @@ export interface Table {
   tableHeaders: UnmappedTableHeadersConfig;
 }
 
-export type BlockType =
-  | 'HtmlBlock'
-  | 'DataBlock'
-  | 'EmbedBlockLink'
-  | 'TileGroupBlock';
+export type BlockType = 'HtmlBlock' | 'DataBlock' | 'EmbedBlockLink';
 
 export interface BaseBlock {
   id: string;
