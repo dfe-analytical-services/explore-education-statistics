@@ -1198,6 +1198,7 @@
     ],
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+    "vNetDdosPlanName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'), '-ddos-plan')]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
     "analyticsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-analytics')]",
@@ -3573,6 +3574,26 @@
     },
     {
       "condition": "[parameters('deploySubnets')]",
+      "type": "Microsoft.Network/ddosProtectionPlans",
+      "apiVersion": "2024-07-01",
+      "name": "[variables('vNetDdosPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Ddos protection plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "condition": "[parameters('deploySubnets')]",
       "apiVersion": "2020-05-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",
@@ -3590,11 +3611,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "dependsOn": ["[resourceId('Microsoft.Network/ddosProtectionPlans', variables('vNetDdosPlanName'))]"],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
             "10.0.0.0/16"
           ]
+        },
+        "enableDdosProtection": true,
+        "ddosProtectionPlan": {
+          "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', variables('vNetDdosPlanName'))]"
         },
         "subnets": [
           {
