@@ -13,11 +13,9 @@ public class PublicationsController(IPublicationsService publicationsService) : 
     [HttpGet("publications/{publicationSlug}")]
     public async Task<ActionResult<PublicationDto>> GetPublication(
         string publicationSlug,
-        CancellationToken cancellationToken = default)
-    {
-        return await publicationsService.GetPublication(
+        CancellationToken cancellationToken = default) =>
+        await publicationsService.GetPublication(
                 publicationSlug,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .HandleFailuresOrOk();
-    }
 }
