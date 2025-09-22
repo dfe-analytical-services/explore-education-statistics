@@ -4,7 +4,6 @@ import {
   DataBlock,
   EmbedBlock,
 } from '@common/services/types/blocks';
-import { EinContentBlock } from '@common/services/types/einBlocks';
 
 export interface CommentUser {
   id: string;
