@@ -16,6 +16,6 @@ public class PublicationsController(IPublicationsService publicationsService) : 
         CancellationToken cancellationToken = default) =>
         await publicationsService.GetPublication(
                 publicationSlug,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .HandleFailuresOrOk();
 }

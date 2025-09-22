@@ -18,6 +18,6 @@ public class RelatedInformationController(IRelatedInformationService relatedInfo
         await relatedInformationService.GetRelatedInformationForRelease(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .HandleFailuresOrOk();
 }
