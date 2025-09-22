@@ -16,8 +16,8 @@ public class ReleaseVersionsController(IReleaseVersionsService releaseVersionsSe
         string releaseSlug,
         CancellationToken cancellationToken = default) =>
         await releaseVersionsService.GetReleaseVersionSummary(
-                publicationSlug,
-                releaseSlug,
+                publicationSlug: publicationSlug,
+                releaseSlug: releaseSlug,
                 cancellationToken)
             .HandleFailuresOrOk();
 }
