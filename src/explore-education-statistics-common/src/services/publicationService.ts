@@ -10,7 +10,6 @@ import {
   ExternalMethodology,
 } from '@common/services/types/methodology';
 import { Organisation } from '@common/services/types/organisation';
-import { PaginatedList } from '@common/services/types/pagination';
 import { SortDirection } from '@common/services/types/sort';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
