@@ -27,6 +27,8 @@ public class PreviewTokenService(
     public async Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
+        DateTimeOffset? activates,
+        DateTimeOffset? expires,
         CancellationToken cancellationToken = default
     )
     {
@@ -36,12 +38,16 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
+                var activatesUtc = activates?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
+                var expiresUtc = expires?.ToUniversalTime() ?? activatesUtc.AddDays(7);
                 var previewToken = publicDataDbContext.PreviewTokens.Add(
                     new PreviewToken
                     {
                         DataSetVersionId = dataSetVersionId,
                         Label = label,
-                        Expires = DateTimeOffset.UtcNow.AddDays(1),
+                        Created = DateTimeOffset.UtcNow,
+                        Activates = activatesUtc, 
+                        Expires = expiresUtc,
                         CreatedByUserId = userService.GetUserId(),
                     }
                 );
@@ -169,8 +175,9 @@ public class PreviewTokenService(
             Status = previewToken.Status,
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
+            Activates = previewToken.Activates,
             Expires = previewToken.Expires,
-            Updated = previewToken.Updated,
+            Updated = previewToken.Updated
         };
     }
 }

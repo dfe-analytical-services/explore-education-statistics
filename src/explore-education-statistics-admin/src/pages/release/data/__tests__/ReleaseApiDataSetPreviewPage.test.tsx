@@ -54,7 +54,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
     id: 'token-id',
     label: 'Test label',
     status: 'Active',
-    created: now.toISOString(),
+    activates: now.toISOString(),
     createdByEmail: 'test@gov.uk',
     updated: '',
     expires: addHours(now, 24).toISOString(),
