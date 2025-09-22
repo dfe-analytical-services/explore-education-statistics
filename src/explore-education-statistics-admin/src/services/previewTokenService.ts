@@ -14,6 +14,8 @@ const previewTokenService = {
   createPreviewToken(data: {
     dataSetVersionId: string;
     label: string;
+    created?: Date | null;
+    expires?: Date | null;
   }): Promise<PreviewToken> {
     return client.post('/public-data/preview-tokens', data);
   },

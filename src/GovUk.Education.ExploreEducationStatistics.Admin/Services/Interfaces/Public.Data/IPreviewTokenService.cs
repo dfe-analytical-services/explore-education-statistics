@@ -10,6 +10,8 @@ public interface IPreviewTokenService
     Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
+        DateTimeOffset? created,
+        DateTimeOffset? expiry,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
