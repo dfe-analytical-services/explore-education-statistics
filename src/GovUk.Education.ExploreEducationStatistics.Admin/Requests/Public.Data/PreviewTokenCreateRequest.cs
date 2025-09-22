@@ -8,7 +8,11 @@ public record PreviewTokenCreateRequest
     public required Guid DataSetVersionId { get; init; }
 
     public required string Label { get; init; }
-
+    
+    public DateTimeOffset? Created { get; init; }
+    
+    public DateTimeOffset? Expires { get; init; }
+    
     public class Validator : AbstractValidator<PreviewTokenCreateRequest>
     {
         public Validator()
