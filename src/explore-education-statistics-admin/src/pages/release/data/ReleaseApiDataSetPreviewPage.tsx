@@ -30,13 +30,49 @@ export default function ReleaseApiDataSetPreviewPage() {
     apiDataSetQueries.get(dataSetId),
   );
 
-  const handleCreate = async (label: string) => {
+  function getPresetSpanEndDate(days: number) {
+    const fromDate = new Date();
+    fromDate.setHours(0, 0, 1);
+    const allowed = new Set([1, 2, 3, 4, 5, 6, 7]);
+
+    if (!Number.isFinite(days) || !allowed.has(days)) {
+      throw new Error(`valid days requested: ${days}`);
+    }
+
+    fromDate.setDate(fromDate.getDate() + days);
+    return fromDate;
+  }
+
+  const handleCreate = async (
+    label: string,
+    datePresetSpan: number,
+    created?: Date | null,
+    expires?: Date | null,
+  ) => {
+    let startDate: Date = new Date();
+    let endDate: Date;
+
     if (!dataSet?.draftVersion) {
       return;
     }
+
+    if (datePresetSpan > 0) {
+      endDate = getPresetSpanEndDate(datePresetSpan);
+    } else if (created && expires) {
+      expires.setHours(23, 59, 59);
+      startDate = created;
+      endDate = expires;
+    } else {
+      throw new Error(
+        'Either date preset or both from and to dates must be provided',
+      );
+    }
+
     const token = await previewTokenService.createPreviewToken({
       label,
       dataSetVersionId: dataSet?.draftVersion?.id,
+      created: startDate,
+      expires: endDate,
     });
 
     history.push(
