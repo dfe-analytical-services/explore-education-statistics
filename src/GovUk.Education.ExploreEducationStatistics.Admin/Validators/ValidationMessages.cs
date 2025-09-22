@@ -550,4 +550,14 @@ public static class ValidationMessages
             Message = string.Format(ReplacementError.Message, originalFileId),
         };
     }
+    
+    public static readonly LocalizableMessage InvalidExpiryError = new(
+        Code: "Predicate",
+        Message: "Expires must be no more than 7 days after the created date."
+    );
+
+    public static readonly LocalizableMessage InvalidCreatedError = new(
+        Code: "Predicate",
+        Message: "Created date must be within the next 7 days."
+    );
 }

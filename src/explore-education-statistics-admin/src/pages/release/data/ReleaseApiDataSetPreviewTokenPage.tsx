@@ -63,6 +63,18 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     history.push(tokenLogPagePath);
   };
 
+  const dateIsToday = (stringDate: string): boolean => {
+    const getYMD = (date: Date) => {
+      return {
+        y: date.getUTCFullYear(),
+        m: date.getUTCMonth(), // 0-based (0 = Jan, 11 = Dec)
+        d: date.getUTCDate(),
+      };
+    };
+    const d1 = getYMD(new Date());
+    const d2 = getYMD(new Date(stringDate));
+    return d1.y === d2.y && d1.m === d2.m && d1.d === d2.d;
+  };
   const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;
 
   return (
@@ -99,9 +111,20 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   label="Preview token"
                   text={previewToken.id}
                 />
-
+                {!dateIsToday(previewToken.created) && (
+                  <>
+                    The token actives from:{' '}
+                    <strong>
+                      <FormattedDate format="MM/dd/yyyy">
+                        {previewToken.created}
+                      </FormattedDate>{' '}
+                      (local time){' '}
+                    </strong>
+                  </>
+                )}
                 <p>
-                  The token expires:{' '}
+                  {dateIsToday(previewToken.created) ? 'The token' : 'and'}{' '}
+                  expires:{' '}
                   <strong>
                     <FormattedDate formatRelativeToNow>
                       {previewToken.expiry}
