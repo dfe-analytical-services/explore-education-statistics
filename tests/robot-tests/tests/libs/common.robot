@@ -187,9 +187,12 @@ user waits until page finishes loading
     # waiting for user interaction prior to loading their content.
     user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
     ...    ${spinner_timeout}
-    # Wait to ensure network activity attribute is updated in DOM
+
     sleep    0.5
-    user waits until page does not contain element    css:body[data-network-activity="active"]    ${network_timeout}
+
+    # Wait to ensure network activity attribute is updated in DOM
+    # EES-6602 Temporarily disable this check to see how it effects run speed and reliability
+    #user waits until page does not contain element    css:body[data-network-activity="active"]    ${network_timeout}
 
 user waits until parent contains element
     [Arguments]
