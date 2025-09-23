@@ -19,7 +19,7 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
             schema.Enum.Clear();
             var timeIdentifiers = Enum.GetValues<TimeIdentifier>();
             var values = timeIdentifiers.Select(name => name.GetEnumValue());
-            schema.Enum.AddRange(values.Select(v => new OpenApiString($"{v}")));;
+            schema.Enum.AddRange(values.Select(v => new OpenApiString($"{v}")));
         }
     }
 }

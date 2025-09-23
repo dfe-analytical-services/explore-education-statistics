@@ -25,7 +25,7 @@ public class ReleaseSubjectRepository : IReleaseSubjectRepository
         Guid releaseVersionId,
         Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null)
     {
-        IQueryable<ReleaseSubject> query = _statisticsDbContext.ReleaseSubject
+        var query = _statisticsDbContext.ReleaseSubject
             .Where(rs => rs.ReleaseVersionId == releaseVersionId);
 
         if (queryExtender is not null)

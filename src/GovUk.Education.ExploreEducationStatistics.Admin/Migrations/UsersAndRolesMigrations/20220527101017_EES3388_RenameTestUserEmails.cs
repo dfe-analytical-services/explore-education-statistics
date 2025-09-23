@@ -4,6 +4,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES3388_RenameTestUserEmails : Migration
 {
     private const string MigrationId = "20220527101017";

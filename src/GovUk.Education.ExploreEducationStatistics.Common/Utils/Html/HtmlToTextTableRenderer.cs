@@ -88,7 +88,7 @@ internal class HtmlToTextTableRenderer
         else
         {
             cellElements.ForEach(
-                (cellElement, index) =>
+                (cellElement, _) =>
                 {
                     // Initialise cells with placeholder
                     // nulls so that these can be replaced
@@ -96,7 +96,7 @@ internal class HtmlToTextTableRenderer
                     cellElement.ColumnSpan
                         .ToEnumerable()
                         .ForEach(
-                            span => { cells.Add(null); }
+                            _ => { cells.Add(null); }
                         );
                 }
             );

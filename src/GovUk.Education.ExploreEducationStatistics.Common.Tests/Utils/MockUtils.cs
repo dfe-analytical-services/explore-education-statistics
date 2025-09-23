@@ -146,7 +146,7 @@ public static class MockUtils
 
     public static void VerifyAllMocks(ITuple mocks)
     {
-        Mock[] values = mocks
+        var values = mocks
             .GetType()
             .GetFields()
             .Select(f => f.GetValue(mocks))

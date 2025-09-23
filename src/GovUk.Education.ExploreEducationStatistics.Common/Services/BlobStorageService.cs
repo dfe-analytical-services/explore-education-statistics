@@ -566,7 +566,7 @@ public abstract class BlobStorageService(
             {
                 DestinationConnectionString = options?.DestinationConnectionString,
                 SetAttributesCallbackAsync = options?.SetAttributesCallbackAsync,
-                ShouldOverwriteCallbackAsync = (source, destination) => Task.FromResult(true),
+                ShouldOverwriteCallbackAsync = (_, _) => Task.FromResult(true),
                 ShouldTransferCallbackAsync = options?.ShouldTransferCallbackAsync,
             }
         );

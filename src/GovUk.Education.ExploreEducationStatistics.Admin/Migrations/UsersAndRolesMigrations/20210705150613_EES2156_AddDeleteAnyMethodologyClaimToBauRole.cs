@@ -2,6 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES2156_AddDeleteAnyMethodologyAmendmentClaimToBauRole : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
