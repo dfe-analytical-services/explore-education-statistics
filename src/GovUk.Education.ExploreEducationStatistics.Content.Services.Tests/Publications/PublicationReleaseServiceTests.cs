@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -55,6 +56,170 @@ public abstract class PublicationReleaseServiceTests
                     expectedTotalResults: numReleases,
                     expectedPage: page,
                     expectedPageSize: pageSize);
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublishedReleasesExist_MapsReleasesCorrectly()
+        {
+            // Arrange
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ =>
+                [
+                    _dataFixture.DefaultRelease(publishedVersions: 1)
+                        .WithLabel("Final")
+                ]);
+            var release = publication.Releases[0];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleases(
+                    publicationSlug: publication.Slug);
+
+                // Assert
+                var pagedResult = outcome.AssertRight();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 1,
+                    expectedPage: 1,
+                    expectedPageSize: 10);
+
+                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
+
+                Assert.Multiple(() =>
+                {
+                    Assert.Equal(release.Id, releaseEntry.ReleaseId);
+                    Assert.True(releaseEntry.IsLatestRelease);
+                    Assert.Equal(release.Label, releaseEntry.Label);
+                    Assert.Equal(release.Versions[0].Published, releaseEntry.LastUpdated);
+                    // TODO EES-6414 'Published' should be the published display date
+                    Assert.Equal(release.Versions[0].Published, releaseEntry.Published);
+                    Assert.Equal(release.Slug, releaseEntry.Slug);
+                    Assert.Equal(release.Title, releaseEntry.Title);
+                    Assert.Equal(release.TimePeriodCoverage.GetEnumLabel(), releaseEntry.CoverageTitle);
+                    Assert.Equal(release.YearTitle, releaseEntry.YearTitle);
+                });
+            }
+        }
+
+        [Fact]
+        public async Task WhenLegacyReleasesExist_MapsLegacyReleasesCorrectly()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
+                .FinishWith(p => p.ReleaseSeries =
+                [
+                    ..
+                    p.Releases
+                        .Select(r => _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(r.Id))
+                        .ToArray(),
+                    _dataFixture.DefaultLegacyReleaseSeriesItem()
+                ]);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleases(
+                    publicationSlug: publication.Slug);
+
+                // Assert
+                var pagedResult = outcome.AssertRight();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 2,
+                    expectedPage: 1,
+                    expectedPageSize: 10);
+
+                var legacyReleaseEntry = Assert.IsType<LegacyPublicationReleaseEntryDto>(pagedResult.Results[1]);
+                var expectedLegacyReleaseEntry = publication.ReleaseSeries[1];
+                Assert.Multiple(() =>
+                {
+                    Assert.Equal(expectedLegacyReleaseEntry.LegacyLinkDescription, legacyReleaseEntry.Title);
+                    Assert.Equal(expectedLegacyReleaseEntry.LegacyLinkUrl, legacyReleaseEntry.Url);
+                });
+            }
+        }
+
+        [Fact]
+        public async Task WhenMultiplePublishedAndLegacyReleasesExist_ReturnsReleasesInPublicationOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                [
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
+                    _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
+                    _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023)
+                ])
+                .FinishWith(p => p.ReleaseSeries =
+                [
+                    // Specify a custom order for the releases, differing from the chronological year order,
+                    // and include a legacy release in the middle of the series
+                    _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(p.Releases.Single(r => r.Year == 2023).Id),
+                    _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(p.Releases.Single(r => r.Year == 2025).Id),
+                    _dataFixture.DefaultLegacyReleaseSeriesItem(),
+                    _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(p.Releases.Single(r => r.Year == 2024).Id)
+                ]);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleases(
+                    publicationSlug: publication.Slug);
+
+                // Assert
+                var pagedResult = outcome.AssertRight();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 4,
+                    expectedPage: 1,
+                    expectedPageSize: 10);
+
+                var expectedReleases = new[] { (Year: 2023, Index: 0), (Year: 2025, Index: 1), (Year: 2024, Index: 3) };
+
+                foreach (var (year, index) in expectedReleases)
+                {
+                    var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results[index]);
+                    Assert.Equal(publication.Releases.Single(r => r.Year == year).Id, releaseEntry.ReleaseId);
+                }
+
+                var legacyEntry = Assert.IsType<LegacyPublicationReleaseEntryDto>(pagedResult.Results[2]);
+                Assert.Multiple(() =>
+                {
+                    Assert.Equal(publication.ReleaseSeries[2].LegacyLinkDescription, legacyEntry.Title);
+                    Assert.Equal(publication.ReleaseSeries[2].LegacyLinkUrl, legacyEntry.Url);
+                });
             }
         }
 
@@ -139,9 +304,12 @@ public abstract class PublicationReleaseServiceTests
 
                 var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
                 var expectedReleaseVersion = release.Versions[1];
-                Assert.Equal(expectedReleaseVersion.Published, releaseEntry.LastUpdated);
-                // TODO EES-6414 'Published' should be the published display date
-                Assert.Equal(expectedReleaseVersion.Published, releaseEntry.Published);
+                Assert.Multiple(() =>
+                {
+                    Assert.Equal(expectedReleaseVersion.Published, releaseEntry.LastUpdated);
+                    // TODO EES-6414 'Published' should be the published display date
+                    Assert.Equal(expectedReleaseVersion.Published, releaseEntry.Published);
+                });
             }
         }
 

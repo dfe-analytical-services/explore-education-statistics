@@ -28,7 +28,7 @@ public class PublicationsController(
         [FromQuery] GetPublicationReleasesRequest request,
         CancellationToken cancellationToken = default) =>
         await publicationReleasesService.GetPublicationReleases(
-                publicationSlug: request.PublicationSlug,
+                request.PublicationSlug,
                 page: request.Page,
                 pageSize: request.PageSize,
                 cancellationToken)
