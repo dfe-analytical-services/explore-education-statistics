@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
@@ -24,7 +25,7 @@ public record PaginatedListViewModel<T>
     }
 
     /// <summary>
-    /// Paginate some results (in memory) that have not been paginated yet.
+    /// Paginates a list of results (in memory) that have not been paginated yet.
     /// </summary>
     /// <remarks>
     /// Construct <see cref="PaginatedListViewModel{T}"/> directly when the results can be
@@ -32,26 +33,25 @@ public record PaginatedListViewModel<T>
     /// pagination should aim to avoid pulling all results into memory. 
     /// This method is intended for cases where it is not possible to do this.
     /// </remarks>
-    /// <param name="allResults">All of the un-paginated results</param>
-    /// <param name="page">The current page</param>
-    /// <param name="pageSize">The size of each page</param>
+    /// <typeparam name="T">The type of elements in the source list</typeparam>
+    /// <param name="allResults">The complete list of unpaginated results</param>
+    /// <param name="page">The current page number</param>
+    /// <param name="pageSize">The number of items per page</param>
+    /// <returns>
+    /// A <see cref="PaginatedListViewModel{T}"/> containing the elements of the specified page, along with pagination metadata.
+    /// </returns>
     public static PaginatedListViewModel<T> Paginate(
         List<T> allResults,
         int page,
-        int pageSize)
-    {
-        var pagedResults = allResults
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        return new PaginatedListViewModel<T>(
-            results: pagedResults,
+        int pageSize) =>
+        new(
+            results: allResults
+                .Paginate(page, pageSize)
+                .ToList(),
             totalResults: allResults.Count,
             page: page,
             pageSize: pageSize
         );
-    }
 }
 
 public record PagingViewModel
