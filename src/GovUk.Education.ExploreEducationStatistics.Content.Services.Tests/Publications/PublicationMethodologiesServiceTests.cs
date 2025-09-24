@@ -16,13 +16,68 @@ public abstract class PublicationMethodologiesServiceTests
     public class GetMethodologiesForPublicationTests : PublicationMethodologiesServiceTests
     {
         [Fact]
+        public async Task WhenPublicationHasPublishedMethodologies_ReturnsMethodologies()
+        {
+            // Arrange
+            var (publication, otherPublication1, otherPublication2) = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)])
+                .GenerateTuple3();
+
+            var methodologies = _dataFixture.DefaultMethodology()
+                .ForIndex(0,
+                    s =>
+                        s.SetOwningPublication(publication))
+                .ForIndex(1,
+                    s =>
+                        s.SetOwningPublication(otherPublication1)
+                            .SetAdoptingPublications([publication]))
+                .ForIndex(2,
+                    s =>
+                        s.SetOwningPublication(otherPublication2)
+                            .SetAdoptingPublications([publication]))
+                .WithMethodologyVersions(_ => [_dataFixture.DefaultMethodologyVersion()])
+                .FinishWith(m => m.LatestPublishedVersion = m.Versions[0])
+                .GenerateList();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.AddRange(publication, otherPublication1, otherPublication2);
+                context.Methodologies.AddRange(methodologies);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationMethodologies(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(methodologies.Count, result.Methodologies.Length);
+                Assert.All(methodologies,
+                    (expected, index) =>
+                    {
+                        var actual = result.Methodologies[index];
+                        Assert.Equal(expected.Id, actual.MethodologyId);
+                        Assert.Equal(expected.LatestPublishedVersion!.Slug, actual.Slug);
+                        Assert.Equal(expected.LatestPublishedVersion!.Title, actual.Title);
+                    });
+                Assert.Null(result.ExternalMethodology);
+            }
+        }
+
+        [Fact]
         public async Task WhenPublicationHasExternalMethodology_ReturnsExternalMethodology()
         {
             // Arrange
             var externalMethodology = new ExternalMethodology
             {
                 Title = "External methodology",
-                Url = "http://test.com/external-methodology"
+                Url = "https://test.com/external-methodology"
             };
             Publication publication = _dataFixture.DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)])
@@ -44,10 +99,78 @@ public abstract class PublicationMethodologiesServiceTests
 
                 // Assert
                 var result = outcome.AssertRight();
-                Assert.Empty(result.Methodologies);
                 Assert.NotNull(result.ExternalMethodology);
                 Assert.Equal(externalMethodology.Title, result.ExternalMethodology.Title);
                 Assert.Equal(externalMethodology.Url, result.ExternalMethodology.Url);
+                Assert.Empty(result.Methodologies);
+            }
+        }
+
+        [Fact]
+        public async Task WhenMultipleMethodologiesExist_ReturnsMethodologiesOrderedByTitle()
+        {
+            // Arrange
+            var (publication, otherPublication1, otherPublication2) = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)])
+                .GenerateTuple3();
+
+            var methodologies = _dataFixture.DefaultMethodology()
+                .ForIndex(0,
+                    s =>
+                        s.SetOwningPublication(publication)
+                            .SetMethodologyVersions(_ =>
+                            [
+                                _dataFixture.DefaultMethodologyVersion()
+                                    .WithAlternativeTitle("Methodology C")
+                            ]))
+                .ForIndex(1,
+                    s =>
+                        s.SetOwningPublication(otherPublication1)
+                            .SetAdoptingPublications([publication])
+                            .SetMethodologyVersions(_ =>
+                            [
+                                _dataFixture.DefaultMethodologyVersion()
+                                    .WithAlternativeTitle("Methodology A")
+                            ]))
+                .ForIndex(2,
+                    s =>
+                        s.SetOwningPublication(otherPublication2)
+                            .SetAdoptingPublications([publication])
+                            .SetMethodologyVersions(_ =>
+                            [
+                                _dataFixture.DefaultMethodologyVersion()
+                                    .WithAlternativeTitle("Methodology B")
+                            ]))
+                .WithMethodologyVersions(_ => [_dataFixture.DefaultMethodologyVersion()])
+                .FinishWith(m => m.LatestPublishedVersion = m.Versions[0])
+                .GenerateList();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.AddRange(publication, otherPublication1, otherPublication2);
+                context.Methodologies.AddRange(methodologies);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationMethodologies(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                var expectedMethodologies = methodologies
+                    .OrderBy(m => m.LatestPublishedVersion!.Title)
+                    .ToArray();
+
+                Assert.Equal(expectedMethodologies.Length, result.Methodologies.Length);
+                Assert.All(expectedMethodologies,
+                    (expectedMethodology, index)
+                        => Assert.Equal(expectedMethodology.Id, result.Methodologies[index].MethodologyId));
             }
         }
 
@@ -76,6 +199,57 @@ public abstract class PublicationMethodologiesServiceTests
                 var result = outcome.AssertRight();
                 Assert.Empty(result.Methodologies);
                 Assert.Null(result.ExternalMethodology);
+            }
+        }
+
+        [Fact]
+        public async Task WhenMethodologyHasNoPublishedVersions_MethodologyIsExcludedFromResults()
+        {
+            // Arrange
+            var (publication, otherPublication1, otherPublication2) = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)])
+                .GenerateTuple3();
+
+            var methodologies = _dataFixture.DefaultMethodology()
+                .ForIndex(0,
+                    s =>
+                        s.SetOwningPublication(publication))
+                .ForIndex(1,
+                    s =>
+                        s.SetOwningPublication(otherPublication1)
+                            .SetAdoptingPublications([publication]))
+                .ForIndex(2,
+                    s =>
+                        s.SetOwningPublication(otherPublication2)
+                            .SetAdoptingPublications([publication]))
+                .WithMethodologyVersions(_ => [_dataFixture.DefaultMethodologyVersion()])
+                .GenerateList();
+
+            // Give one of the methodologies a published version
+            var publishedMethodology = methodologies[1];
+            publishedMethodology.LatestPublishedVersion = publishedMethodology.Versions[0];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.AddRange(publication, otherPublication1, otherPublication2);
+                context.Methodologies.AddRange(methodologies);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationMethodologies(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                // Only the published methodology should be in the results
+                var methodology = Assert.Single(result.Methodologies);
+                Assert.Equal(publishedMethodology.Id, methodology.MethodologyId);
             }
         }
 
