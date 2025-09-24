@@ -4333,7 +4333,8 @@
           },
           "resourceGroup": {
             "value": "[resourceGroup().name]"
-          }
+          },
+          "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
         }
       },
       "dependsOn": [
