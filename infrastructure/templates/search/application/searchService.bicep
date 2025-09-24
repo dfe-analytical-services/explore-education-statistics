@@ -28,6 +28,9 @@ param semanticRankerAvailability string
 @description('A list of IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
 param storageIpRules IpRange[]
 
+@description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
+param logAnalyticsWorkspaceId string
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -62,6 +65,7 @@ module searchServiceModule '../components/searchService.bicep' = {
       throttledSearchQueriesPercentage: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     }
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     tagValues: tagValues
   }
 }
