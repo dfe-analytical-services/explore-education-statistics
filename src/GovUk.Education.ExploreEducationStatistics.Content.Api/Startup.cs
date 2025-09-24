@@ -180,6 +180,7 @@ public class Startup(
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+        services.AddTransient<IReleaseContentService, ReleaseContentService>();
         services.AddTransient<IReleaseSearchableDocumentsService, ReleaseSearchableDocumentsService>();
         services.AddTransient<IReleaseVersionsService, ReleaseVersionsService>();
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
