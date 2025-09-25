@@ -17,29 +17,45 @@ public record PreviewTokenCreateRequest
     {
         public Validator()
         {
+            // Normalize comparisons to UK time to avoid "previous day" issues when converting from BST/GMT to UTC.
+            var ukTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+
             bool IsCreatedToday(DateTimeOffset created)
             {
-                return DateTimeOffset.UtcNow.Day == created.Day 
-                       && DateTimeOffset.UtcNow.Month == created.Month 
-                       && DateTimeOffset.UtcNow.Year == created.Year;
+                return DateTimeOffset.Now.Day == created.Day 
+                       && DateTimeOffset.Now.Month == created.Month 
+                       && DateTimeOffset.Now.Year == created.Year;
             }
-            bool IsLessThanOrEqualDates(DateTimeOffset created, DateTimeOffset expires)
+            bool IsLessThanOrEqualDates(DateTimeOffset dateStart, DateTimeOffset dateEnd)
             {
-                return (expires.Month < created.Month && expires.Year <= created.Year) ||
-                (expires.Day < created.Day && expires.Month <= created.Month && expires.Year <= created.Year);
+                return (dateStart.Month < dateEnd.Month && dateStart.Year <= dateEnd.Year) ||
+                (dateStart.Day <= dateEnd.Day && dateStart.Month <= dateEnd.Month && dateStart.Year <= dateEnd.Year);
             }
 
-            When(request => request.Created.HasValue && request.Expires.HasValue, () =>
+            When(request => request.Activates.HasValue && request.Expires.HasValue, () =>
             {
-                RuleFor(request => request.Created!.Value)
-                    .Must(created => 
-                        (IsCreatedToday(created) || created >= DateTimeOffset.UtcNow.AddMinutes(-5))
-                        && created <= DateTimeOffset.UtcNow.AddDays(7))
+                var nowUk = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, ukTz);
+
+                RuleFor(request => request.Activates!.Value)
+                    .Must(created =>
+                    {
+                        var createdUk = TimeZoneInfo.ConvertTime(created, ukTz);
+                        return (IsCreatedToday(createdUk) || created > nowUk)
+                            && created <= nowUk.AddDays(7);
+                    })
                     .WithMessage("Created date must be within the next 7 days.");
                 RuleFor(request => request.Expires!.Value)
-                    .Must((request, expires) => 
-                        IsLessThanOrEqualDates(request.Created!.Value.AddDays(7), expires))
-                    .WithMessage("Expires must be no more than 7 days after the created date.");
+                    .Must((request, expires) =>
+                    {
+                        var createdUk = TimeZoneInfo.ConvertTime(request.Activates!.Value, ukTz);
+                        var expiresUk = TimeZoneInfo.ConvertTime(expires, ukTz);
+                        var sevenDaysFromCreated = createdUk.AddDays(7);
+
+                        var expiresIsWithin7DaysFromCreated = IsLessThanOrEqualDates(expiresUk, sevenDaysFromCreated);
+                        var createdIsBeforeExpires = IsLessThanOrEqualDates(createdUk, expiresUk);
+                        return expiresIsWithin7DaysFromCreated && createdIsBeforeExpires;
+                    })
+                    .WithMessage("Expires date must be no more than 7 days after the created date.");
             });
 
             RuleFor(request => request.DataSetVersionId)
