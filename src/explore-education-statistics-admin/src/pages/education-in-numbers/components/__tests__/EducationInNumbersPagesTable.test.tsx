@@ -4,7 +4,7 @@ import _educationInNumbersService, {
 } from '@admin/services/educationInNumbersService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import baseRender from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
