@@ -49,6 +49,22 @@ export default function ApiDataSetPreviewTokenCreateForm({
   onCancel,
   onSubmit,
 }: Props) {
+  const endDateIsLaterThanOrEqualToStartDate = (
+    startDate: Date,
+    endDate: Date,
+  ) => {
+    const startMidnight = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+    );
+    const endMidnight = new Date(
+      endDate.getFullYear(),
+      endDate.getMonth(),
+      endDate.getDate(),
+    );
+    return startMidnight <= endMidnight;
+  };
   const showInline = true;
   const { user } = useAuthContext();
   const isBau = user?.permissions.isBauUser;
@@ -58,38 +74,70 @@ export default function ApiDataSetPreviewTokenCreateForm({
       agreeTerms: Yup.boolean()
         .required('The terms of usage must be agreed')
         .oneOf([true], 'The terms of usage must be agreed'),
-      datePresetSpan: Yup.number().when('selectionMethod', {
+      datePresetSpan: Yup.number()
+        .nullable()
+        .when('selectionMethod', {
+          is: 'presetDays',
+          then: s =>
+            s
+              .required('A duration between 1 and 7 days must be selected')
+              .test({
+                name: 'in-range',
+                message: 'A duration between 1 and 7 days must be selected',
+                test(value) {
+                  return value >= 1 && value <= 7;
+                },
+              }),
+        }),
+      activates: Yup.date().when('selectionMethod', {
         is: 'customDates',
         then: s =>
-          s.required('A duration between 1 and 7 days must be selected'),
-      }),
-      created: Yup.date().when('selectionMethod', {
-        is: 'customDates',
-        then: s =>
-          s.required('Activates date must be a valid date').test({
-            name: 'within-7-days',
-            message: 'Created date must be within 7 days from today',
-            test(value) {
-              const now = new Date();
-              const maxDate = new Date();
-              maxDate.setDate(now.getDate() + 7);
-              return value <= maxDate;
-            },
-          }),
+          s
+            .required('Activates date must be a valid date')
+            .test({
+              name: 'not-in-past',
+              message: 'Activates date must not be in the past',
+              test(value) {
+                if (value == null) return true;
+                const now = new Date();
+                return endDateIsLaterThanOrEqualToStartDate(now, value);
+              },
+            })
+            .test({
+              name: 'within-7-days',
+              message: 'Activates date must be within 7 days from today',
+              test(value) {
+                if (value == null) return false;
+                const now = new Date();
+                const maxDate = new Date();
+                maxDate.setDate(now.getDate() + 7);
+                console.log('value', value, 'now', now, 'endDate', maxDate);
+                return endDateIsLaterThanOrEqualToStartDate(value, maxDate);
+              },
+            }),
       }),
       expires: Yup.date().when('selectionMethod', {
         is: 'customDates',
         then: s =>
           s.required('Expires date must be a valid date').test({
-            name: 'after-created',
+            name: 'after-activates',
             message:
               'Expires date must be later than Activates date by at most 7 days',
             test(value, context) {
-              const created = context.parent.created as Date | null;
-              if (value == null || created == null) return true;
+              const activates = context.parent.activates as Date | null;
+              if (value == null || activates == null) return true;
               const maxDate = new Date();
-              maxDate.setDate(created.getDate() + 7);
-              return value > created && value <= maxDate;
+              value.setHours(23, 59, 59, 999);
+              maxDate.setDate(activates.getDate() + 7);
+              const laterThanActivates = endDateIsLaterThanOrEqualToStartDate(
+                activates,
+                value,
+              );
+              const notLaterThanMaxTime = endDateIsLaterThanOrEqualToStartDate(
+                value,
+                maxDate,
+              );
+              return laterThanActivates && notLaterThanMaxTime;
             },
           }),
       }),
@@ -131,7 +179,6 @@ export default function ApiDataSetPreviewTokenCreateForm({
                   legend="Select a custom duration"
                   legendSize="s"
                   hint="Select a number of days"
-                  order={[]}
                   options={[
                     {
                       label: 'Choose number of days',
