@@ -56,7 +56,7 @@ public static class MethodologyGeneratorExtensions
         IEnumerable<MethodologyVersion> methodologyVersions)
         => setters.SetMethodologyVersions(_ => methodologyVersions);
 
-    private static InstanceSetters<Methodology> SetMethodologyVersions(
+    public static InstanceSetters<Methodology> SetMethodologyVersions(
         this InstanceSetters<Methodology> setters,
         Func<SetterContext, IEnumerable<MethodologyVersion>> methodologyVersions)
         => setters.Set(

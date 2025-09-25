@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Pub
 [Route("api")]
 [ApiController]
 public class PublicationsController(
+    IPublicationMethodologiesService publicationMethodologiesService,
     IPublicationReleasesService publicationReleasesService,
     IPublicationsService publicationsService) : ControllerBase
 {
@@ -19,6 +20,15 @@ public class PublicationsController(
         string publicationSlug,
         CancellationToken cancellationToken = default) =>
         await publicationsService.GetPublication(
+                publicationSlug,
+                cancellationToken)
+            .HandleFailuresOrOk();
+
+    [HttpGet("publications/{publicationSlug}/methodologies")]
+    public async Task<ActionResult<PublicationMethodologiesDto>> GetPublicationMethodologies(
+        string publicationSlug,
+        CancellationToken cancellationToken = default) =>
+        await publicationMethodologiesService.GetPublicationMethodologies(
                 publicationSlug,
                 cancellationToken)
             .HandleFailuresOrOk();
