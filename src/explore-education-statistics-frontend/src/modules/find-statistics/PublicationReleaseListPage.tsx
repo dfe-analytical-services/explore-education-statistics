@@ -46,7 +46,7 @@ const PublicationReleaseListPage = ({
       breadcrumbLabel="Releases"
     >
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
+        <div className="govuk-grid-column-three-quarters">
           {publicationSummary.nextReleaseDate && (
             <div
               className="govuk-!-margin-bottom-2"
