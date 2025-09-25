@@ -3,7 +3,7 @@ import _educationInNumbersService, {
 } from '@admin/services/educationInNumbersService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
@@ -80,12 +80,10 @@ describe('EducationInNumbersListPage', () => {
 
     await user.click(within(modal).getByRole('button', { name: 'Confirm' }));
 
-    await waitFor(() => {
-      expect(
-        educationInNumbersService.deleteEducationInNumbersPage,
-      ).toHaveBeenCalledWith('draft-page-id');
-      expect(refetch).toHaveBeenCalledTimes(1);
-    });
+    expect(
+      educationInNumbersService.deleteEducationInNumbersPage,
+    ).toHaveBeenCalledWith('draft-page-id');
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   test('shows amendment cancellation modal and refetches on confirm', async () => {
@@ -114,12 +112,10 @@ describe('EducationInNumbersListPage', () => {
 
     await user.click(within(modal).getByRole('button', { name: 'Confirm' }));
 
-    await waitFor(() => {
-      expect(
-        educationInNumbersService.deleteEducationInNumbersPage,
-      ).toHaveBeenCalledWith('draft-amendment-id');
-      expect(refetch).toHaveBeenCalledTimes(1);
-    });
+    expect(
+      educationInNumbersService.deleteEducationInNumbersPage,
+    ).toHaveBeenCalledWith('draft-amendment-id');
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   test('shows reorder button if two or more subpages', () => {

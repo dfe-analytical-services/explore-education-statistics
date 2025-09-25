@@ -18,7 +18,7 @@ import { generatePath, useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
 interface Props {
-  einPages: EinSummaryWithPrevVersion[];
+  pages: EinSummaryWithPrevVersion[];
   isReordering: boolean;
   onCancelReordering: () => void;
   onConfirmReordering: (pageIds: string[]) => void;
@@ -26,36 +26,36 @@ interface Props {
 }
 
 const EducationInNumbersPagesTable = ({
-  einPages: initialEinPages,
+  pages: initialPage,
   isReordering,
   onCancelReordering,
   onConfirmReordering,
   onDelete,
 }: Props) => {
   const history = useHistory();
-  const [einPages, setEinPages] = useState(initialEinPages);
+  const [pages, setPages] = useState(initialPage);
 
   useEffect(() => {
-    setEinPages(initialEinPages);
-  }, [initialEinPages]);
+    setPages(initialPage);
+  }, [initialPage]);
 
   if (isReordering) {
     return (
       <ReorderableList
         heading="Reorder pages"
-        id="einPages"
-        list={einPages.map(page => ({
+        id="pages"
+        list={pages.map(page => ({
           id: page.id,
           label: page.title,
         }))}
         onCancel={() => {
-          setEinPages(initialEinPages);
+          setPages(initialPage);
           onCancelReordering();
         }}
-        onConfirm={() => onConfirmReordering(einPages.map(p => p.id))}
+        onConfirm={() => onConfirmReordering(pages.map(p => p.id))}
         onMoveItem={({ prevIndex, nextIndex }) => {
-          const reordered = reorder(einPages, prevIndex, nextIndex);
-          setEinPages(reordered);
+          const reordered = reorder(pages, prevIndex, nextIndex);
+          setPages(reordered);
         }}
       />
     );
@@ -74,7 +74,7 @@ const EducationInNumbersPagesTable = ({
       </thead>
 
       <tbody>
-        {einPages.map(page => (
+        {pages.map(page => (
           <tr key={page.title}>
             <td data-testid="Title" className={styles.title}>
               {page.title}

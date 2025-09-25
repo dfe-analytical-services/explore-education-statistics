@@ -176,15 +176,12 @@ describe('EducationInNumbersPagesTable', () => {
     await user.click(
       within(row).getByRole('button', { name: 'Create amendment' }),
     );
-
-    await waitFor(() => {
-      expect(
-        educationInNumbersService.createEducationInNumbersPageAmendment,
-      ).toHaveBeenCalledWith('published-page-id');
-      expect(history.location.pathname).toBe(
-        '/education-in-numbers/new-amendment-id/summary',
-      );
-    });
+    expect(
+      educationInNumbersService.createEducationInNumbersPageAmendment,
+    ).toHaveBeenCalledWith('published-page-id');
+    expect(history.location.pathname).toBe(
+      '/education-in-numbers/new-amendment-id/summary',
+    );
   });
 
   describe('reordering', () => {
@@ -195,7 +192,7 @@ describe('EducationInNumbersPagesTable', () => {
             onCancelReordering={noop}
             onConfirmReordering={noop}
             onDelete={noop}
-            einPages={testPages}
+            pages={testPages}
             isReordering
           />
         </TestConfigContextProvider>,
@@ -225,7 +222,7 @@ describe('EducationInNumbersPagesTable', () => {
             onCancelReordering={noop}
             onConfirmReordering={noop}
             onDelete={noop}
-            einPages={testPages}
+            pages={testPages}
             isReordering={false}
           />
         </TestConfigContextProvider>

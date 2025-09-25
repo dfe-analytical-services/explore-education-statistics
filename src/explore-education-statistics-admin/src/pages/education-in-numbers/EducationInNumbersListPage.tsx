@@ -39,7 +39,7 @@ const EducationInNumbersListPage = () => {
     >
       {pages.length > 0 ? (
         <EducationInNumbersPagesTable
-          einPages={pages}
+          pages={pages}
           onDelete={async id => {
             educationInNumbersService.deleteEducationInNumbersPage(id);
             await refetchPages();
