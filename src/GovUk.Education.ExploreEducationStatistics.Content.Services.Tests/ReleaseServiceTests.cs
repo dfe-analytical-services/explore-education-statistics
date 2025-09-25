@@ -201,7 +201,6 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 1,
         Heading = "Release 1 summary section",
-        Caption = "",
         Type = ContentSectionType.ReleaseSummary,
         Content = new List<ContentBlock>
         {
@@ -217,7 +216,6 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 0,
         Heading = "Release 1 related dashboards section",
-        Caption = "",
         Type = ContentSectionType.RelatedDashboards,
         Content = new List<ContentBlock>(),
         ReleaseVersion = Release1V1
@@ -229,7 +227,6 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 2,
         Heading = "Release 1 section 1 order 2",
-        Caption = "",
         Type = ContentSectionType.Generic,
         Content = new List<ContentBlock>
         {
@@ -246,7 +243,6 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 0,
         Heading = "Release 1 section 2 order 0",
-        Caption = "",
         Type = ContentSectionType.Generic,
         ReleaseVersion = Release1V1
     };
@@ -256,7 +252,6 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 1,
         Heading = "Release 1 section 3 order 1",
-        Caption = "",
         Type = ContentSectionType.Generic,
         ReleaseVersion = Release1V1
     };

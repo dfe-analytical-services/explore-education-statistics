@@ -156,7 +156,6 @@ public abstract class ReleaseServiceTests
                 Content = ListOf(new ContentSection
                 {
                     Id = Guid.NewGuid(),
-                    Caption = "Template caption index 0",
                     Heading = "Template heading index 0",
                     Type = ContentSectionType.Generic,
                     Order = 1,
@@ -241,7 +240,6 @@ public abstract class ReleaseServiceTests
 
                 var contentSections = newReleaseVersion.GenericContent.ToList();
                 Assert.Single(contentSections);
-                Assert.Equal("Template caption index 0", contentSections[0].Caption);
                 Assert.Equal("Template heading index 0", contentSections[0].Heading);
                 Assert.Single(contentSections);
                 Assert.Equal(1, contentSections[0].Order);

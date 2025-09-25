@@ -97,7 +97,6 @@ export const testRelease: ReleaseVersion = {
       id: '24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94',
       order: 1,
       heading: 'About these statistics',
-      caption: '',
       content: [
         {
           id: '7eeb1478-ab26-4b70-9128-b976429efa2f',
@@ -111,7 +110,6 @@ export const testRelease: ReleaseVersion = {
       id: '8965ef44-5ad7-4ab0-a142-78453d6f40af',
       order: 2,
       heading: 'Pupil absence rates',
-      caption: '',
       content: [
         {
           id: '2c369594-3bbc-40b4-ad19-196c923f5c7f',
@@ -131,7 +129,6 @@ export const testRelease: ReleaseVersion = {
       id: '6f493eee-443a-4403-9069-fef82e2f5788',
       order: 3,
       heading: 'Persistent absence',
-      caption: '',
       content: [
         {
           id: '8a8add13-368c-4067-9210-166bb19a00c1',
@@ -151,7 +148,6 @@ export const testRelease: ReleaseVersion = {
       id: 'fbf99442-3b72-46bc-836d-8866c552c53d',
       order: 4,
       heading: 'Reasons for absence',
-      caption: '',
       content: [
         {
           id: '2ef5f84f-e151-425d-8906-2921712f9157',
@@ -166,7 +162,6 @@ export const testRelease: ReleaseVersion = {
     id: '4f30b382-ce28-4a3e-801a-ce76004f5eb4',
     order: 1,
     heading: '',
-    caption: '',
     content: [
       {
         id: 'a0b85d7d-a9bd-48b5-82c6-a119adc74ca2',
@@ -180,7 +175,6 @@ export const testRelease: ReleaseVersion = {
     id: 'headlines-id',
     order: 1,
     heading: '',
-    caption: '',
     content: [
       {
         id: 'b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9',
@@ -195,14 +189,12 @@ export const testRelease: ReleaseVersion = {
     id: 'key-stats-secondary-id',
     order: 1,
     heading: '',
-    caption: '',
     content: [],
   },
   relatedDashboardsSection: {
     id: 'related-dashboards-id',
     order: 0,
     heading: '',
-    caption: '',
     content: [
       {
         id: 'related-dashboards-content-block-id',

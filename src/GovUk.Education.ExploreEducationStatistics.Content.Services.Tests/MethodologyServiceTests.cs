@@ -239,22 +239,19 @@ public class MethodologyServiceTests
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 2,
-                                Heading = "Annex 3 heading",
-                                Caption = "Annex 3 caption"
+                                Heading = "Annex 3 heading"
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 0,
-                                Heading = "Annex 1 heading",
-                                Caption = "Annex 1 caption"
+                                Heading = "Annex 1 heading"
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 1,
-                                Heading = "Annex 2 heading",
-                                Caption = "Annex 2 caption"
+                                Heading = "Annex 2 heading"
                             }
                         },
                         Content = new List<ContentSection>
@@ -263,22 +260,19 @@ public class MethodologyServiceTests
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 2,
-                                Heading = "Section 3 heading",
-                                Caption = "Section 3 caption"
+                                Heading = "Section 3 heading"
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 0,
-                                Heading = "Section 1 heading",
-                                Caption = "Section 1 caption"
+                                Heading = "Section 1 heading"
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 1,
-                                Heading = "Section 2 heading",
-                                Caption = "Section 2 caption"
+                                Heading = "Section 2 heading"
                             }
                         },
                     },
@@ -333,7 +327,6 @@ public class MethodologyServiceTests
         ContentSectionViewModel actual)
     {
         Assert.Equal(expected.Id, actual.Id);
-        Assert.Equal(expected.Caption, actual.Caption);
         Assert.Equal(expected.Heading, actual.Heading);
         Assert.Equal(expected.Order, actual.Order);
     }

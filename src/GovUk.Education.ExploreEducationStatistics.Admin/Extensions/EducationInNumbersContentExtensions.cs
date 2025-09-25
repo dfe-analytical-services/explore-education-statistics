@@ -13,7 +13,6 @@ public static class EducationInNumbersContentExtensions
             Id = newSectionId,
             Order = section.Order,
             Heading = section.Heading,
-            Caption = section.Caption,
             EducationInNumbersPageId = newPageId,
             Content = section.Content
                 .Select(block => block.Clone(newSectionId))

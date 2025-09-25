@@ -1118,7 +1118,6 @@ public class ReleaseAmendmentServiceTests
         Assert.NotEqual(originalSection.Id, amendedSection.Id);
 
         Assert.NotEqual(originalSection.Id, amendedSection.Id);
-        Assert.Equal(originalSection.Caption, amendedSection.Caption);
         Assert.Equal(originalSection.Heading, amendedSection.Heading);
         Assert.Equal(originalSection.Order, amendedSection.Order);
         Assert.Equal(originalSection.Type, amendedSection.Type);

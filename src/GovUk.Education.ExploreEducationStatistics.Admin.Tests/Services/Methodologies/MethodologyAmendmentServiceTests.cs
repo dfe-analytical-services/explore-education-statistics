@@ -139,7 +139,6 @@ public class MethodologyAmendmentServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Caption = "Annex caption",
                         Heading = "Annex heading",
                         Order = 2,
                         Type = ContentSectionType.Generic,
@@ -225,7 +224,6 @@ public class MethodologyAmendmentServiceTests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Caption = "Content caption",
                         Heading = "Content heading",
                         Order = 2,
                         Type = ContentSectionType.Generic,
@@ -304,7 +302,6 @@ public class MethodologyAmendmentServiceTests
         Assert.NotEqual(originalContentSection.Id, amendmentContentSection.Id);
 
         // Check the other basic Content Section fields are the same
-        Assert.Equal(originalContentSection.Caption, amendmentContentSection.Caption);
         Assert.Equal(originalContentSection.Heading, amendmentContentSection.Heading);
         Assert.Equal(originalContentSection.Order, amendmentContentSection.Order);
         Assert.Equal(originalContentSection.Type, amendmentContentSection.Type);

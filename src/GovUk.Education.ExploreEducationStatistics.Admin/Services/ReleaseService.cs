@@ -200,7 +200,6 @@ public partial class ReleaseService(
             ReleaseVersionId = newReleaseVersion.Id,
 
             // Copy certain fields from the original.
-            Caption = originalSection.Caption,
             Heading = originalSection.Heading,
             Order = originalSection.Order,
             Type = originalSection.Type

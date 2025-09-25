@@ -9,7 +9,6 @@ export const testMethodology: Methodology = {
     {
       order: 0,
       heading: 'Section 1',
-      caption: 'Section 1 caption',
       content: [
         {
           body: '<p>section 1 content</p>',
@@ -22,7 +21,6 @@ export const testMethodology: Methodology = {
     {
       order: 1,
       heading: 'Section 2',
-      caption: 'Section 2 caption',
       content: [
         {
           body: '<p>section 2 content</p>',
@@ -37,7 +35,6 @@ export const testMethodology: Methodology = {
     {
       order: 0,
       heading: 'Annex 1',
-      caption: 'Annex 1 caption',
       content: [
         {
           body: '<p>annex 1 content</p>',
@@ -50,7 +47,6 @@ export const testMethodology: Methodology = {
     {
       order: 1,
       heading: 'Annex 2',
-      caption: 'Annex 2 caption',
       content: [
         {
           body: '<p>annex 2 content</p>',
@@ -63,7 +59,6 @@ export const testMethodology: Methodology = {
     {
       order: 2,
       heading: 'Annex 3',
-      caption: 'Annex 3 caption',
       content: [
         {
           body: '<p>annex 3 content</p>',

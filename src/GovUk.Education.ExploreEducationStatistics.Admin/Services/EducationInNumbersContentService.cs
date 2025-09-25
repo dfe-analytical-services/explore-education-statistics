@@ -40,7 +40,6 @@ public class EducationInNumbersContentService(
             EducationInNumbersPageId = pageId,
             Order = order,
             Heading = "New section",
-            Caption = null,
             Content = [],
         };
 
