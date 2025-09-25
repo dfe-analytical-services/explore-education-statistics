@@ -267,3 +267,15 @@ def user_updates_methodology_published_date_via_api(methodology_id: str, publish
     assert (
         response.status_code < 300
     ), f"Updating methodology published date failed with {response.status_code} and {response.text}"
+
+
+def user_removes_ein_page_if_exists(ein_page_title: str):
+    response = admin_client.get("/api/education-in-numbers")
+    assert response.status_code < 300, "Failed to get Ein pages"
+
+    ein_pages = response.json()
+
+    for page in ein_pages:
+        if page.get("title") == ein_page_title:
+            admin_client.delete(f"/api/education-in-numbers/{page.get('id')}")
+            # we don't break here as there may be multiple versions

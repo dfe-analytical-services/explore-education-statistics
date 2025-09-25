@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -12,14 +13,18 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EducationInNumbersService(
+    IOptions<AppOptions> appOptions,
     ContentDbContext contentDbContext,
     IUserService userService) : IEducationInNumbersService
 {
+    private readonly bool _publishedPageDeletionAllowed = appOptions.Value.EnableEinPublishedPageDeletion;
+
     public async Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id)
     {
         return await contentDbContext.EducationInNumbersPages
@@ -287,9 +292,11 @@ public class EducationInNumbersService(
             .SingleOrNotFoundAsync(page => page.Id == id)
             .OnSuccessVoid(async page =>
             {
-                if (page.Published != null)
+                if (!_publishedPageDeletionAllowed || page.Published != null) // @MarkFix tests covering appOption
                 {
-                    // we currently only allow the cancellation of unpublished amendments
+                    // we currently only allow the cancellation of unpublished amendments - everything else cannot be
+                    // deleted *except* on dev, where we allow all pages to be deleted so the UI tests can clean
+                    // up after themselves
                     throw new ArgumentException("Cannot delete published page");
                 }
 

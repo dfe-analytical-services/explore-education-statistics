@@ -9,6 +9,7 @@ Library     utilities.py
 Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
+Library     admin_api.py
 
 
 *** Variables ***
@@ -53,6 +54,7 @@ user opens the browser
     # then can continue using the site as per usual without any more need to interact
     # with authentication.
     ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
+    log to console    Loading page in browser: ${authenticated_url}
     go to    ${authenticated_url}
     user waits until page finishes loading
 
