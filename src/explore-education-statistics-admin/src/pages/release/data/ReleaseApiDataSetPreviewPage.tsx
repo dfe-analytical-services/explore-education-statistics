@@ -49,22 +49,19 @@ export default function ReleaseApiDataSetPreviewPage() {
     activates?: Date | null,
     expires?: Date | null,
   ) => {
-    let startDate: Date = new Date();
-    let endDate: Date;
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
 
     if (!dataSet?.draftVersion) {
       return;
     }
     if (datePresetSpan > 0) {
+      startDate = new Date();
       endDate = getPresetSpanEndDate(datePresetSpan);
     } else if (activates && expires) {
       expires.setHours(23, 59, 59);
       startDate = activates;
       endDate = expires;
-    } else {
-      throw new Error(
-        'Either date preset or both from and to dates must be provided',
-      );
     }
 
     const token = await previewTokenService.createPreviewToken({

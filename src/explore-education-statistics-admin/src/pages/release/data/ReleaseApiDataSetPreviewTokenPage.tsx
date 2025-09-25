@@ -63,7 +63,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     history.push(tokenLogPagePath);
   };
 
-  const dateIsToday = (stringDate: string): boolean => {
+  const dateIsToday = (stringDate?: string): boolean => {
+    if (stringDate === undefined) return true;
     const getYMD = (date: Date) => {
       return {
         y: date.getUTCFullYear(),
@@ -76,6 +77,9 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     return d1.y === d2.y && d1.m === d2.m && d1.d === d2.d;
   };
   const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;
+  const activatesToday = dateIsToday(
+    previewToken ? previewToken.activates : undefined,
+  );
 
   return (
     <>
@@ -112,22 +116,20 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   label="Preview token"
                   text={previewToken.id}
                 />
-                {!dateIsToday(previewToken.activates) && (
+
+                {!activatesToday && (
                   <>
-                    The token actives from:{' '}
+                    The token is active from:{' '}
                     <strong>
-                      <FormattedDate format="MM/dd/yyyy">
-                        {previewToken.activates}
-                      </FormattedDate>{' '}
+                      <FormattedDate>{previewToken.activates}</FormattedDate>{' '}
                       (local time){' '}
                     </strong>
                   </>
                 )}
                 <p>
-                  {dateIsToday(previewToken.activates) ? 'The token' : 'and'}{' '}
-                  expires:{' '}
+                  {activatesToday ? 'The token' : 'and'} expires:{' '}
                   <strong>
-                    <FormattedDate format="MM/dd/yyyy">
+                    <FormattedDate formatRelativeToNow={activatesToday}>
                       {previewToken.expiry}
                     </FormattedDate>{' '}
                     (local time)
