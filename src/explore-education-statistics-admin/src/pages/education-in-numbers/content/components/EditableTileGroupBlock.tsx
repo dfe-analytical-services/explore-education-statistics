@@ -4,8 +4,10 @@ import { useEducationInNumbersPageContentState } from '@admin/pages/education-in
 import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
+import ButtonText from '@common/components/ButtonText';
 import { FormTextInput } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
+import ModalConfirm from '@common/components/ModalConfirm';
 import ReorderableList from '@common/components/ReorderableList';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
@@ -207,12 +209,21 @@ const EditableTileGroupBlock = ({
                       <FreeTextStatTile key={tile.id} tile={tile} />
                       {!isEditingStatTile && (
                         <ButtonGroup className="govuk-!-margin-top-2">
-                          <Button onClick={() => setIsEditingStatTile(tile.id)}>
+                          <Button
+                            onClick={() => setIsEditingStatTile(tile.id)}
+                            variant="secondary"
+                          >
                             Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
                           </Button>
-                          <Button
-                            variant="warning"
-                            onClick={async () => {
+                          <ModalConfirm
+                            title="Remove tile"
+                            triggerButton={
+                              <ButtonText variant="warning">
+                                Delete tile
+                                <VisuallyHidden>- {title}</VisuallyHidden>
+                              </ButtonText>
+                            }
+                            onConfirm={async () => {
                               await deleteFreeTextStatTile({
                                 educationInNumbersPageId,
                                 blockId: block.id,
@@ -221,9 +232,8 @@ const EditableTileGroupBlock = ({
                               });
                             }}
                           >
-                            Delete tile
-                            <VisuallyHidden>- {title}</VisuallyHidden>
-                          </Button>
+                            <p>Are you sure you want to remove this tile?</p>
+                          </ModalConfirm>
                         </ButtonGroup>
                       )}
                     </>
