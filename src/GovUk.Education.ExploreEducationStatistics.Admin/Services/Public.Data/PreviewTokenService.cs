@@ -27,7 +27,7 @@ public class PreviewTokenService(
     public async Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
-        DateTimeOffset? created,
+        DateTimeOffset? activates,
         DateTimeOffset? expiry,
         CancellationToken cancellationToken = default)
     {
@@ -40,7 +40,8 @@ public class PreviewTokenService(
                 {
                     DataSetVersionId = dataSetVersionId,
                     Label = label,
-                    Created = created ?? DateTimeOffset.UtcNow,
+                    Created = DateTimeOffset.UtcNow,
+                    Activates = activates,
                     Expiry = expiry ?? DateTimeOffset.UtcNow.AddDays(1),
                     CreatedByUserId = userService.GetUserId()
                 });
@@ -151,6 +152,7 @@ public class PreviewTokenService(
             Status = previewToken.Status,
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
+            Activates = previewToken.Activates ?? previewToken.Created,
             Expiry = previewToken.Expiry,
             Updated = previewToken.Updated
         };
