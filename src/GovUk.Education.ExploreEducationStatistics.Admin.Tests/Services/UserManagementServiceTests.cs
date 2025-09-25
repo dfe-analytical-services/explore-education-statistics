@@ -912,11 +912,9 @@ public class UserManagementServiceTests
     [Fact]
     public async Task DeleteUser()
     {
-        var internalUser = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = "test@test.com",
-        };
+        var internalUser = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var identityUser = new ApplicationUser
         {
@@ -980,7 +978,7 @@ public class UserManagementServiceTests
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             userRepository
-                .Setup(mock => mock.FindByEmail(internalUser.Email))
+                .Setup(mock => mock.FindByEmail(internalUser.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => contentDbContext.Users.Single(u => u.Email == internalUser.Email))
                 .Verifiable();
 
@@ -1011,6 +1009,7 @@ public class UserManagementServiceTests
             Assert.NotNull(dbInternalUser.SoftDeleted);
             dbInternalUser.SoftDeleted.AssertUtcNow();
             Assert.Equal(CreatedById, dbInternalUser.DeletedById);
+            Assert.False(dbInternalUser.Active);
         }
 
         VerifyAllMocks(
@@ -1032,7 +1031,7 @@ public class UserManagementServiceTests
 
         var userRepository = new Mock<IUserRepository>(Strict);
         userRepository
-            .Setup(mock => mock.FindByEmail(email))
+            .Setup(mock => mock.FindByEmail(email, It.IsAny<CancellationToken>()))
             .ReturnsAsync((User?)null)
             .Verifiable();
 

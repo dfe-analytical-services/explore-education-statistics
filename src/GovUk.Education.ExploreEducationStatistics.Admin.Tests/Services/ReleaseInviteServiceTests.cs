@@ -140,10 +140,9 @@ public class ReleaseInviteServiceTests
                 .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .Generate(2));
 
-        var user = new User
-        {
-            Email = Email,
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail(Email)
+            .Generate();
 
         var newReleaseVersionIds = ListOf(
             publication.Releases[0].Versions[0].Id,
@@ -325,10 +324,9 @@ public class ReleaseInviteServiceTests
                 .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .Generate(2));
 
-        var user = new User
-        {
-            Email = Email,
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail(Email)
+            .Generate();
 
         var userRelease1Role = new UserReleaseRole
         {
@@ -482,10 +480,9 @@ public class ReleaseInviteServiceTests
     [Fact]
     public async Task InviteContributor_ExistingUser_FailsSendingEmail()
     {
-        var user = new User
-        {
-            Email = Email,
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail(Email)
+            .Generate();
 
         Publication publication = _dataFixture
             .DefaultPublication()
