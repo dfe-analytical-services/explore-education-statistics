@@ -113,7 +113,8 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                       </FormattedDate>
                     </td>
                     <td className="govuk-!-text-align-right">
-                      {token.status === 'Active' && (
+                      {(token.status === 'Active' ||
+                        token.status === 'Pending') && (
                         <>
                           <Link
                             to={generatePath<ReleaseDataSetPreviewTokenRouteParams>(
