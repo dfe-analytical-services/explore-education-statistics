@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Semver;
@@ -540,6 +541,7 @@ public class ReleaseAmendmentServiceTests
             var amendmentEmbedBlockLink = await contentDbContext
                 .ContentBlocks
                 .OfType<EmbedBlockLink>()
+                .Include(embedBlockLink => embedBlockLink.EmbedBlock)
                 .SingleAsync(block => block.ReleaseVersionId == amendment.Id);
 
             var originalEmbedBlockLink =
@@ -1140,6 +1142,7 @@ public class ReleaseAmendmentServiceTests
         Assert.Empty(amendedBlock.Comments);
     }
 
+    [UsedImplicitly] 
     private static void AssertAmendedReleaseRoleCorrect(
         UserReleaseRole originalReleaseRole,
         UserReleaseRole amendedReleaseRole,
@@ -1154,6 +1157,7 @@ public class ReleaseAmendmentServiceTests
         Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
     }
 
+    [UsedImplicitly] 
     private static void AssertAmendedReleaseFileCorrect(
         ReleaseFile originalFile,
         ReleaseFile amendmentDataFile,

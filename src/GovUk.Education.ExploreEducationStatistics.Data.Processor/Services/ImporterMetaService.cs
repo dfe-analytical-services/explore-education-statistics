@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -52,6 +53,8 @@ public class ImporterMetaService : IImporterMetaService
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+        metaRows = IgnoreFiltersUsedForGrouping(metaRows);
+
         var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, subject);
         var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, subject);
 
@@ -91,6 +94,8 @@ public class ImporterMetaService : IImporterMetaService
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
+        metaRows = IgnoreFiltersUsedForGrouping(metaRows);
+        
         var filters = (await GetFilters(metaRows, subject, context)).ToList();
         var indicators = GetIndicators(metaRows, subject, context).ToList();
 
@@ -117,6 +122,18 @@ public class ImporterMetaService : IImporterMetaService
             .Select(filter => (
                 filter: filters.Single(f => f.Name == filter.ColumnName),
                 column: filter.ColumnName))
+            .ToList();
+    }
+
+    private static List<MetaRow> IgnoreFiltersUsedForGrouping(List<MetaRow> metaRows)
+    {
+        var groupingColumns = metaRows
+            .Select(mr => mr.FilterGroupingColumn?.ToLower())
+            .WhereNotNull() ;
+
+        return metaRows
+            .Where(r => r.ColumnType != ColumnType.Filter 
+                    || !groupingColumns.Contains(r.ColumnName.ToLower()))
             .ToList();
     }
 

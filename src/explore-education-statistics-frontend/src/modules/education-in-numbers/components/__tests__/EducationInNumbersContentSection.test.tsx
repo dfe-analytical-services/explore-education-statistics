@@ -24,7 +24,7 @@ describe('EducationInNumbersContentSection', () => {
       <EducationInNumbersContentSection
         content={testBlockContent}
         heading="Section 1"
-        isLastSection={false}
+        isFirstSection={false}
       />,
     );
 

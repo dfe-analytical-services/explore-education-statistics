@@ -274,7 +274,7 @@ public class ReleaseDataFileServicePermissionTests
         return new ReleaseDataFileService(
             contentDbContext,
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            privateBlobStorageService ??= Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
+            privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
             dataSetValidator ?? Mock.Of<IDataSetValidator>(MockBehavior.Strict),
             fileRepository ?? new FileRepository(contentDbContext),
             releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),

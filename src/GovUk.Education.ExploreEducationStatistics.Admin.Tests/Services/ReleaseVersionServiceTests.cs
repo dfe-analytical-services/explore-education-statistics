@@ -646,7 +646,7 @@ public abstract class ReleaseVersionServiceTests
                         fileId: testFixture.File.Id);
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            var errorDetail = validationProblem.AssertHasError(
+            validationProblem.AssertHasError(
                 expectedPath: null,
                 expectedCode: ValidationMessages.ReleaseFileMustBeOriginal.Code);
         }

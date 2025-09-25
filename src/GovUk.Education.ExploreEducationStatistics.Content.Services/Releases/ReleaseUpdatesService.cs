@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 
 public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IReleaseUpdatesService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetPaginatedUpdatesForRelease(
+    public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetReleaseUpdates(
         string publicationSlug,
         string releaseSlug,
         int page = 1,
@@ -36,8 +37,8 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         CancellationToken cancellationToken) =>
         contentDbContext.Publications
             .AsNoTracking()
-            .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue)
-            .SingleOrNotFoundAsync(cancellationToken);
+            .WhereHasPublishedRelease()
+            .SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);
 
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,

@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +31,8 @@ public class RelatedInformationService(ContentDbContext contentDbContext) : IRel
         CancellationToken cancellationToken) =>
         contentDbContext.Publications
             .AsNoTracking()
-            .SingleOrNotFoundAsync(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue,
-                cancellationToken);
+            .WhereHasPublishedRelease()
+            .SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);
 
     private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,

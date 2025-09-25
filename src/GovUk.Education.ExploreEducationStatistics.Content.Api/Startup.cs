@@ -173,12 +173,14 @@ public class Startup(
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
         services.AddTransient<IGlossaryService, GlossaryService>();
         services.AddTransient<IThemeService, ThemeService>();
+        services.AddTransient<IPublicationReleasesService, PublicationReleasesService>();
         services.AddTransient<IPublicationsSitemapService, PublicationsSitemapService>();
         services.AddTransient<IPublicationsSearchService, PublicationsSearchService>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
         services.AddTransient<IReleaseSearchableDocumentsService, ReleaseSearchableDocumentsService>();
+        services.AddTransient<IReleaseVersionsService, ReleaseVersionsService>();
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 

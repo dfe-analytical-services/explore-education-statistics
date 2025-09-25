@@ -8,6 +8,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES3661_AddPublicationsFullTextCatalogAndIndex : Migration
 {
     private const string MigrationId = "20221108151034";

@@ -300,12 +300,12 @@ public static class ReflectionExtensionsTests
         }
 
         [Fact]
-        public void Task()
+        public async Task Task()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Task<string>), out var boxed));
 
             var value = Assert.IsType<Task<string>>(boxed);
-            Assert.Equal(TestString, value.Result);
+            Assert.Equal(TestString, await value);
         }
 
         [Fact]
@@ -316,58 +316,58 @@ public static class ReflectionExtensionsTests
         }
 
         [Fact]
-        public void Task_List()
+        public async Task Task_List()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Task<List<string>>), out var boxed));
 
             var value = Assert.IsType<Task<List<string>>>(boxed);
-            Assert.Equal(list, value.Result);
+            Assert.Equal(list, await value);
         }
 
         [Fact]
-        public void Task_List_Interface()
+        public async Task Task_List_Interface()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Task<IList<string>>), out var boxed));
 
             var value = Assert.IsType<Task<IList<string>>>(boxed);
-            Assert.Equal(list, value.Result);
+            Assert.Equal(list, await value);
         }
 
         [Fact]
-        public void Task_List_Collection()
+        public async Task Task_List_Collection()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Task<ICollection<string>>), out var boxed));
 
             var value = Assert.IsType<Task<ICollection<string>>>(boxed);
-            Assert.Equal(list, value.Result);
+            Assert.Equal(list, await value);
         }
 
         [Fact]
-        public void Task_List_Enumerable()
+        public async Task Task_List_Enumerable()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Task<IEnumerable<string>>), out var boxed));
 
             var value = Assert.IsType<Task<IEnumerable<string>>>(boxed);
-            Assert.Equal(list, value.Result);
+            Assert.Equal(list, await value);
         }
 
         [Fact]
-        public void Task_List_Task()
+        public async Task Task_List_Task()
         {
             var list = ListOf(FromResult("test"));
 
             Assert.True(list.TryBoxToResult(typeof(Task<List<Task<string>>>), out var boxed));
 
             var value = Assert.IsType<Task<List<Task<string>>>>(boxed);
-            Assert.Equal(list, value.Result);
+            Assert.Equal(list, await value);
         }
 
         [Fact]
@@ -380,30 +380,30 @@ public static class ReflectionExtensionsTests
         }
 
         [Fact]
-        public void Task_Either()
+        public async Task Task_Either()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, string>>), out var boxed));
 
             var value = Assert.IsType<Task<Either<Unit, string>>>(boxed);
-            Assert.Equal(TestString, value.Result.Right);
+            Assert.Equal(TestString, (await value).Right);
         }
 
         [Fact]
-        public void Task_Either_ActionResult()
+        public async Task Task_Either_ActionResult()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, ActionResult<string>>>), out var boxed));
 
             var value = Assert.IsType<Task<Either<Unit, ActionResult<string>>>>(boxed);
-            Assert.Equal(TestString, value.Result.Right.Value);
+            Assert.Equal(TestString, (await value).Right.Value);
         }
 
         [Fact]
-        public void Task_Task()
+        public async Task Task_Task()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Task<Task<string>>), out var boxed));
 
             var value = Assert.IsType<Task<Task<string>>>(boxed);
-            Assert.Equal(TestString, value.Result.Result);
+            Assert.Equal(TestString, await await value);
         }
 
         [Fact]
@@ -481,12 +481,12 @@ public static class ReflectionExtensionsTests
         }
 
         [Fact]
-        public void Task_ActionResult()
+        public async Task Task_ActionResult()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Task<ActionResult<string>>), out var boxed));
 
             var value = Assert.IsType<Task<ActionResult<string>>>(boxed);
-            Assert.Equal(TestString, value.Result.Value);
+            Assert.Equal(TestString, (await value).Value);
         }
 
         [Fact]
@@ -504,65 +504,65 @@ public static class ReflectionExtensionsTests
         }
 
         [Fact]
-        public void Either_Task()
+        public async Task Either_Task()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Either<Unit, Task<string>>), out var boxed));
 
             var value = Assert.IsType<Either<Unit, Task<string>>>(boxed);
-            Assert.Equal(TestString, value.Right.Result);
+            Assert.Equal(TestString, await value.Right);
         }
 
         [Fact]
-        public void Either_Task_ActionResult()
+        public async Task Either_Task_ActionResult()
         {
             Assert.True(TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<string>>>), out var boxed));
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<string>>>>(boxed);
-            Assert.Equal(TestString, value.Right.Result.Value);
+            Assert.Equal(TestString, (await value.Right).Value);
         }
 
         [Fact]
-        public void Either_Task_ActionResult_List()
+        public async Task Either_Task_ActionResult_List()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<List<string>>>>), out var boxed));
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<List<string>>>>>(boxed);
-            Assert.Equal(list, value.Right.Result.Value);
+            Assert.Equal(list, (await value.Right).Value);
         }
 
         [Fact]
-        public void Either_Task_ActionResult_List_Interface()
+        public async Task Either_Task_ActionResult_List_Interface()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<IList<string>>>>), out var boxed));
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<IList<string>>>>>(boxed);
-            Assert.Equal(list, value.Right.Result.Value);
+            Assert.Equal(list, (await value.Right).Value);
         }
 
         [Fact]
-        public void Either_Task_ActionResult_List_Collection()
+        public async Task Either_Task_ActionResult_List_Collection()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<ICollection<string>>>>), out var boxed));
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<ICollection<string>>>>>(boxed);
-            Assert.Equal(list, value.Right.Result.Value);
+            Assert.Equal(list, (await value.Right).Value);
         }
 
         [Fact]
-        public void Either_Task_ActionResult_List_Enumerable()
+        public async Task Either_Task_ActionResult_List_Enumerable()
         {
             var list = ListOf("test");
 
             Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<IEnumerable<string>>>>), out var boxed));
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<IEnumerable<string>>>>>(boxed);
-            Assert.Equal(list, value.Right.Result.Value);
+            Assert.Equal(list, (await value.Right).Value);
         }
 
         [Fact]
@@ -591,8 +591,6 @@ public static class ReflectionExtensionsTests
 
     public class TryUnboxResultTests
     {
-        private const string TestString = "test-value";
-
         [Fact]
         public void ValueType()
         {
@@ -765,7 +763,7 @@ public static class ReflectionExtensionsTests
         {
             var boxed = FromResult(TestString);
 
-            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
             Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
         }
 
@@ -774,7 +772,7 @@ public static class ReflectionExtensionsTests
         {
             var boxed = CompletedTask;
 
-            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
             Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
         }
 
@@ -811,7 +809,7 @@ public static class ReflectionExtensionsTests
         {
             var boxed = new Either<Unit, Task<string>>(FromResult(TestString));
 
-            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
             Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
         }
 
@@ -820,7 +818,7 @@ public static class ReflectionExtensionsTests
         {
             var boxed = new Either<Unit, Task>(CompletedTask);
 
-            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+            var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
             Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
         }
 

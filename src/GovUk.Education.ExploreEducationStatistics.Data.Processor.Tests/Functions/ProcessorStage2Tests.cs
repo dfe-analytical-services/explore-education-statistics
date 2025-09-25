@@ -152,7 +152,13 @@ public class ProcessorStage2Tests
             scenario.GetExpectedLocations().ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
         }
     }
-
+    
+    [Fact]
+    public async Task ProcessStage2_IgnoresFilterRowsWithGroupingColumnNamesOfOtherFilters()
+    {
+        await AssertStage2ItemsImportedCorrectly(new IgnoresFilterRowsInMetaFileScenario());
+    }
+    
     private async Task AssertStage2ItemsImportedCorrectly(
         IProcessorStage2TestScenario scenario,
         IImporterLocationCache? locationCache = null)

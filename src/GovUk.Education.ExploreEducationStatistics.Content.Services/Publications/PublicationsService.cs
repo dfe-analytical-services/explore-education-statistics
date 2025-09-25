@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
     {
         var query = contentDbContext.Publications
             .AsNoTracking()
-            .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue);
+            .WhereHasPublishedRelease();
 
         if (includeContact)
         {
@@ -52,7 +53,7 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
             query = query.Include(p => p.Theme);
         }
 
-        return await query.SingleOrNotFoundAsync(cancellationToken);
+        return await query.SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);
     }
 
     private async Task<Publication?> GetSupersededByPublication(

@@ -147,7 +147,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
                         }
                     });
             })
-            .ConfigureServices((hostContext, services) =>
+            .ConfigureServices((_, services) =>
             {
                 services
                     .ReplaceService(NotificationClient);

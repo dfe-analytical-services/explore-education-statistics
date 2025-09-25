@@ -1,17 +1,17 @@
 import InsetText from '@common/components/InsetText';
-import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import { ContentBlock } from '@common/services/types/blocks';
+import EinContentBlockRenderer from '@common/modules/education-in-numbers/components/EinContentBlockRenderer';
+import { EinContentBlock } from '@common/services/types/einBlocks';
 import React from 'react';
 
 interface Props {
-  blocks: ContentBlock[];
+  blocks: EinContentBlock[];
 }
 
 const EducationInNumbersSectionBlocks = ({ blocks }: Props) => {
   return blocks.length > 0 ? (
     <>
       {blocks.map(block => (
-        <ContentBlockRenderer key={block.id} block={block} />
+        <EinContentBlockRenderer key={block.id} block={block} />
       ))}
     </>
   ) : (

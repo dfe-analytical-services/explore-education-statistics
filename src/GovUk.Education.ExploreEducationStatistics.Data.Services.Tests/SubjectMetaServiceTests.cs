@@ -1181,7 +1181,7 @@ public class SubjectMetaServiceTests
             var savedSequence = savedReleaseFile.FilterSequence;
 
             Assert.NotNull(savedSequence);
-            Assert.Equal(2, savedSequence!.Count);
+            Assert.Equal(2, savedSequence.Count);
 
             // Filter 1
             var savedFilter1 = savedSequence[0];
@@ -2183,7 +2183,7 @@ public class SubjectMetaServiceTests
             var savedSequence = savedReleaseFile.IndicatorSequence;
 
             Assert.NotNull(savedSequence);
-            Assert.Equal(2, savedSequence!.Count);
+            Assert.Equal(2, savedSequence.Count);
 
             // Indicator Group 1
             var savedIndicatorGroup1 = savedSequence[0];

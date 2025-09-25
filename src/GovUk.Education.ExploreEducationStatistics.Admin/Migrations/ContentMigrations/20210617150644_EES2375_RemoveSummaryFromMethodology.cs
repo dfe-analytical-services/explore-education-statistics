@@ -2,6 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES2375_RemoveSummaryFromMethodology : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)

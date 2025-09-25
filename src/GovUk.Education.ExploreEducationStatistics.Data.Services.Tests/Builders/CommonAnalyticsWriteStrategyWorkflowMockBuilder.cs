@@ -15,7 +15,7 @@ public class CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRe
             .Setup(m => m.Report(It.IsAny<IWorkflowActor<TAnalyticsCaptureRequest>>(), It.IsAny<TAnalyticsCaptureRequest>(), It.IsAny<CancellationToken>()))
             .Callback(
                 (IWorkflowActor<TAnalyticsCaptureRequest> workflowActor,
-                TAnalyticsCaptureRequest request,
+                TAnalyticsCaptureRequest _,
                 CancellationToken _) 
                     => _reportCalls.Add(new ReportCallArguments(workflowActor)))
             .Returns(Task.CompletedTask);

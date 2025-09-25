@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES3126_MigrateReleaseType : Migration
 {
     private static readonly Dictionary<ReleaseType, Guid> ReleaseTypeIds = new Dictionary<ReleaseType, Guid>

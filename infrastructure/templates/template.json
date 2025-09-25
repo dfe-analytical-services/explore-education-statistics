@@ -803,6 +803,28 @@
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public-site')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public-site')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
+    "coreStorageVnetRules": [
+      {
+        "id": "[variables('adminSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('importerSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('publisherSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('publicApiDataProcessorSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('screenerFunctionAppSubnetRef')]",
+        "action": "Allow"
+      }
+    ],
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
@@ -813,13 +835,51 @@
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
     "notificationsStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eesnotify')]",
+    "notificationsStorageVnetRules": [
+      {
+        "id": "[variables('notifySubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('publisherSubnetRef')]",
+        "action": "Allow"
+      }
+    ],
     "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
+    "publicStorageVnetRules": [
+      {
+        "id": "[variables('adminSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('contentSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('dataSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('publisherSubnetRef')]",
+        "action": "Allow"
+      }
+    ],
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
     "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
+    "publisherStorageVnetRules": [
+      {
+        "id": "[variables('adminSubnetRef')]",
+        "action": "Allow"
+      },
+      {
+        "id": "[variables('publisherSubnetRef')]",
+        "action": "Allow"
+      }
+    ],
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
@@ -1138,6 +1198,7 @@
     ],
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+    "vNetDdosPlanName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'), '-ddos-plan')]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
     "analyticsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-analytics')]",
@@ -2335,42 +2396,16 @@
     {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2023-05-01",
       "location": "westeurope",
       "kind": "StorageV2",
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false,
         "networkAcls": {
-          "condition": "[parameters('useSubnets')]",
           "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('importerSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('publicApiDataProcessorSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('screenerFunctionAppSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
+          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('coreStorageVnetRules'), createArray())]",
           "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
@@ -2379,7 +2414,7 @@
         {
           "name": "default",
           "type": "blobServices",
-          "apiVersion": "2019-04-01",
+          "apiVersion": "2023-05-01",
           "properties": {
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
@@ -2844,8 +2879,8 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('notificationsstorageAccountName')]",
-      "apiVersion": "2019-04-01",
+      "name": "[variables('notificationsStorageAccountName')]",
+      "apiVersion": "2023-05-01",
       "location": "[resourceGroup().location]",
       "kind": "Storage",
       "sku": {
@@ -2853,21 +2888,10 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false,
         "networkAcls": {
-          "condition": "[parameters('useSubnets')]",
           "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('notifySubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
+          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('notificationsStorageVnetRules'), createArray())]",
           "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
@@ -2876,7 +2900,7 @@
         {
           "name": "default",
           "type": "blobServices",
-          "apiVersion": "2019-04-01",
+          "apiVersion": "2023-05-01",
           "properties": {
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
@@ -2884,7 +2908,7 @@
             }
           },
           "dependsOn": [
-            "[variables('notificationsstorageAccountName')]"
+            "[variables('notificationsStorageAccountName')]"
           ]
         }
       ],
@@ -2905,37 +2929,18 @@
     {
       "name": "[variables('publicStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-07-01",
+      "apiVersion": "2023-05-01",
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
-        "name": "Standard_LRS",
-        "tier": "Standard"
+        "name": "Standard_LRS"
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false,
         "networkAcls": {
-          "condition": "[parameters('useSubnets')]",
           "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "condition": "[parameters('useSubnets')]",
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('contentSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('dataSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
+          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publicStorageVnetRules'), createArray())]",
           "ipRules": "[parameters('storageFirewallRules')]",
           "defaultAction": "Deny"
         }
@@ -3478,7 +3483,7 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('publisherStorageAccountName')]",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2023-05-01",
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
@@ -3486,20 +3491,11 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false,
         "networkAcls": {
-          "condition": "[parameters('useSubnets')]",
           "bypass": "AzureServices",
-          "virtualNetworkRules": [
-            {
-              "id": "[variables('adminSubnetRef')]",
-              "action": "Allow"
-            },
-            {
-              "id": "[variables('publisherSubnetRef')]",
-              "action": "Allow"
-            }
-          ],
           "ipRules": "[parameters('storageFirewallRules')]",
+          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publisherStorageVnetRules'), createArray())]",
           "defaultAction": "Deny"
         }
       },
@@ -3507,7 +3503,7 @@
         {
           "name": "default",
           "type": "blobServices",
-          "apiVersion": "2019-04-01",
+          "apiVersion": "2023-05-01",
           "properties": {
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
@@ -3536,20 +3532,21 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('loggingStorageAccountName')]",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2023-05-01",
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false
       },
       "resources": [
         {
           "name": "default",
           "type": "blobServices",
-          "apiVersion": "2019-04-01",
+          "apiVersion": "2023-05-01",
           "properties": {
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
@@ -3565,6 +3562,26 @@
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
         "ServiceType": "Storage account V2",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "condition": "[parameters('deploySubnets')]",
+      "type": "Microsoft.Network/ddosProtectionPlans",
+      "apiVersion": "2024-07-01",
+      "name": "[variables('vNetDdosPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Ddos protection plan",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -3594,11 +3611,16 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
+      "dependsOn": ["[resourceId('Microsoft.Network/ddosProtectionPlans', variables('vNetDdosPlanName'))]"],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
             "10.0.0.0/16"
           ]
+        },
+        "enableDdosProtection": true,
+        "ddosProtectionPlan": {
+          "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', variables('vNetDdosPlanName'))]"
         },
         "subnets": [
           {
