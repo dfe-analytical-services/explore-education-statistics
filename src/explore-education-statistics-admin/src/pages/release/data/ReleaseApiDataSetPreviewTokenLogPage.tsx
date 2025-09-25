@@ -79,7 +79,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
               <tr>
                 <th>Reference</th>
                 <th>User</th>
-                <th>Date generated</th>
+                <th>Activates</th>
                 <th>Status</th>
                 <th>Expiry</th>
                 <th className="govuk-!-text-align-right">Action</th>
@@ -87,18 +87,22 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
             </thead>
             <tbody>
               {previewTokens.map(token => {
+                const pendingOrExpired =
+                  token.status === 'Pending' ? 'yellow' : 'grey';
                 return (
                   <tr key={token.id}>
                     <td>{token.label}</td>
                     <td>{token.createdByEmail}</td>
                     <td>
                       <FormattedDate format="d MMMM yyyy, HH:mm">
-                        {token.created}
+                        {token.activates}
                       </FormattedDate>
                     </td>
                     <td>
                       <Tag
-                        colour={token.status === 'Active' ? 'green' : 'grey'}
+                        colour={
+                          token.status === 'Active' ? 'green' : pendingOrExpired
+                        }
                       >
                         {token.status}
                       </Tag>

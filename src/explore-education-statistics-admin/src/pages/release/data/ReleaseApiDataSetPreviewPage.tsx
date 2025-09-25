@@ -46,7 +46,7 @@ export default function ReleaseApiDataSetPreviewPage() {
   const handleCreate = async (
     label: string,
     datePresetSpan: number,
-    created?: Date | null,
+    activates?: Date | null,
     expires?: Date | null,
   ) => {
     let startDate: Date = new Date();
@@ -55,12 +55,11 @@ export default function ReleaseApiDataSetPreviewPage() {
     if (!dataSet?.draftVersion) {
       return;
     }
-
     if (datePresetSpan > 0) {
       endDate = getPresetSpanEndDate(datePresetSpan);
-    } else if (created && expires) {
+    } else if (activates && expires) {
       expires.setHours(23, 59, 59);
-      startDate = created;
+      startDate = activates;
       endDate = expires;
     } else {
       throw new Error(
@@ -71,7 +70,7 @@ export default function ReleaseApiDataSetPreviewPage() {
     const token = await previewTokenService.createPreviewToken({
       label,
       dataSetVersionId: dataSet?.draftVersion?.id,
-      created: startDate,
+      activates: startDate,
       expires: endDate,
     });
 

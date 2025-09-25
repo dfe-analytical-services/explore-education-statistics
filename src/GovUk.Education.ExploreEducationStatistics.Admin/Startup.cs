@@ -1011,7 +1011,7 @@ internal class NoOpPreviewTokenService : IPreviewTokenService
     public Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
-        DateTimeOffset? created,
+        DateTimeOffset? activates,
         DateTimeOffset? expiry,
         CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();

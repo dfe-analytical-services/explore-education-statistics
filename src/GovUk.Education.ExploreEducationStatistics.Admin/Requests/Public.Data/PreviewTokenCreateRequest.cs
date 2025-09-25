@@ -9,7 +9,7 @@ public record PreviewTokenCreateRequest
 
     public required string Label { get; init; }
     
-    public DateTimeOffset? Created { get; init; }
+    public DateTimeOffset? Activates { get; init; }
     
     public DateTimeOffset? Expires { get; init; }
     

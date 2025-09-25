@@ -21,7 +21,7 @@ interface FormValues {
   agreeTerms: boolean;
   label: string;
   datePresetSpan?: number | null;
-  created?: Date | string | null;
+  activates?: Date | string | null;
   expires?: Date | string | null;
   selectionMethod?: 'presetDays' | 'customDates' | null;
 }
@@ -31,7 +31,7 @@ interface Props {
   onSubmit: (
     label: string,
     datePresetSpan: number,
-    created?: Date | null,
+    activates?: Date | null,
     expires?: Date | null,
   ) => void;
 }
@@ -111,7 +111,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                   ? values.datePresetSpan
                   : undefined,
                 values.selectionMethod === 'customDates'
-                  ? values.created
+                  ? values.activates
                   : undefined,
                 values.selectionMethod === 'customDates'
                   ? values.expires
@@ -155,8 +155,8 @@ export default function ApiDataSetPreviewTokenCreateForm({
                             hint="The date the preview token activates for use"
                             legend="Activates on"
                             legendSize="s"
-                            name="created"
-                            id="created"
+                            name="activates"
+                            id="activates"
                           />
                           <br />
                           <FormFieldDateInput<FormValues>

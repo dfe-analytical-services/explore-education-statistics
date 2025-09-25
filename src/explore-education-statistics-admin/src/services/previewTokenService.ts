@@ -3,9 +3,9 @@ import client from '@admin/services/utils/service';
 export interface PreviewToken {
   id: string;
   label: string;
-  status: 'Expired' | 'Active';
+  status: 'Expired' | 'Active' | 'Pending';
   createdByEmail: string;
-  created: string;
+  activates: string;
   expiry: string;
   updated: string;
 }
@@ -14,7 +14,7 @@ const previewTokenService = {
   createPreviewToken(data: {
     dataSetVersionId: string;
     label: string;
-    created?: Date | null;
+    activates?: Date | null;
     expires?: Date | null;
   }): Promise<PreviewToken> {
     return client.post('/public-data/preview-tokens', data);
