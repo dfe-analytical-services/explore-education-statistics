@@ -1,3 +1,6 @@
+#nullable enable
+
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -1243,15 +1246,80 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext);
             var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.Delete(page.Id));
-            Assert.Equal("Cannot delete published page", exception.Message);
+            Assert.Equal("Can only delete unpublished amendments", exception.Message);
+        }
+    }
+
+    [Fact]
+    public async Task FullDelete_Success()
+    {
+        var rootPage = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = null, Order = 0 };
+        var pageV0 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 1, Version = 0, Published = DateTime.UtcNow };
+        var pageV1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 1, Version = 1, Published = null };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.EducationInNumbersPages.AddRange(rootPage, pageV0, pageV1);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = CreateService(
+                contentDbContext,
+                enableEinPublishedPageDeletion: true);
+
+            var result = await service.FullDelete(pageV1.Slug);
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var pages = contentDbContext.EducationInNumbersPages.ToList();
+
+            var dbRootPage = Assert.Single(pages);
+            Assert.Equal(rootPage.Id, dbRootPage.Id);
+
+            // NOTE: Associated content is cascade deleted by the DB - cannot test that with the InMemory db
+        }
+    }
+
+    [Fact]
+    public async Task FullDelete_DisabledByEnvVar_ThrowsException()
+    {
+        var page = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Published = DateTime.UtcNow };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.EducationInNumbersPages.Add(page);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = CreateService(
+                contentDbContext,
+                enableEinPublishedPageDeletion: false);
+
+            var exception = await Assert.ThrowsAsync<Exception>(() => service.FullDelete(page.Slug));
+            Assert.Equal("Full delete not enabled", exception.Message);
         }
     }
 
     private EducationInNumbersService CreateService(
         ContentDbContext contentDbContext,
-        IUserService? userService = null)
+        IUserService? userService = null,
+        bool enableEinPublishedPageDeletion = false)
     {
+        var appOptions = Microsoft.Extensions.Options.Options.Create(new AppOptions
+        {
+            EnableEinPublishedPageDeletion = enableEinPublishedPageDeletion,
+        });
+
         return new EducationInNumbersService(
+            appOptions,
             contentDbContext,
             userService ?? AlwaysTrueUserService(_userId).Object);
     }

@@ -9,7 +9,7 @@ from tests.libs.logger import get_logger
 logger = get_logger(__name__)
 
 
-def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) -> []:
+def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) -> list[str]:
     robot_args = [
         "--name",
         "UI Tests",
@@ -47,10 +47,12 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
     return robot_args
 
 
-def _create_include_and_exclude_args(arguments: argparse.Namespace) -> []:
+def _create_include_and_exclude_args(arguments: argparse.Namespace) -> list[str]:
     include_exclude_args = ["--exclude", "Failing"]
     include_exclude_args += ["--exclude", "UnderConstruction"]
     include_exclude_args += ["--exclude", "VisualTesting"]
+    if arguments.exclude_tags:
+        include_exclude_args += ["--exclude", arguments.exclude_tags]
     if arguments.tags:
         include_exclude_args += ["--include", arguments.tags]
     if arguments.reseed:

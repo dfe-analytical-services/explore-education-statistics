@@ -79,4 +79,12 @@ public class EducationInNumbersController(
         return await einService.Delete(id)
             .HandleFailuresOrOk();
     }
+
+    [HttpDelete("education-in-numbers/full-delete/{slug}")]
+    public async Task<ActionResult<Unit>> FullDelete(
+        [FromRoute] string slug)
+    {
+        return await einService.FullDelete(slug)
+            .HandleFailuresOrOk();
+    }
 }

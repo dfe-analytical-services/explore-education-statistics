@@ -166,7 +166,6 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-
             await context.EducationInNumbersPages.AddAsync(new EducationInNumbersPage
             {
                 Id = _pageId,
@@ -219,7 +218,18 @@ public class EducationInNumbersContentServiceTests
             await context.EducationInNumbersPages.AddAsync(new EducationInNumbersPage
             {
                 Id = _pageId,
-                Content = [new EinContentSection { Id = _sectionAId, Heading = "Old Heading" }]
+                Content =
+                [
+                    new EinContentSection
+                    {
+                        Id = _sectionAId,
+                        Heading = "Old Heading",
+                        Content =
+                        [
+                            new EinTileGroupBlock { Tiles = [new EinFreeTextStatTile { Title = "Test tile" }] }
+                        ],
+                    }
+                ]
             });
             await context.SaveChangesAsync();
         }
@@ -234,6 +244,12 @@ public class EducationInNumbersContentServiceTests
 
             var viewModel = result.AssertRight();
             Assert.Equal("New Heading", viewModel.Heading);
+
+            var block = Assert.Single(viewModel.Content);
+            var groupBlock = Assert.IsType<EinTileGroupBlockViewModel>(block);
+            var tile = Assert.Single(groupBlock.Tiles);
+            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(tile);
+            Assert.Equal("Test tile", freeTextStatTile.Title);
 
             var dbSection = await context.EinContentSections.SingleAsync();
             Assert.Equal("New Heading", dbSection.Heading);
@@ -266,9 +282,21 @@ public class EducationInNumbersContentServiceTests
                 Id = _pageId,
                 Content =
                 [
-                    new EinContentSection { Id = _sectionAId, Order = 0 },
-                    new EinContentSection { Id = _sectionBId, Order = 1 },
-                    new EinContentSection { Id = sectionCId, Order = 2 },
+                    new EinContentSection
+                    {
+                        Id = _sectionAId,
+                        Order = 0
+                    },
+                    new EinContentSection
+                    {
+                        Id = _sectionBId,
+                        Order = 1
+                    },
+                    new EinContentSection
+                    {
+                        Id = sectionCId,
+                        Order = 2
+                    },
                 ]
             });
             await context.SaveChangesAsync();
@@ -277,7 +305,12 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = new EducationInNumbersContentService(context);
-            var newOrder = new List<Guid> { _sectionBId, sectionCId, _sectionAId };
+            var newOrder = new List<Guid>
+            {
+                _sectionBId,
+                sectionCId,
+                _sectionAId
+            };
             var result = await service.ReorderSections(_pageId, newOrder);
 
             var viewModels = result.AssertRight();
@@ -318,7 +351,11 @@ public class EducationInNumbersContentServiceTests
                 Id = _pageId,
                 Content =
                 [
-                    new EinContentSection { Id = _sectionAId, Order = 0 },
+                    new EinContentSection
+                    {
+                        Id = _sectionAId,
+                        Order = 0
+                    },
                 ]
             });
             await context.SaveChangesAsync();
@@ -328,11 +365,16 @@ public class EducationInNumbersContentServiceTests
         {
             var service = new EducationInNumbersContentService(context);
             // Providing a different set of IDs
-            var newOrder = new List<Guid> { _sectionAId, _sectionBId };
+            var newOrder = new List<Guid>
+            {
+                _sectionAId,
+                _sectionBId
+            };
             var result = await service.ReorderSections(_pageId, newOrder);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
-            validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedSectionIdsDifferFromActualSectionIds);
+            validationResult.AssertHasGlobalError(ValidationErrorMessages
+                .EinProvidedSectionIdsDifferFromActualSectionIds);
         }
     }
 
@@ -348,9 +390,21 @@ public class EducationInNumbersContentServiceTests
                 Id = _pageId,
                 Content =
                 [
-                    new EinContentSection { Id = _sectionAId, Order = 0 },
-                    new EinContentSection { Id = _sectionBId, Order = 1 },
-                    new EinContentSection { Id = sectionCId, Order = 2 },
+                    new EinContentSection
+                    {
+                        Id = _sectionAId,
+                        Order = 0
+                    },
+                    new EinContentSection
+                    {
+                        Id = _sectionBId,
+                        Order = 1
+                    },
+                    new EinContentSection
+                    {
+                        Id = sectionCId,
+                        Order = 2
+                    },
                 ]
             });
             await context.SaveChangesAsync();
@@ -439,7 +493,14 @@ public class EducationInNumbersContentServiceTests
             {
                 Id = _sectionAId,
                 EducationInNumbersPageId = _pageId,
-                Content = [new EinHtmlBlock { Id = _blockAId, Order = 0 }]
+                Content =
+                [
+                    new EinHtmlBlock
+                    {
+                        Id = _blockAId,
+                        Order = 0
+                    }
+                ]
             });
             await context.SaveChangesAsync();
         }
@@ -473,7 +534,14 @@ public class EducationInNumbersContentServiceTests
             {
                 Id = _sectionAId,
                 EducationInNumbersPageId = _pageId,
-                Content = [new EinHtmlBlock { Id = _blockAId, Order = 0 }]
+                Content =
+                [
+                    new EinHtmlBlock
+                    {
+                        Id = _blockAId,
+                        Order = 0
+                    }
+                ]
             });
             await context.SaveChangesAsync();
         }
@@ -560,7 +628,14 @@ public class EducationInNumbersContentServiceTests
             {
                 Id = _sectionAId,
                 EducationInNumbersPageId = _pageId,
-                Content = [new EinHtmlBlock { Id = _blockAId, Body = "Old body" }]
+                Content =
+                [
+                    new EinHtmlBlock
+                    {
+                        Id = _blockAId,
+                        Body = "Old body"
+                    }
+                ]
             });
             await context.SaveChangesAsync();
         }
@@ -617,10 +692,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = new EducationInNumbersContentService(context);
-            var request = new EinTileGroupBlockUpdateRequest
-            {
-                Title = "New title"
-            };
+            var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
             var result = await service.UpdateTileGroupBlock(
                 _pageId, _sectionAId, _blockAId, request);
 
@@ -672,9 +744,21 @@ public class EducationInNumbersContentServiceTests
                 EducationInNumbersPageId = _pageId,
                 Content =
                 [
-                    new EinHtmlBlock { Id = _blockAId, Order = 0 },
-                    new EinHtmlBlock { Id = _blockBId, Order = 1 },
-                    new EinHtmlBlock { Id = blockCId, Order = 2 }
+                    new EinHtmlBlock
+                    {
+                        Id = _blockAId,
+                        Order = 0
+                    },
+                    new EinHtmlBlock
+                    {
+                        Id = _blockBId,
+                        Order = 1
+                    },
+                    new EinHtmlBlock
+                    {
+                        Id = blockCId,
+                        Order = 2
+                    }
                 ]
             });
             await context.SaveChangesAsync();
@@ -683,7 +767,12 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = new EducationInNumbersContentService(context);
-            var newOrder = new List<Guid> { _blockBId, blockCId, _blockAId };
+            var newOrder = new List<Guid>
+            {
+                _blockBId,
+                blockCId,
+                _blockAId
+            };
             var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
 
             var viewModels = result.AssertRight();
@@ -709,7 +798,11 @@ public class EducationInNumbersContentServiceTests
                 EducationInNumbersPageId = _pageId,
                 Content =
                 [
-                    new EinHtmlBlock { Id = _blockAId, Order = 0 },
+                    new EinHtmlBlock
+                    {
+                        Id = _blockAId,
+                        Order = 0
+                    },
                 ]
             });
             await context.SaveChangesAsync();
@@ -719,7 +812,11 @@ public class EducationInNumbersContentServiceTests
         {
             var service = new EducationInNumbersContentService(context);
 
-            var newOrder = new List<Guid> { _blockAId, _blockBId }; // _blockBId does not exist in the section
+            var newOrder = new List<Guid>
+            {
+                _blockAId,
+                _blockBId
+            }; // _blockBId does not exist in the section
             var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
@@ -740,9 +837,21 @@ public class EducationInNumbersContentServiceTests
                 EducationInNumbersPageId = _pageId,
                 Content =
                 [
-                    new EinHtmlBlock { Id = _blockAId, Order = 0 },
-                    new EinHtmlBlock { Id = _blockBId, Order = 1 },
-                    new EinHtmlBlock { Id = blockCId, Order = 2 },
+                    new EinHtmlBlock
+                    {
+                        Id = _blockAId,
+                        Order = 0
+                    },
+                    new EinHtmlBlock
+                    {
+                        Id = _blockBId,
+                        Order = 1
+                    },
+                    new EinHtmlBlock
+                    {
+                        Id = blockCId,
+                        Order = 2
+                    },
                 ]
             });
             await context.SaveChangesAsync();
@@ -847,11 +956,15 @@ public class EducationInNumbersContentServiceTests
             await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
             {
                 Id = _blockAId,
-                Tiles = [new EinFreeTextStatTile { Id = _tileAId, Order = 0 }],
-                EinContentSection = new EinContentSection
-                {
-                    EducationInNumbersPageId = _pageId
-                }
+                Tiles =
+                [
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileAId,
+                        Order = 0
+                    }
+                ],
+                EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId }
             });
             await context.SaveChangesAsync();
         }
@@ -893,10 +1006,7 @@ public class EducationInNumbersContentServiceTests
                         LinkText = "Old link text",
                     },
                 ],
-                EinContentSection = new EinContentSection
-                {
-                    EducationInNumbersPageId = _pageId
-                }
+                EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId }
             });
             await context.SaveChangesAsync();
         }
@@ -957,14 +1067,23 @@ public class EducationInNumbersContentServiceTests
                 Id = _blockAId,
                 Tiles =
                 [
-                    new EinFreeTextStatTile { Id = _tileAId, Order = 0 },
-                    new EinFreeTextStatTile { Id = _tileBId, Order = 1 },
-                    new EinFreeTextStatTile { Id = tileCId, Order = 2 },
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileAId,
+                        Order = 0
+                    },
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileBId,
+                        Order = 1
+                    },
+                    new EinFreeTextStatTile
+                    {
+                        Id = tileCId,
+                        Order = 2
+                    },
                 ],
-                EinContentSection = new EinContentSection
-                {
-                    EducationInNumbersPageId = _pageId
-                }
+                EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId }
             });
             await context.SaveChangesAsync();
         }
@@ -972,7 +1091,12 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = new EducationInNumbersContentService(context);
-            var newOrder = new List<Guid> { _tileBId, tileCId, _tileAId };
+            var newOrder = new List<Guid>
+            {
+                _tileBId,
+                tileCId,
+                _tileAId
+            };
             var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
 
             var viewModels = result.AssertRight();
@@ -1000,11 +1124,15 @@ public class EducationInNumbersContentServiceTests
             await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
             {
                 Id = _blockAId,
-                Tiles = [new EinFreeTextStatTile { Id = _tileAId, Order = 0 },],
-                EinContentSection = new EinContentSection
-                {
-                    EducationInNumbersPageId = _pageId
-                }
+                Tiles =
+                [
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileAId,
+                        Order = 0
+                    },
+                ],
+                EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId }
             });
             await context.SaveChangesAsync();
         }
@@ -1013,7 +1141,11 @@ public class EducationInNumbersContentServiceTests
         {
             var service = new EducationInNumbersContentService(context);
 
-            var newOrder = new List<Guid> { _tileAId, _tileBId }; // _tileBId does not exist
+            var newOrder = new List<Guid>
+            {
+                _tileAId,
+                _tileBId
+            }; // _tileBId does not exist
             var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
@@ -1033,14 +1165,23 @@ public class EducationInNumbersContentServiceTests
                 Id = _blockAId,
                 Tiles =
                 [
-                    new EinFreeTextStatTile { Id = _tileAId, Order = 0 },
-                    new EinFreeTextStatTile { Id = _tileBId, Order = 1 },
-                    new EinFreeTextStatTile { Id = tileCId, Order = 2 },
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileAId,
+                        Order = 0
+                    },
+                    new EinFreeTextStatTile
+                    {
+                        Id = _tileBId,
+                        Order = 1
+                    },
+                    new EinFreeTextStatTile
+                    {
+                        Id = tileCId,
+                        Order = 2
+                    },
                 ],
-                EinContentSection = new EinContentSection
-                {
-                    EducationInNumbersPageId = _pageId
-                }
+                EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId }
             });
             await context.SaveChangesAsync();
         }
@@ -1086,10 +1227,7 @@ public class EducationInNumbersContentServiceTests
             await context.EinContentBlocks.AddAsync(new EinTileGroupBlock
             {
                 Id = _blockAId,
-                EinContentSection = new EinContentSection
-                {
-                    EducationInNumbersPageId = _pageId
-                }
+                EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId }
             });
             await context.SaveChangesAsync();
         }

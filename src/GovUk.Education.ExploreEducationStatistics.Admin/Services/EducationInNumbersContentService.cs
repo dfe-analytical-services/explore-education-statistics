@@ -60,6 +60,7 @@ public class EducationInNumbersContentService(
     {
         return await contentDbContext.EinContentSections
             .Include(s => s.Content)
+            .ThenInclude(b => (b as EinTileGroupBlock)!.Tiles)
             .FirstOrNotFoundAsync(section =>
                 section.EducationInNumbersPageId == pageId
                 && section.Id == sectionId)

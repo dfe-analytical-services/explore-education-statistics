@@ -9,6 +9,7 @@ Library     utilities.py
 Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
+Library     admin_api.py
 
 
 *** Variables ***
@@ -53,6 +54,8 @@ user opens the browser
     # then can continue using the site as per usual without any more need to interact
     # with authentication.
     ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
+    log to console    Loading page in browser: ${authenticated_url}
+    # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
     go to    ${authenticated_url}
     user waits until page finishes loading
 
@@ -201,14 +204,12 @@ user waits until parent contains element
     ...    ${timeout}=${timeout}
     ...    ${error}=${NONE}
     ...    ${count}=${NONE}
-    ...    ${retries}=5
     wait until parent contains element
     ...    ${parent_element_or_selector}
     ...    ${child_selector}
     ...    timeout=${timeout}
     ...    error=${error}
     ...    count=${count}
-    ...    retries=${retries}
 
 user waits until parent does not contain element
     [Arguments]
@@ -216,13 +217,11 @@ user waits until parent does not contain element
     ...    ${child_selector}
     ...    ${timeout}=${timeout}
     ...    ${error}=${NONE}
-    ...    ${retries}=5
     wait until parent does not contain element
     ...    ${parent_element_or_selector}
     ...    ${child_selector}
     ...    timeout=${timeout}
     ...    error=${error}
-    ...    retries=${retries}
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body

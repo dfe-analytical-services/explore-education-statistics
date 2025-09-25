@@ -29,4 +29,6 @@ public interface IEducationInNumbersService
         List<Guid> newOrder);
 
     Task<Either<ActionResult, Unit>> Delete(Guid id);
+
+    Task<Either<ActionResult, Unit>> FullDelete(string slug);
 }

@@ -97,10 +97,10 @@ def wait_until_parent_contains_element(
     timeout: int = None,
     error: str = None,
     count: int = None,
-    retries: int = 5,
 ):
+    retry_delay = 1
     default_timeout = BuiltIn().get_variable_value("${TIMEOUT}")
-    retry_delay = timeout / retries if timeout is not None else int(default_timeout) / retries
+    retries = int(timeout / retry_delay if timeout is not None else int(default_timeout) / retry_delay)
     normalised_child_locator = _normalise_child_locator(child_locator)
     expected_count = None if is_noney(count) else count
 
@@ -130,10 +130,11 @@ def wait_until_parent_contains_element(
 
 
 def wait_until_parent_does_not_contain_element(
-    parent_locator_or_element: object, child_locator: str, timeout: int = None, error: str = None, retries: int = 5
+    parent_locator_or_element: object, child_locator: str, timeout: int = None, error: str = None
 ):
+    retry_delay = 1
     default_timeout = BuiltIn().get_variable_value("${TIMEOUT}")
-    retry_delay = timeout / retries if timeout is not None else int(default_timeout) / retries
+    retries = int(timeout / retry_delay if timeout is not None else int(default_timeout) / retry_delay)
     normalised_child_locator = _normalise_child_locator(child_locator)
 
     def check_child_elements_are_not_present():
@@ -300,7 +301,7 @@ def _normalise_child_locator(child_locator: str) -> str:
     raise_assertion_error(f"Child locator was not a str - {child_locator}")
 
 
-def _get_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = "") -> WebElement:
+def _get_webelement_from_locator(parent_locator: object, timeout: float = None, error: str = "") -> WebElement:
     if isinstance(parent_locator, str):
         sl().wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
         return sl().find_element(parent_locator)
