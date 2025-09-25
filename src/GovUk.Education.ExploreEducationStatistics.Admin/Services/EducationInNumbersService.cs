@@ -239,24 +239,12 @@ public class EducationInNumbersService(
     public async Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(
         List<Guid> newOrder)
     {
-        var subPageList = await contentDbContext.EducationInNumbersPages
-            .Where(page => page.Slug != null)
-            .GroupBy(page => page.Slug)
+        var pageList = await contentDbContext.EducationInNumbersPages
+            .GroupBy(page => page.Slug ?? "ROOT PAGE") // needed because GroupBy doesn't play well with null - doesn't affect the returned page
             .Select(group => group
                 .OrderByDescending(p => p.Version)
                 .First())
             .ToListAsync();
-
-        // GroupBy doesn't play nice with null slugs, hence the need to fetch the root page separately
-        var rootPage = await contentDbContext.EducationInNumbersPages
-            .Where(page => page.Slug == null)
-            .OrderByDescending(page => page.Version)
-            .Take(1)
-            .SingleAsync();
-
-        var pageList = subPageList
-            .Concat([rootPage])
-            .ToList();
 
         if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
                 newOrder, pageList.Select(page => page.Id)))
