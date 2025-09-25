@@ -47,8 +47,8 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
+                        .ReturnsAsync([]);
                 }
 
                 await handler.HandleAsync(authContext);
@@ -75,7 +75,7 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
                 .ReturnsAsync(CollectionUtils.ListOf(Owner));
 
             await handler.HandleAsync(authContext);
@@ -95,8 +95,8 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id, false))
+                .ReturnsAsync([]);
 
             await handler.HandleAsync(authContext);
             VerifyAllMocks(userPublicationRoleRepository);

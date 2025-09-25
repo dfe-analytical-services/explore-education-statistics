@@ -5,21 +5,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserPublicationRoleRepository
 {
-    Task<UserPublicationRole> Create(Guid userId,
+    Task<UserPublicationRole?> TryCreate(Guid userId,
         Guid publicationId,
-        PublicationRole role,
+        PublicationRole publicationRole,
         Guid createdById);
 
     Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
 
     Task<List<PublicationRole>> GetAllRolesByUserAndPublication(
         Guid userId,
-        Guid publicationId);
+        Guid publicationId,
+        bool includeNewPermissionsSystemRoles = false);
 
     Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
         Guid publicationId,
-        PublicationRole role);
+        PublicationRole role,
+        bool includeNewPermissionsSystemRoles = false);
+
+    Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRolesByUserAndPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeNewPermissionsSystemRoles = false);
 
     Task<bool> UserHasRoleOnPublication(
         Guid userId,

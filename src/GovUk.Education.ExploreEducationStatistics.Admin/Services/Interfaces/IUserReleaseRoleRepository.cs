@@ -7,7 +7,7 @@ public interface IUserReleaseRoleRepository
 {
     Task<UserReleaseRole> Create(Guid userId,
         Guid releaseVersionId,
-        ReleaseRole role,
+        ReleaseRole releaseRole,
         Guid createdById);
 
     Task<UserReleaseRole> CreateIfNotExists(Guid userId,
@@ -24,6 +24,8 @@ public interface IUserReleaseRoleRepository
         List<Guid> releaseVersionIds,
         ReleaseRole role,
         Guid createdById);
+    
+    Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role);
 
     Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
 
@@ -35,6 +37,8 @@ public interface IUserReleaseRoleRepository
 
     Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId,
         ReleaseRole[]? rolesToInclude);
+    
+    Task<IReadOnlyList<UserReleaseRole>> ListUserReleaseRolesByUserAndPublication(Guid userId, Guid publicationId);
 
     Task<bool> HasUserReleaseRole(Guid userId,
         Guid releaseVersionId,
