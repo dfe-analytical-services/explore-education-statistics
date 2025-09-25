@@ -98,7 +98,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
             <span className="govuk-caption-l">API data set preview token</span>
             <h2>{dataSet?.title}</h2>
 
-            {previewToken?.status === 'Active' ? (
+            {previewToken?.status === 'Active' ||
+            previewToken?.status === 'Pending' ? (
               <>
                 <p>
                   Reference: <strong>{previewToken.label}</strong>
@@ -111,22 +112,22 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   label="Preview token"
                   text={previewToken.id}
                 />
-                {!dateIsToday(previewToken.created) && (
+                {!dateIsToday(previewToken.activates) && (
                   <>
                     The token actives from:{' '}
                     <strong>
                       <FormattedDate format="MM/dd/yyyy">
-                        {previewToken.created}
+                        {previewToken.activates}
                       </FormattedDate>{' '}
                       (local time){' '}
                     </strong>
                   </>
                 )}
                 <p>
-                  {dateIsToday(previewToken.created) ? 'The token' : 'and'}{' '}
+                  {dateIsToday(previewToken.activates) ? 'The token' : 'and'}{' '}
                   expires:{' '}
                   <strong>
-                    <FormattedDate formatRelativeToNow>
+                    <FormattedDate format="MM/dd/yyyy">
                       {previewToken.expiry}
                     </FormattedDate>{' '}
                     (local time)
