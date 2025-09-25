@@ -132,7 +132,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
   });
 
   describe('Custom dates selection', () => {
-    test('shows validation error when start date is after the end date', async () => {
+    test('shows validation error when start date is in the past', async () => {
       const today = new Date();
       const beforeTodayBy8Days = new Date();
       beforeTodayBy8Days.setDate(today.getDate() - 8);

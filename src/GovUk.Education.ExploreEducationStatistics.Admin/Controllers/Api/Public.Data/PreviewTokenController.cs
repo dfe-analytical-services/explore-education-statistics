@@ -22,7 +22,8 @@ public class PreviewTokenController(IPreviewTokenService previewTokenService) : 
             .CreatePreviewToken(request.DataSetVersionId, 
                 request.Label, 
                 request.Activates, 
-                request.Expires, cancellationToken)
+                request.Expires, 
+                cancellationToken)
             .HandleFailuresOr(previewToken =>
                 CreatedAtAction(nameof(GetPreviewToken), new { previewTokenId = previewToken.Id }, previewToken));
     }

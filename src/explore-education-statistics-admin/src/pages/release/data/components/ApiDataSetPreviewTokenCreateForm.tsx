@@ -111,7 +111,6 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 const now = new Date();
                 const maxDate = new Date();
                 maxDate.setDate(now.getDate() + 7);
-                console.log('value', value, 'now', now, 'endDate', maxDate);
                 return endDateIsLaterThanOrEqualToStartDate(value, maxDate);
               },
             }),
