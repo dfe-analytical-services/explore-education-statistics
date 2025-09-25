@@ -43,12 +43,15 @@ const PublicationReleaseListPage = ({
           link: `/find-statistics/${publicationSummary.slug}/${publicationSummary.latestRelease.slug}`,
         },
       ]}
-      breadcrumbLabel="Updates"
+      breadcrumbLabel="Releases"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           {publicationSummary.nextReleaseDate && (
-            <div className="govuk-!-margin-bottom-2">
+            <div
+              className="govuk-!-margin-bottom-2"
+              data-testid="next-release-date"
+            >
               <h3 className="govuk-heading-m govuk-!-margin-bottom-2">
                 Next release date
               </h3>
@@ -75,20 +78,19 @@ const PublicationReleaseListPage = ({
                 <th scope="col">Last update</th>
               </tr>
             </thead>
-
             <tbody>
               {results.map(release =>
                 'releaseId' in release ? (
                   <tr key={release.releaseId}>
                     <td>
                       <Link
-                        to={`/find-statistics/${publicationSummary.slug}/${release.slug}`}
+                        to={`/find-statistics/${publicationSummary.slug}/${release.slug}?redesign=true`} // TODO EES-6449 remove query param when live
                       >
                         {release.title}
                       </Link>
                     </td>
                     <td>
-                      <div className="dfe-flex dfe-gap-2">
+                      <div className="dfe-flex dfe-flex-wrap dfe-gap-2">
                         <FormattedDate>{release.published}</FormattedDate>
                         {release.isLatestRelease === true && (
                           <Tag>Latest release</Tag>

@@ -333,49 +333,9 @@ const publicationService = {
     publicationSlug: string,
     params?: PaginationRequestParams,
   ): Promise<PaginatedList<PublicationReleaseSeriesItem>> {
-    return publicationSlug === 'test'
-      ? contentApi.get(`/publications/${publicationSlug}/release-entries`, {
-          params,
-        })
-      : new Promise(resolve => {
-          setTimeout(() => {
-            resolve({
-              paging: {
-                page: 1,
-                pageSize: 2,
-                totalResults: 5,
-                totalPages: 3,
-              },
-              results: [
-                {
-                  releaseId: '550e8400-e29b-41d4-a716-446655440000',
-                  slug: publicationSlug,
-                  title: 'Calendar year 2024 - Final',
-                  yearTitle: '2021/22',
-                  coverageTitle: 'Academic Year',
-                  label: 'Final',
-                  published: '2025-08-10T09:30:00+01:00',
-                  lastUpdated: '2025-08-11T14:30:00+01:00',
-                  isLatestRelease: true,
-                },
-                {
-                  releaseId: '550e8400-e29a-41d4-a716-446655440000',
-                  slug: publicationSlug,
-                  title: 'Calendar year 2024',
-                  yearTitle: '2021/22',
-                  coverageTitle: 'Academic Year',
-                  published: '2025-07-01T09:30:00+01:00',
-                  lastUpdated: '2025-07-11T14:30:00+01:00',
-                  isLatestRelease: false,
-                },
-                {
-                  title: '2020/21',
-                  url: 'https://example.com/legacy/2021-22',
-                },
-              ],
-            });
-          }, 500);
-        });
+    return contentApi.get(`/publications/${publicationSlug}/release-entries`, {
+      params,
+    });
   },
   getPublicationReleaseSummary(
     publicationSlug: string,
