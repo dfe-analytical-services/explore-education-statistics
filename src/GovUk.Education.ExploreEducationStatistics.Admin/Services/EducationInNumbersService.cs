@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -12,13 +13,19 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class EducationInNumbersService(ContentDbContext contentDbContext, IUserService userService)
-    : IEducationInNumbersService
+public class EducationInNumbersService(
+    IOptions<AppOptions> appOptions,
+    ContentDbContext contentDbContext,
+    IUserService userService
+) : IEducationInNumbersService
 {
+    private readonly bool _publishedPageDeletionAllowed = appOptions.Value.EnableEinPublishedPageDeletion;
+
     public async Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id)
     {
         return await contentDbContext
@@ -272,8 +279,7 @@ public class EducationInNumbersService(ContentDbContext contentDbContext, IUserS
             {
                 if (page.Published != null)
                 {
-                    // we currently only allow the cancellation of unpublished amendments
-                    throw new ArgumentException("Cannot delete published page");
+                    throw new ArgumentException("Can only delete unpublished amendments");
                 }
 
                 contentDbContext.EducationInNumbersPages.Remove(page);
@@ -282,5 +288,22 @@ public class EducationInNumbersService(ContentDbContext contentDbContext, IUserS
 
                 await contentDbContext.SaveChangesAsync();
             });
+    }
+
+    public async Task<Either<ActionResult, Unit>> FullDelete(string slug)
+    {
+        if (!_publishedPageDeletionAllowed)
+        {
+            throw new Exception("Full delete not enabled");
+        }
+
+        var pagesToRemove = contentDbContext.EducationInNumbersPages.Where(page => page.Slug == slug).ToList();
+        contentDbContext.EducationInNumbersPages.RemoveRange(pagesToRemove);
+
+        // NOTE: Sections and blocks are cascade deleted by the database, so no worries
+
+        await contentDbContext.SaveChangesAsync();
+
+        return Unit.Instance;
     }
 }

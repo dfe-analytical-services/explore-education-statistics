@@ -24,62 +24,35 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ThemeService : IThemeService
+public class ThemeService(
+    IOptions<AppOptions> appOptions,
+    ContentDbContext contentDbContext,
+    IDataSetVersionRepository dataSetVersionRepository,
+    IMapper mapper,
+    IPersistenceHelper<ContentDbContext> persistenceHelper,
+    IUserService userService,
+    IMethodologyService methodologyService,
+    IPublishingService publishingService,
+    IReleaseVersionService releaseVersionService,
+    IAdminEventRaiser eventRaiser,
+    IPublicationCacheService publicationCacheService,
+    ILogger<ThemeService> logger
+) : IThemeService
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IDataSetVersionRepository _dataSetVersionRepository;
-    private readonly IMapper _mapper;
-    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IUserService _userService;
-    private readonly IMethodologyService _methodologyService;
-    private readonly IPublishingService _publishingService;
-    private readonly IReleaseVersionService _releaseVersionService;
-    private readonly IAdminEventRaiser _eventRaiser;
-    private readonly IPublicationCacheService _publicationCacheService;
-    private readonly ILogger<ThemeService> _logger;
-    private readonly bool _themeDeletionAllowed;
-
-    public ThemeService(
-        IOptions<AppOptions> appOptions,
-        ContentDbContext contentDbContext,
-        IDataSetVersionRepository dataSetVersionRepository,
-        IMapper mapper,
-        IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IUserService userService,
-        IMethodologyService methodologyService,
-        IPublishingService publishingService,
-        IReleaseVersionService releaseVersionService,
-        IAdminEventRaiser eventRaiser,
-        IPublicationCacheService publicationCacheService,
-        ILogger<ThemeService> logger
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _dataSetVersionRepository = dataSetVersionRepository;
-        _mapper = mapper;
-        _persistenceHelper = persistenceHelper;
-        _userService = userService;
-        _methodologyService = methodologyService;
-        _publishingService = publishingService;
-        _releaseVersionService = releaseVersionService;
-        _eventRaiser = eventRaiser;
-        _publicationCacheService = publicationCacheService;
-        _logger = logger;
-        _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
-    }
+    private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
 
     public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(ThemeSaveViewModel created)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllTaxonomy()
             .OnSuccess(async _ =>
             {
-                if (await _contentDbContext.Themes.AnyAsync(theme => theme.Slug == created.Slug))
+                if (await contentDbContext.Themes.AnyAsync(theme => theme.Slug == created.Slug))
                 {
                     return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                 }
 
-                var saved = await _contentDbContext.Themes.AddAsync(
+                var saved = await contentDbContext.Themes.AddAsync(
                     new Theme
                     {
                         Slug = created.Slug,
@@ -88,9 +61,9 @@ public class ThemeService : IThemeService
                     }
                 );
 
-                await _contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
 
-                await _publishingService.TaxonomyChanged();
+                await publishingService.TaxonomyChanged();
 
                 return await GetTheme(saved.Entity.Id);
             });
@@ -98,12 +71,12 @@ public class ThemeService : IThemeService
 
     public async Task<Either<ActionResult, ThemeViewModel>> UpdateTheme(Guid id, ThemeSaveViewModel updated)
     {
-        return await _persistenceHelper
+        return await persistenceHelper
             .CheckEntityExists<Theme>(id)
-            .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
+            .OnSuccessDo(userService.CheckCanManageAllTaxonomy)
             .OnSuccess(async theme =>
             {
-                if (await _contentDbContext.Themes.AnyAsync(t => t.Slug == updated.Slug && t.Id != id))
+                if (await contentDbContext.Themes.AnyAsync(t => t.Slug == updated.Slug && t.Id != id))
                 {
                     return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                 }
@@ -112,13 +85,13 @@ public class ThemeService : IThemeService
                 theme.Slug = updated.Slug;
                 theme.Summary = updated.Summary;
 
-                await _contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
 
-                await _publishingService.TaxonomyChanged();
+                await publishingService.TaxonomyChanged();
 
                 await InvalidatePublicationsCacheByTheme(theme.Id);
 
-                await _eventRaiser.OnThemeUpdated(theme);
+                await eventRaiser.OnThemeUpdated(theme);
 
                 return await GetTheme(theme.Id);
             });
@@ -126,7 +99,7 @@ public class ThemeService : IThemeService
 
     public async Task InvalidatePublicationsCacheByTheme(Guid themeId)
     {
-        var themePublicationsSlugs = await _contentDbContext
+        var themePublicationsSlugs = await contentDbContext
             .Publications.Where(p => p.ThemeId == themeId)
             .Select(p => p.Slug)
             .ToListAsync();
@@ -138,10 +111,10 @@ public class ThemeService : IThemeService
     {
         try
         {
-            await _publicationCacheService
+            await publicationCacheService
                 .UpdatePublication(publicationSlug)
                 .OnFailureDo(result =>
-                    _logger.LogWarning(
+                    logger.LogWarning(
                         "Failed to invalidate cache for Publication {PublicationSlug}. Reason: {Result}",
                         publicationSlug,
                         result
@@ -150,29 +123,29 @@ public class ThemeService : IThemeService
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, "Failed to invalidate cache for Publication {PublicationSlug}.", publicationSlug);
+            logger.LogWarning(e, "Failed to invalidate cache for Publication {PublicationSlug}.", publicationSlug);
         }
     }
 
     public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllTaxonomy()
-            .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(id))
-            .OnSuccess(_mapper.Map<ThemeViewModel>);
+            .OnSuccess(() => persistenceHelper.CheckEntityExists<Theme>(id))
+            .OnSuccess(mapper.Map<ThemeViewModel>);
     }
 
     public async Task<Either<ActionResult, List<ThemeViewModel>>> GetThemes()
     {
-        return await _userService
+        return await userService
             .CheckCanAccessSystem()
             .OnSuccess(async _ =>
-                await _userService
+                await userService
                     .CheckCanManageAllTaxonomy()
-                    .OnSuccess(async () => await _contentDbContext.Themes.ToListAsync())
+                    .OnSuccess(async () => await contentDbContext.Themes.ToListAsync())
                     .OrElse(GetUserThemes)
             )
-            .OnSuccess(list => list.Select(_mapper.Map<ThemeViewModel>).OrderBy(theme => theme.Title).ToList());
+            .OnSuccess(list => list.Select(mapper.Map<ThemeViewModel>).OrderBy(theme => theme.Title).ToList());
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteTheme(
@@ -180,17 +153,17 @@ public class ThemeService : IThemeService
         CancellationToken cancellationToken = default
     )
     {
-        return await _userService
+        return await userService
             .CheckCanManageAllTaxonomy()
-            .OnSuccess(() => _contentDbContext.Themes.FirstOrNotFoundAsync(t => t.Id == themeId, cancellationToken))
+            .OnSuccess(() => contentDbContext.Themes.FirstOrNotFoundAsync(t => t.Id == themeId, cancellationToken))
             .OnSuccessDo(CheckCanDeleteTheme)
             .OnSuccessDo(() => DeletePublicationsForTheme(themeId, cancellationToken))
             .OnSuccessVoid(async theme =>
             {
-                _contentDbContext.Themes.Remove(theme);
-                await _contentDbContext.SaveChangesAsync(cancellationToken);
+                contentDbContext.Themes.Remove(theme);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
 
-                await _publishingService.TaxonomyChanged(cancellationToken);
+                await publishingService.TaxonomyChanged(cancellationToken);
             });
     }
 
@@ -199,7 +172,7 @@ public class ThemeService : IThemeService
         CancellationToken cancellationToken
     )
     {
-        var publicationIds = await _contentDbContext
+        var publicationIds = await contentDbContext
             .Publications.Where(p => p.ThemeId == themeId)
             .Select(p => p.Id)
             .ToListAsync(cancellationToken);
@@ -220,13 +193,13 @@ public class ThemeService : IThemeService
         CancellationToken cancellationToken
     )
     {
-        var methodologyIdsToDelete = await _contentDbContext
+        var methodologyIdsToDelete = await contentDbContext
             .PublicationMethodologies.Where(pm => pm.Owner && pm.PublicationId == publicationId)
             .Select(pm => pm.MethodologyId)
             .ToListAsync(cancellationToken);
 
         return await methodologyIdsToDelete
-            .Select(methodologyId => _methodologyService.DeleteMethodology(methodologyId, true))
+            .Select(methodologyId => methodologyService.DeleteMethodology(methodologyId, true))
             .OnSuccessAllReturnVoid();
     }
 
@@ -235,7 +208,7 @@ public class ThemeService : IThemeService
         CancellationToken cancellationToken
     )
     {
-        var publication = await _contentDbContext
+        var publication = await contentDbContext
             .Publications.Include(p => p.LatestPublishedReleaseVersion)
             .Include(p => p.Contact)
             .FirstAsync(p => p.Id == publicationId, cancellationToken);
@@ -253,7 +226,7 @@ public class ThemeService : IThemeService
 
         // Some Content Db Releases may be soft-deleted and therefore not visible.
         // Ignore the query filter to make sure they are found
-        var releaseVersionsToDelete = await _contentDbContext
+        var releaseVersionsToDelete = await contentDbContext
             .ReleaseVersions.AsNoTracking()
             .IgnoreQueryFilters()
             .Include(rv => rv.Release)
@@ -264,7 +237,7 @@ public class ThemeService : IThemeService
             .ToAsyncEnumerable()
             .SelectAwait(async rv =>
             {
-                var dataSetVersions = await _dataSetVersionRepository.GetDataSetVersions(rv.Id);
+                var dataSetVersions = await dataSetVersionRepository.GetDataSetVersions(rv.Id);
 
                 return new ReleaseVersionAndDataSetVersions(ReleaseVersion: rv, DataSetVersions: dataSetVersions);
             })
@@ -277,16 +250,16 @@ public class ThemeService : IThemeService
 
         return await releaseVersionIdsInDeleteOrder
             .Select(releaseVersionId =>
-                _releaseVersionService.DeleteTestReleaseVersion(releaseVersionId, cancellationToken)
+                releaseVersionService.DeleteTestReleaseVersion(releaseVersionId, cancellationToken)
             )
             .OnSuccessAll()
             .OnSuccessVoid(async () =>
             {
-                _contentDbContext.Publications.Remove(publication);
-                _contentDbContext.Contacts.Remove(publication.Contact);
-                await _contentDbContext.SaveChangesAsync(cancellationToken);
+                contentDbContext.Publications.Remove(publication);
+                contentDbContext.Contacts.Remove(publication.Contact);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
 
-                await _eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
+                await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
             });
     }
 
@@ -294,10 +267,10 @@ public class ThemeService : IThemeService
     {
         return !_themeDeletionAllowed
             ? new ForbidResult()
-            : await _userService
+            : await userService
                 .CheckCanManageAllTaxonomy()
                 .OnSuccess(async _ =>
-                    (await _contentDbContext.Themes.ToListAsync(cancellationToken)).Where(theme =>
+                    (await contentDbContext.Themes.ToListAsync(cancellationToken)).Where(theme =>
                         theme.IsTestOrSeedTheme()
                     )
                 )
@@ -308,8 +281,8 @@ public class ThemeService : IThemeService
                         await DeleteTheme(theme.Id, cancellationToken);
                     }
 
-                    await _contentDbContext.SaveChangesAsync(cancellationToken);
-                    await _publishingService.TaxonomyChanged(cancellationToken);
+                    await contentDbContext.SaveChangesAsync(cancellationToken);
+                    await publishingService.TaxonomyChanged(cancellationToken);
                 });
     }
 
@@ -334,16 +307,16 @@ public class ThemeService : IThemeService
 
     private async Task<List<Theme>> GetUserThemes()
     {
-        var userId = _userService.GetUserId();
+        var userId = userService.GetUserId();
 
-        return await _contentDbContext
+        return await contentDbContext
             .UserReleaseRoles.AsQueryable()
             .Where(userReleaseRole =>
                 userReleaseRole.UserId == userId && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
             )
             .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Publication)
             .Concat(
-                _contentDbContext
+                contentDbContext
                     .UserPublicationRoles.AsQueryable()
                     .Where(userPublicationRole =>
                         userPublicationRole.UserId == userId

@@ -536,6 +536,10 @@
       "type": "bool",
       "defaultValue": false
     },
+    "enableEinPublishedPageDeletion": {
+      "type": "bool",
+      "defaultValue": false
+    },
     "memoryCacheEnabled": {
       "type": "bool",
       "defaultValue": true,
@@ -1961,6 +1965,7 @@
         "App__Url": "[concat('https://', parameters('adminUri'))]",
         "App__EnableSwagger": "[parameters('enableSwagger')]",
         "App__EnableThemeDeletion": "[parameters('enableThemeDeletion')]",
+        "App__EnableEinPubilshedPageDeletion": "[parameters('enableEinPublishedPageDeletion')]",
         "Azure__SignalR__ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
         "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",

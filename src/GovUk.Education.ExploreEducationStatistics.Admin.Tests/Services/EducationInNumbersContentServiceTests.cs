@@ -221,7 +221,18 @@ public class EducationInNumbersContentServiceTests
                 new EducationInNumbersPage
                 {
                     Id = _pageId,
-                    Content = [new EinContentSection { Id = _sectionAId, Heading = "Old Heading" }],
+                    Content =
+                    [
+                        new EinContentSection
+                        {
+                            Id = _sectionAId,
+                            Heading = "Old Heading",
+                            Content =
+                            [
+                                new EinTileGroupBlock { Tiles = [new EinFreeTextStatTile { Title = "Test tile" }] },
+                            ],
+                        },
+                    ],
                 }
             );
             await context.SaveChangesAsync();
@@ -234,6 +245,12 @@ public class EducationInNumbersContentServiceTests
 
             var viewModel = result.AssertRight();
             Assert.Equal("New Heading", viewModel.Heading);
+
+            var block = Assert.Single(viewModel.Content);
+            var groupBlock = Assert.IsType<EinTileGroupBlockViewModel>(block);
+            var tile = Assert.Single(groupBlock.Tiles);
+            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(tile);
+            Assert.Equal("Test tile", freeTextStatTile.Title);
 
             var dbSection = await context.EinContentSections.SingleAsync();
             Assert.Equal("New Heading", dbSection.Heading);
