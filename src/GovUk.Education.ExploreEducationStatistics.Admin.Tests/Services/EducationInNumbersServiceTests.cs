@@ -1035,42 +1035,49 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Reorder_Success()
     {
-        var page1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 0 };
-        var page2 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-2", Order = 1 };
-        var page3 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-3", Order = 2 };
+        var rootPage = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = null, Order = 0 };
+        var page1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 1 };
+        var page2 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-2", Order = 2 };
+        var page3 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-3", Order = 3 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(page1, page2, page3);
+            contentDbContext.EducationInNumbersPages.AddRange(rootPage, page1, page2, page3);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var newOrder = new List<Guid> { page3.Id, page1.Id, page2.Id };
+            var newOrder = new List<Guid> { rootPage.Id, page3.Id, page1.Id, page2.Id };
             var result = await service.Reorder(newOrder);
             result.AssertRight();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
+            var dbRootPage = await contentDbContext.EducationInNumbersPages.FindAsync(rootPage.Id);
+            Assert.NotNull(dbRootPage);
+            Assert.Equal(0, dbRootPage.Order);
+            dbRootPage.Updated.AssertUtcNow();
+            Assert.Equal(_userId, dbRootPage.UpdatedById);
+
             var savedPage1 = await contentDbContext.EducationInNumbersPages.FindAsync(page1.Id);
             Assert.NotNull(savedPage1);
-            Assert.Equal(1, savedPage1.Order);
+            Assert.Equal(2, savedPage1.Order);
             savedPage1.Updated.AssertUtcNow();
             Assert.Equal(_userId, savedPage1.UpdatedById);
 
             var savedPage2 = await contentDbContext.EducationInNumbersPages.FindAsync(page2.Id);
             Assert.NotNull(savedPage2);
-            Assert.Equal(2, savedPage2.Order);
+            Assert.Equal(3, savedPage2.Order);
             savedPage2.Updated.AssertUtcNow();
             Assert.Equal(_userId, savedPage2.UpdatedById);
 
             var savedPage3 = await contentDbContext.EducationInNumbersPages.FindAsync(page3.Id);
             Assert.NotNull(savedPage3);
-            Assert.Equal(0, savedPage3.Order);
+            Assert.Equal(1, savedPage3.Order);
             savedPage3.Updated.AssertUtcNow();
             Assert.Equal(_userId, savedPage3.UpdatedById);
         }
@@ -1079,43 +1086,50 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Reorder_WithAmendment_Success()
     {
-        var page1V0 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Version = 0, Order = 0, Published = DateTime.UtcNow };
-        var page1V1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Version = 1, Order = 0, Published = null };
-        var page2 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-2", Version = 0, Order = 1 };
+        var rootPage = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = null, Order = 0 };
+        var page1V0 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Version = 0, Order = 1, Published = DateTime.UtcNow };
+        var page1V1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Version = 1, Order = 1, Published = null };
+        var page2 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-2", Version = 0, Order = 2 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(page1V0, page1V1, page2);
+            contentDbContext.EducationInNumbersPages.AddRange(rootPage, page1V0, page1V1, page2);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var newOrder = new List<Guid> { page2.Id, page1V1.Id };
+            var newOrder = new List<Guid> { rootPage.Id, page2.Id, page1V1.Id };
             var result = await service.Reorder(newOrder);
             result.AssertRight();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
+            var dbRootPage = await contentDbContext.EducationInNumbersPages.FindAsync(rootPage.Id);
+            Assert.NotNull(dbRootPage);
+            Assert.Equal(0, dbRootPage.Order);
+            dbRootPage.Updated.AssertUtcNow();
+            Assert.Equal(_userId, dbRootPage.UpdatedById);
+
             // if there is an amendment, we update the original and the amendment, as the amendment could be cancelled
             var savedPage1V0 = await contentDbContext.EducationInNumbersPages.FindAsync(page1V0.Id);
             Assert.NotNull(savedPage1V0);
-            Assert.Equal(1, savedPage1V0.Order);
+            Assert.Equal(2, savedPage1V0.Order);
             savedPage1V0.Updated.AssertUtcNow();
             Assert.Equal(_userId, savedPage1V0.UpdatedById);
 
             var savedPage1V1 = await contentDbContext.EducationInNumbersPages.FindAsync(page1V1.Id);
             Assert.NotNull(savedPage1V1);
-            Assert.Equal(1, savedPage1V1.Order);
+            Assert.Equal(2, savedPage1V1.Order);
             savedPage1V1.Updated.AssertUtcNow();
             Assert.Equal(_userId, savedPage1V1.UpdatedById);
 
             var savedPage2 = await contentDbContext.EducationInNumbersPages.FindAsync(page2.Id);
             Assert.NotNull(savedPage2);
-            Assert.Equal(0, savedPage2.Order);
+            Assert.Equal(1, savedPage2.Order);
             savedPage2.Updated.AssertUtcNow();
             Assert.Equal(_userId, savedPage2.UpdatedById);
         }
@@ -1124,20 +1138,21 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Reorder_PageIdsDiffer_ValidationError()
     {
-        var page1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 0 };
-        var page2 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-2", Order = 1 };
+        var rootPage = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = null, Order = 0 };
+        var page1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 1 };
+        var page2 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-2", Order = 2 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(page1, page2);
+            contentDbContext.EducationInNumbersPages.AddRange(rootPage, page1, page2);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var newOrder = new List<Guid> { page1.Id, Guid.NewGuid() };
+            var newOrder = new List<Guid> { rootPage.Id, page1.Id, Guid.NewGuid() };
             var result = await service.Reorder(newOrder);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
@@ -1148,13 +1163,14 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Delete_UnpublishedAmendment_Success()
     {
-        var pageV0 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Version = 0, Published = DateTime.UtcNow };
-        var pageV1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Version = 1, Published = null };
+        var rootPage = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = null, Order = 0 };
+        var pageV0 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 1, Version = 0, Published = DateTime.UtcNow };
+        var pageV1 = new EducationInNumbersPage { Id = Guid.NewGuid(), Slug = "page-1", Order = 1, Version = 1, Published = null };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(pageV0, pageV1);
+            contentDbContext.EducationInNumbersPages.AddRange(rootPage, pageV0, pageV1);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1168,8 +1184,10 @@ public class EducationInNumbersServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var pages = contentDbContext.EducationInNumbersPages.ToList();
-            var savedPage = Assert.Single(pages);
-            Assert.Equal(pageV0.Id, savedPage.Id);
+
+            Assert.Equal(2, pages.Count);
+            Assert.NotNull(pages.Find(page => page.Id == rootPage.Id));
+            Assert.NotNull(pages.Find(page => page.Id == pageV0.Id));
 
             // NOTE: Associated content is cascade deleted by the DB - cannot test that with the InMemory db
         }

@@ -53,6 +53,9 @@ const educationInNumbersService = {
   deleteEducationInNumbersPage(id: string): Promise<void> {
     return client.delete(`/education-in-numbers/${id}`);
   },
+  reorderEducationInNumbersPages(pageIds: string[]): Promise<void> {
+    return client.put(`/education-in-numbers/order`, pageIds);
+  },
 };
 
 export default educationInNumbersService;
