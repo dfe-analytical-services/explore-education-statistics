@@ -20,12 +20,30 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset Created { get; set; }
 
+    public DateTimeOffset? Activates { get; set; }
+
     public required DateTimeOffset Expiry { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
 
-    public PreviewTokenStatus Status =>
-        DateTimeOffset.UtcNow > Expiry ? PreviewTokenStatus.Expired : PreviewTokenStatus.Active;
+    public PreviewTokenStatus Status
+    {
+        get
+        {
+            var ukTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+            var nowUk = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, ukTz);
+            
+            return Activates.HasValue 
+                ? TimeZoneInfo.ConvertTime(Activates.Value, ukTz) > nowUk
+                    ? PreviewTokenStatus.Pending
+                    : Expiry < nowUk 
+                        ? PreviewTokenStatus.Expired 
+                        : PreviewTokenStatus.Active 
+                : Expiry < nowUk
+                    ? PreviewTokenStatus.Expired 
+                    : PreviewTokenStatus.Active;
+        }
+    }
 
     internal class Config : IEntityTypeConfiguration<PreviewToken>
     {
@@ -43,5 +61,6 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 public enum PreviewTokenStatus
 {
     Active,
+    Pending,
     Expired
 }
