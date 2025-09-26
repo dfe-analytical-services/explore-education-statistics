@@ -63,7 +63,23 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     history.push(tokenLogPagePath);
   };
 
+  const dateIsToday = (stringDate?: string): boolean => {
+    if (stringDate === undefined) return true;
+    const getYMD = (date: Date) => {
+      return {
+        y: date.getUTCFullYear(),
+        m: date.getUTCMonth(), // 0-based (0 = Jan, 11 = Dec)
+        d: date.getUTCDate(),
+      };
+    };
+    const d1 = getYMD(new Date());
+    const d2 = getYMD(new Date(stringDate));
+    return d1.y === d2.y && d1.m === d2.m && d1.d === d2.d;
+  };
   const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;
+  const activatesToday = dateIsToday(
+    previewToken ? previewToken.activates : undefined,
+  );
 
   return (
     <>
@@ -86,7 +102,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
             <span className="govuk-caption-l">API data set preview token</span>
             <h2>{dataSet?.title}</h2>
 
-            {previewToken?.status === 'Active' ? (
+            {previewToken?.status === 'Active' ||
+            previewToken?.status === 'Pending' ? (
               <>
                 <p>
                   Reference: <strong>{previewToken.label}</strong>
@@ -100,10 +117,19 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   text={previewToken.id}
                 />
 
+                {!activatesToday && (
+                  <>
+                    The token is active from:{' '}
+                    <strong>
+                      <FormattedDate>{previewToken.activates}</FormattedDate>{' '}
+                      (local time){' '}
+                    </strong>
+                  </>
+                )}
                 <p>
-                  The token expires:{' '}
+                  {activatesToday ? 'The token' : 'and'} expires:{' '}
                   <strong>
-                    <FormattedDate formatRelativeToNow>
+                    <FormattedDate formatRelativeToNow={activatesToday}>
                       {previewToken.expiry}
                     </FormattedDate>{' '}
                     (local time)

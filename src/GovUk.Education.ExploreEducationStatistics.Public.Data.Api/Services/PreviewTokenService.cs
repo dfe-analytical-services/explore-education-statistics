@@ -85,7 +85,8 @@ public class PreviewTokenService(
             .Where(pt => pt.Id == previewTokenId)
             .Where(pt => pt.DataSetVersionId == dataSetVersionId)
             .Where(pt => pt.DataSetVersion.Status == DataSetVersionStatus.Draft)
-            .Where(pt => pt.Expiry > timestamp)
+            .Where(pt => (pt.Activates == null || pt.Activates <= timestamp) 
+                         && pt.Expiry > timestamp)
             .AnyAsync(cancellationToken: cancellationToken);
     }
     
