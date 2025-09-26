@@ -15,7 +15,10 @@ describe('ReleasePageTabNav', () => {
     const heading = screen.getByRole('navigation', { name: 'Release' });
     expect(
       within(heading).getByRole('link', { name: 'Release home' }),
-    ).toHaveAttribute('href', '/find-statistics/test-publication/test-slug');
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/test-slug?redesign=true',
+    ); // TODO EES-6449 - remove query param
     expect(
       within(heading).getByRole('link', { name: 'Release home' }),
     ).not.toHaveAttribute('aria-current', 'page');
