@@ -16,5 +16,5 @@ Parse Find Statistics page HTML
     set suite variable    ${parsed_page}
 
 Validate publications list is on page
-    [Tags]    NotAgainstDev    NotAgainstTest    NotAgainstPreProd
+    Skip    msg=Requires frontend Azure Search configuration in Local; Fails in Dev/Test/PreProd due to auth issue.
     ${list}=    user_gets_publications_list    ${parsed_page}
