@@ -290,7 +290,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                     // Assign a new Id.
                     Id = contentSectionAmendmentId,
 
-                    Caption = originalSection.Caption,
                     Heading = originalSection.Heading,
                     Order = originalSection.Order,
                     Type = originalSection.Type,

@@ -129,7 +129,6 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
                 Id = Guid.NewGuid(),
 
                 // Copy certain fields from the original.
-                Caption = originalContentSection.Caption,
                 Heading = originalContentSection.Heading,
                 Order = originalContentSection.Order,
                 Type = originalContentSection.Type,

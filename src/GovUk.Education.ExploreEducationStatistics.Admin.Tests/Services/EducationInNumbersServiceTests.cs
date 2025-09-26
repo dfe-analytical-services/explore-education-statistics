@@ -458,7 +458,6 @@ public class EducationInNumbersServiceTests
                     Id = Guid.NewGuid(),
                     Order = 0,
                     Heading = "Section 1",
-                    Caption = "Section 1 caption",
                     Content =
                     [
                         new EinHtmlBlock
@@ -482,7 +481,6 @@ public class EducationInNumbersServiceTests
                     Id = Guid.NewGuid(),
                     Order = 1,
                     Heading = "Section 2",
-                    Caption = "Section 2 caption",
                     Content =
                     [
                         new EinHtmlBlock
@@ -529,7 +527,6 @@ public class EducationInNumbersServiceTests
             Assert.Equal(amendment.Id, amendmentSection1.EducationInNumbersPageId);
             Assert.Equal(originalSection1.Order, amendmentSection1.Order);
             Assert.Equal(originalSection1.Heading, amendmentSection1.Heading);
-            Assert.Equal(originalSection1.Caption, amendmentSection1.Caption);
             Assert.Equal(originalSection1.Content.Count, amendmentSection1.Content.Count);
 
             var originalSection1Block1 = (EinHtmlBlock)originalSection1.Content[0];
@@ -552,7 +549,6 @@ public class EducationInNumbersServiceTests
             Assert.Equal(amendment.Id, amendmentSection2.EducationInNumbersPageId);
             Assert.Equal(originalSection2.Order, amendmentSection2.Order);
             Assert.Equal(originalSection2.Heading, amendmentSection2.Heading);
-            Assert.Equal(originalSection2.Caption, amendmentSection2.Caption);
             Assert.Equal(originalSection2.Content.Count, amendmentSection2.Content.Count);
 
             var amendmentSection2Block1 = Assert.IsType<EinHtmlBlock>(amendmentSection2.Content[0]);

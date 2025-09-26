@@ -14,8 +14,6 @@ public class EducationInNumbersContentViewModels
 
         public string Heading { get; set; } = string.Empty;
 
-        public string? Caption { get; set; }
-
         public List<EinContentBlockViewModel> Content { get; set; } = new();
 
         public static EinContentSectionViewModel FromModel(EinContentSection section)
@@ -25,7 +23,6 @@ public class EducationInNumbersContentViewModels
                 Id = section.Id,
                 Order = section.Order,
                 Heading = section.Heading,
-                Caption = section.Caption,
                 Content = section.Content
                     .Select(EinContentBlockViewModel.FromModel)
                     .OrderBy(block => block.Order)

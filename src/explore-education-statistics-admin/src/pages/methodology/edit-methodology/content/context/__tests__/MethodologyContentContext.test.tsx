@@ -17,7 +17,6 @@ const basicMethodology: MethodologyContent = {
     {
       id: 'content-section-0',
       order: 0,
-      caption: '',
       heading: 'New section 3',
       content: [
         {
@@ -41,7 +40,6 @@ const basicMethodology: MethodologyContent = {
       order: 1,
       heading: 'New section',
       content: [],
-      caption: '',
     },
   ],
   annexes: [
@@ -49,7 +47,6 @@ const basicMethodology: MethodologyContent = {
       id: 'annex-section-0',
       order: 0,
       heading: 'New section 3',
-      caption: '',
       content: [
         {
           id: 'annex-section-0-content-0',
@@ -65,7 +62,6 @@ const basicMethodology: MethodologyContent = {
       order: 1,
       heading: 'New section',
       content: [],
-      caption: '',
     },
   ],
   notes: [],
@@ -310,7 +306,6 @@ describe('MethodologyContext', () => {
         payload: {
           sectionKey: 'content',
           section: {
-            caption: '',
             heading: 'A new section',
             id: 'new-section-1',
             order: basicMethodology.content.length,
@@ -367,7 +362,6 @@ describe('MethodologyContext', () => {
           meta: { sectionId: basicSection.id, sectionKey: 'content' },
           section: {
             ...basicSection,
-            caption: 'updated caption',
             heading: 'updated heading',
           },
         },
@@ -375,7 +369,6 @@ describe('MethodologyContext', () => {
     );
 
     expect(methodology.content[0].id).toEqual(basicSection.id);
-    expect(methodology.content[0].caption).toEqual('updated caption');
     expect(methodology.content[0].heading).toEqual('updated heading');
   });
 });

@@ -161,13 +161,12 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             });
           }}
         >
-          {data.content.map(({ heading, caption, order, content }) => {
+          {data.content.map(({ heading, order, content }) => {
             return (
               <AccordionSection
                 id={`content-section-${order}`}
                 anchorLinkIdPrefix="content"
                 heading={heading}
-                caption={caption}
                 key={order}
               >
                 {({ open, contentId }) => (
@@ -198,12 +197,11 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               });
             }}
           >
-            {data.annexes.map(({ heading, caption, order, content }) => {
+            {data.annexes.map(({ heading, order, content }) => {
               return (
                 <AccordionSection
                   anchorLinkIdPrefix="annexes"
                   heading={heading}
-                  caption={caption}
                   key={order}
                 >
                   <MethodologySectionBlocks

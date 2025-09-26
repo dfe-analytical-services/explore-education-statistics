@@ -19,7 +19,6 @@ export const testEinPageContent: EinContent = {
     {
       id: 'content-section-0',
       order: 0,
-      caption: '',
       heading: 'New section 3',
       content: [
         {
@@ -41,7 +40,6 @@ export const testEinPageContent: EinContent = {
       order: 1,
       heading: 'New section',
       content: [],
-      caption: '',
     },
     {
       id: 'content-section-2',
@@ -68,7 +66,6 @@ export const testEinPageContent: EinContent = {
           ],
         },
       ],
-      caption: '',
     },
   ],
 };

@@ -148,7 +148,6 @@ export interface ContentSection<BlockType> {
   id: string;
   order: number;
   heading: string;
-  caption?: string;
   content: BlockType[];
 }
 

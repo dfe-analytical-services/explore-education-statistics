@@ -8,7 +8,5 @@ public class ContentSectionViewModel
 
     public string Heading { get; set; }
 
-    public string Caption { get; set; }
-
     public List<IContentBlockViewModel> Content { get; set; } = new List<IContentBlockViewModel>();
 }

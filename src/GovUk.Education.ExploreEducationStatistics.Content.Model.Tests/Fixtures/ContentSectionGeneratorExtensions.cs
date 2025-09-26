@@ -23,7 +23,6 @@ public static class ContentSectionGeneratorExtensions
     public static InstanceSetters<ContentSection> SetDefaults(this InstanceSetters<ContentSection> setters)
         => setters
             .SetDefault(p => p.Id)
-            .SetDefault(p => p.Caption)
             .SetDefault(p => p.Heading)
             .SetDefault(p => p.Order)
             .Set(p => p.Type, ContentSectionType.Generic);

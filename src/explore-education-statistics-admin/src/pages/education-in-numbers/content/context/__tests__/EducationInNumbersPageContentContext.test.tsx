@@ -157,7 +157,6 @@ describe('EducationInNumbersPageContentContext', () => {
         type: 'ADD_CONTENT_SECTION',
         payload: {
           section: {
-            caption: '',
             heading: 'A new section',
             id: 'new-section-1',
             order: testEinPageContent.content.length,
@@ -211,7 +210,6 @@ describe('EducationInNumbersPageContentContext', () => {
           meta: { sectionId: basicSection.id },
           section: {
             ...basicSection,
-            caption: 'updated caption',
             heading: 'updated heading',
           },
         },
@@ -219,7 +217,6 @@ describe('EducationInNumbersPageContentContext', () => {
     );
 
     expect(pageContent.content[0].id).toEqual(basicSection.id);
-    expect(pageContent.content[0].caption).toEqual('updated caption');
     expect(pageContent.content[0].heading).toEqual('updated heading');
   });
 

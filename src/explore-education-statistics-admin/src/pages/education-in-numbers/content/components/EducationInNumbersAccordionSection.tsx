@@ -23,7 +23,7 @@ interface EducationInNumbersAccordionSectionProps {
 }
 
 const EducationInNumbersAccordionSection = ({
-  section: { id: sectionId, caption, heading, content: sectionContent = [] },
+  section: { id: sectionId, heading, content: sectionContent = [] },
   educationInNumbersPageId,
   educationInNumbersPageSlug,
   onRemoveSection,
@@ -133,7 +133,6 @@ const EducationInNumbersAccordionSection = ({
           : undefined
       }
       heading={heading}
-      caption={caption}
       headerButtons={
         <Button
           variant={!isReordering ? 'secondary' : undefined}
