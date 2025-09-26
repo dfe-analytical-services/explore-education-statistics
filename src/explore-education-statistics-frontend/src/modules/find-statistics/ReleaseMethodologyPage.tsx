@@ -97,6 +97,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
     const { publication: publicationSlug, release: releaseSlug } =
       query as Dictionary<string>;
 
+    // TODO EES-6449 - remove
     if (process.env.APP_ENV === 'Production') {
       return {
         notFound: true,

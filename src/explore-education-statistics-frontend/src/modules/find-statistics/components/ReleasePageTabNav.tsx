@@ -44,7 +44,10 @@ const ReleasePageTabNav = ({ activePage, releaseUrlBase }: Props) => {
           <li key={key}>
             <Link
               className={styles.navItem}
-              to={`${ensureTrailingSlash(releaseUrlBase)}${slug}`}
+              // TODO EES-6449 - remove redesign query param
+              to={`${ensureTrailingSlash(releaseUrlBase)}${
+                slug || '?redesign=true'
+              }`}
               aria-current={activePage === key ? 'page' : undefined}
               unvisited
             >
