@@ -1,6 +1,12 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .nav {
+  position: sticky;
+  top: 0;
+  background-color: govuk-colour('white');
+}
+
+.navList {
   display: flex;
   align-items: flex-end;
   gap: govuk-spacing(4);
