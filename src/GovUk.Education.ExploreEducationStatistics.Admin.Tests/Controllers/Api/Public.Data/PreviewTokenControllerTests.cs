@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -19,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -35,6 +35,16 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
     public class CreatePreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
     {
         public record CreatePreviewTokenValidationError(string Code, string Message, string Path);
+
+        private static readonly LocalizableMessage InvalidExpiryError = new(
+            Code: "Predicate",
+            Message: "Expires date must be no more than 7 days after the created date."
+        );
+
+        private static readonly LocalizableMessage InvalidCreatedError = new(
+            Code: "Predicate",
+            Message: "Created date must be within the next 7 days."
+        );
 
         private static readonly CreatePreviewTokenValidationError ExpectInvalidExpiry = new(
             InvalidExpiryError.Code,

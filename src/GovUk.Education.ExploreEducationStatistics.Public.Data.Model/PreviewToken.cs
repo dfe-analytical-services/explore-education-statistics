@@ -20,7 +20,7 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset Created { get; set; }
 
-    public DateTimeOffset? Activates { get; set; }
+    public required DateTimeOffset? Activates { get; set; }
 
     public required DateTimeOffset Expiry { get; set; }
 
@@ -30,16 +30,13 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
     {
         get
         {
-            var ukTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
-            var nowUk = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, ukTz);
-            
             return Activates.HasValue 
-                ? TimeZoneInfo.ConvertTime(Activates.Value, ukTz) > nowUk
+                ? Activates.Value > DateTimeOffset.UtcNow
                     ? PreviewTokenStatus.Pending
-                    : Expiry < nowUk 
+                    : Expiry < DateTimeOffset.UtcNow 
                         ? PreviewTokenStatus.Expired 
                         : PreviewTokenStatus.Active 
-                : Expiry < nowUk
+                : Expiry < DateTimeOffset.UtcNow
                     ? PreviewTokenStatus.Expired 
                     : PreviewTokenStatus.Active;
         }
