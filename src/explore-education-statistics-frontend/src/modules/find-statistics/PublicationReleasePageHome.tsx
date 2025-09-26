@@ -1,3 +1,5 @@
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
   PublicationSummaryRedesign,
   ReleaseVersionSummary,
@@ -25,7 +27,13 @@ const PublicationReleasePage: NextPage<Props> = ({
         activePage="home"
         releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
       />
-      <p>Home</p>
+      <ReleasePageLayout>
+        <h2>TODO EES-6443- render release content</h2>
+        <ContactUsSection
+          publicationContact={publicationSummary.contact}
+          publicationTitle={publicationSummary.title}
+        />
+      </ReleasePageLayout>
     </ReleasePageShell>
   );
 };

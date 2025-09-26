@@ -38,8 +38,8 @@ interface Props {
 
 const ReleasePageTabNav = ({ activePage, releaseUrlBase }: Props) => {
   return (
-    <nav aria-label="Release">
-      <ul className={styles.nav}>
+    <nav aria-label="Release" className={styles.nav}>
+      <ul className={styles.navList}>
         {Object.entries(releasePageItems).map(([key, { title, slug }]) => (
           <li key={key}>
             <Link

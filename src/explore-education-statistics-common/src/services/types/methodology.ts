@@ -8,3 +8,9 @@ export interface ExternalMethodology {
   title: string;
   url: string;
 }
+
+export interface InternalMethodologySummary {
+  methodologyId: string;
+  slug: string;
+  title: string;
+}

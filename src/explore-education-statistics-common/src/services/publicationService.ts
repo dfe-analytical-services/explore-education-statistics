@@ -8,6 +8,7 @@ import { ReleaseType } from '@common/services/types/releaseType';
 import {
   MethodologySummary,
   ExternalMethodology,
+  InternalMethodologySummary,
 } from '@common/services/types/methodology';
 import { Organisation } from '@common/services/types/organisation';
 import { SortDirection } from '@common/services/types/sort';
@@ -260,6 +261,11 @@ export interface PublicationTreeSummary {
   supersededBy?: PublicationSupersededBy;
 }
 
+export interface PublicationMethodologiesList {
+  methodologies: InternalMethodologySummary[];
+  externalMethodology?: ExternalMethodology;
+}
+
 export interface PublicationSupersededBy {
   id: string;
   title: string;
@@ -343,6 +349,11 @@ const publicationService = {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
     );
+  },
+  getPublicationMethodologies(
+    publicationSlug: string,
+  ): Promise<PublicationMethodologiesList[]> {
+    return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
   getLatestPreReleaseAccessList(
     publicationSlug: string,
