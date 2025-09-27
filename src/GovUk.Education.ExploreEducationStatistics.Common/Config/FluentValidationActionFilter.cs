@@ -1,4 +1,3 @@
-#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;

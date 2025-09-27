@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GovUk.Education.ExploreEducationStatistics.Common;
 
 public static class TableStorageTableNames

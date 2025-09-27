@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 
 public static class EesClaimTypes

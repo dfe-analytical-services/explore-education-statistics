@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
