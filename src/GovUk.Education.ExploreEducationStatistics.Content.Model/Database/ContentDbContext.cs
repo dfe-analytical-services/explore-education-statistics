@@ -596,6 +596,8 @@ public class ContentDbContext : DbContext
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v)
             );
+
+        modelBuilder.Entity<DataBlock>().Navigation(block => block.DataBlockVersion).AutoInclude();
     }
 
     private static void ConfigureHtmlBlock(ModelBuilder modelBuilder)
@@ -608,6 +610,8 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<EmbedBlockLink>().Property(block => block.EmbedBlockId).HasColumnName("EmbedBlockId");
 
         modelBuilder.Entity<EmbedBlockLink>().HasOne(eb => eb.EmbedBlock).WithOne().OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EmbedBlockLink>().Navigation(eb => eb.EmbedBlock).AutoInclude();
     }
 
     private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
