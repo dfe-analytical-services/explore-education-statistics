@@ -204,7 +204,7 @@ Verify the 'Active tokens' and 'Expired tokens' on preview token log page
     user checks table column heading contains    1    2    User
     user checks table column heading contains    1    3    Date generated
     user checks table column heading contains    1    4    Status
-    user checks table column heading contains    1    5    Expiry
+    user checks table column heading contains    1    5    Expires
     user checks table column heading contains    1    6    Action
 
     user checks table cell contains    1    4    Active
