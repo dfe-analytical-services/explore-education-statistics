@@ -411,7 +411,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() => DataFixture.DefaultPreviewToken()
-                    .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
+                    .ForIndex(1, pt => pt.SetExpires(DateTimeOffset.UtcNow.AddSeconds(-1)))
                     .WithCreatedByUserId(CreatedByBauUser.Id)
                     .Generate(2))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
@@ -487,10 +487,10 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() => DataFixture.DefaultPreviewToken()
-                    .ForIndex(0, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddHours(1)))
-                    .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(-1)))
-                    .ForIndex(2, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
-                    .ForIndex(3, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(1)))
+                    .ForIndex(0, pt => pt.SetExpires(DateTimeOffset.UtcNow.AddHours(1)))
+                    .ForIndex(1, pt => pt.SetExpires(DateTimeOffset.UtcNow.AddDays(-1)))
+                    .ForIndex(2, pt => pt.SetExpires(DateTimeOffset.UtcNow.AddSeconds(-1)))
+                    .ForIndex(3, pt => pt.SetExpires(DateTimeOffset.UtcNow.AddDays(1)))
                     .WithCreatedByUserId(CreatedByBauUser.Id)
                     .Generate(4))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);

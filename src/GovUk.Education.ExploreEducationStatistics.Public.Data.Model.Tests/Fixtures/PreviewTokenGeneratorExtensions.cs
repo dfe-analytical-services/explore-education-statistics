@@ -33,7 +33,7 @@ public static class PreviewTokenGeneratorExtensions
     public static Generator<PreviewToken> WithExpiry(
         this Generator<PreviewToken> generator,
         DateTimeOffset expiry)
-        => generator.ForInstance(s => s.SetExpiry(expiry));
+        => generator.ForInstance(s => s.SetExpires(expiry));
 
     public static Generator<PreviewToken> WithLabel(
         this Generator<PreviewToken> generator,
@@ -75,7 +75,7 @@ public static class PreviewTokenGeneratorExtensions
         DateTimeOffset created)
         => instanceSetter.Set(pt => pt.Created, created);
 
-    public static InstanceSetters<PreviewToken> SetExpiry(
+    public static InstanceSetters<PreviewToken> SetExpires(
         this InstanceSetters<PreviewToken> instanceSetter,
         DateTimeOffset expiry)
         => instanceSetter.Set(pt => pt.Expires, expiry);
