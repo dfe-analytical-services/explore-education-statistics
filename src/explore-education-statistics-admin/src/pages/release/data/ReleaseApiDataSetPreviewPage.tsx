@@ -49,8 +49,8 @@ export default function ReleaseApiDataSetPreviewPage() {
     activates?: Date | null,
     expires?: Date | null,
   ) => {
-    let startDate: Date | undefined;
-    let endDate: Date | undefined;
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
 
     if (!dataSet?.draftVersion) {
       return;
@@ -59,6 +59,7 @@ export default function ReleaseApiDataSetPreviewPage() {
       startDate = new Date();
       endDate = getPresetSpanEndDate(datePresetSpan);
     } else if (activates && expires) {
+      activates.setHours(0, 0, 1);
       expires.setHours(23, 59, 59);
       startDate = activates;
       endDate = expires;
