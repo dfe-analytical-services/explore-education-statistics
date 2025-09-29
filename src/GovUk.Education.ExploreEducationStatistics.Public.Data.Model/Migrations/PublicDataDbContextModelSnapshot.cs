@@ -668,7 +668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset?>("Activates")
+                    b.Property<DateTimeOffset>("Activates")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("Created")
@@ -680,7 +680,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("Expiry")
+                    b.Property<DateTimeOffset>("Expires")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Label")
