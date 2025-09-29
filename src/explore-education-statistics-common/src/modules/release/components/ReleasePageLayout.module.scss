@@ -14,9 +14,16 @@
   align-self: flex-start;
   max-height: calc(100vh - (var(--sidebar-y-offset)));
   overflow-y: auto;
+  // Provide space for nav item border to display
+  margin-left: -14px;
+  padding-left: 14px;
 }
 
 .content {
   flex: 1 1 auto;
   padding-bottom: govuk-spacing(8);
+
+  section {
+    scroll-margin-top: var(--sidebar-y-offset);
+  }
 }

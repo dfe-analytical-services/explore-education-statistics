@@ -1,35 +1,37 @@
+import PageNavExpandable, {
+  NavItem,
+} from '@common/components/PageNavExpandable';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import styles from '@common/modules/release/components/ReleasePageLayout.module.scss';
 import React, { ReactNode } from 'react';
 
 interface Props {
+  activeSection?: string;
   children: ReactNode;
+  navItems: NavItem[];
+  onChangeSection?: (id: string) => void;
+  onClickNavItem?: (id: string) => void;
 }
 
-const ReleasePageLayout = ({ children }: Props) => {
+const ReleasePageLayout = ({
+  activeSection,
+  children,
+  navItems,
+  onChangeSection,
+  onClickNavItem,
+}: Props) => {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (
     <div className={styles.wrapper}>
       {!isMobileMedia && (
         <div className={styles.sidebar}>
-          <h2 className="govuk-heading-s" id="nav-label">
-            On this page
-          </h2>
-          <nav aria-labelledby="nav-label" role="navigation">
-            <ul className="govuk-list">
-              <li>TODO EES-6476 Build nav</li>
-
-              <li className="govuk-!-margin-top-8">
-                <a
-                  className="govuk-link--no-visited-state govuk-link--no-underline"
-                  href="#main-content"
-                >
-                  Back to top
-                </a>
-              </li>
-            </ul>
-          </nav>
+          <PageNavExpandable
+            activeSection={activeSection}
+            items={navItems}
+            onChangeSection={onChangeSection}
+            onClickItem={onClickNavItem}
+          />
         </div>
       )}
       <div className={styles.content}>{children}</div>
