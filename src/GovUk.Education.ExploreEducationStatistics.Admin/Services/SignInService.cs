@@ -78,7 +78,6 @@ public class SignInService(
         // This will also fetch soft-deleted & expired users
         var existingInternalUser = await contentDbContext
             .Users
-            .IgnoreQueryFilters()
             .SingleOrDefaultAsync(u => u.Email.ToLower() == profile.Email.ToLower());
 
         // Create a new set of AspNetUser records for the Identity Framework.
@@ -198,7 +197,7 @@ public class SignInService(
     }
 
     private async Task<Guid> GetDeletedUserId() =>
-        (await userRepository.FindDeletedUserPlaceholder())!.Id;
+        (await userRepository.FindDeletedUserPlaceholder()).Id;
 
     private async Task<Guid> GetCorrespondingCreatedByUserId(UserInvite inviteToSystem)
     {

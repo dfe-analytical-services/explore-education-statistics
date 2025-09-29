@@ -35,8 +35,7 @@ public class ReleasePermissionServiceTests
             .WithUser(_dataFixture.DefaultUser()
                 .WithFirstName("User1")
                 .WithLastName("One")
-                .WithEmail("user1@test.com")
-                .Generate())
+                .WithEmail("user1@test.com"))
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
@@ -44,8 +43,7 @@ public class ReleasePermissionServiceTests
             .WithUser(_dataFixture.DefaultUser()
                 .WithFirstName("User2")
                 .WithLastName("Two")
-                .WithEmail("user2@test.com")
-                .Generate())
+                .WithEmail("user2@test.com"))
             .WithReleaseVersion(releaseVersion)
             .WithRole(PrereleaseViewer);
 
@@ -426,15 +424,12 @@ public class ReleasePermissionServiceTests
                 .WithPublication(_dataFixture.DefaultPublication()));
 
         UserReleaseRole user1ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(_dataFixture.DefaultUser()
-                .Generate())
+            .WithUser(_dataFixture.DefaultUser())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
         UserReleaseRole user2ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(_dataFixture.DefaultUser()
-                .WithEmail("test@test.com")
-                .Generate())
+            .WithUser(_dataFixture.DefaultUser())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 

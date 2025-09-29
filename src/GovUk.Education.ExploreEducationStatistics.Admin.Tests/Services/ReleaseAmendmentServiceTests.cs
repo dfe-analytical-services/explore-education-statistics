@@ -789,8 +789,7 @@ public class ReleaseAmendmentServiceTests
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
             contentDbContext.Users.Add(_fixture.DefaultUser()
-                .WithId(_userId)
-                .Generate());
+                .WithId(_userId));
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -856,8 +855,7 @@ public class ReleaseAmendmentServiceTests
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
             contentDbContext.Users.Add(_fixture.DefaultUser()
-                .WithId(_userId)
-                .Generate());
+                .WithId(_userId));
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -901,8 +899,7 @@ public class ReleaseAmendmentServiceTests
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
             contentDbContext.Users.Add(_fixture.DefaultUser()
-                .WithId(_userId)
-                .Generate());
+                .WithId(_userId));
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -985,8 +982,7 @@ public class ReleaseAmendmentServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(originalReleaseVersion);
             contentDbContext.Users.AddRange(_fixture.DefaultUser()
-                .WithId(_userId)
-                .Generate());
+                .WithId(_userId));
 
             await contentDbContext.SaveChangesAsync();
 

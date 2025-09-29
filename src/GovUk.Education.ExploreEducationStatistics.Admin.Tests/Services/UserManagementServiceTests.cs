@@ -913,7 +913,6 @@ public class UserManagementServiceTests
     public async Task DeleteUser()
     {
         var internalUser = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
             .Generate();
 
         var identityUser = new ApplicationUser

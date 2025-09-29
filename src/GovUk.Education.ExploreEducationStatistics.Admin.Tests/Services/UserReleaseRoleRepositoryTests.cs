@@ -479,8 +479,7 @@ public abstract class UserReleaseRoleRepositoryTests
                             .WithPublication(otherPublication))),                
                 // Role for same Publication but different user
                _fixture.DefaultUserReleaseRole()
-                    .WithUser(_fixture.DefaultUser()
-                        .Generate())
+                    .WithUser(_fixture.DefaultUser())
                     .WithRole(ReleaseRole.PrereleaseViewer)
                     .WithReleaseVersion(_fixture.DefaultReleaseVersion()
                         .WithRelease(_fixture.DefaultRelease()
@@ -679,12 +678,8 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var email = "test@test.com";
-
             var userReleaseRole = _fixture.DefaultUserReleaseRole()
-                .WithUser(_fixture.DefaultUser()
-                    .WithEmail(email)
-                    .Generate())
+                .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(_fixture.DefaultReleaseVersion()
                     .WithRelease(_fixture.DefaultRelease()
                         .WithPublication(_fixture.DefaultPublication())))

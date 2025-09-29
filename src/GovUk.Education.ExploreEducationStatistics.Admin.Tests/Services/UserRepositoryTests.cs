@@ -16,7 +16,6 @@ public class UserRepositoryTests
     public async Task FindByEmail()
     {
         var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
             .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -30,7 +29,7 @@ public class UserRepositoryTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var repository = SetupUserRepository(contentDbContext);
-            var result = await repository.FindByEmail("test@test.com");
+            var result = await repository.FindByEmail(user.Email);
             Assert.NotNull(result);
             Assert.Equal(user.Id, result.Id);
         }

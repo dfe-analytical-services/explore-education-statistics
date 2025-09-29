@@ -199,15 +199,13 @@ public class PublicationRepositoryTests
         // Set up other publication and release roles unrelated to this user
 
         UserPublicationRole userPublicationRole = _dataFixture.DefaultUserPublicationRole()
-            .WithUser(_dataFixture.DefaultUser()
-                .Generate())
+            .WithUser(_dataFixture.DefaultUser())
             .WithPublication(_dataFixture.DefaultPublication()
                 .WithTheme(theme))
             .WithRole(PublicationRole.Owner);
 
         UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(_dataFixture.DefaultUser()
-                .Generate())
+            .WithUser(_dataFixture.DefaultUser())
             .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
                 .WithRelease(_dataFixture.DefaultRelease()
                     .WithPublication(_dataFixture.DefaultPublication()

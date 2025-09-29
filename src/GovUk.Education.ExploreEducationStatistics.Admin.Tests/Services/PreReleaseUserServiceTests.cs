@@ -632,7 +632,6 @@ public class PreReleaseUserServiceTests
             .WithPublishScheduled(PublishedScheduledStartOfDay);
 
         var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
             .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1189,7 +1188,6 @@ public class PreReleaseUserServiceTests
     public async Task RemovePreReleaseUser_NoRemainingReleaseInvites_AcceptedInvite()
     {
         var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
             .Generate();
 
         var unacceptedUserInvite = new UserInvite
@@ -1283,7 +1281,6 @@ public class PreReleaseUserServiceTests
     public async Task RemovePreReleaseUser_RemainingReleaseInvites()
     {
         var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
             .Generate();
 
         var unacceptedUserInvite = new UserInvite
@@ -1389,7 +1386,6 @@ public class PreReleaseUserServiceTests
     public async Task RemovePreReleaseUser_NoRemainingReleaseInvites()
     {
         var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
             .Generate();
 
         var unacceptedUserInvite = new UserInvite

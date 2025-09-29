@@ -129,8 +129,7 @@ public class UserManagementServicePermissionTests
     {
         await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
         contentDbContext.Users.Add(_dataFixture.DefaultUser()
-               .WithEmail("ees-test.user@education.gov.uk")
-               .Generate());
+               .WithEmail("ees-test.user@education.gov.uk"));
         await contentDbContext.SaveChangesAsync();
 
         await PolicyCheckBuilder<SecurityPolicies>()

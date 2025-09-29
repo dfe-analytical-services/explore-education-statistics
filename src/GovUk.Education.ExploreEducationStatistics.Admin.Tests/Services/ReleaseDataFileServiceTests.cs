@@ -38,8 +38,7 @@ public class ReleaseDataFileServiceTests
     private readonly DataFixture _fixture = new();
 
     private readonly User _user = new DataFixture()
-        .DefaultUser()
-        .WithEmail("test@test.com");
+        .DefaultUser();
 
     [Fact]
     public async Task Delete()

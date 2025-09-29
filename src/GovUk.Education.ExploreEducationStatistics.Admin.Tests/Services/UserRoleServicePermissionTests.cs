@@ -189,8 +189,7 @@ public class UserRoleServicePermissionTests
 
         UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
             .WithReleaseVersion(releaseVersion)
-            .WithUser(_dataFixture.DefaultUser()
-                .Generate())
+            .WithUser(_dataFixture.DefaultUser())
             .WithRole(Contributor);
 
         await PolicyCheckBuilder<SecurityPolicies>()

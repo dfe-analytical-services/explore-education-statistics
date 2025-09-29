@@ -29,8 +29,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
     private static readonly ClaimsPrincipal BauUser = new DataFixture().BauUser();
 
     private static readonly User CreatedByBauUser = new DataFixture().DefaultUser()
-        .WithId(BauUser.GetUserId())
-        .WithEmail("bau.user@test.com");
+        .WithId(BauUser.GetUserId());
 
     public class CreatePreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
     {
