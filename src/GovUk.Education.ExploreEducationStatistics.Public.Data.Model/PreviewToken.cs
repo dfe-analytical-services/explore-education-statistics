@@ -20,7 +20,7 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset Created { get; set; }
 
-    public required DateTimeOffset? Activates { get; set; }
+    public required DateTimeOffset Activates { get; set; }
 
     public required DateTimeOffset Expiry { get; set; }
 
@@ -30,15 +30,9 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
     {
         get
         {
-            return Activates.HasValue 
-                ? Activates.Value > DateTimeOffset.UtcNow
-                    ? PreviewTokenStatus.Pending
-                    : Expiry < DateTimeOffset.UtcNow 
-                        ? PreviewTokenStatus.Expired 
-                        : PreviewTokenStatus.Active 
-                : Expiry < DateTimeOffset.UtcNow
-                    ? PreviewTokenStatus.Expired 
-                    : PreviewTokenStatus.Active;
+            var now = DateTimeOffset.UtcNow;
+            return now >= Expires ? PreviewTokenStatus.Expired :
+                now < Activates ? PreviewTokenStatus.Pending : PreviewTokenStatus.Active;
         }
     }
 

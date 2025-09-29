@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20250924193424_EES6080_AddActivatesToPreviewTokens")]
-    partial class EES6080_AddActivatesToPreviewTokens
+    [Migration("20250926141647_EES6080_RenameExpiryAndAddActivatesInPreviewTokensTable")]
+    partial class EES6080_RenameExpiryAndAddActivatesInPreviewTokensTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -671,7 +671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset?>("Activates")
+                    b.Property<DateTimeOffset>("Activates")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("Created")
@@ -683,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("Expiry")
+                    b.Property<DateTimeOffset>("Expires")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Label")
