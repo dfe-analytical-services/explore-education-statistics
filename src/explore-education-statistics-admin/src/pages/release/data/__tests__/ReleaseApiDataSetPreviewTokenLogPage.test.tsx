@@ -54,7 +54,7 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
       activates: '2024-01-01T14:00Z',
       createdByEmail: 'test-1@hiveit.co.uk',
       updated: '',
-      expiry: '2024-01-02T14:00Z',
+      expires: '2024-01-02T14:00Z',
     },
     {
       id: 'token-id-2',
@@ -63,7 +63,7 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
       activates: '2024-02-01T10:00Z',
       createdByEmail: 'test-2@hiveit.co.uk',
       updated: '',
-      expiry: '2024-02-02T10:00Z',
+      expires: '2024-02-02T10:00Z',
     },
     {
       id: 'token-id-3',
@@ -72,7 +72,7 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
       activates: '2024-03-01T10:00Z',
       createdByEmail: 'test-3@hiveit.co.uk',
       updated: '',
-      expiry: '2024-03-02T10:00Z',
+      expires: '2024-03-02T10:00Z',
     },
   ];
 

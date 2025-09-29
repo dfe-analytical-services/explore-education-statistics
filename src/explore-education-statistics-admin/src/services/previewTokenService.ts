@@ -6,7 +6,7 @@ export interface PreviewToken {
   status: 'Expired' | 'Active' | 'Pending';
   createdByEmail: string;
   activates: string;
-  expiry: string;
+  expires: string;
   updated: string;
 }
 

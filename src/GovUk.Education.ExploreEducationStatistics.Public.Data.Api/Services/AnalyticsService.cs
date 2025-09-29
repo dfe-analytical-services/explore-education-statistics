@@ -204,7 +204,7 @@ public class AnalyticsService(
             Label: previewToken.Label,
             DataSetVersionId: previewToken.DataSetVersionId,
             Created: previewToken.Created,
-            Expiry: previewToken.Expiry);
+            Expiry: previewToken.Expires);
     }
 
     /// <summary>

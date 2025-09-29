@@ -92,7 +92,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(PreviewTokenStatus.Active, viewModel.Status),
                 () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
-                () => viewModel.Expiry.AssertEqual(DateTimeOffset.UtcNow.AddDays(1)),
+                () => viewModel.Expires.AssertEqual(DateTimeOffset.UtcNow.AddDays(1)),
                 () => Assert.Null(viewModel.Updated)
             );
 
@@ -106,7 +106,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
                 () => Assert.Equal(CreatedByBauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => viewModel.Created.AssertUtcNow(),
-                () => viewModel.Expiry.AssertEqual(DateTimeOffset.UtcNow.AddDays(1)),
+                () => viewModel.Expires.AssertEqual(DateTimeOffset.UtcNow.AddDays(1)),
                 () => Assert.Null(actualPreviewToken.Updated)
             );
         }
@@ -309,8 +309,9 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 Label = previewToken.Label,
                 Status = PreviewTokenStatus.Active,
                 Created = previewToken.Created,
+                Activates = previewToken.Created,
                 CreatedByEmail = CreatedByBauUser.Email,
-                Expiry = previewToken.Expiry,
+                Expires = previewToken.Expires,
                 Updated = previewToken.Updated
             };
 
@@ -431,9 +432,10 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                     Id = pt.Id,
                     Label = pt.Label,
                     Status = pt.Status,
+                    Activates = pt.Activates,
                     Created = pt.Created,
                     CreatedByEmail = CreatedByBauUser.Email,
-                    Expiry = pt.Expiry,
+                    Expires = pt.Expires,
                     Updated = pt.Updated
                 })
                 .ToList();
@@ -629,7 +631,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(PreviewTokenStatus.Expired, viewModel.Status),
                 () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
                 () => Assert.Equal(previewToken.Created.TruncateNanoseconds(), viewModel.Created),
-                () => viewModel.Expiry.AssertUtcNow(),
+                () => viewModel.Expires.AssertUtcNow(),
                 () => viewModel.Updated.AssertUtcNow()
             );
 
@@ -640,7 +642,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 
             Assert.Multiple(
                 () => Assert.Equal(PreviewTokenStatus.Expired, actualPreviewToken.Status),
-                () => actualPreviewToken.Expiry.AssertUtcNow(),
+                () => actualPreviewToken.Expires.AssertUtcNow(),
                 () => actualPreviewToken.Updated.AssertUtcNow()
             );
         }
