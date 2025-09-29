@@ -113,6 +113,9 @@ public class DataBlock : ContentBlock
     private List<IChart> ChartsInternal { get; set; } = new();
 
     public TableBuilderConfiguration Table { get; set; }
+
+    [JsonIgnore]
+    public DataBlockVersion DataBlockVersion { get; set; } = null!;
 }
 
 [AttributeUsage(AttributeTargets.Field)]
