@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 /// <inheritdoc />
 public partial class EES6502_AddingNewColumnsToUsersTable : Migration
 {
-    private const string MigrationId = "20250916172054";
+    private const string MigrationId = "20250929113120";
 
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,7 +73,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             type: "nvarchar(450)",
             nullable: true);
 
-        // Migrate 'RoleId', 'Created' and 'CreatedById' values for existing Users
+        // Migrate 'Active', 'RoleId', 'Created' and 'CreatedById' values for existing Users.
+        // Also create the placeholder 'Deleted User' record.
         migrationBuilder.SqlFromFile(
             MigrationConstants.ContentMigrationsPath,
             $"{MigrationId}_{nameof(EES6502_AddingNewColumnsToUsersTable)}.sql");

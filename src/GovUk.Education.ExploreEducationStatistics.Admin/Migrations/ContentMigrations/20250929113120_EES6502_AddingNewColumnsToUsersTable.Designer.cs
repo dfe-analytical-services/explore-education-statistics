@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20250916172054_EES6502_AddingNewColumnsToUsersTable")]
+    [Migration("20250929113120_EES6502_AddingNewColumnsToUsersTable")]
     partial class EES6502_AddingNewColumnsToUsersTable
     {
         /// <inheritdoc />
@@ -159,9 +159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Caption")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Heading")
                         .HasColumnType("nvarchar(max)");
@@ -479,10 +476,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Caption")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
                     b.Property<Guid>("EducationInNumbersPageId")
                         .HasColumnType("uniqueidentifier");
 
@@ -499,6 +492,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("EducationInNumbersPageId");
 
                     b.ToTable("EinContentSections");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EinParentBlockId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EinParentBlockId");
+
+                    b.ToTable("EinTiles");
+
+                    b.HasDiscriminator<string>("Type").HasValue("EinTile");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EmbedBlock", b =>
@@ -1748,6 +1769,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasDiscriminator().HasValue("HtmlBlock");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTileGroupBlock", b =>
+                {
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentBlock");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.HasDiscriminator().HasValue("TileGroupBlock");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinFreeTextStatTile", b =>
+                {
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTile");
+
+                    b.Property<string>("LinkText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinkUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Statistic")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Trend")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("FreeTextStatTile");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticDataBlock", b =>
                 {
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatistic");
@@ -1947,6 +2004,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("EducationInNumbersPage");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTile", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTileGroupBlock", "EinParentBlock")
+                        .WithMany("Tiles")
+                        .HasForeignKey("EinParentBlockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EinParentBlock");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.FeaturedTable", b =>
@@ -2633,6 +2701,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
                 {
                     b.Navigation("Publications");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTileGroupBlock", b =>
+                {
+                    b.Navigation("Tiles");
                 });
 #pragma warning restore 612, 618
         }
