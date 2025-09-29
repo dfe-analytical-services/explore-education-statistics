@@ -803,6 +803,8 @@ public class ContentDbContext : DbContext
             .Property(v => v.Updated)
             .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
+        modelBuilder.Entity<DataBlockVersion>().HasOne(v => v.ContentBlock).WithOne(db => db.DataBlockVersion);
+
         // Automatically include the backing ContentBlock of type "DataBlock" whenever we retrieve
         // DataBlockVersions, as DataBlockVersions encapsulate their backing ContentBlocks and will replace them
         // entirely in EES-4640.
