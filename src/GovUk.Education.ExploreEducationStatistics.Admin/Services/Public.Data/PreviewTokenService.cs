@@ -38,7 +38,7 @@ public class PreviewTokenService(
                 {
                     DataSetVersionId = dataSetVersionId,
                     Label = label,
-                    Expiry = DateTimeOffset.UtcNow.AddDays(1),
+                    Expires = DateTimeOffset.UtcNow.AddDays(1),
                     CreatedByUserId = userService.GetUserId()
                 });
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -76,7 +76,7 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidatePreviewToken)
             .OnSuccess(async previewToken =>
             {
-                previewToken.Expiry = DateTimeOffset.UtcNow;
+                previewToken.Expires = DateTimeOffset.UtcNow;
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
                 return await MapPreviewToken(previewToken);
             });
@@ -130,7 +130,7 @@ public class PreviewTokenService(
         return await previewTokens
             .ToAsyncEnumerable()
             .SelectAwait(async pt => await MapPreviewToken(pt))
-            .OrderByDescending(pt => pt.Expiry)
+            .OrderByDescending(pt => pt.Expires)
             .ToListAsync(cancellationToken);
     }
 
@@ -148,7 +148,7 @@ public class PreviewTokenService(
             Status = previewToken.Status,
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
-            Expiry = previewToken.Expiry,
+            Expires = previewToken.Expires,
             Updated = previewToken.Updated
         };
     }
