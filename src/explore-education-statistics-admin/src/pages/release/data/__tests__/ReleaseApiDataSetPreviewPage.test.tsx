@@ -57,7 +57,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
     created: now.toISOString(),
     createdByEmail: 'test@gov.uk',
     updated: '',
-    expiry: addHours(now, 24).toISOString(),
+    expires: addHours(now, 24).toISOString(),
   };
 
   test('renders correctly', async () => {

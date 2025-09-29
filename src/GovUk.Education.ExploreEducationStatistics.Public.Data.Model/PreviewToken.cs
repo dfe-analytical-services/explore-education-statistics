@@ -20,12 +20,12 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset Created { get; set; }
 
-    public required DateTimeOffset Expiry { get; set; }
+    public required DateTimeOffset Expires { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
 
     public PreviewTokenStatus Status =>
-        DateTimeOffset.UtcNow > Expiry ? PreviewTokenStatus.Expired : PreviewTokenStatus.Active;
+        DateTimeOffset.UtcNow > Expires ? PreviewTokenStatus.Expired : PreviewTokenStatus.Active;
 
     internal class Config : IEntityTypeConfiguration<PreviewToken>
     {
