@@ -1,5 +1,7 @@
 import SectionBreak from '@common/components/SectionBreak';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ContactUsSection, {
+  contactUsNavItem,
+} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
   PublicationMethodologiesList,
@@ -14,7 +16,14 @@ import ReleasePageShell from '@frontend/modules/find-statistics/components/Relea
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import React, { useState } from 'react';
+
+const pageSectionIds = ['methodology-section', 'contact-us-section'] as const;
+type PageSectionId = (typeof pageSectionIds)[number];
+
+function isValidPageSectionId(value: string): value is PageSectionId {
+  return pageSectionIds.includes(value as PageSectionId);
+}
 
 interface Props {
   methodologiesSummary: PublicationMethodologiesList;
@@ -28,6 +37,9 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
   releaseVersionSummary,
 }) => {
   const { methodologies, externalMethodology } = methodologiesSummary;
+  const [activeSection, setActiveSection] = useState<PageSectionId>(
+    'methodology-section',
+  );
 
   const externalMethodologyAttributes = getUrlAttributes(
     externalMethodology?.url || '',
@@ -35,16 +47,32 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
 
   const hasMethodologies = methodologies.length > 0 || externalMethodology;
 
+  const navItems = [
+    hasMethodologies && { id: 'methodology-section', text: 'Methodology' },
+    contactUsNavItem,
+  ].filter(item => !!item);
+
+  const setActiveSectionIfValid = (sectionId: string) => {
+    if (isValidPageSectionId(sectionId)) {
+      setActiveSection(sectionId);
+    }
+  };
+
   return (
     <ReleasePageShell
       activePage="methodology"
       publicationSummary={publicationSummary}
       releaseVersionSummary={releaseVersionSummary}
     >
-      <ReleasePageLayout>
+      <ReleasePageLayout
+        activeSection={activeSection}
+        navItems={navItems}
+        onClickNavItem={setActiveSectionIfValid}
+        onChangeSection={setActiveSectionIfValid}
+      >
         {hasMethodologies && (
           <>
-            <section id="methodology-section">
+            <section id="methodology-section" data-page-section>
               <h2>Methodology</h2>
               <p>
                 Find out how and why we collect, process and publish these
