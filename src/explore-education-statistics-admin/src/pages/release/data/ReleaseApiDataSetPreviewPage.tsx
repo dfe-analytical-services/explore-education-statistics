@@ -16,6 +16,7 @@ import Modal from '@common/components/Modal';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
+import { PreviewTokenFormProps } from '@admin/pages/release/data/types/PreviewTokenFormProps';
 
 export default function ReleaseApiDataSetPreviewPage() {
   const history = useHistory();
@@ -33,22 +34,23 @@ export default function ReleaseApiDataSetPreviewPage() {
   function getPresetSpanEndDate(days: number) {
     const fromDate = new Date();
     fromDate.setHours(0, 0, 1);
-    const allowed = new Set([1, 2, 3, 4, 5, 6, 7]);
 
-    if (!Number.isFinite(days) || !allowed.has(days)) {
-      throw new Error(`valid days requested: ${days}`);
+    if (Number.isInteger(days) && days > 0 && days < 8) {
+      throw new Error(
+        `The number of days (${days}) selected is not allowed, please select between 1 to 7 days.`,
+      );
     }
 
     fromDate.setDate(fromDate.getDate() + days);
     return fromDate;
   }
 
-  const handleCreate = async (
-    label: string,
-    datePresetSpan: number,
-    activates?: Date | null,
-    expires?: Date | null,
-  ) => {
+  const handleCreate = async ({
+    label,
+    datePresetSpan,
+    activates,
+    expires,
+  }: PreviewTokenFormProps) => {
     let startDate: Date | null = null;
     let endDate: Date | null = null;
 

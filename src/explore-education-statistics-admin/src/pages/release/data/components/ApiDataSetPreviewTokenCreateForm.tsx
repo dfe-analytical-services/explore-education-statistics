@@ -1,3 +1,4 @@
+import { isSameDay, isBefore, isPast } from 'date-fns';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -16,6 +17,7 @@ import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { useAuthContext } from '@admin/contexts/AuthContext';
+import { PreviewTokenFormProps } from '@admin/pages/release/data/types/PreviewTokenFormProps';
 
 interface FormValues {
   agreeTerms: boolean;
@@ -28,12 +30,7 @@ interface FormValues {
 
 interface Props {
   onCancel: () => void;
-  onSubmit: (
-    label: string,
-    datePresetSpan: number,
-    activates?: Date | null,
-    expires?: Date | null,
-  ) => void;
+  onSubmit: (values: PreviewTokenFormProps) => void;
 }
 
 const presetOptions: RadioOption[] = [
@@ -65,7 +62,6 @@ export default function ApiDataSetPreviewTokenCreateForm({
     );
     return startMidnight <= endMidnight;
   };
-  const showInline = true;
   const { user } = useAuthContext();
   const isBau = user?.permissions.isBauUser;
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -98,9 +94,8 @@ export default function ApiDataSetPreviewTokenCreateForm({
               name: 'not-in-past',
               message: 'Activates date must not be in the past',
               test(value) {
-                if (value == null) return true;
-                const now = new Date();
-                return endDateIsLaterThanOrEqualToStartDate(now, value);
+                if (value == null) return false;
+                return isPast(value);
               },
             })
             .test({
@@ -111,7 +106,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 const now = new Date();
                 const maxDate = new Date();
                 maxDate.setDate(now.getDate() + 7);
-                return endDateIsLaterThanOrEqualToStartDate(value, maxDate);
+                return isSameDay(value, maxDate) || isBefore(value, maxDate);
               },
             }),
       }),
@@ -152,18 +147,21 @@ export default function ApiDataSetPreviewTokenCreateForm({
           <Form
             id="apiDataSetTokenCreateForm"
             onSubmit={values =>
-              onSubmit(
-                values.label,
-                values.selectionMethod === 'presetDays'
-                  ? values.datePresetSpan
-                  : undefined,
-                values.selectionMethod === 'customDates'
-                  ? values.activates
-                  : undefined,
-                values.selectionMethod === 'customDates'
-                  ? values.expires
-                  : undefined,
-              )
+              onSubmit({
+                label: values.label,
+                datePresetSpan:
+                  values.selectionMethod === 'presetDays'
+                    ? values.datePresetSpan
+                    : null,
+                activates:
+                  values.selectionMethod === 'customDates'
+                    ? values.activates
+                    : null,
+                expires:
+                  values.selectionMethod === 'customDates'
+                    ? values.expires
+                    : null,
+              })
             }
           >
             <FormFieldTextInput<FormValues>
@@ -186,7 +184,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                         <FormFieldRadioGroup<FormValues>
                           legend="Select a duration"
                           legendSize="s"
-                          inline={showInline}
+                          inline
                           name="datePresetSpan"
                           options={presetOptions}
                         />

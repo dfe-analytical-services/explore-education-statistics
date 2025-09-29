@@ -87,8 +87,6 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
             </thead>
             <tbody>
               {previewTokens.map(token => {
-                const pendingOrExpired =
-                  token.status === 'Pending' ? 'yellow' : 'grey';
                 return (
                   <tr key={token.id}>
                     <td>{token.label}</td>
@@ -99,11 +97,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                       </FormattedDate>
                     </td>
                     <td>
-                      <Tag
-                        colour={
-                          token.status === 'Active' ? 'green' : pendingOrExpired
-                        }
-                      >
+                      <Tag colour={getTokenStatusColour(token.status)}>
                         {token.status}
                       </Tag>
                     </td>
@@ -172,4 +166,16 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
       </LoadingSpinner>
     </>
   );
+}
+function getTokenStatusColour(status: string) {
+  switch (status) {
+    case 'Active':
+      return 'green';
+    case 'Pending':
+      return 'yellow';
+    case 'Expired':
+      return 'grey';
+    default:
+      return 'grey';
+  }
 }
