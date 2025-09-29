@@ -31,7 +31,7 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
         get
         {
             var now = DateTimeOffset.UtcNow;
-            return now >= Expires ? PreviewTokenStatus.Expired :
+            return now >= Expiry ? PreviewTokenStatus.Expired :
                 now < Activates ? PreviewTokenStatus.Pending : PreviewTokenStatus.Active;
         }
     }

@@ -17,26 +17,23 @@ public record PreviewTokenCreateRequest
     {
         public Validator()
         {
-            When(request => request.Activates.HasValue && request.Expires.HasValue, () =>
-            {
-                var utcNow = DateTimeOffset.UtcNow;
+            var utcNow = DateTimeOffset.UtcNow;
 
-                RuleFor(request => request.Activates!.Value)
-                    .Must(created => IsLessThanOrEqualEndDate(utcNow, created)
-                                     && created <= utcNow.AddDays(7))
-                    .WithMessage("Created date must be within the next 7 days.");
-                RuleFor(request => request.Expires!.Value)
-                    .Must((request, expires) =>
-                    {
-                        var activates = request.Activates!.Value;
-                        var sevenDaysFromCreated = activates.AddDays(7);
+            RuleFor(request => request.Activates!.Value)
+                .Must(created => IsLessThanOrEqualEndDate(utcNow, created)
+                                 && created <= utcNow.AddDays(7))
+                .WithMessage("Created date must be within the next 7 days.");
+            RuleFor(request => request.Expires!.Value)
+                .Must((request, expires) =>
+                {
+                    var activates = request.Activates!.Value;
+                    var sevenDaysFromCreated = activates.AddDays(7);
 
-                        var expiresIsWithin7DaysFromCreated = IsLessThanOrEqualEndDate(expires, sevenDaysFromCreated);
-                        var createdIsBeforeExpires = IsLessThanOrEqualEndDate(activates, expires);
-                        return expiresIsWithin7DaysFromCreated && createdIsBeforeExpires;
-                    })
-                    .WithMessage("Expires date must be no more than 7 days after the created date.");
-            });
+                    var expiresIsWithin7DaysFromCreated = IsLessThanOrEqualEndDate(expires, sevenDaysFromCreated);
+                    var createdIsBeforeExpires = IsLessThanOrEqualEndDate(activates, expires);
+                    return expiresIsWithin7DaysFromCreated && createdIsBeforeExpires;
+                })
+                .WithMessage("Expires date must be no more than 7 days after the created date.");
 
             RuleFor(request => request.DataSetVersionId)
                 .NotEmpty();

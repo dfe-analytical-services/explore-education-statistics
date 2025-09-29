@@ -41,7 +41,7 @@ public class PreviewTokenService(
                     DataSetVersionId = dataSetVersionId,
                     Label = label,
                     Created = DateTimeOffset.UtcNow,
-                    Activates = activates,
+                    Activates = activates ?? DateTimeOffset.UtcNow,
                     Expiry = expiry ?? DateTimeOffset.UtcNow.AddDays(1),
                     CreatedByUserId = userService.GetUserId()
                 });
@@ -152,7 +152,7 @@ public class PreviewTokenService(
             Status = previewToken.Status,
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
-            Activates = previewToken.Activates ?? previewToken.Created,
+            Activates = previewToken.Activates,
             Expiry = previewToken.Expiry,
             Updated = previewToken.Updated
         };
