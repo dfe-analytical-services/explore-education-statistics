@@ -640,6 +640,14 @@ Because the `.editorconfig` file is attached to the solution, both Rider and Vis
 The easiest way is probably through an IDE, configured as per the step above. Most IDEs can format single files if you right-click it in the explorer.
 Failing that, the faffier harder way is to pass an `--include <PATH>` argument to `dotnet format` on the command line, providing it the files you want it to format.
 
+You can install dotnet format using:
+
+```sh
+dotnet tool restore
+```
+
+This installs the version stated in `.config/dotnet-tools.json`
+
 #### How do I run the formatter manually?
 
 You can perform the same check as the pre-commit hooks / GitHubs actions do and receive a report by running the following command from the repository root:
