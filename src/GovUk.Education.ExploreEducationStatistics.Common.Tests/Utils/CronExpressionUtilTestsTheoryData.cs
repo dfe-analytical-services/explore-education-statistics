@@ -41,30 +41,34 @@ public class CronExpressionUtilTestsTheoryData
     /// the next occurrence of the Cron expression in the UTC time zone, expected results remain in UTC (+00:00).
     /// </para>
     /// </remarks>
-    public static readonly TheoryData<DateTimeOffset, DateTimeOffset, string, TimeZoneInfo, string>
-        UtcTimeZoneTestData =
-            new()
-            {
-            // @formatter:off
-            { Dt("2025-01-01T00:00:00 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", Utc, "Beginning of scheduled day" },
-            { Dt("2025-01-01T08:30:00 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour before schedule" },
-            { Dt("2025-01-01T09:29:59 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", Utc, "One second before schedule" },
-            { Dt("2025-01-01T09:30:00 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "On the schedule" },
-            { Dt("2025-01-01T09:30:01 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "One second after schedule" },
-            { Dt("2025-01-01T10:30:00 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour after schedule" },
-            { Dt("2025-01-01T23:59:59 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "End of scheduled day" },
-            { Dt("2025-03-30T00:00:00 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour before BST starts" },
-            { Dt("2025-03-30T00:59:59 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One second before BST starts" },
-            { Dt("2025-03-30T01:00:00 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "BST started" },
-            { Dt("2025-03-30T01:00:01 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One second after BST started" },
-            { Dt("2025-03-30T02:00:00 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour after BST started" },
-            { Dt("2025-10-26T00:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour before BST ends" },
-            { Dt("2025-10-26T00:59:59 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One second before BST ends" },
-            { Dt("2025-10-26T01:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "BST ended" },
-            { Dt("2025-10-26T01:00:01 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One second after BST ended" },
-            { Dt("2025-10-26T02:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour after BST ended" }
-            // @formatter:on
-            };
+    public static readonly TheoryData<
+        DateTimeOffset,
+        DateTimeOffset,
+        string,
+        TimeZoneInfo,
+        string
+    > UtcTimeZoneTestData = new()
+    {
+        // csharpier-ignore-start
+        { Dt("2025-01-01T00:00:00 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", Utc, "Beginning of scheduled day" },
+        { Dt("2025-01-01T08:30:00 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour before schedule" },
+        { Dt("2025-01-01T09:29:59 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", Utc, "One second before schedule" },
+        { Dt("2025-01-01T09:30:00 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "On the schedule" },
+        { Dt("2025-01-01T09:30:01 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "One second after schedule" },
+        { Dt("2025-01-01T10:30:00 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour after schedule" },
+        { Dt("2025-01-01T23:59:59 +00:00"), Dt("2025-01-02T09:30:00 +00:00"), "30 9 * * *", Utc, "End of scheduled day" },
+        { Dt("2025-03-30T00:00:00 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour before BST starts" },
+        { Dt("2025-03-30T00:59:59 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One second before BST starts" },
+        { Dt("2025-03-30T01:00:00 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "BST started" },
+        { Dt("2025-03-30T01:00:01 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One second after BST started" },
+        { Dt("2025-03-30T02:00:00 +00:00"), Dt("2025-03-30T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour after BST started" },
+        { Dt("2025-10-26T00:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour before BST ends" },
+        { Dt("2025-10-26T00:59:59 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One second before BST ends" },
+        { Dt("2025-10-26T01:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "BST ended" },
+        { Dt("2025-10-26T01:00:01 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One second after BST ended" },
+        { Dt("2025-10-26T02:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", Utc, "One hour after BST ended" }
+        // csharpier-ignore-end
+    };
 
     /// <summary>
     /// Test data to verify calculating the next occurrence of a Cron expression in the UK time zone.
@@ -105,7 +109,7 @@ public class CronExpressionUtilTestsTheoryData
     public static readonly TheoryData<DateTimeOffset, DateTimeOffset, string, TimeZoneInfo, string> UkTimeZoneTestData =
         new()
         {
-            // @formatter:off
+            // csharpier-ignore-start
             { Dt("2025-01-01T00:00:00 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", UkTimeZone, "Beginning of scheduled day" },
             { Dt("2025-01-01T08:30:00 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", UkTimeZone, "One hour before schedule" },
             { Dt("2025-01-01T09:29:59 +00:00"), Dt("2025-01-01T09:30:00 +00:00"), "30 9 * * *", UkTimeZone, "One second before schedule" },
@@ -128,7 +132,7 @@ public class CronExpressionUtilTestsTheoryData
             { Dt("2025-10-26T01:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", UkTimeZone, "BST ended" },
             { Dt("2025-10-26T01:00:01 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", UkTimeZone, "One second after BST ended" },
             { Dt("2025-10-26T02:00:00 +00:00"), Dt("2025-10-26T09:30:00 +00:00"), "30 9 * * *", UkTimeZone, "One hour after BST ended" }
-            // @formatter:on
+            // csharpier-ignore-end
         };
 
     private static DateTimeOffset Dt(string input)
