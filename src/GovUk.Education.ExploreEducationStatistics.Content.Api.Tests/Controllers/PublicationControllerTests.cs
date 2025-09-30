@@ -21,14 +21,15 @@ public class PublicationControllerTests
 
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication("publication-a"))
-            .ReturnsAsync(new PublicationCacheViewModel
-            {
-                Id = publicationId,
-                Title = "Test title",
-            });
+        publicationCacheService
+            .Setup(mock => mock.GetPublication("publication-a"))
+            .ReturnsAsync(
+                new PublicationCacheViewModel { Id = publicationId, Title = "Test title" }
+            );
 
-        var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
+        var controller = BuildPublicationController(
+            publicationCacheService: publicationCacheService.Object
+        );
 
         var result = await controller.GetPublicationTitle("publication-a");
 
@@ -45,10 +46,13 @@ public class PublicationControllerTests
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication("missing-publication"))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication("missing-publication"))
             .ReturnsAsync(new NotFoundResult());
 
-        var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
+        var controller = BuildPublicationController(
+            publicationCacheService: publicationCacheService.Object
+        );
 
         var result = await controller.GetPublicationTitle("missing-publication");
 
@@ -62,20 +66,15 @@ public class PublicationControllerTests
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
+        var controller = BuildPublicationController(
+            publicationCacheService: publicationCacheService.Object
+        );
 
         publicationCacheService
             .Setup(s => s.GetPublicationTree(PublicationTreeFilter.DataCatalogue))
-            .ReturnsAsync(new List<PublicationTreeThemeViewModel>
-            {
-                new()
-                {
-                    Publications =
-                    [
-                        new()
-                    ]
-                }
-            });
+            .ReturnsAsync(
+                new List<PublicationTreeThemeViewModel> { new() { Publications = [new()] } }
+            );
 
         var result = await controller.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 

@@ -13,113 +13,126 @@ public class AdminEventRaiserMockBuilder
     private readonly Mock<IAdminEventRaiser> _mock = new(MockBehavior.Strict);
     private readonly List<InvokeArguments> _invocations = [];
 
-    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnReleaseSlugChanged =
-        m => m.OnReleaseSlugChanged(
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnReleaseSlugChanged = m =>
+        m.OnReleaseSlugChanged(
             It.IsAny<Guid>(),
             It.IsAny<string>(),
             It.IsAny<Guid>(),
             It.IsAny<string>(),
-            It.IsAny<bool>());
+            It.IsAny<bool>()
+        );
 
-    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationArchived =
-        m => m.OnPublicationArchived(
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationArchived = m =>
+        m.OnPublicationArchived(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid>());
+
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationChanged = m =>
+        m.OnPublicationChanged(It.IsAny<Publication>());
+
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationDeleted = m =>
+        m.OnPublicationDeleted(
             It.IsAny<Guid>(),
             It.IsAny<string>(),
-            It.IsAny<Guid>());
+            It.IsAny<LatestPublishedReleaseInfo?>()
+        );
 
-    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationChanged =
-        m => m.OnPublicationChanged(It.IsAny<Publication>());
-
-    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationDeleted =
-        m => m.OnPublicationDeleted(
-            It.IsAny<Guid>(),
-            It.IsAny<string>(),
-            It.IsAny<LatestPublishedReleaseInfo?>());
-
-    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationLatestPublishedReleaseReordered =
-        m => m.OnPublicationLatestPublishedReleaseReordered(
+    private static readonly Expression<
+        Func<IAdminEventRaiser, Task>
+    > OnPublicationLatestPublishedReleaseReordered = m =>
+        m.OnPublicationLatestPublishedReleaseReordered(
             It.IsAny<Publication>(),
             It.IsAny<Guid>(),
             It.IsAny<Guid>()
-            );
+        );
 
-    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationRestored =
-        m => m.OnPublicationRestored(
-            It.IsAny<Guid>(),
-            It.IsAny<string>(),
-            It.IsAny<Guid>());
+    private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationRestored = m =>
+        m.OnPublicationRestored(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid>());
 
     public IAdminEventRaiser Build() => _mock.Object;
 
     public AdminEventRaiserMockBuilder()
     {
-        _mock
-            .Setup(m => m.OnThemeUpdated(It.IsAny<Theme>()))
-            .Returns(Task.CompletedTask);
+        _mock.Setup(m => m.OnThemeUpdated(It.IsAny<Theme>())).Returns(Task.CompletedTask);
+
+        _mock.Setup(OnReleaseSlugChanged).Returns(Task.CompletedTask);
+
+        _mock.Setup(OnPublicationArchived).Returns(Task.CompletedTask);
+
+        _mock.Setup(OnPublicationChanged).Returns(Task.CompletedTask);
+
+        _mock.Setup(OnPublicationDeleted).Returns(Task.CompletedTask);
 
         _mock
-            .Setup(OnReleaseSlugChanged)
-            .Returns(Task.CompletedTask);
-
-        _mock
-            .Setup(OnPublicationArchived)
-            .Returns(Task.CompletedTask);
-
-        _mock
-            .Setup(OnPublicationChanged)
-            .Returns(Task.CompletedTask);
-
-        _mock
-            .Setup(OnPublicationDeleted)
-            .Returns(Task.CompletedTask);
-
-        _mock
-            .Setup(m => m.OnPublicationLatestPublishedReleaseReordered(
-                It.IsAny<Publication>(),
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>()))
-            .Callback((
-                    Publication publication, 
+            .Setup(m =>
+                m.OnPublicationLatestPublishedReleaseReordered(
+                    It.IsAny<Publication>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()
+                )
+            )
+            .Callback(
+                (
+                    Publication publication,
                     Guid oldLatestPublishedReleaseId,
-                    Guid oldLatestPublishedReleaseVersionId) =>
-                _invocations
-                    .Add(new InvokeArguments(
-                        publication, 
-                        oldLatestPublishedReleaseId,
-                        oldLatestPublishedReleaseVersionId)))
+                    Guid oldLatestPublishedReleaseVersionId
+                ) =>
+                    _invocations.Add(
+                        new InvokeArguments(
+                            publication,
+                            oldLatestPublishedReleaseId,
+                            oldLatestPublishedReleaseVersionId
+                        )
+                    )
+            )
             .Returns(Task.CompletedTask);
 
-        _mock
-            .Setup(OnPublicationRestored)
-            .Returns(Task.CompletedTask);
+        _mock.Setup(OnPublicationRestored).Returns(Task.CompletedTask);
     }
 
     private record InvokeArguments(
-        Publication Publication, 
+        Publication Publication,
         Guid OldLatestPublishedReleaseId,
-        Guid OldLatestPublishedReleaseVersionId)
-    {
-    }
+        Guid OldLatestPublishedReleaseVersionId
+    ) { }
 
     public class Asserter(AdminEventRaiserMockBuilder mockBuilder)
     {
         public void OnThemeUpdatedWasRaised(Func<Theme, bool>? predicate = null) =>
-            mockBuilder._mock.Verify(m => m.OnThemeUpdated(It.Is<Theme>(t => predicate == null || predicate(t))),
-                Times.Once);
+            mockBuilder._mock.Verify(
+                m => m.OnThemeUpdated(It.Is<Theme>(t => predicate == null || predicate(t))),
+                Times.Once
+            );
 
         public void OnReleaseSlugChangedWasRaised(
             Guid? expectedReleaseId = null,
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
             string? expectedPublicationSlug = null,
-            bool? expectedIsPublicationArchived = null) => 
-            mockBuilder._mock.Verify(m => m.OnReleaseSlugChanged(
-                    It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId), 
-                    It.Is<string>(newReleaseSlug => expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug), 
-                    It.Is<Guid>(publicationId => expectedPublicationId == null || publicationId == expectedPublicationId), 
-                    It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug),
-                    It.Is<bool>(isPublicationArchived => expectedIsPublicationArchived == null || isPublicationArchived == expectedIsPublicationArchived)),
-                Times.Once);
+            bool? expectedIsPublicationArchived = null
+        ) =>
+            mockBuilder._mock.Verify(
+                m =>
+                    m.OnReleaseSlugChanged(
+                        It.Is<Guid>(releaseId =>
+                            expectedReleaseId == null || releaseId == expectedReleaseId
+                        ),
+                        It.Is<string>(newReleaseSlug =>
+                            expectedNewReleaseSlug == null
+                            || newReleaseSlug == expectedNewReleaseSlug
+                        ),
+                        It.Is<Guid>(publicationId =>
+                            expectedPublicationId == null || publicationId == expectedPublicationId
+                        ),
+                        It.Is<string>(publicationSlug =>
+                            expectedPublicationSlug == null
+                            || publicationSlug == expectedPublicationSlug
+                        ),
+                        It.Is<bool>(isPublicationArchived =>
+                            expectedIsPublicationArchived == null
+                            || isPublicationArchived == expectedIsPublicationArchived
+                        )
+                    ),
+                Times.Once
+            );
 
         public void OnReleaseSlugChangedWasNotRaised() =>
             mockBuilder._mock.Verify(OnReleaseSlugChanged, Times.Never);
@@ -127,12 +140,21 @@ public class AdminEventRaiserMockBuilder
         public void OnPublicationArchivedWasRaised(
             Guid? publicationId = null,
             string? publicationSlug = null,
-            Guid? supersededByPublicationId = null) =>
-            mockBuilder._mock.Verify(m => m.OnPublicationArchived(
-                    It.Is<Guid>(actual => publicationId == null || actual == publicationId),
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<Guid>(actual => supersededByPublicationId == null || actual == supersededByPublicationId)),
-                Times.Once);
+            Guid? supersededByPublicationId = null
+        ) =>
+            mockBuilder._mock.Verify(
+                m =>
+                    m.OnPublicationArchived(
+                        It.Is<Guid>(actual => publicationId == null || actual == publicationId),
+                        It.Is<string>(actual =>
+                            publicationSlug == null || actual == publicationSlug
+                        ),
+                        It.Is<Guid>(actual =>
+                            supersededByPublicationId == null || actual == supersededByPublicationId
+                        )
+                    ),
+                Times.Once
+            );
 
         public void OnPublicationArchivedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationArchived, Times.Never);
@@ -144,16 +166,24 @@ public class AdminEventRaiserMockBuilder
                 publication.Slug,
                 publication.Title,
                 publication.Summary,
-                publication.IsArchived());
+                publication.IsArchived()
+            );
 
-            mockBuilder._mock.Verify(m => m.OnPublicationChanged(It.Is<Publication>(p =>
-                    new PublicationChangedEvent(
-                        p.Id,
-                        p.Slug,
-                        p.Title,
-                        p.Summary,
-                        p.IsArchived()) == expectedEvent)),
-                Times.Once);
+            mockBuilder._mock.Verify(
+                m =>
+                    m.OnPublicationChanged(
+                        It.Is<Publication>(p =>
+                            new PublicationChangedEvent(
+                                p.Id,
+                                p.Slug,
+                                p.Title,
+                                p.Summary,
+                                p.IsArchived()
+                            ) == expectedEvent
+                        )
+                    ),
+                Times.Once
+            );
         }
 
         private void OnPublicationChangedWasNotRaised() =>
@@ -162,13 +192,21 @@ public class AdminEventRaiserMockBuilder
         public void OnPublicationDeletedWasRaised(
             Guid? publicationId = null,
             string? publicationSlug = null,
-            LatestPublishedReleaseInfo? latestPublishedRelease = null) =>
-            mockBuilder._mock.Verify(m => m.OnPublicationDeleted(
-                    It.Is<Guid>(actual => publicationId == null || actual == publicationId),
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<LatestPublishedReleaseInfo?>(actual =>
-                        latestPublishedRelease == null || actual == latestPublishedRelease)),
-                Times.Once);
+            LatestPublishedReleaseInfo? latestPublishedRelease = null
+        ) =>
+            mockBuilder._mock.Verify(
+                m =>
+                    m.OnPublicationDeleted(
+                        It.Is<Guid>(actual => publicationId == null || actual == publicationId),
+                        It.Is<string>(actual =>
+                            publicationSlug == null || actual == publicationSlug
+                        ),
+                        It.Is<LatestPublishedReleaseInfo?>(actual =>
+                            latestPublishedRelease == null || actual == latestPublishedRelease
+                        )
+                    ),
+                Times.Once
+            );
 
         private void OnPublicationDeletedWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationDeleted, Times.Never);
@@ -176,17 +214,23 @@ public class AdminEventRaiserMockBuilder
         public void OnPublicationLatestPublishedReleaseReorderedWasRaised(
             Publication publication,
             Guid previousReleaseId,
-            Guid previousReleaseVersionId)
+            Guid previousReleaseVersionId
+        )
         {
             var expectedEvent = new PublicationLatestPublishedReleaseReorderedEvent(
                 publication.Id,
                 publication.Title,
                 publication.Slug,
-                publication.LatestPublishedReleaseVersion?.ReleaseId ?? throw new ArgumentException("Publication does not have latest published release version child object.", nameof(publication)),
+                publication.LatestPublishedReleaseVersion?.ReleaseId
+                    ?? throw new ArgumentException(
+                        "Publication does not have latest published release version child object.",
+                        nameof(publication)
+                    ),
                 publication.LatestPublishedReleaseVersionId!.Value,
                 previousReleaseId,
                 previousReleaseVersionId,
-                publication.IsArchived());
+                publication.IsArchived()
+            );
 
             Xunit.Assert.Single(
                 mockBuilder._invocations,
@@ -199,8 +243,9 @@ public class AdminEventRaiserMockBuilder
                         inv.Publication.LatestPublishedReleaseVersionId!.Value,
                         inv.OldLatestPublishedReleaseId,
                         inv.OldLatestPublishedReleaseVersionId,
-                        inv.Publication.IsArchived())
-                    == expectedEvent);
+                        inv.Publication.IsArchived()
+                    ) == expectedEvent
+            );
         }
 
         private void OnPublicationLatestPublishedReleaseReorderedWasNotRaised() =>
@@ -209,13 +254,22 @@ public class AdminEventRaiserMockBuilder
         public void OnPublicationRestoredWasRaised(
             Guid? publicationId = null,
             string? publicationSlug = null,
-            Guid? previousSupersededByPublicationId = null) =>
-            mockBuilder._mock.Verify(m => m.OnPublicationRestored(
-                    It.Is<Guid>(actual => publicationId == null || actual == publicationId),
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<Guid>(actual =>
-                        previousSupersededByPublicationId == null || actual == previousSupersededByPublicationId)),
-                Times.Once);
+            Guid? previousSupersededByPublicationId = null
+        ) =>
+            mockBuilder._mock.Verify(
+                m =>
+                    m.OnPublicationRestored(
+                        It.Is<Guid>(actual => publicationId == null || actual == publicationId),
+                        It.Is<string>(actual =>
+                            publicationSlug == null || actual == publicationSlug
+                        ),
+                        It.Is<Guid>(actual =>
+                            previousSupersededByPublicationId == null
+                            || actual == previousSupersededByPublicationId
+                        )
+                    ),
+                Times.Once
+            );
 
         public void OnPublicationRestoredWasNotRaised() =>
             mockBuilder._mock.Verify(OnPublicationRestored, Times.Never);

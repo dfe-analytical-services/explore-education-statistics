@@ -10,5 +10,6 @@ public interface IMethodologyApprovalService
 {
     Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
         Guid methodologyVersionId,
-        MethodologyApprovalUpdateRequest request);
+        MethodologyApprovalUpdateRequest request
+    );
 }

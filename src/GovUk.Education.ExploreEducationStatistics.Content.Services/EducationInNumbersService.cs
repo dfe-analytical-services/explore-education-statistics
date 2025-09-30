@@ -9,12 +9,13 @@ using static GovUk.Education.ExploreEducationStatistics.Content.ViewModels.Educa
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class EducationInNumbersService(ContentDbContext contentDbContext) : IEducationInNumbersService
+public class EducationInNumbersService(ContentDbContext contentDbContext)
+    : IEducationInNumbersService
 {
     public async Task<Either<ActionResult, List<EinNavItemViewModel>>> ListEinPages()
     {
-        var uniqueSlugs = contentDbContext.EducationInNumbersPages
-            .Where(page => page.Published != null)
+        var uniqueSlugs = contentDbContext
+            .EducationInNumbersPages.Where(page => page.Published != null)
             .Select(page => page.Slug)
             .Distinct()
             .ToList();
@@ -22,8 +23,8 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
         var latestPages = new List<EinNavItemViewModel>();
         foreach (var slug in uniqueSlugs)
         {
-            var latestPage = await contentDbContext.EducationInNumbersPages
-                .Where(page => page.Slug == slug && page.Published != null)
+            var latestPage = await contentDbContext
+                .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
                 .OrderByDescending(page => page.Version)
                 .Select(page => EinNavItemViewModel.FromModel(page))
                 .FirstAsync();
@@ -31,15 +32,13 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
             latestPages.Add(latestPage);
         }
 
-        return latestPages
-            .OrderBy(page => page.Order)
-            .ToList();
+        return latestPages.OrderBy(page => page.Order).ToList();
     }
 
     public async Task<Either<ActionResult, EinPageViewModel>> GetEinPage(string? slug)
     {
-        return await contentDbContext.EducationInNumbersPages
-            .Include(page => page.Content)
+        return await contentDbContext
+            .EducationInNumbersPages.Include(page => page.Content)
             .ThenInclude(section => section.Content)
             .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .Where(page => page.Slug == slug && page.Published != null)

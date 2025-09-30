@@ -54,10 +54,11 @@ public static class ValidationMessages
         Message: $"Type must be one of the following values: {MappingType.ManualMapped}, {MappingType.ManualNone}"
     );
 
-    public static readonly LocalizableMessage CandidateKeyMustBeSpecifiedWithMappedMappingType = new(
-        Code: nameof(CandidateKeyMustBeSpecifiedWithMappedMappingType),
-        Message: $"Value must be specified if type is {nameof(MappingType.ManualMapped)}"
-    );
+    public static readonly LocalizableMessage CandidateKeyMustBeSpecifiedWithMappedMappingType =
+        new(
+            Code: nameof(CandidateKeyMustBeSpecifiedWithMappedMappingType),
+            Message: $"Value must be specified if type is {nameof(MappingType.ManualMapped)}"
+        );
 
     public static readonly LocalizableMessage CandidateKeyMustBeEmptyWithNoneMappingType = new(
         Code: nameof(CandidateKeyMustBeEmptyWithNoneMappingType),
@@ -214,7 +215,9 @@ public static class ValidationMessages
         Message: "In dataset_names.csv, all file names should be unique. Duplicate file name: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(string duplicate)
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(
+        string duplicate
+    )
     {
         return new ErrorViewModel
         {
@@ -230,11 +233,7 @@ public static class ValidationMessages
 
     public static ErrorViewModel GenerateErrorFileIsNull()
     {
-        return new ErrorViewModel
-        {
-            Code = FileIsNull.Code,
-            Message = FileIsNull.Message,
-        };
+        return new ErrorViewModel { Code = FileIsNull.Code, Message = FileIsNull.Message };
     }
 
     public static readonly LocalizableMessage DataReplacementAlreadyInProgress = new(
@@ -256,9 +255,7 @@ public static class ValidationMessages
         Message: "Title '{0}' must be {1} characters or fewer"
     );
 
-    public static ErrorViewModel GenerateErrorDataSetTitleTooLong(
-        string title,
-        int maxLength)
+    public static ErrorViewModel GenerateErrorDataSetTitleTooLong(string title, int maxLength)
     {
         return new ErrorViewModel
         {
@@ -291,7 +288,10 @@ public static class ValidationMessages
         return new ErrorViewModel
         {
             Code = ZipContainsUnusedFiles.Code,
-            Message = string.Format(ZipContainsUnusedFiles.Message, unusedFileNames.JoinToString(",")),
+            Message = string.Format(
+                ZipContainsUnusedFiles.Message,
+                unusedFileNames.JoinToString(",")
+            ),
         };
     }
 
@@ -390,12 +390,17 @@ public static class ValidationMessages
         Message: "Data set title '{0}' should not contain special characters"
     );
 
-    public static ErrorViewModel GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(string fileName)
+    public static ErrorViewModel GenerateErrorDataSetTitleShouldNotContainSpecialCharacters(
+        string fileName
+    )
     {
         return new ErrorViewModel
         {
             Code = DataSetTitleShouldNotContainSpecialCharacters.Code,
-            Message = string.Format(DataSetTitleShouldNotContainSpecialCharacters.Message, fileName),
+            Message = string.Format(
+                DataSetTitleShouldNotContainSpecialCharacters.Message,
+                fileName
+            ),
         };
     }
 
@@ -426,12 +431,12 @@ public static class ValidationMessages
             Message = string.Format(CannotReplaceDraftApiDataSet.Message, title),
         };
     }
-    
+
     public static readonly LocalizableMessage CannotCreateMultipleDraftApiDataSet = new(
         Code: nameof(CannotCreateMultipleDraftApiDataSet),
-        Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set." +
-                 " There is a draft API version which is not published. Multiple draft API versions at the same time are not permitted in the system." +
-                 " Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this action."
+        Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set."
+            + " There is a draft API version which is not published. Multiple draft API versions at the same time are not permitted in the system."
+            + " Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this action."
     );
 
     public static ErrorViewModel GenerateErrorCannotCreateMultipleDraftApiDataSet(string title)

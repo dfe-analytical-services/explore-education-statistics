@@ -15,9 +15,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
-    public class GetStatusesForReleaseVersionTests(TestApplicationFactory testApp) : DataSetVersionServiceTests(testApp)
+    public class GetStatusesForReleaseVersionTests(TestApplicationFactory testApp)
+        : DataSetVersionServiceTests(testApp)
     {
         /// <summary>
         /// Test that each DataSetVersion status is reported correctly.
@@ -38,8 +40,7 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
         {
             var unrelatedReleaseVersion = Guid.NewGuid();
 
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseFile dataFile = DataFixture
                 .DefaultReleaseFile()
@@ -47,13 +48,11 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
                 .WithReleaseVersion(releaseVersion);
 
             DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1,
-                    indicators: 1,
-                    locations: 1,
-                    timePeriods: 2)
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(dataFile.Id))
+                .WithRelease(
+                    DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(dataFile.Id)
+                )
                 .WithStatus(DataSetVersionStatus.Processing);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -62,7 +61,8 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             });
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.Add(dataSetVersion));
+                context.DataSetVersions.Add(dataSetVersion)
+            );
 
             var service = TestApp.Services.GetRequiredService<IDataSetVersionService>();
 
@@ -71,8 +71,7 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
 
         private async Task AssertDataSetVersionStatusReturnedOk(DataSetVersionStatus status)
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseFile dataFile = DataFixture
                 .DefaultReleaseFile()
@@ -80,13 +79,11 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
                 .WithReleaseVersion(releaseVersion);
 
             DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1,
-                    indicators: 1,
-                    locations: 1,
-                    timePeriods: 2)
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(dataFile.Id))
+                .WithRelease(
+                    DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(dataFile.Id)
+                )
                 .WithStatus(status);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -95,11 +92,14 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             });
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.Add(dataSetVersion));
+                context.DataSetVersions.Add(dataSetVersion)
+            );
 
             var service = TestApp.Services.GetRequiredService<IDataSetVersionService>();
 
-            var statusSummary = Assert.Single(await service.GetStatusesForReleaseVersion(dataFile.ReleaseVersionId));
+            var statusSummary = Assert.Single(
+                await service.GetStatusesForReleaseVersion(dataFile.ReleaseVersionId)
+            );
             Assert.Equal(dataSetVersion.Id, statusSummary.Id);
             Assert.Equal(dataSetVersion.DataSet.Title, statusSummary.Title);
             Assert.Equal(status, statusSummary.Status);
@@ -112,9 +112,11 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
-                .WithRelease(DataFixture.DefaultRelease()
-                    .WithPublication(DataFixture.DefaultPublication()));
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication())
+                );
 
             var (releaseDataFile1, releaseDataFile2) = DataFixture
                 .DefaultReleaseFile()
@@ -131,18 +133,24 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             DataSetVersion dataSetVersion1 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseDataFile1.Id)
-                    .WithSlug(releaseVersion.Release.Slug)
-                    .WithTitle(releaseVersion.Release.Title));
+                .WithRelease(
+                    DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseDataFile1.Id)
+                        .WithSlug(releaseVersion.Release.Slug)
+                        .WithTitle(releaseVersion.Release.Title)
+                );
 
             DataSetVersion dataSetVersion2 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseDataFile2.Id)
-                    .WithSlug(releaseVersion.Release.Slug)
-                    .WithTitle(releaseVersion.Release.Title));
+                .WithRelease(
+                    DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseDataFile2.Id)
+                        .WithSlug(releaseVersion.Release.Slug)
+                        .WithTitle(releaseVersion.Release.Title)
+                );
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -157,35 +165,42 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             await service.UpdateVersionsForReleaseVersion(
                 releaseVersion.Id,
                 releaseSlug: updatedReleaseSlug,
-                releaseTitle: updatedReleaseTitle);
+                releaseTitle: updatedReleaseTitle
+            );
 
             await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
 
-            var actualDataSetVersions = await publicDataDbContext.DataSetVersions
-                .AsNoTracking()
+            var actualDataSetVersions = await publicDataDbContext
+                .DataSetVersions.AsNoTracking()
                 .ToListAsync();
 
             Assert.Equal(2, actualDataSetVersions.Count);
 
-            Assert.All(actualDataSetVersions,
+            Assert.All(
+                actualDataSetVersions,
                 [UsedImplicitly]
                 (dataSetVersion) =>
                 {
                     Assert.Equal(updatedReleaseSlug, dataSetVersion.Release.Slug);
                     Assert.Equal(updatedReleaseTitle, dataSetVersion.Release.Title);
-                });
+                }
+            );
         }
 
         [Fact]
         public async Task UnrelatedDataSetVersionsAreNotUpdated()
         {
-            ReleaseVersion releaseVersion1 = DataFixture.DefaultReleaseVersion()
-                .WithRelease(DataFixture.DefaultRelease()
-                    .WithPublication(DataFixture.DefaultPublication()));
+            ReleaseVersion releaseVersion1 = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication())
+                );
 
-            ReleaseVersion releaseVersion2 = DataFixture.DefaultReleaseVersion()
-                .WithRelease(DataFixture.DefaultRelease()
-                    .WithPublication(DataFixture.DefaultPublication()));
+            ReleaseVersion releaseVersion2 = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication())
+                );
 
             ReleaseFile releaseVersion1DataFile = DataFixture
                 .DefaultReleaseFile()
@@ -206,18 +221,24 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             DataSetVersion dataSetVersion1 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseVersion1DataFile.Id)
-                    .WithSlug(releaseVersion1.Release.Slug)
-                    .WithTitle(releaseVersion1.Release.Title));
+                .WithRelease(
+                    DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseVersion1DataFile.Id)
+                        .WithSlug(releaseVersion1.Release.Slug)
+                        .WithTitle(releaseVersion1.Release.Title)
+                );
 
             DataSetVersion dataSetVersion2 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseVersion2DataFile.Id)
-                    .WithSlug(releaseVersion2.Release.Slug)
-                    .WithTitle(releaseVersion2.Release.Title));
+                .WithRelease(
+                    DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseVersion2DataFile.Id)
+                        .WithSlug(releaseVersion2.Release.Slug)
+                        .WithTitle(releaseVersion2.Release.Title)
+                );
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -232,20 +253,21 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             await service.UpdateVersionsForReleaseVersion(
                 releaseVersion1.Id,
                 releaseSlug: updatedReleaseSlug,
-                releaseTitle: updatedReleaseTitle);
+                releaseTitle: updatedReleaseTitle
+            );
 
             await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
 
-            var actualDataSetVersion1 = await publicDataDbContext.DataSetVersions
-                .AsNoTracking()
+            var actualDataSetVersion1 = await publicDataDbContext
+                .DataSetVersions.AsNoTracking()
                 .SingleAsync(dsv => dsv.Id == dataSetVersion1.Id);
 
             Assert.Equal(updatedReleaseSlug, actualDataSetVersion1.Release.Slug);
             Assert.Equal(updatedReleaseTitle, actualDataSetVersion1.Release.Title);
 
             // Assert that the data set version unrelated to the release version has not been updated
-            var actualDataSetVersion2 = await publicDataDbContext.DataSetVersions
-                .AsNoTracking()
+            var actualDataSetVersion2 = await publicDataDbContext
+                .DataSetVersions.AsNoTracking()
                 .SingleAsync(dsv => dsv.Id == dataSetVersion2.Id);
 
             Assert.Equal(releaseVersion2.Release.Slug, actualDataSetVersion2.Release.Slug);

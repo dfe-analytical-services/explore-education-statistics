@@ -7,7 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 
 public class TimeIdentifierJsonConverter : JsonConverter<TimeIdentifier?>
 {
-    public override void WriteJson(JsonWriter writer, TimeIdentifier? value, JsonSerializer serializer)
+    public override void WriteJson(
+        JsonWriter writer,
+        TimeIdentifier? value,
+        JsonSerializer serializer
+    )
     {
         writer.WriteStartObject();
         writer.WritePropertyName("value");
@@ -17,14 +21,19 @@ public class TimeIdentifierJsonConverter : JsonConverter<TimeIdentifier?>
         writer.WriteEndObject();
     }
 
-    public override TimeIdentifier? ReadJson(JsonReader reader, Type objectType, TimeIdentifier? existingValue,
+    public override TimeIdentifier? ReadJson(
+        JsonReader reader,
+        Type objectType,
+        TimeIdentifier? existingValue,
         bool hasExistingValue,
-        JsonSerializer serializer)
+        JsonSerializer serializer
+    )
     {
-        if (reader.TokenType == JsonToken.Null) return null;
+        if (reader.TokenType == JsonToken.Null)
+            return null;
 
         var jsonValue = JObject.Load(reader).GetValue("value").Value<string>();
-        var timeIdentifiers = ((TimeIdentifier[]) Enum.GetValues(typeof(TimeIdentifier)));
+        var timeIdentifiers = ((TimeIdentifier[])Enum.GetValues(typeof(TimeIdentifier)));
         return timeIdentifiers.First(identifier => identifier.GetEnumValue() == jsonValue);
     }
 }

@@ -19,10 +19,7 @@ public class MethodologyContentServicePermissionTests
     [Fact]
     public async Task GetContent()
     {
-        var methodologyVersion = new MethodologyVersion
-        {
-            Methodology = new Methodology()
-        };
+        var methodologyVersion = new MethodologyVersion { Methodology = new Methodology() };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -33,18 +30,22 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanViewSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanViewSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.GetContent(methodologyVersion.Id);
-                    });
+                    return methodologyContentService.GetContent(methodologyVersion.Id);
+                });
         }
     }
-    
+
     [Fact]
     public async Task GetContentBlocks()
     {
@@ -59,15 +60,21 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanViewSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanViewSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.GetContentBlocks<ContentBlock>(methodologyVersion.Id);
-                    });
+                    return methodologyContentService.GetContentBlocks<ContentBlock>(
+                        methodologyVersion.Id
+                    );
+                });
         }
     }
 
@@ -76,12 +83,10 @@ public class MethodologyContentServicePermissionTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
-                Content = new List<ContentSection>
-                {
-                    new()
-                }
-            }
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = new List<ContentSection> { new() },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -93,19 +98,25 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanViewSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanViewSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.GetContentSection(methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id);
-                    });
+                    return methodologyContentService.GetContentSection(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id
+                    );
+                });
         }
     }
-    
+
     [Fact]
     public async Task ReorderContentSections()
     {
@@ -120,16 +131,22 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.ReorderContentSections(methodologyVersion.Id,
-                            new Dictionary<Guid, int>());
-                    });
+                    return methodologyContentService.ReorderContentSections(
+                        methodologyVersion.Id,
+                        new Dictionary<Guid, int>()
+                    );
+                });
         }
     }
 
@@ -147,18 +164,23 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.AddContentSection(
-                            methodologyVersion.Id,
-                            new ContentSectionAddRequest(),
-                            MethodologyContentService.ContentListType.Content);
-                    });
+                    return methodologyContentService.AddContentSection(
+                        methodologyVersion.Id,
+                        new ContentSectionAddRequest(),
+                        MethodologyContentService.ContentListType.Content
+                    );
+                });
         }
     }
 
@@ -167,12 +189,10 @@ public class MethodologyContentServicePermissionTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
-                Content = new List<ContentSection>
-                {
-                    new()
-                }
-            }
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = new List<ContentSection> { new() },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -184,18 +204,23 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.UpdateContentSectionHeading(
-                            methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id,
-                            "New heading");
-                    });
+                    return methodologyContentService.UpdateContentSectionHeading(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id,
+                        "New heading"
+                    );
+                });
         }
     }
 
@@ -204,12 +229,10 @@ public class MethodologyContentServicePermissionTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
-                Content = new List<ContentSection>
-                {
-                    new()
-                }
-            }
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = new List<ContentSection> { new() },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -221,31 +244,34 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.RemoveContentSection(
-                            methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id);
-                    });
+                    return methodologyContentService.RemoveContentSection(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id
+                    );
+                });
         }
     }
-    
+
     [Fact]
     public async Task ReorderContentBlocks()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
-                Content = new List<ContentSection>
-                {
-                    new()
-                }
-            }
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = new List<ContentSection> { new() },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -257,36 +283,35 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.ReorderContentBlocks(
-                            methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id,
-                            new Dictionary<Guid, int>()
-                        );
-                    });
+                    return methodologyContentService.ReorderContentBlocks(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id,
+                        new Dictionary<Guid, int>()
+                    );
+                });
         }
     }
-    
+
     [Fact]
     public async Task AddContentBlock()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
-                Content = new List<ContentSection>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            }   
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = new List<ContentSection> { new() { Id = Guid.NewGuid() } },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -298,39 +323,38 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.AddContentBlock(
-                            methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id,
-                            new ContentBlockAddRequest()
-                        );
-                    });
+                    return methodologyContentService.AddContentBlock(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id,
+                        new ContentBlockAddRequest()
+                    );
+                });
         }
     }
-    
+
     [Fact]
     public async Task RemoveContentBlock()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Content = new List<ContentBlock>
-                        {
-                            new HtmlBlock()
-                        }
-                    }
-                }
-            }
+                    new() { Content = new List<ContentBlock> { new HtmlBlock() } },
+                },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -342,39 +366,38 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.RemoveContentBlock(
-                            methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id,
-                            methodologyVersion.MethodologyContent.Content.First().Content.First().Id
-                        );
-                    });
+                    return methodologyContentService.RemoveContentBlock(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id,
+                        methodologyVersion.MethodologyContent.Content.First().Content.First().Id
+                    );
+                });
         }
     }
-    
+
     [Fact]
     public async Task UpdateTextBasedContentBlock()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
-                    new()
-                    {
-                        Content = new List<ContentBlock>
-                        {
-                            new HtmlBlock()
-                        }
-                    }
-                }
-            }
+                    new() { Content = new List<ContentBlock> { new HtmlBlock() } },
+                },
+            },
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -386,27 +409,32 @@ public class MethodologyContentServicePermissionTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(m => m.Id == methodologyVersion.Id,
-                    CanUpdateSpecificMethodology)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
+                .SetupResourceCheckToFailWithMatcher<MethodologyVersion>(
+                    m => m.Id == methodologyVersion.Id,
+                    CanUpdateSpecificMethodology
+                )
+                .AssertForbidden(userService =>
+                {
+                    var methodologyContentService = SetupMethodologyContentService(
+                        contentDbContext,
+                        userService: userService.Object
+                    );
 
-                        return methodologyContentService.UpdateTextBasedContentBlock(
-                            methodologyVersion.Id,
-                            methodologyVersion.MethodologyContent.Content.First().Id,
-                            methodologyVersion.MethodologyContent.Content.First().Content.First().Id,
-                            new ContentBlockUpdateRequest()
-                        );
-                    });
+                    return methodologyContentService.UpdateTextBasedContentBlock(
+                        methodologyVersion.Id,
+                        methodologyVersion.MethodologyContent.Content.First().Id,
+                        methodologyVersion.MethodologyContent.Content.First().Content.First().Id,
+                        new ContentBlockUpdateRequest()
+                    );
+                });
         }
     }
-    
+
     private static MethodologyContentService SetupMethodologyContentService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             contentDbContext,

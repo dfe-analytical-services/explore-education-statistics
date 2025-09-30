@@ -24,7 +24,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
     private static readonly MethodologyVersion MethodologyVersion = new()
     {
         Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid()
+        MethodologyId = Guid.NewGuid(),
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -39,24 +39,21 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                Status = Approved
+                Status = Approved,
             };
 
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var (
-                    handler,
-                    _,
-                    _,
-                    _) = CreateHandlerAndDependencies();
+                var (handler, _, _, _) = CreateHandlerAndDependencies();
 
                 var user = DataFixture
                     .AuthenticatedUser(userId: UserId)
                     .WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                        (user, methodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    UpdateSpecificMethodologyRequirement,
+                    MethodologyVersion
+                >(user, methodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -77,10 +74,10 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                     methodologyRepository,
                     userPublicationRoleRepository,
                     userReleaseRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
@@ -99,16 +96,18 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    UpdateSpecificMethodologyRequirement,
+                    MethodologyVersion
+                >(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
                 VerifyAllMocks(
                     methodologyRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
             });
@@ -120,8 +119,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
         {
-            var expectedReleaseRolesToPass =
-                ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
+            var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
 
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
@@ -130,10 +128,10 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                     methodologyRepository,
                     userPublicationRoleRepository,
                     userReleaseRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
@@ -146,18 +144,23 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    UpdateSpecificMethodologyRequirement,
+                    MethodologyVersion
+                >(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository);
+                    userReleaseRoleRepository
+                );
 
-                Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
+                Assert.Equal(
+                    expectedReleaseRolesToPass.Contains(releaseRole),
+                    authContext.HasSucceeded
+                );
             });
         }
 
@@ -169,10 +172,10 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 methodologyRepository,
                 userPublicationRoleRepository,
                 userReleaseRoleRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -185,16 +188,18 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                UpdateSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
             VerifyAllMocks(
                 methodologyRepository,
                 userPublicationRoleRepository,
-                userReleaseRoleRepository);
+                userReleaseRoleRepository
+            );
 
             Assert.False(authContext.HasSucceeded);
         }
@@ -205,8 +210,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
         Mock<IMethodologyRepository>,
         Mock<IUserPublicationRoleRepository>,
         Mock<IUserReleaseRoleRepository>
-        )
-        CreateHandlerAndDependencies()
+    ) CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -218,7 +222,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 userReleaseRoleRepository.Object,
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict))
+                Mock.Of<IPreReleaseService>(Strict)
+            )
         );
 
         return (

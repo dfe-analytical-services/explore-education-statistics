@@ -5,12 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 public interface IPreviewTokenService
 {
     Task<PreviewToken?> GetPreviewTokenFromRequest();
-    
+
     Task<bool> ValidatePreviewTokenForDataSet(
         Guid dataSetId,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     Task<bool> ValidatePreviewTokenForDataSetVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

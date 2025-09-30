@@ -14,7 +14,7 @@ public static class FileExtensions
         Chart,
         Data,
         Image,
-        DataGuidance
+        DataGuidance,
     };
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
@@ -24,7 +24,7 @@ public static class FileExtensions
         Kb,
         Mb,
         Gb,
-        Tb
+        Tb,
     }
 
     public static string DisplaySize(this File file)
@@ -58,7 +58,11 @@ public static class FileExtensions
     {
         if (!PublicFileTypes.Contains(file.Type))
         {
-            throw new ArgumentOutOfRangeException(nameof(file.Type), file.Type, "Cannot create public path for file type");
+            throw new ArgumentOutOfRangeException(
+                nameof(file.Type),
+                file.Type,
+                "Cannot create public path for file type"
+            );
         }
 
         // Public release files are located in blob storage under the latest release version in path /<releaseVersionId>/<type>/<fileId>.

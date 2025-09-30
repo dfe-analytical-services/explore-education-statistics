@@ -9,7 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 public static class ClaimsPrincipalGeneratorExtensions
 {
-    public static Generator<ClaimsPrincipal> VerifiedButNotAuthorizedByIdentityProviderUser(this DataFixture fixture)
+    public static Generator<ClaimsPrincipal> VerifiedButNotAuthorizedByIdentityProviderUser(
+        this DataFixture fixture
+    )
     {
         return fixture
             .Generator<ClaimsPrincipal>()
@@ -17,7 +19,9 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithScope("some-other-scope");
     }
 
-    public static Generator<ClaimsPrincipal> VerifiedByIdentityProviderUser(this DataFixture fixture)
+    public static Generator<ClaimsPrincipal> VerifiedByIdentityProviderUser(
+        this DataFixture fixture
+    )
     {
         return fixture
             .Generator<ClaimsPrincipal>()
@@ -27,7 +31,8 @@ public static class ClaimsPrincipalGeneratorExtensions
 
     public static Generator<ClaimsPrincipal> AuthenticatedUser(
         this DataFixture fixture,
-        Guid userId = default)
+        Guid userId = default
+    )
     {
         return fixture
             .Generator<ClaimsPrincipal>()
@@ -36,21 +41,19 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString());
     }
 
-    public static Generator<ClaimsPrincipal> BauUser(
-        this DataFixture fixture)
+    public static Generator<ClaimsPrincipal> BauUser(this DataFixture fixture)
     {
         return fixture
             .Generator<ClaimsPrincipal>()
             .WithId(Guid.NewGuid())
             .WithRole(GlobalRoles.RoleNames.BauUser)
             .WithScope(SecurityScopes.AccessAdminApiScope)
-            .ForInstance(s => EnumUtil
-                .GetEnums<SecurityClaimTypes>()
-                .ForEach(c => s.AddClaim(c.ToString())));
+            .ForInstance(s =>
+                EnumUtil.GetEnums<SecurityClaimTypes>().ForEach(c => s.AddClaim(c.ToString()))
+            );
     }
 
-    public static Generator<ClaimsPrincipal> AnalystUser(
-        this DataFixture fixture)
+    public static Generator<ClaimsPrincipal> AnalystUser(this DataFixture fixture)
     {
         return fixture
             .Generator<ClaimsPrincipal>()
@@ -63,8 +66,7 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString());
     }
 
-    public static Generator<ClaimsPrincipal> PreReleaseUser(
-        this DataFixture fixture)
+    public static Generator<ClaimsPrincipal> PreReleaseUser(this DataFixture fixture)
     {
         return fixture
             .Generator<ClaimsPrincipal>()
@@ -75,6 +77,8 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString());
     }
 
-    public static Generator<ClaimsPrincipal> WithId(this Generator<ClaimsPrincipal> generator, Guid userId)
-        => generator.ForInstance(p => p.AddClaim(EesClaimTypes.LocalUserId, userId.ToString()));
+    public static Generator<ClaimsPrincipal> WithId(
+        this Generator<ClaimsPrincipal> generator,
+        Guid userId
+    ) => generator.ForInstance(p => p.AddClaim(EesClaimTypes.LocalUserId, userId.ToString()));
 }

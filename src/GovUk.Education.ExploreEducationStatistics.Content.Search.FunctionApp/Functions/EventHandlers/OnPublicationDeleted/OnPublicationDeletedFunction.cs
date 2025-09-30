@@ -12,8 +12,12 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
     [QueueOutput("%RemoveSearchableDocumentQueueName%")]
     public async Task<RemoveSearchableDocumentDto[]> OnPublicationDeleted(
         [QueueTrigger("%PublicationDeletedQueueName%")] EventGridEvent eventDto,
-        FunctionContext context) =>
-        await eventGridEventHandler.Handle<PublicationDeletedEventDto, RemoveSearchableDocumentDto[]>(
+        FunctionContext context
+    ) =>
+        await eventGridEventHandler.Handle<
+            PublicationDeletedEventDto,
+            RemoveSearchableDocumentDto[]
+        >(
             context,
             eventDto,
             (payload, _) =>
@@ -23,8 +27,10 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
                         [
                             new RemoveSearchableDocumentDto
                             {
-                                ReleaseId = payload.LatestPublishedRelease.LatestPublishedReleaseId
-                            }
+                                ReleaseId = payload.LatestPublishedRelease.LatestPublishedReleaseId,
+                            },
                         ]
-                        : []));
+                        : []
+                )
+        );
 }

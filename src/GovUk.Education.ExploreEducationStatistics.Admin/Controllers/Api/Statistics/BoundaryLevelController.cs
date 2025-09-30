@@ -15,8 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 [Route("api")]
 [ApiController]
 [Authorize(Roles = RoleNames.BauUser)]
-public class BoundaryLevelController(
-    IBoundaryLevelService boundaryLevelService) : ControllerBase
+public class BoundaryLevelController(IBoundaryLevelService boundaryLevelService) : ControllerBase
 {
     [HttpGet("boundary-level")]
     public async Task<ActionResult<List<BoundaryLevelViewModel>>> ListBoundaryLevels()
@@ -46,7 +45,8 @@ public class BoundaryLevelController(
 
     [HttpPost("boundary-level")]
     public async Task<ActionResult<Unit>> CreateBoundaryLevel(
-        [FromForm] BoundaryLevelCreateRequest request)
+        [FromForm] BoundaryLevelCreateRequest request
+    )
     {
         return await boundaryLevelService
             .CreateBoundaryLevel(request.Level, request.Label, request.Published, request.File)

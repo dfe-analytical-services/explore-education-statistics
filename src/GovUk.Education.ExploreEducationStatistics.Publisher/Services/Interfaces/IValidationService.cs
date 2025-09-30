@@ -7,5 +7,7 @@ public interface IValidationService
 {
     Task<bool> ValidatePublishingState(Guid releaseVersionId);
 
-    Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(Guid releaseVersionId);
+    Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(
+        Guid releaseVersionId
+    );
 }

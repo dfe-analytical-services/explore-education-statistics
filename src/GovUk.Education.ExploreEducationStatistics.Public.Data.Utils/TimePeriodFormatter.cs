@@ -6,7 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 public static partial class TimePeriodFormatter
 {
-    [GeneratedRegex(@"^[0-9]{4}(\/[0-9]{4})?$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
+    [GeneratedRegex(
+        @"^[0-9]{4}(\/[0-9]{4})?$",
+        RegexOptions.Compiled,
+        matchTimeoutMilliseconds: 200
+    )]
     private static partial Regex PeriodRegexGenerated();
 
     private static readonly Regex PeriodRegex = PeriodRegexGenerated();

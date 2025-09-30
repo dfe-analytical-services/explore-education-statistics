@@ -6,29 +6,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 
 public class PublicApiPublicationCallsProcessor(
     IAnalyticsPathResolver pathResolver,
-    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow
+) : IRequestFileProcessor
 {
     private static readonly string[] PublicApiPublicationSubPath = ["public-api", "publications"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiPublicationSubPath);
-    public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiPublicationSubPath);
-    
+    public string ReportsDirectory =>
+        pathResolver.BuildReportsDirectory(PublicApiPublicationSubPath);
+
     public Task Process()
     {
-        return workflow.Process(new WorkflowActor(
-            sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));
+        return workflow.Process(
+            new WorkflowActor(sourceDirectory: SourceDirectory, reportsDirectory: ReportsDirectory)
+        );
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : DirectJsonCopyWorkflowActorBase(
             sourceDirectory: sourceDirectory,
             reportsDirectory: reportsDirectory,
-            reportFilenamePart: "publications")
+            reportFilenamePart: "publications"
+        )
     {
         public override async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE sourceTable (
                     publicationId UUID,
                     publicationTitle VARCHAR,
@@ -36,7 +40,8 @@ public class PublicApiPublicationCallsProcessor(
                     startTime DATETIME,
                     type VARCHAR
                 );
-            ");
+            "
+            );
         }
     }
 }

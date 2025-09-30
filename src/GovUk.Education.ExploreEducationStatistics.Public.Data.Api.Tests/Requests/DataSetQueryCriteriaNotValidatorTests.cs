@@ -11,12 +11,10 @@ public class DataSetQueryCriteriaNotValidatorTests
     [Fact]
     public void Null_Failure()
     {
-        var query = new DataSetQueryCriteriaNot
-        {
-            Not = null!
-        };
+        var query = new DataSetQueryCriteriaNot { Not = null! };
 
-        _validator.TestValidate(query)
+        _validator
+            .TestValidate(query)
             .ShouldHaveValidationErrorFor("Not")
             .WithErrorCode(FluentValidationKeys.NotNullValidator)
             .Only();
@@ -29,10 +27,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         {
             Not = new DataSetQueryCriteriaFacets
             {
-                Filters = new DataSetQueryCriteriaFilters
-                {
-                    Eq = "12345"
-                },
+                Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
             },
         };
 
@@ -46,32 +41,19 @@ public class DataSetQueryCriteriaNotValidatorTests
         {
             Not = new DataSetQueryCriteriaFacets
             {
-                Filters = new DataSetQueryCriteriaFilters
-                {
-                    Eq = ""
-                },
+                Filters = new DataSetQueryCriteriaFilters { Eq = "" },
             },
         };
 
-        _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("Not.Filters.Eq")
-            .Only();
+        _validator.TestValidate(query).ShouldHaveValidationErrorFor("Not.Filters.Eq").Only();
     }
 
     [Fact]
     public void Condition_Empty_Failure()
     {
-        var query = new DataSetQueryCriteriaNot
-        {
-            Not = new DataSetQueryCriteriaOr
-            {
-                Or = [],
-            },
-        };
+        var query = new DataSetQueryCriteriaNot { Not = new DataSetQueryCriteriaOr { Or = [] } };
 
-        _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("Not.Or")
-            .Only();
+        _validator.TestValidate(query).ShouldHaveValidationErrorFor("Not.Or").Only();
     }
 
     [Fact]
@@ -85,10 +67,7 @@ public class DataSetQueryCriteriaNotValidatorTests
                 [
                     new DataSetQueryCriteriaFacets
                     {
-                        Filters = new DataSetQueryCriteriaFilters
-                        {
-                            Eq = "12345"
-                        },
+                        Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                     },
                 ],
             },
@@ -108,18 +87,13 @@ public class DataSetQueryCriteriaNotValidatorTests
                 [
                     new DataSetQueryCriteriaFacets
                     {
-                        Filters = new DataSetQueryCriteriaFilters
-                        {
-                            Eq = new string('x', 11)
-                        },
+                        Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                     },
                 ],
             },
         };
 
-        _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("Not.Or[0].Filters.Eq")
-            .Only();
+        _validator.TestValidate(query).ShouldHaveValidationErrorFor("Not.Or[0].Filters.Eq").Only();
     }
 
     [Fact]
@@ -133,16 +107,13 @@ public class DataSetQueryCriteriaNotValidatorTests
                 [
                     new DataSetQueryCriteriaFacets
                     {
-                        Filters = new DataSetQueryCriteriaFilters
-                        {
-                            Eq = "12345"
-                        },
+                        Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                     },
                     new DataSetQueryCriteriaFacets
                     {
                         TimePeriods = new DataSetQueryCriteriaTimePeriods
                         {
-                            Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" }
+                            Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" },
                         },
                     },
                 ],
@@ -163,16 +134,13 @@ public class DataSetQueryCriteriaNotValidatorTests
                 [
                     new DataSetQueryCriteriaFacets
                     {
-                        Filters = new DataSetQueryCriteriaFilters
-                        {
-                            Eq = new string('x', 11)
-                        },
+                        Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                     },
                     new DataSetQueryCriteriaFacets
                     {
                         TimePeriods = new DataSetQueryCriteriaTimePeriods
                         {
-                            Gte = new DataSetQueryTimePeriod { Period = "", Code = "AY" }
+                            Gte = new DataSetQueryTimePeriod { Period = "", Code = "AY" },
                         },
                     },
                 ],
@@ -196,17 +164,13 @@ public class DataSetQueryCriteriaNotValidatorTests
             {
                 Not = new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetQueryCriteriaFilters
-                    {
-                        Eq = "12345"
-                    },
+                    Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                 },
             },
         };
 
         _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
     }
-
 
     [Fact]
     public void Not_SingleFacets_Failure()
@@ -217,17 +181,12 @@ public class DataSetQueryCriteriaNotValidatorTests
             {
                 Not = new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetQueryCriteriaFilters
-                    {
-                        Eq = new string('x', 11)
-                    },
+                    Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                 },
             },
         };
 
-        _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("Not.Not.Filters.Eq")
-            .Only();
+        _validator.TestValidate(query).ShouldHaveValidationErrorFor("Not.Not.Filters.Eq").Only();
     }
 
     [Fact]
@@ -243,14 +202,11 @@ public class DataSetQueryCriteriaNotValidatorTests
                     {
                         Not = new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = "12345"
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                         },
                     },
                 ],
-            }
+            },
         };
 
         _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
@@ -269,17 +225,15 @@ public class DataSetQueryCriteriaNotValidatorTests
                     {
                         Not = new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = new string('x', 11)
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                         },
                     },
                 ],
-            }
+            },
         };
 
-        _validator.TestValidate(query)
+        _validator
+            .TestValidate(query)
             .ShouldHaveValidationErrorFor("Not.And[0].Not.Filters.Eq")
             .Only();
     }

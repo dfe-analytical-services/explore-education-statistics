@@ -10,10 +10,13 @@ public class ReleaseRepository(ContentDbContext contentDbContext) : IReleaseRepo
 {
     public async Task<List<Release>> ListPublishedReleases(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var publication = await contentDbContext.Publications
-            .SingleAsync(p => p.Id == publicationId, cancellationToken: cancellationToken);
+        var publication = await contentDbContext.Publications.SingleAsync(
+            p => p.Id == publicationId,
+            cancellationToken: cancellationToken
+        );
 
         var publicationReleaseSeriesReleaseIds = publication.ReleaseSeries.ReleaseIds();
 
@@ -21,15 +24,15 @@ public class ReleaseRepository(ContentDbContext contentDbContext) : IReleaseRepo
             .Select((releaseId, index) => (releaseId, index))
             .ToDictionary(tuple => tuple.releaseId, tuple => tuple.index);
 
-        return (await QueryPublishedReleases(publicationId)
-                .ToListAsync(cancellationToken))
+        return (await QueryPublishedReleases(publicationId).ToListAsync(cancellationToken))
             .OrderBy(r => releaseIdIndexMap[r.Id])
             .ToList();
     }
 
     public async Task<List<Guid>> ListPublishedReleaseIds(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await QueryPublishedReleases(publicationId)
             .Select(r => r.Id)
@@ -40,8 +43,8 @@ public class ReleaseRepository(ContentDbContext contentDbContext) : IReleaseRepo
     {
         // For simplicity, we only query releases that have ANY version that has been published.
         // In future this may need to change if release versions can be recalled/unpublished.
-        return contentDbContext.Releases
-            .Where(r => r.PublicationId == publicationId)
+        return contentDbContext
+            .Releases.Where(r => r.PublicationId == publicationId)
             .Where(r => r.Versions.Any(rv => rv.Published != null));
     }
 }

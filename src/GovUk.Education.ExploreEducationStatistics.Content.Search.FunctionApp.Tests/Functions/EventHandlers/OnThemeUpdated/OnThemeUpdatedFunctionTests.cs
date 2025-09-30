@@ -10,11 +10,12 @@ public class OnThemeUpdatedFunctionTests
 {
     private readonly ContentApiClientMockBuilder _contentApiMockBuilder = new();
 
-    private OnThemeUpdatedFunction GetSut() => new(
-        new EventGridEventHandler(new NullLogger<EventGridEventHandler>()),
-        _contentApiMockBuilder.Build(),
-        new NullLogger<OnThemeUpdatedFunction>()
-    );
+    private OnThemeUpdatedFunction GetSut() =>
+        new(
+            new EventGridEventHandler(new NullLogger<EventGridEventHandler>()),
+            _contentApiMockBuilder.Build(),
+            new NullLogger<OnThemeUpdatedFunction>()
+        );
 
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
@@ -24,30 +25,34 @@ public class OnThemeUpdatedFunctionTests
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(10)]
-    public async Task GivenEvent_WhenThemeContainsNPublications_ThenNMessagesReturned(int numberOfPublications)
+    public async Task GivenEvent_WhenThemeContainsNPublications_ThenNMessagesReturned(
+        int numberOfPublications
+    )
     {
         // ARRANGE
         var themeId = Guid.NewGuid();
-        var eventDto = new EventGridEventBuilder()
-            .WithSubject(themeId.ToString())
-            .Build();
+        var eventDto = new EventGridEventBuilder().WithSubject(themeId.ToString()).Build();
         var sut = GetSut();
-        var publications = Enumerable.Range(0, numberOfPublications)
+        var publications = Enumerable
+            .Range(0, numberOfPublications)
             .Select(i => new PublicationInfo
             {
                 PublicationSlug = $"publication-slug-{i}",
-                LatestReleaseSlug = $"release-slug-{i}"
+                LatestReleaseSlug = $"release-slug-{i}",
             })
             .ToArray();
-        
+
         _contentApiMockBuilder.WhereThemeHasPublications(publications);
-        
+
         // ACT
         var response = await sut.OnThemeUpdated(eventDto, new FunctionContextMockBuilder().Build());
 
         // ASSERT
         _contentApiMockBuilder.Assert.PublicationsRequestedForThemeId(themeId);
         Assert.Equal(numberOfPublications, response.Length);
-        Assert.Equal(publications.Select(p => p.PublicationSlug), response.Select(message => message.PublicationSlug));
+        Assert.Equal(
+            publications.Select(p => p.PublicationSlug),
+            response.Select(message => message.PublicationSlug)
+        );
     }
 }

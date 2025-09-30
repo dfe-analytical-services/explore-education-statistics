@@ -24,15 +24,18 @@ public class FileStorageService : IFileStorageService
         // table storage in favour of a database table, so we won't need this leasing
         // mechanism in the near future anyway.
         // TODO: Remove this in favour of database table for locking (EES-1232)
-        var client = new BlobServiceClient(_publisherStorageConnectionString, new BlobClientOptions
-        {
-            Retry =
+        var client = new BlobServiceClient(
+            _publisherStorageConnectionString,
+            new BlobClientOptions
             {
-                Mode = RetryMode.Fixed,
-                Delay = TimeSpan.FromSeconds(5),
-                MaxRetries = 5
+                Retry =
+                {
+                    Mode = RetryMode.Fixed,
+                    Delay = TimeSpan.FromSeconds(5),
+                    MaxRetries = 5,
+                },
             }
-        });
+        );
 
         var blobContainer = client.GetBlobContainerClient(PublisherLeases.Name);
         await blobContainer.CreateIfNotExistsAsync();

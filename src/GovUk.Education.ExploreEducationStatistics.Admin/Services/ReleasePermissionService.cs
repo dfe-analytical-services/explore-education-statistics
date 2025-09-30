@@ -13,54 +13,67 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Con
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-
 public class ReleasePermissionService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IReleaseVersionRepository releaseVersionRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
-    IUserService userService) : IReleasePermissionService
+    IUserService userService
+) : IReleasePermissionService
 {
-    public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-        ListReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude = null)
+    public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>> ListReleaseRoles(
+        Guid releaseVersionId,
+        ReleaseRole[]? rolesToInclude = null
+    )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                query => query.Include(rv => rv.Publication))
-            .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
+            .CheckEntityExists<ReleaseVersion>(
+                releaseVersionId,
+                query => query.Include(rv => rv.Publication)
+            )
+            .OnSuccessDo(releaseVersion =>
+                userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication)
+            )
             .OnSuccess(async _ =>
             {
-                var users = await userReleaseRoleRepository
-                    .ListUserReleaseRoles(releaseVersionId, rolesToInclude);
+                var users = await userReleaseRoleRepository.ListUserReleaseRoles(
+                    releaseVersionId,
+                    rolesToInclude
+                );
 
                 return users
-                    .Select(userReleaseRole =>
-                        new UserReleaseRoleSummaryViewModel(
-                            userReleaseRole.UserId,
-                            userReleaseRole.User.DisplayName,
-                            userReleaseRole.User.Email,
-                            userReleaseRole.Role))
+                    .Select(userReleaseRole => new UserReleaseRoleSummaryViewModel(
+                        userReleaseRole.UserId,
+                        userReleaseRole.User.DisplayName,
+                        userReleaseRole.User.Email,
+                        userReleaseRole.Role
+                    ))
                     .OrderBy(model => model.UserDisplayName)
                     .ToList();
             });
     }
 
-    public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
-        ListReleaseInvites(Guid releaseVersionId, ReleaseRole[]? rolesToInclude = null)
+    public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>> ListReleaseInvites(
+        Guid releaseVersionId,
+        ReleaseRole[]? rolesToInclude = null
+    )
     {
         var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
 
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                query => query.Include(rv => rv.Publication))
-            .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
+            .CheckEntityExists<ReleaseVersion>(
+                releaseVersionId,
+                query => query.Include(rv => rv.Publication)
+            )
+            .OnSuccessDo(releaseVersion =>
+                userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication)
+            )
             .OnSuccess(async _ =>
             {
                 var invites = await contentDbContext
-                    .UserReleaseInvites
-                    .Where(i =>
-                        i.ReleaseVersionId == releaseVersionId
-                        && rolesToCheck.Contains(i.Role))
+                    .UserReleaseInvites.Where(i =>
+                        i.ReleaseVersionId == releaseVersionId && rolesToCheck.Contains(i.Role)
+                    )
                     .ToListAsync();
 
                 return invites
@@ -70,54 +83,63 @@ public class ReleasePermissionService(
             });
     }
 
-    public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-        ListPublicationContributors(Guid publicationId)
+    public async Task<
+        Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>
+    > ListPublicationContributors(Guid publicationId)
     {
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccessDo(publication => userService
-                .CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
+            .OnSuccessDo(publication =>
+                userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor)
+            )
             .OnSuccess(async () =>
             {
-                var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
+                var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(
+                    publicationId
+                );
 
                 var users = await contentDbContext
-                    .UserReleaseRoles
-                    .Include(releaseRole => releaseRole.User)
+                    .UserReleaseRoles.Include(releaseRole => releaseRole.User)
                     .Where(userReleaseRole =>
                         releaseVersionIds.Contains(userReleaseRole.ReleaseVersionId)
-                        && userReleaseRole.Role == ReleaseRole.Contributor)
+                        && userReleaseRole.Role == ReleaseRole.Contributor
+                    )
                     .Select(userReleaseRole => userReleaseRole.User)
                     .Distinct()
                     .ToListAsync();
 
                 return users
-                    .Select(user =>
-                        new UserReleaseRoleSummaryViewModel(
-                            user.Id,
-                            user.DisplayName,
-                            user.Email,
-                            ReleaseRole.Contributor
-                        ))
+                    .Select(user => new UserReleaseRoleSummaryViewModel(
+                        user.Id,
+                        user.DisplayName,
+                        user.Email,
+                        ReleaseRole.Contributor
+                    ))
                     .OrderBy(model => model.UserDisplayName)
                     .ToList();
             });
     }
 
     public async Task<Either<ActionResult, Unit>> UpdateReleaseContributors(
-        Guid releaseVersionId, List<Guid> userIds)
+        Guid releaseVersionId,
+        List<Guid> userIds
+    )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                query =>
-                    query.Include(rv => rv.Release)
-                        .ThenInclude(r => r.Publication))
-            .OnSuccessDo(releaseVersion => userService
-                .CheckCanUpdateReleaseRole(releaseVersion.Release.Publication, ReleaseRole.Contributor))
+            .CheckEntityExists<ReleaseVersion>(
+                releaseVersionId,
+                query => query.Include(rv => rv.Release).ThenInclude(r => r.Publication)
+            )
+            .OnSuccessDo(releaseVersion =>
+                userService.CheckCanUpdateReleaseRole(
+                    releaseVersion.Release.Publication,
+                    ReleaseRole.Contributor
+                )
+            )
             .OnSuccessVoid(async releaseVersion =>
             {
-                var releaseContributorReleaseRolesByUserId = await contentDbContext.UserReleaseRoles
-                    .Include(releaseRole => releaseRole.User)
+                var releaseContributorReleaseRolesByUserId = await contentDbContext
+                    .UserReleaseRoles.Include(releaseRole => releaseRole.User)
                     .Where(urr => urr.ReleaseVersionId == releaseVersion.Id)
                     .Where(urr => urr.Role == ReleaseRole.Contributor)
                     .ToDictionaryAsync(urr => urr.UserId);
@@ -137,23 +159,28 @@ public class ReleasePermissionService(
                     userIds: usersToBeAdded,
                     releaseVersionId: releaseVersion.Id,
                     role: ReleaseRole.Contributor,
-                    createdById: userService.GetUserId());
+                    createdById: userService.GetUserId()
+                );
             });
     }
 
     public async Task<Either<ActionResult, Unit>> RemoveAllUserContributorPermissionsForPublication(
-        Guid publicationId, Guid userId)
+        Guid publicationId,
+        Guid userId
+    )
     {
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccessDo(publication => userService
-                .CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
+            .OnSuccessDo(publication =>
+                userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor)
+            )
             .OnSuccessVoid(async publication =>
             {
                 await userReleaseRoleRepository.RemoveForPublicationAndUser(
                     userId: userId,
                     publicationId: publicationId,
-                    rolesToInclude: ReleaseRole.Contributor);
+                    rolesToInclude: ReleaseRole.Contributor
+                );
             });
     }
 }

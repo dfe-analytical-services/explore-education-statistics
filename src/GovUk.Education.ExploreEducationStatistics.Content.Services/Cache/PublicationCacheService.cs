@@ -18,9 +18,11 @@ public class PublicationCacheService : IPublicationCacheService
     private readonly IPublicBlobStorageService _publicBlobStorageService;
     private readonly ILogger<PublicationCacheService> _logger;
 
-    public PublicationCacheService(IPublicationService publicationService,
+    public PublicationCacheService(
+        IPublicationService publicationService,
         IPublicBlobStorageService publicBlobStorageService,
-        ILogger<PublicationCacheService> logger)
+        ILogger<PublicationCacheService> logger
+    )
     {
         _publicationService = publicationService;
         _publicBlobStorageService = publicBlobStorageService;
@@ -28,13 +30,16 @@ public class PublicationCacheService : IPublicationCacheService
     }
 
     [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
-    public Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(string publicationSlug)
+    public Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(
+        string publicationSlug
+    )
     {
         return _publicationService.Get(publicationSlug);
     }
 
-    public async Task<Either<ActionResult, IList<PublicationTreeThemeViewModel>>> GetPublicationTree(
-        PublicationTreeFilter filter)
+    public async Task<
+        Either<ActionResult, IList<PublicationTreeThemeViewModel>>
+    > GetPublicationTree(PublicationTreeFilter filter)
     {
         var fullPublicationTree = await GetFullPublicationTree();
 
@@ -47,7 +52,9 @@ public class PublicationCacheService : IPublicationCacheService
     }
 
     [BlobCache(typeof(PublicationCacheKey), forceUpdate: true, ServiceName = "public")]
-    public Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug)
+    public Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(
+        string publicationSlug
+    )
     {
         return _publicationService.Get(publicationSlug);
     }
@@ -58,7 +65,7 @@ public class PublicationCacheService : IPublicationCacheService
             containerName: BlobContainers.PublicContent,
             options: new IBlobStorageService.DeleteBlobsOptions
             {
-                IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$")
+                IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$"),
             }
         );
 
@@ -80,10 +87,11 @@ public class PublicationCacheService : IPublicationCacheService
 
     private static async Task<PublicationTreeThemeViewModel> FilterPublicationTreeTheme(
         PublicationTreeThemeViewModel theme,
-        PublicationTreeFilter filter)
+        PublicationTreeFilter filter
+    )
     {
-        var publications = await theme.Publications
-            .ToAsyncEnumerable()
+        var publications = await theme
+            .Publications.ToAsyncEnumerable()
             .Where(publication => FilterPublicationTreePublication(publication, filter))
             .OrderBy(publication => publication.Title)
             .ToListAsync();
@@ -99,7 +107,8 @@ public class PublicationCacheService : IPublicationCacheService
 
     private static bool FilterPublicationTreePublication(
         PublicationTreePublicationViewModel publication,
-        PublicationTreeFilter filter)
+        PublicationTreeFilter filter
+    )
     {
         switch (filter)
         {

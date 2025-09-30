@@ -9,7 +9,8 @@ public partial class EES2686RenameReleaseMetaGuidanceToDataGuidance : Migration
         migrationBuilder.RenameColumn(
             name: "MetaGuidance",
             newName: "DataGuidance",
-            table: "Releases");
+            table: "Releases"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -17,6 +18,7 @@ public partial class EES2686RenameReleaseMetaGuidanceToDataGuidance : Migration
         migrationBuilder.RenameColumn(
             name: "DataGuidance",
             newName: "MetaGuidance",
-            table: "Releases");
+            table: "Releases"
+        );
     }
 }

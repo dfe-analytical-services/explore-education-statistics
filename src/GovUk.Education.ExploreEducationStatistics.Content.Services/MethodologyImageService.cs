@@ -19,31 +19,40 @@ public class MethodologyImageService : IMethodologyImageService
     private readonly IPublicBlobStorageService _publicBlobStorageService;
     private readonly IUserService _userService;
 
-    public MethodologyImageService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+    public MethodologyImageService(
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
         IPublicBlobStorageService publicBlobStorageService,
-        IUserService userService)
+        IUserService userService
+    )
     {
         _persistenceHelper = persistenceHelper;
         _publicBlobStorageService = publicBlobStorageService;
         _userService = userService;
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
+    public async Task<Either<ActionResult, FileStreamResult>> Stream(
+        Guid methodologyVersionId,
+        Guid fileId
+    )
     {
         return await _persistenceHelper
-            .CheckEntityExists<MethodologyFile>(q => q
-                .Include(mf => mf.File)
-                .Include(mf => mf.MethodologyVersion)
-                .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
+            .CheckEntityExists<MethodologyFile>(q =>
+                q.Include(mf => mf.File)
+                    .Include(mf => mf.MethodologyVersion)
+                    .Where(mf =>
+                        mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId
+                    )
+            )
             .OnSuccessDo(mf => _userService.CheckCanViewMethodologyVersion(mf.MethodologyVersion))
             .OnSuccessCombineWith(mf =>
-                _publicBlobStorageService.GetDownloadStream(PublicMethodologyFiles, mf.Path()))
+                _publicBlobStorageService.GetDownloadStream(PublicMethodologyFiles, mf.Path())
+            )
             .OnSuccess(methodologyFileAndStream =>
             {
                 var (methodologyFile, stream) = methodologyFileAndStream;
                 return new FileStreamResult(stream, methodologyFile.File.ContentType)
                 {
-                    FileDownloadName = methodologyFile.File.Filename
+                    FileDownloadName = methodologyFile.File.Filename,
                 };
             });
     }

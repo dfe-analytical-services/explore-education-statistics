@@ -24,10 +24,18 @@ internal static class DataSetQueryRequestTestData
                                     {
                                         NotIn =
                                         [
-                                            new DataSetQueryTimePeriod { Period = "Period3", Code = "Code" },
-                                            new DataSetQueryTimePeriod { Period = "Period4", Code = "Code" }
-                                        ]
-                                    }
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period3",
+                                                Code = "Code",
+                                            },
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period4",
+                                                Code = "Code",
+                                            },
+                                        ],
+                                    },
                                 },
                                 new DataSetQueryCriteriaFacets
                                 {
@@ -35,24 +43,35 @@ internal static class DataSetQueryRequestTestData
                                     {
                                         In =
                                         [
-                                            new DataSetQueryTimePeriod { Period = "Period1", Code = "Code" },
-                                            new DataSetQueryTimePeriod { Period = "Period2", Code = "Code" }
-                                        ]
-                                    }
-                                }
-                            ]
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period1",
+                                                Code = "Code",
+                                            },
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period2",
+                                                Code = "Code",
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter3" }
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter3" },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { In = ["Filter1", "Filter2"] }
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                In = ["Filter1", "Filter2"],
+                            },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter4"] }
+                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter4"] },
                         },
                         new DataSetQueryCriteriaNot
                         {
@@ -68,11 +87,16 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location2"
+                                                    Level = "Level",
+                                                    Ukprn = "Location2",
                                                 },
-                                                new DataSetQueryLocationId { Level = "Level", Id = "Location3" }
-                                            ]
-                                        }
+                                                new DataSetQueryLocationId
+                                                {
+                                                    Level = "Level",
+                                                    Id = "Location3",
+                                                },
+                                            ],
+                                        },
                                     },
                                     new DataSetQueryCriteriaFacets
                                     {
@@ -82,20 +106,25 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location4"
+                                                    Level = "Level",
+                                                    Ukprn = "Location4",
                                                 },
-                                                new DataSetQueryLocationId { Level = "Level", Id = "Location1" }
-                                            ]
-                                        }
+                                                new DataSetQueryLocationId
+                                                {
+                                                    Level = "Level",
+                                                    Id = "Location1",
+                                                },
+                                            ],
+                                        },
                                     },
-                                ]
-                            }
+                                ],
+                            },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter5" }
-                        }
-                    ]
+                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter5" },
+                        },
+                    ],
                 },
                 new DataSetQueryCriteriaAnd
                 {
@@ -103,42 +132,38 @@ internal static class DataSetQueryRequestTestData
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter9" }
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter9" },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { In = ["Filter7", "Filter8"] }
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                In = ["Filter7", "Filter8"],
+                            },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter6"] }
+                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter6"] },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter10" }
-                        }
-                    ]
-                }
-            ]
+                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter10" },
+                        },
+                    ],
+                },
+            ],
         },
-        Sorts = [
-            new DataSetQuerySort
-            {
-                Field = "Field2", 
-                Direction = "ASC",
-            },
-            new DataSetQuerySort
-            {
-                Field = "Field1", 
-                Direction = "ASC",
-            }
+        Sorts =
+        [
+            new DataSetQuerySort { Field = "Field2", Direction = "ASC" },
+            new DataSetQuerySort { Field = "Field1", Direction = "ASC" },
         ],
         Indicators = ["Indicator3", "Indicator1", "Indicator2"],
         Debug = true,
         Page = 3,
-        PageSize = 300
+        PageSize = 300,
     };
-    
+
     /// <summary>
     /// This query request is logically the same as NestedQuery1 but with sub-criteria and
     /// list elements in different orders.
@@ -155,21 +180,24 @@ internal static class DataSetQueryRequestTestData
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter10" }
+                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter10" },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { In = ["Filter7", "Filter8"] }
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                In = ["Filter7", "Filter8"],
+                            },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter6"] }
+                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter6"] },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter9" }
-                        }
-                    ]
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter9" },
+                        },
+                    ],
                 },
                 new DataSetQueryCriteriaAnd
                 {
@@ -189,11 +217,16 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location4"
+                                                    Level = "Level",
+                                                    Ukprn = "Location4",
                                                 },
-                                                new DataSetQueryLocationId { Level = "Level", Id = "Location1" }
-                                            ]
-                                        }
+                                                new DataSetQueryLocationId
+                                                {
+                                                    Level = "Level",
+                                                    Id = "Location1",
+                                                },
+                                            ],
+                                        },
                                     },
                                     new DataSetQueryCriteriaFacets
                                     {
@@ -203,14 +236,19 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location2"
+                                                    Level = "Level",
+                                                    Ukprn = "Location2",
                                                 },
-                                                new DataSetQueryLocationId { Level = "Level", Id = "Location3" }
-                                            ]
-                                        }
+                                                new DataSetQueryLocationId
+                                                {
+                                                    Level = "Level",
+                                                    Id = "Location3",
+                                                },
+                                            ],
+                                        },
                                     },
-                                ]
-                            }
+                                ],
+                            },
                         },
                         new DataSetQueryCriteriaOr
                         {
@@ -222,10 +260,18 @@ internal static class DataSetQueryRequestTestData
                                     {
                                         In =
                                         [
-                                            new DataSetQueryTimePeriod { Period = "Period2", Code = "Code" },
-                                            new DataSetQueryTimePeriod { Period = "Period1", Code = "Code" }
-                                        ]
-                                    }
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period2",
+                                                Code = "Code",
+                                            },
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period1",
+                                                Code = "Code",
+                                            },
+                                        ],
+                                    },
                                 },
                                 new DataSetQueryCriteriaFacets
                                 {
@@ -233,48 +279,52 @@ internal static class DataSetQueryRequestTestData
                                     {
                                         NotIn =
                                         [
-                                            new DataSetQueryTimePeriod { Period = "Period3", Code = "Code" },
-                                            new DataSetQueryTimePeriod { Period = "Period4", Code = "Code" }
-                                        ]
-                                    }
-                                }
-                            ]
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period3",
+                                                Code = "Code",
+                                            },
+                                            new DataSetQueryTimePeriod
+                                            {
+                                                Period = "Period4",
+                                                Code = "Code",
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { In = ["Filter2", "Filter1"] }
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                In = ["Filter2", "Filter1"],
+                            },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter3" }
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "Filter3" },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter5" }
+                            Filters = new DataSetQueryCriteriaFilters { NotEq = "Filter5" },
                         },
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter4"] }
-                        }
-                    ]
-                }
-            ]
+                            Filters = new DataSetQueryCriteriaFilters { NotIn = ["Filter4"] },
+                        },
+                    ],
+                },
+            ],
         },
-        Sorts = [
-            new DataSetQuerySort
-            {
-                Field = "Field2", 
-                Direction = "ASC",
-            },
-            new DataSetQuerySort
-            {
-                Field = "Field1", 
-                Direction = "ASC",
-            }
+        Sorts =
+        [
+            new DataSetQuerySort { Field = "Field2", Direction = "ASC" },
+            new DataSetQuerySort { Field = "Field1", Direction = "ASC" },
         ],
         Indicators = ["Indicator1", "Indicator3", "Indicator2"],
         Debug = true,
         Page = 3,
-        PageSize = 300
+        PageSize = 300,
     };
 }

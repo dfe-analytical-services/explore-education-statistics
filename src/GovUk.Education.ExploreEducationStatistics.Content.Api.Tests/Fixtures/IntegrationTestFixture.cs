@@ -16,10 +16,10 @@ using Xunit;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 
 [Collection(CacheTestFixture.CollectionName)]
-public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
-    CacheServiceTestFixture,
-    IClassFixture<TestApplicationFactory>,
-    IAsyncLifetime
+public abstract class IntegrationTestFixture(TestApplicationFactory testApp)
+    : CacheServiceTestFixture,
+        IClassFixture<TestApplicationFactory>,
+        IAsyncLifetime
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
         .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
@@ -58,7 +58,8 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     }
 
     public WebApplicationFactory<Startup> BuildWebApplicationFactory(
-        List<Action<IWebHostBuilder>> webHostBuilderConfigFuncs)
+        List<Action<IWebHostBuilder>> webHostBuilderConfigFuncs
+    )
     {
         return TestApp.WithWebHostBuilder(builder =>
         {
@@ -77,8 +78,10 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
         {
             builder.ConfigureServices(services =>
             {
-                services.ReplaceService<IAnalyticsPathResolver>(_ =>
-                    new TestAnalyticsPathResolver(), optional: true);
+                services.ReplaceService<IAnalyticsPathResolver>(
+                    _ => new TestAnalyticsPathResolver(),
+                    optional: true
+                );
             });
         };
     }
@@ -88,23 +91,30 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
         if (_azuriteContainer.State != TestcontainersStates.Running)
         {
             throw new InvalidOperationException(
-                $"Azurite container must be started via '{nameof(StartAzurite)}' method first");
+                $"Azurite container must be started via '{nameof(StartAzurite)}' method first"
+            );
         }
 
         return builder =>
         {
             builder
-                .ConfigureAppConfiguration((_, config) =>
-                {
-                    config.AddInMemoryCollection(
-                    [
-                        new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString())
-                    ]);
-                })
+                .ConfigureAppConfiguration(
+                    (_, config) =>
+                    {
+                        config.AddInMemoryCollection(
+                            [
+                                new KeyValuePair<string, string?>(
+                                    "PublicStorage",
+                                    _azuriteContainer.GetConnectionString()
+                                ),
+                            ]
+                        );
+                    }
+                )
                 .ConfigureServices(services =>
                 {
-                    services.ReplaceService<IPublicBlobStorageService>(sp =>
-                        new PublicBlobStorageService(
+                    services.ReplaceService<IPublicBlobStorageService>(
+                        sp => new PublicBlobStorageService(
                             _azuriteContainer.GetConnectionString(),
                             sp.GetRequiredService<ILogger<IBlobStorageService>>(),
                             sasService: sp.GetRequiredService<IBlobSasService>()

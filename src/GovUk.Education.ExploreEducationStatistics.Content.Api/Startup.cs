@@ -43,9 +43,7 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Servic
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api;
 
 [ExcludeFromCodeCoverage]
-public class Startup(
-    IConfiguration configuration,
-    IHostEnvironment hostEnvironment)
+public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
     // This method gets called by the runtime. Use this method to add services to the container.
     public virtual void ConfigureServices(IServiceCollection services)
@@ -54,10 +52,12 @@ public class Startup(
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-        services.AddApplicationInsightsTelemetry()
+        services
+            .AddApplicationInsightsTelemetry()
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
-        services.AddMvc(options =>
+        services
+            .AddMvc(options =>
             {
                 options.Filters.Add(new OperationCancelledExceptionFilter());
                 options.Filters.Add(new ProblemDetailsResultFilter());
@@ -80,10 +80,13 @@ public class Startup(
 
         services.AddDbContext<StatisticsDbContext>(options =>
             options
-                .UseSqlServer(configuration.GetConnectionString("StatisticsDb"),
-                    providerOptions => 
+                .UseSqlServer(
+                    configuration.GetConnectionString("StatisticsDb"),
+                    providerOptions =>
                         providerOptions
-                            .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                            .MigrationsAssembly(
+                                "GovUk.Education.ExploreEducationStatistics.Data.Model"
+                            )
                             .EnableCustomRetryOnFailure()
                 )
                 .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
@@ -91,8 +94,9 @@ public class Startup(
 
         services.AddDbContext<ContentDbContext>(options =>
             options
-                .UseSqlServer(configuration.GetConnectionString("ContentDb"),
-                    providerOptions => 
+                .UseSqlServer(
+                    configuration.GetConnectionString("ContentDb"),
+                    providerOptions =>
                         providerOptions
                             .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                             .EnableCustomRetryOnFailure()
@@ -109,41 +113,55 @@ public class Startup(
         // Register the Swagger generator, defining 1 or more Swagger documents
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "Explore education statistics - Content API",
-                Version = "v1"
-            });
+            options.SwaggerDoc(
+                "v1",
+                new OpenApiInfo
+                {
+                    Title = "Explore education statistics - Content API",
+                    Version = "v1",
+                }
+            );
         });
 
         services.AddCors();
 
         // Options - to allow them to be injected into services
-        services.AddOptions<AnalyticsOptions>()
+        services
+            .AddOptions<AnalyticsOptions>()
             .Bind(configuration.GetSection(AnalyticsOptions.Section));
 
         // Services
         services.AddSingleton<IBlobSasService, BlobSasService>();
-        services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(
+        services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(
+            provider => new PublicBlobStorageService(
                 connectionString: configuration.GetRequiredValue("PublicStorage"),
                 logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                sasService: provider.GetRequiredService<IBlobSasService>()));
+                sasService: provider.GetRequiredService<IBlobSasService>()
+            )
+        );
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()));
+            provider.GetRequiredService<ILogger<BlobCacheService>>()
+        ));
         services.AddSingleton<IMemoryCacheService>(provider =>
         {
             var memoryCacheConfig = configuration.GetSection("MemoryCache");
             var maxCacheSizeMb = memoryCacheConfig.GetValue<int>("MaxCacheSizeMb");
-            var expirationScanFrequencySeconds = memoryCacheConfig.GetValue<int>("ExpirationScanFrequencySeconds");
+            var expirationScanFrequencySeconds = memoryCacheConfig.GetValue<int>(
+                "ExpirationScanFrequencySeconds"
+            );
             return new MemoryCacheService(
-                new MemoryCache(new MemoryCacheOptions
-                {
-                    SizeLimit = maxCacheSizeMb * 1000000,
-                    ExpirationScanFrequency = TimeSpan.FromSeconds(expirationScanFrequencySeconds),
-                }),
-                provider.GetRequiredService<ILogger<MemoryCacheService>>());
+                new MemoryCache(
+                    new MemoryCacheOptions
+                    {
+                        SizeLimit = maxCacheSizeMb * 1000000,
+                        ExpirationScanFrequency = TimeSpan.FromSeconds(
+                            expirationScanFrequencySeconds
+                        ),
+                    }
+                ),
+                provider.GetRequiredService<ILogger<MemoryCacheService>>()
+            );
         });
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IIndicatorRepository, IndicatorRepository>();
@@ -180,7 +198,10 @@ public class Startup(
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();
-        services.AddTransient<IReleaseSearchableDocumentsService, ReleaseSearchableDocumentsService>();
+        services.AddTransient<
+            IReleaseSearchableDocumentsService,
+            ReleaseSearchableDocumentsService
+        >();
         services.AddTransient<IReleaseVersionsService, ReleaseVersionsService>();
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
@@ -197,20 +218,26 @@ public class Startup(
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app,
-        IWebHostEnvironment env,
-        ILogger<Startup> _)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> _)
     {
         // Enable caching and register any caching services
         CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+        BlobCacheAttribute.AddService(
+            "public",
+            app.ApplicationServices.GetRequiredService<IBlobCacheService>()
+        );
 
-        // Register the MemoryCacheService only if the Memory Caching is enabled. 
+        // Register the MemoryCacheService only if the Memory Caching is enabled.
         var memoryCacheConfig = configuration.GetSection("MemoryCache");
         if (memoryCacheConfig.GetValue("Enabled", false))
         {
-            MemoryCacheAttribute.SetOverrideConfiguration(memoryCacheConfig.GetSection("Overrides"));
-            MemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IMemoryCacheService>()!);
+            MemoryCacheAttribute.SetOverrideConfiguration(
+                memoryCacheConfig.GetSection("Overrides")
+            );
+            MemoryCacheAttribute.AddService(
+                "default",
+                app.ApplicationServices.GetService<IMemoryCacheService>()!
+            );
         }
 
         if (env.IsDevelopment())
@@ -223,10 +250,9 @@ public class Startup(
             app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
         }
 
-        var rewriteOptions = new RewriteOptions()
-            .Add(new LowercasePathRule());
+        var rewriteOptions = new RewriteOptions().Add(new LowercasePathRule());
 
-        if(configuration.GetValue<bool>("enableSwagger"))
+        if (configuration.GetValue<bool>("enableSwagger"))
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -240,14 +266,17 @@ public class Startup(
 
         app.UseRewriter(rewriteOptions);
 
-        app.UseCors(options => options
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "https://localhost:3000",
-                "https://localhost:3001")
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+        app.UseCors(options =>
+            options
+                .WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "https://localhost:3000",
+                    "https://localhost:3001"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+        );
 
         app.UseMiddleware(typeof(SeoSecurityHeaderMiddleware));
         app.UseMvc();
@@ -256,7 +285,8 @@ public class Startup(
         app.UseResponseCompression();
 
         app.ServerFeatures.Get<IServerAddressesFeature>()
-            ?.Addresses
-            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+            ?.Addresses.ForEach(address =>
+                Console.WriteLine($"Server listening on address: {address}")
+            );
     }
 }

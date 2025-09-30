@@ -14,12 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 {
     private const string DraftVersionFolderName = "draft";
-    
+
     private readonly IOptions<DataFilesOptions> _options;
     private readonly IWebHostEnvironment _environment;
     private readonly string _basePath;
 
-    public DataSetVersionPathResolver(IOptions<DataFilesOptions> options, IWebHostEnvironment environment)
+    public DataSetVersionPathResolver(
+        IOptions<DataFilesOptions> options,
+        IWebHostEnvironment environment
+    )
     {
         _options = options;
         _environment = environment;
@@ -39,29 +42,34 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string DirectoryPath(DataSetVersion dataSetVersion)
     {
-        var folderName = dataSetVersion.IsPrivateStatus() 
+        var folderName = dataSetVersion.IsPrivateStatus()
             ? DraftVersionFolderName
             : $"v{dataSetVersion.SemVersion()}";
-        
+
         return Path.Combine(
-            ((IDataSetVersionPathResolver) this).DataSetsPath(),
+            ((IDataSetVersionPathResolver)this).DataSetsPath(),
             dataSetVersion.DataSetId.ToString(),
-            folderName);
+            folderName
+        );
     }
-    
+
     public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion versionNumber)
     {
         return Path.Combine(
-            ((IDataSetVersionPathResolver) this).DataSetsPath(),
+            ((IDataSetVersionPathResolver)this).DataSetsPath(),
             dataSetVersion.DataSetId.ToString(),
-            $"v{versionNumber}");
+            $"v{versionNumber}"
+        );
     }
 
     private string GetBasePath()
     {
         if (_environment.IsDevelopment())
         {
-            return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(_options.Value.BasePath));
+            return Path.Combine(
+                PathUtils.ProjectRootPath,
+                PathUtils.OsPath(_options.Value.BasePath)
+            );
         }
 
         if (_environment.IsIntegrationTest())

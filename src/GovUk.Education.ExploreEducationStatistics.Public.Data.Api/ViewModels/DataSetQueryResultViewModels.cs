@@ -7,7 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 /// <summary>
 /// A paginated list of results from a data set query.
 /// </summary>
-public record DataSetQueryPaginatedResultsViewModel : PaginatedListViewModel<DataSetQueryResultViewModel>
+public record DataSetQueryPaginatedResultsViewModel
+    : PaginatedListViewModel<DataSetQueryResultViewModel>
 {
     /// <summary>
     /// A list of warnings, highlighting any potential issues with the request.

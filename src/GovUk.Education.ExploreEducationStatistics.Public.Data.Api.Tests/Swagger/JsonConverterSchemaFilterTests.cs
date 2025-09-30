@@ -21,10 +21,9 @@ public class JsonConverterSchemaFilterTests
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new JsonConverterSchemaFilter()],
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");
@@ -99,7 +98,8 @@ public class JsonConverterSchemaFilterTests
     {
         var schema = GenerateSchema<TestReadOnlyListEnumConverters>();
 
-        var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumLabels).CamelCase();
+        var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumLabels)
+            .CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
 
         Assert.Null(propertySchema.Reference);
@@ -110,7 +110,8 @@ public class JsonConverterSchemaFilterTests
         Assert.Null(propertySchema.Items.Reference);
         Assert.Empty(propertySchema.Items.AllOf);
 
-        var enumStrings = propertySchema.Items.Enum.Cast<OpenApiString>()
+        var enumStrings = propertySchema
+            .Items.Enum.Cast<OpenApiString>()
             .Select(e => e.Value)
             .ToList();
 
@@ -122,7 +123,8 @@ public class JsonConverterSchemaFilterTests
     {
         var schema = GenerateSchema<TestReadOnlyListEnumConverters>();
 
-        var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumValues).CamelCase();
+        var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumValues)
+            .CamelCase();
         var propertySchema = schema.Properties[schemaPropertyName];
 
         Assert.Null(propertySchema.Reference);
@@ -133,7 +135,8 @@ public class JsonConverterSchemaFilterTests
         Assert.Null(propertySchema.Items.Reference);
         Assert.Empty(propertySchema.Items.AllOf);
 
-        var enumStrings = propertySchema.Items.Enum.Cast<OpenApiString>()
+        var enumStrings = propertySchema
+            .Items.Enum.Cast<OpenApiString>()
             .Select(e => e.Value)
             .ToList();
 
@@ -193,7 +196,6 @@ public class JsonConverterSchemaFilterTests
         Assert.Null(propertySchema.Type);
         Assert.Empty(propertySchema.Enum);
     }
-
 
     private OpenApiSchema GenerateSchema<TConverters>()
     {
@@ -265,10 +267,20 @@ public class JsonConverterSchemaFilterTests
 
     private class TestReadOnlyListEnumConverters
     {
-        [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
+        [JsonConverter(
+            typeof(ReadOnlyListJsonConverter<
+                GeographicLevel,
+                EnumToEnumLabelJsonConverter<GeographicLevel>
+            >)
+        )]
         public IReadOnlyList<GeographicLevel> GeographicLevelEnumLabels { get; init; } = [];
 
-        [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
+        [JsonConverter(
+            typeof(ReadOnlyListJsonConverter<
+                GeographicLevel,
+                EnumToEnumValueJsonConverter<GeographicLevel>
+            >)
+        )]
         public IReadOnlyList<GeographicLevel> GeographicLevelEnumValues { get; init; } = [];
     }
 

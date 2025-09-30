@@ -7,4 +7,5 @@ public record ContentBlockLockViewModel(
     Guid ReleaseVersionId,
     DateTimeOffset Locked,
     DateTimeOffset LockedUntil,
-    UserDetailsViewModel LockedBy);
+    UserDetailsViewModel LockedBy
+);

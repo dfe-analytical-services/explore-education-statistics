@@ -12,10 +12,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
 {
-    protected override string ResourcesPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "PublicZipDownloads");
+    protected override string ResourcesPath =>
+        Path.Combine(
+            Assembly.GetExecutingAssembly().GetDirectoryPath(),
+            "Resources",
+            "PublicZipDownloads"
+        );
 
     public class ProcessTests : PublicZipDownloadsProcessorTests
     {
@@ -29,12 +31,12 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var zipDownloadsReport = Assert.Single(reports);
 
@@ -54,7 +56,8 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 zipDownloadReportRow,
                 "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json",
-                1);
+                1
+            );
         }
 
         [Fact]
@@ -81,12 +84,14 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 zipDownloadReportRows[0],
                 "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json",
-                1);
+                1
+            );
 
             await AssertReportRow(
                 zipDownloadReportRows[1],
                 "ZipDownloadRequestFile_WithSubjectId.json",
-                1);
+                1
+            );
         }
 
         [Fact]
@@ -113,12 +118,14 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 zipDownloadReportRows[0],
                 "ZipDownloadRequestFile_NoSubjectId_ReleaseDownloads.json",
-                1);
+                1
+            );
 
             await AssertReportRow(
                 zipDownloadReportRows[1],
                 "ZipDownloadRequestFile_NoSubjectId_ReleaseUsefulInfo.json",
-                1);
+                1
+            );
         }
 
         [Fact]
@@ -145,30 +152,35 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
             await AssertReportRow(
                 zipDownloadReportRow,
                 "ZipDownloadRequestFile_WithSubjectId.json",
-                2);
+                2
+            );
         }
 
-        private static async Task<List<ZipDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection, string reportFile)
+        private static async Task<List<ZipDownloadReportLine>> ReadReport(
+            DuckDbConnection duckDbConnection,
+            string reportFile
+        )
         {
-            return (await duckDbConnection
+            return (
+                await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
-                    .QueryAsync<ZipDownloadReportLine>())
+                    .QueryAsync<ZipDownloadReportLine>()
+            )
                 .OrderBy(row => row.DataSetTitle)
                 .ToList();
         }
     }
-    
+
     private PublicZipDownloadsProcessor BuildService()
     {
-        return new PublicZipDownloadsProcessor(
-            pathResolver: PathResolver,
-            workflow: Workflow);
+        return new PublicZipDownloadsProcessor(pathResolver: PathResolver, workflow: Workflow);
     }
 
     private async Task AssertReportRow(
         ZipDownloadReportLine row,
         string jsonFileName,
-        int numRequests)
+        int numRequests
+    )
     {
         var jsonText = await File.ReadAllTextAsync(Path.Combine(ResourcesPath, jsonFileName));
 
@@ -185,7 +197,8 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
 
         // Generate expected ZipDownloadHash
         var subjectIdStr = request.SubjectId == null ? "" : request.SubjectId.ToString()!.ToLower();
-        var strToHash = $"{subjectIdStr}{request.ReleaseVersionId.ToString().ToLower()}{request.FromPage}";
+        var strToHash =
+            $"{subjectIdStr}{request.ReleaseVersionId.ToString().ToLower()}{request.FromPage}";
         var bytesToHash = Encoding.UTF8.GetBytes(strToHash);
         var hash = MD5.Create().ComputeHash(bytesToHash);
         var hashSb = new StringBuilder();
@@ -194,7 +207,7 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
         Assert.Equal(hashSb.ToString(), row.ZipDownloadHash);
         Assert.Equal(numRequests, row.Downloads);
     }
-    
+
     public record CaptureZipDownloadRequest(
         string PublicationName,
         Guid ReleaseVersionId,
@@ -202,7 +215,8 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
         string? ReleaseLabel,
         string FromPage,
         Guid? SubjectId = null,
-        string? DataSetTitle = null);
+        string? DataSetTitle = null
+    );
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ZipDownloadReportLine(
@@ -214,5 +228,6 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
         Guid? SubjectId,
         string? DataSetTitle,
         string FromPage,
-        int Downloads);
+        int Downloads
+    );
 }

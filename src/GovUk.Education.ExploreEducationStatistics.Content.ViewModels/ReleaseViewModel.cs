@@ -52,9 +52,7 @@ public record ReleaseViewModel
 
     public PublicationViewModel Publication { get; }
 
-    public ReleaseViewModel(
-        ReleaseCacheViewModel release,
-        PublicationViewModel publication)
+    public ReleaseViewModel(ReleaseCacheViewModel release, PublicationViewModel publication)
     {
         Id = release.Id;
         Title = release.Title;

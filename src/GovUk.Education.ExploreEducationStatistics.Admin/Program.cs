@@ -11,43 +11,45 @@ public class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((ctx, builder) =>
-            {
-                if (!ctx.HostingEnvironment.IsDevelopment())
+            .ConfigureAppConfiguration(
+                (ctx, builder) =>
                 {
-                    return;
-                }
+                    if (!ctx.HostingEnvironment.IsDevelopment())
+                    {
+                        return;
+                    }
 
-                // Can specify `IdpConfig` variable if you want to choose between a custom config
-                // and Keycloak, but otherwise, just delete appsettings.Idp.json if you don't need it.
-                var idpConfig = Environment.GetEnvironmentVariable("IdpConfig") ?? "Idp";
+                    // Can specify `IdpConfig` variable if you want to choose between a custom config
+                    // and Keycloak, but otherwise, just delete appsettings.Idp.json if you don't need it.
+                    var idpConfig = Environment.GetEnvironmentVariable("IdpConfig") ?? "Idp";
 
-                var idpFile = builder.GetFileProvider().GetFileInfo($"appsettings.{idpConfig}.json").Exists
-                    ? $"appsettings.{idpConfig}.json"
-                    : "appsettings.Keycloak.json";
+                    var idpFile = builder
+                        .GetFileProvider()
+                        .GetFileInfo($"appsettings.{idpConfig}.json")
+                        .Exists
+                        ? $"appsettings.{idpConfig}.json"
+                        : "appsettings.Keycloak.json";
 
-                builder.AddJsonFile(
-                    idpFile,
-                    optional: false,
-                    reloadOnChange: false
-                );
+                    builder.AddJsonFile(idpFile, optional: false, reloadOnChange: false);
 
-                var bootstrapUsers = Environment.GetEnvironmentVariable("BootstrapUsers");
+                    var bootstrapUsers = Environment.GetEnvironmentVariable("BootstrapUsers");
 
-                if (bootstrapUsers is not null)
-                {
+                    if (bootstrapUsers is not null)
+                    {
+                        builder.AddJsonFile(
+                            $"appsettings.{bootstrapUsers}BootstrapUsers.json",
+                            optional: true,
+                            reloadOnChange: false
+                        );
+                    }
+
                     builder.AddJsonFile(
-                        $"appsettings.{bootstrapUsers}BootstrapUsers.json",
+                        "appsettings.Local.json",
                         optional: true,
                         reloadOnChange: false
                     );
                 }
-
-                builder.AddJsonFile(
-                    "appsettings.Local.json",
-                    optional: true,
-                    reloadOnChange: false);
-            })
+            )
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
@@ -56,23 +58,27 @@ public class Program
                     serverOptions.AddServerHeader = false;
                 });
             })
-            .ConfigureLogging(
-                builder =>
-                {
-                    // Capture logs from early in the application startup
-                    // pipeline from Startup.cs or Program.cs itself.
-                    builder.AddApplicationInsights();
+            .ConfigureLogging(builder =>
+            {
+                // Capture logs from early in the application startup
+                // pipeline from Startup.cs or Program.cs itself.
+                builder.AddApplicationInsights();
 
-                    // Adding the filter below to ensure logs of all severity from Program.cs
-                    // is sent to ApplicationInsights.
-                    builder.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Program).FullName, LogLevel.Debug);
+                // Adding the filter below to ensure logs of all severity from Program.cs
+                // is sent to ApplicationInsights.
+                builder.AddFilter<ApplicationInsightsLoggerProvider>(
+                    typeof(Program).FullName,
+                    LogLevel.Debug
+                );
 
-                    // Adding the filter below to ensure logs of all severity from Startup.cs
-                    // is sent to ApplicationInsights.
-                    builder.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).FullName, LogLevel.Debug);
+                // Adding the filter below to ensure logs of all severity from Startup.cs
+                // is sent to ApplicationInsights.
+                builder.AddFilter<ApplicationInsightsLoggerProvider>(
+                    typeof(Startup).FullName,
+                    LogLevel.Debug
+                );
 
-                    // Allow capturing logs in the App Service if turned on in the App Service logs settings page.
-                    builder.AddAzureWebAppDiagnostics();
-                }
-            );
+                // Allow capturing logs in the App Service if turned on in the App Service logs settings page.
+                builder.AddAzureWebAppDiagnostics();
+            });
 }

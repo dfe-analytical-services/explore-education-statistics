@@ -7,10 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Pub
 
 [Route("api")]
 [ApiController]
-public class PublicationsSitemapController(IPublicationsSitemapService publicationsSitemapService) : ControllerBase
+public class PublicationsSitemapController(IPublicationsSitemapService publicationsSitemapService)
+    : ControllerBase
 {
     [HttpGet("publications/sitemap-items")]
     public async Task<PublicationSitemapPublicationDto[]> GetSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await publicationsSitemapService.GetSitemapItems(cancellationToken);
+        CancellationToken cancellationToken = default
+    ) => await publicationsSitemapService.GetSitemapItems(cancellationToken);
 }

@@ -49,7 +49,10 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
         return LocationMappingPlan.Levels[level];
     }
 
-    public LocationOptionMapping GetLocationOptionMapping(GeographicLevel level, string locationOptionKey)
+    public LocationOptionMapping GetLocationOptionMapping(
+        GeographicLevel level,
+        string locationOptionKey
+    )
     {
         return GetLocationLevelMappings(level).Mappings[locationOptionKey];
     }
@@ -68,32 +71,41 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     {
         public void Configure(EntityTypeBuilder<DataSetVersionMapping> builder)
         {
-            builder.Property(mapping => mapping.Id)
-                .HasValueGenerator<UuidV7ValueGenerator>();
+            builder.Property(mapping => mapping.Id).HasValueGenerator<UuidV7ValueGenerator>();
 
-            builder.HasIndex(mapping => new { mapping.SourceDataSetVersionId })
+            builder
+                .HasIndex(mapping => new { mapping.SourceDataSetVersionId })
                 .HasDatabaseName("IX_DataSetVersionMappings_SourceDataSetVersionId")
                 .IsUnique();
 
-            builder.HasIndex(mapping => new { mapping.TargetDataSetVersionId })
+            builder
+                .HasIndex(mapping => new { mapping.TargetDataSetVersionId })
                 .HasDatabaseName("IX_DataSetVersionMappings_TargetDataSetVersionId")
                 .IsUnique();
 
-            builder.Property(p => p.LocationMappingPlan)
+            builder
+                .Property(p => p.LocationMappingPlan)
                 .HasColumnType("jsonb")
                 .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
                     v =>
-                        JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                    v =>
-                        JsonSerializer.Deserialize<LocationMappingPlan>(v, (JsonSerializerOptions)null!)!);
+                        JsonSerializer.Deserialize<LocationMappingPlan>(
+                            v,
+                            (JsonSerializerOptions)null!
+                        )!
+                );
 
-            builder.Property(p => p.FilterMappingPlan)
+            builder
+                .Property(p => p.FilterMappingPlan)
                 .HasColumnType("jsonb")
                 .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
                     v =>
-                        JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                    v =>
-                        JsonSerializer.Deserialize<FilterMappingPlan>(v, (JsonSerializerOptions)null!)!);
+                        JsonSerializer.Deserialize<FilterMappingPlan>(
+                            v,
+                            (JsonSerializerOptions)null!
+                        )!
+                );
         }
     }
 }
@@ -129,7 +141,7 @@ public enum MappingType
     /// source element.  It will still take the user to confirm these and switch them to be
     /// "ManualNone" in the process before the service indicates that the mappings are complete.
     /// </summary>
-    AutoNone
+    AutoNone,
 }
 
 /// <summary>
@@ -140,8 +152,7 @@ public abstract record MappableElement
     public required string Label { get; set; }
 }
 
-public abstract record MappableElementWithOptions<TMappableOption>
-    : MappableElement
+public abstract record MappableElementWithOptions<TMappableOption> : MappableElement
     where TMappableOption : MappableElement
 {
     public Dictionary<string, TMappableOption> Options { get; init; } = [];
@@ -182,7 +193,7 @@ public abstract record ParentMapping<TMappableElement, TOption, TOptionMapping>
 
 /// <summary>
 /// This represents a location option that is potentially mappable to another location option
-/// from the same geographic level. 
+/// from the same geographic level.
 /// </summary>
 public record MappableLocationOption : MappableElement
 {
@@ -205,7 +216,7 @@ public record LocationOptionMapping : Mapping<MappableLocationOption>;
 
 /// <summary>
 /// This represents a single geographic level's worth of location mappings from the source
-/// data set version and potential candidates to map to from the target data set version. 
+/// data set version and potential candidates to map to from the target data set version.
 /// </summary>
 public record LocationLevelMappings
 {
@@ -224,7 +235,7 @@ public class LocationMappingPlan
 }
 
 /// <summary>
-/// This represents a filter option that is potentially mappable to another filter option. 
+/// This represents a filter option that is potentially mappable to another filter option.
 /// </summary>
 public record MappableFilterOption : MappableElement;
 
@@ -243,15 +254,16 @@ public record FilterMappingCandidate : MappableElementWithOptions<MappableFilter
 /// <summary>
 /// This represents a potential mapping of a filter option from the source data set version
 /// to a filter option in the target version.  In order to be mappable, both filter options'
-/// parent filters must firstly be mapped to each other.  
+/// parent filters must firstly be mapped to each other.
 /// </summary>
 public record FilterOptionMapping : Mapping<MappableFilterOption>;
 
 /// <summary>
 /// This represents a potential mapping of a filter from the source data set version
-/// to a filter in the target version.  
+/// to a filter in the target version.
 /// </summary>
-public record FilterMapping : ParentMapping<MappableFilter, MappableFilterOption, FilterOptionMapping>;
+public record FilterMapping
+    : ParentMapping<MappableFilter, MappableFilterOption, FilterOptionMapping>;
 
 /// <summary>
 /// This represents the overall mapping plan for filters and filter options from the source

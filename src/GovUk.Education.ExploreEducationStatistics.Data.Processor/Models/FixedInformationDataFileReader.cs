@@ -126,7 +126,7 @@ public class FixedInformationDataFileReader
         PlanningAreaCode,
 
         [EnumLabelValue("planning_area_name")]
-        PlanningAreaName
+        PlanningAreaName,
     }
 
     private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
@@ -142,9 +142,12 @@ public class FixedInformationDataFileReader
         _timeIdentifierColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_identifier"));
         _yearColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_period"));
         _geographicLevelColumnIndex = csvHeaders.FindIndex(h => h.Equals("geographic_level"));
-        _locationColumnIndexes = EnumUtil.GetEnums<LocationColumn>().ToDictionary(
-            enumValue => enumValue,
-            enumValue => csvHeaders.FindIndex(h => h.Equals(enumValue.GetEnumLabel())));
+        _locationColumnIndexes = EnumUtil
+            .GetEnums<LocationColumn>()
+            .ToDictionary(
+                enumValue => enumValue,
+                enumValue => csvHeaders.FindIndex(h => h.Equals(enumValue.GetEnumLabel()))
+            );
     }
 
     public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues)
@@ -153,7 +156,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
+            return (TimeIdentifier)TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -179,7 +182,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (GeographicLevel) GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
+            return (GeographicLevel)GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -209,7 +212,7 @@ public class FixedInformationDataFileReader
             RscRegion = GetRscRegion(rowValues),
             School = GetSchool(rowValues),
             Sponsor = GetSponsor(rowValues),
-            Ward = GetWard(rowValues)
+            Ward = GetWard(rowValues),
         };
     }
 
@@ -241,35 +244,58 @@ public class FixedInformationDataFileReader
         var name = GetLocationAttributeValue(LocationColumn.LaName, rowValues);
         return GetLocationAttributeOrDefault(
             () => new LocalAuthority(newCode, oldCode, name),
-            oldCode, newCode, name);
+            oldCode,
+            newCode,
+            name
+        );
     }
 
     private LocalAuthorityDistrict? GetLocalAuthorityDistrict(IReadOnlyList<string> rowValues)
     {
         var code = GetLocationAttributeValue(LocationColumn.LadCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LadName, rowValues);
-        return GetLocationAttributeOrDefault(() => new LocalAuthorityDistrict(code, name), code, name);
+        return GetLocationAttributeOrDefault(
+            () => new LocalAuthorityDistrict(code, name),
+            code,
+            name
+        );
     }
 
-    private LocalEnterprisePartnership? GetLocalEnterprisePartnership(IReadOnlyList<string> rowValues)
+    private LocalEnterprisePartnership? GetLocalEnterprisePartnership(
+        IReadOnlyList<string> rowValues
+    )
     {
         var code = GetLocationAttributeValue(LocationColumn.LepCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LepName, rowValues);
-        return GetLocationAttributeOrDefault(() => new LocalEnterprisePartnership(code, name), code, name);
+        return GetLocationAttributeOrDefault(
+            () => new LocalEnterprisePartnership(code, name),
+            code,
+            name
+        );
     }
 
-    private LocalSkillsImprovementPlanArea? GetLocalSkillsImprovementPlanArea(IReadOnlyList<string> rowValues)
+    private LocalSkillsImprovementPlanArea? GetLocalSkillsImprovementPlanArea(
+        IReadOnlyList<string> rowValues
+    )
     {
         var code = GetLocationAttributeValue(LocationColumn.LsipCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LsipName, rowValues);
-        return GetLocationAttributeOrDefault(() => new LocalSkillsImprovementPlanArea(code, name), code, name);
+        return GetLocationAttributeOrDefault(
+            () => new LocalSkillsImprovementPlanArea(code, name),
+            code,
+            name
+        );
     }
 
     private MayoralCombinedAuthority? GetMayoralCombinedAuthority(IReadOnlyList<string> rowValues)
     {
         var code = GetLocationAttributeValue(LocationColumn.McaCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.McaName, rowValues);
-        return GetLocationAttributeOrDefault(() => new MayoralCombinedAuthority(code, name), code, name);
+        return GetLocationAttributeOrDefault(
+            () => new MayoralCombinedAuthority(code, name),
+            code,
+            name
+        );
     }
 
     private MultiAcademyTrust? GetMultiAcademyTrust(IReadOnlyList<string> rowValues)
@@ -288,9 +314,19 @@ public class FixedInformationDataFileReader
 
     private ParliamentaryConstituency? GetParliamentaryConstituency(IReadOnlyList<string> rowValues)
     {
-        var code = GetLocationAttributeValue(LocationColumn.ParliamentaryConstituencyCode, rowValues);
-        var name = GetLocationAttributeValue(LocationColumn.ParliamentaryConstituencyName, rowValues);
-        return GetLocationAttributeOrDefault(() => new ParliamentaryConstituency(code, name), code, name);
+        var code = GetLocationAttributeValue(
+            LocationColumn.ParliamentaryConstituencyCode,
+            rowValues
+        );
+        var name = GetLocationAttributeValue(
+            LocationColumn.ParliamentaryConstituencyName,
+            rowValues
+        );
+        return GetLocationAttributeOrDefault(
+            () => new ParliamentaryConstituency(code, name),
+            code,
+            name
+        );
     }
 
     private Provider? GetProvider(IReadOnlyList<string> rowValues)
@@ -341,7 +377,10 @@ public class FixedInformationDataFileReader
         return GetLocationAttributeOrDefault(() => new PlanningArea(code, name), code, name);
     }
 
-    private string? GetLocationAttributeValue(LocationColumn column, IReadOnlyList<string> rowValues)
+    private string? GetLocationAttributeValue(
+        LocationColumn column,
+        IReadOnlyList<string> rowValues
+    )
     {
         var columnIndex = _locationColumnIndexes[column];
         return columnIndex != -1 ? rowValues[columnIndex].Trim() : null;
@@ -349,7 +388,8 @@ public class FixedInformationDataFileReader
 
     private TLocationAttribute? GetLocationAttributeOrDefault<TLocationAttribute>(
         Func<TLocationAttribute> creatorFunc,
-        params string?[] attributeValues)
+        params string?[] attributeValues
+    )
         where TLocationAttribute : LocationAttribute
     {
         return !attributeValues.All(v => v.IsNullOrEmpty()) ? creatorFunc.Invoke() : default;

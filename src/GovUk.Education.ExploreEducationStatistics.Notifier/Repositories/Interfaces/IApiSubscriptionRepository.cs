@@ -14,32 +14,38 @@ public interface IApiSubscriptionRepository
     Task<ApiSubscription?> GetSubscription(
         Guid dataSetId,
         string email,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task CreatePendingSubscription(
         Guid dataSetId,
         string dataSetTitle,
         string email,
         DateTimeOffset expiryDateTime,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task UpdateSubscription(
         ApiSubscription subscription,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task DeleteSubscription(
         Guid dataSetId,
         string email,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<AsyncPageable<ApiSubscription>> QuerySubscriptions(
         Expression<Func<ApiSubscription, bool>>? filter = null,
         int? maxPerPage = 1000,
         IEnumerable<string>? select = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task BatchManipulateSubscriptions(
         IEnumerable<ApiSubscription> subscriptions,
         TableTransactionActionType tableTransactionActionType,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

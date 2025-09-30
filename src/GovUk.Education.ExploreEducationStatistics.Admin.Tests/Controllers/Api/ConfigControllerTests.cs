@@ -68,25 +68,35 @@ public class ConfigControllerTests
             viewModel.PublicApiDocsUrl
         );
         Assert.Equal(
-            new []
+            new[]
             {
                 "https://department-for-education.shinyapps.io",
-                "https://dfe-analytical-services.github.io"
+                "https://dfe-analytical-services.github.io",
             },
-            viewModel.PermittedEmbedUrlDomains);
+            viewModel.PermittedEmbedUrlDomains
+        );
 
         const string realm = "https://ees.local:5031/auth/realms/ees-realm";
         Assert.Equal("ees-admin-client", viewModel.Oidc.ClientId);
         Assert.Equal(realm, viewModel.Oidc.Authority);
-        Assert.Equal(new [] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
+        Assert.Equal(new[] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
         Assert.Equal(SecurityScopes.AccessAdminApiScope, viewModel.Oidc.AdminApiScope);
 
         var authorityMetadata = viewModel.Oidc.AuthorityMetadata!;
-        Assert.Equal($"{realm}/protocol/openid-connect/auth", authorityMetadata.AuthorizationEndpoint);
+        Assert.Equal(
+            $"{realm}/protocol/openid-connect/auth",
+            authorityMetadata.AuthorizationEndpoint
+        );
         Assert.Equal($"{realm}/protocol/openid-connect/token", authorityMetadata.TokenEndpoint);
         Assert.Equal(realm, authorityMetadata.Issuer);
-        Assert.Equal($"{realm}/protocol/openid-connect/userinfo", authorityMetadata.UserInfoEndpoint);
-        Assert.Equal($"{realm}/protocol/openid-connect/logout", authorityMetadata.EndSessionEndpoint);
+        Assert.Equal(
+            $"{realm}/protocol/openid-connect/userinfo",
+            authorityMetadata.UserInfoEndpoint
+        );
+        Assert.Equal(
+            $"{realm}/protocol/openid-connect/logout",
+            authorityMetadata.EndSessionEndpoint
+        );
     }
 
     private static IConfiguration GetConfiguration()

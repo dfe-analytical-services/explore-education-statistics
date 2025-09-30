@@ -9,9 +9,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
-{
-}
+public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement { }
 
 public class CreateMethodologyForSpecificPublicationAuthorizationHandler
     : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
@@ -21,7 +19,8 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandler
 
     public CreateMethodologyForSpecificPublicationAuthorizationHandler(
         ContentDbContext context,
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _context = context;
         _authorizationHandlerService = authorizationHandlerService;
@@ -30,7 +29,8 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         CreateMethodologyForSpecificPublicationRequirement requirement,
-        Publication publication)
+        Publication publication
+    )
     {
         // No user is allowed to create a new methodology of an archived or to-be-archived publication
         if (publication.SupersededById.HasValue)
@@ -39,9 +39,11 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandler
         }
 
         // If a publication owns a methodology already, they cannot own another
-        if (await _context
-                .PublicationMethodologies
-                .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
+        if (
+            await _context.PublicationMethodologies.AnyAsync(pm =>
+                pm.PublicationId == publication.Id && pm.Owner
+            )
+        )
         {
             return;
         }
@@ -52,11 +54,13 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandler
             return;
         }
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+        if (
+            await _authorizationHandlerService.HasRolesOnPublication(
+                context.User.GetUserId(),
+                publication.Id,
+                Owner
+            )
+        )
         {
             context.Succeed(requirement);
         }

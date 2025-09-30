@@ -16,7 +16,9 @@ public class EnumSchemaFilter : ISchemaFilter
         if (context.Type.IsEnum)
         {
             schema.Enum.Clear();
-            schema.Enum.AddRange(Enum.GetNames(context.Type).Select(name => new OpenApiString($"{name}")));
+            schema.Enum.AddRange(
+                Enum.GetNames(context.Type).Select(name => new OpenApiString($"{name}"))
+            );
         }
     }
 }

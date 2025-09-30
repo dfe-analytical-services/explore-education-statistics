@@ -7,7 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 
 public static class ObservationViewModelBuilder
 {
-    public static ObservationViewModel BuildObservation(Observation observation, IEnumerable<Guid> indicators)
+    public static ObservationViewModel BuildObservation(
+        Observation observation,
+        IEnumerable<Guid> indicators
+    )
     {
         return new ObservationViewModel
         {
@@ -16,16 +19,13 @@ public static class ObservationViewModelBuilder
             GeographicLevel = observation.Location.GeographicLevel,
             LocationId = observation.LocationId,
             Measures = Measures(observation, indicators.ToList()),
-            TimePeriod = observation.GetTimePeriod()
+            TimePeriod = observation.GetTimePeriod(),
         };
     }
 
     private static List<Guid> FilterItems(Observation observation)
     {
-        return observation
-            .FilterItems
-            .Select(item => item.FilterItemId)
-            .ToList();
+        return observation.FilterItems.Select(item => item.FilterItemId).ToList();
     }
 
     private static Dictionary<Guid, string> Measures(Observation observation, List<Guid> indicators)
@@ -35,8 +35,8 @@ public static class ObservationViewModelBuilder
             return observation.Measures;
         }
 
-        return observation.Measures
-            .Where(pair => indicators.Contains(pair.Key))
+        return observation
+            .Measures.Where(pair => indicators.Contains(pair.Key))
             .ToDictionary(item => item.Key, item => item.Value);
     }
 }

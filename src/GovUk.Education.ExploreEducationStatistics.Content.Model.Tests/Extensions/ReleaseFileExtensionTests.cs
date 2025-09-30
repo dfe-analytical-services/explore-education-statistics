@@ -20,8 +20,8 @@ public class ReleaseFileExtensionTests
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         Assert.Equal(releaseFile.File.Path(), releaseFile.Path());
@@ -38,18 +38,20 @@ public class ReleaseFileExtensionTests
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
-        Assert.Equal($"{releaseFile.ReleaseVersionId}/ancillary/{releaseFile.File.Id}", releaseFile.PublicPath());
+        Assert.Equal(
+            $"{releaseFile.ReleaseVersionId}/ancillary/{releaseFile.File.Id}",
+            releaseFile.PublicPath()
+        );
     }
 
     [Fact]
     public void ToFileInfo()
     {
-        var createdByUser = _dataFixture.DefaultUser()
-            .Generate();
+        var createdByUser = _dataFixture.DefaultUser().Generate();
 
         var releaseFile = new ReleaseFile
         {
@@ -64,8 +66,8 @@ public class ReleaseFileExtensionTests
                 ContentLength = 10240,
                 Type = Ancillary,
                 Created = new DateTime(),
-                CreatedBy = createdByUser
-            }
+                CreatedBy = createdByUser,
+            },
         };
 
         var info = releaseFile.ToFileInfo();
@@ -95,7 +97,7 @@ public class ReleaseFileExtensionTests
                 Filename = "ancillary.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-            }
+            },
         };
 
         var info = releaseFile.ToFileInfo();

@@ -32,31 +32,33 @@ public class PublicationControllerTests : CacheServiceTestFixture
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
-            LatestPublishedReleaseVersionId = latestReleaseVersionId
+            LatestPublishedReleaseVersionId = latestReleaseVersionId,
         };
 
         var (controller, mocks) = BuildControllerAndMocks();
 
-        var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", latestReleaseVersionId);
+        var cacheKey = new ReleaseSubjectsCacheKey(
+            "publication",
+            "release",
+            latestReleaseVersionId
+        );
 
         SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
         mocks
-            .cacheKeyService
-            .Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseVersionId))
+            .cacheKeyService.Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseVersionId))
             .ReturnsAsync(cacheKey);
 
-        mocks.cacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
+        mocks
+            .cacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
             .ReturnsAsync(null!);
 
         mocks
-            .releaseService
-            .Setup(s => s.ListSubjects(latestReleaseVersionId))
+            .releaseService.Setup(s => s.ListSubjects(latestReleaseVersionId))
             .ReturnsAsync(subjects);
 
-        mocks.cacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, subjects))
+        mocks
+            .cacheService.Setup(s => s.SetItemAsync<object>(cacheKey, subjects))
             .Returns(Task.CompletedTask);
 
         var result = await controller.ListLatestReleaseSubjects(publication.Id);
@@ -71,7 +73,7 @@ public class PublicationControllerTests : CacheServiceTestFixture
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
-            LatestPublishedReleaseVersionId = null
+            LatestPublishedReleaseVersionId = null,
         };
 
         var (controller, mocks) = BuildControllerAndMocks();
@@ -92,13 +94,12 @@ public class PublicationControllerTests : CacheServiceTestFixture
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
-            LatestPublishedReleaseVersionId = latestReleaseId
+            LatestPublishedReleaseVersionId = latestReleaseId,
         };
 
         var featuredTables = new List<FeaturedTableViewModel>
         {
-            new
-            (
+            new(
                 Id: Guid.NewGuid(),
                 Name: "name",
                 Description: "description",
@@ -113,8 +114,8 @@ public class PublicationControllerTests : CacheServiceTestFixture
 
         SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
-        mocks.releaseService
-            .Setup(s => s.ListFeaturedTables(latestReleaseId))
+        mocks
+            .releaseService.Setup(s => s.ListFeaturedTables(latestReleaseId))
             .ReturnsAsync(featuredTables);
 
         var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
@@ -129,7 +130,7 @@ public class PublicationControllerTests : CacheServiceTestFixture
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
-            LatestPublishedReleaseVersionId = null
+            LatestPublishedReleaseVersionId = null,
         };
 
         var (controller, mocks) = BuildControllerAndMocks();
@@ -150,17 +151,10 @@ public class PublicationControllerTests : CacheServiceTestFixture
             "Name",
             0,
             "Content",
-            new TimePeriodLabels
-            {
-                From = "2020",
-                To = "2022"
-            },
+            new TimePeriodLabels { From = "2020", To = "2022" },
             new List<string> { "level1" },
-            new List<string> { "filter1", },
-            new List<string>
-            {
-                "indicator1", "indicator2", "indicator3", "indicator4",
-            },
+            new List<string> { "filter1" },
+            new List<string> { "indicator1", "indicator2", "indicator3", "indicator4" },
             new FileInfo
             {
                 Created = DateTime.Now,
@@ -170,30 +164,37 @@ public class PublicationControllerTests : CacheServiceTestFixture
                 Summary = "Summary",
                 Type = FileType.Ancillary,
                 FileName = "Filename",
-                UserName = "UserName"
+                UserName = "UserName",
             },
-            DateTime.Now);
+            DateTime.Now
+        );
 
         var converted = DeserializeObject<SubjectViewModel>(SerializeObject(original));
         converted.AssertDeepEqualTo(original);
     }
 
-    private (PublicationController controller,
+    private (
+        PublicationController controller,
         (
-        Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
-        Mock<IReleaseService> releaseService,
-        Mock<ICacheKeyService> cacheKeyService,
-        Mock<IBlobCacheService> cacheService
+            Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
+            Mock<IReleaseService> releaseService,
+            Mock<ICacheKeyService> cacheKeyService,
+            Mock<IBlobCacheService> cacheService
         ) mocks
-        ) BuildControllerAndMocks()
+    ) BuildControllerAndMocks()
     {
         var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
         var releaseService = new Mock<IReleaseService>(Strict);
         var cacheKeyService = new Mock<ICacheKeyService>(Strict);
         var controller = new PublicationController(
-            contentPersistenceHelper.Object, releaseService.Object, cacheKeyService.Object);
+            contentPersistenceHelper.Object,
+            releaseService.Object,
+            cacheKeyService.Object
+        );
 
-        return (controller,
-            (contentPersistenceHelper, releaseService, cacheKeyService, BlobCacheService));
+        return (
+            controller,
+            (contentPersistenceHelper, releaseService, cacheKeyService, BlobCacheService)
+        );
     }
 }

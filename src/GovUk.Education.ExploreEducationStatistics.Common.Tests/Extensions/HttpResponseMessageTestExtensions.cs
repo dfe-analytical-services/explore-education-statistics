@@ -30,7 +30,11 @@ public static class HttpResponseMessageTestExtensions
         return message.AssertBodyEqualTo(expectedBody);
     }
 
-    public static T AssertOk<T>(this HttpResponseMessage message, T expectedBody, bool useSystemJson = false)
+    public static T AssertOk<T>(
+        this HttpResponseMessage message,
+        T expectedBody,
+        bool useSystemJson = false
+    )
     {
         Assert.Equal(OK, message.StatusCode);
         return message.AssertBodyEqualTo(expectedBody, useSystemJson);
@@ -39,7 +43,8 @@ public static class HttpResponseMessageTestExtensions
     public static (T body, string createdEntityId) AssertCreated<T>(
         this HttpResponseMessage message,
         string expectedLocationPrefix,
-        bool useSystemJson = false)
+        bool useSystemJson = false
+    )
     {
         Assert.Equal(Created, message.StatusCode);
         Assert.NotNull(message.Headers.Location);
@@ -58,14 +63,19 @@ public static class HttpResponseMessageTestExtensions
         this HttpResponseMessage message,
         T expectedBody,
         string expectedLocation,
-        bool useSystemJson = false)
+        bool useSystemJson = false
+    )
     {
         Assert.Equal(Created, message.StatusCode);
         Assert.Equal(new Uri(expectedLocation), message.Headers.Location);
         return message.AssertBodyEqualTo(expectedBody, useSystemJson);
     }
 
-    public static void AssertHasHeader(this HttpResponseMessage message, string headerKey, string expectedHeaderValue)
+    public static void AssertHasHeader(
+        this HttpResponseMessage message,
+        string headerKey,
+        string expectedHeaderValue
+    )
     {
         message.Headers.TryGetValues(headerKey, out var headerValue);
         Assert.NotNull(headerValue);
@@ -110,7 +120,9 @@ public static class HttpResponseMessageTestExtensions
         return message.AssertBodyIsProblemDetails();
     }
 
-    public static ValidationProblemViewModel AssertValidationProblem(this HttpResponseMessage message)
+    public static ValidationProblemViewModel AssertValidationProblem(
+        this HttpResponseMessage message
+    )
     {
         Assert.Equal(BadRequest, message.StatusCode);
 
@@ -133,7 +145,9 @@ public static class HttpResponseMessageTestExtensions
         return details;
     }
 
-    public static ValidationProblemViewModel AssertBodyIsValidationProblem(this HttpResponseMessage message)
+    public static ValidationProblemViewModel AssertBodyIsValidationProblem(
+        this HttpResponseMessage message
+    )
     {
         var details = Deserialize<ValidationProblemViewModel>(message, useSystemJson: true);
 
@@ -151,7 +165,11 @@ public static class HttpResponseMessageTestExtensions
         return actual;
     }
 
-    public static T AssertBodyEqualTo<T>(this HttpResponseMessage message, T expected, bool useSystemJson = false)
+    public static T AssertBodyEqualTo<T>(
+        this HttpResponseMessage message,
+        T expected,
+        bool useSystemJson = false
+    )
     {
         var body = Deserialize<T>(message, useSystemJson: useSystemJson);
 
@@ -171,7 +189,8 @@ public static class HttpResponseMessageTestExtensions
         return useSystemJson
             ? JsonSerializer.Deserialize<T>(
                 message.Content.ReadAsStream().ReadToEnd(),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            )
             : message.Content.ReadFromJson<T>();
     }
 }

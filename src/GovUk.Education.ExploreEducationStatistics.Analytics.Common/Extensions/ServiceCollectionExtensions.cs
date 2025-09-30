@@ -17,38 +17,40 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static AnalyticsRegistrar AddAnalyticsCommon(
         this IServiceCollection services,
-        IConfiguration configuration) =>
-        new(services, configuration);
+        IConfiguration configuration
+    ) => new(services, configuration);
 
     public class AnalyticsRegistrar(IServiceCollection services, IConfiguration configuration)
     {
-        private readonly bool _isAnalyticsEnabled = 
-            configuration
-                .GetSection(AnalyticsOptions.Section)
-                .Get<AnalyticsOptions>()?
-                .Enabled == true;
-        
-        private readonly IServiceCollection _services = 
-            services
-                .AddOptions<AnalyticsOptions>().Bind(configuration.GetSection(AnalyticsOptions.Section)).Services
-                .AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+        private readonly bool _isAnalyticsEnabled =
+            configuration.GetSection(AnalyticsOptions.Section).Get<AnalyticsOptions>()?.Enabled
+            == true;
 
-        public AnalyticsEnabledRegistrar WhenEnabled => _services.AddAnalyticsCommon(_isAnalyticsEnabled);
+        private readonly IServiceCollection _services = services
+            .AddOptions<AnalyticsOptions>()
+            .Bind(configuration.GetSection(AnalyticsOptions.Section))
+            .Services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+
+        public AnalyticsEnabledRegistrar WhenEnabled =>
+            _services.AddAnalyticsCommon(_isAnalyticsEnabled);
     }
-    
-    private static AnalyticsEnabledRegistrar AddAnalyticsCommon(this IServiceCollection services, bool isAnalyticsEnabled) =>
+
+    private static AnalyticsEnabledRegistrar AddAnalyticsCommon(
+        this IServiceCollection services,
+        bool isAnalyticsEnabled
+    ) =>
         new(
             isAnalyticsEnabled
-            ? services
-                .AddSingleton<IAnalyticsManager, AnalyticsManager>()
-                .AddSingleton<IAnalyticsWriter, AnalyticsWriter>()
-                .AddHostedService<AnalyticsConsumer>()
-                .AddTransient(
-                    typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
-                    typeof(CommonAnalyticsWriteStrategyWorkflow<>))
-                .TryAddSingletonInline<DateTimeProvider>()
-            : services
-                .AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>(),
+                ? services
+                    .AddSingleton<IAnalyticsManager, AnalyticsManager>()
+                    .AddSingleton<IAnalyticsWriter, AnalyticsWriter>()
+                    .AddHostedService<AnalyticsConsumer>()
+                    .AddTransient(
+                        typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
+                        typeof(CommonAnalyticsWriteStrategyWorkflow<>)
+                    )
+                    .TryAddSingletonInline<DateTimeProvider>()
+                : services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>(),
             isAnalyticsEnabled
         );
 
@@ -62,11 +64,13 @@ public static class ServiceCollectionExtensions
             }
             return this;
         }
+
         public IServiceCollection Services => services;
     }
+
     public class AnalyticsEnabledRegistrar(IServiceCollection services, bool isAnalyticsEnabled)
     {
-        public AnalyticsEnabledRegistrar AddWriteStrategy<TWriter>() 
+        public AnalyticsEnabledRegistrar AddWriteStrategy<TWriter>()
             where TWriter : class, IAnalyticsWriteStrategy
         {
             if (isAnalyticsEnabled)
@@ -75,6 +79,7 @@ public static class ServiceCollectionExtensions
             }
             return this;
         }
+
         public AnalyticsEnabledRegistrar WithService(Action<IServiceCollection> registrations)
         {
             if (isAnalyticsEnabled)
@@ -83,11 +88,14 @@ public static class ServiceCollectionExtensions
             }
             return this;
         }
+
         public IServiceCollection Services => services;
         public AnalyticsDisabledRegistrar WhenDisabled => new(services, isAnalyticsEnabled);
     }
-    
-    private static IServiceCollection TryAddSingletonInline<TService>(this IServiceCollection services)
+
+    private static IServiceCollection TryAddSingletonInline<TService>(
+        this IServiceCollection services
+    )
         where TService : class
     {
         services.TryAddSingleton<TService>();

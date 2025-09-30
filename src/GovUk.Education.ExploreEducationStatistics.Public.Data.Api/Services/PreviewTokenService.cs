@@ -9,7 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class PreviewTokenService(
     PublicDataDbContext publicDataDbContext,
-    IHttpContextAccessor httpContextAccessor) : IPreviewTokenService
+    IHttpContextAccessor httpContextAccessor
+) : IPreviewTokenService
 {
     public async Task<PreviewToken?> GetPreviewTokenFromRequest()
     {
@@ -20,14 +21,13 @@ public class PreviewTokenService(
             return null;
         }
 
-        return await publicDataDbContext
-            .PreviewTokens
-            .SingleOrDefaultAsync(pt => pt.Id == tokenId);
+        return await publicDataDbContext.PreviewTokens.SingleOrDefaultAsync(pt => pt.Id == tokenId);
     }
 
     public async Task<bool> ValidatePreviewTokenForDataSet(
         Guid dataSetId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var previewTokenId = GetPreviewTokenIdFromRequest();
 
@@ -35,10 +35,9 @@ public class PreviewTokenService(
         {
             return false;
         }
-            
+
         var dataSet = await publicDataDbContext
-            .DataSets
-            .AsNoTracking()
+            .DataSets.AsNoTracking()
             .SingleOrDefaultAsync(d => d.Id == dataSetId, cancellationToken);
 
         if (dataSet == null)
@@ -54,12 +53,14 @@ public class PreviewTokenService(
         return await HasActivePreviewToken(
             dataSetVersionId: dataSet.LatestDraftVersionId.Value,
             previewTokenId: previewTokenId.Value,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
-    
+
     public async Task<bool> ValidatePreviewTokenForDataSetVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var previewTokenId = GetPreviewTokenIdFromRequest();
 
@@ -71,35 +72,37 @@ public class PreviewTokenService(
         return await HasActivePreviewToken(
             dataSetVersionId: dataSetVersionId,
             previewTokenId: previewTokenId.Value,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     private async Task<bool> HasActivePreviewToken(
         Guid dataSetVersionId,
         Guid previewTokenId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var timestamp = DateTimeOffset.UtcNow; // Capture UtcNow and pass into query as a literal to avoid bizarre timing issues in tests.
         return await publicDataDbContext
-            .PreviewTokens
-            .Where(pt => pt.Id == previewTokenId)
+            .PreviewTokens.Where(pt => pt.Id == previewTokenId)
             .Where(pt => pt.DataSetVersionId == dataSetVersionId)
             .Where(pt => pt.DataSetVersion.Status == DataSetVersionStatus.Draft)
             .Where(pt => pt.Expiry > timestamp)
             .AnyAsync(cancellationToken: cancellationToken);
     }
-    
+
     private Guid? GetPreviewTokenIdFromRequest()
     {
-        if (!httpContextAccessor
-            .HttpContext
-            .TryGetRequestHeader(
+        if (
+            !httpContextAccessor.HttpContext.TryGetRequestHeader(
                 RequestHeaderNames.PreviewToken,
-                out var previewTokenString))
+                out var previewTokenString
+            )
+        )
         {
             return null;
         }
-        
+
         if (!Guid.TryParse(previewTokenString, out var previewTokenId))
         {
             return null;

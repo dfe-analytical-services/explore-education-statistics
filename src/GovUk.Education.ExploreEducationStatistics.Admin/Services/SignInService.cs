@@ -23,7 +23,8 @@ public class SignInService(
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserPublicationInviteRepository userPublicationInviteRepository,
-    IUserRepository userRepository) : ISignInService
+    IUserRepository userRepository
+) : ISignInService
 {
     public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
     {
@@ -40,16 +41,18 @@ public class SignInService(
                 LoginResult: LoginResult.LoginSuccess,
                 UserProfile: new UserProfile(
                     Id: Guid.Parse(existingUser.Id),
-                    FirstName: existingUser.FirstName));
+                    FirstName: existingUser.FirstName
+                )
+            );
         }
 
         // If the email address does not match an existing user in the service, see if they have been invited.
         var inviteToSystem = await usersAndRolesDbContext
-            .UserInvites
-            .IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
+            .UserInvites.IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
             .Include(i => i.Role)
             .FirstOrDefaultAsync(invite =>
-                invite.Email.ToLower() == profile.Email.ToLower() && invite.Accepted == false);
+                invite.Email.ToLower() == profile.Email.ToLower() && invite.Accepted == false
+            );
 
         // If the newly logging in User has an unaccepted invite with a matching email address, register them with
         // the Identity Framework and also create any "internal" User records too if they don't already exist.  If
@@ -65,7 +68,8 @@ public class SignInService(
 
     private async Task<Either<ActionResult, SignInResponseViewModel>> HandleNewInvitedUser(
         UserInvite inviteToSystem,
-        UserProfileFromClaims profile)
+        UserProfileFromClaims profile
+    )
     {
         if (inviteToSystem.Expired)
         {
@@ -76,9 +80,9 @@ public class SignInService(
         inviteToSystem.Accepted = true;
 
         // This will also fetch soft-deleted & expired users
-        var existingInternalUser = await contentDbContext
-            .Users
-            .SingleOrDefaultAsync(u => u.Email.ToLower() == profile.Email.ToLower());
+        var existingInternalUser = await contentDbContext.Users.SingleOrDefaultAsync(u =>
+            u.Email.ToLower() == profile.Email.ToLower()
+        );
 
         // Create a new set of AspNetUser records for the Identity Framework.
         var newAspNetUser = new ApplicationUser
@@ -87,14 +91,17 @@ public class SignInService(
             UserName = profile.Email,
             Email = profile.Email, // do these need lower-casing?
             FirstName = profile.FirstName,
-            LastName = profile.LastName
+            LastName = profile.LastName,
         };
 
         await usersAndRolesDbContext.Users.AddAsync(newAspNetUser);
         await usersAndRolesDbContext.SaveChangesAsync();
 
         // Add them to their global role.
-        var addedIdentityUserRoles = await userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
+        var addedIdentityUserRoles = await userManager.AddToRoleAsync(
+            newAspNetUser,
+            inviteToSystem.Role.Name
+        );
 
         if (!addedIdentityUserRoles.Succeeded)
         {
@@ -134,7 +141,7 @@ public class SignInService(
                 Active = true,
                 RoleId = inviteToSystem.RoleId,
                 Created = DateTimeOffset.UtcNow,
-                CreatedById = createdById
+                CreatedById = createdById,
             };
 
             await contentDbContext.Users.AddAsync(newInternalUser);
@@ -149,7 +156,9 @@ public class SignInService(
             LoginResult: LoginResult.RegistrationSuccess,
             UserProfile: new UserProfile(
                 Id: Guid.Parse(newAspNetUser.Id),
-                FirstName: newAspNetUser.FirstName));
+                FirstName: newAspNetUser.FirstName
+            )
+        );
     }
 
     private async Task HandleReleaseInvites(Guid newUserId, string email)
@@ -158,11 +167,14 @@ public class SignInService(
 
         await releaseInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userReleaseRoleRepository.Create(
-                userId: newUserId,
-                releaseVersionId: invite.ReleaseVersionId,
-                role: invite.Role,
-                createdById: invite.CreatedById));
+            .ForEachAwaitAsync(invite =>
+                userReleaseRoleRepository.Create(
+                    userId: newUserId,
+                    releaseVersionId: invite.ReleaseVersionId,
+                    role: invite.Role,
+                    createdById: invite.CreatedById
+                )
+            );
 
         await userReleaseInviteRepository.RemoveByUserEmail(email);
     }
@@ -173,18 +185,19 @@ public class SignInService(
 
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userPublicationRoleRepository.Create(
-                userId: newUserId,
-                publicationId: invite.PublicationId,
-                role: invite.Role,
-                createdById: invite.CreatedById));
+            .ForEachAwaitAsync(invite =>
+                userPublicationRoleRepository.Create(
+                    userId: newUserId,
+                    publicationId: invite.PublicationId,
+                    role: invite.Role,
+                    createdById: invite.CreatedById
+                )
+            );
 
         await userPublicationInviteRepository.RemoveByUserEmail(email);
     }
 
-    private async Task HandleExpiredInvite(
-        UserInvite inviteToSystem,
-        string email)
+    private async Task HandleExpiredInvite(UserInvite inviteToSystem, string email)
     {
         await contentDbContext.RequireTransaction(async () =>
         {
@@ -207,8 +220,7 @@ public class SignInService(
         }
 
         var createdByAspNetUserEmail = await usersAndRolesDbContext
-            .Users
-            .Where(u => u.Id == inviteToSystem.CreatedById)
+            .Users.Where(u => u.Id == inviteToSystem.CreatedById)
             .Select(u => u.Email)
             .SingleOrDefaultAsync();
 
@@ -218,13 +230,12 @@ public class SignInService(
         }
 
         var createdByInternalUserId = await contentDbContext
-            .Users
-            .Where(u => u.Email == createdByAspNetUserEmail)
+            .Users.Where(u => u.Email == createdByAspNetUserEmail)
             .Select(u => u.Id)
             .SingleOrDefaultAsync();
 
-        return createdByInternalUserId == Guid.Empty 
-            ? await GetDeletedUserId() 
+        return createdByInternalUserId == Guid.Empty
+            ? await GetDeletedUserId()
             : createdByInternalUserId;
     }
 }

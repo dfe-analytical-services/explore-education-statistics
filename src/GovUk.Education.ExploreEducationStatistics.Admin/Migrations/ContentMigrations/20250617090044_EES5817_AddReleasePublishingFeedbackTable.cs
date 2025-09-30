@@ -16,13 +16,25 @@ public partial class EES5817_AddReleasePublishingFeedbackTable : Migration
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                EmailToken = table.Column<string>(type: "nvarchar(55)", maxLength: 55, nullable: false),
+                EmailToken = table.Column<string>(
+                    type: "nvarchar(55)",
+                    maxLength: 55,
+                    nullable: false
+                ),
                 ReleaseVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 UserPublicationRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                Response = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                AdditionalFeedback = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                Response = table.Column<string>(
+                    type: "nvarchar(50)",
+                    maxLength: 50,
+                    nullable: false
+                ),
+                AdditionalFeedback = table.Column<string>(
+                    type: "nvarchar(2000)",
+                    maxLength: 2000,
+                    nullable: true
+                ),
                 Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                FeedbackReceived = table.Column<DateTime>(type: "datetime2", nullable: true)
+                FeedbackReceived = table.Column<DateTime>(type: "datetime2", nullable: true),
             },
             constraints: table =>
             {
@@ -32,19 +44,23 @@ public partial class EES5817_AddReleasePublishingFeedbackTable : Migration
                     column: x => x.ReleaseVersionId,
                     principalTable: "ReleaseVersions",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
+                    onDelete: ReferentialAction.Cascade
+                );
+            }
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_ReleasePublishingFeedback_ReleaseVersionId",
             table: "ReleasePublishingFeedback",
-            column: "ReleaseVersionId");
+            column: "ReleaseVersionId"
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_ReleasePublishingFeedback_Token",
             table: "ReleasePublishingFeedback",
             column: "EmailToken",
-            unique: true);
+            unique: true
+        );
 
         migrationBuilder.Sql("GRANT INSERT ON dbo.ReleasePublishingFeedback TO [content];");
     }
@@ -52,7 +68,6 @@ public partial class EES5817_AddReleasePublishingFeedbackTable : Migration
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "ReleasePublishingFeedback");
+        migrationBuilder.DropTable(name: "ReleasePublishingFeedback");
     }
 }

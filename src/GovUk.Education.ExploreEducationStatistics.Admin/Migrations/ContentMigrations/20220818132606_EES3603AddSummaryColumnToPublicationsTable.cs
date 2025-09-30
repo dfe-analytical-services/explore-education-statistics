@@ -14,13 +14,12 @@ public partial class EES3603AddSummaryColumnToPublicationsTable : Migration
             type: "nvarchar(160)",
             maxLength: 160,
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Summary",
-            table: "Publications");
+        migrationBuilder.DropColumn(name: "Summary", table: "Publications");
     }
 }

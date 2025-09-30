@@ -15,10 +15,8 @@ public class TableBuilderUtilsTests
          */
         Assert.Equal(
             1,
-            MaximumTableCellCount(
-                countOfIndicators: 1,
-                countOfLocations: 1,
-                countOfTimePeriods: 1));
+            MaximumTableCellCount(countOfIndicators: 1, countOfLocations: 1, countOfTimePeriods: 1)
+        );
     }
 
     [Fact]
@@ -29,10 +27,8 @@ public class TableBuilderUtilsTests
          */
         Assert.Equal(
             3,
-            MaximumTableCellCount(
-                countOfIndicators: 3,
-                countOfLocations: 1,
-                countOfTimePeriods: 1));
+            MaximumTableCellCount(countOfIndicators: 3, countOfLocations: 1, countOfTimePeriods: 1)
+        );
     }
 
     [Fact]
@@ -45,10 +41,8 @@ public class TableBuilderUtilsTests
          */
         Assert.Equal(
             3,
-            MaximumTableCellCount(
-                countOfIndicators: 1,
-                countOfLocations: 3,
-                countOfTimePeriods: 1));
+            MaximumTableCellCount(countOfIndicators: 1, countOfLocations: 3, countOfTimePeriods: 1)
+        );
     }
 
     [Fact]
@@ -61,10 +55,8 @@ public class TableBuilderUtilsTests
          */
         Assert.Equal(
             3,
-            MaximumTableCellCount(
-                countOfIndicators: 1,
-                countOfLocations: 1,
-                countOfTimePeriods: 3));
+            MaximumTableCellCount(countOfIndicators: 1, countOfLocations: 1, countOfTimePeriods: 3)
+        );
     }
 
     [Fact]
@@ -80,10 +72,8 @@ public class TableBuilderUtilsTests
          */
         Assert.Equal(
             12,
-            MaximumTableCellCount(
-                countOfIndicators: 2,
-                countOfLocations: 2,
-                countOfTimePeriods: 3));
+            MaximumTableCellCount(countOfIndicators: 2, countOfLocations: 2, countOfTimePeriods: 3)
+        );
     }
 
     [Fact]
@@ -103,7 +93,9 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(1)));
+                countsOfFilterItemsByFilter: ListOf(1)
+            )
+        );
     }
 
     [Fact]
@@ -123,7 +115,9 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(1, 1)));
+                countsOfFilterItemsByFilter: ListOf(1, 1)
+            )
+        );
     }
 
     [Fact]
@@ -155,7 +149,9 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(3)));
+                countsOfFilterItemsByFilter: ListOf(3)
+            )
+        );
     }
 
     [Fact]
@@ -205,6 +201,8 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(3, 2)));
+                countsOfFilterItemsByFilter: ListOf(3, 2)
+            )
+        );
     }
 }

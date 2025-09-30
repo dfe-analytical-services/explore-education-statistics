@@ -13,16 +13,25 @@ public static class StartupSecurityConfiguration
     {
         services
             .AddAuthentication()
-            .AddScheme<AuthenticationSchemeOptions, AnonymousAuthenticationHandler>("Anonymous", null);
+            .AddScheme<AuthenticationSchemeOptions, AnonymousAuthenticationHandler>(
+                "Anonymous",
+                null
+            );
 
         services
             .AddAuthorizationBuilder()
-            .AddPolicy(PublicDataSecurityPolicies.CanViewDataSet.ToString(),
-                policy => policy.Requirements.Add(new ViewDataSetRequirement()))
-            .AddPolicy(PublicDataSecurityPolicies.CanQueryDataSetVersion.ToString(),
-                policy => policy.Requirements.Add(new QueryDataSetVersionRequirement()))
-            .AddPolicy(PublicDataSecurityPolicies.CanViewDataSetVersion.ToString(),
-                policy => policy.Requirements.Add(new ViewDataSetVersionRequirement()));
+            .AddPolicy(
+                PublicDataSecurityPolicies.CanViewDataSet.ToString(),
+                policy => policy.Requirements.Add(new ViewDataSetRequirement())
+            )
+            .AddPolicy(
+                PublicDataSecurityPolicies.CanQueryDataSetVersion.ToString(),
+                policy => policy.Requirements.Add(new QueryDataSetVersionRequirement())
+            )
+            .AddPolicy(
+                PublicDataSecurityPolicies.CanViewDataSetVersion.ToString(),
+                policy => policy.Requirements.Add(new ViewDataSetVersionRequirement())
+            );
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthorizationHandler, ViewDataSetAuthorizationHandler>();

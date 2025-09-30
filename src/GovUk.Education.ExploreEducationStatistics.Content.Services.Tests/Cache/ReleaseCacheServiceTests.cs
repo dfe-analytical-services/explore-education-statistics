@@ -33,17 +33,10 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
             {
                 Id = Guid.NewGuid(),
                 Title = "Test Organisation",
-                Url = "https://test-organisation"
-            }
+                Url = "https://test-organisation",
+            },
         ],
-        Updates =
-        [
-            new ReleaseNoteViewModel
-            {
-                Id = Guid.NewGuid(),
-                On = DateTime.UtcNow,
-            }
-        ],
+        Updates = [new ReleaseNoteViewModel { Id = Guid.NewGuid(), On = DateTime.UtcNow }],
         Content =
         [
             new ContentSectionViewModel
@@ -53,22 +46,13 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                 Content =
                 [
                     new HtmlBlockViewModel { Id = Guid.NewGuid() },
-
-                    new DataBlockViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Charts = [new LineChart()]
-                    }
-                ]
-            }
+                    new DataBlockViewModel { Id = Guid.NewGuid(), Charts = [new LineChart()] },
+                ],
+            },
         ],
         SummarySection = ContentSectionWithHtmlBlock(),
         HeadlinesSection = ContentSectionWithHtmlBlock(),
-        KeyStatistics =
-        [
-            new KeyStatisticTextViewModel(),
-            new KeyStatisticDataBlockViewModel()
-        ],
+        KeyStatistics = [new KeyStatisticTextViewModel(), new KeyStatisticDataBlockViewModel()],
         KeyStatisticsSecondarySection = ContentSectionWithHtmlBlock(),
         RelatedDashboardsSection = ContentSectionWithHtmlBlock(),
         DownloadFiles =
@@ -80,13 +64,10 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                 FileName = "test-file.txt",
                 Size = "10 Kb",
                 Type = FileType.Ancillary,
-            }
+            },
         ],
         Type = ReleaseType.AccreditedOfficialStatistics,
-        RelatedInformation =
-        [
-            new LinkViewModel { Id = Guid.NewGuid() }
-        ]
+        RelatedInformation = [new LinkViewModel { Id = Guid.NewGuid() }],
     };
 
     [Fact]
@@ -104,7 +85,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
-        releaseService.Setup(s => s.GetRelease(PublicationSlug, ReleaseSlug))
+        releaseService
+            .Setup(s => s.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(_releaseViewModel);
 
         var service = BuildService(releaseService: releaseService.Object);
@@ -145,7 +127,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
-        releaseService.Setup(s => s.GetRelease(PublicationSlug, ReleaseSlug))
+        releaseService
+            .Setup(s => s.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(new NotFoundResult());
 
         var service = BuildService(releaseService: releaseService.Object);
@@ -172,7 +155,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
-        releaseService.Setup(s => s.GetRelease(PublicationSlug, null))
+        releaseService
+            .Setup(s => s.GetRelease(PublicationSlug, null))
             .ReturnsAsync(_releaseViewModel);
 
         var service = BuildService(releaseService: releaseService.Object);
@@ -213,7 +197,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
-        releaseService.Setup(s => s.GetRelease(PublicationSlug, null))
+        releaseService
+            .Setup(s => s.GetRelease(PublicationSlug, null))
             .ReturnsAsync(new NotFoundResult());
 
         var service = BuildService(releaseService: releaseService.Object);
@@ -245,7 +230,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var result = await service.UpdateRelease(
             ReleaseVersionId,
             publicationSlug: PublicationSlug,
-            releaseSlug: ReleaseSlug);
+            releaseSlug: ReleaseSlug
+        );
 
         // There should be no attempt on the cache service to get the cached resource
 
@@ -273,7 +259,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.UpdateRelease(
             ReleaseVersionId,
-            publicationSlug: PublicationSlug);
+            publicationSlug: PublicationSlug
+        );
 
         // There should be no attempt on the cache service to get the cached resource
 
@@ -304,7 +291,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
             ReleaseVersionId,
             expectedPublishDate,
             publicationSlug: PublicationSlug,
-            releaseSlug: ReleaseSlug);
+            releaseSlug: ReleaseSlug
+        );
 
         // There should be no attempt on the cache service to get the cached resource
 
@@ -334,7 +322,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var result = await service.UpdateReleaseStaged(
             ReleaseVersionId,
             expectedPublishDate,
-            publicationSlug: PublicationSlug);
+            publicationSlug: PublicationSlug
+        );
 
         // There should be no attempt on the cache service to get the cached resource
 
@@ -359,11 +348,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
             Order = 1,
             Content = new List<IContentBlockViewModel>
             {
-                new HtmlBlockViewModel
-                {
-                    Id = Guid.NewGuid()
-                }
-            }
+                new HtmlBlockViewModel { Id = Guid.NewGuid() },
+            },
         };
     }
 
@@ -374,6 +360,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         return new ReleaseCacheService(
             releaseService: releaseService ?? Mock.Of<IReleaseService>(Strict),
-            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict));
+            publicBlobStorageService: publicBlobStorageService
+                ?? Mock.Of<IPublicBlobStorageService>(Strict)
+        );
     }
 }

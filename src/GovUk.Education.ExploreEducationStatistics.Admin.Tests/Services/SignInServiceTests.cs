@@ -40,7 +40,7 @@ public class SignInServiceTests
             {
                 Id = CreatedById.ToString(),
                 Email = createdByEmail.ToLower(),
-                UserName = createdByEmail.ToLower()
+                UserName = createdByEmail.ToLower(),
             };
 
             var userInvite = new UserInvite
@@ -50,18 +50,20 @@ public class SignInServiceTests
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Role",
-                    NormalizedName = "ROLE"
+                    NormalizedName = "ROLE",
                 },
                 CreatedBy = createdByAspNetUser,
                 Created = DateTime.UtcNow,
-                Accepted = false
+                Accepted = false,
             };
 
-            var createdByInternalUser = _dataFixture.DefaultUser()
+            var createdByInternalUser = _dataFixture
+                .DefaultUser()
                 .WithEmail(createdByEmail.ToLower())
                 .Generate();
 
-            var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _dataFixture
+                .DefaultUserReleaseInvite()
                 .WithEmail(email)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
                 .WithCreatedById(CreatedById)
@@ -70,7 +72,8 @@ public class SignInServiceTests
                 .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
                 .GenerateList(3);
 
-            var userPublicationInvites = _dataFixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _dataFixture
+                .DefaultUserPublicationInvite()
                 .WithEmail(email)
                 .WithPublication(_dataFixture.DefaultPublication())
                 .WithCreatedById(CreatedById)
@@ -81,7 +84,9 @@ public class SignInServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 usersAndRolesDbContext.UserInvites.Add(userInvite);
                 await usersAndRolesDbContext.SaveChangesAsync();
@@ -94,13 +99,18 @@ public class SignInServiceTests
             }
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(mock => mock.GetProfileFromClaims())
+            userService
+                .Setup(mock => mock.GetProfileFromClaims())
                 .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
-            userManager.Setup(mock => mock.FindByEmailAsync(email))
+            userManager
+                .Setup(mock => mock.FindByEmailAsync(email))
                 .ReturnsAsync((ApplicationUser?)null);
-            userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
+            userManager
+                .Setup(mock =>
+                    mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name)
+                )
                 .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -111,7 +121,9 @@ public class SignInServiceTests
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(
+                Strict
+            );
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationInvites);
@@ -123,11 +135,14 @@ public class SignInServiceTests
             foreach (var userReleaseInvite in userReleaseInvites)
             {
                 userReleaseRoleRepository
-                    .Setup(mock => mock.Create(
-                        It.IsAny<Guid>(),
-                        userReleaseInvite.ReleaseVersionId,
-                        userReleaseInvite.Role,
-                        CreatedById))
+                    .Setup(mock =>
+                        mock.Create(
+                            It.IsAny<Guid>(),
+                            userReleaseInvite.ReleaseVersionId,
+                            userReleaseInvite.Role,
+                            CreatedById
+                        )
+                    )
                     .ReturnsAsync(new UserReleaseRole());
             }
 
@@ -135,16 +150,21 @@ public class SignInServiceTests
             foreach (var userPublicationInvite in userPublicationInvites)
             {
                 userPublicationRoleRepository
-                    .Setup(mock => mock.Create(
-                        It.IsAny<Guid>(),
-                        userPublicationInvite.PublicationId,
-                        userPublicationInvite.Role,
-                        CreatedById))
+                    .Setup(mock =>
+                        mock.Create(
+                            It.IsAny<Guid>(),
+                            userPublicationInvite.PublicationId,
+                            userPublicationInvite.Role,
+                            CreatedById
+                        )
+                    )
                     .ReturnsAsync(new UserPublicationRole());
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
@@ -154,7 +174,8 @@ public class SignInServiceTests
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userPublicationInviteRepository: userPublicationInviteRepository.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object);
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await service.RegisterOrSignIn();
                 result.AssertRight();
@@ -166,21 +187,26 @@ public class SignInServiceTests
                 userReleaseInviteRepository,
                 userPublicationInviteRepository,
                 userReleaseRoleRepository,
-                userPublicationRoleRepository);
+                userPublicationRoleRepository
+            );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
-                var newIdentityUser = await usersAndRolesDbContext.Users
-                    .SingleAsync(u => u.Email == email.ToLower());
+                var newIdentityUser = await usersAndRolesDbContext.Users.SingleAsync(u =>
+                    u.Email == email.ToLower()
+                );
 
                 Assert.Equal(email.ToLower(), newIdentityUser.Email);
                 Assert.Equal(email.ToLower(), newIdentityUser.UserName);
                 Assert.Equal(firstName, newIdentityUser.FirstName);
                 Assert.Equal(lastName, newIdentityUser.LastName);
 
-                var newUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Email == email.ToLower());
+                var newUser = await contentDbContext.Users.SingleAsync(u =>
+                    u.Email == email.ToLower()
+                );
 
                 Assert.Equal(email.ToLower(), newUser.Email);
                 Assert.Equal(firstName, newUser.FirstName);
@@ -206,14 +232,15 @@ public class SignInServiceTests
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Role",
-                    NormalizedName = "ROLE"
+                    NormalizedName = "ROLE",
                 },
                 CreatedById = CreatedById.ToString(),
                 Created = DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays - 1),
-                Accepted = false
+                Accepted = false,
             };
 
-            var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _dataFixture
+                .DefaultUserReleaseInvite()
                 .WithEmail(email)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
                 .WithCreatedById(CreatedById)
@@ -222,7 +249,8 @@ public class SignInServiceTests
                 .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
                 .GenerateList(3);
 
-            var userPublicationInvites = _dataFixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _dataFixture
+                .DefaultUserPublicationInvite()
                 .WithEmail(email)
                 .WithPublication(_dataFixture.DefaultPublication())
                 .WithCreatedById(CreatedById)
@@ -233,18 +261,22 @@ public class SignInServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 usersAndRolesDbContext.UserInvites.Add(userInvite);
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(mock => mock.GetProfileFromClaims())
+            userService
+                .Setup(mock => mock.GetProfileFromClaims())
                 .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
-            userManager.Setup(mock => mock.FindByEmailAsync(email))
+            userManager
+                .Setup(mock => mock.FindByEmailAsync(email))
                 .ReturnsAsync((ApplicationUser?)null);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -252,13 +284,17 @@ public class SignInServiceTests
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(
+                Strict
+            );
             userPublicationInviteRepository
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
@@ -266,7 +302,8 @@ public class SignInServiceTests
                     userService: userService.Object,
                     userManager: userManager.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object
+                );
 
                 var result = await service.RegisterOrSignIn();
                 result.AssertRight();
@@ -276,23 +313,28 @@ public class SignInServiceTests
                 userService,
                 userManager,
                 userReleaseInviteRepository,
-                userPublicationInviteRepository);
+                userPublicationInviteRepository
+            );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
-                var newIdentityUser = await usersAndRolesDbContext.Users
-                    .SingleOrDefaultAsync(u => u.Email == email.ToLower());
+                var newIdentityUser = await usersAndRolesDbContext.Users.SingleOrDefaultAsync(u =>
+                    u.Email == email.ToLower()
+                );
 
                 Assert.Null(newIdentityUser);
 
-                var newUser = await contentDbContext.Users
-                    .SingleOrDefaultAsync(u => u.Email == email.ToLower());
+                var newUser = await contentDbContext.Users.SingleOrDefaultAsync(u =>
+                    u.Email == email.ToLower()
+                );
 
                 Assert.Null(newUser);
 
-                var updatedUserInvite = usersAndRolesDbContext.UserInvites
-                    .IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
+                var updatedUserInvite = usersAndRolesDbContext
+                    .UserInvites.IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
                     .Where(i => i.Email.ToLower() == email.ToLower())
                     .SingleOrDefault();
 
@@ -301,8 +343,7 @@ public class SignInServiceTests
         }
 
         [Fact]
-        public async Task
-            RegisterOrSignIn_UserInviteMissingCreatedById_SetsUserCreatedByIdToDeletedUserPlaceholder()
+        public async Task RegisterOrSignIn_UserInviteMissingCreatedById_SetsUserCreatedByIdToDeletedUserPlaceholder()
         {
             var email = "test@test.com";
             var firstName = "Bill";
@@ -315,29 +356,36 @@ public class SignInServiceTests
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Role",
-                    NormalizedName = "ROLE"
+                    NormalizedName = "ROLE",
                 },
                 Created = DateTime.UtcNow,
-                Accepted = false
+                Accepted = false,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 usersAndRolesDbContext.UserInvites.Add(userInvite);
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(mock => mock.GetProfileFromClaims())
+            userService
+                .Setup(mock => mock.GetProfileFromClaims())
                 .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
-            userManager.Setup(mock => mock.FindByEmailAsync(email))
+            userManager
+                .Setup(mock => mock.FindByEmailAsync(email))
                 .ReturnsAsync((ApplicationUser?)null);
-            userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
+            userManager
+                .Setup(mock =>
+                    mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name)
+                )
                 .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -348,7 +396,9 @@ public class SignInServiceTests
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(
+                Strict
+            );
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync([]);
@@ -358,13 +408,16 @@ public class SignInServiceTests
 
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
-            userRepository.Setup(mock => mock.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
-               .ReturnsAsync(_dataFixture.DefaultUser()
-                    .WithId(deletedUserPlaceholderId)
-                    .Generate());
+            userRepository
+                .Setup(mock => mock.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                    _dataFixture.DefaultUser().WithId(deletedUserPlaceholderId).Generate()
+                );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
@@ -373,7 +426,8 @@ public class SignInServiceTests
                     userManager: userManager.Object,
                     userRepository: userRepository.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object
+                );
 
                 var result = await service.RegisterOrSignIn();
                 result.AssertRight();
@@ -384,13 +438,17 @@ public class SignInServiceTests
                 userManager,
                 userRepository,
                 userReleaseInviteRepository,
-                userPublicationInviteRepository);
+                userPublicationInviteRepository
+            );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
-                var newUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Email == email.ToLower());
+                var newUser = await contentDbContext.Users.SingleAsync(u =>
+                    u.Email == email.ToLower()
+                );
 
                 Assert.Equal(deletedUserPlaceholderId, newUser.CreatedById);
             }
@@ -413,7 +471,7 @@ public class SignInServiceTests
             {
                 Id = CreatedById.ToString(),
                 Email = createdByEmail.ToLower(),
-                UserName = createdByEmail.ToLower()
+                UserName = createdByEmail.ToLower(),
             };
 
             var userInvite = new UserInvite
@@ -423,18 +481,20 @@ public class SignInServiceTests
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Role",
-                    NormalizedName = "ROLE"
+                    NormalizedName = "ROLE",
                 },
                 CreatedBy = createdByAspNetUser,
                 Created = DateTime.UtcNow,
-                Accepted = false
+                Accepted = false,
             };
 
-            var createdByInternalUser = _dataFixture.DefaultUser()
+            var createdByInternalUser = _dataFixture
+                .DefaultUser()
                 .WithEmail(createdByEmail.ToLower())
                 .Generate();
 
-            var existingUser = _dataFixture.DefaultUser()
+            var existingUser = _dataFixture
+                .DefaultUser()
                 .WithEmail(email.ToLower())
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
@@ -443,7 +503,8 @@ public class SignInServiceTests
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .Generate();
 
-            var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _dataFixture
+                .DefaultUserReleaseInvite()
                 .WithEmail(email)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
                 .WithCreatedById(CreatedById)
@@ -452,7 +513,8 @@ public class SignInServiceTests
                 .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
                 .GenerateList(3);
 
-            var userPublicationInvites = _dataFixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _dataFixture
+                .DefaultUserPublicationInvite()
                 .WithEmail(email)
                 .WithPublication(_dataFixture.DefaultPublication())
                 .WithCreatedById(CreatedById)
@@ -463,7 +525,9 @@ public class SignInServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 usersAndRolesDbContext.UserInvites.Add(userInvite);
                 await usersAndRolesDbContext.SaveChangesAsync();
@@ -476,13 +540,18 @@ public class SignInServiceTests
             }
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(mock => mock.GetProfileFromClaims())
+            userService
+                .Setup(mock => mock.GetProfileFromClaims())
                 .Returns(new UserProfileFromClaims(email, updatedFirstName, updatedLastName));
 
             var userManager = MockUserManager();
-            userManager.Setup(mock => mock.FindByEmailAsync(email))
+            userManager
+                .Setup(mock => mock.FindByEmailAsync(email))
                 .ReturnsAsync((ApplicationUser?)null);
-            userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
+            userManager
+                .Setup(mock =>
+                    mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name)
+                )
                 .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -493,7 +562,9 @@ public class SignInServiceTests
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(
+                Strict
+            );
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationInvites);
@@ -505,11 +576,14 @@ public class SignInServiceTests
             foreach (var userReleaseInvite in userReleaseInvites)
             {
                 userReleaseRoleRepository
-                    .Setup(mock => mock.Create(
-                        It.IsAny<Guid>(),
-                        userReleaseInvite.ReleaseVersionId,
-                        userReleaseInvite.Role,
-                        CreatedById))
+                    .Setup(mock =>
+                        mock.Create(
+                            It.IsAny<Guid>(),
+                            userReleaseInvite.ReleaseVersionId,
+                            userReleaseInvite.Role,
+                            CreatedById
+                        )
+                    )
                     .ReturnsAsync(new UserReleaseRole());
             }
 
@@ -517,16 +591,21 @@ public class SignInServiceTests
             foreach (var userPublicationInvite in userPublicationInvites)
             {
                 userPublicationRoleRepository
-                    .Setup(mock => mock.Create(
-                        It.IsAny<Guid>(),
-                        userPublicationInvite.PublicationId,
-                        userPublicationInvite.Role,
-                        CreatedById))
+                    .Setup(mock =>
+                        mock.Create(
+                            It.IsAny<Guid>(),
+                            userPublicationInvite.PublicationId,
+                            userPublicationInvite.Role,
+                            CreatedById
+                        )
+                    )
                     .ReturnsAsync(new UserPublicationRole());
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
@@ -536,7 +615,8 @@ public class SignInServiceTests
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userPublicationInviteRepository: userPublicationInviteRepository.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object);
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await service.RegisterOrSignIn();
                 result.AssertRight();
@@ -548,21 +628,25 @@ public class SignInServiceTests
                 userReleaseInviteRepository,
                 userPublicationInviteRepository,
                 userReleaseRoleRepository,
-                userPublicationRoleRepository);
+                userPublicationRoleRepository
+            );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
-                var newIdentityUser = await usersAndRolesDbContext.Users
-                    .SingleAsync(u => u.Email == email.ToLower());
+                var newIdentityUser = await usersAndRolesDbContext.Users.SingleAsync(u =>
+                    u.Email == email.ToLower()
+                );
 
                 Assert.Equal(email.ToLower(), newIdentityUser.Email);
                 Assert.Equal(email.ToLower(), newIdentityUser.UserName);
                 Assert.Equal(updatedFirstName, newIdentityUser.FirstName);
                 Assert.Equal(updatedLastName, newIdentityUser.LastName);
 
-                var newUser = await contentDbContext.Users
-                    .IgnoreQueryFilters() // Make sure we didn't create an ADDITIONAL user, but just reactivated the existing one
+                var newUser = await contentDbContext
+                    .Users.IgnoreQueryFilters() // Make sure we didn't create an ADDITIONAL user, but just reactivated the existing one
                     .SingleAsync(u => u.Email == email.ToLower());
 
                 Assert.Equal(email.ToLower(), newUser.Email);
@@ -590,13 +674,14 @@ public class SignInServiceTests
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "Role",
-                    NormalizedName = "ROLE"
+                    NormalizedName = "ROLE",
                 },
                 Created = DateTime.UtcNow,
-                Accepted = false
+                Accepted = false,
             };
 
-            var existingUser = _dataFixture.DefaultUser()
+            var existingUser = _dataFixture
+                .DefaultUser()
                 .WithEmail(email.ToLower())
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
@@ -608,7 +693,9 @@ public class SignInServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 usersAndRolesDbContext.UserInvites.Add(userInvite);
                 await usersAndRolesDbContext.SaveChangesAsync();
@@ -621,13 +708,18 @@ public class SignInServiceTests
             }
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(mock => mock.GetProfileFromClaims())
+            userService
+                .Setup(mock => mock.GetProfileFromClaims())
                 .Returns(new UserProfileFromClaims(email, firstName, lastName));
 
             var userManager = MockUserManager();
-            userManager.Setup(mock => mock.FindByEmailAsync(email))
+            userManager
+                .Setup(mock => mock.FindByEmailAsync(email))
                 .ReturnsAsync((ApplicationUser?)null);
-            userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name))
+            userManager
+                .Setup(mock =>
+                    mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), userInvite.Role.Name)
+                )
                 .ReturnsAsync(IdentityResult.Success);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -638,7 +730,9 @@ public class SignInServiceTests
                 .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
+            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(
+                Strict
+            );
             userPublicationInviteRepository
                 .Setup(mock => mock.GetInvitesByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync([]);
@@ -648,13 +742,16 @@ public class SignInServiceTests
 
             var deletedUserPlaceholderId = Guid.NewGuid();
             var userRepository = new Mock<IUserRepository>(Strict);
-            userRepository.Setup(mock => mock.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
-               .ReturnsAsync(_dataFixture.DefaultUser()
-                   .WithId(deletedUserPlaceholderId)
-                   .Generate());
+            userRepository
+                .Setup(mock => mock.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                    _dataFixture.DefaultUser().WithId(deletedUserPlaceholderId).Generate()
+                );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
@@ -663,7 +760,8 @@ public class SignInServiceTests
                     userManager: userManager.Object,
                     userRepository: userRepository.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                    userPublicationInviteRepository: userPublicationInviteRepository.Object
+                );
 
                 var result = await service.RegisterOrSignIn();
                 result.AssertRight();
@@ -674,13 +772,16 @@ public class SignInServiceTests
                 userManager,
                 userRepository,
                 userReleaseInviteRepository,
-                userPublicationInviteRepository);
+                userPublicationInviteRepository
+            );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (
+                var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+            )
             {
-                var newUser = await contentDbContext.Users
-                    .IgnoreQueryFilters() // Make sure we didn't create an ADDITIONAL user, but just reactivated the existing one
+                var newUser = await contentDbContext
+                    .Users.IgnoreQueryFilters() // Make sure we didn't create an ADDITIONAL user, but just reactivated the existing one
                     .SingleAsync(u => u.Email == email.ToLower());
 
                 Assert.Equal(deletedUserPlaceholderId, newUser.CreatedById);
@@ -697,7 +798,8 @@ public class SignInServiceTests
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserPublicationInviteRepository? userPublicationInviteRepository = null,
-        IUserRepository? userRepository = null)
+        IUserRepository? userRepository = null
+    )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -708,10 +810,14 @@ public class SignInServiceTests
             usersAndRolesDbContext: usersAndRolesDbContext,
             userManager: userManager ?? MockUserManager().Object,
             contentDbContext: contentDbContext,
-            userReleaseRoleRepository: userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
-            userPublicationRoleRepository: userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
-            userReleaseInviteRepository: userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
-            userPublicationInviteRepository: userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(),
+            userReleaseRoleRepository: userReleaseRoleRepository
+                ?? Mock.Of<IUserReleaseRoleRepository>(),
+            userPublicationRoleRepository: userPublicationRoleRepository
+                ?? Mock.Of<IUserPublicationRoleRepository>(),
+            userReleaseInviteRepository: userReleaseInviteRepository
+                ?? Mock.Of<IUserReleaseInviteRepository>(),
+            userPublicationInviteRepository: userPublicationInviteRepository
+                ?? Mock.Of<IUserPublicationInviteRepository>(),
             userRepository: userRepository ?? Mock.Of<IUserRepository>()
         );
     }

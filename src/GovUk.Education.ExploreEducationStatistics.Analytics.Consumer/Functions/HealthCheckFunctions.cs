@@ -9,41 +9,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Function
 // ReSharper disable once ClassNeverInstantiated.Global
 public class HealthCheckFunctions(
     ILogger<HealthCheckFunctions> logger,
-    IAnalyticsPathResolver pathResolver)
+    IAnalyticsPathResolver pathResolver
+)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
     public Task<IActionResult> HealthCheck(
 #pragma warning disable IDE0060
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request
+    )
 #pragma warning restore IDE0060
     {
         var fileShareMountHealthCheck = CheckFileShareMountHealth();
 
         var healthCheckResponse = new HealthCheckResponse(
-            FileShareMount: fileShareMountHealthCheck);
+            FileShareMount: fileShareMountHealthCheck
+        );
 
         if (healthCheckResponse.Healthy)
         {
             return Task.FromResult<IActionResult>(new OkObjectResult(healthCheckResponse));
         }
-        
-        return Task.FromResult<IActionResult>(new ObjectResult(healthCheckResponse) {
-            StatusCode = StatusCodes.Status500InternalServerError
-        });
+
+        return Task.FromResult<IActionResult>(
+            new ObjectResult(healthCheckResponse)
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+            }
+        );
     }
-    
+
     private HealthCheckSummary CheckFileShareMountHealth()
     {
         logger.LogInformation("Attempting to read from file share");
-        
+
         try
         {
             if (Directory.Exists(pathResolver.GetBasePath()))
             {
                 return HealthCheckSummary.Healthy();
             }
-            
+
             return HealthCheckSummary.Unhealthy("File Share Mount folder does not exist");
         }
         catch (Exception e)
@@ -65,19 +71,12 @@ public class HealthCheckFunctions(
 
         public static HealthCheckSummary Healthy()
         {
-            return new HealthCheckSummary
-            {
-                IsHealthy = true
-            };
+            return new HealthCheckSummary { IsHealthy = true };
         }
 
         public static HealthCheckSummary Unhealthy(string reason)
         {
-            return new HealthCheckSummary
-            {
-                IsHealthy = false,
-                UnhealthyReason = reason
-            };
+            return new HealthCheckSummary { IsHealthy = false, UnhealthyReason = reason };
         }
     }
 }

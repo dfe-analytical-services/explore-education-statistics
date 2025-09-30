@@ -13,18 +13,22 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
         var nullabilityContext = new NullabilityInfoContext();
         var properties = context.Type.GetProperties();
 
-        foreach(var property in properties)
+        foreach (var property in properties)
         {
-            if (property.HasAttribute<JsonIgnoreAttribute>()
-                || !property.HasAttribute<RequiredMemberAttribute>())
+            if (
+                property.HasAttribute<JsonIgnoreAttribute>()
+                || !property.HasAttribute<RequiredMemberAttribute>()
+            )
             {
                 continue;
             }
 
-            var jsonName = property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+            var jsonName =
+                property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
 
             var jsonKey = schema.Properties.Keys.SingleOrDefault(key =>
-                string.Equals(key, jsonName, StringComparison.OrdinalIgnoreCase));
+                string.Equals(key, jsonName, StringComparison.OrdinalIgnoreCase)
+            );
 
             if (string.IsNullOrWhiteSpace(jsonKey))
             {

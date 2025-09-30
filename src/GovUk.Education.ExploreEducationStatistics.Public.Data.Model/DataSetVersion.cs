@@ -69,92 +69,113 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DateTimeOffset? Updated { get; set; }
 
-    public string PublicVersion => VersionPatch > 0 
-        ? $"{VersionMajor}.{VersionMinor}.{VersionPatch}" 
-        : $"{VersionMajor}.{VersionMinor}";
+    public string PublicVersion =>
+        VersionPatch > 0
+            ? $"{VersionMajor}.{VersionMinor}.{VersionPatch}"
+            : $"{VersionMajor}.{VersionMinor}";
 
-    public SemVersion SemVersion() => new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
+    public SemVersion SemVersion() =>
+        new(major: VersionMajor, minor: VersionMinor, patch: VersionPatch);
 
     public SemVersion DefaultNextVersion() => SemVersion().WithMinor(VersionMinor + 1).WithPatch(0);
-    
+
     public SemVersion NextPatchVersion() => SemVersion().WithPatch(VersionPatch + 1);
 
     public bool IsFirstVersion => VersionMajor == 1 && VersionMinor == 0 && VersionPatch == 0;
 
-    public DataSetVersionType VersionType
-        => VersionPatch == 0 
-            ? VersionMinor == 0 
-                ? DataSetVersionType.Major 
-                : DataSetVersionType.Minor 
+    public DataSetVersionType VersionType =>
+        VersionPatch == 0
+            ? VersionMinor == 0
+                ? DataSetVersionType.Major
+                : DataSetVersionType.Minor
             : DataSetVersionType.Patch;
 
-    public bool CanBeDeleted => Status is DataSetVersionStatus.Failed
-        or DataSetVersionStatus.Mapping
-        or DataSetVersionStatus.Draft
-        or DataSetVersionStatus.Cancelled;
+    public bool CanBeDeleted =>
+        Status
+            is DataSetVersionStatus.Failed
+                or DataSetVersionStatus.Mapping
+                or DataSetVersionStatus.Draft
+                or DataSetVersionStatus.Cancelled;
 
-    public bool CanBeUpdated => Status is DataSetVersionStatus.Mapping
-        or DataSetVersionStatus.Draft;
+    public bool CanBeUpdated =>
+        Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Draft;
 
     internal class Config : IEntityTypeConfiguration<DataSetVersion>
     {
         public void Configure(EntityTypeBuilder<DataSetVersion> builder)
         {
-            builder.Property(dsv => dsv.Id)
-                .HasValueGenerator<UuidV7ValueGenerator>();
+            builder.Property(dsv => dsv.Id).HasValueGenerator<UuidV7ValueGenerator>();
 
-            builder.Property(dsv => dsv.Status)
-                .HasConversion<string>();
+            builder.Property(dsv => dsv.Status).HasConversion<string>();
 
-            builder.OwnsOne(v => v.MetaSummary, ms =>
-            {
-                ms.ToJson();
-                ms.OwnsOne(msb => msb.TimePeriodRange, msb =>
+            builder.OwnsOne(
+                v => v.MetaSummary,
+                ms =>
                 {
-                    msb.OwnsOne(tpr => tpr.Start, tpr =>
-                    {
-                        tpr.Property(tpm => tpm.Code)
-                            .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
-                    });
-                    msb.OwnsOne(tpr => tpr.End, tpr =>
-                    {
-                        tpr.Property(tpm => tpm.Code)
-                            .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
-                    });
-                });
-
-                ms.Property(msb => msb.GeographicLevels)
-                    .HasColumnType("text[]")
-                    .HasConversion(
-                        value => value
-                            .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider)
-                            .ToList(),
-                        value => value
-                            .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider)
-                            .ToList(),
-                        new ValueComparer<List<GeographicLevel>>(
-                            (c1, c2) => c1!.SequenceEqual(c2!),
-                            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                            c => c.ToList())
+                    ms.ToJson();
+                    ms.OwnsOne(
+                        msb => msb.TimePeriodRange,
+                        msb =>
+                        {
+                            msb.OwnsOne(
+                                tpr => tpr.Start,
+                                tpr =>
+                                {
+                                    tpr.Property(tpm => tpm.Code)
+                                        .HasConversion(
+                                            new EnumToEnumValueConverter<TimeIdentifier>()
+                                        );
+                                }
+                            );
+                            msb.OwnsOne(
+                                tpr => tpr.End,
+                                tpr =>
+                                {
+                                    tpr.Property(tpm => tpm.Code)
+                                        .HasConversion(
+                                            new EnumToEnumValueConverter<TimeIdentifier>()
+                                        );
+                                }
+                            );
+                        }
                     );
-            });
 
-            builder.OwnsOne(dsv => dsv.Release,
+                    ms.Property(msb => msb.GeographicLevels)
+                        .HasColumnType("text[]")
+                        .HasConversion(
+                            value =>
+                                value
+                                    .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider)
+                                    .ToList(),
+                            value =>
+                                value
+                                    .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider)
+                                    .ToList(),
+                            new ValueComparer<List<GeographicLevel>>(
+                                (c1, c2) => c1!.SequenceEqual(c2!),
+                                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                                c => c.ToList()
+                            )
+                        );
+                }
+            );
+
+            builder.OwnsOne(
+                dsv => dsv.Release,
                 ownedBuilder =>
                 {
-                    ownedBuilder
-                        .HasIndex(r => r.DataSetFileId);
-                    ownedBuilder
-                        .HasIndex(r => r.ReleaseFileId)
-                        .IsUnique();
-                });
+                    ownedBuilder.HasIndex(r => r.DataSetFileId);
+                    ownedBuilder.HasIndex(r => r.ReleaseFileId).IsUnique();
+                }
+            );
 
-            builder.HasIndex(dsv => new
+            builder
+                .HasIndex(dsv => new
                 {
                     dsv.DataSetId,
                     dsv.VersionMajor,
                     dsv.VersionMinor,
-                    dsv.VersionPatch
+                    dsv.VersionPatch,
                 })
                 .HasDatabaseName("IX_DataSetVersions_DataSetId_VersionNumber")
                 .IsUnique();

@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ResolveSpecificCommentRequirement : IAuthorizationRequirement
-{
-}
+public class ResolveSpecificCommentRequirement : IAuthorizationRequirement { }
 
 public class ResolveSpecificCommentAuthorizationHandler
     : AuthorizationHandler<ResolveSpecificCommentRequirement, Comment>
@@ -16,26 +14,30 @@ public class ResolveSpecificCommentAuthorizationHandler
     private readonly ContentDbContext _contentDbContext;
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public ResolveSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
-        AuthorizationHandlerService authorizationHandlerService)
+    public ResolveSpecificCommentAuthorizationHandler(
+        ContentDbContext contentDbContext,
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _contentDbContext = contentDbContext;
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         ResolveSpecificCommentRequirement requirement,
-        Comment resource)
+        Comment resource
+    )
     {
         var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
         var updateSpecificReleaseVersionContext = new AuthorizationHandlerContext(
             requirements: [new UpdateSpecificReleaseVersionRequirement()],
-            user:
-            context.User,
-            resource: releaseVersion);
+            user: context.User,
+            resource: releaseVersion
+        );
         await new UpdateSpecificReleaseVersionAuthorizationHandler(
-                _authorizationHandlerService)
-            .HandleAsync(updateSpecificReleaseVersionContext);
+            _authorizationHandlerService
+        ).HandleAsync(updateSpecificReleaseVersionContext);
 
         if (updateSpecificReleaseVersionContext.HasSucceeded)
         {
@@ -46,8 +48,7 @@ public class ResolveSpecificCommentAuthorizationHandler
     private static ReleaseVersion? GetReleaseVersion(ContentDbContext context, Comment comment)
     {
         var contentBlock = context
-            .ContentBlocks
-            .Include(block => block.ContentSection)
+            .ContentBlocks.Include(block => block.ContentSection)
             .ThenInclude(contentSection => contentSection!.ReleaseVersion)
             .First(block => block.Id == comment.ContentBlockId);
 

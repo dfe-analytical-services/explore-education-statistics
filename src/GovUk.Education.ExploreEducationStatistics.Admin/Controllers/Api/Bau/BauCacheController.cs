@@ -36,7 +36,8 @@ public class BauCacheController : ControllerBase
         IPublicBlobStorageService publicBlobStorageService,
         IGlossaryCacheService glossaryCacheService,
         IMethodologyCacheService methodologyCacheService,
-        IPublicationCacheService publicationCacheService)
+        IPublicationCacheService publicationCacheService
+    )
     {
         _privateBlobStorageService = privateBlobStorageService;
         _publicBlobStorageService = publicBlobStorageService;
@@ -56,7 +57,9 @@ public class BauCacheController : ControllerBase
                 BlobContainers.PrivateContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^releases/{WildcardDirectoryNamePattern}/({pathString})/")
+                    IncludeRegex = new Regex(
+                        $"^releases/{WildcardDirectoryNamePattern}/({pathString})/"
+                    ),
                 }
             );
         }
@@ -72,38 +75,42 @@ public class BauCacheController : ControllerBase
     }
 
     [HttpPut("public-cache/trees")]
-    public async Task<ActionResult> UpdatePublicCacheTrees(UpdatePublicCacheTreePathsViewModel request)
+    public async Task<ActionResult> UpdatePublicCacheTrees(
+        UpdatePublicCacheTreePathsViewModel request
+    )
     {
         if (request.CacheEntries.Any())
         {
-            await request.CacheEntries
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
+            await request
+                .CacheEntries.ToAsyncEnumerable()
+                .ForEachAwaitAsync(async entry =>
+                {
+                    var allowedPath =
+                        EnumUtil.GetFromEnumValue<UpdatePublicCacheTreePathsViewModel.CacheEntry>(
+                            entry
+                        );
 
-                    async entry =>
+                    switch (allowedPath)
                     {
-                        var allowedPath =
-                            EnumUtil.GetFromEnumValue<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
-
-                        switch (allowedPath)
-                        {
-                            case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree:
-                                await _methodologyCacheService.UpdateSummariesTree();
-                                break;
-                            case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                                await _publicationCacheService.UpdatePublicationTree();
-                                break;
-                            default:
-                                throw new ArgumentException($"Unsupported cache entry {entry}");
-                        }
-                    });
+                        case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree:
+                            await _methodologyCacheService.UpdateSummariesTree();
+                            break;
+                        case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
+                            await _publicationCacheService.UpdatePublicationTree();
+                            break;
+                        default:
+                            throw new ArgumentException($"Unsupported cache entry {entry}");
+                    }
+                });
         }
 
         return NoContent();
     }
 
     [HttpDelete("public-cache/releases")]
-    public async Task<ActionResult> ClearPublicCacheReleases(ClearPublicCacheReleasePathsViewModel request)
+    public async Task<ActionResult> ClearPublicCacheReleases(
+        ClearPublicCacheReleasePathsViewModel request
+    )
     {
         if (request.Paths.Any())
         {
@@ -113,7 +120,9 @@ public class BauCacheController : ControllerBase
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/releases/{WildcardDirectoryNamePattern}/({pathString})/")
+                    IncludeRegex = new Regex(
+                        $"^publications/{WildcardDirectoryNamePattern}/releases/{WildcardDirectoryNamePattern}/({pathString})/"
+                    ),
                 }
             );
         }
@@ -128,7 +137,7 @@ public class BauCacheController : ControllerBase
             containerName: BlobContainers.PublicContent,
             options: new DeleteBlobsOptions
             {
-                IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$")
+                IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$"),
             }
         );
 
@@ -140,10 +149,7 @@ public class BauCacheController : ControllerBase
     {
         await _publicBlobStorageService.DeleteBlobs(
             containerName: BlobContainers.PublicContent,
-            options: new DeleteBlobsOptions
-            {
-                IncludeRegex = new Regex("^publications/.+$")
-            }
+            options: new DeleteBlobsOptions { IncludeRegex = new Regex("^publications/.+$") }
         );
 
         return NoContent();
@@ -158,14 +164,20 @@ public class BauCacheController : ControllerBase
     [HttpDelete("public-cache/publications/publication-json")]
     public async Task<ActionResult> ClearPublicCachePublicationJson()
     {
-        var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
+        var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(
+            ".",
+            "\\."
+        );
 
         await _publicBlobStorageService.DeleteBlobs(
             BlobContainers.PublicContent,
             options: new DeleteBlobsOptions
             {
-                IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/{publicationJsonFilenameRegex}$")
-            });
+                IncludeRegex = new Regex(
+                    $"^publications/{WildcardDirectoryNamePattern}/{publicationJsonFilenameRegex}$"
+                ),
+            }
+        );
 
         return NoContent();
     }
@@ -180,7 +192,10 @@ public class BauCacheController : ControllerBase
     [HttpDelete("public-cache/publications/release-json")]
     public async Task<ActionResult> ClearPublicCacheReleaseJson()
     {
-        var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
+        var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(
+            ".",
+            "\\."
+        );
 
         await _publicBlobStorageService.DeleteBlobs(
             BlobContainers.PublicContent,
@@ -193,15 +208,18 @@ public class BauCacheController : ControllerBase
                 // publications/***/releases/1234-35.json
                 // publications/***/releases/1234-q1.json
                 // publications/***/releases/1234-35-q1.json
-                IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$")
-            });
+                IncludeRegex = new Regex(
+                    $"^publications/{WildcardDirectoryNamePattern}/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$"
+                ),
+            }
+        );
 
         return NoContent();
     }
 
     /// <summary>
     /// Clears all GeoJSON cached for Admin.
-    /// 
+    ///
     /// Useful for when the GeoJSON cache needs to be refreshed, without impacting associated data blocks.
     /// </summary>
     [HttpDelete("private-cache/data-blocks/geojson")]
@@ -212,15 +230,18 @@ public class BauCacheController : ControllerBase
             options: new DeleteBlobsOptions
             {
                 // Match against pattern: releases/***/data-blocks/GUID-boundary-levels/GUID-2.json
-                IncludeRegex = new Regex($"^releases/{WildcardDirectoryNamePattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$")
-            });
+                IncludeRegex = new Regex(
+                    $"^releases/{WildcardDirectoryNamePattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$"
+                ),
+            }
+        );
 
         return NoContent();
     }
 
     /// <summary>
     /// Clears all GeoJSON cached for Data.
-    /// 
+    ///
     /// Useful for when the GeoJSON cache needs to be refreshed, without impacting associated data blocks.
     /// </summary>
     [HttpDelete("public-cache/data-blocks/geojson")]
@@ -236,8 +257,11 @@ public class BauCacheController : ControllerBase
                 // publications/***/releases/1234-35/data-blocks/GUID-boundary-levels/GUID-12.json
                 // publications/***/releases/1234-q1/data-blocks/GUID-boundary-levels/GUID-12.json
                 // publications/***/releases/1234-35-q1/data-blocks/GUID-boundary-levels/GUID-123.json
-                IncludeRegex = new Regex($"^publications/{WildcardDirectoryNamePattern}/releases/{ReleasePeriodPattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$")
-            });
+                IncludeRegex = new Regex(
+                    $"^publications/{WildcardDirectoryNamePattern}/releases/{ReleasePeriodPattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$"
+                ),
+            }
+        );
 
         return NoContent();
     }
@@ -247,13 +271,13 @@ public class BauCacheController : ControllerBase
         public enum CacheEntry
         {
             MethodologyTree,
-            PublicationTree
+            PublicationTree,
         }
 
         private static readonly HashSet<string> AllowedCacheEntries = new()
         {
             CacheEntry.MethodologyTree.ToString(),
-            CacheEntry.PublicationTree.ToString()
+            CacheEntry.PublicationTree.ToString(),
         };
 
         [MinLength(1)]
@@ -266,7 +290,7 @@ public class BauCacheController : ControllerBase
         private static readonly HashSet<string> AllowedPaths = new()
         {
             FileStoragePathUtils.DataBlocksDirectory,
-            FileStoragePathUtils.SubjectMetaDirectory
+            FileStoragePathUtils.SubjectMetaDirectory,
         };
 
         [MinLength(1)]
@@ -279,7 +303,7 @@ public class BauCacheController : ControllerBase
         private static readonly HashSet<string> AllowedPaths = new()
         {
             FileStoragePathUtils.DataBlocksDirectory,
-            FileStoragePathUtils.SubjectMetaDirectory
+            FileStoragePathUtils.SubjectMetaDirectory,
         };
 
         [MinLength(1)]

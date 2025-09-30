@@ -10,9 +10,11 @@ public class Methodology
 
     public List<PublicationMethodology> Publications { get; set; } = new();
 
-    [Required] public string OwningPublicationTitle { get; set; } = null!;
+    [Required]
+    public string OwningPublicationTitle { get; set; } = null!;
 
-    [Required] public string OwningPublicationSlug { get; set; } = null!;
+    [Required]
+    public string OwningPublicationSlug { get; set; } = null!;
 
     public List<MethodologyVersion> Versions { get; set; } = new();
 
@@ -24,18 +26,21 @@ public class Methodology
     {
         if (Publications.IsNullOrEmpty())
         {
-            throw new ArgumentException("Methodology must be hydrated with Publications to get the owning publication");
+            throw new ArgumentException(
+                "Methodology must be hydrated with Publications to get the owning publication"
+            );
         }
 
-        return Publications
-            .Single(pm => pm.Owner);
+        return Publications.Single(pm => pm.Owner);
     }
 
     public MethodologyVersion LatestVersion()
     {
         if (Versions.IsNullOrEmpty())
         {
-            throw new ArgumentException("Methodology must be hydrated with Versions to get the latest version");
+            throw new ArgumentException(
+                "Methodology must be hydrated with Versions to get the latest version"
+            );
         }
 
         return Versions.Single(mv => IsLatestVersionOfMethodology(mv.Id));
@@ -45,10 +50,12 @@ public class Methodology
     {
         if (Versions == null)
         {
-            throw new ArgumentException("Methodology must be hydrated with Versions to test the latest version");
+            throw new ArgumentException(
+                "Methodology must be hydrated with Versions to test the latest version"
+            );
         }
 
         return Versions.Exists(mv => mv.Id == methodologyVersionId)
-               && Versions.All(mv => mv.PreviousVersionId != methodologyVersionId);
+            && Versions.All(mv => mv.PreviousVersionId != methodologyVersionId);
     }
 }

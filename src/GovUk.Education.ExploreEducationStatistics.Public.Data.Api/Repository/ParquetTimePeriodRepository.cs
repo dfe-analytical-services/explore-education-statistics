@@ -14,13 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetTimePeriodRepository(
     IDuckDbConnection duckDbConnection,
-    IDataSetVersionPathResolver dataSetVersionPathResolver)
-    : IParquetTimePeriodRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : IParquetTimePeriodRepository
 {
     public async Task<IList<ParquetTimePeriod>> List(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var idsList = ids.ToList();
 
@@ -31,19 +32,22 @@ public class ParquetTimePeriodRepository(
 
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT *
-             FROM '{dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion):raw}'
-             WHERE {TimePeriodsTable.Cols.Id:raw} IN ({idsList})
-             """
+            SELECT *
+            FROM '{dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion):raw}'
+            WHERE {TimePeriodsTable.Cols.Id:raw} IN ({idsList})
+            """
         );
 
-        return (await command.QueryAsync<ParquetTimePeriod>(cancellationToken: cancellationToken)).AsList();
+        return (
+            await command.QueryAsync<ParquetTimePeriod>(cancellationToken: cancellationToken)
+        ).AsList();
     }
 
     public async Task<IList<ParquetTimePeriod>> List(
         DataSetVersion dataSetVersion,
         IEnumerable<DataSetQueryTimePeriod> timePeriods,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var timePeriodsList = timePeriods.ToList();
 
@@ -52,24 +56,25 @@ public class ParquetTimePeriodRepository(
             return new List<ParquetTimePeriod>();
         }
 
-        var inFragment = new DuckDbSqlBuilder()
-            .AppendRange(
-                timePeriodsList.Select(
-                    tp => (FormattableString)
-                        $"({TimePeriodFormatter.FormatToCsv(tp.ParsedPeriod())}, {tp.ParsedCode().GetEnumLabel()})"
-                ),
-                joinString: ", "
-            );
+        var inFragment = new DuckDbSqlBuilder().AppendRange(
+            timePeriodsList.Select(tp =>
+                (FormattableString)
+                    $"({TimePeriodFormatter.FormatToCsv(tp.ParsedPeriod())}, {tp.ParsedCode().GetEnumLabel()})"
+            ),
+            joinString: ", "
+        );
 
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT *
-             FROM '{dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion):raw}'
-             WHERE ({TimePeriodsTable.Cols.Period:raw}, {TimePeriodsTable.Cols.Identifier:raw})
-                IN ({inFragment})
-             """
+            SELECT *
+            FROM '{dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion):raw}'
+            WHERE ({TimePeriodsTable.Cols.Period:raw}, {TimePeriodsTable.Cols.Identifier:raw})
+               IN ({inFragment})
+            """
         );
 
-        return (await command.QueryAsync<ParquetTimePeriod>(cancellationToken: cancellationToken)).AsList();
+        return (
+            await command.QueryAsync<ParquetTimePeriod>(cancellationToken: cancellationToken)
+        ).AsList();
     }
 }

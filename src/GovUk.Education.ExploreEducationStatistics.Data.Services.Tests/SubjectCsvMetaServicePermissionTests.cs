@@ -23,7 +23,7 @@ public class SubjectCsvMetaServicePermissionTests
     private static readonly ReleaseSubject ReleaseSubject = new()
     {
         ReleaseVersionId = ReleaseVersionId,
-        SubjectId = SubjectId
+        SubjectId = SubjectId,
     };
 
     [Fact]
@@ -31,19 +31,18 @@ public class SubjectCsvMetaServicePermissionTests
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = BuildService(userService.Object);
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildService(userService.Object);
 
-                    var query = new FullTableQuery
-                    {
-                        SubjectId = SubjectId
-                    };
+                var query = new FullTableQuery { SubjectId = SubjectId };
 
-                    return await service.GetSubjectCsvMeta(ReleaseSubject, query, new List<Observation>());
-                }
-            );
+                return await service.GetSubjectCsvMeta(
+                    ReleaseSubject,
+                    query,
+                    new List<Observation>()
+                );
+            });
     }
 
     private static SubjectCsvMetaService BuildService(
@@ -51,7 +50,8 @@ public class SubjectCsvMetaServicePermissionTests
         StatisticsDbContext? statisticsDbContext = null,
         ContentDbContext? contentDbContext = null,
         IFilterItemRepository? filterItemRepository = null,
-        IReleaseFileBlobService? releaseFileBlobService = null)
+        IReleaseFileBlobService? releaseFileBlobService = null
+    )
     {
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
@@ -59,7 +59,8 @@ public class SubjectCsvMetaServicePermissionTests
             contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(),
             userService: userService,
             filterItemRepository: filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
-            releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
+            releaseFileBlobService: releaseFileBlobService
+                ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }
 }

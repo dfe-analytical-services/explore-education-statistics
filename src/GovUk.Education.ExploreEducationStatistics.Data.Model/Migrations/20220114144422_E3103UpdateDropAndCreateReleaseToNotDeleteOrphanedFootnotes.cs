@@ -14,12 +14,18 @@ public partial class E3103UpdateDropAndCreateReleaseToNotDeleteOrphanedFootnotes
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql("DROP PROCEDURE dbo.DropAndCreateRelease");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_DropAndCreateRelease.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_DropAndCreateRelease.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql("DROP PROCEDURE dbo.DropAndCreateRelease");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{InitialCreate_Custom.MigrationId}_Routine_DropAndCreateRelease.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{InitialCreate_Custom.MigrationId}_Routine_DropAndCreateRelease.sql"
+        );
     }
 }

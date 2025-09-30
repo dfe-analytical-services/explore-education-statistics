@@ -9,7 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public static class PermissionTestUtil
 {
-    public static PolicyCheckBuilder<SecurityPolicies> PolicyCheckBuilder(Mock<IUserService> userService = null)
+    public static PolicyCheckBuilder<SecurityPolicies> PolicyCheckBuilder(
+        Mock<IUserService> userService = null
+    )
     {
         return new PolicyCheckBuilder<SecurityPolicies>(userService);
     }
@@ -20,18 +22,23 @@ public static class PermissionTestUtil
         TProtectedResource resource,
         Mock<IUserService> userService,
         TService service,
-        params SecurityPolicies[] policies)
+        params SecurityPolicies[] policies
+    )
     {
-        policies.ToList().ForEach(policy =>
-            userService
-                .Setup(s => s.MatchesPolicy(resource, policy))
-                .ReturnsAsync(policy != policies.Last()));
+        policies
+            .ToList()
+            .ForEach(policy =>
+                userService
+                    .Setup(s => s.MatchesPolicy(resource, policy))
+                    .ReturnsAsync(policy != policies.Last())
+            );
 
         var result = await protectedAction.Invoke(service);
 
         PermissionTestUtils.AssertForbidden(result);
 
-        policies.ToList().ForEach(policy =>
-            userService.Verify(s => s.MatchesPolicy(resource, policy)));
+        policies
+            .ToList()
+            .ForEach(policy => userService.Verify(s => s.MatchesPolicy(resource, policy)));
     }
 }

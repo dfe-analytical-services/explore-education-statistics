@@ -25,8 +25,6 @@ public record LocationAttributeNode
             return ListOf(Attribute);
         }
 
-        return Children
-            .SelectMany(child => child.GetLeafAttributes())
-            .ToList();
+        return Children.SelectMany(child => child.GetLeafAttributes()).ToList();
     }
 }

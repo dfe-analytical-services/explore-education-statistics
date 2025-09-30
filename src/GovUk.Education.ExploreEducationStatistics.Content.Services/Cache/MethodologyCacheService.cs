@@ -15,7 +15,8 @@ public class MethodologyCacheService : IMethodologyCacheService
 
     public MethodologyCacheService(
         IMethodologyService methodologyService,
-        ILogger<MethodologyCacheService> logger)
+        ILogger<MethodologyCacheService> logger
+    )
     {
         _methodologyService = methodologyService;
         _logger = logger;
@@ -28,14 +29,17 @@ public class MethodologyCacheService : IMethodologyCacheService
     }
 
     [BlobCache(typeof(AllMethodologiesCacheKey), forceUpdate: true, ServiceName = "public")]
-    public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateSummariesTree()
+    public async Task<
+        Either<ActionResult, List<AllMethodologiesThemeViewModel>>
+    > UpdateSummariesTree()
     {
         _logger.LogInformation("Updating cached Methodology Tree");
         return await _methodologyService.GetSummariesTree();
     }
 
-    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
-        Guid publicationId)
+    public Task<
+        Either<ActionResult, List<MethodologyVersionSummaryViewModel>>
+    > GetSummariesByPublication(Guid publicationId)
     {
         return GetSummariesTree()
             .OnSuccess(methodologiesByTheme =>
@@ -43,7 +47,8 @@ public class MethodologyCacheService : IMethodologyCacheService
                 var matchingPublication = methodologiesByTheme
                     .SelectMany(theme => theme.Publications)
                     .SingleOrDefault(publication => publication.Id == publicationId);
-                return matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>();
+                return matchingPublication?.Methodologies
+                    ?? new List<MethodologyVersionSummaryViewModel>();
             });
     }
 }

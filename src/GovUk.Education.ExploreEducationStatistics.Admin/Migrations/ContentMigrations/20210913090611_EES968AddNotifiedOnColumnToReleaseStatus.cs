@@ -9,13 +9,12 @@ public partial class EES968AddNotifiedOnColumnToReleaseStatus : Migration
         migrationBuilder.AddColumn<DateTime>(
             name: "NotifiedOn",
             table: "ReleaseStatus",
-            nullable: true);
+            nullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "NotifiedOn",
-            table: "ReleaseStatus");
+        migrationBuilder.DropColumn(name: "NotifiedOn", table: "ReleaseStatus");
     }
 }

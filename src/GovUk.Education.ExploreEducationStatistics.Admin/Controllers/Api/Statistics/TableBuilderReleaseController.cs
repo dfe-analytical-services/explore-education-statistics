@@ -22,16 +22,14 @@ public class TableBuilderReleaseController : ControllerBase
     [HttpGet("data/releases/{releaseVersionId:guid}/subjects")]
     public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseVersionId)
     {
-        return await _releaseService
-            .ListSubjects(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseService.ListSubjects(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("data/releases/{releaseVersionId:guid}/featured-tables")]
-    public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseVersionId)
+    public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(
+        Guid releaseVersionId
+    )
     {
-        return await _releaseService
-            .ListFeaturedTables(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseService.ListFeaturedTables(releaseVersionId).HandleFailuresOrOk();
     }
 }

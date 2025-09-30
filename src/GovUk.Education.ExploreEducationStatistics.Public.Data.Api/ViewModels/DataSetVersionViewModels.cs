@@ -83,7 +83,12 @@ public class DataSetVersionViewModel
     /// The geographic levels available in the data set.
     /// </summary>
     /// <example>["National", "Regional", "Local authority"]</example>
-    [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
+    [JsonConverter(
+        typeof(ReadOnlyListJsonConverter<
+            GeographicLevel,
+            EnumToEnumLabelJsonConverter<GeographicLevel>
+        >)
+    )]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -102,7 +107,8 @@ public class DataSetVersionViewModel
 /// <summary>
 /// A paginated list of data set versions.
 /// </summary>
-public record DataSetVersionPaginatedListViewModel : PaginatedListViewModel<DataSetVersionViewModel>;
+public record DataSetVersionPaginatedListViewModel
+    : PaginatedListViewModel<DataSetVersionViewModel>;
 
 /// <summary>
 /// Provides high-level information about the latest version of a data set.
@@ -141,7 +147,12 @@ public record DataSetLatestVersionViewModel
     /// The geographic levels available in the data set.
     /// </summary>
     /// <example>["National", "Regional", "Local authority"]</example>
-    [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
+    [JsonConverter(
+        typeof(ReadOnlyListJsonConverter<
+            GeographicLevel,
+            EnumToEnumLabelJsonConverter<GeographicLevel>
+        >)
+    )]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>

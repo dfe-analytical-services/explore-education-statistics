@@ -9,14 +9,14 @@ public interface IMethodologyNoteService
 {
     Task<Either<ActionResult, MethodologyNoteViewModel>> AddNote(
         Guid methodologyVersionId,
-        MethodologyNoteAddRequest request);
+        MethodologyNoteAddRequest request
+    );
 
-    Task<Either<ActionResult, Unit>> DeleteNote(
-        Guid methodologyVersionId,
-        Guid methodologyNoteId);
+    Task<Either<ActionResult, Unit>> DeleteNote(Guid methodologyVersionId, Guid methodologyNoteId);
 
     Task<Either<ActionResult, MethodologyNoteViewModel>> UpdateNote(
         Guid methodologyVersionId,
         Guid methodologyNoteId,
-        MethodologyNoteUpdateRequest request);
+        MethodologyNoteUpdateRequest request
+    );
 }

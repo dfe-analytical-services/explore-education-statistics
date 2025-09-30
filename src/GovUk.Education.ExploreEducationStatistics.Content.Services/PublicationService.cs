@@ -25,7 +25,8 @@ public class PublicationService : IPublicationService
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IPublicationRepository publicationRepository,
         IReleaseRepository releaseRepository,
-        IReleaseVersionRepository releaseVersionRepository)
+        IReleaseVersionRepository releaseVersionRepository
+    )
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
@@ -34,17 +35,23 @@ public class PublicationService : IPublicationService
         _releaseVersionRepository = releaseVersionRepository;
     }
 
-    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(Guid publicationId)
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(
+        Guid publicationId
+    )
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<Publication>(query => query
-                .Include(p => p.LatestPublishedReleaseVersion)
-                .Where(p => p.Id == publicationId))
+            .CheckEntityExists<Publication>(query =>
+                query
+                    .Include(p => p.LatestPublishedReleaseVersion)
+                    .Where(p => p.Id == publicationId)
+            )
             .OnSuccess(publication =>
             {
                 if (publication.LatestPublishedReleaseVersionId == null)
                 {
-                    return new Either<ActionResult, PublishedPublicationSummaryViewModel>(new NotFoundResult());
+                    return new Either<ActionResult, PublishedPublicationSummaryViewModel>(
+                        new NotFoundResult()
+                    );
                 }
 
                 return new PublishedPublicationSummaryViewModel
@@ -61,20 +68,26 @@ public class PublicationService : IPublicationService
     public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<Publication>(query => query
-                .Include(p => p.ReleaseVersions)
-                .Include(p => p.Contact)
-                .Include(p => p.Theme)
-                .Include(p => p.SupersededBy)
-                .Where(p => p.Slug == publicationSlug))
+            .CheckEntityExists<Publication>(query =>
+                query
+                    .Include(p => p.ReleaseVersions)
+                    .Include(p => p.Contact)
+                    .Include(p => p.Theme)
+                    .Include(p => p.SupersededBy)
+                    .Where(p => p.Slug == publicationSlug)
+            )
             .OnSuccess(async publication =>
             {
                 if (publication.LatestPublishedReleaseVersionId == null)
                 {
-                    return new Either<ActionResult, PublicationCacheViewModel>(new NotFoundResult());
+                    return new Either<ActionResult, PublicationCacheViewModel>(
+                        new NotFoundResult()
+                    );
                 }
 
-                var publishedReleases = await _releaseRepository.ListPublishedReleases(publication.Id);
+                var publishedReleases = await _releaseRepository.ListPublishedReleases(
+                    publication.Id
+                );
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
                 return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
             });
@@ -82,8 +95,8 @@ public class PublicationService : IPublicationService
 
     public async Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree()
     {
-        var themes = await _contentDbContext.Themes
-            .Include(theme => theme.Publications)
+        var themes = await _contentDbContext
+            .Themes.Include(theme => theme.Publications)
             .ThenInclude(publication => publication.SupersededBy)
             .ToListAsync();
 
@@ -98,7 +111,8 @@ public class PublicationService : IPublicationService
     private static PublicationCacheViewModel BuildPublicationViewModel(
         Publication publication,
         List<Release> releases,
-        bool isSuperseded)
+        bool isSuperseded
+    )
     {
         var theme = publication.Theme;
 
@@ -115,12 +129,13 @@ public class PublicationService : IPublicationService
                 Id = theme.Id,
                 Slug = theme.Slug,
                 Title = theme.Title,
-                Summary = theme.Summary
+                Summary = theme.Summary,
             },
             Contact = new ContactViewModel(publication.Contact),
-            ExternalMethodology = publication.ExternalMethodology != null
-                ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
-                : null,
+            ExternalMethodology =
+                publication.ExternalMethodology != null
+                    ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
+                    : null,
             LatestReleaseId = publication.LatestPublishedReleaseVersionId!.Value,
             IsSuperseded = isSuperseded,
             SupersededBy = isSuperseded
@@ -128,7 +143,7 @@ public class PublicationService : IPublicationService
                 {
                     Id = publication.SupersededBy!.Id,
                     Slug = publication.SupersededBy.Slug,
-                    Title = publication.SupersededBy.Title
+                    Title = publication.SupersededBy.Title,
                 }
                 : null,
             Releases = releases
@@ -136,21 +151,25 @@ public class PublicationService : IPublicationService
                 {
                     Id = r.Id,
                     Slug = r.Slug,
-                    Title = r.Title
+                    Title = r.Title,
                 })
                 .ToList(),
-            ReleaseSeries = releaseSeriesItemViewModels
+            ReleaseSeries = releaseSeriesItemViewModels,
         };
     }
 
     private static List<ReleaseSeriesItemViewModel> BuildReleaseSeriesItemViewModels(
         Publication publication,
-        List<Release> releases)
+        List<Release> releases
+    )
     {
         var publishedReleasesById = releases.ToDictionary(r => r.Id);
-        return publication.ReleaseSeries
+        return publication
+            .ReleaseSeries
             // Only include release series items for legacy links and published releases
-            .Where(rsi => rsi.IsLegacyLink || publishedReleasesById.ContainsKey(rsi.ReleaseId!.Value))
+            .Where(rsi =>
+                rsi.IsLegacyLink || publishedReleasesById.ContainsKey(rsi.ReleaseId!.Value)
+            )
             .Select(rsi =>
             {
                 if (rsi.IsLegacyLink)
@@ -158,7 +177,7 @@ public class PublicationService : IPublicationService
                     return new ReleaseSeriesItemViewModel
                     {
                         Description = rsi.LegacyLinkDescription!,
-                        LegacyLinkUrl = rsi.LegacyLinkUrl
+                        LegacyLinkUrl = rsi.LegacyLinkUrl,
                     };
                 }
 
@@ -168,7 +187,7 @@ public class PublicationService : IPublicationService
                 {
                     Description = release.Title,
                     ReleaseId = release.Id,
-                    ReleaseSlug = release.Slug
+                    ReleaseSlug = release.Slug,
                 };
             })
             .ToList();
@@ -176,11 +195,10 @@ public class PublicationService : IPublicationService
 
     private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
     {
-        var publications = await theme.Publications
-            .Where(publication => publication.LatestPublishedReleaseVersionId != null)
+        var publications = await theme
+            .Publications.Where(publication => publication.LatestPublishedReleaseVersionId != null)
             .ToAsyncEnumerable()
-            .SelectAwait(async publication =>
-                await BuildPublicationTreePublication(publication))
+            .SelectAwait(async publication => await BuildPublicationTreePublication(publication))
             .OrderBy(publication => publication.Title)
             .ToListAsync();
 
@@ -189,20 +207,26 @@ public class PublicationService : IPublicationService
             Id = theme.Id,
             Title = theme.Title,
             Summary = theme.Summary,
-            Publications = publications
+            Publications = publications,
         };
     }
 
-    private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
+    private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(
+        Publication publication
+    )
     {
         var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
 
         var latestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId;
         var latestReleaseHasData =
-            latestPublishedReleaseVersionId.HasValue && await HasAnyDataFiles(latestPublishedReleaseVersionId.Value);
+            latestPublishedReleaseVersionId.HasValue
+            && await HasAnyDataFiles(latestPublishedReleaseVersionId.Value);
 
         var publishedReleaseVersionIds =
-            await _releaseVersionRepository.ListLatestReleaseVersionIds(publication.Id, publishedOnly: true);
+            await _releaseVersionRepository.ListLatestReleaseVersionIds(
+                publication.Id,
+                publishedOnly: true
+            );
         var anyLiveReleaseHasData = await publishedReleaseVersionIds
             .ToAsyncEnumerable()
             .AnyAwaitAsync(async id => await HasAnyDataFiles(id));
@@ -218,34 +242,41 @@ public class PublicationService : IPublicationService
                 {
                     Id = publication.SupersededBy!.Id,
                     Slug = publication.SupersededBy.Slug,
-                    Title = publication.SupersededBy.Title
+                    Title = publication.SupersededBy.Title,
                 }
                 : null,
             LatestReleaseHasData = latestReleaseHasData,
-            AnyLiveReleaseHasData = anyLiveReleaseHasData
+            AnyLiveReleaseHasData = anyLiveReleaseHasData,
         };
     }
 
     private async Task<bool> HasAnyDataFiles(Guid releaseVersionId)
     {
-        return await _contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data);
+        return await _contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .AnyAsync(rf =>
+                rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data
+            );
     }
 
     public async Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
         Guid? themeId = null,
-        CancellationToken cancellationToken = default) =>
-        await _contentDbContext.Publications
-            .Include(p => p.LatestPublishedReleaseVersion)
+        CancellationToken cancellationToken = default
+    ) =>
+        await _contentDbContext
+            .Publications.Include(p => p.LatestPublishedReleaseVersion)
             .ThenInclude(rv => rv!.Release)
-            .Where(p => 
+            .Where(p =>
                 // Is published
-                p.LatestPublishedReleaseVersionId.HasValue 
+                p.LatestPublishedReleaseVersionId.HasValue
                 // Is not superseded/archived
-                && (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
+                && (
+                    p.SupersededById == null
+                    || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue
+                )
+            )
             .If(!themeId.IsBlank())
-                .ThenWhere(p => p.ThemeId == themeId!.Value)
+            .ThenWhere(p => p.ThemeId == themeId!.Value)
             .Select(publication => PublicationInfoViewModel.FromEntity(publication))
             .ToListAsync(cancellationToken);
 }

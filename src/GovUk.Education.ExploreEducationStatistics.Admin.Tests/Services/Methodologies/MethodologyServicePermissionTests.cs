@@ -22,21 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyServicePermissionTests
 {
-    private readonly Publication _publication = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly Publication _publication = new() { Id = Guid.NewGuid() };
 
     private readonly Methodology _methodology = new()
     {
         Id = Guid.NewGuid(),
-        Versions = new List<MethodologyVersion>
-        {
-            new()
-            {
-                Id = Guid.NewGuid()
-            }
-        }
+        Versions = new List<MethodologyVersion> { new() { Id = Guid.NewGuid() } },
     };
 
     private readonly MethodologyVersion _methodologyVersion = new()
@@ -44,7 +35,7 @@ public class MethodologyServicePermissionTests
         Id = Guid.NewGuid(),
         AlternativeTitle = "Title",
         AlternativeSlug = "title",
-        Status = Draft
+        Status = Draft,
     };
 
     [Fact]
@@ -52,16 +43,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
-                            _publication.Id, _publication).Object,
-                        userService: userService.Object);
-                    return service.AdoptMethodology(_publication.Id, _methodologyVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                        _publication.Id,
+                        _publication
+                    ).Object,
+                    userService: userService.Object
+                );
+                return service.AdoptMethodology(_publication.Id, _methodologyVersion.Id);
+            });
     }
 
     [Fact]
@@ -69,16 +61,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_publication, CanCreateMethodologyForSpecificPublication)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
-                            _publication.Id, _publication).Object,
-                        userService: userService.Object);
-                    return service.CreateMethodology(_publication.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                        _publication.Id,
+                        _publication
+                    ).Object,
+                    userService: userService.Object
+                );
+                return service.CreateMethodology(_publication.Id);
+            });
     }
 
     [Fact]
@@ -87,7 +80,7 @@ public class MethodologyServicePermissionTests
         var link = new PublicationMethodology
         {
             PublicationId = new Guid(),
-            MethodologyId = new Guid()
+            MethodologyId = new Guid(),
         };
 
         var persistenceHelper = new Mock<IPersistenceHelper<ContentDbContext>>(Strict);
@@ -95,15 +88,14 @@ public class MethodologyServicePermissionTests
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(link, CanDropMethodologyLink)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: persistenceHelper.Object,
-                        userService: userService.Object);
-                    return service.DropMethodology(link.PublicationId, link.MethodologyId);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: persistenceHelper.Object,
+                    userService: userService.Object
+                );
+                return service.DropMethodology(link.PublicationId, link.MethodologyId);
+            });
     }
 
     [Fact]
@@ -111,16 +103,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_publication, CanAdoptMethodologyForSpecificPublication)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
-                            _publication.Id, _publication).Object,
-                        userService: userService.Object);
-                    return service.GetAdoptableMethodologies(_publication.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                        _publication.Id,
+                        _publication
+                    ).Object,
+                    userService: userService.Object
+                );
+                return service.GetAdoptableMethodologies(_publication.Id);
+            });
     }
 
     [Fact]
@@ -128,16 +121,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanViewSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                            _methodologyVersion.Id, _methodologyVersion).Object,
-                        userService: userService.Object);
-                    return service.GetMethodology(_methodologyVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<
+                        ContentDbContext,
+                        MethodologyVersion
+                    >(_methodologyVersion.Id, _methodologyVersion).Object,
+                    userService: userService.Object
+                );
+                return service.GetMethodology(_methodologyVersion.Id);
+            });
     }
 
     [Fact]
@@ -146,16 +140,17 @@ public class MethodologyServicePermissionTests
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanApproveSpecificMethodology)
             .SetupResourceCheckToFail(_methodologyVersion, CanMarkSpecificMethodologyAsDraft)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                            _methodologyVersion.Id, _methodologyVersion).Object,
-                        userService: userService.Object);
-                    return service.GetUnpublishedReleasesUsingMethodology(_methodologyVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<
+                        ContentDbContext,
+                        MethodologyVersion
+                    >(_methodologyVersion.Id, _methodologyVersion).Object,
+                    userService: userService.Object
+                );
+                return service.GetUnpublishedReleasesUsingMethodology(_methodologyVersion.Id);
+            });
     }
 
     [Fact]
@@ -163,16 +158,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
-                            _publication.Id, _publication).Object,
-                        userService: userService.Object);
-                    return service.ListLatestMethodologyVersions(_publication.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                        _publication.Id,
+                        _publication
+                    ).Object,
+                    userService: userService.Object
+                );
+                return service.ListLatestMethodologyVersions(_publication.Id);
+            });
     }
 
     [Fact]
@@ -180,16 +176,14 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanUpdateSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(userService: userService.Object);
-                    return service.UpdateMethodology(_methodologyVersion.Id, new MethodologyUpdateRequest
-                    {
-                        Title = "Updated Title"
-                    });
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(userService: userService.Object);
+                return service.UpdateMethodology(
+                    _methodologyVersion.Id,
+                    new MethodologyUpdateRequest { Title = "Updated Title" }
+                );
+            });
     }
 
     [Fact]
@@ -197,14 +191,14 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(IsBauUser)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(userService: userService.Object);
-                    return service.UpdateMethodologyPublished(_methodologyVersion.Id,
-                        new MethodologyPublishedUpdateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(userService: userService.Object);
+                return service.UpdateMethodologyPublished(
+                    _methodologyVersion.Id,
+                    new MethodologyPublishedUpdateRequest()
+                );
+            });
     }
 
     [Fact]
@@ -212,16 +206,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodology.Versions[0], CanDeleteSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
-                            _methodology.Id, _methodology).Object,
-                        userService: userService.Object);
-                    return service.DeleteMethodology(_methodology.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Methodology>(
+                        _methodology.Id,
+                        _methodology
+                    ).Object,
+                    userService: userService.Object
+                );
+                return service.DeleteMethodology(_methodology.Id);
+            });
     }
 
     [Fact]
@@ -229,16 +224,17 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanDeleteSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(
-                        contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
-                            _methodologyVersion.Id, _methodologyVersion).Object,
-                        userService: userService.Object);
-                    return service.DeleteMethodologyVersion(_methodologyVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(
+                    contentPersistenceHelper: MockPersistenceHelper<
+                        ContentDbContext,
+                        MethodologyVersion
+                    >(_methodologyVersion.Id, _methodologyVersion).Object,
+                    userService: userService.Object
+                );
+                return service.DeleteMethodologyVersion(_methodologyVersion.Id);
+            });
     }
 
     [Fact]
@@ -246,13 +242,11 @@ public class MethodologyServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanViewSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyService(userService: userService.Object);
-                    return service.GetMethodologyStatuses(_methodologyVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyService(userService: userService.Object);
+                return service.GetMethodologyStatuses(_methodologyVersion.Id);
+            });
     }
 
     private MethodologyService SetupMethodologyService(
@@ -264,7 +258,8 @@ public class MethodologyServicePermissionTests
         IMethodologyApprovalService? methodologyApprovalService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
@@ -282,6 +277,9 @@ public class MethodologyServicePermissionTests
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        return MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);
+        return MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+            _methodologyVersion.Id,
+            _methodologyVersion
+        );
     }
 }

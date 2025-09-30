@@ -21,37 +21,48 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet(
-        "release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}/comments")]
+        "release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}/comments"
+    )]
     public async Task<ActionResult<List<CommentViewModel>>> GetComments(
         Guid releaseVersionId,
         Guid contentSectionId,
-        Guid contentBlockId)
+        Guid contentBlockId
+    )
     {
         return await _commentService
-            .GetComments(releaseVersionId: releaseVersionId,
+            .GetComments(
+                releaseVersionId: releaseVersionId,
                 contentSectionId: contentSectionId,
-                contentBlockId: contentBlockId)
+                contentBlockId: contentBlockId
+            )
             .HandleFailuresOrOk();
     }
 
     [HttpPost(
-        "release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}/comments/add")]
+        "release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}/comments/add"
+    )]
     public async Task<ActionResult<CommentViewModel>> AddComment(
         Guid releaseVersionId,
         Guid contentSectionId,
         Guid contentBlockId,
-        CommentSaveRequest saveRequest)
+        CommentSaveRequest saveRequest
+    )
     {
         return await _commentService
-            .AddComment(releaseVersionId: releaseVersionId,
+            .AddComment(
+                releaseVersionId: releaseVersionId,
                 contentSectionId: contentSectionId,
-                contentBlockId: contentBlockId, saveRequest)
+                contentBlockId: contentBlockId,
+                saveRequest
+            )
             .HandleFailuresOrOk();
     }
 
     [HttpPut("comment/{commentId:guid}")]
-    public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId,
-        CommentSaveRequest saveRequest)
+    public async Task<ActionResult<CommentViewModel>> UpdateComment(
+        Guid commentId,
+        CommentSaveRequest saveRequest
+    )
     {
         if (saveRequest.SetResolved.HasValue)
         {
@@ -60,16 +71,12 @@ public class CommentController : ControllerBase
                 .HandleFailuresOrOk();
         }
 
-        return await _commentService
-            .UpdateComment(commentId, saveRequest)
-            .HandleFailuresOrOk();
+        return await _commentService.UpdateComment(commentId, saveRequest).HandleFailuresOrOk();
     }
 
     [HttpDelete("comment/{commentId:guid}")]
     public async Task<ActionResult> DeleteComment(Guid commentId)
     {
-        return await _commentService
-            .DeleteComment(commentId)
-            .HandleFailuresOrNoContent();
+        return await _commentService.DeleteComment(commentId).HandleFailuresOrNoContent();
     }
 }

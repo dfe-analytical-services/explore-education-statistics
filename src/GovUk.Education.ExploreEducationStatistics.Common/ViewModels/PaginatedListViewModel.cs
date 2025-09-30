@@ -30,7 +30,7 @@ public record PaginatedListViewModel<T>
     /// <remarks>
     /// Construct <see cref="PaginatedListViewModel{T}"/> directly when the results can be
     /// paginated beforehand i.e. in the database. This is more efficient as
-    /// pagination should aim to avoid pulling all results into memory. 
+    /// pagination should aim to avoid pulling all results into memory.
     /// This method is intended for cases where it is not possible to do this.
     /// </remarks>
     /// <typeparam name="T">The type of elements in the source list</typeparam>
@@ -40,14 +40,9 @@ public record PaginatedListViewModel<T>
     /// <returns>
     /// A <see cref="PaginatedListViewModel{T}"/> containing the elements of the specified page, along with pagination metadata.
     /// </returns>
-    public static PaginatedListViewModel<T> Paginate(
-        List<T> allResults,
-        int page,
-        int pageSize) =>
+    public static PaginatedListViewModel<T> Paginate(List<T> allResults, int page, int pageSize) =>
         new(
-            results: allResults
-                .Paginate(page, pageSize)
-                .ToList(),
+            results: allResults.Paginate(page, pageSize).ToList(),
             totalResults: allResults.Count,
             page: page,
             pageSize: pageSize

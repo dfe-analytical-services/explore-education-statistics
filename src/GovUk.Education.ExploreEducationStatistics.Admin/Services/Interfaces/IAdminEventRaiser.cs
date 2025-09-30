@@ -13,27 +13,32 @@ public interface IAdminEventRaiser
         string newReleaseSlug,
         Guid publicationId,
         string publicationSlug,
-        bool isPublicationArchived);
+        bool isPublicationArchived
+    );
 
     Task OnPublicationArchived(
         Guid publicationId,
         string publicationSlug,
-        Guid supersededByPublicationId);
+        Guid supersededByPublicationId
+    );
 
     Task OnPublicationChanged(Publication publication);
 
     Task OnPublicationDeleted(
         Guid publicationId,
         string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease);
+        LatestPublishedReleaseInfo? latestPublishedRelease
+    );
 
     Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
         Guid previousLatestPublishedReleaseId,
-        Guid previousLatestPublishedReleaseVersionId);
+        Guid previousLatestPublishedReleaseVersionId
+    );
 
     Task OnPublicationRestored(
         Guid publicationId,
         string publicationSlug,
-        Guid previousSupersededByPublicationId);
+        Guid previousSupersededByPublicationId
+    );
 }

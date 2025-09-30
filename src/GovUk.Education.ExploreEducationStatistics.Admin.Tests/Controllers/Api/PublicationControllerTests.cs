@@ -14,9 +14,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
-public class PublicationControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class PublicationControllerTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
-    public class CreatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    public class CreatePublicationTests(TestApplicationFactory testApp)
+        : PublicationControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -37,9 +39,9 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     TeamName = "Team",
                     TeamEmail = "team@test.com",
                     ContactName = "Contact",
-                    ContactTelNo = "01234567890"
+                    ContactTelNo = "01234567890",
                 },
-                ThemeId = theme.Id
+                ThemeId = theme.Id,
             };
 
             var response = await CreatePublication(request);
@@ -62,8 +64,8 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
 
             await using var context = TestApp.GetDbContext<ContentDbContext>();
 
-            var saved = await context.Publications
-                .Include(p => p.Contact)
+            var saved = await context
+                .Publications.Include(p => p.Contact)
                 .Include(p => p.Theme)
                 .SingleAsync(p => p.Id == result.Id);
 
@@ -83,8 +85,10 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         [Fact]
         public async Task PublicationSlugNotUnique_ReturnsValidationError()
         {
-            var publication = DataFixture.DefaultPublication()
-                .WithTheme(DataFixture.DefaultTheme()).Generate();
+            var publication = DataFixture
+                .DefaultPublication()
+                .WithTheme(DataFixture.DefaultTheme())
+                .Generate();
 
             var theme = DataFixture.DefaultTheme().Generate();
 
@@ -104,16 +108,18 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     TeamName = "Team",
                     TeamEmail = "team@test.com",
                     ContactName = "Contact",
-                    ContactTelNo = "01234567890"
+                    ContactTelNo = "01234567890",
                 },
-                ThemeId = theme.Id
+                ThemeId = theme.Id,
             };
 
             var response = await CreatePublication(request);
 
             var validationProblem = response.AssertValidationProblem();
 
-            validationProblem.AssertHasGlobalError(ValidationErrorMessages.PublicationSlugNotUnique);
+            validationProblem.AssertHasGlobalError(
+                ValidationErrorMessages.PublicationSlugNotUnique
+            );
 
             await using var context = TestApp.GetDbContext<ContentDbContext>();
 
@@ -134,9 +140,9 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     TeamName = "Team",
                     TeamEmail = "team@test.com",
                     ContactName = "Contact",
-                    ContactTelNo = "01234567890"
+                    ContactTelNo = "01234567890",
                 },
-                ThemeId = Guid.NewGuid()
+                ThemeId = Guid.NewGuid(),
             };
 
             var response = await CreatePublication(request);
@@ -144,8 +150,12 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             var validationProblem = response.AssertValidationProblem();
 
             Assert.Equal(2, validationProblem.Errors.Count);
-            validationProblem.AssertHasNotEmptyError(nameof(PublicationCreateRequest.Title).ToLowerFirst());
-            validationProblem.AssertHasNotEmptyError(nameof(PublicationCreateRequest.Summary).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(
+                nameof(PublicationCreateRequest.Title).ToLowerFirst()
+            );
+            validationProblem.AssertHasNotEmptyError(
+                nameof(PublicationCreateRequest.Summary).ToLowerFirst()
+            );
         }
 
         [Fact]
@@ -160,9 +170,9 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     TeamName = "Team",
                     TeamEmail = "team@test.com",
                     ContactName = "Contact",
-                    ContactTelNo = "01234567890"
+                    ContactTelNo = "01234567890",
                 },
-                ThemeId = Guid.NewGuid()
+                ThemeId = Guid.NewGuid(),
             };
 
             var response = await CreatePublication(request);
@@ -170,10 +180,14 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             var validationProblem = response.AssertValidationProblem();
 
             Assert.Equal(2, validationProblem.Errors.Count);
-            validationProblem.AssertHasMaximumLengthError(nameof(PublicationCreateRequest.Title).ToLowerFirst(),
-                maxLength: 65);
-            validationProblem.AssertHasMaximumLengthError(nameof(PublicationCreateRequest.Summary).ToLowerFirst(),
-                maxLength: 160);
+            validationProblem.AssertHasMaximumLengthError(
+                nameof(PublicationCreateRequest.Title).ToLowerFirst(),
+                maxLength: 65
+            );
+            validationProblem.AssertHasMaximumLengthError(
+                nameof(PublicationCreateRequest.Summary).ToLowerFirst(),
+                maxLength: 160
+            );
         }
 
         [Fact]
@@ -195,14 +209,12 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     TeamName = "Team",
                     TeamEmail = "team@test.com",
                     ContactName = "Contact",
-                    ContactTelNo = "01234567890"
+                    ContactTelNo = "01234567890",
                 },
-                ThemeId = theme.Id
+                ThemeId = theme.Id,
             };
 
-            var client = TestApp
-                .SetUser(DataFixture.AuthenticatedUser())
-                .CreateClient();
+            var client = TestApp.SetUser(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await CreatePublication(request, client);
 
@@ -211,19 +223,23 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
 
         private async Task<HttpResponseMessage> CreatePublication(
             PublicationCreateRequest request,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= TestApp
-                .SetUser(DataFixture
-                    .AuthenticatedUser()
-                    .WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication)))
+                .SetUser(
+                    DataFixture
+                        .AuthenticatedUser()
+                        .WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication))
+                )
                 .CreateClient();
 
             return await client.PostAsJsonAsync("api/publications", request);
         }
     }
 
-    public class UpdatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    public class UpdatePublicationTests(TestApplicationFactory testApp)
+        : PublicationControllerTests(testApp)
     {
         [Fact]
         public async Task RequiredFieldsAreEmpty_ReturnsValidationError()
@@ -233,7 +249,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             {
                 Title = "", // Empty title
                 Summary = "", // Empty summary
-                ThemeId = Guid.NewGuid()
+                ThemeId = Guid.NewGuid(),
             };
 
             var response = await UpdatePublication(publicationId, request);
@@ -241,8 +257,12 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             var validationProblem = response.AssertValidationProblem();
 
             Assert.Equal(2, validationProblem.Errors.Count);
-            validationProblem.AssertHasNotEmptyError(nameof(PublicationSaveRequest.Title).ToLowerFirst());
-            validationProblem.AssertHasNotEmptyError(nameof(PublicationSaveRequest.Summary).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(
+                nameof(PublicationSaveRequest.Title).ToLowerFirst()
+            );
+            validationProblem.AssertHasNotEmptyError(
+                nameof(PublicationSaveRequest.Summary).ToLowerFirst()
+            );
         }
 
         [Fact]
@@ -253,7 +273,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             {
                 Title = new string('A', count: 66), // Title exceeds max length of 65
                 Summary = new string('A', count: 161), // Summary exceeds max length of 160
-                ThemeId = Guid.NewGuid()
+                ThemeId = Guid.NewGuid(),
             };
 
             var response = await UpdatePublication(publicationId, request);
@@ -261,21 +281,28 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             var validationProblem = response.AssertValidationProblem();
 
             Assert.Equal(2, validationProblem.Errors.Count);
-            validationProblem.AssertHasMaximumLengthError(nameof(PublicationSaveRequest.Title).ToLowerFirst(),
-                maxLength: 65);
-            validationProblem.AssertHasMaximumLengthError(nameof(PublicationSaveRequest.Summary).ToLowerFirst(),
-                maxLength: 160);
+            validationProblem.AssertHasMaximumLengthError(
+                nameof(PublicationSaveRequest.Title).ToLowerFirst(),
+                maxLength: 65
+            );
+            validationProblem.AssertHasMaximumLengthError(
+                nameof(PublicationSaveRequest.Summary).ToLowerFirst(),
+                maxLength: 160
+            );
         }
 
         private async Task<HttpResponseMessage> UpdatePublication(
             Guid publicationId,
             PublicationSaveRequest request,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= TestApp
-                .SetUser(DataFixture
-                    .AuthenticatedUser()
-                    .WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications)))
+                .SetUser(
+                    DataFixture
+                        .AuthenticatedUser()
+                        .WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications))
+                )
                 .CreateClient();
 
             return await client.PutAsJsonAsync($"api/publications/{publicationId}", request);

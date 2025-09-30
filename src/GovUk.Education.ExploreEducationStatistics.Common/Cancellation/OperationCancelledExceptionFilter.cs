@@ -5,7 +5,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Validators.Valida
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 
 /// <summary>
-/// A filter that converts CancellationToken-initiated cancellations into a 400 API error response. 
+/// A filter that converts CancellationToken-initiated cancellations into a 400 API error response.
 /// </summary>
 public class OperationCancelledExceptionFilter : ExceptionFilterAttribute
 {
@@ -14,10 +14,7 @@ public class OperationCancelledExceptionFilter : ExceptionFilterAttribute
         if (context.Exception is OperationCanceledException)
         {
             context.ExceptionHandled = true;
-            context.Result = ValidationResult(new ErrorViewModel
-            {
-                Code = "RequestCancelled"
-            });
+            context.Result = ValidationResult(new ErrorViewModel { Code = "RequestCancelled" });
         }
     }
 }

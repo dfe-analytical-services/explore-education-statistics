@@ -61,54 +61,47 @@ public record DataSetQueryCriteriaTimePeriods
             Gte,
             Lt,
             Lte,
-            ..In ?? [],
-            ..NotIn ?? []
+            .. In ?? [],
+            .. NotIn ?? [],
         ];
 
-        return timePeriods
-            .OfType<DataSetQueryTimePeriod>()
-            .ToHashSet();
+        return timePeriods.OfType<DataSetQueryTimePeriod>().ToHashSet();
     }
 
     public static DataSetQueryCriteriaTimePeriods Create(
         string comparator,
-        IList<DataSetQueryTimePeriod> timePeriods)
+        IList<DataSetQueryTimePeriod> timePeriods
+    )
     {
         return comparator switch
         {
             nameof(Eq) => new DataSetQueryCriteriaTimePeriods
             {
-                Eq = timePeriods.Count > 0 ? timePeriods[0] : null
+                Eq = timePeriods.Count > 0 ? timePeriods[0] : null,
             },
             nameof(NotEq) => new DataSetQueryCriteriaTimePeriods
             {
-                NotEq = timePeriods.Count > 0 ? timePeriods[0] : null
+                NotEq = timePeriods.Count > 0 ? timePeriods[0] : null,
             },
-            nameof(In) => new DataSetQueryCriteriaTimePeriods
-            {
-                In = timePeriods.ToList()
-            },
-            nameof(NotIn) => new DataSetQueryCriteriaTimePeriods
-            {
-                NotIn = timePeriods.ToList()
-            },
+            nameof(In) => new DataSetQueryCriteriaTimePeriods { In = timePeriods.ToList() },
+            nameof(NotIn) => new DataSetQueryCriteriaTimePeriods { NotIn = timePeriods.ToList() },
             nameof(Gt) => new DataSetQueryCriteriaTimePeriods
             {
-                Gt = timePeriods.Count > 0 ? timePeriods[0] : null
+                Gt = timePeriods.Count > 0 ? timePeriods[0] : null,
             },
             nameof(Gte) => new DataSetQueryCriteriaTimePeriods
             {
-                Gte = timePeriods.Count > 0 ? timePeriods[0] : null
+                Gte = timePeriods.Count > 0 ? timePeriods[0] : null,
             },
             nameof(Lt) => new DataSetQueryCriteriaTimePeriods
             {
-                Lt = timePeriods.Count > 0 ? timePeriods[0] : null
+                Lt = timePeriods.Count > 0 ? timePeriods[0] : null,
             },
             nameof(Lte) => new DataSetQueryCriteriaTimePeriods
             {
-                Lte = timePeriods.Count > 0 ? timePeriods[0] : null
+                Lte = timePeriods.Count > 0 ? timePeriods[0] : null,
             },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null),
         };
     }
 
@@ -124,21 +117,25 @@ public record DataSetQueryCriteriaTimePeriods
                 .SetValidator(new DataSetQueryTimePeriod.Validator()!)
                 .When(request => request.NotEq is not null);
 
-            When(q => q.In is not null, () =>
-            {
-                RuleFor(request => request.In)
-                    .NotEmpty();
-                RuleForEach(request => request.In)
-                    .SetValidator(new DataSetQueryTimePeriod.Validator());
-            });
+            When(
+                q => q.In is not null,
+                () =>
+                {
+                    RuleFor(request => request.In).NotEmpty();
+                    RuleForEach(request => request.In)
+                        .SetValidator(new DataSetQueryTimePeriod.Validator());
+                }
+            );
 
-            When(q => q.NotIn is not null, () =>
-            {
-                RuleFor(request => request.NotIn)
-                    .NotEmpty();
-                RuleForEach(request => request.NotIn)
-                    .SetValidator(new DataSetQueryTimePeriod.Validator());
-            });
+            When(
+                q => q.NotIn is not null,
+                () =>
+                {
+                    RuleFor(request => request.NotIn).NotEmpty();
+                    RuleForEach(request => request.NotIn)
+                        .SetValidator(new DataSetQueryTimePeriod.Validator());
+                }
+            );
 
             RuleFor(request => request.Gt)
                 .SetValidator(new DataSetQueryTimePeriod.Validator()!)

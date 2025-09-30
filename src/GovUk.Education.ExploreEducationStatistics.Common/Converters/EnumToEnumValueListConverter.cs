@@ -13,15 +13,11 @@ public class EnumToEnumValueListConverter<TEnum>(ConverterMappingHints? mappingH
 {
     public static List<string> ToProvider(IList<TEnum> values)
     {
-        return values
-            .Select(EnumToEnumValueConverter<TEnum>.ToProvider)
-            .ToList();
+        return values.Select(EnumToEnumValueConverter<TEnum>.ToProvider).ToList();
     }
 
     public static List<TEnum> FromProvider(IList<string> values)
     {
-        return values
-            .Select(EnumToEnumValueConverter<TEnum>.FromProvider)
-            .ToList();
+        return values.Select(EnumToEnumValueConverter<TEnum>.FromProvider).ToList();
     }
 }

@@ -10,14 +10,12 @@ public class DataImportStatusViewModel
     public int PercentageComplete { get; set; }
     public int StagePercentageComplete { get; set; }
     public int? TotalRows { get; set; }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public DataImportStatus Status { get; set; }
 
     public static DataImportStatusViewModel NotFound()
     {
-        return new DataImportStatusViewModel
-        {
-            Status = DataImportStatus.NOT_FOUND
-        };
+        return new DataImportStatusViewModel { Status = DataImportStatus.NOT_FOUND };
     }
 }

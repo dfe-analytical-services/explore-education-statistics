@@ -22,7 +22,8 @@ public class FileImportService : IFileImportService
         ILogger<FileImportService> logger,
         IPrivateBlobStorageService privateBlobStorageService,
         IDataImportService dataImportService,
-        IImporterService importerService)
+        IImporterService importerService
+    )
     {
         _logger = logger;
         _privateBlobStorageService = privateBlobStorageService;
@@ -41,17 +42,18 @@ public class FileImportService : IFileImportService
                 import.File.Filename,
                 import.Status
             );
-            
+
             return;
         }
 
         if (import.Status == CANCELLING)
         {
             _logger.LogInformation(
-                "Import for {Filename} is {ImportStatus} - ignoring Observations and marking import as " +
-                "CANCELLED",
+                "Import for {Filename} is {ImportStatus} - ignoring Observations and marking import as "
+                    + "CANCELLED",
                 import.File.Filename,
-                import.Status);
+                import.Status
+            );
 
             await _dataImportService.UpdateStatus(import.Id, CANCELLED, 100);
             return;
@@ -60,7 +62,9 @@ public class FileImportService : IFileImportService
         var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
 
         var datafileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
-        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
+        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(
+            import
+        );
 
         await _importerService.ImportObservations(
             import,
@@ -77,7 +81,8 @@ public class FileImportService : IFileImportService
     public async Task ImportFiltersAndLocations(
         Guid importId,
         SubjectMeta subjectMeta,
-        StatisticsDbContext context)
+        StatisticsDbContext context
+    )
     {
         var import = await _dataImportService.GetImport(importId);
 
@@ -87,7 +92,8 @@ public class FileImportService : IFileImportService
             import,
             datafileStreamProvider,
             subjectMeta,
-            context);
+            context
+        );
     }
 
     public async Task CompleteImport(DataImport import, StatisticsDbContext context)
@@ -95,14 +101,19 @@ public class FileImportService : IFileImportService
         if (import.Status.IsFinished())
         {
             _logger.LogInformation(
-                "Import for {Filename} is already finished in state {ImportStatus} - not attempting to " +
-                "mark as completed or failed",
+                "Import for {Filename} is already finished in state {ImportStatus} - not attempting to "
+                    + "mark as completed or failed",
                 import.File.Filename,
-                import.Status);
+                import.Status
+            );
 
             if (import.Status == COMPLETE)
             {
-                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+                await _dataImportService.WriteDataSetFileMeta(
+                    import.FileId,
+                    import.SubjectId,
+                    import.TotalRows!.Value
+                );
             }
 
             return;
@@ -110,33 +121,45 @@ public class FileImportService : IFileImportService
 
         if (import.Status.IsAborting())
         {
-            _logger.LogInformation("Import for {Filename} is trying to abort in " +
-                                   "state {ImportStatus} - not attempting to mark as completed or failed, but " +
-                                   "instead marking as {AbortedState}, the final state of the aborting process",
+            _logger.LogInformation(
+                "Import for {Filename} is trying to abort in "
+                    + "state {ImportStatus} - not attempting to mark as completed or failed, but "
+                    + "instead marking as {AbortedState}, the final state of the aborting process",
                 import.File.Filename,
                 import.Status,
-                import.Status.GetFinishingStateOfAbortProcess());
+                import.Status.GetFinishingStateOfAbortProcess()
+            );
 
-            await _dataImportService.UpdateStatus(import.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
+            await _dataImportService.UpdateStatus(
+                import.Id,
+                import.Status.GetFinishingStateOfAbortProcess(),
+                100
+            );
             return;
         }
 
-        var observationCount = await context
-            .Observation
-            .CountAsync(o => o.SubjectId.Equals(import.SubjectId));
+        var observationCount = await context.Observation.CountAsync(o =>
+            o.SubjectId.Equals(import.SubjectId)
+        );
 
         if (observationCount != import.ExpectedImportedRows)
         {
-            await _dataImportService.FailImport(import.Id,
-                $"Number of observations inserted ({observationCount}) " +
-                        $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry");
+            await _dataImportService.FailImport(
+                import.Id,
+                $"Number of observations inserted ({observationCount}) "
+                    + $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry"
+            );
         }
         else
         {
             if (import.Errors.Count == 0)
             {
                 await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
-                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+                await _dataImportService.WriteDataSetFileMeta(
+                    import.FileId,
+                    import.SubjectId,
+                    import.TotalRows!.Value
+                );
             }
             else
             {

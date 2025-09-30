@@ -53,7 +53,7 @@ public record DataSetGetQueryLocations
             Eq = Eq is not null ? IDataSetQueryLocation.Parse(Eq) : null,
             NotEq = NotEq is not null ? IDataSetQueryLocation.Parse(NotEq) : null,
             In = In?.Select(IDataSetQueryLocation.Parse).ToList(),
-            NotIn = NotIn?.Select(IDataSetQueryLocation.Parse).ToList()
+            NotIn = NotIn?.Select(IDataSetQueryLocation.Parse).ToList(),
         };
     }
 
@@ -69,21 +69,23 @@ public record DataSetGetQueryLocations
                 .LocationString()
                 .When(request => request.NotEq is not null);
 
-            When(q => q.In is not null, () =>
-            {
-                RuleFor(request => request.In)
-                    .NotEmpty();
-                RuleForEach(request => request.In)
-                    .LocationString();
-            });
+            When(
+                q => q.In is not null,
+                () =>
+                {
+                    RuleFor(request => request.In).NotEmpty();
+                    RuleForEach(request => request.In).LocationString();
+                }
+            );
 
-            When(q => q.NotIn is not null, () =>
-            {
-                RuleFor(request => request.NotIn)
-                    .NotEmpty();
-                RuleForEach(request => request.NotIn)
-                    .LocationString();
-            });
+            When(
+                q => q.NotIn is not null,
+                () =>
+                {
+                    RuleFor(request => request.NotIn).NotEmpty();
+                    RuleForEach(request => request.NotIn).LocationString();
+                }
+            );
         }
     }
 }

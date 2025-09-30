@@ -10,16 +10,20 @@ public static class FiltersMetaViewModelBuilder
 {
     public static Dictionary<string, FilterMetaViewModel> BuildFiltersFromFilterItems(
         IEnumerable<FilterItem> values,
-        IEnumerable<FilterSequenceEntry>? sequence = null)
+        IEnumerable<FilterSequenceEntry>? sequence = null
+    )
     {
         var filters = GroupFilterItemsByFilter(values);
         return BuildFilters(filters, sequence);
     }
 
-    public static Dictionary<string, FilterMetaViewModel> BuildFilters(IEnumerable<Filter> values,
-        IEnumerable<FilterSequenceEntry>? sequence = null)
+    public static Dictionary<string, FilterMetaViewModel> BuildFilters(
+        IEnumerable<Filter> values,
+        IEnumerable<FilterSequenceEntry>? sequence = null
+    )
     {
-        return OrderAsDictionary(values,
+        return OrderAsDictionary(
+            values,
             idSelector: value => value.Id,
             labelSelector: value => value.Label,
             sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
@@ -27,7 +31,10 @@ public static class FiltersMetaViewModelBuilder
             {
                 return new FilterMetaViewModel(input, index)
                 {
-                    Options = BuildFilterGroups(input.Value.FilterGroups, input.Sequence?.ChildSequence)
+                    Options = BuildFilterGroups(
+                        input.Value.FilterGroups,
+                        input.Sequence?.ChildSequence
+                    ),
                 };
             },
             sequence: sequence
@@ -35,7 +42,8 @@ public static class FiltersMetaViewModelBuilder
     }
 
     public static Dictionary<string, FilterCsvMetaViewModel> BuildCsvFiltersFromFilterItems(
-        IEnumerable<FilterItem> values)
+        IEnumerable<FilterItem> values
+    )
     {
         var filters = GroupFilterItemsByFilter(values);
 
@@ -47,24 +55,33 @@ public static class FiltersMetaViewModelBuilder
 
     private static Dictionary<string, FilterGroupMetaViewModel> BuildFilterGroups(
         IEnumerable<FilterGroup> values,
-        IEnumerable<FilterGroupSequenceEntry>? sequence = null)
+        IEnumerable<FilterGroupSequenceEntry>? sequence = null
+    )
     {
-        return OrderAsDictionaryWithTotalFirst(values,
+        return OrderAsDictionaryWithTotalFirst(
+            values,
             idSelector: value => value.Id,
             labelSelector: value => value.Label,
             sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
-            resultSelector: (input, index) => new FilterGroupMetaViewModel(input, index)
-            {
-                Options = BuildFilterItems(input.Value.FilterItems, input.Sequence?.ChildSequence)
-            },
+            resultSelector: (input, index) =>
+                new FilterGroupMetaViewModel(input, index)
+                {
+                    Options = BuildFilterItems(
+                        input.Value.FilterItems,
+                        input.Sequence?.ChildSequence
+                    ),
+                },
             sequence: sequence
         );
     }
 
-    private static List<FilterItemMetaViewModel> BuildFilterItems(IEnumerable<FilterItem> values,
-        IEnumerable<Guid>? sequence = null)
+    private static List<FilterItemMetaViewModel> BuildFilterItems(
+        IEnumerable<FilterItem> values,
+        IEnumerable<Guid>? sequence = null
+    )
     {
-        return OrderAsListTotalFirst(values,
+        return OrderAsListTotalFirst(
+            values,
             idSelector: value => value.Id,
             labelSelector: value => value.Label,
             sequenceIdSelector: sequenceEntry => sequenceEntry,
@@ -76,7 +93,11 @@ public static class FiltersMetaViewModelBuilder
     private static List<Filter> GroupFilterItemsByFilter(IEnumerable<FilterItem> filterItems)
     {
         return filterItems
-            .GroupBy(filterItem => filterItem.FilterGroup, filterItem => filterItem, FilterGroup.IdComparer)
+            .GroupBy(
+                filterItem => filterItem.FilterGroup,
+                filterItem => filterItem,
+                FilterGroup.IdComparer
+            )
             .Select(grouping =>
             {
                 var filterGroup = grouping.Key;
@@ -85,7 +106,11 @@ public static class FiltersMetaViewModelBuilder
                 copy.FilterItems = grouping.ToList();
                 return copy;
             })
-            .GroupBy(filterGroup => filterGroup.Filter, filterGroup => filterGroup, Filter.IdComparer)
+            .GroupBy(
+                filterGroup => filterGroup.Filter,
+                filterGroup => filterGroup,
+                Filter.IdComparer
+            )
             .Select(grouping =>
             {
                 var filter = grouping.Key;

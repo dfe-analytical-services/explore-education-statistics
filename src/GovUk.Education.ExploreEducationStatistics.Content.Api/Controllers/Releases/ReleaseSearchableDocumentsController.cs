@@ -12,16 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Rel
 /// </summary>
 [Route("api")]
 [ApiController]
-public class ReleaseSearchableDocumentsController(IReleaseSearchableDocumentsService releaseSearchableDocumentsService)
-    : ControllerBase
+public class ReleaseSearchableDocumentsController(
+    IReleaseSearchableDocumentsService releaseSearchableDocumentsService
+) : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases/latest/searchable")]
-    public async Task<ActionResult<ReleaseSearchableDocumentDto>>
-        GetLatestReleaseAsSearchableDocument(
-            string publicationSlug,
-            CancellationToken cancellationToken = default) =>
-        await releaseSearchableDocumentsService.GetLatestReleaseAsSearchableDocument(
-                publicationSlug,
-                cancellationToken)
+    public async Task<
+        ActionResult<ReleaseSearchableDocumentDto>
+    > GetLatestReleaseAsSearchableDocument(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseSearchableDocumentsService
+            .GetLatestReleaseAsSearchableDocument(publicationSlug, cancellationToken)
             .HandleFailuresOrOk();
 }

@@ -9,14 +9,14 @@ internal class PublicationServiceTestsTheoryData
 {
     private static readonly DataFixture DataFixture = new();
 
-    private static Publication NotLivePublication() => DataFixture
-        .DefaultPublication()
-        .WithTheme(DataFixture.DefaultTheme().Generate());
+    private static Publication NotLivePublication() =>
+        DataFixture.DefaultPublication().WithTheme(DataFixture.DefaultTheme().Generate());
 
-    private static Publication LivePublication() => DataFixture
-        .DefaultPublication()
-        .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
-        .WithTheme(DataFixture.DefaultTheme());
+    private static Publication LivePublication() =>
+        DataFixture
+            .DefaultPublication()
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
+            .WithTheme(DataFixture.DefaultTheme());
 
     /// <summary>
     /// Test data to verify if expected events are raised during a publication update based on the publication's live
@@ -50,32 +50,36 @@ internal class PublicationServiceTestsTheoryData
     /// </item>
     /// </list>
     /// </remarks>
-    public static readonly TheoryData<Publication, Publication?, Publication?, bool, bool>
-        PublicationArchivedEventTestData =
-            new()
-            {
-                // @formatter:off
-                // When the publication is live expect events to be raised dependent on states
-                // of the initial and updated `SupersededBy` publications
-                { LivePublication(), null, null, false, false },
-                { LivePublication(), null, NotLivePublication(), false, false },
-                { LivePublication(), null, LivePublication(), true, false }, // Transition to archived
-                { LivePublication(), NotLivePublication(), null, false, false },
-                { LivePublication(), NotLivePublication(), NotLivePublication(), false, false },
-                { LivePublication(), NotLivePublication(), LivePublication(), true, false }, // Transition to archived
-                { LivePublication(), LivePublication(), null, false, true }, // Transition to not archived
-                { LivePublication(), LivePublication(), NotLivePublication(), false, true }, // Transition to not archived
-                { LivePublication(), LivePublication(), LivePublication(), false, false },
-                // When the publication is not live expect no events to be raised
-                { NotLivePublication(), null, null, false, false },
-                { NotLivePublication(), null, NotLivePublication(), false, false },
-                { NotLivePublication(), null, LivePublication(), false, false },
-                { NotLivePublication(), NotLivePublication(), null, false, false },
-                { NotLivePublication(), NotLivePublication(), NotLivePublication(), false, false },
-                { NotLivePublication(), NotLivePublication(), LivePublication(), false, false },
-                { NotLivePublication(), LivePublication(), null, false, false },
-                { NotLivePublication(), LivePublication(), NotLivePublication(), false, false },
-                { NotLivePublication(), LivePublication(), LivePublication(), false, false }
-                // @formatter:on
-            };
+    public static readonly TheoryData<
+        Publication,
+        Publication?,
+        Publication?,
+        bool,
+        bool
+    > PublicationArchivedEventTestData = new()
+    {
+        // @formatter:off
+        // When the publication is live expect events to be raised dependent on states
+        // of the initial and updated `SupersededBy` publications
+        { LivePublication(), null, null, false, false },
+        { LivePublication(), null, NotLivePublication(), false, false },
+        { LivePublication(), null, LivePublication(), true, false }, // Transition to archived
+        { LivePublication(), NotLivePublication(), null, false, false },
+        { LivePublication(), NotLivePublication(), NotLivePublication(), false, false },
+        { LivePublication(), NotLivePublication(), LivePublication(), true, false }, // Transition to archived
+        { LivePublication(), LivePublication(), null, false, true }, // Transition to not archived
+        { LivePublication(), LivePublication(), NotLivePublication(), false, true }, // Transition to not archived
+        { LivePublication(), LivePublication(), LivePublication(), false, false },
+        // When the publication is not live expect no events to be raised
+        { NotLivePublication(), null, null, false, false },
+        { NotLivePublication(), null, NotLivePublication(), false, false },
+        { NotLivePublication(), null, LivePublication(), false, false },
+        { NotLivePublication(), NotLivePublication(), null, false, false },
+        { NotLivePublication(), NotLivePublication(), NotLivePublication(), false, false },
+        { NotLivePublication(), NotLivePublication(), LivePublication(), false, false },
+        { NotLivePublication(), LivePublication(), null, false, false },
+        { NotLivePublication(), LivePublication(), NotLivePublication(), false, false },
+        { NotLivePublication(), LivePublication(), LivePublication(), false, false },
+        // @formatter:on
+    };
 }

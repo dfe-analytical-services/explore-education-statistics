@@ -10,7 +10,7 @@ public class EventGridEventHandlerTests
     private readonly LoggerMockBuilder<EventGridEventHandler> _loggerMockBuilder = new();
 
     private EventGridEventHandler GetSut() => new(_loggerMockBuilder.Build());
-    
+
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
 
@@ -23,21 +23,28 @@ public class EventGridEventHandlerTests
         var sut = GetSut();
 
         MockPayloadClass? actualPayload = null;
-        
-        Task<MockResponse> Handler(MockPayloadClass payload, CancellationToken cancellationToken = default)
+
+        Task<MockResponse> Handler(
+            MockPayloadClass payload,
+            CancellationToken cancellationToken = default
+        )
         {
             actualPayload = payload;
-            return Task.FromResult(new MockResponse());            
+            return Task.FromResult(new MockResponse());
         }
-        
+
         // ACT
-        await sut.Handle<MockPayloadClass, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
-        
+        await sut.Handle<MockPayloadClass, MockResponse>(
+            _functionContextMockBuilder.Build(),
+            _eventGridEventBuilder.Build(),
+            Handler
+        );
+
         // ASSERT
         Assert.NotNull(actualPayload);
         Assert.Equal(expectedPayload.Messaage, actualPayload.Messaage);
     }
-    
+
     [Fact]
     public async Task GivenEvent_WhenHasRecordPayload_ThenHandlerIsCalledWithPayload()
     {
@@ -47,20 +54,27 @@ public class EventGridEventHandlerTests
         var sut = GetSut();
 
         MockPayloadRecord? actualPayload = null;
-        
-        Task<MockResponse> Handler(MockPayloadRecord payload, CancellationToken cancellationToken = default)
+
+        Task<MockResponse> Handler(
+            MockPayloadRecord payload,
+            CancellationToken cancellationToken = default
+        )
         {
             actualPayload = payload;
-            return Task.FromResult(new MockResponse());            
+            return Task.FromResult(new MockResponse());
         }
-        
+
         // ACT
-        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
-        
+        await sut.Handle<MockPayloadRecord, MockResponse>(
+            _functionContextMockBuilder.Build(),
+            _eventGridEventBuilder.Build(),
+            Handler
+        );
+
         // ASSERT
         Assert.Equal(expectedPayload, actualPayload);
     }
-    
+
     [Fact]
     public async Task GivenEvent_WhenEventHandled_ThenHandlerLogs()
     {
@@ -68,14 +82,21 @@ public class EventGridEventHandlerTests
         _functionContextMockBuilder.ForFunctionName("FUNCTION_NAME_123");
         var sut = GetSut();
 
-        Task<MockResponse> Handler(MockPayloadRecord payload, CancellationToken cancellationToken = default)
+        Task<MockResponse> Handler(
+            MockPayloadRecord payload,
+            CancellationToken cancellationToken = default
+        )
         {
-            return Task.FromResult(new MockResponse());            
+            return Task.FromResult(new MockResponse());
         }
-        
+
         // ACT
-        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
-        
+        await sut.Handle<MockPayloadRecord, MockResponse>(
+            _functionContextMockBuilder.Build(),
+            _eventGridEventBuilder.Build(),
+            Handler
+        );
+
         // ASSERT
         _loggerMockBuilder.Assert.LoggedDebugContains("FUNCTION_NAME_123");
     }
@@ -88,21 +109,28 @@ public class EventGridEventHandlerTests
         var sut = GetSut();
 
         MockPayloadClass? actualPayload = null;
-        
-        Task<MockResponse> Handler(MockPayloadClass payload, CancellationToken cancellationToken = default)
+
+        Task<MockResponse> Handler(
+            MockPayloadClass payload,
+            CancellationToken cancellationToken = default
+        )
         {
             actualPayload = payload;
-            return Task.FromResult(new MockResponse());            
+            return Task.FromResult(new MockResponse());
         }
-        
+
         // ACT
-        await sut.Handle<MockPayloadClass, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
-        
+        await sut.Handle<MockPayloadClass, MockResponse>(
+            _functionContextMockBuilder.Build(),
+            _eventGridEventBuilder.Build(),
+            Handler
+        );
+
         // ASSERT
         Assert.NotNull(actualPayload);
         Assert.Null(actualPayload.Messaage);
     }
-    
+
     [Fact]
     public async Task GivenEvent_WhenHasNoRecordPayload_ThenHandlerIsCalledWithDefaultPayload()
     {
@@ -111,22 +139,28 @@ public class EventGridEventHandlerTests
         var sut = GetSut();
 
         MockPayloadRecord? actualPayload = null;
-        
-        Task<MockResponse> Handler(MockPayloadRecord payload, CancellationToken cancellationToken = default)
+
+        Task<MockResponse> Handler(
+            MockPayloadRecord payload,
+            CancellationToken cancellationToken = default
+        )
         {
             actualPayload = payload;
-            return Task.FromResult(new MockResponse());            
+            return Task.FromResult(new MockResponse());
         }
-        
+
         // ACT
-        await sut.Handle<MockPayloadRecord, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
-        
+        await sut.Handle<MockPayloadRecord, MockResponse>(
+            _functionContextMockBuilder.Build(),
+            _eventGridEventBuilder.Build(),
+            Handler
+        );
+
         // ASSERT
         var expectedPayload = new MockPayloadRecord();
         Assert.Equal(expectedPayload, actualPayload);
     }
-    
-    
+
     [Fact]
     public async Task GivenHandlerCalled_WhenHandlerReturnsResponse_ThenSUTReturnsResponse()
     {
@@ -134,14 +168,21 @@ public class EventGridEventHandlerTests
         var sut = GetSut();
 
         var expectedResponse = new MockResponse();
-        
-        Task<MockResponse> Handler(MockPayloadClass payload, CancellationToken cancellationToken = default)
+
+        Task<MockResponse> Handler(
+            MockPayloadClass payload,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.FromResult(expectedResponse);
         }
-        
+
         // ACT
-        var actualReponse = await sut.Handle<MockPayloadClass, MockResponse>(_functionContextMockBuilder.Build(), _eventGridEventBuilder.Build(), Handler);
+        var actualReponse = await sut.Handle<MockPayloadClass, MockResponse>(
+            _functionContextMockBuilder.Build(),
+            _eventGridEventBuilder.Build(),
+            Handler
+        );
 
         // ASSERT
         Assert.NotNull(actualReponse);
@@ -152,7 +193,7 @@ public class EventGridEventHandlerTests
     {
         public string? Messaage { get; init; }
     }
-    
+
     public record MockPayloadRecord
     {
         public string? Messaage { get; init; }
@@ -160,4 +201,3 @@ public class EventGridEventHandlerTests
 
     public record MockResponse { }
 }
-

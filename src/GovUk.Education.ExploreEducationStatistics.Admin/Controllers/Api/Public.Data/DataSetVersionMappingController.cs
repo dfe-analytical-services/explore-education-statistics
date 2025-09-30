@@ -19,7 +19,8 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
     [Produces("application/json")]
     public Task<ActionResult<LocationMappingPlan>> GetLocationMappings(
         [FromRoute] Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return mappingService
             .GetLocationMappings(nextDataSetVersionId, cancellationToken)
@@ -28,16 +29,20 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpPatch("locations")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
+    public async Task<
+        ActionResult<BatchLocationMappingUpdatesResponseViewModel>
+    > ApplyBatchLocationMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchLocationMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await mappingService
             .ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -45,7 +50,8 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
     [Produces("application/json")]
     public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
         [FromRoute] Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return mappingService
             .GetFilterMappings(nextDataSetVersionId, cancellationToken)
@@ -54,16 +60,20 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpPatch("filters/options")]
     [Produces("application/json")]
-    public async Task<ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+    public async Task<
+        ActionResult<BatchFilterOptionMappingUpdatesResponseViewModel>
+    > ApplyBatchFilterOptionMappingUpdates(
         [FromRoute] Guid nextDataSetVersionId,
         [FromBody] BatchFilterOptionMappingUpdatesRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await mappingService
             .ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersionId,
                 request: request,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 }

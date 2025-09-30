@@ -41,7 +41,8 @@ public class PermalinkService : IPermalinkService
         IPublicBlobStorageService publicBlobStorageService,
         IFrontendService frontendService,
         ISubjectRepository subjectRepository,
-        IPublicationRepository publicationRepository)
+        IPublicationRepository publicationRepository
+    )
     {
         _contentDbContext = contentDbContext;
         _tableBuilderService = tableBuilderService;
@@ -52,8 +53,10 @@ public class PermalinkService : IPermalinkService
         _publicationRepository = publicationRepository;
     }
 
-    public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
-        CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(
+        Guid permalinkId,
+        CancellationToken cancellationToken = default
+    )
     {
         return await Find(permalinkId, cancellationToken)
             .OnSuccessCombineWith(_ => DownloadPermalink(permalinkId, cancellationToken))
@@ -64,25 +67,31 @@ public class PermalinkService : IPermalinkService
             });
     }
 
-    private async Task<Either<ActionResult, Permalink>> Find(Guid permalinkId,
-        CancellationToken cancellationToken)
+    private async Task<Either<ActionResult, Permalink>> Find(
+        Guid permalinkId,
+        CancellationToken cancellationToken
+    )
     {
-        return await _contentDbContext.Permalinks
-            .SingleOrNotFoundAsync(
-                predicate: permalink => permalink.Id == permalinkId,
-                cancellationToken: cancellationToken);
+        return await _contentDbContext.Permalinks.SingleOrNotFoundAsync(
+            predicate: permalink => permalink.Id == permalinkId,
+            cancellationToken: cancellationToken
+        );
     }
 
-    public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(
+        PermalinkCreateRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await (request.ReleaseVersionId ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId))
-            .OnSuccess(releaseVersionId =>
-            {
-                return _tableBuilderService.Query(releaseVersionId,
-                        request.Query.AsFullTableQuery(),
-                        cancellationToken)
-                    .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
+        return await (
+            request.ReleaseVersionId
+            ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId)
+        ).OnSuccess(releaseVersionId =>
+        {
+            return _tableBuilderService
+                .Query(releaseVersionId, request.Query.AsFullTableQuery(), cancellationToken)
+                .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(
+                    async tableResult =>
                     {
                         var frontendTableTask = _frontendService.CreateTable(
                             tableResult,
@@ -120,7 +129,7 @@ public class PermalinkService : IPermalinkService
                         // create a new view model with the footnotes added directly
                         var tableWithFootnotes = table with
                         {
-                            Footnotes = subjectMeta.Footnotes
+                            Footnotes = subjectMeta.Footnotes,
                         };
 
                         var permalink = new Permalink
@@ -132,27 +141,34 @@ public class PermalinkService : IPermalinkService
                         };
                         _contentDbContext.Permalinks.Add(permalink);
 
-                        await UploadSnapshot(permalink: permalink,
+                        await UploadSnapshot(
+                            permalink: permalink,
                             observations: tableResult.Results.ToList(),
                             csvMeta: csvMeta,
                             table: tableWithFootnotes,
-                            cancellationToken: cancellationToken);
+                            cancellationToken: cancellationToken
+                        );
 
                         await _contentDbContext.SaveChangesAsync(cancellationToken);
                         return await BuildViewModel(permalink, tableWithFootnotes);
-                    });
-            });
+                    }
+                );
+        });
     }
 
     public async Task<Either<ActionResult, Stream>> GetCsvDownloadStream(
         Guid permalinkId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await Find(permalinkId, cancellationToken)
-            .OnSuccess(() => _publicBlobStorageService.GetDownloadStream(
-                containerName: BlobContainers.PermalinkSnapshots,
-                path: $"{permalinkId}.csv.zst",
-                cancellationToken: cancellationToken));
+            .OnSuccess(() =>
+                _publicBlobStorageService.GetDownloadStream(
+                    containerName: BlobContainers.PermalinkSnapshots,
+                    path: $"{permalinkId}.csv.zst",
+                    cancellationToken: cancellationToken
+                )
+            );
     }
 
     private static async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
@@ -173,20 +189,16 @@ public class PermalinkService : IPermalinkService
         IWriter csv,
         List<ObservationViewModel> observations,
         PermalinkCsvMetaViewModel meta,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var locationHeaders = meta.Headers
-            .Where(header => LocationCsvUtils.AllCsvColumns().Contains(header))
+        var locationHeaders = meta
+            .Headers.Where(header => LocationCsvUtils.AllCsvColumns().Contains(header))
             .ToHashSet();
 
-        var rows = observations
-            .Select(
-                observation => MapCsvRow(
-                    observation: observation,
-                    meta: meta,
-                    locationHeaders: locationHeaders
-                )
-            );
+        var rows = observations.Select(observation =>
+            MapCsvRow(observation: observation, meta: meta, locationHeaders: locationHeaders)
+        );
 
         await csv.WriteRecordsAsync(rows, cancellationToken);
     }
@@ -194,7 +206,8 @@ public class PermalinkService : IPermalinkService
     private object MapCsvRow(
         ObservationViewModel observation,
         PermalinkCsvMetaViewModel meta,
-        HashSet<string> locationHeaders)
+        HashSet<string> locationHeaders
+    )
     {
         var timePeriod = observation.GetTimePeriodTuple();
 
@@ -202,11 +215,7 @@ public class PermalinkService : IPermalinkService
 
         foreach (var header in meta.Headers)
         {
-            row[header] = GetCsvRowValue(header,
-                observation,
-                timePeriod,
-                meta,
-                locationHeaders);
+            row[header] = GetCsvRowValue(header, observation, timePeriod, meta, locationHeaders);
         }
 
         return row;
@@ -217,12 +226,16 @@ public class PermalinkService : IPermalinkService
         ObservationViewModel observation,
         (int Year, TimeIdentifier TimeIdentifier) timePeriod,
         PermalinkCsvMetaViewModel meta,
-        IReadOnlySet<string> locationHeaders)
+        IReadOnlySet<string> locationHeaders
+    )
     {
         switch (header)
         {
             case "time_period":
-                return TimePeriodLabelFormatter.FormatCsvYear(timePeriod.Year, timePeriod.TimeIdentifier);
+                return TimePeriodLabelFormatter.FormatCsvYear(
+                    timePeriod.Year,
+                    timePeriod.TimeIdentifier
+                );
             case "time_identifier":
                 return timePeriod.TimeIdentifier.GetEnumLabel();
             case "geographic_level":
@@ -241,8 +254,10 @@ public class PermalinkService : IPermalinkService
 
         if (meta.FiltersByGroupingColumn.TryGetValue(header, out var filterFoundFromGroupHeader))
         {
-            var match = observation.Filters
-                .Where(filterItemId => filterFoundFromGroupHeader.Items.ContainsKey(filterItemId))
+            var match = observation
+                .Filters.Where(filterItemId =>
+                    filterFoundFromGroupHeader.Items.ContainsKey(filterItemId)
+                )
                 .OfType<Guid?>()
                 .FirstOrDefault(null as Guid?);
 
@@ -254,8 +269,8 @@ public class PermalinkService : IPermalinkService
 
         if (meta.Filters.TryGetValue(header, out var filter))
         {
-            var match = observation.Filters
-                .Where(filterItemId => filter.Items.ContainsKey(filterItemId))
+            var match = observation
+                .Filters.Where(filterItemId => filter.Items.ContainsKey(filterItemId))
                 .OfType<Guid?>()
                 .FirstOrDefault(null as Guid?);
 
@@ -267,8 +282,7 @@ public class PermalinkService : IPermalinkService
 
         if (meta.Indicators.TryGetValue(header, out var indicator))
         {
-            var match = observation.Measures
-                .First(measure => measure.Key == indicator.Id);
+            var match = observation.Measures.First(measure => measure.Key == indicator.Id);
 
             return match.Value;
         }
@@ -276,7 +290,10 @@ public class PermalinkService : IPermalinkService
         return string.Empty;
     }
 
-    private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, PermalinkTableViewModel table)
+    private async Task<PermalinkViewModel> BuildViewModel(
+        Permalink permalink,
+        PermalinkTableViewModel table
+    )
     {
         var status = await GetPermalinkStatus(permalink.SubjectId);
         return new PermalinkViewModel
@@ -286,19 +303,24 @@ public class PermalinkService : IPermalinkService
             DataSetTitle = permalink.DataSetTitle,
             PublicationTitle = permalink.PublicationTitle,
             Status = status,
-            Table = table
+            Table = table,
         };
     }
 
-    private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
+    private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(
+        Guid subjectId
+    )
     {
-        return await _subjectRepository.FindPublicationIdForSubject(subjectId)
+        return await _subjectRepository
+            .FindPublicationIdForSubject(subjectId)
             .OrNotFound()
-            .OnSuccess(async publicationId => await _contentDbContext.Publications
-                .Where(p => p.Id == publicationId)
-                .Select(p => p.LatestPublishedReleaseVersionId)
-                .SingleOrDefaultAsync()
-                .OrNotFound());
+            .OnSuccess(async publicationId =>
+                await _contentDbContext
+                    .Publications.Where(p => p.Id == publicationId)
+                    .Select(p => p.LatestPublishedReleaseVersionId)
+                    .SingleOrDefaultAsync()
+                    .OrNotFound()
+            );
     }
 
     private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
@@ -306,11 +328,13 @@ public class PermalinkService : IPermalinkService
         // TODO EES-3339 This doesn't currently include a status to warn if the footnotes have been amended on a Release,
         // and will return 'Current' unless one of the other cases also applies.
 
-        var releasesVersionsWithSubject = await _contentDbContext.ReleaseFiles
-            .Where(rf =>
+        var releasesVersionsWithSubject = await _contentDbContext
+            .ReleaseFiles.Where(rf =>
                 rf.File.SubjectId == subjectId
                 && rf.File.Type == FileType.Data
-                && rf.ReleaseVersion.Published.HasValue && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
+                && rf.ReleaseVersion.Published.HasValue
+                && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value
+            )
             .Select(rf => rf.ReleaseVersion)
             .ToListAsync();
 
@@ -319,20 +343,26 @@ public class PermalinkService : IPermalinkService
             return PermalinkStatus.SubjectRemoved;
         }
 
-        var publication = await _contentDbContext.Publications
-            .Include(p => p.LatestPublishedReleaseVersion)
+        var publication = await _contentDbContext
+            .Publications.Include(p => p.LatestPublishedReleaseVersion)
             .SingleAsync(p => p.Id == releasesVersionsWithSubject.First().PublicationId);
 
         var latestPublishedReleaseVersion = publication.LatestPublishedReleaseVersion;
 
-        if (latestPublishedReleaseVersion != null && releasesVersionsWithSubject.All(rv =>
-                rv.ReleaseId != latestPublishedReleaseVersion.ReleaseId))
+        if (
+            latestPublishedReleaseVersion != null
+            && releasesVersionsWithSubject.All(rv =>
+                rv.ReleaseId != latestPublishedReleaseVersion.ReleaseId
+            )
+        )
         {
             return PermalinkStatus.NotForLatestRelease;
         }
 
-        if (latestPublishedReleaseVersion != null
-            && releasesVersionsWithSubject.All(rv => rv.Id != latestPublishedReleaseVersion.Id))
+        if (
+            latestPublishedReleaseVersion != null
+            && releasesVersionsWithSubject.All(rv => rv.Id != latestPublishedReleaseVersion.Id)
+        )
         {
             return PermalinkStatus.SubjectReplacedOrRemoved;
         }
@@ -345,20 +375,27 @@ public class PermalinkService : IPermalinkService
         return PermalinkStatus.Current;
     }
 
-    private async Task<Either<ActionResult, PermalinkTableViewModel>> DownloadPermalink(Guid permalinkId,
-        CancellationToken cancellationToken = default)
+    private async Task<Either<ActionResult, PermalinkTableViewModel>> DownloadPermalink(
+        Guid permalinkId,
+        CancellationToken cancellationToken = default
+    )
     {
-        return (await _publicBlobStorageService.GetDeserializedJson<PermalinkTableViewModel>(
-            containerName: BlobContainers.PermalinkSnapshots,
-            path: $"{permalinkId}.json.zst",
-            cancellationToken: cancellationToken))!;
+        return (
+            await _publicBlobStorageService.GetDeserializedJson<PermalinkTableViewModel>(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalinkId}.json.zst",
+                cancellationToken: cancellationToken
+            )
+        )!;
     }
 
-    private async Task UploadSnapshot(Permalink permalink,
+    private async Task UploadSnapshot(
+        Permalink permalink,
         List<ObservationViewModel> observations,
         PermalinkCsvMetaViewModel csvMeta,
         PermalinkTableViewModel table,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await Task.WhenAll(
             UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
@@ -366,14 +403,18 @@ public class PermalinkService : IPermalinkService
         );
     }
 
-    private async Task UploadTableCsv(Permalink permalink,
+    private async Task UploadTableCsv(
+        Permalink permalink,
         List<ObservationViewModel> observations,
         PermalinkCsvMetaViewModel csvMeta,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await using var csvStream = new MemoryStream();
-        await using var csvWriter =
-            new CsvWriter(new StreamWriter(csvStream, leaveOpen: true), CultureInfo.InvariantCulture);
+        await using var csvWriter = new CsvWriter(
+            new StreamWriter(csvStream, leaveOpen: true),
+            CultureInfo.InvariantCulture
+        );
         await WriteCsvHeaderRow(csvWriter, csvMeta);
         await WriteCsvRows(csvWriter, observations, csvMeta, cancellationToken);
         await csvWriter.FlushAsync();
@@ -388,9 +429,11 @@ public class PermalinkService : IPermalinkService
         );
     }
 
-    private async Task UploadTable(Permalink permalink,
+    private async Task UploadTable(
+        Permalink permalink,
         PermalinkTableViewModel table,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await _publicBlobStorageService.UploadAsJson(
             containerName: BlobContainers.PermalinkSnapshots,

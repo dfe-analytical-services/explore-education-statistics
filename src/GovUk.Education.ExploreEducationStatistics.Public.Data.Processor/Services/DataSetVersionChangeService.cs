@@ -12,11 +12,11 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 {
     public async Task CreateChanges(
         Guid nextDataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var nextVersion = await publicDataDbContext
-            .DataSetVersions
-            .Include(dsv => dsv.DataSet)
+            .DataSetVersions.Include(dsv => dsv.DataSet)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
         var previousVersionId = nextVersion.DataSet.LatestLiveVersionId!.Value;
@@ -26,34 +26,40 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             await CreateFilterChanges(
                 previousVersionId: previousVersionId,
                 nextVersionId: nextVersion.Id,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             await CreateLocationChanges(
                 previousVersionId: previousVersionId,
                 nextVersionId: nextVersion.Id,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             await CreateGeographicLevelChange(
                 previousVersionId: previousVersionId,
                 nextVersionId: nextVersion.Id,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             await CreateIndicatorChanges(
                 previousVersionId: previousVersionId,
                 nextVersionId: nextVersion.Id,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             await CreateTimePeriodChanges(
                 previousVersionId: previousVersionId,
                 nextVersionId: nextVersion.Id,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
         });
     }
 
     private async Task CreateFilterChanges(
         Guid previousVersionId,
         Guid nextVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var oldMetas = await GetFilterMetas(previousVersionId, cancellationToken);
         var newMetas = await GetFilterMetas(nextVersionId, cancellationToken);
@@ -72,36 +78,47 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 // Filter updated
                 if (!IsFilterEqual(newFilterTuple.FilterMeta, oldFilterTuple.FilterMeta))
                 {
-                    metaUpdates.Add(new FilterMetaChange
-                    {
-                        DataSetVersionId = nextVersionId,
-                        PreviousState = oldFilterTuple.FilterMeta,
-                        PreviousStateId = oldFilterTuple.FilterMeta.Id,
-                        CurrentState = newFilterTuple.FilterMeta,
-                        CurrentStateId = newFilterTuple.FilterMeta.Id
-                    });
+                    metaUpdates.Add(
+                        new FilterMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = oldFilterTuple.FilterMeta,
+                            PreviousStateId = oldFilterTuple.FilterMeta.Id,
+                            CurrentState = newFilterTuple.FilterMeta,
+                            CurrentStateId = newFilterTuple.FilterMeta.Id,
+                        }
+                    );
                 }
 
                 foreach (var (optionPublicId, oldOptionLink) in oldFilterTuple.OptionLinks)
                 {
-                    if (!newFilterTuple.OptionLinks.TryGetValue(optionPublicId, out var newOptionLink))
+                    if (
+                        !newFilterTuple.OptionLinks.TryGetValue(
+                            optionPublicId,
+                            out var newOptionLink
+                        )
+                    )
                     {
                         // Filter option deleted
-                        optionMetaDeletions.Add(new FilterOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink)
-                        });
+                        optionMetaDeletions.Add(
+                            new FilterOptionMetaChange
+                            {
+                                DataSetVersionId = nextVersionId,
+                                PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink),
+                            }
+                        );
                     }
                     // Filter option updated
                     else if (!IsFilterOptionEqual(newOptionLink.Option, oldOptionLink.Option))
                     {
-                        optionMetaUpdates.Add(new FilterOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink),
-                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
-                        });
+                        optionMetaUpdates.Add(
+                            new FilterOptionMetaChange
+                            {
+                                DataSetVersionId = nextVersionId,
+                                PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink),
+                                CurrentState = FilterOptionMetaChange.State.Create(newOptionLink),
+                            }
+                        );
 
                         // Improving performance by removing from the new meta to avoid having to loop
                         // over it again when finding the additions
@@ -112,12 +129,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             else
             {
                 // Filter deleted
-                metaDeletions.Add(new FilterMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    PreviousState = oldFilterTuple.FilterMeta,
-                    PreviousStateId = oldFilterTuple.FilterMeta.Id,
-                });
+                metaDeletions.Add(
+                    new FilterMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        PreviousState = oldFilterTuple.FilterMeta,
+                        PreviousStateId = oldFilterTuple.FilterMeta.Id,
+                    }
+                );
             }
         }
 
@@ -130,23 +149,27 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     if (!oldFilterTuple.OptionLinks.ContainsKey(optionPublicId))
                     {
                         // Filter option added
-                        optionMetaAdditions.Add(new FilterOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
-                        });
+                        optionMetaAdditions.Add(
+                            new FilterOptionMetaChange
+                            {
+                                DataSetVersionId = nextVersionId,
+                                CurrentState = FilterOptionMetaChange.State.Create(newOptionLink),
+                            }
+                        );
                     }
                 }
             }
             else
             {
                 // Filter added
-                metaAdditions.Add(new FilterMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    CurrentState = newFilterTuple.FilterMeta,
-                    CurrentStateId = newFilterTuple.FilterMeta.Id
-                });
+                metaAdditions.Add(
+                    new FilterMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        CurrentState = newFilterTuple.FilterMeta,
+                        CurrentStateId = newFilterTuple.FilterMeta.Id,
+                    }
+                );
             }
         }
 
@@ -158,15 +181,17 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             [
                 .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
                 .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
-                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)
-            ]);
+                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label),
+            ]
+        );
 
         publicDataDbContext.FilterOptionMetaChanges.AddRange(
             [
                 .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
                 .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
-                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label)
-            ]);
+                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label),
+            ]
+        );
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -178,7 +203,10 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             && filterMeta1.Hint == filterMeta2.Hint;
     }
 
-    private static bool IsFilterOptionEqual(FilterOptionMeta filterOptionMeta1, FilterOptionMeta filterOptionMeta2)
+    private static bool IsFilterOptionEqual(
+        FilterOptionMeta filterOptionMeta1,
+        FilterOptionMeta filterOptionMeta2
+    )
     {
         return filterOptionMeta1.Label == filterOptionMeta2.Label;
     }
@@ -186,7 +214,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     private async Task CreateLocationChanges(
         Guid previousVersionId,
         Guid nextVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var oldMetas = await GetLocationMetas(previousVersionId, cancellationToken);
         var newMetas = await GetLocationMetas(nextVersionId, cancellationToken);
@@ -203,24 +232,37 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             {
                 foreach (var (optionPublicId, oldOptionLink) in oldLocationTuple.OptionLinks)
                 {
-                    if (!newLocationTuple.OptionLinks.TryGetValue(optionPublicId, out var newOptionLink))
+                    if (
+                        !newLocationTuple.OptionLinks.TryGetValue(
+                            optionPublicId,
+                            out var newOptionLink
+                        )
+                    )
                     {
                         // Location option deleted
-                        optionMetaDeletions.Add(new LocationOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            PreviousState = LocationOptionMetaChange.State.Create(oldOptionLink)
-                        });
+                        optionMetaDeletions.Add(
+                            new LocationOptionMetaChange
+                            {
+                                DataSetVersionId = nextVersionId,
+                                PreviousState = LocationOptionMetaChange.State.Create(
+                                    oldOptionLink
+                                ),
+                            }
+                        );
                     }
                     // Location option updated
                     else if (!IsLocationOptionEqual(newOptionLink.Option, oldOptionLink.Option))
                     {
-                        optionMetaUpdates.Add(new LocationOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            PreviousState = LocationOptionMetaChange.State.Create(oldOptionLink),
-                            CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
-                        });
+                        optionMetaUpdates.Add(
+                            new LocationOptionMetaChange
+                            {
+                                DataSetVersionId = nextVersionId,
+                                PreviousState = LocationOptionMetaChange.State.Create(
+                                    oldOptionLink
+                                ),
+                                CurrentState = LocationOptionMetaChange.State.Create(newOptionLink),
+                            }
+                        );
 
                         // Improving performance by removing from the new meta to avoid having to loop
                         // over it again when finding the additions
@@ -231,12 +273,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             else
             {
                 // Location deleted
-                metaDeletions.Add(new LocationMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    PreviousState = oldLocationTuple.LocationMeta,
-                    PreviousStateId = oldLocationTuple.LocationMeta.Id,
-                });
+                metaDeletions.Add(
+                    new LocationMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        PreviousState = oldLocationTuple.LocationMeta,
+                        PreviousStateId = oldLocationTuple.LocationMeta.Id,
+                    }
+                );
             }
         }
 
@@ -249,23 +293,27 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     if (!oldLocationTuple.OptionLinks.ContainsKey(optionPublicId))
                     {
                         // Location option added
-                        optionMetaAdditions.Add(new LocationOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
-                        });
+                        optionMetaAdditions.Add(
+                            new LocationOptionMetaChange
+                            {
+                                DataSetVersionId = nextVersionId,
+                                CurrentState = LocationOptionMetaChange.State.Create(newOptionLink),
+                            }
+                        );
                     }
                 }
             }
             else
             {
                 // Location added
-                metaAdditions.Add(new LocationMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    CurrentState = newLocationTuple.LocationMeta,
-                    CurrentStateId = newLocationTuple.LocationMeta.Id
-                });
+                metaAdditions.Add(
+                    new LocationMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        CurrentState = newLocationTuple.LocationMeta,
+                        CurrentStateId = newLocationTuple.LocationMeta.Id,
+                    }
+                );
             }
         }
 
@@ -276,20 +324,25 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         publicDataDbContext.LocationMetaChanges.AddRange(
             [
                 .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Level.GetEnumLabel()),
-                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Level.GetEnumLabel())
-            ]);
+                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Level.GetEnumLabel()),
+            ]
+        );
 
         publicDataDbContext.LocationOptionMetaChanges.AddRange(
             [
                 .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
                 .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
-                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label)
-            ]);
+                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label),
+            ]
+        );
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private static bool IsLocationOptionEqual(LocationOptionMeta locationOptionMeta1, LocationOptionMeta locationOptionMeta2)
+    private static bool IsLocationOptionEqual(
+        LocationOptionMeta locationOptionMeta1,
+        LocationOptionMeta locationOptionMeta2
+    )
     {
         // We need to check if the label, and any codes have changed.
         // However, the LocationOptionMeta table is constrained so that every row is unique and we only create new options
@@ -300,22 +353,29 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     private async Task CreateGeographicLevelChange(
         Guid previousVersionId,
         Guid nextVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var oldGeographicLevelMeta = await GetGeographicLevelMeta(previousVersionId, cancellationToken);
+        var oldGeographicLevelMeta = await GetGeographicLevelMeta(
+            previousVersionId,
+            cancellationToken
+        );
         var newGeographicLevelMeta = await GetGeographicLevelMeta(nextVersionId, cancellationToken);
 
-        var levelsAreEqual =
-            newGeographicLevelMeta.Levels.Order().SequenceEqual(oldGeographicLevelMeta.Levels.Order());
+        var levelsAreEqual = newGeographicLevelMeta
+            .Levels.Order()
+            .SequenceEqual(oldGeographicLevelMeta.Levels.Order());
 
         if (!levelsAreEqual)
         {
-            publicDataDbContext.GeographicLevelMetaChanges.Add(new GeographicLevelMetaChange
-            {
-                DataSetVersionId = nextVersionId,
-                PreviousStateId = oldGeographicLevelMeta.Id,
-                CurrentStateId = newGeographicLevelMeta.Id
-            });
+            publicDataDbContext.GeographicLevelMetaChanges.Add(
+                new GeographicLevelMetaChange
+                {
+                    DataSetVersionId = nextVersionId,
+                    PreviousStateId = oldGeographicLevelMeta.Id,
+                    CurrentStateId = newGeographicLevelMeta.Id,
+                }
+            );
             await publicDataDbContext.SaveChangesAsync(cancellationToken);
         }
     }
@@ -323,7 +383,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     private async Task CreateIndicatorChanges(
         Guid previousVersionId,
         Guid nextVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var oldMetas = await GetIndicatorMetas(previousVersionId, cancellationToken);
         var newMetas = await GetIndicatorMetas(nextVersionId, cancellationToken);
@@ -339,25 +400,29 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 // Indicator updated
                 if (!IsIndicatorEqual(newIndicator, oldIndicator))
                 {
-                    metaUpdates.Add(new IndicatorMetaChange
-                    {
-                        DataSetVersionId = nextVersionId,
-                        PreviousState = oldIndicator,
-                        PreviousStateId = oldIndicator.Id,
-                        CurrentState = newIndicator,
-                        CurrentStateId = newIndicator.Id
-                    });
+                    metaUpdates.Add(
+                        new IndicatorMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = oldIndicator,
+                            PreviousStateId = oldIndicator.Id,
+                            CurrentState = newIndicator,
+                            CurrentStateId = newIndicator.Id,
+                        }
+                    );
                 }
             }
             else
             {
                 // Indicator deleted
-                metaDeletions.Add(new IndicatorMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    PreviousState = oldIndicator,
-                    PreviousStateId = oldIndicator.Id,
-                });
+                metaDeletions.Add(
+                    new IndicatorMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        PreviousState = oldIndicator,
+                        PreviousStateId = oldIndicator.Id,
+                    }
+                );
             }
         }
 
@@ -366,12 +431,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             if (!oldMetas.TryGetValue(indicatorPublicId, out _))
             {
                 // Indicator added
-                metaAdditions.Add(new IndicatorMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    CurrentState = newIndicator,
-                    CurrentStateId = newIndicator.Id
-                });
+                metaAdditions.Add(
+                    new IndicatorMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        CurrentState = newIndicator,
+                        CurrentStateId = newIndicator.Id,
+                    }
+                );
             }
         }
 
@@ -383,8 +450,9 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             [
                 .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
                 .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
-                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)
-            ]);
+                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label),
+            ]
+        );
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -400,7 +468,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     private async Task CreateTimePeriodChanges(
         Guid previousVersionId,
         Guid nextVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var oldTimePeriodMetas = await GetTimePeriodMetas(previousVersionId, cancellationToken);
         var newTimePeriodMetas = await GetTimePeriodMetas(nextVersionId, cancellationToken);
@@ -413,7 +482,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             {
                 DataSetVersionId = nextVersionId,
                 PreviousStateId = timePeriodMeta.Id,
-                CurrentStateId = null
+                CurrentStateId = null,
             })
             .ToList();
 
@@ -425,82 +494,83 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             {
                 DataSetVersionId = nextVersionId,
                 PreviousStateId = null,
-                CurrentStateId = timePeriodMeta.Id
+                CurrentStateId = timePeriodMeta.Id,
             })
             .ToList();
 
-        publicDataDbContext.TimePeriodMetaChanges.AddRange([.. timePeriodMetaDeletions, .. timePeriodMetaAdditions]);
+        publicDataDbContext.TimePeriodMetaChanges.AddRange(
+            [.. timePeriodMetaDeletions, .. timePeriodMetaAdditions]
+        );
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async
-        Task<Dictionary<string, (FilterMeta FilterMeta, Dictionary<string, FilterOptionMetaLink> OptionLinks)>>
-        GetFilterMetas(
-            Guid dataSetVersionId,
-            CancellationToken cancellationToken)
+    private async Task<
+        Dictionary<
+            string,
+            (FilterMeta FilterMeta, Dictionary<string, FilterOptionMetaLink> OptionLinks)
+        >
+    > GetFilterMetas(Guid dataSetVersionId, CancellationToken cancellationToken)
     {
         return await publicDataDbContext
-            .FilterMetas
-            .Include(m => m.OptionLinks)
+            .FilterMetas.Include(m => m.OptionLinks)
             .ThenInclude(l => l.Option)
             .Where(m => m.DataSetVersionId == dataSetVersionId)
             .ToDictionaryAsync(
                 m => m.PublicId,
-                m => (
-                    FilterMeta: m,
-                    OptionLinks: m.OptionLinks.ToDictionary(l => l.PublicId)
-                ),
-                cancellationToken);
+                m => (FilterMeta: m, OptionLinks: m.OptionLinks.ToDictionary(l => l.PublicId)),
+                cancellationToken
+            );
     }
 
     private async Task<GeographicLevelMeta> GetGeographicLevelMeta(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await publicDataDbContext
-            .GeographicLevelMetas
-            .AsNoTracking()
+            .GeographicLevelMetas.AsNoTracking()
             .SingleAsync(m => m.DataSetVersionId == dataSetVersionId, cancellationToken);
     }
 
     private async Task<Dictionary<string, IndicatorMeta>> GetIndicatorMetas(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await publicDataDbContext
-            .IndicatorMetas
-            .Where(m => m.DataSetVersionId == dataSetVersionId)
-            .ToDictionaryAsync(
-                i => i.PublicId,
-                cancellationToken);
+            .IndicatorMetas.Where(m => m.DataSetVersionId == dataSetVersionId)
+            .ToDictionaryAsync(i => i.PublicId, cancellationToken);
     }
 
-    private async Task<Dictionary<GeographicLevel,
-        (LocationMeta LocationMeta, Dictionary<string, LocationOptionMetaLink> OptionLinks)>> GetLocationMetas(
-        Guid previousVersionId, CancellationToken cancellationToken)
+    private async Task<
+        Dictionary<
+            GeographicLevel,
+            (LocationMeta LocationMeta, Dictionary<string, LocationOptionMetaLink> OptionLinks)
+        >
+    > GetLocationMetas(Guid previousVersionId, CancellationToken cancellationToken)
     {
         return await publicDataDbContext
-            .LocationMetas
-            .Include(lm => lm.OptionLinks)
+            .LocationMetas.Include(lm => lm.OptionLinks)
             .ThenInclude(oml => oml.Option)
             .Where(lm => lm.DataSetVersionId == previousVersionId)
             .ToDictionaryAsync(
                 lm => lm.Level,
                 lm =>
-                (
-                    LocationMeta: lm,
-                    OptionLinks: lm.OptionLinks.ToDictionary(loml => loml.PublicId)
-                ),
-                cancellationToken);
+                    (
+                        LocationMeta: lm,
+                        OptionLinks: lm.OptionLinks.ToDictionary(loml => loml.PublicId)
+                    ),
+                cancellationToken
+            );
     }
 
     private async Task<IReadOnlyList<TimePeriodMeta>> GetTimePeriodMetas(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await publicDataDbContext
-            .TimePeriodMetas
-            .AsNoTracking()
+            .TimePeriodMetas.AsNoTracking()
             .Where(tpm => tpm.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }

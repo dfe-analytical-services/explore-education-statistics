@@ -32,7 +32,12 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DateTime? Updated { get; set; }
 
-    public string TimePeriod => TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, TimePeriodLabelFormat.FullLabelBeforeYear);
+    public string TimePeriod =>
+        TimePeriodLabelFormatter.Format(
+            Year,
+            TimePeriodCoverage,
+            TimePeriodLabelFormat.FullLabelBeforeYear
+        );
 
     public string Title => string.IsNullOrEmpty(Label) ? TimePeriod : $"{TimePeriod} {Label}";
 
@@ -42,17 +47,17 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     {
         public void Configure(EntityTypeBuilder<Release> builder)
         {
-            builder.Property(m => m.Slug)
-                .HasMaxLength(51);
+            builder.Property(m => m.Slug).HasMaxLength(51);
 
-            builder.Property(m => m.Label)
-                .HasMaxLength(20);
+            builder.Property(m => m.Label).HasMaxLength(20);
 
-            builder.Property(m => m.TimePeriodCoverage)
+            builder
+                .Property(m => m.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(5);
 
-            builder.HasIndex(dsv => new
+            builder
+                .HasIndex(dsv => new
                 {
                     dsv.PublicationId,
                     dsv.Year,

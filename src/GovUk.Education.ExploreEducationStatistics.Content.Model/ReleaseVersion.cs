@@ -20,9 +20,11 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     // be published and the Published date set.
     public DateTime? PublishScheduled { get; set; }
 
-    [NotMapped] public bool Live => Published.HasValue && UtcNow >= Published.Value;
+    [NotMapped]
+    public bool Live => Published.HasValue && UtcNow >= Published.Value;
 
-    [NotMapped] public bool Amendment => Version > 0 && !Live;
+    [NotMapped]
+    public bool Amendment => Version > 0 && !Live;
 
     [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
     public Guid PublicationId { get; set; }
@@ -103,28 +105,44 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public ContentSection KeyStatisticsSecondarySection
     {
         get => FindSingleSectionByType(ContentSectionType.KeyStatisticsSecondary);
-        set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, new List<ContentSection> { value });
+        set =>
+            ReplaceContentSectionsOfType(
+                ContentSectionType.KeyStatisticsSecondary,
+                new List<ContentSection> { value }
+            );
     }
 
     [NotMapped]
     public ContentSection HeadlinesSection
     {
         get => FindSingleSectionByType(ContentSectionType.Headlines);
-        set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, new List<ContentSection> { value });
+        set =>
+            ReplaceContentSectionsOfType(
+                ContentSectionType.Headlines,
+                new List<ContentSection> { value }
+            );
     }
 
     [NotMapped]
     public ContentSection SummarySection
     {
         get => FindSingleSectionByType(ContentSectionType.ReleaseSummary);
-        set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, new List<ContentSection> { value });
+        set =>
+            ReplaceContentSectionsOfType(
+                ContentSectionType.ReleaseSummary,
+                new List<ContentSection> { value }
+            );
     }
 
     [NotMapped]
     public ContentSection RelatedDashboardsSection
     {
         get => FindSingleSectionByType(ContentSectionType.RelatedDashboards);
-        set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, new List<ContentSection> { value });
+        set =>
+            ReplaceContentSectionsOfType(
+                ContentSectionType.RelatedDashboards,
+                new List<ContentSection> { value }
+            );
     }
 
     public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
@@ -136,11 +154,13 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
             Content = new List<ContentSection>();
         }
 
-        return Content
-            .SingleOrDefault(section => section.Type == type);
+        return Content.SingleOrDefault(section => section.Type == type);
     }
 
-    private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
+    private void ReplaceContentSectionsOfType(
+        ContentSectionType type,
+        IEnumerable<ContentSection> replacementSections
+    )
     {
         if (Content == null)
         {

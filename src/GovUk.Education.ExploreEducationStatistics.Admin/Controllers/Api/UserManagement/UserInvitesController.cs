@@ -20,7 +20,8 @@ public class UserInvitesController : ControllerBase
 
     public UserInvitesController(
         IUserManagementService userManagementService,
-        IReleaseInviteService releaseInviteService)
+        IReleaseInviteService releaseInviteService
+    )
     {
         _userManagementService = userManagementService;
         _releaseInviteService = releaseInviteService;
@@ -29,23 +30,20 @@ public class UserInvitesController : ControllerBase
     [HttpGet("user-management/invites")]
     public async Task<ActionResult<List<PendingInviteViewModel>>> GetInvitedUsers()
     {
-        return await _userManagementService
-            .ListPendingInvites()
-            .HandleFailuresOrOk();
+        return await _userManagementService.ListPendingInvites().HandleFailuresOrOk();
     }
 
     [HttpPost("user-management/invites")]
     public async Task<ActionResult<UserInvite>> InviteUser(UserInviteCreateRequest request)
     {
-        return await _userManagementService
-            .InviteUser(request)
-            .HandleFailuresOrOk();
+        return await _userManagementService.InviteUser(request).HandleFailuresOrOk();
     }
 
     [HttpPost("user-management/publications/{publicationId:guid}/invites/contributor")]
     public async Task<ActionResult<Unit>> InviteContributor(
         Guid publicationId,
-        ContributorInviteCreateRequest request)
+        ContributorInviteCreateRequest request
+    )
     {
         return await _releaseInviteService
             .InviteContributor(request.Email, publicationId, request.ReleaseIds)
@@ -55,19 +53,17 @@ public class UserInvitesController : ControllerBase
     [HttpDelete("user-management/publications/{publicationId:guid}/release-invites/contributor")]
     public async Task<ActionResult<Unit>> RemoveContributorReleaseInvites(
         Guid publicationId,
-        EmailViewModel emailViewModel)
+        EmailViewModel emailViewModel
+    )
     {
         return await _releaseInviteService
-            .RemoveByPublication(emailViewModel.Email, publicationId,
-                ReleaseRole.Contributor)
+            .RemoveByPublication(emailViewModel.Email, publicationId, ReleaseRole.Contributor)
             .HandleFailuresOrOk();
     }
 
     [HttpDelete("user-management/invites/{email}")]
     public async Task<ActionResult> CancelUserInvite(string email)
     {
-        return await _userManagementService
-            .CancelInvite(email)
-            .HandleFailuresOrNoContent();
+        return await _userManagementService.CancelInvite(email).HandleFailuresOrNoContent();
     }
 }

@@ -12,21 +12,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 
 public class ReleaseSearchableDocumentsService(
     ContentDbContext contentDbContext,
-    IReleaseService releaseService) : IReleaseSearchableDocumentsService
+    IReleaseService releaseService
+) : IReleaseSearchableDocumentsService
 {
-    public async Task<Either<ActionResult, ReleaseSearchableDocumentDto>> GetLatestReleaseAsSearchableDocument(
+    public async Task<
+        Either<ActionResult, ReleaseSearchableDocumentDto>
+    > GetLatestReleaseAsSearchableDocument(
         string publicationSlug,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default
+    ) =>
         await GetPublicationBySlug(publicationSlug, cancellationToken)
-            .OnSuccessCombineWith(p => releaseService.GetRelease(p.LatestPublishedReleaseVersionId!.Value))
+            .OnSuccessCombineWith(p =>
+                releaseService.GetRelease(p.LatestPublishedReleaseVersionId!.Value)
+            )
             .OnSuccess(tuple =>
-                ReleaseSearchableDocumentDto.FromModel(publication: tuple.Item1, release: tuple.Item2));
+                ReleaseSearchableDocumentDto.FromModel(
+                    publication: tuple.Item1,
+                    release: tuple.Item2
+                )
+            );
 
     private async Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
-        CancellationToken cancellationToken) =>
-        await contentDbContext.Publications
-            .AsNoTracking()
+        CancellationToken cancellationToken
+    ) =>
+        await contentDbContext
+            .Publications.AsNoTracking()
             .Include(p => p.Theme)
             .WhereHasPublishedRelease()
             .SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);

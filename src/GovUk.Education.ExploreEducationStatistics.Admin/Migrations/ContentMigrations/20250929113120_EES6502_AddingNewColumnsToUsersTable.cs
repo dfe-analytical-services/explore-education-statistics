@@ -21,7 +21,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "FirstName",
@@ -31,7 +32,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Email",
@@ -41,7 +43,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         // Add 'Active' as non-nullable with a default of 'false'.
         // For existing users, we will set this to 'true' in the data migration step below IF they are not soft-deleted.
@@ -50,58 +53,63 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             table: "Users",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
 
         migrationBuilder.AddColumn<DateTimeOffset>(
             name: "Created",
             table: "Users",
             type: "datetimeoffset",
             nullable: false,
-            defaultValue: DateTimeOffset.MinValue);
+            defaultValue: DateTimeOffset.MinValue
+        );
 
         // Add 'CreatedById' as nullable first, so that we don't break foreign key constraints while we populate existing rows
         migrationBuilder.AddColumn<Guid>(
             name: "CreatedById",
             table: "Users",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         // Add 'RoleId' as nullable first, so that we don't break foreign key constraints while we populate existing rows
         migrationBuilder.AddColumn<string>(
             name: "RoleId",
             table: "Users",
             type: "nvarchar(450)",
-            nullable: true);
+            nullable: true
+        );
 
         // Migrate 'Active', 'RoleId', 'Created' and 'CreatedById' values for existing Users.
         // Also create the placeholder 'Deleted User' record.
         migrationBuilder.SqlFromFile(
             MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES6502_AddingNewColumnsToUsersTable)}.sql");
+            $"{MigrationId}_{nameof(EES6502_AddingNewColumnsToUsersTable)}.sql"
+        );
 
         // Alter 'RoleId' to non-nullable now that existing rows are populated
         migrationBuilder.AlterColumn<string>(
             name: "RoleId",
             table: "Users",
             type: "nvarchar(450)",
-            nullable: false);
+            nullable: false
+        );
 
         // Alter 'CreatedById' to non-nullable now that existing rows are populated
         migrationBuilder.AlterColumn<string>(
             name: "CreatedById",
             table: "Users",
             type: "uniqueidentifier",
-            nullable: false);
+            nullable: false
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Users_CreatedById",
             table: "Users",
-            column: "CreatedById");
+            column: "CreatedById"
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Users_RoleId",
-            table: "Users",
-            column: "RoleId");
+        migrationBuilder.CreateIndex(name: "IX_Users_RoleId", table: "Users", column: "RoleId");
 
         migrationBuilder.AddForeignKey(
             name: "FK_Users_AspNetRoles_RoleId",
@@ -109,7 +117,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             column: "RoleId",
             principalTable: "AspNetRoles",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Users_Users_CreatedById",
@@ -117,43 +126,28 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             column: "CreatedById",
             principalTable: "Users",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_Users_AspNetRoles_RoleId",
-            table: "Users");
+        migrationBuilder.DropForeignKey(name: "FK_Users_AspNetRoles_RoleId", table: "Users");
 
-        migrationBuilder.DropForeignKey(
-            name: "FK_Users_Users_CreatedById",
-            table: "Users");
+        migrationBuilder.DropForeignKey(name: "FK_Users_Users_CreatedById", table: "Users");
 
-        migrationBuilder.DropIndex(
-            name: "IX_Users_CreatedById",
-            table: "Users");
+        migrationBuilder.DropIndex(name: "IX_Users_CreatedById", table: "Users");
 
-        migrationBuilder.DropIndex(
-            name: "IX_Users_RoleId",
-            table: "Users");
+        migrationBuilder.DropIndex(name: "IX_Users_RoleId", table: "Users");
 
-        migrationBuilder.DropColumn(
-            name: "Active",
-            table: "Users");
+        migrationBuilder.DropColumn(name: "Active", table: "Users");
 
-        migrationBuilder.DropColumn(
-            name: "Created",
-            table: "Users");
+        migrationBuilder.DropColumn(name: "Created", table: "Users");
 
-        migrationBuilder.DropColumn(
-            name: "CreatedById",
-            table: "Users");
+        migrationBuilder.DropColumn(name: "CreatedById", table: "Users");
 
-        migrationBuilder.DropColumn(
-            name: "RoleId",
-            table: "Users");
+        migrationBuilder.DropColumn(name: "RoleId", table: "Users");
 
         migrationBuilder.AlterColumn<string>(
             name: "LastName",
@@ -161,7 +155,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "FirstName",
@@ -169,7 +164,8 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Email",
@@ -177,6 +173,7 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

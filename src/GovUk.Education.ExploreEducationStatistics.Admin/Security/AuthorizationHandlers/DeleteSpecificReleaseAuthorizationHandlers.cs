@@ -10,9 +10,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApp
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement
-{
-}
+public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement { }
 
 public class DeleteSpecificReleaseAuthorizationHandler
     : AuthorizationHandler<DeleteSpecificReleaseRequirement, ReleaseVersion>
@@ -20,7 +18,8 @@ public class DeleteSpecificReleaseAuthorizationHandler
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public DeleteSpecificReleaseAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
@@ -28,7 +27,8 @@ public class DeleteSpecificReleaseAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DeleteSpecificReleaseRequirement requirement,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         if (releaseVersion.ApprovalStatus != Draft)
         {
@@ -50,11 +50,13 @@ public class DeleteSpecificReleaseAuthorizationHandler
                 return;
             }
 
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        userId: context.User.GetUserId(),
-                        publicationId: releaseVersion.PublicationId,
-                        Owner))
+            if (
+                await _authorizationHandlerService.HasRolesOnPublication(
+                    userId: context.User.GetUserId(),
+                    publicationId: releaseVersion.PublicationId,
+                    Owner
+                )
+            )
             {
                 context.Succeed(requirement);
             }

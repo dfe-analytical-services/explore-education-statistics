@@ -22,7 +22,10 @@ public class PublicDataDbContext : DbContext
     }
 
     public PublicDataDbContext(
-        DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
+        DbContextOptions<PublicDataDbContext> options,
+        bool updateTimestamps = true
+    )
+        : base(options)
     {
         Configure(updateTimestamps: updateTimestamps);
     }
@@ -44,17 +47,30 @@ public class PublicDataDbContext : DbContext
     }
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
-    public Task<int> NextSequenceValue(string sequenceName, CancellationToken cancellationToken = default) =>
-        Database.SqlQueryRaw<int>($"""
-                                   SELECT nextval('public."{sequenceName}"') AS "Value"
-                                   """)
+    public Task<int> NextSequenceValue(
+        string sequenceName,
+        CancellationToken cancellationToken = default
+    ) =>
+        Database
+            .SqlQueryRaw<int>(
+                $"""
+                SELECT nextval('public."{sequenceName}"') AS "Value"
+                """
+            )
             .FirstAsync(cancellationToken);
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
-    public Task<int> SetSequenceValue(string sequenceName, long value, CancellationToken cancellationToken = default) =>
-        Database.SqlQueryRaw<int>($"""
-                                   SELECT setval('public."{sequenceName}"', {value}) AS "Value"
-                                   """)
+    public Task<int> SetSequenceValue(
+        string sequenceName,
+        long value,
+        CancellationToken cancellationToken = default
+    ) =>
+        Database
+            .SqlQueryRaw<int>(
+                $"""
+                SELECT setval('public."{sequenceName}"', {value}) AS "Value"
+                """
+            )
             .FirstAsync(cancellationToken);
 
     public virtual DbSet<DataSet> DataSets { get; init; } = null!;
@@ -72,7 +88,8 @@ public class PublicDataDbContext : DbContext
     public virtual DbSet<TimePeriodMeta> TimePeriodMetas { get; init; } = null!;
     public virtual DbSet<FilterMetaChange> FilterMetaChanges { get; init; } = null!;
     public virtual DbSet<FilterOptionMetaChange> FilterOptionMetaChanges { get; init; } = null!;
-    public virtual DbSet<GeographicLevelMetaChange> GeographicLevelMetaChanges { get; init; } = null!;
+    public virtual DbSet<GeographicLevelMetaChange> GeographicLevelMetaChanges { get; init; } =
+        null!;
     public virtual DbSet<IndicatorMetaChange> IndicatorMetaChanges { get; init; } = null!;
     public virtual DbSet<LocationMetaChange> LocationMetaChanges { get; init; } = null!;
     public virtual DbSet<LocationOptionMetaChange> LocationOptionMetaChanges { get; init; } = null!;

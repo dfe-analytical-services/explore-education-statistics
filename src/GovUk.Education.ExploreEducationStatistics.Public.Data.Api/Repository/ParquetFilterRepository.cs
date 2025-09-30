@@ -13,13 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetFilterRepository(
     IDuckDbConnection duckDbConnection,
-    IDataSetVersionPathResolver dataSetVersionPathResolver)
-    : IParquetFilterRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : IParquetFilterRepository
 {
     public async Task<IList<ParquetFilterOption>> ListOptions(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await ListOptionsById<ParquetFilterOption>(
             dataSetVersion: dataSetVersion,
@@ -32,7 +33,8 @@ public class ParquetFilterRepository(
     public async Task<IList<ParquetFilterOption>> ListOptions(
         DataSetVersion dataSetVersion,
         IEnumerable<string> publicIds,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var publicIdsList = publicIds.ToList();
 
@@ -43,19 +45,22 @@ public class ParquetFilterRepository(
 
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT *
-             FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
-             WHERE {FilterOptionsTable.Cols.PublicId:raw} IN ({publicIdsList})
-             """
+            SELECT *
+            FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
+            WHERE {FilterOptionsTable.Cols.PublicId:raw} IN ({publicIdsList})
+            """
         );
 
-        return (await command.QueryAsync<ParquetFilterOption>(cancellationToken: cancellationToken)).AsList();
+        return (
+            await command.QueryAsync<ParquetFilterOption>(cancellationToken: cancellationToken)
+        ).AsList();
     }
 
     public async Task<IList<IdPublicIdPair>> ListOptionPublicIds(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await ListOptionsById<IdPublicIdPair>(
             dataSetVersion: dataSetVersion,
@@ -65,7 +70,7 @@ public class ParquetFilterRepository(
                 FilterOptionsTable.Cols.Id,
                 FilterOptionsTable.Cols.PublicId,
                 FilterOptionsTable.Cols.FilterId,
-                FilterOptionsTable.Cols.FilterColumn
+                FilterOptionsTable.Cols.FilterColumn,
             ],
             cancellationToken: cancellationToken
         );
@@ -75,7 +80,8 @@ public class ParquetFilterRepository(
         DataSetVersion dataSetVersion,
         IList<int> ids,
         IList<string> columns,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (ids.Count == 0)
         {
@@ -91,10 +97,10 @@ public class ParquetFilterRepository(
 
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT {columnsFragments}
-             FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
-             WHERE {FilterOptionsTable.Cols.Id:raw} IN ({ids})
-             """
+            SELECT {columnsFragments}
+            FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
+            WHERE {FilterOptionsTable.Cols.Id:raw} IN ({ids})
+            """
         );
 
         return (await command.QueryAsync<T>(cancellationToken: cancellationToken)).AsList();
@@ -102,22 +108,22 @@ public class ParquetFilterRepository(
 
     public async Task<Dictionary<string, string>> GetFilterColumnsById(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT DISTINCT 
-                {FilterOptionsTable.Cols.FilterId:raw},
-                {FilterOptionsTable.Cols.FilterColumn:raw}
-             FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
-             """);
-
-        var cols = await command
-            .QueryAsync<(string FilterId, string FilterColumn)>(cancellationToken: cancellationToken);
-
-        return cols.ToDictionary(
-            tuple => tuple.FilterId,
-            tuple => tuple.FilterColumn
+            SELECT DISTINCT 
+               {FilterOptionsTable.Cols.FilterId:raw},
+               {FilterOptionsTable.Cols.FilterColumn:raw}
+            FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
+            """
         );
+
+        var cols = await command.QueryAsync<(string FilterId, string FilterColumn)>(
+            cancellationToken: cancellationToken
+        );
+
+        return cols.ToDictionary(tuple => tuple.FilterId, tuple => tuple.FilterColumn);
     }
 }

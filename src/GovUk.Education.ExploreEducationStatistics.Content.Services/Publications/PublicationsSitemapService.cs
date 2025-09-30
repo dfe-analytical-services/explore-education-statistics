@@ -6,12 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 
-public class PublicationsSitemapService(ContentDbContext contentDbContext) : IPublicationsSitemapService
+public class PublicationsSitemapService(ContentDbContext contentDbContext)
+    : IPublicationsSitemapService
 {
-    public async Task<PublicationSitemapPublicationDto[]> GetSitemapItems(CancellationToken cancellationToken = default)
+    public async Task<PublicationSitemapPublicationDto[]> GetSitemapItems(
+        CancellationToken cancellationToken = default
+    )
     {
         // Fetch the latest published release versions for non-superseded publications
-        var latestPublishedReleaseVersions = await GetLatestPublishedReleaseVersions(cancellationToken);
+        var latestPublishedReleaseVersions = await GetLatestPublishedReleaseVersions(
+            cancellationToken
+        );
 
         // Group the latest published release versions by publication, and map to sitemap DTOs
         return latestPublishedReleaseVersions
@@ -33,12 +38,16 @@ public class PublicationsSitemapService(ContentDbContext contentDbContext) : IPu
             .ToArray();
     }
 
-    private Task<ReleaseVersion[]> GetLatestPublishedReleaseVersions(CancellationToken cancellationToken) =>
-        contentDbContext.ReleaseVersions
-            .AsNoTracking()
+    private Task<ReleaseVersion[]> GetLatestPublishedReleaseVersions(
+        CancellationToken cancellationToken
+    ) =>
+        contentDbContext
+            .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Release.Publication)
             .LatestReleaseVersions(publishedOnly: true)
-            .Where(rv => rv.Release.Publication.SupersededBy == null
-                         || rv.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId == null)
+            .Where(rv =>
+                rv.Release.Publication.SupersededBy == null
+                || rv.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId == null
+            )
             .ToArrayAsync(cancellationToken);
 }

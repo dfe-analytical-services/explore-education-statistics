@@ -16,11 +16,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var pages = new List<EducationInNumbersPage>
                 {
-                    new() { Id = Guid.NewGuid(), Title = "Page 1 v1", Slug = "page-1", Order = 2, Version = 1, Published = DateTime.UtcNow },
-                    new() { Id = Guid.NewGuid(), Title = "Page 1 v2", Slug = "page-1", Order = 2, Version = 2, Published = DateTime.UtcNow },
-                    new() { Id = Guid.NewGuid(), Title = "Page 2 v1", Slug = "page-2", Order = 1, Version = 1, Published = DateTime.UtcNow },
-                    new() { Id = Guid.NewGuid(), Title = "Page 2 v2 (unpublished)", Slug = "page-2", Order = 1, Version = 2, Published = null },
-                    new() { Id = Guid.NewGuid(), Title = "Page 3 v1", Slug = "page-3", Order = 0, Version = 0, Published = DateTime.UtcNow },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Page 1 v1",
+                        Slug = "page-1",
+                        Order = 2,
+                        Version = 1,
+                        Published = DateTime.UtcNow,
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Page 1 v2",
+                        Slug = "page-1",
+                        Order = 2,
+                        Version = 2,
+                        Published = DateTime.UtcNow,
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Page 2 v1",
+                        Slug = "page-2",
+                        Order = 1,
+                        Version = 1,
+                        Published = DateTime.UtcNow,
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Page 2 v2 (unpublished)",
+                        Slug = "page-2",
+                        Order = 1,
+                        Version = 2,
+                        Published = null,
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Page 3 v1",
+                        Slug = "page-3",
+                        Order = 0,
+                        Version = 0,
+                        Published = DateTime.UtcNow,
+                    },
                 };
                 await contentDbContext.EducationInNumbersPages.AddRangeAsync(pages);
                 await contentDbContext.SaveChangesAsync();
@@ -60,7 +100,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             var pages = new List<EducationInNumbersPage>
             {
-                new() { Id = Guid.NewGuid(), Title = "Test Page v1", Slug = "test-page", Order = 0, Version = 0, Published = DateTime.UtcNow, Content = [] },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Test Page v1",
+                    Slug = "test-page",
+                    Order = 0,
+                    Version = 0,
+                    Published = DateTime.UtcNow,
+                    Content = [],
+                },
                 new()
                 {
                     Id = Guid.NewGuid(),
@@ -70,28 +119,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Order = 0,
                     Version = 1,
                     Published = new DateTime(2000, 1, 1),
-                    Content = [
+                    Content =
+                    [
                         new EinContentSection
                         {
                             Id = Guid.NewGuid(),
                             Heading = "Section heading",
                             Order = 0,
-                            Content = [
-                                new EinHtmlBlock
-                                {
-                                    Order = 1,
-                                    Body = "EinHtmlBlock 2",
-                                },
-                                new EinHtmlBlock
-                                {
-                                    Order = 0,
-                                    Body = "EinHtmlBlock 1",
-                                }
-                            ]
-                        }
-                    ]
+                            Content =
+                            [
+                                new EinHtmlBlock { Order = 1, Body = "EinHtmlBlock 2" },
+                                new EinHtmlBlock { Order = 0, Body = "EinHtmlBlock 1" },
+                            ],
+                        },
+                    ],
                 },
-                new() { Id = Guid.NewGuid(), Title = "Another Page", Slug = "another-page", Order = 1, Published = DateTime.UtcNow, Content = [] }
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Another Page",
+                    Slug = "another-page",
+                    Order = 1,
+                    Published = DateTime.UtcNow,
+                    Content = [],
+                },
             };
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {

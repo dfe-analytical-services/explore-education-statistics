@@ -10,24 +10,34 @@ public class FilterHierarchiesOptionsConverter : JsonConverter<List<FilterHierar
     public override List<FilterHierarchyOptions>? ReadJson(
         JsonReader reader,
         Type objectType,
-        List<FilterHierarchyOptions>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+        List<FilterHierarchyOptions>? existingValue,
+        bool hasExistingValue,
+        JsonSerializer serializer
+    )
     {
         if (reader.TokenType == JsonToken.Null)
         {
             return null;
         }
 
-        var dictionary = serializer.Deserialize<IDictionary<Guid, List<FilterHierarchyOption>>>(reader);
+        var dictionary = serializer.Deserialize<IDictionary<Guid, List<FilterHierarchyOption>>>(
+            reader
+        );
 
-        return dictionary?
-            .Select(kvp => new FilterHierarchyOptions
+        return dictionary
+            ?.Select(kvp => new FilterHierarchyOptions
             {
                 LeafFilterId = kvp.Key,
                 Options = kvp.Value,
-            }).ToList();
+            })
+            .ToList();
     }
 
-    public override void WriteJson(JsonWriter writer, List<FilterHierarchyOptions>? value, JsonSerializer serializer)
+    public override void WriteJson(
+        JsonWriter writer,
+        List<FilterHierarchyOptions>? value,
+        JsonSerializer serializer
+    )
     {
         if (value == null)
         {

@@ -6,13 +6,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Au
 
 public class ViewDataSetRequirement : IAuthorizationRequirement;
 
-public class ViewDataSetAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
-    : AuthorizationHandler<ViewDataSetRequirement, DataSet>
+public class ViewDataSetAuthorizationHandler(
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<ViewDataSetRequirement, DataSet>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewDataSetRequirement requirement,
-        DataSet dataSet)
+        DataSet dataSet
+    )
     {
         if (dataSet.Status is DataSetStatus.Published or DataSetStatus.Deprecated)
         {

@@ -71,12 +71,15 @@ public class FileTypeService : IFileTypeService
     public async Task<bool> HasZipFileType(IFormFile zipFile)
     {
         return await HasMatchingMimeType(zipFile, FileTypeValidationUtils.AllowedZipFileMimeTypes)
-            && HasMatchingEncodingType(zipFile, FileTypeValidationUtils.AllowedZipFileEncodingTypes);
+            && HasMatchingEncodingType(
+                zipFile,
+                FileTypeValidationUtils.AllowedZipFileEncodingTypes
+            );
     }
 
     /// <remarks>Mime Detective is much better at zip files.</remarks>
-    private static async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
-        => await stream.GetFileTypeAsync();
+    private static async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream) =>
+        await stream.GetFileTypeAsync();
 
     private string GuessMagicInfo(IFormFile file, MagicOpenFlags flag)
     {

@@ -17,27 +17,33 @@ public record BoundaryLevelCreateRequest
 
     public class Validator() : AbstractValidator<BoundaryLevelCreateRequest>
     {
-        public Validator(IBoundaryLevelService boundaryLevelService) : this()
+        public Validator(IBoundaryLevelService boundaryLevelService)
+            : this()
         {
-            RuleFor(request => request.Level)
-                .NotEmpty();
+            RuleFor(request => request.Level).NotEmpty();
 
             RuleFor(request => request.Label)
                 .NotEmpty()
-                .MustAsync(async (label, cancellationToken) =>
-                {
-                    var existingLevels = await boundaryLevelService.ListBoundaryLevels(cancellationToken);
-                    return existingLevels.IsRight && !existingLevels.Right.Exists(bl => bl.Label == label);
-                })
+                .MustAsync(
+                    async (label, cancellationToken) =>
+                    {
+                        var existingLevels = await boundaryLevelService.ListBoundaryLevels(
+                            cancellationToken
+                        );
+                        return existingLevels.IsRight
+                            && !existingLevels.Right.Exists(bl => bl.Label == label);
+                    }
+                )
                 .WithMessage("A boundary level matching {PropertyValue} already exists");
 
             RuleFor(request => request.File)
                 .NotNull()
                 .Must(file => file.FileName.Split('.').Last() == "geojson")
-                .WithMessage("Invalid file type \"{PropertyValue}\" - file must be in GeoJSON format");
+                .WithMessage(
+                    "Invalid file type \"{PropertyValue}\" - file must be in GeoJSON format"
+                );
 
-            RuleFor(request => request.Published)
-                .NotEmpty();
+            RuleFor(request => request.Published).NotEmpty();
         }
     }
 }

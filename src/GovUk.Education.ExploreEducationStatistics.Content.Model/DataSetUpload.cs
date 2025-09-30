@@ -23,8 +23,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public required long DataFileSizeInBytes { get; init; }
 
-    public string DataFilePath
-        => $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Data)}{DataFileId}";
+    public string DataFilePath =>
+        $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Data)}{DataFileId}";
 
     public required Guid MetaFileId { get; init; }
 
@@ -32,8 +32,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public required long MetaFileSizeInBytes { get; init; }
 
-    public string MetaFilePath
-        => $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Metadata)}{MetaFileId}";
+    public string MetaFilePath =>
+        $"{FileStoragePathUtils.FilesPath(ReleaseVersionId, FileType.Metadata)}{MetaFileId}";
 
     public Guid? ReplacingFileId { get; init; }
 

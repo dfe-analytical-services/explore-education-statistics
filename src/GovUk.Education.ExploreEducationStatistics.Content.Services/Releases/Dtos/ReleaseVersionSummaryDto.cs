@@ -38,14 +38,17 @@ public record ReleaseVersionSummaryDto
         ReleaseVersion releaseVersion,
         bool isLatestRelease,
         PublishingOrganisationDto[] publishingOrganisations,
-        int updateCount) =>
+        int updateCount
+    ) =>
         new()
         {
             Id = releaseVersion.Id,
             ReleaseId = releaseVersion.ReleaseId,
             IsLatestRelease = isLatestRelease,
             Label = releaseVersion.Release.Label,
-            LastUpdated = releaseVersion.Published ?? throw new ArgumentException("ReleaseVersion must be published"),
+            LastUpdated =
+                releaseVersion.Published
+                ?? throw new ArgumentException("ReleaseVersion must be published"),
             // TODO EES-6414 'Published' should be the published display date
             Published = releaseVersion.Published.Value,
             PublishingOrganisations = publishingOrganisations,
@@ -54,7 +57,7 @@ public record ReleaseVersionSummaryDto
             CoverageTitle = releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
             YearTitle = releaseVersion.Release.YearTitle,
             Type = releaseVersion.Type,
-            UpdateCount = updateCount
+            UpdateCount = updateCount,
         };
 }
 
@@ -71,6 +74,6 @@ public record PublishingOrganisationDto
         {
             Id = organisation.Id,
             Title = organisation.Title,
-            Url = organisation.Url
+            Url = organisation.Url,
         };
 }

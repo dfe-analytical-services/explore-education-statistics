@@ -17,41 +17,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Pub
 /// </summary>
 [Route("api/publications")]
 [ApiController]
-public class PublicationsSearchController(IPublicationsSearchService publicationsSearchService) : ControllerBase
+public class PublicationsSearchController(IPublicationsSearchService publicationsSearchService)
+    : ControllerBase
 {
-    [MemoryCache(typeof(ListPublicationsGetCacheKey),
+    [MemoryCache(
+        typeof(ListPublicationsGetCacheKey),
         durationInSeconds: 10,
-        expiryScheduleCron: HalfHourlyExpirySchedule)]
+        expiryScheduleCron: HalfHourlyExpirySchedule
+    )]
     public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> GetPublications(
         [FromQuery] PublicationsListGetRequest request,
-        CancellationToken cancellationToken = default) =>
-        await publicationsSearchService
-            .GetPublications(
-                request.ReleaseType,
-                request.ThemeId,
-                request.Search,
-                request.Sort,
-                request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize,
-                cancellationToken: cancellationToken);
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicationsSearchService.GetPublications(
+            request.ReleaseType,
+            request.ThemeId,
+            request.Search,
+            request.Sort,
+            request.SortDirection,
+            page: request.Page,
+            pageSize: request.PageSize,
+            cancellationToken: cancellationToken
+        );
 
-    [MemoryCache(typeof(ListPublicationsPostCacheKey),
+    [MemoryCache(
+        typeof(ListPublicationsPostCacheKey),
         durationInSeconds: 10,
-        expiryScheduleCron: HalfHourlyExpirySchedule)]
+        expiryScheduleCron: HalfHourlyExpirySchedule
+    )]
     [HttpPost]
     public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> GetPublications(
         [FromBody] PublicationsListPostRequest request,
-        CancellationToken cancellationToken = default) =>
-        await publicationsSearchService
-            .GetPublications(
-                request.ReleaseType,
-                request.ThemeId,
-                request.Search,
-                request.Sort,
-                request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize,
-                publicationIds: request.PublicationIds,
-                cancellationToken: cancellationToken);
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicationsSearchService.GetPublications(
+            request.ReleaseType,
+            request.ThemeId,
+            request.Search,
+            request.Sort,
+            request.SortDirection,
+            page: request.Page,
+            pageSize: request.PageSize,
+            publicationIds: request.PublicationIds,
+            cancellationToken: cancellationToken
+        );
 }

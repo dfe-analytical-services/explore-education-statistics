@@ -56,17 +56,9 @@ public class ContentServiceTests
         var releaseVersion = new ReleaseVersion
         {
             Content = ListOf(
-                new ContentSection
-                {
-                    Heading = "New section",
-                    Order = 1
-                },
-                new ContentSection
-                {
-                    Heading = "New section",
-                    Order = 2
-                }
-            )
+                new ContentSection { Heading = "New section", Order = 1 },
+                new ContentSection { Heading = "New section", Order = 2 }
+            ),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -106,20 +98,20 @@ public class ContentServiceTests
                         new HtmlBlock
                         {
                             Body = "Test html block 1",
-                            ReleaseVersionId = releaseVersionId
+                            ReleaseVersionId = releaseVersionId,
                         },
                         new HtmlBlock
                         {
                             Body = "Test html block 2",
-                            ReleaseVersionId = releaseVersionId
+                            ReleaseVersionId = releaseVersionId,
                         },
                         new DataBlock
                         {
                             Name = "Test data block 1",
-                            ReleaseVersionId = releaseVersionId
+                            ReleaseVersionId = releaseVersionId,
                         }
                     ),
-                    ReleaseVersionId = releaseVersionId
+                    ReleaseVersionId = releaseVersionId,
                 },
                 new ContentSection
                 {
@@ -129,22 +121,22 @@ public class ContentServiceTests
                         new HtmlBlock
                         {
                             Body = "Test html block 3",
-                            ReleaseVersionId = releaseVersionId
+                            ReleaseVersionId = releaseVersionId,
                         },
                         new HtmlBlock
                         {
                             Body = "Test html block 4",
-                            ReleaseVersionId = releaseVersionId
+                            ReleaseVersionId = releaseVersionId,
                         },
                         new DataBlock
                         {
                             Name = "Test data block 2",
-                            ReleaseVersionId = releaseVersionId
+                            ReleaseVersionId = releaseVersionId,
                         }
                     ),
-                    ReleaseVersionId = releaseVersionId
+                    ReleaseVersionId = releaseVersionId,
                 }
-            )
+            ),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -185,35 +177,29 @@ public class ContentServiceTests
             Order = 1,
             Content = new List<ContentBlock>
             {
-                new HtmlBlock
-                {
-                    ReleaseVersion = releaseVersion
-                },
-                new DataBlock
-                {
-                    ReleaseVersion = releaseVersion
-                },
+                new HtmlBlock { ReleaseVersion = releaseVersion },
+                new DataBlock { ReleaseVersion = releaseVersion },
                 new EmbedBlockLink
                 {
                     EmbedBlock = new EmbedBlock(),
-                    ReleaseVersion = releaseVersion
-                }
+                    ReleaseVersion = releaseVersion,
+                },
             },
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var contentSection2 = new ContentSection
         {
             Order = 2,
             Content = new List<ContentBlock>(),
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var contentSection3 = new ContentSection
         {
             Order = 3,
             Content = new List<ContentBlock>(),
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -221,7 +207,10 @@ public class ContentServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ContentSections.AddRange(
-                contentSectionToRemove, contentSection2, contentSection3);
+                contentSectionToRemove,
+                contentSection2,
+                contentSection3
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -230,7 +219,8 @@ public class ContentServiceTests
             var service = SetupContentService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentSection(
                 releaseVersionId: contentSectionToRemove.ReleaseVersionId,
-                contentSectionId: contentSectionToRemove.Id);
+                contentSectionId: contentSectionToRemove.Id
+            );
 
             var contentSectionList = result.AssertRight();
 
@@ -272,11 +262,8 @@ public class ContentServiceTests
     {
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
-                new HtmlBlock(),
-            },
-            ReleaseVersion = new ReleaseVersion()
+            Content = new List<ContentBlock> { new HtmlBlock() },
+            ReleaseVersion = new ReleaseVersion(),
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -288,9 +275,7 @@ public class ContentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupContentService(contentDbContext: contentDbContext);
-            var result = await service.RemoveContentSection(
-                Guid.NewGuid(),
-                contentSection.Id);
+            var result = await service.RemoveContentSection(Guid.NewGuid(), contentSection.Id);
 
             result.AssertNotFound();
         }
@@ -303,33 +288,26 @@ public class ContentServiceTests
         var otherReleaseVersion = new ReleaseVersion();
         var relatedContentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
-                new HtmlBlock
-                {
-                    ReleaseVersion = releaseVersion
-                }
-            },
-            ReleaseVersion = releaseVersion
+            Content = new List<ContentBlock> { new HtmlBlock { ReleaseVersion = releaseVersion } },
+            ReleaseVersion = releaseVersion,
         };
         var unrelatedContentSection = new ContentSection
         {
             Id = Guid.NewGuid(),
             Content = new List<ContentBlock>
             {
-                new HtmlBlock
-                {
-                    ReleaseVersion = otherReleaseVersion
-                },
+                new HtmlBlock { ReleaseVersion = otherReleaseVersion },
             },
-            ReleaseVersion = otherReleaseVersion
+            ReleaseVersion = otherReleaseVersion,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.ContentSections.AddRangeAsync(
-                relatedContentSection, unrelatedContentSection);
+                relatedContentSection,
+                unrelatedContentSection
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -338,7 +316,8 @@ public class ContentServiceTests
             var service = SetupContentService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentSection(
                 releaseVersionId: releaseVersion.Id,
-                contentSectionId: unrelatedContentSection.Id);
+                contentSectionId: unrelatedContentSection.Id
+            );
 
             result.AssertNotFound();
         }
@@ -354,14 +333,8 @@ public class ContentServiceTests
             Order = 0,
             Comments = new List<Comment>
             {
-                new()
-                {
-                    Content = "Comment to be removed 1",
-                },
-                new()
-                {
-                    Content = "Comment to be removed 2",
-                },
+                new() { Content = "Comment to be removed 1" },
+                new() { Content = "Comment to be removed 2" },
             },
         };
 
@@ -375,17 +348,11 @@ public class ContentServiceTests
                 Order = 1,
                 Comments = new List<Comment>
                 {
-                    new()
-                    {
-                        Content = "Comment 1",
-                    },
-                    new()
-                    {
-                        Content = "Comment 2",
-                    },
+                    new() { Content = "Comment 1" },
+                    new() { Content = "Comment 2" },
                 },
             },
-            DataBlockParentId = Guid.NewGuid()
+            DataBlockParentId = Guid.NewGuid(),
         };
 
         var contentSection = new ContentSection
@@ -397,7 +364,7 @@ public class ContentServiceTests
                 dataBlockVersion.ContentBlock,
                 new HtmlBlock { Order = 2 },
             },
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -414,7 +381,8 @@ public class ContentServiceTests
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: contentSectionId,
-                contentBlockId: blockToRemove.Id);
+                contentBlockId: blockToRemove.Id
+            );
 
             var viewModelList = result.AssertRight();
 
@@ -424,9 +392,7 @@ public class ContentServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var contentBlocks = contentDbContext.ContentBlocks
-                .OrderBy(cb => cb.Order)
-                .ToList();
+            var contentBlocks = contentDbContext.ContentBlocks.OrderBy(cb => cb.Order).ToList();
 
             Assert.Equal(2, contentBlocks.Count);
 
@@ -435,9 +401,11 @@ public class ContentServiceTests
             Assert.Equal(1, contentBlocks[1].Order);
             Assert.IsType<HtmlBlock>(contentBlocks[1]);
 
-            var comments = contentDbContext.Comment
-                .Where(c => c.ContentBlockId == dataBlockVersion.ContentBlockId
-                            || c.ContentBlockId == blockToRemove.Id)
+            var comments = contentDbContext
+                .Comment.Where(c =>
+                    c.ContentBlockId == dataBlockVersion.ContentBlockId
+                    || c.ContentBlockId == blockToRemove.Id
+                )
                 .ToList();
             Assert.Equal(2, comments.Count);
             Assert.Equal("Comment 1", comments[0].Content);
@@ -453,14 +421,11 @@ public class ContentServiceTests
         {
             Content = new List<ContentBlock>
             {
-                new HtmlBlock
-                {
-                    Id = contentBlockId,
-                },
+                new HtmlBlock { Id = contentBlockId },
                 new DataBlock(),
                 new HtmlBlock(),
             },
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -476,7 +441,8 @@ public class ContentServiceTests
             var result = await service.RemoveContentBlock(
                 Guid.NewGuid(),
                 contentSection.Id,
-                contentBlockId);
+                contentBlockId
+            );
 
             result.AssertNotFound();
         }
@@ -491,19 +457,9 @@ public class ContentServiceTests
         {
             Content = new List<ContentBlock>
             {
-                new HtmlBlock
-                {
-                    Id = contentBlockId,
-                    ReleaseVersion = releaseVersion
-                },
-                new DataBlock
-                {
-                    ReleaseVersion = releaseVersion
-                },
-                new HtmlBlock
-                {
-                    ReleaseVersion = releaseVersion
-                }
+                new HtmlBlock { Id = contentBlockId, ReleaseVersion = releaseVersion },
+                new DataBlock { ReleaseVersion = releaseVersion },
+                new HtmlBlock { ReleaseVersion = releaseVersion },
             },
         };
 
@@ -520,7 +476,8 @@ public class ContentServiceTests
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: Guid.NewGuid(),
-                contentBlockId: contentBlockId);
+                contentBlockId: contentBlockId
+            );
 
             result.AssertNotFound();
         }
@@ -534,14 +491,11 @@ public class ContentServiceTests
         {
             Content = new List<ContentBlock>
             {
-                new HtmlBlock
-                {
-                    Id = contentBlockId,
-                },
+                new HtmlBlock { Id = contentBlockId },
                 new DataBlock(),
                 new HtmlBlock(),
             },
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -557,7 +511,8 @@ public class ContentServiceTests
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: contentSection.Id,
-                contentBlockId: Guid.NewGuid());
+                contentBlockId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -571,27 +526,23 @@ public class ContentServiceTests
         var incorrectContentBlockId = Guid.NewGuid();
         var incorrectContentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
-                new HtmlBlock { Id = incorrectContentBlockId },
-            },
-            ReleaseVersion = releaseVersion
+            Content = new List<ContentBlock> { new HtmlBlock { Id = incorrectContentBlockId } },
+            ReleaseVersion = releaseVersion,
         };
 
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
-                new HtmlBlock(),
-            },
-            ReleaseVersion = releaseVersion
+            Content = new List<ContentBlock> { new HtmlBlock() },
+            ReleaseVersion = releaseVersion,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.ContentSections.AddRangeAsync(
-                contentSection, incorrectContentSection);
+                contentSection,
+                incorrectContentSection
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -601,7 +552,8 @@ public class ContentServiceTests
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: contentSection.Id,
-                contentBlockId: incorrectContentBlockId);
+                contentBlockId: incorrectContentBlockId
+            );
 
             result.AssertNotFound();
         }
@@ -610,28 +562,27 @@ public class ContentServiceTests
     [Fact]
     public async Task AttachDataBlock()
     {
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithOrder(1)
-                .WithReleaseVersion(releaseVersion))
+            .WithLatestPublishedVersion(
+                _fixture.DefaultDataBlockVersion().WithOrder(1).WithReleaseVersion(releaseVersion)
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
         releaseVersion.Content = _fixture
             .DefaultContentSection()
-            .WithContentBlocks(_fixture
-                .DefaultHtmlBlock()
-                .ForIndex(0, s => s.SetOrder(1))
-                .ForIndex(1, s => s.SetOrder(3))
-                .ForIndex(2, s => s.SetOrder(5))
-                .GenerateList())
+            .WithContentBlocks(
+                _fixture
+                    .DefaultHtmlBlock()
+                    .ForIndex(0, s => s.SetOrder(1))
+                    .ForIndex(1, s => s.SetOrder(3))
+                    .ForIndex(2, s => s.SetOrder(5))
+                    .GenerateList()
+            )
             .GenerateList(1);
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -644,13 +595,11 @@ public class ContentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupContentService(contentDbContext: contentDbContext);
-            var result = await service.AttachDataBlock(releaseVersionId: releaseVersion.Id,
+            var result = await service.AttachDataBlock(
+                releaseVersionId: releaseVersion.Id,
                 contentSectionId: releaseVersion.Content[0].Id,
-                new DataBlockAttachRequest
-                {
-                    ContentBlockId = dataBlockVersion.Id,
-                    Order = 3
-                });
+                new DataBlockAttachRequest { ContentBlockId = dataBlockVersion.Id, Order = 3 }
+            );
 
             var dataBlockViewModel = result.AssertRight();
             Assert.Equal(dataBlockVersion.Id, dataBlockViewModel.Id);
@@ -683,14 +632,18 @@ public class ContentServiceTests
         IContentSectionRepository contentSectionRepository = null,
         IContentBlockService contentBlockService = null,
         IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
-        IUserService userService = null)
+        IUserService userService = null
+    )
     {
         return new ContentService(
             contentDbContext,
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             contentSectionRepository ?? new ContentSectionRepository(contentDbContext),
             contentBlockService ?? new ContentBlockService(contentDbContext),
-            hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(MockBehavior.Strict),
+            hubContext
+                ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(
+                    MockBehavior.Strict
+                ),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
             AdminMapper(contentDbContext)
         );

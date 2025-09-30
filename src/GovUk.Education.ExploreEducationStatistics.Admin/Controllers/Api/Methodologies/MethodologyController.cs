@@ -21,7 +21,8 @@ public class MethodologyController : ControllerBase
 
     public MethodologyController(
         IMethodologyService methodologyService,
-        IMethodologyAmendmentService methodologyAmendmentService)
+        IMethodologyAmendmentService methodologyAmendmentService
+    )
     {
         _methodologyService = methodologyService;
         _methodologyAmendmentService = methodologyAmendmentService;
@@ -38,9 +39,7 @@ public class MethodologyController : ControllerBase
     [HttpPost("publication/{publicationId:guid}/methodology")]
     public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodology(Guid publicationId)
     {
-        return _methodologyService
-            .CreateMethodology(publicationId)
-            .HandleFailuresOrOk();
+        return _methodologyService.CreateMethodology(publicationId).HandleFailuresOrOk();
     }
 
     [HttpDelete("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
@@ -52,7 +51,9 @@ public class MethodologyController : ControllerBase
     }
 
     [HttpGet("publication/{publicationId:guid}/adoptable-methodologies")]
-    public async Task<ActionResult<List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+    public async Task<ActionResult<List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(
+        Guid publicationId
+    )
     {
         return await _methodologyService
             .GetAdoptableMethodologies(publicationId)
@@ -60,16 +61,17 @@ public class MethodologyController : ControllerBase
     }
 
     [HttpGet("methodology/{methodologyVersionId:guid}")]
-    public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodology(Guid methodologyVersionId)
+    public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodology(
+        Guid methodologyVersionId
+    )
     {
-        return await _methodologyService
-            .GetMethodology(methodologyVersionId)
-            .HandleFailuresOrOk();
+        return await _methodologyService.GetMethodology(methodologyVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("methodology/{methodologyVersionId:guid}/unpublished-releases")]
     public async Task<ActionResult<List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
-        Guid methodologyVersionId)
+        Guid methodologyVersionId
+    )
     {
         return await _methodologyService
             .GetUnpublishedReleasesUsingMethodology(methodologyVersionId)
@@ -77,9 +79,9 @@ public class MethodologyController : ControllerBase
     }
 
     [HttpGet("publication/{publicationId:guid}/methodologies")]
-    public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
-        Guid publicationId,
-        [FromQuery] bool isPrerelease = false)
+    public async Task<
+        ActionResult<List<MethodologyVersionSummaryViewModel>>
+    > ListLatestMethodologyVersions(Guid publicationId, [FromQuery] bool isPrerelease = false)
     {
         return await _methodologyService
             .ListLatestMethodologyVersions(publicationId, isPrerelease)
@@ -89,7 +91,8 @@ public class MethodologyController : ControllerBase
     [HttpPut("methodology/{methodologyVersionId:guid}")]
     public async Task<ActionResult<MethodologyVersionViewModel>> UpdateMethodology(
         Guid methodologyVersionId,
-        MethodologyUpdateRequest request)
+        MethodologyUpdateRequest request
+    )
     {
         return await _methodologyService
             .UpdateMethodology(methodologyVersionId, request)
@@ -99,7 +102,8 @@ public class MethodologyController : ControllerBase
     [HttpPatch("methodology/{methodologyVersionId:guid}/published")]
     public async Task<ActionResult<Unit>> UpdateMethodologyPublished(
         Guid methodologyVersionId,
-        MethodologyPublishedUpdateRequest request)
+        MethodologyPublishedUpdateRequest request
+    )
     {
         return await _methodologyService
             .UpdateMethodologyPublished(methodologyVersionId, request)
@@ -108,7 +112,8 @@ public class MethodologyController : ControllerBase
 
     [HttpPost("methodology/{originalMethodologyVersionId:guid}/amendment")]
     public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodologyAmendment(
-        Guid originalMethodologyVersionId)
+        Guid originalMethodologyVersionId
+    )
     {
         return _methodologyAmendmentService
             .CreateMethodologyAmendment(originalMethodologyVersionId)
@@ -124,7 +129,9 @@ public class MethodologyController : ControllerBase
     }
 
     [HttpGet("methodology/{methodologyVersionId:guid}/status")]
-    public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId)
+    public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyStatuses(
+        Guid methodologyVersionId
+    )
     {
         return _methodologyService
             .GetMethodologyStatuses(methodologyVersionId)
@@ -132,7 +139,9 @@ public class MethodologyController : ControllerBase
     }
 
     [HttpGet("methodology/approvals")]
-    public async Task<ActionResult<List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval()
+    public async Task<
+        ActionResult<List<MethodologyVersionViewModel>>
+    > ListMethodologyVersionsForApproval()
     {
         return await _methodologyService
             .ListUsersMethodologyVersionsForApproval()

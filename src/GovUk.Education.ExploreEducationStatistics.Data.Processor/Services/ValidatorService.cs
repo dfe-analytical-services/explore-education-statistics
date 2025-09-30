@@ -40,7 +40,7 @@ public enum ValidationErrorMessages
     DataFileMustBeCsvFile,
 
     [EnumLabelValue("Only first 100 errors are shown")]
-    FirstOneHundredErrors
+    FirstOneHundredErrors,
 }
 
 public class ValidatorService : IValidatorService
@@ -54,7 +54,8 @@ public class ValidatorService : IValidatorService
         ILogger<ValidatorService> logger,
         IPrivateBlobStorageService privateBlobStorageService,
         IFileTypeService fileTypeService,
-        IDataImportService dataImportService)
+        IDataImportService dataImportService
+    )
     {
         _logger = logger;
         _privateBlobStorageService = privateBlobStorageService;
@@ -71,7 +72,7 @@ public class ValidatorService : IValidatorService
     {
         "time_identifier",
         "time_period",
-        "geographic_level"
+        "geographic_level",
     };
 
     public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(Guid importId)
@@ -83,50 +84,58 @@ public class ValidatorService : IValidatorService
         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
         var dataFileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
-        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
+        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(
+            import
+        );
 
-        return await
-            ValidateCsvFileType(metaFileStreamProvider, isMetaFile: true)
-                .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, isMetaFile: false))
-                .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider))
-                .OnSuccess(async _ =>
-                {
-                    var dataFileColumnHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
-                    var dataFileTotalRows = await CsvUtils.GetTotalRows(dataFileStreamProvider);
+        return await ValidateCsvFileType(metaFileStreamProvider, isMetaFile: true)
+            .OnSuccess(() => ValidateCsvFileType(dataFileStreamProvider, isMetaFile: false))
+            .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider))
+            .OnSuccess(async _ =>
+            {
+                var dataFileColumnHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
+                var dataFileTotalRows = await CsvUtils.GetTotalRows(dataFileStreamProvider);
 
-                    return await
-                        ValidateObservationHeaders(dataFileColumnHeaders)
-                        .OnSuccess(() => ValidateAndCountObservations(
-                            import,
-                            dataFileColumnHeaders,
-                            dataFileTotalRows,
-                            dataFileStreamProvider
-                        )
-                        .OnSuccessDo(() =>
-                            _logger.LogInformation("Validating: {FileName} complete", import.File.Filename)));
-                });
+                return await ValidateObservationHeaders(dataFileColumnHeaders)
+                    .OnSuccess(() =>
+                        ValidateAndCountObservations(
+                                import,
+                                dataFileColumnHeaders,
+                                dataFileTotalRows,
+                                dataFileStreamProvider
+                            )
+                            .OnSuccessDo(() =>
+                                _logger.LogInformation(
+                                    "Validating: {FileName} complete",
+                                    import.File.Filename
+                                )
+                            )
+                    );
+            });
     }
 
     private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFileType(
         Func<Task<Stream>> fileStreamProvider,
-        bool isMetaFile)
+        bool isMetaFile
+    )
     {
         await using var stream = await fileStreamProvider.Invoke();
 
         if (!await _fileTypeService.HasCsvFileType(stream))
         {
-            return ListOf(isMetaFile
-                ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
-                : new DataImportError(DataFileMustBeCsvFile.GetEnumLabel()));
+            return ListOf(
+                isMetaFile
+                    ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
+                    : new DataImportError(DataFileMustBeCsvFile.GetEnumLabel())
+            );
         }
 
         return Unit.Instance;
     }
 
-    private async Task<Either<List<DataImportError>, (List<string> columnHeaders, int totalRows)>>
-        ValidateMetadataFile(
-            File file,
-            Func<Task<Stream>> fileStreamProvider)
+    private async Task<
+        Either<List<DataImportError>, (List<string> columnHeaders, int totalRows)>
+    > ValidateMetadataFile(File file, Func<Task<Stream>> fileStreamProvider)
     {
         _logger.LogDebug("Determining if CSV file {FileName} is correct shape", file.Filename);
 
@@ -136,13 +145,20 @@ public class ValidatorService : IValidatorService
         var errors = new List<DataImportError>();
 
         // Check for unexpected column names
-        Array.ForEach(ImporterMetaService.RequiredMetaColumns, col =>
-        {
-            if (!csvHeaders.Contains(col))
+        Array.ForEach(
+            ImporterMetaService.RequiredMetaColumns,
+            col =>
             {
-                errors.Add(new DataImportError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
+                if (!csvHeaders.Contains(col))
+                {
+                    errors.Add(
+                        new DataImportError(
+                            $"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"
+                        )
+                    );
+                }
             }
-        });
+        );
 
         if (errors.Count > 0)
         {
@@ -155,48 +171,67 @@ public class ValidatorService : IValidatorService
         var filterGroups = new List<string>();
         var filters = new List<string>();
 
-        await CsvUtils.ForEachRow(fileStreamProvider, (cells, index, _) =>
-        {
-            totalRows++;
-
-            if (cells.Count != csvHeaders.Count)
+        await CsvUtils.ForEachRow(
+            fileStreamProvider,
+            (cells, index, _) =>
             {
-                var errorCode = MetaFileHasInvalidNumberOfColumns;
-                errors.Add(new DataImportError($"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"));
-            }
+                totalRows++;
 
-            try
-            {
-                var row = reader.GetMetaRow(cells);
-
-                // TODO: Remove following two conditions for EES-5884
-                if (row.ColumnType == ColumnType.Filter)
+                if (cells.Count != csvHeaders.Count)
                 {
-                    filters.Add(row.ColumnName);
+                    var errorCode = MetaFileHasInvalidNumberOfColumns;
+                    errors.Add(
+                        new DataImportError(
+                            $"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"
+                        )
+                    );
                 }
 
-                if (!string.IsNullOrWhiteSpace(row?.FilterGroupingColumn))
+                try
                 {
-                    filterGroups.Add(row.FilterGroupingColumn);
+                    var row = reader.GetMetaRow(cells);
+
+                    // TODO: Remove following two conditions for EES-5884
+                    if (row.ColumnType == ColumnType.Filter)
+                    {
+                        filters.Add(row.ColumnName);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(row?.FilterGroupingColumn))
+                    {
+                        filterGroups.Add(row.FilterGroupingColumn);
+                    }
+                }
+                catch (Exception e)
+                {
+                    errors.Add(
+                        new DataImportError(
+                            $"error at data row {index + 1}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"
+                        )
+                    );
                 }
             }
-            catch (Exception e)
-            {
-                errors.Add(new DataImportError($"error at data row {index + 1}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"));
-            }
-        });
+        );
 
         // EES-5860 resolved a bug introduced as part of EES-4735, but doesn't include support for filter hierarchies.
         // The following condition prevents publishers from uploading data sets which would cause the importer to fail.
         // EES-5884 aims to implement hierarchy support, after which this condition should be removed.
         if (hasDefaultColumn && filterGroups.Any(filters.Contains))
         {
-            errors.Add(new DataImportError("The filter_default column cannot be used in conjunction with filter hierarchies"));
+            errors.Add(
+                new DataImportError(
+                    "The filter_default column cannot be used in conjunction with filter hierarchies"
+                )
+            );
         }
 
         if (errors.Count > 0)
         {
-            _logger.LogDebug("CSV metadata file {FileName} is invalid - {Errors}", file.Filename, errors.JoinToString());
+            _logger.LogDebug(
+                "CSV metadata file {FileName} is invalid - {Errors}",
+                file.Filename,
+                errors.JoinToString()
+            );
             return errors;
         }
 
@@ -205,7 +240,9 @@ public class ValidatorService : IValidatorService
         return (csvHeaders, totalRows);
     }
 
-    private static Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
+    private static Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(
+        List<string> cols
+    )
     {
         var errors = new List<DataImportError>();
 
@@ -213,7 +250,11 @@ public class ValidatorService : IValidatorService
         {
             if (!cols.Contains(mandatoryCol))
             {
-                errors.Add(new DataImportError($"{DataFileMissingExpectedColumn.GetEnumLabel()} : {mandatoryCol}"));
+                errors.Add(
+                    new DataImportError(
+                        $"{DataFileMissingExpectedColumn.GetEnumLabel()} : {mandatoryCol}"
+                    )
+                );
             }
 
             if (errors.Count == 100)
@@ -224,103 +265,116 @@ public class ValidatorService : IValidatorService
         }
 
         return Task.FromResult<Either<List<DataImportError>, Unit>>(
-            errors.Count > 0
-                ? errors
-                : Unit.Instance);
+            errors.Count > 0 ? errors : Unit.Instance
+        );
     }
 
-    private async Task<Either<List<DataImportError>, ProcessorStatistics>>
-        ValidateAndCountObservations(
-            DataImport import,
-            List<string> csvHeaders,
-            int totalRows,
-            Func<Task<Stream>> dataFileStreamProvider)
+    private async Task<
+        Either<List<DataImportError>, ProcessorStatistics>
+    > ValidateAndCountObservations(
+        DataImport import,
+        List<string> csvHeaders,
+        int totalRows,
+        Func<Task<Stream>> dataFileStreamProvider
+    )
     {
         var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
         var errors = new List<DataImportError>();
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
 
-        await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
-        {
-            if (errors.Count == 100)
+        await CsvUtils.ForEachRow(
+            dataFileStreamProvider,
+            async (rowValues, index, _) =>
             {
-                errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
-                return false;
-            }
-
-            if (rowValues.Count != csvHeaders.Count)
-            {
-                errors.Add(new DataImportError($"Error at row {index + 1}: cell count {rowValues.Count} " +
-                                               $"does not match column header count of {csvHeaders.Count}"));
-                return true;
-            }
-
-            if (index % Stage1RowCheck == 0)
-            {
-                var currentStatus = await _dataImportService.GetImportStatus(import.Id);
-
-                if (currentStatus.IsFinishedOrAborting())
+                if (errors.Count == 100)
                 {
-                    _logger.LogInformation(
-                        "Import for {FileName} has finished or is being aborted, " +
-                        "so finishing importing Filters and Locations early", import.File.Filename);
+                    errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
                     return false;
                 }
-            }
 
-            try
-            {
-                fixedInformationReader.GetTimeIdentifier(rowValues);
-                fixedInformationReader.GetYear(rowValues);
-
-                var level = fixedInformationReader.GetGeographicLevel(rowValues);
-
-                if (rowCountByGeographicLevel.ContainsKey(level))
+                if (rowValues.Count != csvHeaders.Count)
                 {
-                    rowCountByGeographicLevel[level]++;
+                    errors.Add(
+                        new DataImportError(
+                            $"Error at row {index + 1}: cell count {rowValues.Count} "
+                                + $"does not match column header count of {csvHeaders.Count}"
+                        )
+                    );
+                    return true;
                 }
-                else
+
+                if (index % Stage1RowCheck == 0)
                 {
-                    rowCountByGeographicLevel.Add(level, 1);
+                    var currentStatus = await _dataImportService.GetImportStatus(import.Id);
+
+                    if (currentStatus.IsFinishedOrAborting())
+                    {
+                        _logger.LogInformation(
+                            "Import for {FileName} has finished or is being aborted, "
+                                + "so finishing importing Filters and Locations early",
+                            import.File.Filename
+                        );
+                        return false;
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                errors.Add(new DataImportError($"Error at row {index + 1}: {e.Message}"));
-            }
 
-            if (index % Stage1RowCheck == 0)
-            {
-                await _dataImportService.UpdateStatus(import.Id,
-                    DataImportStatus.STAGE_1,
-                    (double)index / totalRows * 100);
-            }
+                try
+                {
+                    fixedInformationReader.GetTimeIdentifier(rowValues);
+                    fixedInformationReader.GetYear(rowValues);
 
-            return true;
-        });
+                    var level = fixedInformationReader.GetGeographicLevel(rowValues);
+
+                    if (rowCountByGeographicLevel.ContainsKey(level))
+                    {
+                        rowCountByGeographicLevel[level]++;
+                    }
+                    else
+                    {
+                        rowCountByGeographicLevel.Add(level, 1);
+                    }
+                }
+                catch (Exception e)
+                {
+                    errors.Add(new DataImportError($"Error at row {index + 1}: {e.Message}"));
+                }
+
+                if (index % Stage1RowCheck == 0)
+                {
+                    await _dataImportService.UpdateStatus(
+                        import.Id,
+                        DataImportStatus.STAGE_1,
+                        (double)index / totalRows * 100
+                    );
+                }
+
+                return true;
+            }
+        );
 
         if (errors.Count > 0)
         {
-            _logger.LogDebug("{ErrorCount} errors fond whilst validating {FileName}",
-                errors.Count, import.File.Filename);
+            _logger.LogDebug(
+                "{ErrorCount} errors fond whilst validating {FileName}",
+                errors.Count,
+                import.File.Filename
+            );
             return errors;
         }
 
-        await _dataImportService.UpdateStatus(
-            import.Id,
-            DataImportStatus.STAGE_1,
-            100);
+        await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 100);
 
-        return new ProcessorStatistics
-        (
+        return new ProcessorStatistics(
             TotalRowCount: totalRows,
             ImportableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
             GeographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
         );
     }
 
-    private static int GetImportableRowCount(Dictionary<GeographicLevel, int> rowCountByGeographicLevel)
+    private static int GetImportableRowCount(
+        Dictionary<GeographicLevel, int> rowCountByGeographicLevel
+    )
     {
         var geographicLevels = rowCountByGeographicLevel.Keys.ToList();
 
@@ -331,6 +385,8 @@ public class ValidatorService : IValidatorService
 
         // Exclude the counts of any 'solo' levels.
         // Those rows will be ignored since they are not being imported exclusively.
-        return rowCountByGeographicLevel.Sum(pair => pair.Key.IsSoloImportableLevel() ? 0 : pair.Value);
+        return rowCountByGeographicLevel.Sum(pair =>
+            pair.Key.IsSoloImportableLevel() ? 0 : pair.Value
+        );
     }
 }

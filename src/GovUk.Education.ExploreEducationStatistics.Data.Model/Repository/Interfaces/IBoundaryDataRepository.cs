@@ -3,5 +3,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
 public interface IBoundaryDataRepository
 {
-    Dictionary<string, BoundaryData> FindByBoundaryLevelAndCodes(long boundaryLevelId, IEnumerable<string> codes);
+    Dictionary<string, BoundaryData> FindByBoundaryLevelAndCodes(
+        long boundaryLevelId,
+        IEnumerable<string> codes
+    );
 }

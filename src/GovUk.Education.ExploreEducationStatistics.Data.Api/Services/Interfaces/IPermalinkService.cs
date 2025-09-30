@@ -8,13 +8,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
 public interface IPermalinkService
 {
-    Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
-        CancellationToken cancellationToken = default);
+    Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(
+        PermalinkCreateRequest request,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
-        CancellationToken cancellationToken = default);
+    Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(
+        Guid permalinkId,
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Stream>> GetCsvDownloadStream(
         Guid permalinkId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

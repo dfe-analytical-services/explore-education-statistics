@@ -7,5 +7,5 @@ public enum DataSetVersionType
 {
     Major,
     Minor,
-    Patch
+    Patch,
 }

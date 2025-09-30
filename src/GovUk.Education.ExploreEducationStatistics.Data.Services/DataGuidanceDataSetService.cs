@@ -21,11 +21,13 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly ITimePeriodService _timePeriodService;
 
-    public DataGuidanceDataSetService(StatisticsDbContext statisticsDbContext,
+    public DataGuidanceDataSetService(
+        StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
         IIndicatorRepository indicatorRepository,
         IFootnoteRepository footnoteRepository,
-        ITimePeriodService timePeriodService)
+        ITimePeriodService timePeriodService
+    )
     {
         _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
@@ -34,24 +36,32 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
         _timePeriodService = timePeriodService;
     }
 
-    public async Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(Guid releaseVersionId,
+    public async Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(
+        Guid releaseVersionId,
         IList<Guid>? dataFileIds = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _contentDbContext.ReleaseVersions
-            .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+        return await _contentDbContext
+            .ReleaseVersions.FirstOrNotFoundAsync(
+                releaseVersion => releaseVersion.Id == releaseVersionId,
+                cancellationToken
+            )
             .OnSuccess(async () =>
             {
-                var releaseFilesQueryable = _contentDbContext.ReleaseFiles
-                    .Include(rf => rf.File)
-                    .Where(rf => rf.ReleaseVersionId == releaseVersionId 
+                var releaseFilesQueryable = _contentDbContext
+                    .ReleaseFiles.Include(rf => rf.File)
+                    .Where(rf =>
+                        rf.ReleaseVersionId == releaseVersionId
                         && rf.File.Type == FileType.Data
-                        && rf.File.ReplacingId == null);
+                        && rf.File.ReplacingId == null
+                    );
 
                 if (dataFileIds != null)
                 {
-                    releaseFilesQueryable =
-                        releaseFilesQueryable.Where(rf => dataFileIds.Contains(rf.FileId));
+                    releaseFilesQueryable = releaseFilesQueryable.Where(rf =>
+                        dataFileIds.Contains(rf.FileId)
+                    );
                 }
 
                 return await releaseFilesQueryable
@@ -60,17 +70,24 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
                     {
                         var subjectId = releaseFile.File.SubjectId!.Value;
 
-                        var geographicLevels = await ListGeographicLevels(subjectId, cancellationToken);
+                        var geographicLevels = await ListGeographicLevels(
+                            subjectId,
+                            cancellationToken
+                        );
                         var timePeriods = await _timePeriodService.GetTimePeriodLabels(subjectId);
                         var variables = await ListVariables(subjectId, cancellationToken);
-                        var footnotes = await ListFootnotes(releaseVersionId: releaseVersionId,
-                            subjectId: subjectId);
+                        var footnotes = await ListFootnotes(
+                            releaseVersionId: releaseVersionId,
+                            subjectId: subjectId
+                        );
 
-                        return BuildDataGuidanceDataSetViewModel(releaseFile,
+                        return BuildDataGuidanceDataSetViewModel(
+                            releaseFile,
                             geographicLevels,
                             timePeriods,
                             variables,
-                            footnotes);
+                            footnotes
+                        );
                     })
                     .OrderBy(viewModel => viewModel.Order)
                     .ThenBy(viewModel => viewModel.Name) // For data sets existing before ordering was added
@@ -78,41 +95,47 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             });
     }
 
-    public async Task<List<string>> ListGeographicLevels(Guid subjectId,
-        CancellationToken cancellationToken = default)
+    public async Task<List<string>> ListGeographicLevels(
+        Guid subjectId,
+        CancellationToken cancellationToken = default
+    )
     {
         return await _statisticsDbContext
-            .Observation
-            .AsNoTracking()
+            .Observation.AsNoTracking()
             .Where(o => o.SubjectId == subjectId)
             .Select(observation => observation.Location.GeographicLevel.GetEnumLabel())
             .Distinct()
             .ToListAsync(cancellationToken);
     }
 
-    private async Task<List<LabelValue>> ListVariables(Guid subjectId,
-        CancellationToken cancellationToken = default)
+    private async Task<List<LabelValue>> ListVariables(
+        Guid subjectId,
+        CancellationToken cancellationToken = default
+    )
     {
-        var filters = await _statisticsDbContext.Filter
-            .Where(filter => filter.SubjectId == subjectId)
-            .Select(filter =>
-                new LabelValue(
-                    string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
-                    filter.Name))
+        var filters = await _statisticsDbContext
+            .Filter.Where(filter => filter.SubjectId == subjectId)
+            .Select(filter => new LabelValue(
+                string.IsNullOrWhiteSpace(filter.Hint)
+                    ? filter.Label
+                    : $"{filter.Label} - {filter.Hint}",
+                filter.Name
+            ))
             .ToListAsync(cancellationToken);
 
-        var indicators = _indicatorRepository.GetIndicators(subjectId)
+        var indicators = _indicatorRepository
+            .GetIndicators(subjectId)
             .Select(indicator => new LabelValue(indicator.Label, indicator.Name));
 
-        return filters.Concat(indicators)
-            .OrderBy(labelValue => labelValue.Value)
-            .ToList();
+        return filters.Concat(indicators).OrderBy(labelValue => labelValue.Value).ToList();
     }
 
     private async Task<List<FootnoteViewModel>> ListFootnotes(Guid releaseVersionId, Guid subjectId)
     {
-        var footnotes = await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
-            subjectId: subjectId);
+        var footnotes = await _footnoteRepository.GetFootnotes(
+            releaseVersionId: releaseVersionId,
+            subjectId: subjectId
+        );
         return FootnotesViewModelBuilder.BuildFootnotes(footnotes);
     }
 
@@ -121,7 +144,8 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
         List<string> geographicLevels,
         TimePeriodLabels timePeriods,
         List<LabelValue> variables,
-        List<FootnoteViewModel> footnotes)
+        List<FootnoteViewModel> footnotes
+    )
     {
         return new DataGuidanceDataSetViewModel
         {
@@ -133,7 +157,7 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             GeographicLevels = geographicLevels,
             TimePeriods = timePeriods,
             Variables = variables,
-            Footnotes = footnotes
+            Footnotes = footnotes,
         };
     }
 }

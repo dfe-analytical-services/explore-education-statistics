@@ -41,7 +41,8 @@ public class ReleaseChecklistService : IReleaseChecklistService
         IMethodologyVersionRepository methodologyVersionRepository,
         IFootnoteRepository footnoteRepository,
         IDataBlockService dataBlockService,
-        IDataSetVersionService dataSetVersionService)
+        IDataSetVersionService dataSetVersionService
+    )
     {
         _contentDbContext = contentDbContext;
         _dataImportService = dataImportService;
@@ -54,19 +55,18 @@ public class ReleaseChecklistService : IReleaseChecklistService
         _dataSetVersionService = dataSetVersionService;
     }
 
-    public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
+    public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(
+        Guid releaseVersionId
+    )
     {
         return await _contentDbContext
-            .ReleaseVersions
-            .HydrateReleaseForChecklist()
+            .ReleaseVersions.HydrateReleaseForChecklist()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
-            .OnSuccess(
-                async release => new ReleaseChecklistViewModel(
-                    await GetErrors(release),
-                    await GetWarnings(release)
-                )
-            );
+            .OnSuccess(async release => new ReleaseChecklistViewModel(
+                await GetErrors(release),
+                await GetWarnings(release)
+            ));
     }
 
     public async Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion)
@@ -75,85 +75,146 @@ public class ReleaseChecklistService : IReleaseChecklistService
 
         if (await _dataImportService.HasIncompleteImports(releaseVersion.Id))
         {
-            errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileImportsMustBeCompleted));
+            errors.Add(
+                new ReleaseChecklistIssue(ValidationErrorMessages.DataFileImportsMustBeCompleted)
+            );
         }
 
-        var replacementDataFiles = await _fileRepository.ListReplacementDataFiles(releaseVersion.Id);
+        var replacementDataFiles = await _fileRepository.ListReplacementDataFiles(
+            releaseVersion.Id
+        );
 
         if (replacementDataFiles.Any())
         {
-            errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.DataFileReplacementsMustBeCompleted
+                )
+            );
         }
 
-        var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(releaseVersion.Id);
+        var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(
+            releaseVersion.Id
+        );
 
         if (isDataGuidanceValid.IsLeft)
         {
-            errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicDataGuidanceRequired));
+            errors.Add(
+                new ReleaseChecklistIssue(ValidationErrorMessages.PublicDataGuidanceRequired)
+            );
         }
 
-        if (releaseVersion.Amendment
-            && !releaseVersion.Updates.Any(update => update.Created > releaseVersion.Created))
+        if (
+            releaseVersion.Amendment
+            && !releaseVersion.Updates.Any(update => update.Created > releaseVersion.Created)
+        )
         {
             errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
         }
 
-        if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.ReleaseSummary))
+        if (
+            await ReleaseSectionHasEmptyHtmlBlock(
+                releaseVersion.Id,
+                ContentSectionType.ReleaseSummary
+            )
+        )
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.SummarySectionContainsEmptyHtmlBlock));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.SummarySectionContainsEmptyHtmlBlock
+                )
+            );
         }
 
         if (await ReleaseHasEmptySection(releaseVersion.Id, ContentSectionType.Generic))
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.EmptyContentSectionExists));
+            errors.Add(
+                new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists)
+            );
         }
 
         if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.Generic))
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock
+                )
+            );
         }
 
-        if (!(await ReleaseHasKeyStatistic(releaseVersion.Id) ||
-              await ReleaseSectionHasNonEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.Headlines)))
+        if (
+            !(
+                await ReleaseHasKeyStatistic(releaseVersion.Id)
+                || await ReleaseSectionHasNonEmptyHtmlBlock(
+                    releaseVersion.Id,
+                    ContentSectionType.Headlines
+                )
+            )
+        )
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock
+                )
+            );
         }
 
-        if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.RelatedDashboards))
+        if (
+            await ReleaseSectionHasEmptyHtmlBlock(
+                releaseVersion.Id,
+                ContentSectionType.RelatedDashboards
+            )
+        )
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock
+                )
+            );
         }
-        
-        var dataSetVersionStatuses = 
-            await _dataSetVersionService.GetStatusesForReleaseVersion(releaseVersion.Id);
-        
+
+        var dataSetVersionStatuses = await _dataSetVersionService.GetStatusesForReleaseVersion(
+            releaseVersion.Id
+        );
+
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted
+                )
+            );
         }
-        
+
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Cancelled))
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.PublicApiDataSetCancellationsMustBeResolved));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetCancellationsMustBeResolved
+                )
+            );
         }
-        
+
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Failed))
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved
+                )
+            );
         }
-        
-        if (dataSetVersionStatuses.Any(status => status.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Finalising))
+
+        if (
+            dataSetVersionStatuses.Any(status =>
+                status.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Finalising
+            )
+        )
         {
-            errors.Add(new ReleaseChecklistIssue(
-                ValidationErrorMessages.PublicApiDataSetMappingsMustBeCompleted));
+            errors.Add(
+                new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetMappingsMustBeCompleted
+                )
+            );
         }
 
         return errors;
@@ -161,36 +222,47 @@ public class ReleaseChecklistService : IReleaseChecklistService
 
     private async Task<bool> ReleaseHasKeyStatistic(Guid releaseVersionId)
     {
-        return await _contentDbContext.KeyStatistics
-            .AnyAsync(ks => ks.ReleaseVersionId == releaseVersionId);
+        return await _contentDbContext.KeyStatistics.AnyAsync(ks =>
+            ks.ReleaseVersionId == releaseVersionId
+        );
     }
 
-    private async Task<bool> ReleaseHasEmptySection(Guid releaseVersionId, ContentSectionType sectionType)
+    private async Task<bool> ReleaseHasEmptySection(
+        Guid releaseVersionId,
+        ContentSectionType sectionType
+    )
     {
         return await _contentDbContext
-            .ContentSections
-            .Where(cs =>
-                cs.ReleaseVersionId == releaseVersionId &&
-                cs.Type == sectionType)
+            .ContentSections.Where(cs =>
+                cs.ReleaseVersionId == releaseVersionId && cs.Type == sectionType
+            )
             .AnyAsync(cs => cs.Content.Count == 0);
     }
 
-    private async Task<bool> ReleaseSectionHasEmptyHtmlBlock(Guid releaseVersionId, ContentSectionType sectionType)
+    private async Task<bool> ReleaseSectionHasEmptyHtmlBlock(
+        Guid releaseVersionId,
+        ContentSectionType sectionType
+    )
     {
-        return await _contentDbContext.ContentBlocks
-            .Where(cb =>
-                cb.ContentSection!.ReleaseVersionId == releaseVersionId &&
-                cb.ContentSection.Type == sectionType)
+        return await _contentDbContext
+            .ContentBlocks.Where(cb =>
+                cb.ContentSection!.ReleaseVersionId == releaseVersionId
+                && cb.ContentSection.Type == sectionType
+            )
             .OfType<HtmlBlock>()
             .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
     }
 
-    private async Task<bool> ReleaseSectionHasNonEmptyHtmlBlock(Guid releaseVersionId, ContentSectionType sectionType)
+    private async Task<bool> ReleaseSectionHasNonEmptyHtmlBlock(
+        Guid releaseVersionId,
+        ContentSectionType sectionType
+    )
     {
-        return await _contentDbContext.ContentBlocks
-            .Where(cb =>
-                cb.ContentSection!.ReleaseVersionId == releaseVersionId &&
-                cb.ContentSection.Type == sectionType)
+        return await _contentDbContext
+            .ContentBlocks.Where(cb =>
+                cb.ContentSection!.ReleaseVersionId == releaseVersionId
+                && cb.ContentSection.Type == sectionType
+            )
             .OfType<HtmlBlock>()
             .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
     }
@@ -199,8 +271,9 @@ public class ReleaseChecklistService : IReleaseChecklistService
     {
         var warnings = new List<ReleaseChecklistIssue>();
 
-        var methodologies = await _methodologyVersionRepository
-            .GetLatestVersionByPublication(releaseVersion.Release.PublicationId);
+        var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(
+            releaseVersion.Release.PublicationId
+        );
 
         if (!methodologies.Any())
         {
@@ -213,8 +286,9 @@ public class ReleaseChecklistService : IReleaseChecklistService
 
         if (methodologiesNotApproved.Any())
         {
-            warnings.AddRange(methodologiesNotApproved.Select(m =>
-                new MethodologyNotApprovedWarning(m.Id)));
+            warnings.AddRange(
+                methodologiesNotApproved.Select(m => new MethodologyNotApprovedWarning(m.Id))
+            );
         }
 
         if (releaseVersion.NextReleaseDate == null)
@@ -230,7 +304,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
         }
         else
         {
-            var subjectsWithNoFootnotes = await GetSubjectsWithNoFootnotes(releaseVersion, dataFiles);
+            var subjectsWithNoFootnotes = await GetSubjectsWithNoFootnotes(
+                releaseVersion,
+                dataFiles
+            );
 
             if (subjectsWithNoFootnotes.Any())
             {
@@ -245,7 +322,9 @@ public class ReleaseChecklistService : IReleaseChecklistService
 
         if (string.IsNullOrEmpty(releaseVersion.PreReleaseAccessList))
         {
-            warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
+            warnings.Add(
+                new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList)
+            );
         }
 
         return warnings;
@@ -253,7 +332,8 @@ public class ReleaseChecklistService : IReleaseChecklistService
 
     private async Task<List<Subject>> GetSubjectsWithNoFootnotes(
         ReleaseVersion releaseVersion,
-        IEnumerable<File> dataFiles)
+        IEnumerable<File> dataFiles
+    )
     {
         var allowedSubjectIds = dataFiles
             .Where(dataFile => dataFile.SubjectId.HasValue)
@@ -268,16 +348,20 @@ public class ReleaseChecklistService : IReleaseChecklistService
     {
         var dataBlocks = await _dataBlockService.ListDataBlocks(releaseVersionId);
         var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
-        return await _contentDbContext.FeaturedTables
-            .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
+        return await _contentDbContext.FeaturedTables.AnyAsync(ft =>
+            dataBlockIds.Contains(ft.DataBlockId)
+        );
     }
 }
 
 public static class ReleaseChecklistQueryableExtensions
 {
-    public static IQueryable<ReleaseVersion> HydrateReleaseForChecklist(this IQueryable<ReleaseVersion> query)
+    public static IQueryable<ReleaseVersion> HydrateReleaseForChecklist(
+        this IQueryable<ReleaseVersion> query
+    )
     {
-        return query.Include(rv => rv.Release)
+        return query
+            .Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .Include(rv => rv.Updates);
     }

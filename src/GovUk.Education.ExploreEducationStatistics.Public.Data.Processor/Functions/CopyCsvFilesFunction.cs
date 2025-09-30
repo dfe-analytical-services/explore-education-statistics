@@ -19,45 +19,54 @@ public class CopyCsvFilesFunction(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IPrivateBlobStorageService privateBlobStorageService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IPrivateBlobStorageService privateBlobStorageService
+) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(ActivityNames.CopyCsvFiles)]
     public async Task CopyCsvFiles(
         [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         var dataSetVersion = dataSetVersionImport.DataSetVersion;
 
         await UpdateImportStage(dataSetVersionImport, CopyingCsvFiles, cancellationToken);
 
-        var csvDataFile = await contentDbContext.ReleaseFiles
-            .AsNoTracking()
+        var csvDataFile = await contentDbContext
+            .ReleaseFiles.AsNoTracking()
             .Where(rf => rf.Id == dataSetVersion.Release.ReleaseFileId)
             .Select(rf => rf.File)
             .SingleAsync(cancellationToken);
 
-        var csvMetaFile = await contentDbContext.Files
-            .AsNoTracking()
-            .SingleAsync(f => f.SubjectId == csvDataFile.SubjectId && f.Type == FileType.Metadata,
-                cancellationToken: cancellationToken);
+        var csvMetaFile = await contentDbContext
+            .Files.AsNoTracking()
+            .SingleAsync(
+                f => f.SubjectId == csvDataFile.SubjectId && f.Type == FileType.Metadata,
+                cancellationToken: cancellationToken
+            );
 
-        await CopyCsvFile(csvDataFile,
+        await CopyCsvFile(
+            csvDataFile,
             dataSetVersionPathResolver.CsvDataPath(dataSetVersion),
             compress: true,
-            cancellationToken);
+            cancellationToken
+        );
 
-        await CopyCsvFile(csvMetaFile,
+        await CopyCsvFile(
+            csvMetaFile,
             dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion),
             compress: false,
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     private async Task CopyCsvFile(
         File csvFile,
         string destinationPath,
         bool compress,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var destinationDirectoryPath = Path.GetDirectoryName(destinationPath);
         if (destinationDirectoryPath != null && !Directory.Exists(destinationDirectoryPath))
@@ -67,27 +76,42 @@ public class CopyCsvFilesFunction(
 
         if (System.IO.File.Exists(destinationPath))
         {
-            logger.LogWarning("Destination csv file '{DestinationPath}' already exists and will be overwritten.",
-                destinationPath);
+            logger.LogWarning(
+                "Destination csv file '{DestinationPath}' already exists and will be overwritten.",
+                destinationPath
+            );
         }
 
         var blobStreamResult = await privateBlobStorageService.GetDownloadStream(
             BlobContainers.PrivateReleaseFiles,
             csvFile.Path(),
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         if (blobStreamResult.IsLeft)
         {
-            throw new Exception($"Error getting blob stream for csv file '{csvFile.Path()}'. " +
-                                $"Got {blobStreamResult.Left.GetType().Name}");
+            throw new Exception(
+                $"Error getting blob stream for csv file '{csvFile.Path()}'. "
+                    + $"Got {blobStreamResult.Left.GetType().Name}"
+            );
         }
 
         await using var blobStream = blobStreamResult.Right;
-        await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+        await using var fileStream = new FileStream(
+            destinationPath,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None
+        );
 
         if (compress)
         {
-            await CompressionUtils.CompressToStream(blobStream, fileStream, ContentEncodings.Gzip, cancellationToken);
+            await CompressionUtils.CompressToStream(
+                blobStream,
+                fileStream,
+                ContentEncodings.Gzip,
+                cancellationToken
+            );
         }
         else
         {

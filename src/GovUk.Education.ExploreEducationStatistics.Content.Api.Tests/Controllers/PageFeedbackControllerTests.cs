@@ -10,7 +10,8 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class PageFeedbackControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class PageFeedbackControllerTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/feedback/page";
 
@@ -24,7 +25,8 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
         {
             Response = PageFeedbackResponse.ProblemEncountered,
             Url = "/",
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            UserAgent =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "What were you doing?",
             Intent = "What did you hope to achieve?",
             Issue = "What went wrong?",
@@ -62,11 +64,27 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
         var validationProblems = response.AssertValidationProblem();
         Assert.Equal(6, validationProblems.Errors.Count);
 
-        validationProblems.AssertHasNotEmptyError(nameof(PageFeedbackCreateRequest.Url).ToLowerFirst());
-        validationProblems.AssertHasMaximumLengthError(nameof(PageFeedbackCreateRequest.UserAgent).ToLowerFirst(), maxLength: 250);
-        validationProblems.AssertHasEnumError(nameof(PageFeedbackCreateRequest.Response).ToLowerFirst());
-        validationProblems.AssertHasMaximumLengthError(nameof(PageFeedbackCreateRequest.Context).ToLowerFirst(), maxLength: 2000);
-        validationProblems.AssertHasMaximumLengthError(nameof(PageFeedbackCreateRequest.Intent).ToLowerFirst(), maxLength: 2000);
-        validationProblems.AssertHasMaximumLengthError(nameof(PageFeedbackCreateRequest.Issue).ToLowerFirst(), maxLength: 2000);
+        validationProblems.AssertHasNotEmptyError(
+            nameof(PageFeedbackCreateRequest.Url).ToLowerFirst()
+        );
+        validationProblems.AssertHasMaximumLengthError(
+            nameof(PageFeedbackCreateRequest.UserAgent).ToLowerFirst(),
+            maxLength: 250
+        );
+        validationProblems.AssertHasEnumError(
+            nameof(PageFeedbackCreateRequest.Response).ToLowerFirst()
+        );
+        validationProblems.AssertHasMaximumLengthError(
+            nameof(PageFeedbackCreateRequest.Context).ToLowerFirst(),
+            maxLength: 2000
+        );
+        validationProblems.AssertHasMaximumLengthError(
+            nameof(PageFeedbackCreateRequest.Intent).ToLowerFirst(),
+            maxLength: 2000
+        );
+        validationProblems.AssertHasMaximumLengthError(
+            nameof(PageFeedbackCreateRequest.Issue).ToLowerFirst(),
+            maxLength: 2000
+        );
     }
 }

@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 [Route("api")]
 [ApiController]
 [Authorize]
-public class RelatedInformationController(IRelatedInformationService relatedInformationService) : ControllerBase
+public class RelatedInformationController(IRelatedInformationService relatedInformationService)
+    : ControllerBase
 {
     [HttpGet("release/{releaseVersionId:guid}/content/related-information")]
     public async Task<ActionResult<List<Link>>> GetRelatedInformation(Guid releaseVersionId)
@@ -23,7 +24,8 @@ public class RelatedInformationController(IRelatedInformationService relatedInfo
     [HttpPost("release/{releaseVersionId:guid}/content/related-information")]
     public async Task<ActionResult<List<Link>>> AddRelatedInformation(
         CreateUpdateLinkRequest request,
-        Guid releaseVersionId)
+        Guid releaseVersionId
+    )
     {
         return await relatedInformationService
             .AddRelatedInformationAsync(releaseVersionId, request)
@@ -34,24 +36,27 @@ public class RelatedInformationController(IRelatedInformationService relatedInfo
     public async Task<ActionResult<List<Link>>> UpdateRelatedInformation(
         List<CreateUpdateLinkRequest> updatedLinkRequests,
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await relatedInformationService
-            .UpdateRelatedInformation(
-                releaseVersionId,
-                updatedLinkRequests,
-                cancellationToken)
+            .UpdateRelatedInformation(releaseVersionId, updatedLinkRequests, cancellationToken)
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("release/{releaseVersionId:guid}/content/related-information/{relatedInformationId:guid}")]
+    [HttpDelete(
+        "release/{releaseVersionId:guid}/content/related-information/{relatedInformationId:guid}"
+    )]
     public async Task<ActionResult<List<Link>>> DeleteRelatedInformation(
         Guid releaseVersionId,
-        Guid relatedInformationId)
+        Guid relatedInformationId
+    )
     {
         return await relatedInformationService
-            .DeleteRelatedInformationAsync(releaseVersionId: releaseVersionId,
-                relatedInformationId: relatedInformationId)
+            .DeleteRelatedInformationAsync(
+                releaseVersionId: releaseVersionId,
+                relatedInformationId: relatedInformationId
+            )
             .HandleFailuresOrOk();
     }
 }

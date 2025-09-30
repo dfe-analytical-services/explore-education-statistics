@@ -21,7 +21,8 @@ public class UserInviteRepository : IUserInviteRepository
         string email,
         Role role,
         Guid createdById,
-        DateTime? createdDate = null)
+        DateTime? createdDate = null
+    )
     {
         return await CreateOrUpdate(email, role.GetEnumValue(), createdById, createdDate);
     }
@@ -30,17 +31,19 @@ public class UserInviteRepository : IUserInviteRepository
         string email,
         string roleId,
         Guid createdById,
-        DateTime? createdDate = null)
+        DateTime? createdDate = null
+    )
     {
         if (createdDate != null && createdDate > DateTime.UtcNow)
         {
-            throw new ArgumentException($"{nameof(UserInvite)} created date cannot be a future date " +
-                                        $"- {createdDate} is more than {DateTime.UtcNow}");
+            throw new ArgumentException(
+                $"{nameof(UserInvite)} created date cannot be a future date "
+                    + $"- {createdDate} is more than {DateTime.UtcNow}"
+            );
         }
 
         var existingInvite = await _usersAndRolesDbContext
-            .UserInvites
-            .IgnoreQueryFilters()
+            .UserInvites.IgnoreQueryFilters()
             .AsQueryable()
             .SingleOrDefaultAsync(i => i.Email.ToLower().Equals(email.ToLower()));
 

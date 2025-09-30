@@ -8,12 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
-public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbContext) : IFilterOptionsDuckDbRepository
+public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbContext)
+    : IFilterOptionsDuckDbRepository
 {
     public async Task CreateFilterOptionsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await publicDataDbContext
             .Entry(dataSetVersion)
@@ -22,23 +24,27 @@ public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbConte
             .Include(m => m.Options)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.SqlBuilder(
-            $"""
-             CREATE TABLE {FilterOptionsTable.TableName:raw}(
-                 {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
-                 {FilterOptionsTable.Cols.Label:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR
-             )
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
+        await duckDbConnection
+            .SqlBuilder(
+                $"""
+                CREATE TABLE {FilterOptionsTable.TableName:raw}(
+                    {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                    {FilterOptionsTable.Cols.Label:raw} VARCHAR,
+                    {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
+                    {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
+                    {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR
+                )
+                """
+            )
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         var id = 1;
 
         foreach (var filter in dataSetVersion.FilterMetas)
         {
-            using var appender = duckDbConnection.CreateAppender(table: FilterOptionsTable.TableName);
+            using var appender = duckDbConnection.CreateAppender(
+                table: FilterOptionsTable.TableName
+            );
 
             foreach (var link in filter.OptionLinks.OrderBy(l => l.Option.Label))
             {

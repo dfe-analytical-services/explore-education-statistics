@@ -10,6 +10,6 @@ public class RecordPermalinkTableDownloadRequestBindingModelBuilder
         {
             PermalinkTitle = "perma link title",
             PermalinkId = Guid.NewGuid(),
-            DownloadFormat = TableDownloadFormat.ODS
+            DownloadFormat = TableDownloadFormat.ODS,
         };
 }

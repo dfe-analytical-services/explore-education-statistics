@@ -21,10 +21,8 @@ public record DataSetListRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Page)
-                .GreaterThanOrEqualTo(1);
-            RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 20);
+            RuleFor(request => request.Page).GreaterThanOrEqualTo(1);
+            RuleFor(request => request.PageSize).InclusiveBetween(1, 20);
         }
     }
 }

@@ -24,35 +24,33 @@ public class ReleaseAmendmentServicePermissionTests
     {
         Publication publication = _fixture
             .DefaultPublication()
-            .WithReleases(_fixture
-                .DefaultRelease(publishedVersions: 1)
-                .Generate(1));
+            .WithReleases(_fixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    using var contentDbContext = InMemoryApplicationDbContext();
-                    contentDbContext.Publications.Add(publication);
-                    contentDbContext.SaveChanges();
+            .AssertForbidden(userService =>
+            {
+                using var contentDbContext = InMemoryApplicationDbContext();
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.SaveChanges();
 
-                    var service = BuildService(userService.Object, contentDbContext);
-                    return service.CreateReleaseAmendment(releaseVersion.Id);
-                }
-            );
+                var service = BuildService(userService.Object, contentDbContext);
+                return service.CreateReleaseAmendment(releaseVersion.Id);
+            });
     }
 
     private ReleaseAmendmentService BuildService(
         IUserService userService,
-        ContentDbContext? context = null)
+        ContentDbContext? context = null
+    )
     {
         return new ReleaseAmendmentService(
             context ?? Mock.Of<ContentDbContext>(),
             userService,
             Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-            Mock.Of<StatisticsDbContext>(MockBehavior.Strict));
+            Mock.Of<StatisticsDbContext>(MockBehavior.Strict)
+        );
     }
 }

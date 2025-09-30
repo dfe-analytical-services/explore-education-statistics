@@ -8,7 +8,8 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
+public class PolicyCheckBuilder<TPolicy>
+    where TPolicy : Enum
 {
     private readonly Mock<IUserService> _userService;
 
@@ -19,9 +20,7 @@ public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
 
     public PolicyCheckBuilder<TPolicy> SetupCheck(TPolicy policy, bool checkResult = true)
     {
-        _userService
-            .Setup(s => s.MatchesPolicy(policy))
-            .ReturnsAsync(checkResult);
+        _userService.Setup(s => s.MatchesPolicy(policy)).ReturnsAsync(checkResult);
 
         return this;
     }
@@ -34,11 +33,10 @@ public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
     public PolicyCheckBuilder<TPolicy> SetupResourceCheck(
         object resource,
         TPolicy policy,
-        bool checkResult = true)
+        bool checkResult = true
+    )
     {
-        _userService
-            .Setup(s => s.MatchesPolicy(resource, policy))
-            .ReturnsAsync(checkResult);
+        _userService.Setup(s => s.MatchesPolicy(resource, policy)).ReturnsAsync(checkResult);
 
         return this;
     }
@@ -46,11 +44,10 @@ public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
     public PolicyCheckBuilder<TPolicy> SetupResourceCheckWithMatcher<T>(
         Expression<Func<T, bool>> matcher,
         TPolicy policy,
-        bool checkResult = true)
+        bool checkResult = true
+    )
     {
-        _userService
-            .Setup(s => s.MatchesPolicy(It.Is(matcher), policy))
-            .ReturnsAsync(checkResult);
+        _userService.Setup(s => s.MatchesPolicy(It.Is(matcher), policy)).ReturnsAsync(checkResult);
 
         return this;
     }
@@ -60,7 +57,10 @@ public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
         return SetupResourceCheck(resource, policy, false);
     }
 
-    public PolicyCheckBuilder<TPolicy> SetupResourceCheckToFailWithMatcher<T>(Expression<Func<T, bool>> matcher, TPolicy policy)
+    public PolicyCheckBuilder<TPolicy> SetupResourceCheckToFailWithMatcher<T>(
+        Expression<Func<T, bool>> matcher,
+        TPolicy policy
+    )
     {
         return SetupResourceCheckWithMatcher(matcher, policy, false);
     }
@@ -70,7 +70,9 @@ public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
         return _userService;
     }
 
-    public async Task AssertForbidden<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
+    public async Task AssertForbidden<T>(
+        Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action
+    )
     {
         var result = await action.Invoke(_userService);
 
@@ -79,7 +81,9 @@ public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
         PermissionTestUtils.AssertForbidden(result);
     }
 
-    public async Task AssertSuccess<T>(Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action)
+    public async Task AssertSuccess<T>(
+        Func<Mock<IUserService>, Task<Either<ActionResult, T>>> action
+    )
     {
         var result = await action.Invoke(_userService);
 

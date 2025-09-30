@@ -9,7 +9,10 @@ public class ContentFilterUtilsTests
 {
     public class CommentsFilterPattern
     {
-        private readonly Regex _regex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
+        private readonly Regex _regex = new(
+            ContentFilterUtils.CommentsFilterPattern,
+            RegexOptions.Compiled
+        );
 
         [Fact]
         public void Replace_TypicalFormat()
@@ -72,7 +75,6 @@ public class ContentFilterUtilsTests
                     />
                     ".TrimIndent();
 
-
             Assert.Equal(
                 @"
                 Content 1
@@ -105,7 +107,6 @@ public class ContentFilterUtilsTests
                         <li><commentplaceholder-start name=""comment-3""></commentplaceholder-start>Content 3<commentplaceholder-end name=""comment-3""></commentplaceholder-end></li>
                         <li><resolvedcomment-start name=""comment-4""></resolvedcomment-start>Content 4<resolvedcomment-end name=""comment-4""></resolvedcomment-end></li>
                     </ul>".TrimIndent();
-
 
             Assert.Equal(
                 @"

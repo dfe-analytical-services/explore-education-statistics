@@ -15,12 +15,15 @@ public partial class EES4666_PopulateReleaseParent : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         // Populate new ReleaseParentId's for all existing Releases
-        migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_PopulateReleaseParent.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.ContentMigrationsPath,
+            $"{MigrationId}_PopulateReleaseParent.sql"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_Releases_ReleaseParents_ReleaseParentId",
-            table: "Releases");
+            table: "Releases"
+        );
 
         // Make ReleaseParentId non-nullable
         migrationBuilder.AlterColumn<Guid>(
@@ -31,7 +34,8 @@ public partial class EES4666_PopulateReleaseParent : Migration
             defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Releases_ReleaseParents_ReleaseParentId",
@@ -39,14 +43,16 @@ public partial class EES4666_PopulateReleaseParent : Migration
             column: "ReleaseParentId",
             principalTable: "ReleaseParents",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Releases_ReleaseParents_ReleaseParentId",
-            table: "Releases");
+            table: "Releases"
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "ReleaseParentId",
@@ -54,14 +60,16 @@ public partial class EES4666_PopulateReleaseParent : Migration
             type: "uniqueidentifier",
             nullable: true,
             oldClrType: typeof(Guid),
-            oldType: "uniqueidentifier");
+            oldType: "uniqueidentifier"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Releases_ReleaseParents_ReleaseParentId",
             table: "Releases",
             column: "ReleaseParentId",
             principalTable: "ReleaseParents",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
 
         migrationBuilder.Sql("UPDATE Releases SET ReleaseParentId = NULL");
     }

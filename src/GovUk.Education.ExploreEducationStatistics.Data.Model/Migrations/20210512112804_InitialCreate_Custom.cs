@@ -17,20 +17,53 @@ public partial class InitialCreate_Custom : Migration
         // Types
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_TableTypes.sql");
         // Routines
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_DropAndCreateRelease.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredFootnotes.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservationRows.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservations.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_DropAndCreateRelease.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_FilteredFootnotes.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_FilteredObservationRows.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_FilteredObservations.sql"
+        );
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_geometry2json.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_GetFilteredObservations.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_InsertObservationFilterItems.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_InsertObservationRows.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_InsertObservations.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_GetFilteredObservations.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_InsertObservationFilterItems.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_InsertObservationRows.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_InsertObservations.sql"
+        );
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_RebuildIndexes.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_RemoveSoftDeletedSubjects.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_RemoveSoftDeletedSubjectsAndObservationRows.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_RemoveSoftDeletedSubjects.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_RemoveSoftDeletedSubjectsAndObservationRows.sql"
+        );
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertLocation.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertPublication.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_UpsertPublication.sql"
+        );
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertTheme.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_UpsertTopic.sql");
         // Views
@@ -45,7 +78,9 @@ public partial class InitialCreate_Custom : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         // Data
-        migrationBuilder.Sql("ALTER TABLE dbo.geometry DROP CONSTRAINT geometry_BoundaryLevel_Id_fk");
+        migrationBuilder.Sql(
+            "ALTER TABLE dbo.geometry DROP CONSTRAINT geometry_BoundaryLevel_Id_fk"
+        );
         migrationBuilder.Sql("TRUNCATE TABLE dbo.geometry");
         migrationBuilder.Sql("TRUNCATE TABLE dbo.BoundaryLevel");
         // Indexes

@@ -12,16 +12,23 @@ public class DataSetFileBuilder
 
     public async Task<FileDto> Build(FileType fileType)
     {
-        if (fileType is not FileType.Data and not FileType.Metadata and not FileType.BulkDataZipIndex)
+        if (
+            fileType
+            is not FileType.Data
+                and not FileType.Metadata
+                and not FileType.BulkDataZipIndex
+        )
         {
-            throw new NotSupportedException("Builder only accepts Data, Metadata and BulkDataZipIndex file types");
+            throw new NotSupportedException(
+                "Builder only accepts Data, Metadata and BulkDataZipIndex file types"
+            );
         }
 
         _fileName ??= fileType switch
         {
             FileType.BulkDataZipIndex => "dataset_names.csv",
             FileType.Metadata => "test-data.meta.csv",
-            _ => "test-data.csv"
+            _ => "test-data.csv",
         };
 
         var memoryStream = new MemoryStream();
@@ -31,13 +38,12 @@ public class DataSetFileBuilder
             memoryStream = await FileStreamUtils.CreateMemoryStreamFromLocalResource(_fileName);
         }
 
-        return
-            new()
-            {
-                FileName = _fileName,
-                FileSize = memoryStream.Length,
-                FileStreamProvider = () => memoryStream,
-            };
+        return new()
+        {
+            FileName = _fileName,
+            FileSize = memoryStream.Length,
+            FileStreamProvider = () => memoryStream,
+        };
     }
 
     public DataSetFileBuilder WhereFileNameIs(string fileName)

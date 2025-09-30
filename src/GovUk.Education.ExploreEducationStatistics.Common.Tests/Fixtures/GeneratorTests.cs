@@ -15,9 +15,7 @@ public class GeneratorTests
     public void Generate_Single()
     {
         var item = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Doe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Doe"))
             .Generate();
 
         Assert.Equal("Jane", item.FirstName);
@@ -28,9 +26,7 @@ public class GeneratorTests
     public void Generate_Single_SetDefaults()
     {
         var item = new Generator<Test>()
-            .ForInstance(s => s
-                .SetDefault(t => t.FirstName)
-                .SetDefault(t => t.LastName))
+            .ForInstance(s => s.SetDefault(t => t.FirstName).SetDefault(t => t.LastName))
             .Generate();
 
         Assert.Equal("Test 0 :: FirstName", item.FirstName);
@@ -41,10 +37,11 @@ public class GeneratorTests
     public void Generate_Single_LastSetterOverrides()
     {
         var item = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Doe")
-                .Set(t => t.LastName, "Loe"))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, "Jane")
+                    .Set(t => t.LastName, "Doe")
+                    .Set(t => t.LastName, "Loe")
+            )
             .Generate();
 
         Assert.Equal("Jane", item.FirstName);
@@ -55,9 +52,10 @@ public class GeneratorTests
     public void Generate_Single_Random()
     {
         var item = new Generator<Test>(seeder: () => 0)
-            .ForInstance(s => s
-                .Set(t => t.FirstName, faker => faker.Name.FirstName())
-                .Set(t => t.LastName, faker => faker.Name.LastName()))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, faker => faker.Name.FirstName())
+                    .Set(t => t.LastName, faker => faker.Name.LastName())
+            )
             .Generate();
 
         Assert.Equal("Moises", item.FirstName);
@@ -68,9 +66,10 @@ public class GeneratorTests
     public void Generate_Single_IndexIsZero()
     {
         var item = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, (_, _, context) => $"Jane {context.Index}")
-                .Set(t => t.LastName, (_, _, context) => $"Doe {context.Index}"))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, (_, _, context) => $"Jane {context.Index}")
+                    .Set(t => t.LastName, (_, _, context) => $"Doe {context.Index}")
+            )
             .Generate();
 
         Assert.Equal("Jane 0", item.FirstName);
@@ -81,13 +80,15 @@ public class GeneratorTests
     public void Generate_Single_InstanceSetter()
     {
         var item = new Generator<Test>()
-            .ForInstance(s => s
-                .Set((_, t, _) =>
+            .ForInstance(s =>
+                s.Set(
+                    (_, t, _) =>
                     {
                         t.FirstName = "John";
                         t.LastName = "Doe";
                     }
-                ))
+                )
+            )
             .Generate();
 
         Assert.Equal("John", item.FirstName);
@@ -98,13 +99,7 @@ public class GeneratorTests
     public void Generate_Single_InstantiateWith()
     {
         var item = new Generator<Test>()
-            .InstantiateWith(
-                () => new Test
-                {
-                    FirstName = "Jill",
-                    LastName = "Roe"
-                }
-            )
+            .InstantiateWith(() => new Test { FirstName = "Jill", LastName = "Roe" })
             .Generate();
 
         Assert.Equal("Jill", item.FirstName);
@@ -115,15 +110,8 @@ public class GeneratorTests
     public void Generate_Single_InstantiateWith_Setter()
     {
         var item = new Generator<Test>()
-            .InstantiateWith(
-                () => new Test
-                {
-                    FirstName = "Jill",
-                    LastName = "Roe"
-                }
-            )
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane"))
+            .InstantiateWith(() => new Test { FirstName = "Jill", LastName = "Roe" })
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane"))
             .Generate();
 
         Assert.Equal("Jane", item.FirstName);
@@ -143,9 +131,7 @@ public class GeneratorTests
     public void Generate_Multiple()
     {
         var items = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Doe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Doe"))
             .GenerateList(3);
 
         Assert.All(items, item => Assert.Equal("Jane", item.FirstName));
@@ -156,9 +142,7 @@ public class GeneratorTests
     public void Generate_Multiple_SetDefaults()
     {
         var items = new Generator<Test>()
-            .ForInstance(s => s
-                .SetDefault(t => t.FirstName)
-                .SetDefault(t => t.LastName))
+            .ForInstance(s => s.SetDefault(t => t.FirstName).SetDefault(t => t.LastName))
             .GenerateList(3);
 
         Assert.Equal("Test 0 :: FirstName", items[0].FirstName);
@@ -173,10 +157,11 @@ public class GeneratorTests
     public void Generate_Multiple_LastSetterOverrides()
     {
         var items = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Doe")
-                .Set(t => t.LastName, "Loe"))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, "Jane")
+                    .Set(t => t.LastName, "Doe")
+                    .Set(t => t.LastName, "Loe")
+            )
             .GenerateList(3);
 
         Assert.All(items, item => Assert.Equal("Jane", item.FirstName));
@@ -187,9 +172,10 @@ public class GeneratorTests
     public void Generate_Multiple_IndexIncrementCorrectly()
     {
         var items = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, (_, _, context) => $"Jane {context.Index}")
-                .Set(t => t.LastName, (_, _, context) => $"Doe {context.Index}"))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, (_, _, context) => $"Jane {context.Index}")
+                    .Set(t => t.LastName, (_, _, context) => $"Doe {context.Index}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -204,13 +190,15 @@ public class GeneratorTests
     public void Generate_Multiple_InstanceSetter()
     {
         var items = new Generator<Test>()
-            .ForInstance(s => s
-                .Set((_, t, _) =>
+            .ForInstance(s =>
+                s.Set(
+                    (_, t, _) =>
                     {
                         t.FirstName = "John";
                         t.LastName = "Doe";
                     }
-                ))
+                )
+            )
             .GenerateList(3);
 
         Assert.All(items, item => Assert.Equal("John", item.FirstName));
@@ -221,13 +209,7 @@ public class GeneratorTests
     public void Generate_Multiple_InstantiateWith()
     {
         var items = new Generator<Test>()
-            .InstantiateWith(
-                () => new Test
-                {
-                    FirstName = "Jill",
-                    LastName = "Roe"
-                }
-            )
+            .InstantiateWith(() => new Test { FirstName = "Jill", LastName = "Roe" })
             .GenerateList(3);
 
         Assert.All(items, item => Assert.Equal("Jill", item.FirstName));
@@ -238,15 +220,8 @@ public class GeneratorTests
     public void Generate_Multiple_InstantiateWith_Setter()
     {
         var items = new Generator<Test>()
-            .InstantiateWith(
-                () => new Test
-                {
-                    FirstName = "Jill",
-                    LastName = "Roe"
-                }
-            )
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane"))
+            .InstantiateWith(() => new Test { FirstName = "Jill", LastName = "Roe" })
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane"))
             .GenerateList(3);
 
         Assert.All(items, item => Assert.Equal("Jane", item.FirstName));
@@ -256,11 +231,9 @@ public class GeneratorTests
     [Fact]
     public void Generate_Multiple_IndexFakerIncrementsCorrectly()
     {
-        var generator = new Generator<Test>()
-            .ForInstance(
-                s => s
-                    .Set(t => t.FirstName, faker => $"Jane {faker.IndexFaker}")
-            );
+        var generator = new Generator<Test>().ForInstance(s =>
+            s.Set(t => t.FirstName, faker => $"Jane {faker.IndexFaker}")
+        );
 
         var items = generator.GenerateList(3);
 
@@ -288,9 +261,10 @@ public class GeneratorTests
     public void Generate_Multiple_Random_SameSeed()
     {
         var items = new Generator<Test>(seeder: () => 1)
-            .ForInstance(s => s
-                .Set(t => t.FirstName, faker => faker.Name.FirstName())
-                .Set(t => t.LastName, faker => faker.Name.LastName()))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, faker => faker.Name.FirstName())
+                    .Set(t => t.LastName, faker => faker.Name.LastName())
+            )
             .GenerateList(3);
 
         Assert.Equal("Delores", items[0].FirstName);
@@ -306,9 +280,10 @@ public class GeneratorTests
     {
         var seed = 0;
         var items = new Generator<Test>(seeder: () => seed++)
-            .ForInstance(s => s
-                .Set(t => t.FirstName, faker => faker.Name.FirstName())
-                .Set(t => t.LastName, faker => faker.Name.LastName()))
+            .ForInstance(s =>
+                s.Set(t => t.FirstName, faker => faker.Name.FirstName())
+                    .Set(t => t.LastName, faker => faker.Name.LastName())
+            )
             .GenerateList(3);
 
         Assert.Equal("Moises", items[0].FirstName);
@@ -323,9 +298,7 @@ public class GeneratorTests
     public void Generate_ForRange_Single()
     {
         var items = new Generator<Test>()
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
+            .ForRange(..2, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
             .GenerateArray(2);
 
         Assert.Equal(2, items.Length);
@@ -337,9 +310,7 @@ public class GeneratorTests
     public void Generate_ForRange_Single_NoOutOfRangeSetters()
     {
         var items = new Generator<Test>()
-            .ForRange(..^2, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
+            .ForRange(..^2, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
             .GenerateArray(4);
 
         Assert.Equal(4, items.Length);
@@ -353,15 +324,9 @@ public class GeneratorTests
     public void Generate_ForRange_Multiple()
     {
         var items = new Generator<Test>()
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
-            .ForRange(2..4, s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Loe"))
-            .ForRange(4.., s => s
-                .Set(t => t.FirstName, "Jill")
-                .Set(t => t. LastName, "Roe"))
+            .ForRange(..2, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
+            .ForRange(2..4, s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Loe"))
+            .ForRange(4.., s => s.Set(t => t.FirstName, "Jill").Set(t => t.LastName, "Roe"))
             .GenerateArray(6);
 
         Assert.Equal(6, items.Length);
@@ -377,15 +342,9 @@ public class GeneratorTests
     public void Generate_ForRange_Multiple_Overlapping()
     {
         var items = new Generator<Test>()
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
-            .ForRange(2..4, s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Loe"))
-            .ForRange(3.., s => s
-                .Set(t => t.FirstName, "Jill")
-                .Set(t => t. LastName, "Roe"))
+            .ForRange(..2, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
+            .ForRange(2..4, s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Loe"))
+            .ForRange(3.., s => s.Set(t => t.FirstName, "Jill").Set(t => t.LastName, "Roe"))
             .GenerateArray(6);
 
         Assert.Equal(6, items.Length);
@@ -403,15 +362,9 @@ public class GeneratorTests
     public void Generate_ForRange_SameRanges_LastOverrides()
     {
         var items = new Generator<Test>()
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
-            .ForRange(2..4, s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Loe"))
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "Jill")
-                .Set(t => t. LastName, "Roe"))
+            .ForRange(..2, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
+            .ForRange(2..4, s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Loe"))
+            .ForRange(..2, s => s.Set(t => t.FirstName, "Jill").Set(t => t.LastName, "Roe"))
             .GenerateArray(4);
 
         Assert.Equal(4, items.Length);
@@ -425,9 +378,7 @@ public class GeneratorTests
     public void Generate_ForRange_EmptyRange_RangeIsNotApplied()
     {
         var items = new Generator<Test>()
-            .ForRange(..0, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
+            .ForRange(..0, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
             .GenerateArray(2);
 
         Assert.All(items, item => Assert.Equal("", item.FirstName));
@@ -437,14 +388,10 @@ public class GeneratorTests
     [Fact]
     public void Generate_ForRange_RangeOutOfBoundsThrows()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => new Generator<Test>()
-                .ForRange(..2, s => s
-                    .Set(t => t.FirstName, "John")
-                    .Set(t => t.LastName, "Doe"))
-                .ForRange(2..4, s => s
-                    .Set(t => t.FirstName, "Jane")
-                    .Set(t => t.LastName, "Loe"))
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new Generator<Test>()
+                .ForRange(..2, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
+                .ForRange(2..4, s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Loe"))
                 .GenerateArray(2)
         );
     }
@@ -452,13 +399,11 @@ public class GeneratorTests
     [Fact]
     public void Generate_Multiple_GenerateList_NoArg()
     {
-       var items = new Generator<Test>()
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "John"))
-            .ForRange(2..4, s => s
-                .Set(t => t.FirstName, "Jane"))
+        var items = new Generator<Test>()
+            .ForRange(..2, s => s.Set(t => t.FirstName, "John"))
+            .ForRange(2..4, s => s.Set(t => t.FirstName, "Jane"))
             .GenerateList();
-       
+
         Assert.Equal(4, items.Count);
     }
 
@@ -466,100 +411,100 @@ public class GeneratorTests
     public void Generate_Multiple_GenerateArray_NoArg()
     {
         var items = new Generator<Test>()
-            .ForRange(..2, s => s
-                .Set(t => t.FirstName, "John"))
-            .ForRange(2..4, s => s
-                .Set(t => t.FirstName, "Jane"))
+            .ForRange(..2, s => s.Set(t => t.FirstName, "John"))
+            .ForRange(2..4, s => s.Set(t => t.FirstName, "Jane"))
             .GenerateArray();
-       
+
         Assert.Equal(4, items.Length);
     }
-    
+
     [Fact]
     public void Generate_Multiple_GenerateArray_NoArg_IndexFromEndRangeSetterProvided()
     {
-        var ex = Assert.Throws<ArgumentException>(() => 
+        var ex = Assert.Throws<ArgumentException>(() =>
             new Generator<Test>()
                 .ForRange(..^2, s => s.Set(t => t.FirstName, "John"))
-                .GenerateList());
-        
+                .GenerateList()
+        );
+
         Assert.StartsWith(
-            "Cannot infer number of elements to create if index-from-end", 
-            ex.Message);
+            "Cannot infer number of elements to create if index-from-end",
+            ex.Message
+        );
     }
-    
+
     [Fact]
     public void Generate_Multiple_GenerateArray_NoArg_UnboundedMaximumSetterProvided()
     {
-        var ex = Assert.Throws<ArgumentException>(() => 
-            new Generator<Test>()
-                .ForRange(1.., s => s.Set(t => t.FirstName, "John"))
-                .GenerateList());
-        
+        var ex = Assert.Throws<ArgumentException>(() =>
+            new Generator<Test>().ForRange(1.., s => s.Set(t => t.FirstName, "John")).GenerateList()
+        );
+
         Assert.StartsWith(
-            "Cannot infer number of elements to create if index-from-end", 
-            ex.Message);
+            "Cannot infer number of elements to create if index-from-end",
+            ex.Message
+        );
     }
-    
+
     [Fact]
     public void Generate_Multiple_GenerateList_NoArg_NoRangeSettersProvided()
     {
-        var ex = Assert.Throws<ArgumentException>(() => 
-            new Generator<Test>()
-                .ForInstance(s => s.Set(t => t.FirstName, "John"))
-                .GenerateList());
-        
+        var ex = Assert.Throws<ArgumentException>(() =>
+            new Generator<Test>().ForInstance(s => s.Set(t => t.FirstName, "John")).GenerateList()
+        );
+
         Assert.Equal(
-            "Cannot infer number of elements to create if no range setters are used", 
-            ex.Message);
+            "Cannot infer number of elements to create if no range setters are used",
+            ex.Message
+        );
     }
-    
+
     [Fact]
     public void Generate_Multiple_GenerateList_NoArg_IndexFromEndRangeSetterProvided()
     {
-        var ex = Assert.Throws<ArgumentException>(() => 
+        var ex = Assert.Throws<ArgumentException>(() =>
             new Generator<Test>()
                 .ForRange(..^2, s => s.Set(t => t.FirstName, "John"))
-                .GenerateList());
-        
+                .GenerateList()
+        );
+
         Assert.StartsWith(
-            "Cannot infer number of elements to create if index-from-end", 
-            ex.Message);
+            "Cannot infer number of elements to create if index-from-end",
+            ex.Message
+        );
     }
-    
+
     [Fact]
     public void Generate_Multiple_GenerateList_NoArg_UnboundedMaximumSetterProvided()
     {
-        var ex = Assert.Throws<ArgumentException>(() => 
-            new Generator<Test>()
-                .ForRange(1.., s => s.Set(t => t.FirstName, "John"))
-                .GenerateList());
-        
+        var ex = Assert.Throws<ArgumentException>(() =>
+            new Generator<Test>().ForRange(1.., s => s.Set(t => t.FirstName, "John")).GenerateList()
+        );
+
         Assert.StartsWith(
-            "Cannot infer number of elements to create if index-from-end", 
-            ex.Message);
+            "Cannot infer number of elements to create if index-from-end",
+            ex.Message
+        );
     }
-    
+
     [Fact]
     public void Generate_Multiple_GenerateArray_NoArg_NoRangeSetterProvided()
     {
-        var ex = Assert.Throws<ArgumentException>(() => 
-            new Generator<Test>()
-                .ForInstance(s => s.Set(t => t.FirstName, "John"))
-                .GenerateArray());
-        
+        var ex = Assert.Throws<ArgumentException>(() =>
+            new Generator<Test>().ForInstance(s => s.Set(t => t.FirstName, "John")).GenerateArray()
+        );
+
         Assert.Equal(
-            "Cannot infer number of elements to create if no range setters are used", 
-            ex.Message);
+            "Cannot infer number of elements to create if no range setters are used",
+            ex.Message
+        );
     }
 
     [Fact]
     public void Generate_ForRange_ForInstanceBefore()
     {
         var items = new Generator<Test>()
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Doe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Doe"))
             .ForRange(2.., s => s.Set(t => t.FirstName, "John"))
             .GenerateArray(4);
 
@@ -574,9 +519,7 @@ public class GeneratorTests
     {
         var items = new Generator<Test>()
             .ForRange(2.., s => s.Set(t => t.FirstName, "John"))
-            .ForInstance(s => s
-                .Set(t => t.FirstName, "Jane")
-                .Set(t => t.LastName, "Doe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Doe"))
             .GenerateArray(4);
 
         Assert.Equal(4, items.Length);
@@ -589,15 +532,9 @@ public class GeneratorTests
     public void Generate_ForRange_LastForInstanceOverrides()
     {
         var items = new Generator<Test>()
-            .ForInstance(
-                s => s
-                    .Set(t => t.FirstName, "Jane")
-                    .Set(t => t.LastName, "Doe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Doe"))
             .ForRange(2..4, s => s.Set(t => t.FirstName, "John"))
-            .ForInstance(
-                s => s
-                    .Set(t => t.FirstName, "Jill")
-                    .Set(t => t.LastName, "Roe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jill").Set(t => t.LastName, "Roe"))
             .Generate(6)
             .ToArray();
 
@@ -616,19 +553,17 @@ public class GeneratorTests
         var items = new Generator<Test>()
             .ForInstance(s => s.Set(t => t.FirstName, "Test"))
             .ForInstance(s => s.Set(t => t.LastName, "User"))
-            .ForIndex(1, s => s
-                .Set(t => t.FirstName, "John")
-                .Set(t => t.LastName, "Doe"))
+            .ForIndex(1, s => s.Set(t => t.FirstName, "John").Set(t => t.LastName, "Doe"))
             .GenerateArray(3);
 
         Assert.Equal(3, items.Length);
-        
+
         Assert.Equal("Test", items[0].FirstName);
         Assert.Equal("User", items[0].LastName);
-        
+
         Assert.Equal("John", items[1].FirstName);
         Assert.Equal("Doe", items[1].LastName);
-        
+
         Assert.Equal("Test", items[2].FirstName);
         Assert.Equal("User", items[2].LastName);
     }
@@ -637,13 +572,11 @@ public class GeneratorTests
     public void FinishWith()
     {
         var items = new Generator<Test>()
-            .FinishWith(
-                t =>
-                {
-                    t.FirstName = "Joe";
-                    t.LastName = "Slow";
-                }
-            )
+            .FinishWith(t =>
+            {
+                t.FirstName = "Joe";
+                t.LastName = "Slow";
+            })
             .GenerateList(2);
 
         Assert.Equal(2, items.Count);
@@ -673,19 +606,15 @@ public class GeneratorTests
     public void FinishWith_Multiple()
     {
         var items = new Generator<Test>()
-            .FinishWith(
-                t =>
-                {
-                    t.FirstName = "Joe";
-                    t.LastName = "Slow";
-                }
-            )
-            .FinishWith(
-                t =>
-                {
-                    t.LastName = "Glow";
-                }
-            )
+            .FinishWith(t =>
+            {
+                t.FirstName = "Joe";
+                t.LastName = "Slow";
+            })
+            .FinishWith(t =>
+            {
+                t.LastName = "Glow";
+            })
             .GenerateList(2);
 
         Assert.Equal(2, items.Count);
@@ -697,10 +626,7 @@ public class GeneratorTests
     public void FinishWith_OverridesOtherSetters()
     {
         var items = new Generator<Test>()
-            .ForInstance(
-                s => s
-                    .Set(t => t.FirstName, "Jane")
-                    .Set(t => t.LastName, "Doe"))
+            .ForInstance(s => s.Set(t => t.FirstName, "Jane").Set(t => t.LastName, "Doe"))
             .ForRange(2.., s => s.Set(t => t.FirstName, "John"))
             .FinishWith(
                 (t, _) =>

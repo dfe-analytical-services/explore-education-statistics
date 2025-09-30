@@ -13,8 +13,10 @@ public class TimePeriodLabelFormatter
     private TimePeriodLabelFormat LabelFormat { get; }
     private TimePeriodYearFormat YearFormat { get; }
 
-    private TimePeriodLabelFormatter(TimePeriodLabelFormat labelFormat,
-        TimePeriodYearFormat yearFormat)
+    private TimePeriodLabelFormatter(
+        TimePeriodLabelFormat labelFormat,
+        TimePeriodYearFormat yearFormat
+    )
     {
         LabelFormat = labelFormat;
         YearFormat = yearFormat;
@@ -23,18 +25,22 @@ public class TimePeriodLabelFormatter
     public static string Format(
         string period,
         TimeIdentifier timeIdentifier,
-        TimePeriodLabelFormat? overridingLabelFormat = null)
+        TimePeriodLabelFormat? overridingLabelFormat = null
+    )
     {
         var year = int.Parse(period); // Will change in the future - see EES-3109
-        return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
+        return FormatterFor(timeIdentifier, overridingLabelFormat)
+            .FormatInternal(year, timeIdentifier);
     }
 
     public static string Format(
         int year,
         TimeIdentifier timeIdentifier,
-        TimePeriodLabelFormat? overridingLabelFormat = null)
+        TimePeriodLabelFormat? overridingLabelFormat = null
+    )
     {
-        return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
+        return FormatterFor(timeIdentifier, overridingLabelFormat)
+            .FormatInternal(year, timeIdentifier);
     }
 
     public static string FormatYear(int year, TimeIdentifier timeIdentifier)
@@ -54,12 +60,13 @@ public class TimePeriodLabelFormatter
         return LabelFormat switch
         {
             TimePeriodLabelFormat.FullLabel => $"{formattedYear} {labelValueAttribute.Label}",
-            TimePeriodLabelFormat.FullLabelBeforeYear => $"{labelValueAttribute.Label} {formattedYear}",
+            TimePeriodLabelFormat.FullLabelBeforeYear =>
+                $"{labelValueAttribute.Label} {formattedYear}",
             TimePeriodLabelFormat.NoLabel => formattedYear,
             TimePeriodLabelFormat.ShortLabel => IsNullOrEmpty(labelValueAttribute.ShortLabel)
                 ? formattedYear
                 : $"{formattedYear} {labelValueAttribute.ShortLabel}",
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
 
@@ -72,7 +79,7 @@ public class TimePeriodLabelFormatter
                 Default => year.ToString(),
                 Academic => $"{year}/{(year + 1) % 100:D2}", // Only want the last two digits,
                 Fiscal => $"{year}-{(year + 1) % 100:D2}", // Only want the last two digits,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
         }
 
@@ -86,7 +93,7 @@ public class TimePeriodLabelFormatter
             return YearFormat switch
             {
                 Academic or Fiscal => $"{year}{(year + 1) % 100:D2}",
-                _ => year.ToString()
+                _ => year.ToString(),
             };
         }
 
@@ -95,12 +102,18 @@ public class TimePeriodLabelFormatter
 
     private static TimePeriodLabelFormatter FormatterFor(
         TimeIdentifier timeIdentifier,
-        TimePeriodLabelFormat? overridingLabelFormat = null)
+        TimePeriodLabelFormat? overridingLabelFormat = null
+    )
     {
         var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
         return overridingLabelFormat.HasValue
-            ? new TimePeriodLabelFormatter(overridingLabelFormat.Value, labelValueAttribute.YearFormat)
-            : new TimePeriodLabelFormatter(labelValueAttribute.LabelFormat,
-                labelValueAttribute.YearFormat);
+            ? new TimePeriodLabelFormatter(
+                overridingLabelFormat.Value,
+                labelValueAttribute.YearFormat
+            )
+            : new TimePeriodLabelFormatter(
+                labelValueAttribute.LabelFormat,
+                labelValueAttribute.YearFormat
+            );
     }
 }

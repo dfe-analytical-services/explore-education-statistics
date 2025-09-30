@@ -23,19 +23,24 @@ public class RecordTableToolDownloadRequestBindingModelBuilder
                 Filters = [Guid.NewGuid(), Guid.NewGuid()],
                 Indicators = [Guid.NewGuid(), Guid.NewGuid()],
                 LocationIds = [Guid.NewGuid(), Guid.NewGuid()],
-                TimePeriod =
-                    new TimePeriodQuery
-                    {
-                        StartYear = 2025,
-                        StartCode = TimeIdentifier.July,
-                        EndYear = 2026,
-                        EndCode = TimeIdentifier.November
-                    },
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2025,
+                    StartCode = TimeIdentifier.July,
+                    EndYear = 2026,
+                    EndCode = TimeIdentifier.November,
+                },
                 FilterHierarchiesOptions = new Dictionary<Guid, List<FilterHierarchyOption>>
                 {
-                    { Guid.NewGuid(), [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])] },
-                    { Guid.NewGuid(), [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])] },
-                }
-            }
+                    {
+                        Guid.NewGuid(),
+                        [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])]
+                    },
+                    {
+                        Guid.NewGuid(),
+                        [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])]
+                    },
+                },
+            },
         };
 }

@@ -18,8 +18,8 @@ public class PublishingService(
     IMethodologyService methodologyService,
     IReleaseService releaseService,
     IOptions<AppOptions> appOptions,
-    ILogger<PublishingService> logger)
-    : IPublishingService
+    ILogger<PublishingService> logger
+) : IPublishingService
 {
     private readonly AppOptions _appOptions = appOptions.Value;
 
@@ -43,7 +43,9 @@ public class PublishingService(
     public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseVersionId)
     {
         var releaseVersion = await releaseService.Get(releaseVersionId);
-        var methodologyVersions = await methodologyService.GetLatestVersionByRelease(releaseVersion);
+        var methodologyVersions = await methodologyService.GetLatestVersionByRelease(
+            releaseVersion
+        );
 
         if (!methodologyVersions.Any())
         {
@@ -52,7 +54,12 @@ public class PublishingService(
 
         foreach (var methodologyVersion in methodologyVersions)
         {
-            if (await methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
+            if (
+                await methodologyService.IsBeingPublishedAlongsideRelease(
+                    methodologyVersion,
+                    releaseVersion
+                )
+            )
             {
                 await PublishMethodologyFiles(methodologyVersion);
             }
@@ -76,14 +83,12 @@ public class PublishingService(
         // Delete any existing blobs in public storage
         await publicBlobStorageService.DeleteBlobs(
             containerName: PublicReleaseFiles,
-            directoryPath: destinationDirectoryPath);
+            directoryPath: destinationDirectoryPath
+        );
 
         // Get a list of source directory paths for all the files.
         // There will be multiple root paths if they were created on different amendment Releases
-        var sourceDirectoryPaths = files
-            .Select(f => $"{f.RootPath}/")
-            .Distinct()
-            .ToList();
+        var sourceDirectoryPaths = files.Select(f => $"{f.RootPath}/").Distinct().ToList();
 
         // Copy the blobs of those directories in private storage to the destination directory in public storage
         foreach (var sourceDirectoryPath in sourceDirectoryPaths)
@@ -102,8 +107,10 @@ public class PublishingService(
                             source: source,
                             files: files,
                             sourceContainerName: PrivateReleaseFiles,
-                            logger: logger)
-                });
+                            logger: logger
+                        ),
+                }
+            );
         }
     }
 
@@ -134,7 +141,9 @@ public class PublishingService(
                         source: source,
                         files: files,
                         sourceContainerName: PrivateMethodologyFiles,
-                        logger: logger)
-            });
+                        logger: logger
+                    ),
+            }
+        );
     }
 }

@@ -9,31 +9,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class BulkDeleteDataSetVersionsFunction(
     IDataSetVersionService dataSetVersionService,
-    ILogger<BulkDeleteDataSetVersionsFunction> logger)
+    ILogger<BulkDeleteDataSetVersionsFunction> logger
+)
 {
     [Function(nameof(BulkDeleteDataSetVersions))]
     public async Task<IActionResult> BulkDeleteDataSetVersions(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete",
-            Route = $"{nameof(BulkDeleteDataSetVersions)}/{{releaseVersionId}}")]
-        HttpRequest httpRequest,
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "delete",
+            Route = $"{nameof(BulkDeleteDataSetVersions)}/{{releaseVersionId}}"
+        )]
+            HttpRequest httpRequest,
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var forceDeleteAll =
-            httpRequest.GetRequestParamBool(paramName: "forceDeleteAll", defaultValue: false);
+        var forceDeleteAll = httpRequest.GetRequestParamBool(
+            paramName: "forceDeleteAll",
+            defaultValue: false
+        );
 
         try
         {
-            return await dataSetVersionService.BulkDeleteVersions(
+            return await dataSetVersionService
+                .BulkDeleteVersions(
                     releaseVersionId,
                     forceDeleteAll: forceDeleteAll,
-                    cancellationToken: cancellationToken)
+                    cancellationToken: cancellationToken
+                )
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'",
-                nameof(BulkDeleteDataSetVersionsFunction));
+            logger.LogError(
+                exception: ex,
+                "Exception occured while executing '{FunctionName}'",
+                nameof(BulkDeleteDataSetVersionsFunction)
+            );
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

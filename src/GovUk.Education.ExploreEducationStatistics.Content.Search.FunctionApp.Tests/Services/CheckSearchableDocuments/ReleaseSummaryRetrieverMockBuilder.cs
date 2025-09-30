@@ -14,11 +14,13 @@ public class ReleaseSummaryRetrieverMockBuilder
         _mock
             .Setup(m => m.GetAllPublishedReleaseSummaries(It.IsAny<CancellationToken>()))
             .ReturnsAsync(_releaseSummaries);
-        
+
         return _mock.Object;
     }
 
-    public ReleaseSummaryRetrieverMockBuilder WhereReleaseSummariesReturnedAre(IList<ReleaseSummary> releaseSummaries)
+    public ReleaseSummaryRetrieverMockBuilder WhereReleaseSummariesReturnedAre(
+        IList<ReleaseSummary> releaseSummaries
+    )
     {
         _releaseSummaries = releaseSummaries;
         return this;

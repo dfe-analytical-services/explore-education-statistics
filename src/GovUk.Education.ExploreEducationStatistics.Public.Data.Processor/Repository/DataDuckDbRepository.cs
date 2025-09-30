@@ -13,14 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class DataDuckDbRepository(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : IDataDuckDbRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : IDataDuckDbRepository
 {
     public async Task CreateDataTable(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var dataSetVersion = await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
+        var dataSetVersion = await publicDataDbContext
+            .DataSetVersions.AsNoTracking()
             .Include(dsv => dsv.FilterMetas)
             .Include(dsv => dsv.IndicatorMetas)
             .Include(dsv => dsv.LocationMetas)
@@ -28,10 +30,12 @@ public class DataDuckDbRepository(
             .AsSplitQuery()
             .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
 
-        await using var duckDbConnection =
-            DuckDbConnection.CreateFileConnection(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
+        await using var duckDbConnection = DuckDbConnection.CreateFileConnection(
+            dataSetVersionPathResolver.DuckDbPath(dataSetVersion)
+        );
 
-        await duckDbConnection.SqlBuilder("CREATE SEQUENCE data_seq START 1")
+        await duckDbConnection
+            .SqlBuilder("CREATE SEQUENCE data_seq START 1")
             .ExecuteAsync(cancellationToken: cancellationToken);
 
         string[] columns =
@@ -39,18 +43,24 @@ public class DataDuckDbRepository(
             $"{DataTable.Cols.Id} UINTEGER NOT NULL PRIMARY KEY",
             $"{DataTable.Cols.TimePeriodId} INTEGER NOT NULL",
             $"{DataTable.Cols.GeographicLevel} VARCHAR NOT NULL",
-            ..dataSetVersion.LocationMetas.Select(location =>
-                $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"),
-            ..dataSetVersion.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
-            ..dataSetVersion.IndicatorMetas.Select(indicator =>
-                $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
+            .. dataSetVersion.LocationMetas.Select(location =>
+                $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"
+            ),
+            .. dataSetVersion.FilterMetas.Select(filter =>
+                $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"
+            ),
+            .. dataSetVersion.IndicatorMetas.Select(indicator =>
+                $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"
+            ),
         ];
 
-        await duckDbConnection.SqlBuilder(
+        await duckDbConnection
+            .SqlBuilder(
                 $"""
-                 CREATE TABLE {DataTable.TableName:raw}
-                 ({columns.JoinToString(",\n"):raw})
-                 """)
+                CREATE TABLE {DataTable.TableName:raw}
+                ({columns.JoinToString(",\n"):raw})
+                """
+            )
             .ExecuteAsync(cancellationToken: cancellationToken);
 
         string[] insertColumns =
@@ -58,61 +68,66 @@ public class DataDuckDbRepository(
             "nextval('data_seq') AS id",
             $"{TimePeriodsTable.Ref().Id} AS {DataTable.Cols.TimePeriodId}",
             DataSourceTable.Ref.GeographicLevel,
-            ..dataSetVersion.LocationMetas.Select(location =>
-                $"COALESCE({LocationOptionsTable.Ref(location).Id}, 0) AS {DataTable.Cols.LocationId(location)}"),
-            ..dataSetVersion.FilterMetas.Select(filter =>
-                $"COALESCE({FilterOptionsTable.Ref(filter).Id}, 0) AS {DataTable.Cols.Filter(filter)}"),
-            ..dataSetVersion.IndicatorMetas.Select(DataTable.Cols.Indicator),
+            .. dataSetVersion.LocationMetas.Select(location =>
+                $"COALESCE({LocationOptionsTable.Ref(location).Id}, 0) AS {DataTable.Cols.LocationId(location)}"
+            ),
+            .. dataSetVersion.FilterMetas.Select(filter =>
+                $"COALESCE({FilterOptionsTable.Ref(filter).Id}, 0) AS {DataTable.Cols.Filter(filter)}"
+            ),
+            .. dataSetVersion.IndicatorMetas.Select(DataTable.Cols.Indicator),
         ];
 
         string[] insertJoins =
         [
-            ..dataSetVersion.LocationMetas.Select(
-                location =>
-                {
-                    var codeColumns = GetLocationCodeColumns(location.Level);
+            .. dataSetVersion.LocationMetas.Select(location =>
+            {
+                var codeColumns = GetLocationCodeColumns(location.Level);
 
-                    string[] conditions =
-                    [
-                        ..codeColumns.Select(col =>
-                            $"{LocationOptionsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"),
-                        $"{LocationOptionsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}"
-                    ];
+                string[] conditions =
+                [
+                    .. codeColumns.Select(col =>
+                        $"{LocationOptionsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"
+                    ),
+                    $"{LocationOptionsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}",
+                ];
 
-                    return $"""
-                            LEFT JOIN {LocationOptionsTable.TableName} AS {LocationOptionsTable.Alias(location)}
-                            ON {conditions.JoinToString(" AND ")}
-                            """;
-                }
-            ),
-            ..dataSetVersion.FilterMetas.Select(
-                filter => $"""
-                           LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
-                           ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'
-                           AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.Column)}
-                           """
+                return $"""
+                LEFT JOIN {LocationOptionsTable.TableName} AS {LocationOptionsTable.Alias(location)}
+                ON {conditions.JoinToString(" AND ")}
+                """;
+            }),
+            .. dataSetVersion.FilterMetas.Select(filter =>
+                $"""
+                LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
+                ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'
+                AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(
+                    filter.Column
+                )}
+                """
             ),
             $"""
-             JOIN {TimePeriodsTable.TableName}
-             ON {TimePeriodsTable.Ref().Period} = {DataSourceTable.Ref.TimePeriod}
-             AND {TimePeriodsTable.Ref().Identifier} = {DataSourceTable.Ref.TimeIdentifier}
-             """
+                JOIN {TimePeriodsTable.TableName}
+                ON {TimePeriodsTable.Ref().Period} = {DataSourceTable.Ref.TimePeriod}
+                AND {TimePeriodsTable.Ref().Identifier} = {DataSourceTable.Ref.TimeIdentifier}
+                """,
         ];
 
         var dataFilePath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
 
-        await duckDbConnection.SqlBuilder(
-            $"""
-             INSERT INTO {DataTable.TableName:raw}
-             SELECT
-             {insertColumns.JoinToString(",\n"):raw}
-             FROM read_csv('{dataFilePath:raw}', ALL_VARCHAR = true) AS {DataSourceTable.TableName:raw}
-             {insertJoins.JoinToString('\n'):raw}
-             ORDER BY
-             {DataSourceTable.Ref.GeographicLevel:raw} ASC,
-             {DataSourceTable.Ref.TimePeriod:raw} DESC
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
+        await duckDbConnection
+            .SqlBuilder(
+                $"""
+                INSERT INTO {DataTable.TableName:raw}
+                SELECT
+                {insertColumns.JoinToString(",\n"):raw}
+                FROM read_csv('{dataFilePath:raw}', ALL_VARCHAR = true) AS {DataSourceTable.TableName:raw}
+                {insertJoins.JoinToString('\n'):raw}
+                ORDER BY
+                {DataSourceTable.Ref.GeographicLevel:raw} ASC,
+                {DataSourceTable.Ref.TimePeriod:raw} DESC
+                """
+            )
+            .ExecuteAsync(cancellationToken: cancellationToken);
     }
 
     private static LocationColumn[] GetLocationCodeColumns(GeographicLevel geographicLevel)
@@ -121,28 +136,40 @@ public class DataDuckDbRepository(
         {
             GeographicLevel.LocalAuthority =>
             [
-                new LocationColumn(Name: LocationOptionsTable.Cols.Code,
-                    CsvName: GeographicLevelUtils.LocalAuthorityCsvColumns.NewCode),
-                new LocationColumn(Name: LocationOptionsTable.Cols.OldCode,
-                    CsvName: GeographicLevelUtils.LocalAuthorityCsvColumns.OldCode)
+                new LocationColumn(
+                    Name: LocationOptionsTable.Cols.Code,
+                    CsvName: GeographicLevelUtils.LocalAuthorityCsvColumns.NewCode
+                ),
+                new LocationColumn(
+                    Name: LocationOptionsTable.Cols.OldCode,
+                    CsvName: GeographicLevelUtils.LocalAuthorityCsvColumns.OldCode
+                ),
             ],
             GeographicLevel.Provider =>
             [
-                new LocationColumn(Name: LocationOptionsTable.Cols.Ukprn,
-                    CsvName: GeographicLevelUtils.ProviderCsvColumns.Ukprn)
+                new LocationColumn(
+                    Name: LocationOptionsTable.Cols.Ukprn,
+                    CsvName: GeographicLevelUtils.ProviderCsvColumns.Ukprn
+                ),
             ],
             GeographicLevel.RscRegion => [],
             GeographicLevel.School =>
             [
-                new LocationColumn(Name: LocationOptionsTable.Cols.Urn,
-                    CsvName: GeographicLevelUtils.SchoolCsvColumns.Urn),
-                new LocationColumn(Name: LocationOptionsTable.Cols.LaEstab,
-                    CsvName: GeographicLevelUtils.SchoolCsvColumns.LaEstab)
+                new LocationColumn(
+                    Name: LocationOptionsTable.Cols.Urn,
+                    CsvName: GeographicLevelUtils.SchoolCsvColumns.Urn
+                ),
+                new LocationColumn(
+                    Name: LocationOptionsTable.Cols.LaEstab,
+                    CsvName: GeographicLevelUtils.SchoolCsvColumns.LaEstab
+                ),
             ],
             _ =>
             [
-                new LocationColumn(Name: LocationOptionsTable.Cols.Code,
-                    CsvName: geographicLevel.CsvCodeColumns().First())
+                new LocationColumn(
+                    Name: LocationOptionsTable.Cols.Code,
+                    CsvName: geographicLevel.CsvCodeColumns().First()
+                ),
             ],
         };
     }

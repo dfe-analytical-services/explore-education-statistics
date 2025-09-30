@@ -20,7 +20,8 @@ public class ThemeController : ControllerBase
 
     public ThemeController(
         IMethodologyCacheService methodologyCacheService,
-        IThemeService themeService)
+        IThemeService themeService
+    )
     {
         _methodologyCacheService = methodologyCacheService;
         _themeService = themeService;
@@ -29,16 +30,17 @@ public class ThemeController : ControllerBase
     [HttpGet("methodology-themes")]
     public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
     {
-        return await _methodologyCacheService
-            .GetSummariesTree()
-            .HandleFailuresOrOk();
+        return await _methodologyCacheService.GetSummariesTree().HandleFailuresOrOk();
     }
 
-    [MemoryCache(typeof(ListThemesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
+    [MemoryCache(
+        typeof(ListThemesCacheKey),
+        durationInSeconds: 10,
+        expiryScheduleCron: HalfHourlyExpirySchedule
+    )]
     [HttpGet("themes")]
     public async Task<IList<ThemeViewModel>> ListThemes()
     {
-        return await _themeService
-            .ListThemes();
+        return await _themeService.ListThemes();
     }
 }

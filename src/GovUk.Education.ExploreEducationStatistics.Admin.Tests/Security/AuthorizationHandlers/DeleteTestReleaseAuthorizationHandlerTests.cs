@@ -16,62 +16,77 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Theme = new Theme { Title = "UI test theme" } }
+            Publication = new Publication { Theme = new Theme { Title = "UI test theme" } },
         };
-        
+
         private static readonly ReleaseVersion SeedReleaseVersion = new()
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Theme = new Theme { Title = "Seed theme" } }
+            Publication = new Publication { Theme = new Theme { Title = "Seed theme" } },
         };
 
         private static readonly ReleaseVersion RealReleaseVersion = new()
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Theme = new Theme { Title = "Normal theme" } }
+            Publication = new Publication { Theme = new Theme { Title = "Normal theme" } },
         };
 
         [Fact]
         public async Task Success_TestRelease()
         {
-            await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectGlobalRoles<
+                ReleaseVersion,
+                DeleteTestReleaseRequirement
+            >(
                 _ => CreateHandler(enableThemeDeletion: true),
                 TestReleaseVersion,
-                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
+                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
+            );
         }
-        
+
         [Fact]
         public async Task Success_SeedRelease()
         {
-            await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectGlobalRoles<
+                ReleaseVersion,
+                DeleteTestReleaseRequirement
+            >(
                 _ => CreateHandler(enableThemeDeletion: true),
                 SeedReleaseVersion,
-                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
+                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
+            );
         }
 
         [Fact]
         public async Task RealReleaseVersion_Forbidden()
         {
-            await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
-                _ => CreateHandler(enableThemeDeletion: true),
-                RealReleaseVersion);
+            await AssertHandlerSucceedsWithCorrectGlobalRoles<
+                ReleaseVersion,
+                DeleteTestReleaseRequirement
+            >(_ => CreateHandler(enableThemeDeletion: true), RealReleaseVersion);
         }
 
         [Fact]
         public async Task ThemeDeletionEnabledIsFalse_Forbidden()
         {
-            await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
-                _ => CreateHandler(enableThemeDeletion: false),
-                TestReleaseVersion);
+            await AssertHandlerSucceedsWithCorrectGlobalRoles<
+                ReleaseVersion,
+                DeleteTestReleaseRequirement
+            >(_ => CreateHandler(enableThemeDeletion: false), TestReleaseVersion);
         }
     }
 
     private static DeleteTestReleaseAuthorizationHandler CreateHandler(
-        bool enableThemeDeletion = false)
+        bool enableThemeDeletion = false
+    )
     {
         return new DeleteTestReleaseAuthorizationHandler(
-            appOptions: new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper());
+            appOptions: new AppOptions
+            {
+                EnableThemeDeletion = enableThemeDeletion,
+            }.ToOptionsWrapper()
+        );
     }
 }

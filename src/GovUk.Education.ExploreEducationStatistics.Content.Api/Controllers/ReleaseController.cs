@@ -21,10 +21,12 @@ public class ReleaseController : ControllerBase
     private readonly IReleaseCacheService _releaseCacheService;
     private readonly IReleaseService _releaseService;
 
-    public ReleaseController(IMethodologyCacheService methodologyCacheService,
+    public ReleaseController(
+        IMethodologyCacheService methodologyCacheService,
         IPublicationCacheService publicationCacheService,
         IReleaseCacheService releaseCacheService,
-        IReleaseService releaseService)
+        IReleaseService releaseService
+    )
     {
         _methodologyCacheService = methodologyCacheService;
         _publicationCacheService = publicationCacheService;
@@ -33,52 +35,67 @@ public class ReleaseController : ControllerBase
     }
 
     [HttpGet("publications/{publicationSlug}/releases")]
-    public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListReleases(string publicationSlug)
+    public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListReleases(
+        string publicationSlug
+    )
     {
-        return await _releaseService.List(publicationSlug)
-            .HandleFailuresOrOk();
+        return await _releaseService.List(publicationSlug).HandleFailuresOrOk();
     }
 
-    [MemoryCache(typeof(GetLatestReleaseCacheKey), durationInSeconds: 10,
-        expiryScheduleCron: HalfHourlyExpirySchedule)]
+    [MemoryCache(
+        typeof(GetLatestReleaseCacheKey),
+        durationInSeconds: 10,
+        expiryScheduleCron: HalfHourlyExpirySchedule
+    )]
     [HttpGet("publications/{publicationSlug}/releases/latest")]
     public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
     {
-        return await GetReleaseViewModel(publicationSlug)
-            .HandleFailuresOrOk();
+        return await GetReleaseViewModel(publicationSlug).HandleFailuresOrOk();
     }
 
     [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
-    public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
+    public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(
+        string publicationSlug
+    )
     {
-        return await GetReleaseSummaryViewModel(publicationSlug)
-            .HandleFailuresOrOk();
+        return await GetReleaseSummaryViewModel(publicationSlug).HandleFailuresOrOk();
     }
 
-    [MemoryCache(typeof(GetReleaseCacheKey), durationInSeconds: 15, expiryScheduleCron: HalfHourlyExpirySchedule)]
+    [MemoryCache(
+        typeof(GetReleaseCacheKey),
+        durationInSeconds: 15,
+        expiryScheduleCron: HalfHourlyExpirySchedule
+    )]
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
-    public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
+    public async Task<ActionResult<ReleaseViewModel>> GetRelease(
+        string publicationSlug,
+        string releaseSlug
+    )
     {
-        return await GetReleaseViewModel(publicationSlug, releaseSlug)
-            .HandleFailuresOrOk();
+        return await GetReleaseViewModel(publicationSlug, releaseSlug).HandleFailuresOrOk();
     }
 
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/summary")]
-    public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug,
-        string releaseSlug)
+    public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummary(
+        string publicationSlug,
+        string releaseSlug
+    )
     {
-        return await GetReleaseSummaryViewModel(
-                publicationSlug,
-                releaseSlug)
-            .HandleFailuresOrOk();
+        return await GetReleaseSummaryViewModel(publicationSlug, releaseSlug).HandleFailuresOrOk();
     }
 
     private Task<Either<ActionResult, ReleaseViewModel>> GetReleaseViewModel(
         string publicationSlug,
-        string? releaseSlug = null) =>
-        _publicationCacheService.GetPublication(publicationSlug)
-            .OnSuccessCombineWith(publication => _methodologyCacheService.GetSummariesByPublication(publication.Id))
-            .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
+        string? releaseSlug = null
+    ) =>
+        _publicationCacheService
+            .GetPublication(publicationSlug)
+            .OnSuccessCombineWith(publication =>
+                _methodologyCacheService.GetSummariesByPublication(publication.Id)
+            )
+            .OnSuccessCombineWith(_ =>
+                _releaseCacheService.GetRelease(publicationSlug, releaseSlug)
+            )
             .OnSuccess(tuple =>
             {
                 var (publication, methodologySummaries, release) = tuple;
@@ -90,17 +107,18 @@ public class ReleaseController : ControllerBase
 
     private Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryViewModel(
         string publicationSlug,
-        string? releaseSlug = null)
+        string? releaseSlug = null
+    )
     {
-        return _publicationCacheService.GetPublication(publicationSlug)
-            .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
+        return _publicationCacheService
+            .GetPublication(publicationSlug)
+            .OnSuccessCombineWith(_ =>
+                _releaseCacheService.GetRelease(publicationSlug, releaseSlug)
+            )
             .OnSuccess(publicationAndRelease =>
             {
                 var (publication, release) = publicationAndRelease;
-                return new ReleaseSummaryViewModel(
-                    release,
-                    publication
-                );
+                return new ReleaseSummaryViewModel(release, publication);
             });
     }
 }

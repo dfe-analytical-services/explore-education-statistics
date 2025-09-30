@@ -44,8 +44,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using StatsReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
@@ -57,20 +56,16 @@ public abstract class ReleaseVersionServiceTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
-    private static readonly User User = new DataFixture()
-        .DefaultUser()
-        .WithId(Guid.NewGuid());
+    private static readonly User User = new DataFixture().DefaultUser().WithId(Guid.NewGuid());
 
     public class GetDeleteDataFilePlanTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
             File file = _dataFixture
                 .DefaultFile()
@@ -99,12 +94,18 @@ public abstract class ReleaseVersionServiceTests
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
 
             var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
-            dataBlockService.Setup(service =>
-                    service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
+            dataBlockService
+                .Setup(service =>
+                    service.GetDeletePlan(
+                        releaseVersion.Id,
+                        It.Is<Subject>(s => s.Id == subject.Id)
+                    )
+                )
                 .ReturnsAsync(deleteDataBlockPlan);
 
             var footnote = new Footnote { Id = Guid.NewGuid() };
-            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
+            footnoteRepository
+                .Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
                 .ReturnsAsync([footnote]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -114,14 +115,15 @@ public abstract class ReleaseVersionServiceTests
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     dataBlockService: dataBlockService.Object,
-                    footnoteRepository: footnoteRepository.Object);
+                    footnoteRepository: footnoteRepository.Object
+                );
 
                 var result = await releaseVersionService.GetDeleteDataFilePlan(
                     releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+                    fileId: file.Id
+                );
 
-                VerifyAllMocks(dataBlockService,
-                    footnoteRepository);
+                VerifyAllMocks(dataBlockService, footnoteRepository);
 
                 var deleteDataFilePlan = result.AssertRight();
 
@@ -154,21 +156,19 @@ public abstract class ReleaseVersionServiceTests
         public async Task FileIsLinkedToPublicApiDataSet_DataSetVersionStatusCondition_PlanValidity(
             DataSetVersionStatus dataSetVersionStatus,
             bool enableReplacementOfPublicApiDataSets,
-            bool expectedValidValue)
+            bool expectedValidValue
+        )
         {
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet();
+            DataSet dataSet = _dataFixture.DefaultDataSet();
 
             DataSetVersion dataSetVersion = _dataFixture
                 .DefaultDataSetVersion()
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
 
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
             File file = _dataFixture
                 .DefaultFile()
@@ -199,19 +199,29 @@ public abstract class ReleaseVersionServiceTests
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
 
-            dataSetVersionService.Setup(service => service.GetDataSetVersion(
-                    releaseFile.PublicApiDataSetId!.Value,
-                    releaseFile.PublicApiDataSetVersion!,
-                    It.IsAny<CancellationToken>()))
+            dataSetVersionService
+                .Setup(service =>
+                    service.GetDataSetVersion(
+                        releaseFile.PublicApiDataSetId!.Value,
+                        releaseFile.PublicApiDataSetVersion!,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(dataSetVersion);
 
             var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
-            dataBlockService.Setup(service =>
-                    service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
+            dataBlockService
+                .Setup(service =>
+                    service.GetDeletePlan(
+                        releaseVersion.Id,
+                        It.Is<Subject>(s => s.Id == subject.Id)
+                    )
+                )
                 .ReturnsAsync(deleteDataBlockPlan);
 
             var footnote = new Footnote { Id = Guid.NewGuid() };
-            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
+            footnoteRepository
+                .Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
                 .ReturnsAsync([footnote]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -223,15 +233,15 @@ public abstract class ReleaseVersionServiceTests
                     dataSetVersionService: dataSetVersionService.Object,
                     dataBlockService: dataBlockService.Object,
                     footnoteRepository: footnoteRepository.Object,
-                    enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
+                    enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets
+                );
 
                 var result = await releaseVersionService.GetDeleteDataFilePlan(
                     releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+                    fileId: file.Id
+                );
 
-                VerifyAllMocks(dataSetVersionService,
-                    dataBlockService,
-                    footnoteRepository);
+                VerifyAllMocks(dataSetVersionService, dataBlockService, footnoteRepository);
 
                 var deleteDataFilePlan = result.AssertRight();
 
@@ -243,8 +253,14 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(dataSet.Id, deleteDataFilePlan.ApiDataSetVersionPlan.DataSetId);
                 Assert.Equal(dataSet.Title, deleteDataFilePlan.ApiDataSetVersionPlan.DataSetTitle);
                 Assert.Equal(dataSetVersion.Id, deleteDataFilePlan.ApiDataSetVersionPlan.Id);
-                Assert.Equal(dataSetVersion.PublicVersion, deleteDataFilePlan.ApiDataSetVersionPlan.Version);
-                Assert.Equal(dataSetVersion.Status, deleteDataFilePlan.ApiDataSetVersionPlan.Status);
+                Assert.Equal(
+                    dataSetVersion.PublicVersion,
+                    deleteDataFilePlan.ApiDataSetVersionPlan.Version
+                );
+                Assert.Equal(
+                    dataSetVersion.Status,
+                    deleteDataFilePlan.ApiDataSetVersionPlan.Status
+                );
                 Assert.Equal(expectedValidValue, deleteDataFilePlan.ApiDataSetVersionPlan.Valid);
                 Assert.Equal(expectedValidValue, deleteDataFilePlan.Valid);
             }
@@ -256,11 +272,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
             File file = _dataFixture
                 .DefaultFile()
@@ -293,23 +307,37 @@ public abstract class ReleaseVersionServiceTests
 
             privateCacheService
                 .Setup(service =>
-                    service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)))
+                    service.DeleteItemAsync(
+                        new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
-            dataBlockService.Setup(service => service.GetDeletePlan(releaseVersion.Id,
-                    It.Is<Subject>(s => s.Id == subject.Id)))
+            dataBlockService
+                .Setup(service =>
+                    service.GetDeletePlan(
+                        releaseVersion.Id,
+                        It.Is<Subject>(s => s.Id == subject.Id)
+                    )
+                )
                 .ReturnsAsync(new DeleteDataBlockPlanViewModel());
 
-            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
+            dataBlockService
+                .Setup(service =>
+                    service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>())
+                )
                 .ReturnsAsync(Unit.Instance);
 
-            dataImportService.Setup(service => service.GetImport(file.Id))
+            dataImportService
+                .Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
 
-            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
+            footnoteRepository
+                .Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
                 .ReturnsAsync([]);
 
-            releaseDataFileService.Setup(service => service.Delete(releaseVersion.Id, file.Id, false))
+            releaseDataFileService
+                .Setup(service => service.Delete(releaseVersion.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository
@@ -319,19 +347,24 @@ public abstract class ReleaseVersionServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseVersionService = BuildService(context,
+                var releaseVersionService = BuildService(
+                    context,
                     statisticsDbContext,
                     privateCacheService: privateCacheService.Object,
                     dataBlockService: dataBlockService.Object,
                     dataImportService: dataImportService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     releaseDataFileService: releaseDataFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object);
+                    releaseSubjectRepository: releaseSubjectRepository.Object
+                );
 
-                var result = await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+                var result = await releaseVersionService.RemoveDataFiles(
+                    releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id
+                );
 
-                VerifyAllMocks(privateCacheService,
+                VerifyAllMocks(
+                    privateCacheService,
                     dataBlockService,
                     dataImportService,
                     footnoteRepository,
@@ -346,11 +379,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task FileImporting()
         {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
             File file = _dataFixture
                 .DefaultFile()
@@ -373,17 +404,20 @@ public abstract class ReleaseVersionServiceTests
 
             var dataImportService = new Mock<IDataImportService>(Strict);
 
-            dataImportService.Setup(service => service.GetImport(file.Id))
+            dataImportService
+                .Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
             await using var context = InMemoryApplicationDbContext(contentDbContextId);
             var releaseVersionService = BuildService(
                 context,
-                dataImportService: dataImportService.Object);
+                dataImportService: dataImportService.Object
+            );
 
             var result = await releaseVersionService.RemoveDataFiles(
                 releaseVersionId: releaseVersion.Id,
-                fileId: file.Id);
+                fileId: file.Id
+            );
 
             VerifyAllMocks(dataImportService);
 
@@ -393,14 +427,11 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ReplacementExists()
         {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
-            Subject replacementSubject = _dataFixture
-                .DefaultSubject();
+            Subject replacementSubject = _dataFixture.DefaultSubject();
 
             File file = _dataFixture
                 .DefaultFile()
@@ -444,38 +475,65 @@ public abstract class ReleaseVersionServiceTests
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
-            privateCacheService.Setup(service =>
-                    service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)))
-                .Returns(Task.CompletedTask);
-            privateCacheService.Setup(service =>
+            privateCacheService
+                .Setup(service =>
                     service.DeleteItemAsync(
-                        new PrivateSubjectMetaCacheKey(releaseVersion.Id, replacementSubject.Id)))
+                        new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)
+                    )
+                )
+                .Returns(Task.CompletedTask);
+            privateCacheService
+                .Setup(service =>
+                    service.DeleteItemAsync(
+                        new PrivateSubjectMetaCacheKey(releaseVersion.Id, replacementSubject.Id)
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
-            dataBlockService.Setup(service =>
-                    service.GetDeletePlan(releaseVersion.Id,
+            dataBlockService
+                .Setup(service =>
+                    service.GetDeletePlan(
+                        releaseVersion.Id,
                         It.Is<Subject>(s =>
-                            new[] { subject.Id, replacementSubject.Id }.Contains(s.Id))))
+                            new[] { subject.Id, replacementSubject.Id }.Contains(s.Id)
+                        )
+                    )
+                )
                 .ReturnsAsync(new DeleteDataBlockPlanViewModel());
 
-            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
+            dataBlockService
+                .Setup(service =>
+                    service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>())
+                )
                 .ReturnsAsync(Unit.Instance);
 
-            dataImportService.Setup(service => service.GetImport(It.IsIn(file.Id, replacementFile.Id)))
+            dataImportService
+                .Setup(service => service.GetImport(It.IsIn(file.Id, replacementFile.Id)))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
 
-            footnoteRepository.Setup(service =>
-                    service.GetFootnotes(releaseVersion.Id, It.IsIn(subject.Id, replacementSubject.Id)))
+            footnoteRepository
+                .Setup(service =>
+                    service.GetFootnotes(
+                        releaseVersion.Id,
+                        It.IsIn(subject.Id, replacementSubject.Id)
+                    )
+                )
                 .ReturnsAsync([]);
 
             releaseDataFileService
-                .Setup(service => service.Delete(releaseVersion.Id, It.IsIn(file.Id, replacementFile.Id), false))
+                .Setup(service =>
+                    service.Delete(releaseVersion.Id, It.IsIn(file.Id, replacementFile.Id), false)
+                )
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository.Setup(service =>
-                    service.DeleteReleaseSubject(releaseVersion.Id,
+            releaseSubjectRepository
+                .Setup(service =>
+                    service.DeleteReleaseSubject(
+                        releaseVersion.Id,
                         It.IsIn(subject.Id, replacementSubject.Id),
-                        true))
+                        true
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -489,11 +547,13 @@ public abstract class ReleaseVersionServiceTests
                     dataImportService: dataImportService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     releaseDataFileService: releaseDataFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object);
+                    releaseSubjectRepository: releaseSubjectRepository.Object
+                );
 
                 var result = await releaseVersionService.RemoveDataFiles(
                     releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+                    fileId: file.Id
+                );
 
                 VerifyAllMocks(
                     privateCacheService,
@@ -501,26 +561,29 @@ public abstract class ReleaseVersionServiceTests
                     dataImportService,
                     footnoteRepository,
                     releaseDataFileService,
-                    releaseSubjectRepository);
+                    releaseSubjectRepository
+                );
 
                 dataBlockService.Verify(
                     mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()),
-                    Times.Exactly(2));
+                    Times.Exactly(2)
+                );
 
                 releaseDataFileService.Verify(
-                    mock => mock.Delete(
-                        releaseVersion.Id,
-                        It.IsIn(file.Id, replacementFile.Id),
-                        false
-                    ),
+                    mock =>
+                        mock.Delete(releaseVersion.Id, It.IsIn(file.Id, replacementFile.Id), false),
                     Times.Exactly(2)
                 );
 
                 releaseSubjectRepository.Verify(
-                    mock => mock.DeleteReleaseSubject(releaseVersion.Id,
-                        It.IsIn(subject.Id, replacementSubject.Id),
-                        true),
-                    Times.Exactly(2));
+                    mock =>
+                        mock.DeleteReleaseSubject(
+                            releaseVersion.Id,
+                            It.IsIn(subject.Id, replacementSubject.Id),
+                            true
+                        ),
+                    Times.Exactly(2)
+                );
 
                 result.AssertRight();
             }
@@ -529,14 +592,11 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ReplacementFileImporting()
         {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
-            Subject subject = _dataFixture
-                .DefaultSubject();
+            Subject subject = _dataFixture.DefaultSubject();
 
-            Subject replacementSubject = _dataFixture
-                .DefaultSubject();
+            Subject replacementSubject = _dataFixture.DefaultSubject();
 
             File file = _dataFixture
                 .DefaultFile()
@@ -571,19 +631,23 @@ public abstract class ReleaseVersionServiceTests
 
             var dataImportService = new Mock<IDataImportService>(Strict);
 
-            dataImportService.Setup(service => service.GetImport(file.Id))
+            dataImportService
+                .Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
-            dataImportService.Setup(service => service.GetImport(replacementFile.Id))
+            dataImportService
+                .Setup(service => service.GetImport(replacementFile.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
             await using var context = InMemoryApplicationDbContext(contentDbContextId);
             var releaseVersionService = BuildService(
                 context,
-                dataImportService: dataImportService.Object);
+                dataImportService: dataImportService.Object
+            );
 
             var result = await releaseVersionService.RemoveDataFiles(
                 releaseVersionId: releaseVersion.Id,
-                fileId: file.Id);
+                fileId: file.Id
+            );
 
             VerifyAllMocks(dataImportService);
 
@@ -597,28 +661,34 @@ public abstract class ReleaseVersionServiceTests
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
 
-            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedThrows404VersionException(
-                _dataFixture,
-                DataSetVersionStatus.Draft,
-                statisticsDbContext, contentDbContext);
+            var testFixture =
+                await RemoveDataSetTestFixture.CreateApiLinkedThrows404VersionException(
+                    _dataFixture,
+                    DataSetVersionStatus.Draft,
+                    statisticsDbContext,
+                    contentDbContext
+                );
 
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
                 enableReplacementOfPublicApiDataSets: true,
-                logger: testFixture.Logger.Object);
+                logger: testFixture.Logger.Object
+            );
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () =>
-                    await releaseVersionService.RemoveDataFiles(
-                        releaseVersionId: testFixture.ReleaseVersion.Id,
-                        fileId: testFixture.File.Id));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await releaseVersionService.RemoveDataFiles(
+                    releaseVersionId: testFixture.ReleaseVersion.Id,
+                    fileId: testFixture.File.Id
+                )
+            );
 
             // Verify the exception message
             Assert.Contains(
                 "Failed to find the data set version expected to be linked to the release file that is being deleted",
-                exception.Message);
+                exception.Message
+            );
         }
 
         [Fact]
@@ -635,22 +705,26 @@ public abstract class ReleaseVersionServiceTests
                 contentDbContext,
                 replacedById: Guid.NewGuid(),
                 replacingId: null,
-                releaseVersionPublished: false);
+                releaseVersionPublished: false
+            );
 
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
-                enableReplacementOfPublicApiDataSets: true);
+                enableReplacementOfPublicApiDataSets: true
+            );
 
             var result = await releaseVersionService.RemoveDataFiles(
-                        releaseVersionId: testFixture.ReleaseVersion.Id,
-                        fileId: testFixture.File.Id);
+                releaseVersionId: testFixture.ReleaseVersion.Id,
+                fileId: testFixture.File.Id
+            );
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: null,
-                expectedCode: ValidationMessages.ReleaseFileMustBeOriginal.Code);
+                expectedCode: ValidationMessages.ReleaseFileMustBeOriginal.Code
+            );
         }
 
         [Fact]
@@ -667,24 +741,28 @@ public abstract class ReleaseVersionServiceTests
                 contentDbContext,
                 replacedById: null,
                 replacingId: Guid.NewGuid(),
-                releaseVersionPublished: true);
+                releaseVersionPublished: true
+            );
 
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
-                enableReplacementOfPublicApiDataSets: true);
+                enableReplacementOfPublicApiDataSets: true
+            );
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () =>
-                    await releaseVersionService.RemoveDataFiles(
-                        releaseVersionId: testFixture.ReleaseVersion.Id,
-                        fileId: testFixture.File.Id));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await releaseVersionService.RemoveDataFiles(
+                    releaseVersionId: testFixture.ReleaseVersion.Id,
+                    fileId: testFixture.File.Id
+                )
+            );
 
             // Verify the exception message
             Assert.Contains(
                 "A replacement file for a DRAFT release version cannot also be a PUBLISHED file.",
-                exception.Message);
+                exception.Message
+            );
         }
 
         [Fact]
@@ -701,24 +779,28 @@ public abstract class ReleaseVersionServiceTests
                 contentDbContext,
                 replacedById: null,
                 replacingId: null,
-                releaseVersionPublished: false);
+                releaseVersionPublished: false
+            );
 
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 dataSetVersionService: testFixture.DataSetVersionService.Object,
                 dataImportService: testFixture.DataImportService.Object,
-                enableReplacementOfPublicApiDataSets: true);
+                enableReplacementOfPublicApiDataSets: true
+            );
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () =>
-                    await releaseVersionService.RemoveDataFiles(
-                        releaseVersionId: testFixture.ReleaseVersion.Id,
-                        fileId: testFixture.File.Id));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await releaseVersionService.RemoveDataFiles(
+                    releaseVersionId: testFixture.ReleaseVersion.Id,
+                    fileId: testFixture.File.Id
+                )
+            );
 
             // Verify the exception message
             Assert.Contains(
                 "A DRAFT release version's file cannot be linked to a PUBLISHED API.",
-                exception.Message);
+                exception.Message
+            );
         }
 
         [Theory]
@@ -736,7 +818,8 @@ public abstract class ReleaseVersionServiceTests
             DataSetVersionStatus dataSetVersionStatus,
             bool enableReplacementOfPublicApiDataSets,
             bool expectingValidationProblem,
-            bool expectingApiDeletion)
+            bool expectingApiDeletion
+        )
         {
             var contextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
@@ -746,7 +829,8 @@ public abstract class ReleaseVersionServiceTests
                 _dataFixture,
                 dataSetVersionStatus,
                 statisticsDbContext,
-                contentDbContext);
+                contentDbContext
+            );
 
             if (enableReplacementOfPublicApiDataSets)
             {
@@ -768,13 +852,20 @@ public abstract class ReleaseVersionServiceTests
                 releaseSubjectRepository: testFixture.ReleaseSubjectRepository.Object,
                 privateCacheService: testFixture.PrivateCacheService.Object,
                 releaseDataFileService: testFixture.ReleaseDataFileService.Object,
-                enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets);
+                enableReplacementOfPublicApiDataSets: enableReplacementOfPublicApiDataSets
+            );
 
             var result = await releaseVersionService.RemoveDataFiles(
                 releaseVersionId: testFixture.ReleaseVersion.Id,
-                fileId: testFixture.File.Id);
+                fileId: testFixture.File.Id
+            );
 
-            VerifyAllMocks(testFixture.DataImportService, testFixture.DataSetVersionService, testFixture.FootnoteRepository, testFixture.DataBlockService);
+            VerifyAllMocks(
+                testFixture.DataImportService,
+                testFixture.DataSetVersionService,
+                testFixture.FootnoteRepository,
+                testFixture.DataBlockService
+            );
 
             if (expectingValidationProblem)
             {
@@ -782,11 +873,17 @@ public abstract class ReleaseVersionServiceTests
 
                 var errorDetail = validationProblem.AssertHasError(
                     expectedPath: null,
-                    expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
+                    expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code
+                );
 
-                var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
+                var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(
+                    errorDetail.Detail
+                );
 
-                Assert.Equal(testFixture.ReleaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
+                Assert.Equal(
+                    testFixture.ReleaseFile.PublicApiDataSetId,
+                    apiDataSetErrorDetail.DataSetId
+                );
             }
             else
             {
@@ -800,9 +897,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
             var release = publication.Releases.Single();
             var releaseVersion = release.Versions.Single();
@@ -821,14 +918,19 @@ public abstract class ReleaseVersionServiceTests
             var newReleaseSlug = $"{release.Slug}-{newLabel}";
             var newReleaseTitle = $"{release.Title} {newLabel}";
 
-            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
-                    releaseVersion.Id,
-                    newReleaseSlug,
-                    newReleaseTitle,
-                    It.IsAny<CancellationToken>()))
+            dataSetVersionService
+                .Setup(service =>
+                    service.UpdateVersionsForReleaseVersion(
+                        releaseVersion.Id,
+                        newReleaseSlug,
+                        newReleaseTitle,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
-            var updatedType = EnumUtil.GetEnums<ReleaseType>()
+            var updatedType = EnumUtil
+                .GetEnums<ReleaseType>()
                 .Except([releaseVersion.Type, ReleaseType.ExperimentalStatistics])
                 .First();
 
@@ -836,26 +938,28 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    dataSetVersionService: dataSetVersionService.Object);
+                    dataSetVersionService: dataSetVersionService.Object
+                );
 
-                var result = await releaseVersionService
-                    .UpdateReleaseVersion(
-                        releaseVersion.Id,
-                        new ReleaseVersionUpdateRequest
-                        {
-                            Type = updatedType,
-                            Year = release.Year,
-                            TimePeriodCoverage = release.TimePeriodCoverage,
-                            PreReleaseAccessList = "New access list",
-                            Label = newLabel,
-                            PublishingOrganisations = null
-                        }
-                    );
+                var result = await releaseVersionService.UpdateReleaseVersion(
+                    releaseVersion.Id,
+                    new ReleaseVersionUpdateRequest
+                    {
+                        Type = updatedType,
+                        Year = release.Year,
+                        TimePeriodCoverage = release.TimePeriodCoverage,
+                        PreReleaseAccessList = "New access list",
+                        Label = newLabel,
+                        PublishingOrganisations = null,
+                    }
+                );
 
                 VerifyAllMocks(dataSetVersionService);
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
                     expectedOrganisationIds: null,
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations)
+                        .ToLowerFirst()
+                );
 
                 var viewModel = result.AssertRight();
 
@@ -874,8 +978,8 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actualReleaseVersion = await context.ReleaseVersions
-                    .Include(rv => rv.Release)
+                var actualReleaseVersion = await context
+                    .ReleaseVersions.Include(rv => rv.Release)
                     .Include(rv => rv.ReleaseStatuses)
                     .Include(rv => rv.PublishingOrganisations)
                     .SingleAsync(rv => rv.Id == releaseVersion.Id);
@@ -899,15 +1003,18 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WhenPublishingOrganisationsHasValidationErrors_ReturnsValidationErrors()
         {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+                );
 
             var releaseVersion = publication.Releases[0].Versions[0];
 
             ErrorViewModel[] expectedValidationErrors =
             [
                 new() { Message = "Validation error 1" },
-                new() { Message = "Validation error 2" }
+                new() { Message = "Validation error 2" },
             ];
 
             _organisationsValidator.WhereHasValidationErrors(expectedValidationErrors);
@@ -921,23 +1028,23 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseVersionService = BuildService(
-                    contentDbContext: context);
+                var releaseVersionService = BuildService(contentDbContext: context);
 
-                var result = await releaseVersionService
-                    .UpdateReleaseVersion(
-                        releaseVersion.Id,
-                        new ReleaseVersionUpdateRequest
-                        {
-                            Type = releaseVersion.Type,
-                            Year = releaseVersion.Release.Year,
-                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
-                            PublishingOrganisations = [Guid.NewGuid(), Guid.NewGuid()]
-                        }
-                    );
+                var result = await releaseVersionService.UpdateReleaseVersion(
+                    releaseVersion.Id,
+                    new ReleaseVersionUpdateRequest
+                    {
+                        Type = releaseVersion.Type,
+                        Year = releaseVersion.Release.Year,
+                        TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                        PublishingOrganisations = [Guid.NewGuid(), Guid.NewGuid()],
+                    }
+                );
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations)
+                        .ToLowerFirst()
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
                 validationProblem.AssertHasErrors(expectedValidationErrors.ToList());
@@ -945,24 +1052,28 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
-        public async Task
-            GivenReleaseVersionHasPublishingOrganisations_WhenRequestHasPublishingOrganisations_UpdatesOrganisations()
+        public async Task GivenReleaseVersionHasPublishingOrganisations_WhenRequestHasPublishingOrganisations_UpdatesOrganisations()
         {
-            var updatedOrganisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var updatedOrganisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             var updatedOrganisationIds = updatedOrganisations.Select(o => o.Id).ToArray();
 
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease()
-                        .WithVersions(_ =>
-                        [
-                            _dataFixture.DefaultReleaseVersion()
-                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
-                                    .Generate(2))
-                        ])
-                ]);
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithPublishingOrganisations(
+                                            _dataFixture.DefaultOrganisation().Generate(2)
+                                        ),
+                                ]
+                            ),
+                    ]
+                );
 
             var releaseVersion = publication.Releases[0].Versions[0];
 
@@ -977,66 +1088,86 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
-            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
-                    releaseVersion.Id,
-                    releaseVersion.Release.Slug,
-                    releaseVersion.Release.Title,
-                    It.IsAny<CancellationToken>()))
+            dataSetVersionService
+                .Setup(service =>
+                    service.UpdateVersionsForReleaseVersion(
+                        releaseVersion.Id,
+                        releaseVersion.Release.Slug,
+                        releaseVersion.Release.Title,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    dataSetVersionService: dataSetVersionService.Object);
+                    dataSetVersionService: dataSetVersionService.Object
+                );
 
-                var result = await releaseVersionService
-                    .UpdateReleaseVersion(
-                        releaseVersion.Id,
-                        new ReleaseVersionUpdateRequest
-                        {
-                            Type = releaseVersion.Type,
-                            Year = releaseVersion.Release.Year,
-                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
-                            PublishingOrganisations = updatedOrganisationIds
-                        }
-                    );
+                var result = await releaseVersionService.UpdateReleaseVersion(
+                    releaseVersion.Id,
+                    new ReleaseVersionUpdateRequest
+                    {
+                        Type = releaseVersion.Type,
+                        Year = releaseVersion.Release.Year,
+                        TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                        PublishingOrganisations = updatedOrganisationIds,
+                    }
+                );
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
                     expectedOrganisationIds: updatedOrganisationIds,
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations)
+                        .ToLowerFirst()
+                );
 
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(updatedOrganisations.Length, viewModel.PublishingOrganisations.Count);
-                Assert.All(updatedOrganisations,
-                    expectedOrganisation => Assert.Contains(viewModel.PublishingOrganisations,
-                        ovm => expectedOrganisation.Id == ovm.Id));
+                Assert.All(
+                    updatedOrganisations,
+                    expectedOrganisation =>
+                        Assert.Contains(
+                            viewModel.PublishingOrganisations,
+                            ovm => expectedOrganisation.Id == ovm.Id
+                        )
+                );
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actualReleaseVersion = await context.ReleaseVersions
-                    .Include(rv => rv.PublishingOrganisations)
+                var actualReleaseVersion = await context
+                    .ReleaseVersions.Include(rv => rv.PublishingOrganisations)
                     .FirstAsync(rv => rv.Id == releaseVersion.Id);
 
-                Assert.Equal(updatedOrganisations.Length, actualReleaseVersion.PublishingOrganisations.Count);
-                Assert.All(updatedOrganisations,
-                    expectedOrganisation => Assert.Contains(actualReleaseVersion.PublishingOrganisations,
-                        o => expectedOrganisation.Id == o.Id));
+                Assert.Equal(
+                    updatedOrganisations.Length,
+                    actualReleaseVersion.PublishingOrganisations.Count
+                );
+                Assert.All(
+                    updatedOrganisations,
+                    expectedOrganisation =>
+                        Assert.Contains(
+                            actualReleaseVersion.PublishingOrganisations,
+                            o => expectedOrganisation.Id == o.Id
+                        )
+                );
             }
         }
 
         [Fact]
-        public async Task
-            GivenReleaseVersionHasNoPublishingOrganisations_WhenRequestHasPublishingOrganisations_UpdatesOrganisations()
+        public async Task GivenReleaseVersionHasNoPublishingOrganisations_WhenRequestHasPublishingOrganisations_UpdatesOrganisations()
         {
-            var updatedOrganisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var updatedOrganisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             var updatedOrganisationIds = updatedOrganisations.Select(o => o.Id).ToArray();
 
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+                );
 
             var releaseVersion = publication.Releases[0].Versions[0];
 
@@ -1051,71 +1182,95 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
-            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
-                    releaseVersion.Id,
-                    releaseVersion.Release.Slug,
-                    releaseVersion.Release.Title,
-                    It.IsAny<CancellationToken>()))
+            dataSetVersionService
+                .Setup(service =>
+                    service.UpdateVersionsForReleaseVersion(
+                        releaseVersion.Id,
+                        releaseVersion.Release.Slug,
+                        releaseVersion.Release.Title,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    dataSetVersionService: dataSetVersionService.Object);
+                    dataSetVersionService: dataSetVersionService.Object
+                );
 
-                var result = await releaseVersionService
-                    .UpdateReleaseVersion(
-                        releaseVersion.Id,
-                        new ReleaseVersionUpdateRequest
-                        {
-                            Type = releaseVersion.Type,
-                            Year = releaseVersion.Release.Year,
-                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
-                            PublishingOrganisations = updatedOrganisationIds
-                        }
-                    );
+                var result = await releaseVersionService.UpdateReleaseVersion(
+                    releaseVersion.Id,
+                    new ReleaseVersionUpdateRequest
+                    {
+                        Type = releaseVersion.Type,
+                        Year = releaseVersion.Release.Year,
+                        TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                        PublishingOrganisations = updatedOrganisationIds,
+                    }
+                );
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
                     expectedOrganisationIds: updatedOrganisationIds,
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations)
+                        .ToLowerFirst()
+                );
 
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(updatedOrganisations.Length, viewModel.PublishingOrganisations.Count);
-                Assert.All(updatedOrganisations,
-                    expectedOrganisation => Assert.Contains(viewModel.PublishingOrganisations,
-                        ovm => expectedOrganisation.Id == ovm.Id));
+                Assert.All(
+                    updatedOrganisations,
+                    expectedOrganisation =>
+                        Assert.Contains(
+                            viewModel.PublishingOrganisations,
+                            ovm => expectedOrganisation.Id == ovm.Id
+                        )
+                );
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actualReleaseVersion = await context.ReleaseVersions
-                    .Include(rv => rv.PublishingOrganisations)
+                var actualReleaseVersion = await context
+                    .ReleaseVersions.Include(rv => rv.PublishingOrganisations)
                     .FirstAsync(rv => rv.Id == releaseVersion.Id);
 
-                Assert.Equal(updatedOrganisations.Length, actualReleaseVersion.PublishingOrganisations.Count);
-                Assert.All(updatedOrganisations,
-                    expectedOrganisation => Assert.Contains(actualReleaseVersion.PublishingOrganisations,
-                        o => expectedOrganisation.Id == o.Id));
+                Assert.Equal(
+                    updatedOrganisations.Length,
+                    actualReleaseVersion.PublishingOrganisations.Count
+                );
+                Assert.All(
+                    updatedOrganisations,
+                    expectedOrganisation =>
+                        Assert.Contains(
+                            actualReleaseVersion.PublishingOrganisations,
+                            o => expectedOrganisation.Id == o.Id
+                        )
+                );
             }
         }
 
         [Fact]
-        public async Task
-            GivenReleaseVersionHasPublishingOrganisations_WhenRequestHasNoPublishingOrganisations_RemovesOrganisations()
+        public async Task GivenReleaseVersionHasPublishingOrganisations_WhenRequestHasNoPublishingOrganisations_RemovesOrganisations()
         {
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease()
-                        .WithVersions(_ =>
-                        [
-                            _dataFixture.DefaultReleaseVersion()
-                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
-                                    .Generate(2))
-                        ])
-                ]);
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithPublishingOrganisations(
+                                            _dataFixture.DefaultOrganisation().Generate(2)
+                                        ),
+                                ]
+                            ),
+                    ]
+                );
 
             var releaseVersion = publication.Releases[0].Versions[0];
 
@@ -1127,34 +1282,40 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
-            dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
-                    releaseVersion.Id,
-                    releaseVersion.Release.Slug,
-                    releaseVersion.Release.Title,
-                    It.IsAny<CancellationToken>()))
+            dataSetVersionService
+                .Setup(service =>
+                    service.UpdateVersionsForReleaseVersion(
+                        releaseVersion.Id,
+                        releaseVersion.Release.Slug,
+                        releaseVersion.Release.Title,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    dataSetVersionService: dataSetVersionService.Object);
+                    dataSetVersionService: dataSetVersionService.Object
+                );
 
-                var result = await releaseVersionService
-                    .UpdateReleaseVersion(
-                        releaseVersion.Id,
-                        new ReleaseVersionUpdateRequest
-                        {
-                            Type = releaseVersion.Type,
-                            Year = releaseVersion.Release.Year,
-                            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
-                            PublishingOrganisations = null
-                        }
-                    );
+                var result = await releaseVersionService.UpdateReleaseVersion(
+                    releaseVersion.Id,
+                    new ReleaseVersionUpdateRequest
+                    {
+                        Type = releaseVersion.Type,
+                        Year = releaseVersion.Release.Year,
+                        TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+                        PublishingOrganisations = null,
+                    }
+                );
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
                     expectedOrganisationIds: null,
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations)
+                        .ToLowerFirst()
+                );
 
                 var viewModel = result.AssertRight();
 
@@ -1163,8 +1324,8 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actualReleaseVersion = await context.ReleaseVersions
-                    .Include(rv => rv.PublishingOrganisations)
+                var actualReleaseVersion = await context
+                    .ReleaseVersions.Include(rv => rv.PublishingOrganisations)
                     .FirstAsync(rv => rv.Id == releaseVersion.Id);
 
                 Assert.Empty(actualReleaseVersion.PublishingOrganisations);
@@ -1176,7 +1337,8 @@ public abstract class ReleaseVersionServiceTests
         {
             Publication publication = _dataFixture.DefaultPublication();
 
-            var (release, otherRelease) = _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+            var (release, otherRelease) = _dataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .WithPublication(publication)
                 .Generate(2)
                 .ToTuple2();
@@ -1195,30 +1357,32 @@ public abstract class ReleaseVersionServiceTests
                 var expectedUpdatedReleaseSlug = NamingUtils.CreateReleaseSlug(
                     year: otherRelease.Year,
                     timePeriodCoverage: otherRelease.TimePeriodCoverage,
-                    label: null);
+                    label: null
+                );
 
-                var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder()
-                    .SetValidationToFail(
+                var releaseSlugValidator =
+                    new ReleaseSlugValidatorMockBuilder().SetValidationToFail(
                         validationErrorMessage: SlugNotUnique,
                         releaseSlug: expectedUpdatedReleaseSlug,
                         publicationId: publication.Id,
-                        releaseId: releaseVersion.ReleaseId);
+                        releaseId: releaseVersion.ReleaseId
+                    );
 
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    releaseSlugValidator: releaseSlugValidator.Build());
+                    releaseSlugValidator: releaseSlugValidator.Build()
+                );
 
-                var result = await releaseVersionService
-                    .UpdateReleaseVersion(
-                        releaseVersion.Id,
-                        new ReleaseVersionUpdateRequest
-                        {
-                            Year = otherRelease.Year,
-                            TimePeriodCoverage = otherRelease.TimePeriodCoverage,
-                            Type = releaseVersion.Type,
-                            PreReleaseAccessList = releaseVersion.PreReleaseAccessList
-                        }
-                    );
+                var result = await releaseVersionService.UpdateReleaseVersion(
+                    releaseVersion.Id,
+                    new ReleaseVersionUpdateRequest
+                    {
+                        Year = otherRelease.Year,
+                        TimePeriodCoverage = otherRelease.TimePeriodCoverage,
+                        Type = releaseVersion.Type,
+                        PreReleaseAccessList = releaseVersion.PreReleaseAccessList,
+                    }
+                );
 
                 result.AssertBadRequest(SlugNotUnique);
             }
@@ -1234,7 +1398,10 @@ public abstract class ReleaseVersionServiceTests
 
             var releaseVersionService = BuildService(Mock.Of<ContentDbContext>());
 
-            var result = await releaseVersionService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
+            var result = await releaseVersionService.UpdateReleaseVersion(
+                It.IsAny<Guid>(),
+                releaseUpdateRequest
+            );
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
@@ -1242,7 +1409,8 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task GivenReleaseVersionExists_AndIsFirstVersion_NewReleaseSlugIsValidated()
         {
-            Release release = _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+            Release release = _dataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .WithPublication(_dataFixture.DefaultPublication());
 
             await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
@@ -1254,7 +1422,8 @@ public abstract class ReleaseVersionServiceTests
             var sut = BuildService(
                 context,
                 dataSetVersionService: dataSetVersionService.Build(),
-                releaseSlugValidator: releaseSlugValidator.Build());
+                releaseSlugValidator: releaseSlugValidator.Build()
+            );
 
             var newLabel = "initial";
 
@@ -1263,7 +1432,7 @@ public abstract class ReleaseVersionServiceTests
                 Year = release.Year,
                 TimePeriodCoverage = release.TimePeriodCoverage,
                 Label = newLabel,
-                Type = ReleaseType.OfficialStatistics
+                Type = ReleaseType.OfficialStatistics,
             };
 
             // ACT
@@ -1273,12 +1442,14 @@ public abstract class ReleaseVersionServiceTests
             var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
                 year: release.Year,
                 timePeriodCoverage: release.TimePeriodCoverage,
-                label: newLabel);
+                label: newLabel
+            );
 
             releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
                 expectedNewReleaseSlug: expectedNewReleaseSlug,
                 expectedPublicationId: release.PublicationId,
-                expectedReleaseId: release.Id);
+                expectedReleaseId: release.Id
+            );
         }
     }
 
@@ -1287,35 +1458,42 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease()
-                        .WithVersions(_ =>
-                        [
-                            _dataFixture.DefaultReleaseVersion()
-                                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                                .WithPublished(DateTime.UtcNow)
-                                .WithPublishScheduled(DateTime.UtcNow)
-                                .WithPublishingOrganisations(_dataFixture.DefaultOrganisation()
-                                    .Generate(2))
-                                .WithReleaseStatuses(_dataFixture.DefaultReleaseStatus()
-                                    .Generate(2))
-                        ])
-                ]);
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                                        .WithPublished(DateTime.UtcNow)
+                                        .WithPublishScheduled(DateTime.UtcNow)
+                                        .WithPublishingOrganisations(
+                                            _dataFixture.DefaultOrganisation().Generate(2)
+                                        )
+                                        .WithReleaseStatuses(
+                                            _dataFixture.DefaultReleaseStatus().Generate(2)
+                                        ),
+                                ]
+                            ),
+                    ]
+                );
 
             var releaseVersion = publication.Releases[0].Versions[0];
 
             var nonPreReleaseUserRole = new UserReleaseRole
             {
                 Role = ReleaseRole.Contributor,
-                ReleaseVersion = releaseVersion
+                ReleaseVersion = releaseVersion,
             };
 
             var nonPreReleaseUserInvite = new UserReleaseInvite
             {
                 Role = ReleaseRole.Contributor,
-                ReleaseVersion = releaseVersion
+                ReleaseVersion = releaseVersion,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1347,25 +1525,39 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.Release.Publication.Title, viewModel.PublicationTitle);
                 Assert.Equal(releaseVersion.Release.Publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(releaseVersion.ApprovalStatus, viewModel.ApprovalStatus);
-                Assert.Equal(releaseVersion.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
-                Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(), viewModel.PublishScheduled);
+                Assert.Equal(
+                    releaseVersion.LatestInternalReleaseNote,
+                    viewModel.LatestInternalReleaseNote
+                );
+                Assert.Equal(
+                    releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(),
+                    viewModel.PublishScheduled
+                );
                 Assert.Equal(releaseVersion.Published, viewModel.Published);
                 Assert.Equal(releaseVersion.PreReleaseAccessList, viewModel.PreReleaseAccessList);
                 Assert.Equal(releaseVersion.NextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(releaseVersion.Type, viewModel.Type);
-                Assert.Equal(releaseVersion.Release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
+                Assert.Equal(
+                    releaseVersion.Release.TimePeriodCoverage,
+                    viewModel.TimePeriodCoverage
+                );
                 Assert.Equal(releaseVersion.NotifySubscribers, viewModel.NotifySubscribers);
                 Assert.Equal(releaseVersion.UpdatePublishedDate, viewModel.UpdatePublishedDate);
 
-                Assert.Equal(releaseVersion.PublishingOrganisations.Count, viewModel.PublishingOrganisations.Count);
-                Assert.All(releaseVersion.PublishingOrganisations,
+                Assert.Equal(
+                    releaseVersion.PublishingOrganisations.Count,
+                    viewModel.PublishingOrganisations.Count
+                );
+                Assert.All(
+                    releaseVersion.PublishingOrganisations,
                     (expectedOrganisation, index) =>
                     {
                         var actualOrganisation = viewModel.PublishingOrganisations[index];
                         Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
                         Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
                         Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
-                    });
+                    }
+                );
 
                 Assert.Null(viewModel.PreviousVersionId);
                 Assert.True(viewModel.LatestRelease);
@@ -1378,11 +1570,18 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WithPreReleaseUsers()
         {
-            UserReleaseRole preReleaseUserRole = _dataFixture.DefaultUserReleaseRole()
+            UserReleaseRole preReleaseUserRole = _dataFixture
+                .DefaultUserReleaseRole()
                 .WithRole(ReleaseRole.PrereleaseViewer)
-                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
-                    .WithRelease(_dataFixture.DefaultRelease()
-                        .WithPublication(_dataFixture.DefaultPublication())));
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(
+                            _dataFixture
+                                .DefaultRelease()
+                                .WithPublication(_dataFixture.DefaultPublication())
+                        )
+                );
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1396,7 +1595,9 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(context);
 
-                var result = await releaseVersionService.GetRelease(preReleaseUserRole.ReleaseVersionId);
+                var result = await releaseVersionService.GetRelease(
+                    preReleaseUserRole.ReleaseVersionId
+                );
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1406,11 +1607,18 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WithPreReleaseInvites()
         {
-            UserReleaseInvite preReleaseUserInvite = _dataFixture.DefaultUserReleaseInvite()
+            UserReleaseInvite preReleaseUserInvite = _dataFixture
+                .DefaultUserReleaseInvite()
                 .WithRole(ReleaseRole.PrereleaseViewer)
-                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
-                    .WithRelease(_dataFixture.DefaultRelease()
-                        .WithPublication(_dataFixture.DefaultPublication())));
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(
+                            _dataFixture
+                                .DefaultRelease()
+                                .WithPublication(_dataFixture.DefaultPublication())
+                        )
+                );
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1424,7 +1632,9 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(context);
 
-                var result = await releaseVersionService.GetRelease(preReleaseUserInvite.ReleaseVersionId);
+                var result = await releaseVersionService.GetRelease(
+                    preReleaseUserInvite.ReleaseVersionId
+                );
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1434,7 +1644,8 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task NotLatestPublishedRelease()
         {
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 2)]);
 
             var notLatestReleaseVersion = publication.Releases[0].Versions[0];
@@ -1462,7 +1673,8 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task NoLatestInternalReleaseNote()
         {
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var contextId = Guid.NewGuid().ToString();
@@ -1476,7 +1688,9 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(context);
 
-                var result = await releaseVersionService.GetRelease(publication.Releases[0].Versions[0].Id);
+                var result = await releaseVersionService.GetRelease(
+                    publication.Releases[0].Versions[0].Id
+                );
 
                 var releaseViewModel = result.AssertRight();
                 Assert.Null(releaseViewModel.LatestInternalReleaseNote);
@@ -1489,7 +1703,8 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var contextId = Guid.NewGuid().ToString();
@@ -1551,20 +1766,26 @@ public abstract class ReleaseVersionServiceTests
                 Id = Guid.NewGuid(),
                 ScheduledWithReleaseVersionId = releaseBeingDeleted.Id,
                 AlternativeTitle = "Methodology 1 with alternative title",
-                Methodology = new Methodology { OwningPublicationTitle = "Methodology 1 owned Publication title" }
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Methodology 1 owned Publication title",
+                },
             };
 
             var methodology2ScheduledWithRelease1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
                 ScheduledWithReleaseVersionId = releaseBeingDeleted.Id,
-                Methodology = new Methodology { OwningPublicationTitle = "Methodology 2 with owned Publication title" }
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Methodology 2 with owned Publication title",
+                },
             };
 
             var methodologyScheduledWithRelease2 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                ScheduledWithReleaseVersionId = releaseNotBeingDeleted.Id
+                ScheduledWithReleaseVersionId = releaseNotBeingDeleted.Id,
             };
 
             var methodologyNotScheduled = new MethodologyVersion { Id = Guid.NewGuid() };
@@ -1578,7 +1799,8 @@ public abstract class ReleaseVersionServiceTests
                     methodology1ScheduledWithRelease1,
                     methodology2ScheduledWithRelease1,
                     methodologyScheduledWithRelease2,
-                    methodologyNotScheduled);
+                    methodologyNotScheduled
+                );
                 await context.SaveChangesAsync();
             }
 
@@ -1586,17 +1808,21 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(context);
 
-                var result = await releaseVersionService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
+                var result = await releaseVersionService.GetDeleteReleaseVersionPlan(
+                    releaseBeingDeleted.Id
+                );
 
                 var plan = result.AssertRight();
 
                 // Assert that only the 2 Methodologies that were scheduled with the Release being deleted are flagged
                 // up in the Plan.
                 Assert.Equal(2, plan.ScheduledMethodologies.Count);
-                var methodology1 =
-                    plan.ScheduledMethodologies.Single(m => m.Id == methodology1ScheduledWithRelease1.Id);
-                var methodology2 =
-                    plan.ScheduledMethodologies.Single(m => m.Id == methodology2ScheduledWithRelease1.Id);
+                var methodology1 = plan.ScheduledMethodologies.Single(m =>
+                    m.Id == methodology1ScheduledWithRelease1.Id
+                );
+                var methodology2 = plan.ScheduledMethodologies.Single(m =>
+                    m.Id == methodology2ScheduledWithRelease1.Id
+                );
 
                 Assert.Equal("Methodology 1 with alternative title", methodology1.Title);
                 Assert.Equal("Methodology 2 with owned Publication title", methodology2.Title);
@@ -1616,15 +1842,8 @@ public abstract class ReleaseVersionServiceTests
 
             var publication = new Publication
             {
-                ReleaseSeries =
-                [
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ReleaseId = release.Id
-                    }
-                ],
-                Theme = new Theme()
+                ReleaseSeries = [new() { Id = Guid.NewGuid(), ReleaseId = release.Id }],
+                Theme = new Theme(),
             };
 
             var releaseVersion = new ReleaseVersion
@@ -1632,13 +1851,13 @@ public abstract class ReleaseVersionServiceTests
                 Id = release.Id,
                 Publication = publication,
                 Version = isAmendment ? 0 : 1,
-                ReleaseId = release.Id
+                ReleaseId = release.Id,
             };
 
             var statisticsReleaseVersion = new StatsReleaseVersion
             {
                 Id = releaseVersion.Id,
-                PublicationId = releaseVersion.Publication.Id
+                PublicationId = releaseVersion.Publication.Id,
             };
 
             // This Methodology is scheduled to go out with the Release being deleted.
@@ -1647,8 +1866,10 @@ public abstract class ReleaseVersionServiceTests
                 Id = Guid.NewGuid(),
                 PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithReleaseVersionId = releaseVersion.Id,
-                Methodology =
-                    new Methodology { OwningPublicationTitle = "Methodology scheduled with this Release" },
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Methodology scheduled with this Release",
+                },
             };
 
             // This Methodology has nothing to do with the Release being deleted.
@@ -1666,27 +1887,23 @@ public abstract class ReleaseVersionServiceTests
             var userReleaseRole = new UserReleaseRole
             {
                 UserId = User.Id,
-                ReleaseVersion = releaseVersion
+                ReleaseVersion = releaseVersion,
             };
 
             var userReleaseInvite = new UserReleaseInvite { ReleaseVersion = releaseVersion };
 
-            var anotherRelease = new ReleaseVersion
-            {
-                Publication = publication,
-                Version = 0
-            };
+            var anotherRelease = new ReleaseVersion { Publication = publication, Version = 0 };
 
             var anotherUserReleaseRole = new UserReleaseRole
             {
                 Id = Guid.NewGuid(),
-                ReleaseVersion = anotherRelease
+                ReleaseVersion = anotherRelease,
             };
 
             var anotherUserReleaseInvite = new UserReleaseInvite
             {
                 Id = Guid.NewGuid(),
-                ReleaseVersion = anotherRelease
+                ReleaseVersion = anotherRelease,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1698,7 +1915,10 @@ public abstract class ReleaseVersionServiceTests
                 context.ReleaseVersions.AddRange(releaseVersion, anotherRelease);
                 context.UserReleaseRoles.AddRange(userReleaseRole, anotherUserReleaseRole);
                 context.UserReleaseInvites.AddRange(userReleaseInvite, anotherUserReleaseInvite);
-                context.MethodologyVersions.AddRange(methodologyScheduledWithRelease, methodologyScheduledWithAnotherRelease);
+                context.MethodologyVersions.AddRange(
+                    methodologyScheduledWithRelease,
+                    methodologyScheduledWithAnotherRelease
+                );
                 await context.SaveChangesAsync();
             }
 
@@ -1719,38 +1939,48 @@ public abstract class ReleaseVersionServiceTests
 
             var forceDeleteRelatedData = false;
 
-            releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
 
-            releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
 
-            dataSetUploadRepository.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository.Setup(mock =>
-                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+            releaseSubjectRepository
+                .Setup(mock =>
+                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData)
+                )
                 .Returns(Task.CompletedTask);
 
             privateCacheService
-                .Setup(mock => mock.DeleteCacheFolderAsync(
-                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
-            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
-                    releaseVersion.Id,
-                    forceDeleteRelatedData,
-                    It.IsAny<CancellationToken>()))
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(Unit.Instance);
 
-            userReleaseInviteRepository.Setup(mock => mock.RemoveByReleaseVersion(
-                    releaseVersion.Id,
-                    default))
+            userReleaseInviteRepository
+                .Setup(mock => mock.RemoveByReleaseVersion(releaseVersion.Id, default))
                 .Returns(Task.CompletedTask);
 
-            userReleaseRoleRepository.Setup(mock => mock.RemoveForReleaseVersion(
-                    releaseVersion.Id,
-                    default))
+            userReleaseRoleRepository
+                .Setup(mock => mock.RemoveForReleaseVersion(releaseVersion.Id, default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
@@ -1766,29 +1996,36 @@ public abstract class ReleaseVersionServiceTests
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object);
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                );
 
                 // Act
                 var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
 
                 // Assert
-                releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
-                    Times.Once);
+                releaseDataFilesService.Verify(
+                    mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                    Times.Once
+                );
 
-                releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
-                    Times.Once);
+                releaseFileService.Verify(
+                    mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                    Times.Once
+                );
 
-                dataSetUploadRepository.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, default),
-                    Times.Once);
+                dataSetUploadRepository.Verify(
+                    mock => mock.DeleteAll(releaseVersion.Id, default),
+                    Times.Once
+                );
 
-                releaseSubjectRepository.Verify(mock =>
+                releaseSubjectRepository.Verify(
+                    mock =>
                         mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
-                    Times.Once);
+                    Times.Once
+                );
 
-                VerifyAllMocks(privateCacheService,
+                VerifyAllMocks(
+                    privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
                     dataSetUploadRepository,
@@ -1803,8 +2040,7 @@ public abstract class ReleaseVersionServiceTests
                 {
                     // assert that hard-deleted entities no longer exist
                     var hardDeletedRelease = await contentDbContext
-                        .ReleaseVersions
-                        .IgnoreQueryFilters()
+                        .ReleaseVersions.IgnoreQueryFilters()
                         .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.Null(hardDeletedRelease);
@@ -1813,41 +2049,48 @@ public abstract class ReleaseVersionServiceTests
                 else
                 {
                     // assert that soft-deleted entities are no longer discoverable by default
-                    var softDeletedRelease = await contentDbContext
-                        .ReleaseVersions
-                        .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
+                    var softDeletedRelease =
+                        await contentDbContext.ReleaseVersions.FirstOrDefaultAsync(rv =>
+                            rv.Id == releaseVersion.Id
+                        );
 
                     Assert.Null(softDeletedRelease);
 
                     // assert that soft-deleted entities do not appear via references from other entities by default
                     var publicationWithoutDeletedRelease = await contentDbContext
-                        .Publications
-                        .Include(p => p.ReleaseVersions)
+                        .Publications.Include(p => p.ReleaseVersions)
                         .AsNoTracking()
                         .FirstAsync(p => p.Id == publication.Id);
 
                     Assert.Single(publicationWithoutDeletedRelease.ReleaseVersions);
-                    Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.ReleaseVersions[0].Id);
+                    Assert.Equal(
+                        anotherRelease.Id,
+                        publicationWithoutDeletedRelease.ReleaseVersions[0].Id
+                    );
 
                     // assert that soft-deleted entities have had their soft-deleted flag set to true
                     var updatedRelease = await contentDbContext
-                        .ReleaseVersions
-                        .IgnoreQueryFilters()
+                        .ReleaseVersions.IgnoreQueryFilters()
                         .FirstAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.True(updatedRelease.SoftDeleted);
 
                     // assert that soft-deleted entities appear via references from other entities when explicitly searched for
                     var publicationWithDeletedRelease = await contentDbContext
-                        .Publications
-                        .Include(p => p.ReleaseVersions)
+                        .Publications.Include(p => p.ReleaseVersions)
                         .IgnoreQueryFilters()
                         .AsNoTracking()
                         .FirstAsync(p => p.Id == publication.Id);
 
                     Assert.Equal(2, publicationWithDeletedRelease.ReleaseVersions.Count);
-                    Assert.Equal(updatedRelease.Id, publicationWithDeletedRelease.ReleaseVersions[0].Id);
-                    Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.ReleaseVersions[1].Id);
+                    Assert.Equal(
+                        updatedRelease.Id,
+                        publicationWithDeletedRelease.ReleaseVersions[0].Id
+                    );
+                    Assert.Equal(
+                        anotherRelease.Id,
+                        publicationWithDeletedRelease.ReleaseVersions[1].Id
+                    );
                     Assert.True(publicationWithDeletedRelease.ReleaseVersions[0].SoftDeleted);
                     Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
                 }
@@ -1856,29 +2099,37 @@ public abstract class ReleaseVersionServiceTests
                 // to do so
                 var retrievedMethodologyVersion =
                     await contentDbContext.MethodologyVersions.SingleAsync(m =>
-                        m.Id == methodologyScheduledWithRelease.Id);
+                        m.Id == methodologyScheduledWithRelease.Id
+                    );
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
-                Assert.InRange(DateTime.UtcNow
-                        .Subtract(retrievedMethodologyVersion.Updated!.Value).Milliseconds,
+                Assert.InRange(
+                    DateTime
+                        .UtcNow.Subtract(retrievedMethodologyVersion.Updated!.Value)
+                        .Milliseconds,
                     0,
-                    1500);
+                    1500
+                );
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
-                var unrelatedMethodology =
-                    await contentDbContext.MethodologyVersions.SingleAsync(
-                        m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                var unrelatedMethodology = await contentDbContext.MethodologyVersions.SingleAsync(
+                    m => m.Id == methodologyScheduledWithAnotherRelease.Id
+                );
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
-                Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
-                    unrelatedMethodology.ScheduledWithReleaseVersionId);
+                Assert.Equal(
+                    methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
+                    unrelatedMethodology.ScheduledWithReleaseVersionId
+                );
 
                 // We don't expect the Statistics ReleaseVersion to be deleted at this point, whether the
                 // Content ReleaseVersion is a draft or not. This needs to remain until the stored procedure
-                // that removes soft-deleted Subjects related to this ReleaseVersion is run. 
-                Assert.NotNull(await statisticsDbContext
-                    .ReleaseVersion
-                    .SingleOrDefaultAsync(rv => rv.Id == statisticsReleaseVersion.Id));
+                // that removes soft-deleted Subjects related to this ReleaseVersion is run.
+                Assert.NotNull(
+                    await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(rv =>
+                        rv.Id == statisticsReleaseVersion.Id
+                    )
+                );
             }
         }
 
@@ -1888,7 +2139,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() }
+                Publication = new Publication { Theme = new Theme() },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1903,27 +2154,32 @@ public abstract class ReleaseVersionServiceTests
 
             var forceDeletePublicApiData = false;
 
-            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
-                    releaseVersion.Id,
-                    forceDeletePublicApiData,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
-                {
-                    Errors = new ErrorViewModel[]
-                    {
-                        new()
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeletePublicApiData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new BadRequestObjectResult(
+                        new ValidationProblemViewModel
                         {
-                            Path = "error path",
-                            Code = "error code"
+                            Errors = new ErrorViewModel[]
+                            {
+                                new() { Path = "error path", Code = "error code" },
+                            },
                         }
-                    }
-                }));
+                    )
+                );
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     context,
-                    processorClient: processorClient.Object);
+                    processorClient: processorClient.Object
+                );
 
                 var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
 
@@ -1933,7 +2189,8 @@ public abstract class ReleaseVersionServiceTests
 
                 validationProblem.AssertHasError(
                     expectedPath: "error path",
-                    expectedCode: "error code");
+                    expectedCode: "error code"
+                );
             }
         }
 
@@ -1943,7 +2200,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() }
+                Publication = new Publication { Theme = new Theme() },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1958,20 +2215,26 @@ public abstract class ReleaseVersionServiceTests
 
             var forceDeletePublicApiData = false;
 
-            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
-                    releaseVersion.Id,
-                    forceDeletePublicApiData,
-                    It.IsAny<CancellationToken>()))
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeletePublicApiData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new HttpRequestException());
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     context,
-                    processorClient: processorClient.Object);
+                    processorClient: processorClient.Object
+                );
 
                 await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                    await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id));
+                    await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id)
+                );
 
                 VerifyAllMocks(processorClient);
             }
@@ -1990,15 +2253,8 @@ public abstract class ReleaseVersionServiceTests
 
             var publication = new Publication
             {
-                ReleaseSeries =
-                [
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ReleaseId = release.Id
-                    }
-                ],
-                Theme = new Theme()
+                ReleaseSeries = [new() { Id = Guid.NewGuid(), ReleaseId = release.Id }],
+                Theme = new Theme(),
             };
 
             var releaseVersion = new ReleaseVersion
@@ -2008,13 +2264,13 @@ public abstract class ReleaseVersionServiceTests
                 Version = 1,
                 ReleaseId = release.Id,
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
-                SoftDeleted = softDeleted
+                SoftDeleted = softDeleted,
             };
 
             var statisticsReleaseVersion = new StatsReleaseVersion
             {
                 Id = releaseVersion.Id,
-                PublicationId = releaseVersion.Publication.Id
+                PublicationId = releaseVersion.Publication.Id,
             };
 
             // This Methodology is scheduled to go out with the Release being deleted.
@@ -2023,8 +2279,10 @@ public abstract class ReleaseVersionServiceTests
                 Id = Guid.NewGuid(),
                 PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithReleaseVersionId = releaseVersion.Id,
-                Methodology =
-                    new Methodology { OwningPublicationTitle = "Methodology scheduled with this Release" },
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Methodology scheduled with this Release",
+                },
             };
 
             // This Methodology has nothing to do with the Release being deleted.
@@ -2042,27 +2300,23 @@ public abstract class ReleaseVersionServiceTests
             var userReleaseRole = new UserReleaseRole
             {
                 UserId = User.Id,
-                ReleaseVersion = releaseVersion
+                ReleaseVersion = releaseVersion,
             };
 
             var userReleaseInvite = new UserReleaseInvite { ReleaseVersion = releaseVersion };
 
-            var anotherRelease = new ReleaseVersion
-            {
-                Publication = publication,
-                Version = 0
-            };
+            var anotherRelease = new ReleaseVersion { Publication = publication, Version = 0 };
 
             var anotherUserReleaseRole = new UserReleaseRole
             {
                 Id = Guid.NewGuid(),
-                ReleaseVersion = anotherRelease
+                ReleaseVersion = anotherRelease,
             };
 
             var anotherUserReleaseInvite = new UserReleaseInvite
             {
                 Id = Guid.NewGuid(),
-                ReleaseVersion = anotherRelease
+                ReleaseVersion = anotherRelease,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2074,8 +2328,10 @@ public abstract class ReleaseVersionServiceTests
                 context.ReleaseVersions.AddRange(releaseVersion, anotherRelease);
                 context.UserReleaseRoles.AddRange(userReleaseRole, anotherUserReleaseRole);
                 context.UserReleaseInvites.AddRange(userReleaseInvite, anotherUserReleaseInvite);
-                context.MethodologyVersions.AddRange(methodologyScheduledWithRelease,
-                    methodologyScheduledWithAnotherRelease);
+                context.MethodologyVersions.AddRange(
+                    methodologyScheduledWithRelease,
+                    methodologyScheduledWithAnotherRelease
+                );
                 await context.SaveChangesAsync();
             }
 
@@ -2088,7 +2344,9 @@ public abstract class ReleaseVersionServiceTests
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
-            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                Strict
+            );
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
@@ -2097,42 +2355,54 @@ public abstract class ReleaseVersionServiceTests
 
             var forceDeleteRelatedData = true;
 
-            dataSetUploadRepository.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
 
-            releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
 
-            releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository.Setup(mock =>
-                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+            releaseSubjectRepository
+                .Setup(mock =>
+                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData)
+                )
                 .Returns(Task.CompletedTask);
 
-            releasePublishingStatusRepository.Setup(mock =>
-                    mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+            releasePublishingStatusRepository
+                .Setup(mock =>
+                    mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id })
+                )
                 .Returns(Task.CompletedTask);
 
             privateCacheService
-                .Setup(mock => mock.DeleteCacheFolderAsync(
-                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
-            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
-                    releaseVersion.Id,
-                    forceDeleteRelatedData,
-                    It.IsAny<CancellationToken>()))
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(Unit.Instance);
 
-            userReleaseInviteRepository.Setup(mock => mock.RemoveByReleaseVersion(
-                    releaseVersion.Id,
-                    default))
+            userReleaseInviteRepository
+                .Setup(mock => mock.RemoveByReleaseVersion(releaseVersion.Id, default))
                 .Returns(Task.CompletedTask);
 
-            userReleaseRoleRepository.Setup(mock => mock.RemoveForReleaseVersion(
-                    releaseVersion.Id,
-                    default))
+            userReleaseRoleRepository
+                .Setup(mock => mock.RemoveForReleaseVersion(releaseVersion.Id, default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
@@ -2149,23 +2419,30 @@ public abstract class ReleaseVersionServiceTests
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object);
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                );
 
                 // Act
-                var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
+                var result = await releaseVersionService.DeleteTestReleaseVersion(
+                    releaseVersion.Id
+                );
 
                 // Assert
-                releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
-                    Times.Once);
+                releaseDataFilesService.Verify(
+                    mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                    Times.Once
+                );
 
-                releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
-                    Times.Once);
+                releaseFileService.Verify(
+                    mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                    Times.Once
+                );
 
-                releaseSubjectRepository.Verify(mock =>
+                releaseSubjectRepository.Verify(
+                    mock =>
                         mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
-                    Times.Once);
+                    Times.Once
+                );
 
                 VerifyAllMocks(
                     privateCacheService,
@@ -2181,8 +2458,7 @@ public abstract class ReleaseVersionServiceTests
 
                 // assert that hard-deleted entities no longer exist
                 var hardDeletedRelease = await contentDbContext
-                    .ReleaseVersions
-                    .IgnoreQueryFilters()
+                    .ReleaseVersions.IgnoreQueryFilters()
                     .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                 Assert.Null(hardDeletedRelease);
@@ -2191,29 +2467,37 @@ public abstract class ReleaseVersionServiceTests
                 // to do so
                 var retrievedMethodologyVersion =
                     await contentDbContext.MethodologyVersions.SingleAsync(m =>
-                        m.Id == methodologyScheduledWithRelease.Id);
+                        m.Id == methodologyScheduledWithRelease.Id
+                    );
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
-                Assert.InRange(DateTime.UtcNow
-                        .Subtract(retrievedMethodologyVersion.Updated!.Value).Milliseconds,
+                Assert.InRange(
+                    DateTime
+                        .UtcNow.Subtract(retrievedMethodologyVersion.Updated!.Value)
+                        .Milliseconds,
                     0,
-                    1500);
+                    1500
+                );
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
-                var unrelatedMethodology =
-                    await contentDbContext.MethodologyVersions.SingleAsync(
-                        m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                var unrelatedMethodology = await contentDbContext.MethodologyVersions.SingleAsync(
+                    m => m.Id == methodologyScheduledWithAnotherRelease.Id
+                );
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
-                Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
-                    unrelatedMethodology.ScheduledWithReleaseVersionId);
+                Assert.Equal(
+                    methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
+                    unrelatedMethodology.ScheduledWithReleaseVersionId
+                );
 
                 // We expect the Statistics ReleaseVersion to be deleted immediately for test ReleaseVersions,
                 // as they do not use Subjects large enough to warrant using the stored procedure that cleans up
                 // soft-deleted Subjects.
-                Assert.Null(await statisticsDbContext
-                    .ReleaseVersion
-                    .SingleOrDefaultAsync(rv => rv.Id == statisticsReleaseVersion.Id));
+                Assert.Null(
+                    await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(rv =>
+                        rv.Id == statisticsReleaseVersion.Id
+                    )
+                );
             }
         }
 
@@ -2223,7 +2507,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() }
+                Publication = new Publication { Theme = new Theme() },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2238,21 +2522,25 @@ public abstract class ReleaseVersionServiceTests
 
             var forceDeletePublicApiData = true;
 
-            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
-                    releaseVersion.Id,
-                    forceDeletePublicApiData,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
-                {
-                    Errors = new ErrorViewModel[]
-                    {
-                        new()
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeletePublicApiData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new BadRequestObjectResult(
+                        new ValidationProblemViewModel
                         {
-                            Path = "error path",
-                            Code = "error code"
+                            Errors = new ErrorViewModel[]
+                            {
+                                new() { Path = "error path", Code = "error code" },
+                            },
                         }
-                    }
-                }));
+                    )
+                );
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
@@ -2260,7 +2548,8 @@ public abstract class ReleaseVersionServiceTests
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                processorClient: processorClient.Object);
+                processorClient: processorClient.Object
+            );
 
             var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
 
@@ -2270,7 +2559,8 @@ public abstract class ReleaseVersionServiceTests
 
             validationProblem.AssertHasError(
                 expectedPath: "error path",
-                expectedCode: "error code");
+                expectedCode: "error code"
+            );
         }
 
         [Fact]
@@ -2279,7 +2569,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() }
+                Publication = new Publication { Theme = new Theme() },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2294,10 +2584,14 @@ public abstract class ReleaseVersionServiceTests
 
             var forceDeletePublicApiData = true;
 
-            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
-                    releaseVersion.Id,
-                    forceDeletePublicApiData,
-                    It.IsAny<CancellationToken>()))
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeletePublicApiData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new HttpRequestException());
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
@@ -2306,10 +2600,12 @@ public abstract class ReleaseVersionServiceTests
             var releaseVersionService = BuildService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                processorClient: processorClient.Object);
+                processorClient: processorClient.Object
+            );
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id));
+                await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id)
+            );
 
             VerifyAllMocks(processorClient);
         }
@@ -2320,11 +2616,14 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success_NotLatestReleaseInPublication()
         {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025)
-                ]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
+                    ]
+                );
 
             var release2024 = publication.Releases.Single(r => r.Year == 2024);
             var release2025 = publication.Releases.Single(r => r.Year == 2025);
@@ -2332,175 +2631,9 @@ public abstract class ReleaseVersionServiceTests
             // Check the publication's latest published release version in the generated test data setup
             Assert.Equal(release2025.Versions[0].Id, publication.LatestPublishedReleaseVersionId);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.Publications.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
-
-            releaseCacheService.Setup(s => s.UpdateRelease(
-                release2024.Versions[0].Id,
-                publication.Slug,
-                release2024.Slug
-            )).ReturnsAsync(new ReleaseCacheViewModel(release2024.Versions[0].Id));
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = BuildService(contentDbContext: context,
-                    releaseCacheService: releaseCacheService.Object);
-
-                var result = await service
-                    .UpdateReleasePublished(
-                        release2024.Versions[0].Id,
-                        request
-                    );
-
-                VerifyAllMocks(releaseCacheService);
-
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == release2024.Versions[0].Id);
-
-                Assert.Equal(request.Published, saved.Published);
-            }
-        }
-
-        [Fact]
-        public async Task Success_LatestReleaseInPublication()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
-
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.Publications.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
-
-            releaseCacheService.Setup(s => s.UpdateRelease(
-                publication.Releases[0].Versions[0].Id,
-                publication.Slug,
-                publication.Releases[0].Slug
-            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
-
-            // As the release is the latest for the publication the separate cache entry for the publication's latest
-            // release should also be updated
-            releaseCacheService.Setup(s => s.UpdateRelease(
-                publication.Releases[0].Versions[0].Id,
-                publication.Slug,
-                null
-            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = BuildService(contentDbContext: context,
-                    releaseCacheService: releaseCacheService.Object);
-
-                var result = await service
-                    .UpdateReleasePublished(
-                        publication.Releases[0].Versions[0].Id,
-                        request
-                    );
-
-                VerifyAllMocks(releaseCacheService);
-
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == publication.Releases[0].Versions[0].Id);
-
-                Assert.Equal(request.Published, saved.Published);
-            }
-        }
-
-        [Fact]
-        public async Task ReleaseNotPublished()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
-
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.Publications.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = BuildService(context);
-
-                var result = await service
-                    .UpdateReleasePublished(
-                        publication.Releases[0].Versions[0].Id,
-                        request
-                    );
-
-                result.AssertBadRequest(ValidationErrorMessages.ReleaseNotPublished);
-            }
-        }
-
-        [Fact]
-        public async Task FutureDate()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
-
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(1) };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.Publications.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = BuildService(context);
-
-                var result = await service
-                    .UpdateReleasePublished(
-                        publication.Releases[0].Versions[0].Id,
-                        request
-                    );
-
-                result.AssertBadRequest(ReleasePublishedCannotBeFutureDate);
-            }
-        }
-
-        [Fact]
-        public async Task ConvertsPublishedFromLocalToUniversalTimezone()
-        {
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
-
             var request = new ReleasePublishedUpdateRequest
             {
-                Published = DateTime.Parse("2022-08-08T09:30:00.0000000+01:00") // DateTimeKind: Local
+                Published = DateTime.UtcNow.AddDays(-1),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2513,28 +2646,23 @@ public abstract class ReleaseVersionServiceTests
 
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
-            releaseCacheService.Setup(s => s.UpdateRelease(
-                publication.Releases[0].Versions[0].Id,
-                publication.Slug,
-                publication.Releases[0].Slug
-            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
-
-            releaseCacheService.Setup(s => s.UpdateRelease(
-                publication.Releases[0].Versions[0].Id,
-                publication.Slug,
-                null
-            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
+            releaseCacheService
+                .Setup(s =>
+                    s.UpdateRelease(release2024.Versions[0].Id, publication.Slug, release2024.Slug)
+                )
+                .ReturnsAsync(new ReleaseCacheViewModel(release2024.Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildService(contentDbContext: context,
-                    releaseCacheService: releaseCacheService.Object);
+                var service = BuildService(
+                    contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object
+                );
 
-                var result = await service
-                    .UpdateReleasePublished(
-                        publication.Releases[0].Versions[0].Id,
-                        request
-                    );
+                var result = await service.UpdateReleasePublished(
+                    release2024.Versions[0].Id,
+                    request
+                );
 
                 VerifyAllMocks(releaseCacheService);
 
@@ -2543,16 +2671,222 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == publication.Releases[0].Versions[0].Id);
+                var saved = await context.ReleaseVersions.SingleAsync(rv =>
+                    rv.Id == release2024.Versions[0].Id
+                );
+
+                Assert.Equal(request.Published, saved.Published);
+            }
+        }
+
+        [Fact]
+        public async Task Success_LatestReleaseInPublication()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(-1),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
+            releaseCacheService
+                .Setup(s =>
+                    s.UpdateRelease(
+                        publication.Releases[0].Versions[0].Id,
+                        publication.Slug,
+                        publication.Releases[0].Slug
+                    )
+                )
+                .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
+
+            // As the release is the latest for the publication the separate cache entry for the publication's latest
+            // release should also be updated
+            releaseCacheService
+                .Setup(s =>
+                    s.UpdateRelease(publication.Releases[0].Versions[0].Id, publication.Slug, null)
+                )
+                .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildService(
+                    contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object
+                );
+
+                var result = await service.UpdateReleasePublished(
+                    publication.Releases[0].Versions[0].Id,
+                    request
+                );
+
+                VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.ReleaseVersions.SingleAsync(rv =>
+                    rv.Id == publication.Releases[0].Versions[0].Id
+                );
+
+                Assert.Equal(request.Published, saved.Published);
+            }
+        }
+
+        [Fact]
+        public async Task ReleaseNotPublished()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+                );
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(-1),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildService(context);
+
+                var result = await service.UpdateReleasePublished(
+                    publication.Releases[0].Versions[0].Id,
+                    request
+                );
+
+                result.AssertBadRequest(ValidationErrorMessages.ReleaseNotPublished);
+            }
+        }
+
+        [Fact]
+        public async Task FutureDate()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(1),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildService(context);
+
+                var result = await service.UpdateReleasePublished(
+                    publication.Releases[0].Versions[0].Id,
+                    request
+                );
+
+                result.AssertBadRequest(ReleasePublishedCannotBeFutureDate);
+            }
+        }
+
+        [Fact]
+        public async Task ConvertsPublishedFromLocalToUniversalTimezone()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.Parse("2022-08-08T09:30:00.0000000+01:00"), // DateTimeKind: Local
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
+            releaseCacheService
+                .Setup(s =>
+                    s.UpdateRelease(
+                        publication.Releases[0].Versions[0].Id,
+                        publication.Slug,
+                        publication.Releases[0].Slug
+                    )
+                )
+                .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
+
+            releaseCacheService
+                .Setup(s =>
+                    s.UpdateRelease(publication.Releases[0].Versions[0].Id, publication.Slug, null)
+                )
+                .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildService(
+                    contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object
+                );
+
+                var result = await service.UpdateReleasePublished(
+                    publication.Releases[0].Versions[0].Id,
+                    request
+                );
+
+                VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.ReleaseVersions.SingleAsync(rv =>
+                    rv.Id == publication.Releases[0].Versions[0].Id
+                );
 
                 // The published date retrieved from the database should always be represented in UTC
                 // because of the conversion setup in the database context config.
                 Assert.Equal(DateTimeKind.Utc, saved.Published!.Value.Kind);
 
                 // Make sure the request date was converted to UTC before it was updated on the release
-                Assert.Equal(DateTime.Parse("2022-08-08T08:30:00Z", styles: DateTimeStyles.AdjustToUniversal),
-                    saved.Published);
+                Assert.Equal(
+                    DateTime.Parse(
+                        "2022-08-08T08:30:00Z",
+                        styles: DateTimeStyles.AdjustToUniversal
+                    ),
+                    saved.Published
+                );
             }
         }
     }
@@ -2566,28 +2900,38 @@ public abstract class ReleaseVersionServiceTests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var otherUser = _fixture.DefaultUser()
-                .Generate();
+            var otherUser = _fixture.DefaultUser().Generate();
 
             var publications = _fixture
                 .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-                            .Generate(1)),
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
-                            .Generate(1)),
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                            .Generate(1))
-                ))
+                .WithReleases(_ =>
+                    ListOf<Release>(
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                                    .Generate(1)
+                            ),
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
+                                    .Generate(1)
+                            ),
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                                    .Generate(1)
+                            )
+                    )
+                )
                 .GenerateList(4);
 
             var contributorReleaseRolesForUser = _fixture
@@ -2615,11 +2959,16 @@ public abstract class ReleaseVersionServiceTests
                 .DefaultUserReleaseRole()
                 .WithUser(otherUser)
                 .WithRole(ReleaseRole.Approver)
-                .WithReleaseVersions(publications.SelectMany(publication =>
-                    publication.Releases.SelectMany(r => r.Versions)))
+                .WithReleaseVersions(
+                    publications.SelectMany(publication =>
+                        publication.Releases.SelectMany(r => r.Versions)
+                    )
+                )
                 .GenerateList();
 
-            var higherReviewReleaseVersionWithApproverRoleForUser = publications[1].Releases[1].Versions.Single();
+            var higherReviewReleaseVersionWithApproverRoleForUser = publications[1]
+                .Releases[1]
+                .Versions.Single();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2648,7 +2997,8 @@ public abstract class ReleaseVersionServiceTests
                 // Publication.
                 Assert.Equal(
                     higherReviewReleaseVersionWithApproverRoleForUser.Publication.Title,
-                    viewModel.Publication!.Title);
+                    viewModel.Publication!.Title
+                );
             }
         }
 
@@ -2657,33 +3007,46 @@ public abstract class ReleaseVersionServiceTests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var otherUser = _fixture.DefaultUser()
-                .Generate();
+            var otherUser = _fixture.DefaultUser().Generate();
 
             var publications = _fixture
                 .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-                            .Generate(1)),
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
-                            .Generate(1)),
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                            .Generate(1)),
-                    _fixture.DefaultRelease()
-                        .WithVersions(_ => _fixture
-                            .DefaultReleaseVersion()
-                            .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
-                            .Generate(1))
-                ))
+                .WithReleases(_ =>
+                    ListOf<Release>(
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                                    .Generate(1)
+                            ),
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
+                                    .Generate(1)
+                            ),
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                                    .Generate(1)
+                            ),
+                        _fixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
+                                    .Generate(1)
+                            )
+                    )
+                )
                 .GenerateList(3);
 
             var ownerPublicationRoleForUser = _fixture
@@ -2714,13 +3077,20 @@ public abstract class ReleaseVersionServiceTests
                 .WithPublications(publications)
                 .GenerateList();
 
-            var releaseVersion1WithApproverRoleForUser = publications[1].Releases[1].Versions.Single();
-            var releaseVersion2WithApproverRoleForUser = publications[1].Releases[3].Versions.Single();
+            var releaseVersion1WithApproverRoleForUser = publications[1]
+                .Releases[1]
+                .Versions.Single();
+            var releaseVersion2WithApproverRoleForUser = publications[1]
+                .Releases[3]
+                .Versions.Single();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Publications.AddRange(publications);
-                context.UserPublicationRoles.AddRange(ownerPublicationRoleForUser, approverPublicationRoleForUser);
+                context.UserPublicationRoles.AddRange(
+                    ownerPublicationRoleForUser,
+                    approverPublicationRoleForUser
+                );
                 context.UserPublicationRoles.AddRange(ownerPublicationRolesForOtherUser);
                 context.UserPublicationRoles.AddRange(approverPublicationRolesForOtherUser);
                 await context.SaveChangesAsync();
@@ -2749,12 +3119,17 @@ public abstract class ReleaseVersionServiceTests
 
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_ => _fixture.DefaultRelease()
-                    .WithVersions(_ => _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
-                        .Generate(1))
-                    .Generate(1));
+                .WithReleases(_ =>
+                    _fixture
+                        .DefaultRelease()
+                        .WithVersions(_ =>
+                            _fixture
+                                .DefaultReleaseVersion()
+                                .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
+                                .Generate(1)
+                        )
+                        .Generate(1)
+                );
 
             var approverReleaseRolesForUser = _fixture
                 .DefaultUserReleaseRole()
@@ -2815,13 +3190,12 @@ public abstract class ReleaseVersionServiceTests
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
         bool enableReplacementOfPublicApiDataSets = false,
-        ILogger<ReleaseVersionService>? logger = null)
+        ILogger<ReleaseVersionService>? logger = null
+    )
     {
         var userService = AlwaysTrueUserService();
 
-        userService
-            .Setup(s => s.GetUserId())
-            .Returns(User.Id);
+        userService.Setup(s => s.GetUserId()).Returns(User.Id);
 
         return new ReleaseVersionService(
             contentDbContext,
@@ -2838,7 +3212,8 @@ public abstract class ReleaseVersionServiceTests
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
-            releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
+            releasePublishingStatusRepository
+                ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
@@ -2847,10 +3222,12 @@ public abstract class ReleaseVersionServiceTests
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
-            featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions
-            {
-                EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
-            }),
+            featureFlags: Microsoft.Extensions.Options.Options.Create(
+                new FeatureFlagsOptions
+                {
+                    EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets,
+                }
+            ),
             logger ?? Mock.Of<ILogger<ReleaseVersionService>>(Strict)
         );
     }

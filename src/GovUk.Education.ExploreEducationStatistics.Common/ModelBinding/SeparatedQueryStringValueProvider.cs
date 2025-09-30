@@ -28,8 +28,10 @@ public class SeparatedQueryStringValueProvider : QueryStringValueProvider
         if (result.Values.Any(x => x.IndexOf(_separator, StringComparison.OrdinalIgnoreCase) > 0))
         {
             var splitValues = new StringValues(
-                result.Values
-                    .SelectMany(x => x.Split(_separator, StringSplitOptions.RemoveEmptyEntries))
+                result
+                    .Values.SelectMany(x =>
+                        x.Split(_separator, StringSplitOptions.RemoveEmptyEntries)
+                    )
                     .ToArray()
             );
 

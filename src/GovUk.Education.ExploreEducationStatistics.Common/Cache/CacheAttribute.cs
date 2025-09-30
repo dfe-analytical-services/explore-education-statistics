@@ -17,8 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;
 public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 {
     private const BindingFlags ConstructorBindingFlags =
-        BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance |
-        BindingFlags.OptionalParamBinding;
+        BindingFlags.Instance
+        | BindingFlags.Public
+        | BindingFlags.CreateInstance
+        | BindingFlags.OptionalParamBinding;
 
     /// <summary>
     /// The base type of the cache key to use.
@@ -44,7 +46,7 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
     /// </para>
     /// </summary>
     public Type Key { get; }
-    
+
     /// <summary>
     /// Flag signifying that this caching attribute forces a cache update.
     /// When an attribute with this flag set is invoked, it will retrieve a fresh
@@ -69,11 +71,17 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
         if (!BaseKey.IsAssignableFrom(Key))
         {
-            throw new ArgumentException($"Cache key type {Key.GetPrettyFullName()} must be assignable to {BaseKey.GetPrettyFullName()}");
+            throw new ArgumentException(
+                $"Cache key type {Key.GetPrettyFullName()} must be assignable to {BaseKey.GetPrettyFullName()}"
+            );
         }
     }
 
-    protected override T WrapSync<T>(Func<object[], T> target, object[] args, AspectEventArgs eventArgs)
+    protected override T WrapSync<T>(
+        Func<object[], T> target,
+        object[] args,
+        AspectEventArgs eventArgs
+    )
     {
         var unboxedResultType = typeof(T).GetUnboxedResultTypePath().Last();
 
@@ -109,7 +117,11 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
         }
     }
 
-    protected override async Task<T> WrapAsync<T>(Func<object[], Task<T>> target, object[] args, AspectEventArgs eventArgs)
+    protected override async Task<T> WrapAsync<T>(
+        Func<object[], Task<T>> target,
+        object[] args,
+        AspectEventArgs eventArgs
+    )
     {
         var unboxedResultType = typeof(T).GetUnboxedResultTypePath().Last();
 
@@ -153,13 +165,15 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
     public abstract Task SetAsync(ICacheKey cacheKey, object value);
 
-    protected virtual T OnException<T>(AspectEventArgs eventArgs, Exception exception) => throw exception;
+    protected virtual T OnException<T>(AspectEventArgs eventArgs, Exception exception) =>
+        throw exception;
 
     public ICacheKey GetCacheKey(Type cacheKeyType, object[] methodArgs, MethodBase method)
     {
         // Order constructors from most parameters to least so that we can
         // try and find the constructor with the most matching arguments first.
-        var constructors = cacheKeyType.GetConstructors()
+        var constructors = cacheKeyType
+            .GetConstructors()
             .OrderByDescending(constructor => constructor.GetParameters().Length)
             .ToList();
 
@@ -174,15 +188,14 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
         var invokeArgs = parameters
             .Select(param =>
+            {
+                if (param.Param is not null)
                 {
-                    if (param.Param is not null)
-                    {
-                        return methodArgs[param.Param.Position];
-                    }
-
-                    return param.HasDefaultValue ? Type.Missing : null;
+                    return methodArgs[param.Param.Position];
                 }
-            )
+
+                return param.HasDefaultValue ? Type.Missing : null;
+            })
             .ToList();
 
         // For some reason, invoking with only missing values
@@ -209,22 +222,22 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
             $"Constructor returned null when it should instantiate {cacheKeyType.GetPrettyFullName()}"
         );
     }
+
     private static List<ParameterInfoScore> GetMatchingParams(
         List<ConstructorInfo> constructors,
         MethodBase method,
-        Type cacheKeyType)
+        Type cacheKeyType
+    )
     {
         var methodParams = method.GetParameters();
 
         var cacheKeyParams = methodParams
-            .Select(
-                param =>
-                {
-                    var attribute = param.GetCustomAttribute<CacheKeyParamAttribute>();
+            .Select(param =>
+            {
+                var attribute = param.GetCustomAttribute<CacheKeyParamAttribute>();
 
-                    return attribute is not null ? new CacheKeyParamInfo(param, attribute) : null;
-                }
-            )
+                return attribute is not null ? new CacheKeyParamInfo(param, attribute) : null;
+            })
             .WhereNotNull()
             .ToList();
 
@@ -234,9 +247,10 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
         {
             var constructorParams = constructor.GetParameters();
 
-            var constructorParamMatches = cacheKeyParams.Count > 0
-                ? MatchConstructorToCacheKeyParams(constructorParams, cacheKeyParams)
-                : MatchConstructorToMethodParams(constructorParams, methodParams);
+            var constructorParamMatches =
+                cacheKeyParams.Count > 0
+                    ? MatchConstructorToCacheKeyParams(constructorParams, cacheKeyParams)
+                    : MatchConstructorToMethodParams(constructorParams, methodParams);
 
             // Not enough arguments match the constructor's
             // parameters, so we should move onto the next one.
@@ -247,27 +261,26 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
             if (!constructorParamMatches.All(HasUnambiguousMatch))
             {
-                matchErrors.Add(GetMultipleMatchesError(constructorParams, constructorParamMatches));
+                matchErrors.Add(
+                    GetMultipleMatchesError(constructorParams, constructorParamMatches)
+                );
 
                 continue;
             }
 
             // The final param candidates that we select
             // to invoke the cache key constructor with.
-            var selectedParams = constructorParamMatches
-                .Select(matches => matches[0])
-                .ToList();
+            var selectedParams = constructorParamMatches.Select(matches => matches[0]).ToList();
 
-            var nonNullParams = selectedParams
-                .Select(param => param.Param)
-                .WhereNotNull()
-                .ToList();
+            var nonNullParams = selectedParams.Select(param => param.Param).WhereNotNull().ToList();
 
             var distinctNonNullParams = nonNullParams.Distinct().ToList();
 
             if (nonNullParams.Count != distinctNonNullParams.Count)
             {
-                matchErrors.Add(GetCandidateParametersError(constructorParams, distinctNonNullParams));
+                matchErrors.Add(
+                    GetCandidateParametersError(constructorParams, distinctNonNullParams)
+                );
 
                 continue;
             }
@@ -278,8 +291,8 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
         if (matchErrors.Any())
         {
             throw new AmbiguousMatchException(
-                $"No constructor for cache key {cacheKeyType.GetPrettyFullName()} could be unambiguously matched. Found the following problems: \n- " +
-                matchErrors.JoinToString("\n- ")
+                $"No constructor for cache key {cacheKeyType.GetPrettyFullName()} could be unambiguously matched. Found the following problems: \n- "
+                    + matchErrors.JoinToString("\n- ")
             );
         }
 
@@ -290,7 +303,8 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
     private static string GetMultipleMatchesError(
         ParameterInfo[] constructorParams,
-        List<List<ParameterInfoScore>> constructorParamMatches)
+        List<List<ParameterInfoScore>> constructorParamMatches
+    )
     {
         var positions = constructorParamMatches
             .Select((matches, index) => !HasUnambiguousMatch(matches) ? index.ToString() : "")
@@ -306,91 +320,106 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
     private static string GetCandidateParametersError(
         IEnumerable<ParameterInfo> constructorParams,
-        IEnumerable<ParameterInfo> selectedParams)
+        IEnumerable<ParameterInfo> selectedParams
+    )
     {
         var constructorString = constructorParams
             .Select(param => param.ToShortString())
             .JoinToString(", ");
 
-        var paramsString = selectedParams
-            .Select(param => param.ToShortString())
-            .JoinToString(", ");
+        var paramsString = selectedParams.Select(param => param.ToShortString()).JoinToString(", ");
 
-        return
-            $"Constructor ({constructorString}) has candidate parameters ({paramsString}) that could not be unambiguously matched";
+        return $"Constructor ({constructorString}) has candidate parameters ({paramsString}) that could not be unambiguously matched";
     }
 
     private static bool HasUnambiguousMatch(List<ParameterInfoScore> matches)
     {
-        return matches.Count > 1
-            ? matches[0].Score > matches[1].Score
-            : matches.Count == 1;
+        return matches.Count > 1 ? matches[0].Score > matches[1].Score : matches.Count == 1;
     }
 
     private static List<List<ParameterInfoScore>> MatchConstructorToCacheKeyParams(
         ParameterInfo[] constructorParams,
-        List<CacheKeyParamInfo> cacheKeyParams)
+        List<CacheKeyParamInfo> cacheKeyParams
+    )
     {
         return MatchConstructorToParams(
             constructorParams,
-            constructorParam =>  cacheKeyParams
-                .Where(param => constructorParam.ParameterType.IsAssignableFrom(param.Info.ParameterType))
-                .Select(param => ScoreCacheKeyParam(param, constructorParam))
-                .OrderByDescending(param => param.Score)
-                .ToList()
+            constructorParam =>
+                cacheKeyParams
+                    .Where(param =>
+                        constructorParam.ParameterType.IsAssignableFrom(param.Info.ParameterType)
+                    )
+                    .Select(param => ScoreCacheKeyParam(param, constructorParam))
+                    .OrderByDescending(param => param.Score)
+                    .ToList()
         );
     }
 
     private static List<List<ParameterInfoScore>> MatchConstructorToMethodParams(
         ParameterInfo[] constructorParams,
-        ParameterInfo[] methodParams)
+        ParameterInfo[] methodParams
+    )
     {
         return MatchConstructorToParams(
             constructorParams,
-            constructorParam => methodParams
-                .Where(param => constructorParam.ParameterType.IsAssignableFrom(param.ParameterType))
-                .Select(param => ScoreParam(param, constructorParam))
-                .OrderByDescending(param => param.Score)
-                .ToList()
+            constructorParam =>
+                methodParams
+                    .Where(param =>
+                        constructorParam.ParameterType.IsAssignableFrom(param.ParameterType)
+                    )
+                    .Select(param => ScoreParam(param, constructorParam))
+                    .OrderByDescending(param => param.Score)
+                    .ToList()
         );
     }
 
     private static List<List<ParameterInfoScore>> MatchConstructorToParams(
         ParameterInfo[] constructorParams,
-        Func<ParameterInfo, List<ParameterInfoScore>> matcher)
+        Func<ParameterInfo, List<ParameterInfoScore>> matcher
+    )
     {
-        return constructorParams.Select(
-                constructorParam =>
+        return constructorParams
+            .Select(constructorParam =>
+            {
+                var matches = matcher(constructorParam);
+
+                if (
+                    !matches.Any()
+                    && (constructorParam.IsNullable() || constructorParam.HasDefaultValue)
+                )
                 {
-                    var matches = matcher(constructorParam);
-
-                    if (!matches.Any() && (constructorParam.IsNullable() || constructorParam.HasDefaultValue))
-                    {
-                        matches.Add(new ParameterInfoScore(null, 0, constructorParam.HasDefaultValue));
-                    }
-
-                    return matches;
+                    matches.Add(new ParameterInfoScore(null, 0, constructorParam.HasDefaultValue));
                 }
-            )
+
+                return matches;
+            })
             .Where(paramMatches => paramMatches.Any())
             .ToList();
     }
 
     private static ParameterInfoScore ScoreCacheKeyParam(
         CacheKeyParamInfo cacheKeyParam,
-        ParameterInfo constructorParam)
+        ParameterInfo constructorParam
+    )
     {
         var (cacheKeyParamInfo, cacheKeyParamAttribute) = cacheKeyParam;
 
         var score = 0;
 
-        if (cacheKeyParamAttribute.Name is not null
-            && cacheKeyParamAttribute.Name == constructorParam.Name)
+        if (
+            cacheKeyParamAttribute.Name is not null
+            && cacheKeyParamAttribute.Name == constructorParam.Name
+        )
         {
             score += 1;
         }
-        else if (constructorParam.Name is not null
-                 && constructorParam.Name.Equals(cacheKeyParamInfo.Name, StringComparison.OrdinalIgnoreCase))
+        else if (
+            constructorParam.Name is not null
+            && constructorParam.Name.Equals(
+                cacheKeyParamInfo.Name,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
         {
             score += 1;
         }
@@ -400,12 +429,15 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
     private static ParameterInfoScore ScoreParam(
         ParameterInfo methodParam,
-        ParameterInfo constructorParam)
+        ParameterInfo constructorParam
+    )
     {
         var score = 0;
 
-        if (constructorParam.Name is not null
-            && constructorParam.Name.Equals(methodParam.Name, StringComparison.OrdinalIgnoreCase))
+        if (
+            constructorParam.Name is not null
+            && constructorParam.Name.Equals(methodParam.Name, StringComparison.OrdinalIgnoreCase)
+        )
         {
             score += 1;
         }
@@ -415,5 +447,9 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
 
     private record CacheKeyParamInfo(ParameterInfo Info, CacheKeyParamAttribute Attribute);
 
-    private record ParameterInfoScore(ParameterInfo? Param, int Score, bool HasDefaultValue = false);
+    private record ParameterInfoScore(
+        ParameterInfo? Param,
+        int Score,
+        bool HasDefaultValue = false
+    );
 }

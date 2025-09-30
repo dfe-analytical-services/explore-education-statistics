@@ -33,31 +33,27 @@ public class ManageContentPageServiceTests
     [Fact]
     public async Task GetManageContentPageViewModel()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithTheme(_dataFixture.DefaultTheme())
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
-            .WithLegacyLinks(_dataFixture.DefaultLegacyReleaseSeriesItem()
-                .Generate(2));
+            .WithLegacyLinks(_dataFixture.DefaultLegacyReleaseSeriesItem().Generate(2));
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        releaseVersion.PublishingOrganisations = _dataFixture.DefaultOrganisation()
-            .GenerateList(2);
+        releaseVersion.PublishingOrganisations = _dataFixture.DefaultOrganisation().GenerateList(2);
 
         releaseVersion.RelatedInformation.Add(
-            new Link
-            {
-                Description = "Related 1",
-                Url = "https://related-1"
-            });
+            new Link { Description = "Related 1", Url = "https://related-1" }
+        );
 
         var unattachedDataBlockParent = new DataBlockParent
         {
             LatestPublishedVersion = new DataBlockVersion
             {
                 ReleaseVersionId = releaseVersion.Id,
-                Id = Guid.NewGuid()
-            }
+                Id = Guid.NewGuid(),
+            },
         };
 
         var keyStatDataBlockParent = new DataBlockParent
@@ -66,7 +62,7 @@ public class ManageContentPageServiceTests
             {
                 ReleaseVersionId = releaseVersion.Id,
                 Id = Guid.NewGuid(),
-            }
+            },
         };
 
         var inContentDataBlockVersionId = Guid.NewGuid();
@@ -77,53 +73,44 @@ public class ManageContentPageServiceTests
             {
                 ReleaseVersionId = releaseVersion.Id,
                 Id = inContentDataBlockVersionId,
-                ContentBlock = new DataBlock
-                {
-                    Id = inContentDataBlockVersionId,
-                    Order = 1
-                }
-            }
+                ContentBlock = new DataBlock { Id = inContentDataBlockVersionId, Order = 1 },
+            },
         };
 
         releaseVersion.KeyStatistics =
         [
-            new KeyStatisticText
-            {
-                Order = 1
-            },
+            new KeyStatisticText { Order = 1 },
             new KeyStatisticDataBlock
             {
                 Order = 0,
-                DataBlockId = keyStatDataBlockParent.LatestPublishedVersion!.Id
-            }
+                DataBlockId = keyStatDataBlockParent.LatestPublishedVersion!.Id,
+            },
         ];
 
         List<DataBlockViewModel> unattachedDataBlocks =
         [
-            new()
-            {
-                Id = unattachedDataBlockParent.LatestPublishedVersion!.Id
-            }
+            new() { Id = unattachedDataBlockParent.LatestPublishedVersion!.Id },
         ];
 
         var files = _dataFixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
-            .WithFiles([
-                _dataFixture.DefaultFile(Ancillary),
-                _dataFixture.DefaultFile(FileType.Data)
-            ])
+            .WithFiles(
+                [_dataFixture.DefaultFile(Ancillary), _dataFixture.DefaultFile(FileType.Data)]
+            )
             .Generate(2)
             .Select(rf => rf.ToFileInfo())
             .ToList();
 
         var methodology = _dataFixture
             .DefaultMethodology()
-            .WithMethodologyVersions(_dataFixture
-                .DefaultMethodologyVersion()
-                .ForIndex(0, mv => mv.SetApprovalStatus(MethodologyApprovalStatus.Approved))
-                .ForIndex(1, mv => mv.SetAlternativeTitle("Alternative title"))
-                .Generate(2))
+            .WithMethodologyVersions(
+                _dataFixture
+                    .DefaultMethodologyVersion()
+                    .ForIndex(0, mv => mv.SetApprovalStatus(MethodologyApprovalStatus.Approved))
+                    .ForIndex(1, mv => mv.SetAlternativeTitle("Alternative title"))
+                    .Generate(2)
+            )
             .FinishWith(m => m.LatestPublishedVersion = m.Versions[0])
             .WithOwningPublication(publication)
             .Generate();
@@ -134,14 +121,10 @@ public class ManageContentPageServiceTests
             Type = ContentSectionType.Generic,
             Content =
             [
-                new HtmlBlock
-                {
-                    Order = 0,
-                    Body = "Test block 1"
-                },
-                inContentDataBlockParent.LatestPublishedVersion!.ContentBlock
+                new HtmlBlock { Order = 0, Body = "Test block 1" },
+                inContentDataBlockParent.LatestPublishedVersion!.ContentBlock,
             ],
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -150,59 +133,71 @@ public class ManageContentPageServiceTests
         {
             contentDbContext.Publications.Add(publication);
             contentDbContext.DataBlockParents.AddRange(
-                unattachedDataBlockParent, keyStatDataBlockParent, inContentDataBlockParent);
+                unattachedDataBlockParent,
+                keyStatDataBlockParent,
+                inContentDataBlockParent
+            );
             contentDbContext.ContentSections.AddRange(
                 new ContentSection
                 {
                     ReleaseVersion = releaseVersion,
-                    Type = ContentSectionType.Headlines
+                    Type = ContentSectionType.Headlines,
                 },
                 new ContentSection
                 {
                     ReleaseVersion = releaseVersion,
-                    Type = ContentSectionType.KeyStatisticsSecondary
+                    Type = ContentSectionType.KeyStatisticsSecondary,
                 },
                 new ContentSection
                 {
                     ReleaseVersion = releaseVersion,
-                    Type = ContentSectionType.ReleaseSummary
+                    Type = ContentSectionType.ReleaseSummary,
                 },
                 new ContentSection
                 {
                     ReleaseVersion = releaseVersion,
-                    Type = ContentSectionType.RelatedDashboards
+                    Type = ContentSectionType.RelatedDashboards,
                 },
-                genericContentSection);
+                genericContentSection
+            );
 
             await contentDbContext.SaveChangesAsync();
         }
 
         var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
         var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
-        dataBlockService.Setup(mock =>
-                mock.GetUnattachedDataBlocks(releaseVersion.Id))
+        dataBlockService
+            .Setup(mock => mock.GetUnattachedDataBlocks(releaseVersion.Id))
             .ReturnsAsync(unattachedDataBlocks);
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.GetLatestVersionByPublication(publication.Id))
+        methodologyVersionRepository
+            .Setup(mock => mock.GetLatestVersionByPublication(publication.Id))
             .ReturnsAsync(methodology.Versions);
 
-        releaseFileService.Setup(mock =>
-                mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
+        releaseFileService
+            .Setup(mock => mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
             .ReturnsAsync(files);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupManageContentPageService(contentDbContext: contentDbContext,
+            var service = SetupManageContentPageService(
+                contentDbContext: contentDbContext,
                 dataBlockService: dataBlockService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                releaseFileService: releaseFileService.Object);
+                releaseFileService: releaseFileService.Object
+            );
 
             var result = await service.GetManageContentPageViewModel(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+            MockUtils.VerifyAllMocks(
+                dataBlockService,
+                methodologyVersionRepository,
+                releaseFileService
+            );
 
             var viewModel = result.AssertRight();
 
@@ -212,35 +207,51 @@ public class ManageContentPageServiceTests
 
             Assert.NotNull(contentRelease);
             Assert.Equal(releaseVersion.Id, contentRelease.Id);
-            Assert.Equal(releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
-                contentRelease.CoverageTitle);
+            Assert.Equal(
+                releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
+                contentRelease.CoverageTitle
+            );
             Assert.True(contentRelease.HasDataGuidance);
             Assert.True(contentRelease.HasPreReleaseAccessList);
 
             Assert.Equal(2, contentRelease.KeyStatistics.Count);
             Assert.Equal(releaseVersion.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
             Assert.Equal(0, contentRelease.KeyStatistics[0].Order);
-            var originalKeyStatDataBlock = (releaseVersion.KeyStatistics[1] as KeyStatisticDataBlock)!;
-            var keyStatDataBlockViewModel =
-                Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
-            Assert.Equal(originalKeyStatDataBlock.DataBlockId, keyStatDataBlockViewModel.DataBlockId);
+            var originalKeyStatDataBlock = (
+                releaseVersion.KeyStatistics[1] as KeyStatisticDataBlock
+            )!;
+            var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(
+                contentRelease.KeyStatistics[0]
+            );
+            Assert.Equal(
+                originalKeyStatDataBlock.DataBlockId,
+                keyStatDataBlockViewModel.DataBlockId
+            );
             Assert.Equal(
                 keyStatDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
-                keyStatDataBlockViewModel.DataBlockParentId);
+                keyStatDataBlockViewModel.DataBlockParentId
+            );
 
             Assert.Equal(releaseVersion.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
             Assert.Equal(1, contentRelease.KeyStatistics[1].Order);
             Assert.IsType<KeyStatisticTextViewModel>(contentRelease.KeyStatistics[1]);
 
-            Assert.Equal(releaseVersion.KeyStatisticsSecondarySection.Id,
-                contentRelease.KeyStatisticsSecondarySection.Id);
+            Assert.Equal(
+                releaseVersion.KeyStatisticsSecondarySection.Id,
+                contentRelease.KeyStatisticsSecondarySection.Id
+            );
             Assert.Equal(releaseVersion.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
-            Assert.Equal(releaseVersion.RelatedDashboardsSection.Id, contentRelease.RelatedDashboardsSection.Id);
+            Assert.Equal(
+                releaseVersion.RelatedDashboardsSection.Id,
+                contentRelease.RelatedDashboardsSection.Id
+            );
             Assert.True(contentRelease.LatestRelease);
             Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
             Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
-            Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(),
-                contentRelease.PublishScheduled);
+            Assert.Equal(
+                releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(),
+                contentRelease.PublishScheduled
+            );
             Assert.Equal(releaseVersion.Published, contentRelease.Published);
             Assert.Equal(publication.Id, contentRelease.PublicationId);
             Assert.Equal(releaseVersion.Release.Slug, contentRelease.Slug);
@@ -250,16 +261,20 @@ public class ManageContentPageServiceTests
             Assert.Equal(releaseVersion.Release.YearTitle, contentRelease.YearTitle);
             Assert.Empty(contentRelease.Updates);
 
-            Assert.Equal(releaseVersion.PublishingOrganisations.Count,
-                contentRelease.PublishingOrganisations.Count);
-            Assert.All(releaseVersion.PublishingOrganisations,
+            Assert.Equal(
+                releaseVersion.PublishingOrganisations.Count,
+                contentRelease.PublishingOrganisations.Count
+            );
+            Assert.All(
+                releaseVersion.PublishingOrganisations,
                 (expectedOrganisation, index) =>
                 {
                     var actualOrganisation = contentRelease.PublishingOrganisations[index];
                     Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
                     Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
                     Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
-                });
+                }
+            );
 
             var contentDownloadFiles = contentRelease.DownloadFiles.ToList();
             Assert.Equal(2, contentDownloadFiles.Count);
@@ -288,14 +303,19 @@ public class ManageContentPageServiceTests
 
             Assert.Equal(2, contentSections[0].Content.Count);
 
-            var htmlBlockViewModel = Assert.IsType<HtmlBlockViewModel>(contentSections[0].Content[0]);
+            var htmlBlockViewModel = Assert.IsType<HtmlBlockViewModel>(
+                contentSections[0].Content[0]
+            );
             Assert.Equal("Test block 1", htmlBlockViewModel.Body);
 
-            var dataBlockViewModel = Assert.IsType<DataBlockViewModel>(contentSections[0].Content[1]);
+            var dataBlockViewModel = Assert.IsType<DataBlockViewModel>(
+                contentSections[0].Content[1]
+            );
             Assert.Equal(inContentDataBlockVersionId, dataBlockViewModel.Id);
             Assert.Equal(
                 inContentDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
-                dataBlockViewModel.DataBlockParentId);
+                dataBlockViewModel.DataBlockParentId
+            );
 
             var contentPublication = contentRelease.Publication;
 
@@ -314,25 +334,39 @@ public class ManageContentPageServiceTests
 
             Assert.False(contentPublicationReleaseSeries[0].IsLegacyLink);
             Assert.Equal(releaseVersion.Release.Id, contentPublicationReleaseSeries[0].ReleaseId);
-            Assert.Equal(releaseVersion.Release.Slug, contentPublicationReleaseSeries[0].ReleaseSlug);
-            Assert.Equal(releaseVersion.Release.Title, contentPublicationReleaseSeries[0].Description);
+            Assert.Equal(
+                releaseVersion.Release.Slug,
+                contentPublicationReleaseSeries[0].ReleaseSlug
+            );
+            Assert.Equal(
+                releaseVersion.Release.Title,
+                contentPublicationReleaseSeries[0].Description
+            );
             Assert.Null(contentPublicationReleaseSeries[0].LegacyLinkUrl);
 
             Assert.True(contentPublicationReleaseSeries[1].IsLegacyLink);
             Assert.Null(contentPublicationReleaseSeries[1].ReleaseId);
             Assert.Null(contentPublicationReleaseSeries[1].ReleaseSlug);
-            Assert.Equal(publication.ReleaseSeries[1].LegacyLinkDescription,
-                contentPublicationReleaseSeries[1].Description);
-            Assert.Equal(publication.ReleaseSeries[1].LegacyLinkUrl,
-                contentPublicationReleaseSeries[1].LegacyLinkUrl);
+            Assert.Equal(
+                publication.ReleaseSeries[1].LegacyLinkDescription,
+                contentPublicationReleaseSeries[1].Description
+            );
+            Assert.Equal(
+                publication.ReleaseSeries[1].LegacyLinkUrl,
+                contentPublicationReleaseSeries[1].LegacyLinkUrl
+            );
 
             Assert.True(contentPublicationReleaseSeries[2].IsLegacyLink);
             Assert.Null(contentPublicationReleaseSeries[2].ReleaseId);
             Assert.Null(contentPublicationReleaseSeries[2].ReleaseSlug);
-            Assert.Equal(publication.ReleaseSeries[2].LegacyLinkDescription,
-                contentPublicationReleaseSeries[2].Description);
-            Assert.Equal(publication.ReleaseSeries[2].LegacyLinkUrl,
-                contentPublicationReleaseSeries[2].LegacyLinkUrl);
+            Assert.Equal(
+                publication.ReleaseSeries[2].LegacyLinkDescription,
+                contentPublicationReleaseSeries[2].Description
+            );
+            Assert.Equal(
+                publication.ReleaseSeries[2].LegacyLinkUrl,
+                contentPublicationReleaseSeries[2].LegacyLinkUrl
+            );
 
             Assert.Equal(2, contentPublication.Methodologies.Count);
             Assert.Equal(methodology.Versions[0].Id, contentPublication.Methodologies[0].Id);
@@ -345,11 +379,14 @@ public class ManageContentPageServiceTests
     [Fact]
     public async Task GetManageContentPageViewModel_IsPrerelease()
     {
-        Publication publication = _dataFixture.DefaultPublication()
-            .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(_ =>
+                [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+            )
             .WithTheme(_dataFixture.DefaultTheme());
 
-        var releaseVersion = publication.Releases.Single().Versions.Single(); 
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         var previousMethodologyVersion = new MethodologyVersion
         {
@@ -397,59 +434,54 @@ public class ManageContentPageServiceTests
             contentDbContext.Publications.Add(publication);
             contentDbContext.MethodologyVersions.AddRange(methodologyVersions);
             contentDbContext.ContentSections.AddRange(
-                new()
-                {
-                    Type = ContentSectionType.Headlines,
-                    ReleaseVersion = releaseVersion
-                },
+                new() { Type = ContentSectionType.Headlines, ReleaseVersion = releaseVersion },
                 new()
                 {
                     Type = ContentSectionType.KeyStatisticsSecondary,
-                    ReleaseVersion = releaseVersion
+                    ReleaseVersion = releaseVersion,
                 },
-                new()
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    ReleaseVersion = releaseVersion
-                },
+                new() { Type = ContentSectionType.ReleaseSummary, ReleaseVersion = releaseVersion },
                 new()
                 {
                     Type = ContentSectionType.RelatedDashboards,
-                    ReleaseVersion = releaseVersion
+                    ReleaseVersion = releaseVersion,
                 },
-                new()
-                {
-                    Type = ContentSectionType.Generic,
-                    ReleaseVersion = releaseVersion
-                });
+                new() { Type = ContentSectionType.Generic, ReleaseVersion = releaseVersion }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
         var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
         var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
-        dataBlockService.Setup(mock =>
-                mock.GetUnattachedDataBlocks(releaseVersion.Id))
+        dataBlockService
+            .Setup(mock => mock.GetUnattachedDataBlocks(releaseVersion.Id))
             .ReturnsAsync(new List<DataBlockViewModel>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.GetLatestVersionByPublication(publication.Id))
+        methodologyVersionRepository
+            .Setup(mock => mock.GetLatestVersionByPublication(publication.Id))
             .ReturnsAsync(methodologyVersions);
 
-        releaseFileService.Setup(mock =>
-                mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
+        releaseFileService
+            .Setup(mock => mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
             .ReturnsAsync(new List<FileInfo>());
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupManageContentPageService(contentDbContext: contentDbContext,
+            var service = SetupManageContentPageService(
+                contentDbContext: contentDbContext,
                 dataBlockService: dataBlockService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                releaseFileService: releaseFileService.Object);
+                releaseFileService: releaseFileService.Object
+            );
 
             var result = await service.GetManageContentPageViewModel(
-                releaseVersion.Id, isPrerelease: true);
+                releaseVersion.Id,
+                isPrerelease: true
+            );
 
             var viewModel = result.AssertRight();
 
@@ -467,29 +499,38 @@ public class ManageContentPageServiceTests
             Assert.Equal("Methodology 3 title", contentPublication.Methodologies[2].Title);
         }
 
-        MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        MockUtils.VerifyAllMocks(
+            dataBlockService,
+            methodologyVersionRepository,
+            releaseFileService
+        );
     }
 
     [Fact]
     public async Task GetManageContentPageViewModel_MapsBlocksCorrectly()
     {
-        var user1 = _dataFixture.DefaultUser()
+        var user1 = _dataFixture
+            .DefaultUser()
             .WithFirstName("Jane")
             .WithLastName("Doe")
             .WithEmail("jane@test.com")
             .Generate();
 
-        var user2 = _dataFixture.DefaultUser()
+        var user2 = _dataFixture
+            .DefaultUser()
             .WithFirstName("Rob")
             .WithLastName("Rowe")
             .WithEmail("rob@test.com")
             .Generate();
 
-        Publication publication = _dataFixture.DefaultPublication()
-            .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(_ =>
+                [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+            )
             .WithTheme(_dataFixture.DefaultTheme());
 
-        var releaseVersion = publication.Releases.Single().Versions.Single(); 
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         var summaryContentSection = new ContentSection
         {
@@ -505,7 +546,7 @@ public class ManageContentPageServiceTests
                         {
                             Content = "Comment 1",
                             Created = DateTime.Parse("2022-03-16T12:00:00Z"),
-                            CreatedBy = user1
+                            CreatedBy = user1,
                         },
                         new Comment
                         {
@@ -513,11 +554,11 @@ public class ManageContentPageServiceTests
                             Created = DateTime.Parse("2022-03-12T12:00:00Z"),
                             CreatedBy = user2,
                             Resolved = DateTime.Parse("2022-03-14T12:00:00Z"),
-                            ResolvedBy = user1
+                            ResolvedBy = user1,
                         }
-                    )
-                }
-            }
+                    ),
+                },
+            },
         };
         var genericContentSection = new ContentSection
         {
@@ -531,8 +572,8 @@ public class ManageContentPageServiceTests
                     Body = "Test block 2",
                     Locked = DateTime.Parse("2022-03-16T12:00:00Z"),
                     LockedBy = user1,
-                }
-            }
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -546,19 +587,21 @@ public class ManageContentPageServiceTests
         }
 
         var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
         var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
-        dataBlockService.Setup(mock =>
-                mock.GetUnattachedDataBlocks(releaseVersion.Id))
+        dataBlockService
+            .Setup(mock => mock.GetUnattachedDataBlocks(releaseVersion.Id))
             .ReturnsAsync(new List<DataBlockViewModel>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.GetLatestVersionByPublication(publication.Id))
+        methodologyVersionRepository
+            .Setup(mock => mock.GetLatestVersionByPublication(publication.Id))
             .ReturnsAsync(new List<MethodologyVersion>());
 
-        releaseFileService.Setup(mock =>
-                mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
+        releaseFileService
+            .Setup(mock => mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
             .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(new List<FileInfo>()));
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -567,17 +610,22 @@ public class ManageContentPageServiceTests
                 contentDbContext: contentDbContext,
                 dataBlockService: dataBlockService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                releaseFileService: releaseFileService.Object);
+                releaseFileService: releaseFileService.Object
+            );
 
             var result = await service.GetManageContentPageViewModel(releaseVersion.Id);
 
             var viewModel = result.AssertRight();
 
-            dataBlockService.Verify(mock =>
-                mock.GetUnattachedDataBlocks(releaseVersion.Id), Times.Once);
+            dataBlockService.Verify(
+                mock => mock.GetUnattachedDataBlocks(releaseVersion.Id),
+                Times.Once
+            );
 
-            releaseFileService.Verify(mock =>
-                mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data), Times.Once);
+            releaseFileService.Verify(
+                mock => mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data),
+                Times.Once
+            );
 
             var contentRelease = viewModel.Release;
 
@@ -587,7 +635,9 @@ public class ManageContentPageServiceTests
             Assert.Null(summaryContentSection.Heading);
             Assert.Single(summaryContentSection.Content);
 
-            var summarySectionBlock = Assert.IsType<HtmlBlockViewModel>(contentReleaseSummary.Content[0]);
+            var summarySectionBlock = Assert.IsType<HtmlBlockViewModel>(
+                contentReleaseSummary.Content[0]
+            );
             Assert.Equal(summaryContentSection.Content[0].Id, summarySectionBlock.Id);
             Assert.Equal("Test block 1", summarySectionBlock.Body);
 
@@ -597,19 +647,28 @@ public class ManageContentPageServiceTests
 
             Assert.Equal("Comment 2", summarySectionBlock.Comments[0].Content);
 
-            Assert.Equal(DateTime.Parse("2022-03-12T12:00:00Z"), summarySectionBlock.Comments[0].Created);
+            Assert.Equal(
+                DateTime.Parse("2022-03-12T12:00:00Z"),
+                summarySectionBlock.Comments[0].Created
+            );
             Assert.Equal(user2.Id, summarySectionBlock.Comments[0].CreatedBy.Id);
             Assert.Equal("Rob Rowe", summarySectionBlock.Comments[0].CreatedBy.DisplayName);
             Assert.Equal("rob@test.com", summarySectionBlock.Comments[0].CreatedBy.Email);
 
-            Assert.Equal(DateTime.Parse("2022-03-14T12:00:00Z"), summarySectionBlock.Comments[0].Resolved);
+            Assert.Equal(
+                DateTime.Parse("2022-03-14T12:00:00Z"),
+                summarySectionBlock.Comments[0].Resolved
+            );
             Assert.Equal(user1.Id, summarySectionBlock.Comments[0].ResolvedBy.Id);
             Assert.Equal("Jane Doe", summarySectionBlock.Comments[0].ResolvedBy.DisplayName);
             Assert.Equal("jane@test.com", summarySectionBlock.Comments[0].ResolvedBy.Email);
 
             Assert.Equal("Comment 1", summarySectionBlock.Comments[1].Content);
 
-            Assert.Equal(DateTime.Parse("2022-03-16T12:00:00Z"), summarySectionBlock.Comments[1].Created);
+            Assert.Equal(
+                DateTime.Parse("2022-03-16T12:00:00Z"),
+                summarySectionBlock.Comments[1].Created
+            );
             Assert.Equal(user1.Id, summarySectionBlock.Comments[1].CreatedBy.Id);
             Assert.Equal("Jane Doe", summarySectionBlock.Comments[1].CreatedBy.DisplayName);
             Assert.Equal("jane@test.com", summarySectionBlock.Comments[1].CreatedBy.Email);
@@ -621,7 +680,9 @@ public class ManageContentPageServiceTests
 
             Assert.Single(contentReleaseContent[0].Content);
 
-            var contentBlock = Assert.IsType<HtmlBlockViewModel>(contentReleaseContent[0].Content[0]);
+            var contentBlock = Assert.IsType<HtmlBlockViewModel>(
+                contentReleaseContent[0].Content[0]
+            );
             Assert.Equal("Test block 2", contentBlock.Body);
 
             Assert.Equal(DateTime.Parse("2022-03-16T12:00:00Z"), contentBlock.Locked);
@@ -630,7 +691,11 @@ public class ManageContentPageServiceTests
             Assert.Equal("jane@test.com", contentBlock.LockedBy!.Email);
         }
 
-        MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        MockUtils.VerifyAllMocks(
+            dataBlockService,
+            methodologyVersionRepository,
+            releaseFileService
+        );
     }
 
     private static ManageContentPageService SetupManageContentPageService(
@@ -641,7 +706,8 @@ public class ManageContentPageServiceTests
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IReleaseFileService? releaseFileService = null,
         IReleaseRepository? releaseRepository = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             contentDbContext,

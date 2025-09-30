@@ -41,24 +41,32 @@ public class ReleaseInviteServicePermissionTest
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
                 tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
-                CanUpdateSpecificReleaseRole)
+                CanUpdateSpecificReleaseRole
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (
+                    var contentDbContext = InMemoryApplicationDbContext(contentDbContextId)
+                )
                 {
                     await contentDbContext.AddAsync(publication);
                     await contentDbContext.SaveChangesAsync();
                 }
 
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (
+                    var contentDbContext = InMemoryApplicationDbContext(contentDbContextId)
+                )
                 {
                     var service = SetupReleaseInviteService(
                         contentDbContext: contentDbContext,
-                        userService: userService.Object);
-                    return await service.InviteContributor("test@test.com",
+                        userService: userService.Object
+                    );
+                    return await service.InviteContributor(
+                        "test@test.com",
                         publication.Id,
-                        ListOf(releaseVersion.Id));
+                        ListOf(releaseVersion.Id)
+                    );
                 }
             });
     }
@@ -76,24 +84,32 @@ public class ReleaseInviteServicePermissionTest
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
                 tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
-                CanUpdateSpecificReleaseRole)
+                CanUpdateSpecificReleaseRole
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (
+                    var contentDbContext = InMemoryApplicationDbContext(contentDbContextId)
+                )
                 {
                     await contentDbContext.AddAsync(publication);
                     await contentDbContext.SaveChangesAsync();
                 }
 
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (
+                    var contentDbContext = InMemoryApplicationDbContext(contentDbContextId)
+                )
                 {
                     var service = SetupReleaseInviteService(
                         contentDbContext: contentDbContext,
-                        userService: userService.Object);
-                    return await service.RemoveByPublication("test@test.com",
+                        userService: userService.Object
+                    );
+                    return await service.RemoveByPublication(
+                        "test@test.com",
                         publication.Id,
-                        ReleaseRole.Contributor);
+                        ReleaseRole.Contributor
+                    );
                 }
             });
     }
@@ -103,9 +119,9 @@ public class ReleaseInviteServicePermissionTest
     {
         var email = "test@test.com";
 
-        var releaseVersion = _fixture.DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(_fixture.DefaultPublication()))
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -118,11 +134,14 @@ public class ReleaseInviteServicePermissionTest
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>();
         userReleaseInviteRepository
-            .Setup(m => m.RemoveByPublicationAndEmail(
-                releaseVersion.Release.PublicationId,
-                email,
-                default,
-                ReleaseRole.Contributor))
+            .Setup(m =>
+                m.RemoveByPublicationAndEmail(
+                    releaseVersion.Release.PublicationId,
+                    email,
+                    default,
+                    ReleaseRole.Contributor
+                )
+            )
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -130,12 +149,14 @@ public class ReleaseInviteServicePermissionTest
         {
             var service = SetupReleaseInviteService(
                 contentDbContext: contentDbContext,
-                userReleaseInviteRepository: userReleaseInviteRepository.Object);
+                userReleaseInviteRepository: userReleaseInviteRepository.Object
+            );
 
             var result = await service.RemoveByPublication(
                 email,
                 releaseVersion.Release.PublicationId,
-                ReleaseRole.Contributor);
+                ReleaseRole.Contributor
+            );
 
             result.AssertRight();
         }
@@ -156,7 +177,8 @@ public class ReleaseInviteServicePermissionTest
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
-        IOptions<NotifyOptions>? notifyOptions = null)
+        IOptions<NotifyOptions>? notifyOptions = null
+    )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();

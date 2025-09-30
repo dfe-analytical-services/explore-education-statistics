@@ -28,62 +28,76 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                new GetLatestReleaseCacheKey(PublicationSlug),
-                typeof(ReleaseViewModel)))
+            .Setup(s =>
+                s.GetItem(new GetLatestReleaseCacheKey(PublicationSlug), typeof(ReleaseViewModel))
+            )
             .Returns((object?)null);
 
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
-        var publicationCacheViewModel = new PublicationCacheViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var publicationCacheViewModel = new PublicationCacheViewModel { Id = Guid.NewGuid() };
         var releaseCacheViewModel = BuildReleaseCacheViewModel();
 
-        methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
             .ReturnsAsync(methodologySummaries);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null))
+        releaseCacheService
+            .Setup(mock => mock.GetRelease(PublicationSlug, null))
             .ReturnsAsync(releaseCacheViewModel);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
+            10,
+            CrontabSchedule.Parse(HalfHourlyExpirySchedule)
+        );
 
-        MemoryCacheService
-            .Setup(s => s.SetItem<object>(
+        MemoryCacheService.Setup(s =>
+            s.SetItem<object>(
                 new GetLatestReleaseCacheKey(PublicationSlug),
                 It.IsAny<ReleaseViewModel>(),
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null));
+                null
+            )
+        );
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
 
         var result = await controller.GetLatestRelease(PublicationSlug);
 
-        VerifyAllMocks(methodologyCacheService,
+        VerifyAllMocks(
+            methodologyCacheService,
             publicationCacheService,
             releaseCacheService,
-            MemoryCacheService);
+            MemoryCacheService
+        );
 
-        result.AssertOkResult(new ReleaseViewModel(releaseCacheViewModel,
-            new PublicationViewModel(publicationCacheViewModel, methodologySummaries)));
+        result.AssertOkResult(
+            new ReleaseViewModel(
+                releaseCacheViewModel,
+                new PublicationViewModel(publicationCacheViewModel, methodologySummaries)
+            )
+        );
     }
 
     [Fact]
     public async Task GetLatestRelease_CachedEntryExists()
     {
-        var releaseViewModel = new ReleaseViewModel(BuildReleaseCacheViewModel(), new PublicationViewModel());
+        var releaseViewModel = new ReleaseViewModel(
+            BuildReleaseCacheViewModel(),
+            new PublicationViewModel()
+        );
 
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                new GetLatestReleaseCacheKey(PublicationSlug),
-                typeof(ReleaseViewModel)))
+            .Setup(s =>
+                s.GetItem(new GetLatestReleaseCacheKey(PublicationSlug), typeof(ReleaseViewModel))
+            )
             .Returns(releaseViewModel);
 
         var controller = BuildReleaseController();
@@ -102,62 +116,82 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
-                typeof(ReleaseViewModel)))
+            .Setup(s =>
+                s.GetItem(
+                    new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
+                    typeof(ReleaseViewModel)
+                )
+            )
             .Returns((object?)null);
 
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
-        var publicationCacheViewModel = new PublicationCacheViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var publicationCacheViewModel = new PublicationCacheViewModel { Id = Guid.NewGuid() };
         var releaseCacheViewModel = BuildReleaseCacheViewModel();
 
-        methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
             .ReturnsAsync(methodologySummaries);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
+        releaseCacheService
+            .Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(releaseCacheViewModel);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            15, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
+            15,
+            CrontabSchedule.Parse(HalfHourlyExpirySchedule)
+        );
 
-        MemoryCacheService
-            .Setup(s => s.SetItem<object>(
+        MemoryCacheService.Setup(s =>
+            s.SetItem<object>(
                 new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
                 It.IsAny<ReleaseViewModel>(),
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null));
+                null
+            )
+        );
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
 
         var result = await controller.GetRelease(PublicationSlug, ReleaseSlug);
 
-        VerifyAllMocks(methodologyCacheService,
+        VerifyAllMocks(
+            methodologyCacheService,
             publicationCacheService,
             releaseCacheService,
-            MemoryCacheService);
+            MemoryCacheService
+        );
 
-        result.AssertOkResult(new ReleaseViewModel(releaseCacheViewModel,
-            new PublicationViewModel(publicationCacheViewModel, methodologySummaries)));
+        result.AssertOkResult(
+            new ReleaseViewModel(
+                releaseCacheViewModel,
+                new PublicationViewModel(publicationCacheViewModel, methodologySummaries)
+            )
+        );
     }
 
     [Fact]
     public async Task GetRelease_CachedEntryExists()
     {
-        var releaseViewModel = new ReleaseViewModel(BuildReleaseCacheViewModel(), new PublicationViewModel());
+        var releaseViewModel = new ReleaseViewModel(
+            BuildReleaseCacheViewModel(),
+            new PublicationViewModel()
+        );
 
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
-                typeof(ReleaseViewModel)))
+            .Setup(s =>
+                s.GetItem(
+                    new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
+                    typeof(ReleaseViewModel)
+                )
+            )
             .Returns(releaseViewModel);
 
         var controller = BuildReleaseController();

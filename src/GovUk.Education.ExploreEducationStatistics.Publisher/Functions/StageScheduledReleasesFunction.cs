@@ -19,7 +19,8 @@ public class StageScheduledReleasesFunction(
     IOptions<AppOptions> appOptions,
     TimeProvider timeProvider,
     IQueueService queueService,
-    IReleasePublishingStatusService releasePublishingStatusService)
+    IReleasePublishingStatusService releasePublishingStatusService
+)
 {
     private readonly AppOptions _appOptions = appOptions.Value;
 
@@ -33,7 +34,8 @@ public class StageScheduledReleasesFunction(
     [Function(nameof(StageScheduledReleases))]
     public async Task StageScheduledReleases(
         [TimerTrigger("%App:StageScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
@@ -41,26 +43,32 @@ public class StageScheduledReleasesFunction(
         var timeZone = timeProvider.LocalTimeZone; // UTC or the time zone in WEBSITE_TIME_ZONE if specified
 
         // Get the next scheduled publishing time using the cron expression of the PublishScheduledReleases function
-        var nextScheduledPublishingTime = CronExpressionUtil.GetNextOccurrence(
-            cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
-            from: now,
-            timeZone
-        ) ?? throw new CronNoFutureOccurrenceException(
-            cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
-            from: now,
-            timeZone);
+        var nextScheduledPublishingTime =
+            CronExpressionUtil.GetNextOccurrence(
+                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                from: now,
+                timeZone
+            )
+            ?? throw new CronNoFutureOccurrenceException(
+                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                from: now,
+                timeZone
+            );
 
         // Fetch releases scheduled for publishing before or on the next run time
-        var releasesToBeStaged = await releasePublishingStatusService
-            .GetScheduledReleasesForPublishingRelativeToDate(
+        var releasesToBeStaged =
+            await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
                 DateComparison.BeforeOrOn,
-                nextScheduledPublishingTime);
+                nextScheduledPublishingTime
+            );
 
         await QueueReleaseFilesAndContentTasks(releasesToBeStaged);
 
-        logger.LogInformation("{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
+        logger.LogInformation(
+            "{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            releasesToBeStaged.ToReleaseVersionIdsString());
+            releasesToBeStaged.ToReleaseVersionIdsString()
+        );
     }
 
     /// <summary>
@@ -77,39 +85,50 @@ public class StageScheduledReleasesFunction(
     [Function(nameof(StageScheduledReleaseVersionsImmediately))]
     public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleaseVersionsImmediately(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
+        var releaseVersionIds = (
+            await request.GetJsonBody<ManualTriggerRequest>()
+        )?.ReleaseVersionIds;
 
         var now = timeProvider.GetLocalNow();
         var startOfToday = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset);
 
-        var releasesToBeStaged = releaseVersionIds?.Length > 0
-            ? await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
-                DateComparison.AfterOrOn,
-                startOfToday)
-            : await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
-                DateComparison.Before,
-                startOfToday.AddDays(1));
+        var releasesToBeStaged =
+            releaseVersionIds?.Length > 0
+                ? await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
+                    DateComparison.AfterOrOn,
+                    startOfToday
+                )
+                : await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
+                    DateComparison.Before,
+                    startOfToday.AddDays(1)
+                );
 
-        var selectedReleasesToBeStaged = releaseVersionIds?.Length > 0
-            ? releasesToBeStaged
-                .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
-                .ToList()
-            : releasesToBeStaged;
+        var selectedReleasesToBeStaged =
+            releaseVersionIds?.Length > 0
+                ? releasesToBeStaged
+                    .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
+                    .ToList()
+                : releasesToBeStaged;
 
         await QueueReleaseFilesAndContentTasks(selectedReleasesToBeStaged);
 
-        logger.LogInformation("{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
+        logger.LogInformation(
+            "{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            selectedReleasesToBeStaged.ToReleaseVersionIdsString());
+            selectedReleasesToBeStaged.ToReleaseVersionIdsString()
+        );
 
         return new ManualTriggerResponse(selectedReleasesToBeStaged.ToReleaseVersionIds());
     }
 
-    private async Task QueueReleaseFilesAndContentTasks(IReadOnlyList<ReleasePublishingKey> scheduled)
+    private async Task QueueReleaseFilesAndContentTasks(
+        IReadOnlyList<ReleasePublishingKey> scheduled
+    )
     {
         if (!scheduled.Any())
         {
@@ -119,8 +138,11 @@ public class StageScheduledReleasesFunction(
         await scheduled
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async key =>
-                await releasePublishingStatusService.UpdateState(key,
-                    ReleasePublishingStatusStates.ScheduledReleaseStartedState));
+                await releasePublishingStatusService.UpdateState(
+                    key,
+                    ReleasePublishingStatusStates.ScheduledReleaseStartedState
+                )
+            );
 
         await queueService.QueuePublishReleaseFilesMessages(scheduled);
         await queueService.QueueStageReleaseContentMessages(scheduled);

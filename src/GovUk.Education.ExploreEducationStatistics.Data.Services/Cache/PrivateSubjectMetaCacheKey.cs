@@ -19,8 +19,5 @@ public record PrivateSubjectMetaCacheKey : IBlobCacheKey
 
     public IBlobContainer Container => PrivateContent;
 
-    public string Key => PrivateContentSubjectMetaPath(
-        ReleaseVersionId,
-        SubjectId
-    );
+    public string Key => PrivateContentSubjectMetaPath(ReleaseVersionId, SubjectId);
 }

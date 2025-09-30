@@ -25,7 +25,8 @@ public record PublicationDto
 
     public static PublicationDto FromPublication(
         Publication publication,
-        Publication? supersededByPublication) =>
+        Publication? supersededByPublication
+    ) =>
         new()
         {
             Id = publication.Id,
@@ -33,15 +34,18 @@ public record PublicationDto
             Summary = publication.Summary,
             Title = publication.Title,
             Contact = PublicationContactDto.FromContact(publication.Contact),
-            LatestRelease = PublicationLatestReleaseDto.FromRelease(publication.LatestPublishedReleaseVersion!.Release),
+            LatestRelease = PublicationLatestReleaseDto.FromRelease(
+                publication.LatestPublishedReleaseVersion!.Release
+            ),
             NextReleaseDate = publication.LatestPublishedReleaseVersion!.NextReleaseDate is null
                 ? null
                 : PublicationNextReleaseDateDto.FromPartialDate(
-                    publication.LatestPublishedReleaseVersion.NextReleaseDate),
+                    publication.LatestPublishedReleaseVersion.NextReleaseDate
+                ),
             SupersededByPublication = supersededByPublication is null
                 ? null
                 : PublicationSupersededByPublicationDto.FromPublication(supersededByPublication),
-            Theme = PublicationThemeDto.FromTheme(publication.Theme)
+            Theme = PublicationThemeDto.FromTheme(publication.Theme),
         };
 }
 
@@ -64,7 +68,7 @@ public record PublicationContactDto
             ContactName = contact.ContactName,
             ContactTelNo = contact.ContactTelNo,
             TeamEmail = contact.TeamEmail,
-            TeamName = contact.TeamName
+            TeamName = contact.TeamName,
         };
 }
 
@@ -82,8 +86,12 @@ public record PublicationNextReleaseDateDto
             : new PublicationNextReleaseDateDto
             {
                 Year = int.Parse(partialDate.Year),
-                Month = string.IsNullOrWhiteSpace(partialDate.Month) ? null : int.Parse(partialDate.Month),
-                Day = string.IsNullOrWhiteSpace(partialDate.Day) ? null : int.Parse(partialDate.Day)
+                Month = string.IsNullOrWhiteSpace(partialDate.Month)
+                    ? null
+                    : int.Parse(partialDate.Month),
+                Day = string.IsNullOrWhiteSpace(partialDate.Day)
+                    ? null
+                    : int.Parse(partialDate.Day),
             };
 }
 
@@ -100,7 +108,7 @@ public record PublicationLatestReleaseDto
         {
             Id = release.Id,
             Slug = release.Slug,
-            Title = release.Title
+            Title = release.Title,
         };
 }
 
@@ -117,7 +125,7 @@ public record PublicationSupersededByPublicationDto
         {
             Id = publication.Id,
             Slug = publication.Slug,
-            Title = publication.Title
+            Title = publication.Title,
         };
 }
 
@@ -134,6 +142,6 @@ public record PublicationThemeDto
         {
             Id = theme.Id,
             Summary = theme.Summary,
-            Title = theme.Title
+            Title = theme.Title,
         };
 }

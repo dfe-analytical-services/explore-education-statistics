@@ -15,15 +15,19 @@ public class PreReleaseController : ControllerBase
     private readonly IPreReleaseUserService _preReleaseUserService;
     private readonly IPreReleaseSummaryService _preReleaseSummaryService;
 
-    public PreReleaseController(IPreReleaseUserService preReleaseUserService,
-        IPreReleaseSummaryService preReleaseSummaryService)
+    public PreReleaseController(
+        IPreReleaseUserService preReleaseUserService,
+        IPreReleaseSummaryService preReleaseSummaryService
+    )
     {
         _preReleaseUserService = preReleaseUserService;
         _preReleaseSummaryService = preReleaseSummaryService;
     }
 
     [HttpGet("release/{releaseVersionId:guid}/prerelease-users")]
-    public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
+    public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetPreReleaseUsers(
+        Guid releaseVersionId
+    )
     {
         return await _preReleaseUserService
             .GetPreReleaseUsers(releaseVersionId)
@@ -33,7 +37,8 @@ public class PreReleaseController : ControllerBase
     [HttpGet("release/{releaseVersionId:guid}/prerelease")]
     public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummary(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await _preReleaseSummaryService
             .GetPreReleaseSummaryViewModel(releaseVersionId, cancellationToken)
@@ -42,7 +47,9 @@ public class PreReleaseController : ControllerBase
 
     [HttpPost("release/{releaseVersionId:guid}/prerelease-users-plan")]
     public async Task<ActionResult<PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
-        Guid releaseVersionId, [FromBody] PreReleaseUserInviteViewModel viewModel)
+        Guid releaseVersionId,
+        [FromBody] PreReleaseUserInviteViewModel viewModel
+    )
     {
         return await _preReleaseUserService
             .GetPreReleaseUsersInvitePlan(releaseVersionId, viewModel.Emails)
@@ -51,7 +58,9 @@ public class PreReleaseController : ControllerBase
 
     [HttpPost("release/{releaseVersionId:guid}/prerelease-users")]
     public async Task<ActionResult<List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
-        Guid releaseVersionId, [FromBody] PreReleaseUserInviteViewModel viewModel)
+        Guid releaseVersionId,
+        [FromBody] PreReleaseUserInviteViewModel viewModel
+    )
     {
         return await _preReleaseUserService
             .InvitePreReleaseUsers(releaseVersionId, viewModel.Emails)
@@ -60,7 +69,9 @@ public class PreReleaseController : ControllerBase
 
     [HttpDelete("release/{releaseVersionId:guid}/prerelease-users")]
     public async Task<ActionResult> RemovePreReleaseUser(
-        Guid releaseVersionId, [FromBody] PreReleaseUserRemoveRequest request)
+        Guid releaseVersionId,
+        [FromBody] PreReleaseUserRemoveRequest request
+    )
     {
         return await _preReleaseUserService
             .RemovePreReleaseUser(releaseVersionId, request.Email)

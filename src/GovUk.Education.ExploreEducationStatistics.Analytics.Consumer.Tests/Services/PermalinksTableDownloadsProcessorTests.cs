@@ -10,12 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBase
 {
-    protected override string ResourcesPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "DataApi",
-        "TableToolDownloads",
-        "FromPermalinkPage");
+    protected override string ResourcesPath =>
+        Path.Combine(
+            Assembly.GetExecutingAssembly().GetDirectoryPath(),
+            "Resources",
+            "DataApi",
+            "TableToolDownloads",
+            "FromPermalinkPage"
+        );
 
     public class ProcessTests : PermalinksTableDownloadsProcessorTests
     {
@@ -29,12 +31,12 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -47,12 +49,9 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             var captureTableToolDownloadLine = Assert.Single(csvDownloadReportRows);
 
-            await AssertReportRow(
-                captureTableToolDownloadLine,
-                "Example1.json",
-                1);
+            await AssertReportRow(captureTableToolDownloadLine, "Example1.json", 1);
         }
-        
+
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
@@ -64,12 +63,12 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -82,15 +81,9 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             Assert.Equal(2, csvDownloadReportRows.Count);
 
-            await AssertReportRow(
-                csvDownloadReportRows[0],
-                "Example1.json",
-                1);
+            await AssertReportRow(csvDownloadReportRows[0], "Example1.json", 1);
 
-            await AssertReportRow(
-                csvDownloadReportRows[1],
-                "Example2.json",
-                1);
+            await AssertReportRow(csvDownloadReportRows[1], "Example2.json", 1);
         }
 
         [Fact]
@@ -114,19 +107,20 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             var csvDownloadReportRow = Assert.Single(csvDownloadReportRows);
 
-            await AssertReportRow(
-                csvDownloadReportRow,
-                "Example1.json",
-                2);
+            await AssertReportRow(csvDownloadReportRow, "Example1.json", 2);
         }
 
-        private static async Task<List<CapturePermaLinkTableDownloadLine>> ReadReport(DuckDbConnection duckDbConnection,
-            string reportFile)
+        private static async Task<List<CapturePermaLinkTableDownloadLine>> ReadReport(
+            DuckDbConnection duckDbConnection,
+            string reportFile
+        )
         {
-            return (await duckDbConnection
+            return (
+                await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
-                    .QueryAsync<CapturePermaLinkTableDownloadLine>())
-                    .OrderBy(row => row.PermalinkTitle)
+                    .QueryAsync<CapturePermaLinkTableDownloadLine>()
+            )
+                .OrderBy(row => row.PermalinkTitle)
                 .ToList();
         }
     }
@@ -135,13 +129,15 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
     {
         return new PermalinksTableDownloadsProcessor(
             pathResolver: PathResolver,
-            workflow: Workflow);
+            workflow: Workflow
+        );
     }
 
     private async Task AssertReportRow(
         CapturePermaLinkTableDownloadLine row,
         string jsonFileName,
-        int numRequests)
+        int numRequests
+    )
     {
         var jsonText = await File.ReadAllTextAsync(Path.Combine(ResourcesPath, jsonFileName));
 
@@ -160,8 +156,12 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
         public required string PermalinkTitle { get; init; }
         public required TableDownloadFormat DownloadFormat { get; init; }
     }
-    
-    public enum TableDownloadFormat { CSV, ODS }
+
+    public enum TableDownloadFormat
+    {
+        CSV,
+        ODS,
+    }
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record CapturePermaLinkTableDownloadLine

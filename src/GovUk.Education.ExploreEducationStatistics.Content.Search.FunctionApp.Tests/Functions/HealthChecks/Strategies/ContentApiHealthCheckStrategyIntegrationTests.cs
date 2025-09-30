@@ -8,18 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper output)
 {
-    private const string ContentApiUrl = "https://content.explore-education-statistics.service.gov.uk/";
+    private const string ContentApiUrl =
+        "https://content.explore-education-statistics.service.gov.uk/";
 
-    [Fact(Skip = "Will attempt to call the production content API. Change ContentApiUrl to your favourite endpoint.")]
+    [Fact(
+        Skip = "Will attempt to call the production content API. Change ContentApiUrl to your favourite endpoint."
+    )]
     public async Task WhenContentApiIsAvailable_ThenReturnsHealthy()
     {
         // ARRANGE
         var sut = new ContentApiHealthCheckStrategy(
-            Microsoft.Extensions.Options.Options.Create(
-                new ContentApiOptions()),
-                new NullLogger<ContentApiHealthCheckStrategy>(),
-            () => new ContentApiClient(
-                new HttpClient { BaseAddress = new Uri(ContentApiUrl) }));
+            Microsoft.Extensions.Options.Options.Create(new ContentApiOptions()),
+            new NullLogger<ContentApiHealthCheckStrategy>(),
+            () => new ContentApiClient(new HttpClient { BaseAddress = new Uri(ContentApiUrl) })
+        );
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);

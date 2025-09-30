@@ -23,9 +23,18 @@ public abstract class NamingUtilTests
         [InlineData("title", "title")]
         [InlineData("TITLE", "title")]
         [InlineData("A sentence with spaces", "a-sentence-with-spaces")]
-        [InlineData("A - sentence -  with - - dashes  -  and -- spaces", "a-sentence-with-dashes-and-spaces")]
-        [InlineData("A sentence with !@£('\\) non alpha numeric characters", "a-sentence-with-non-alpha-numeric-characters")]
-        [InlineData("A sentence with non alpha numeric characters at the end !@£('\\)", "a-sentence-with-non-alpha-numeric-characters-at-the-end")]
+        [InlineData(
+            "A - sentence -  with - - dashes  -  and -- spaces",
+            "a-sentence-with-dashes-and-spaces"
+        )]
+        [InlineData(
+            "A sentence with !@£('\\) non alpha numeric characters",
+            "a-sentence-with-non-alpha-numeric-characters"
+        )]
+        [InlineData(
+            "A sentence with non alpha numeric characters at the end !@£('\\)",
+            "a-sentence-with-non-alpha-numeric-characters-at-the-end"
+        )]
         [InlineData("a sentence with      big     spaces   ", "a-sentence-with-big-spaces")]
         [InlineData("a sentence with numbers 1 2 3 and 4", "a-sentence-with-numbers-1-2-3-and-4")]
         public void EdgeCaseTitles(string title, string expectedSlug)

@@ -18,15 +18,21 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Configuration.AddJsonFile(
     path: "appsettings.Local.json",
     optional: true,
-    reloadOnChange: false);
-
+    reloadOnChange: false
+);
 
 // Logging
 
 builder.Logging.AddConsole();
 builder.Logging.AddApplicationInsights();
-builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Program).FullName, LogLevel.Debug);
-builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).FullName, LogLevel.Debug);
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(
+    typeof(Program).FullName,
+    LogLevel.Debug
+);
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(
+    typeof(Startup).FullName,
+    LogLevel.Debug
+);
 builder.Logging.AddAzureWebAppDiagnostics();
 
 var startup = new Startup(builder.Configuration, builder.Environment);

@@ -15,8 +15,5 @@ public partial class EES3369_RemoveUnusedDatabaseTypes : Migration
         migrationBuilder.Sql("DROP TYPE TimePeriodListType");
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

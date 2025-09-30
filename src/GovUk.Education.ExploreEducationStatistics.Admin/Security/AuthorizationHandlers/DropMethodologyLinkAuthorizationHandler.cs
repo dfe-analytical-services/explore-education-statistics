@@ -7,9 +7,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class DropMethodologyLinkRequirement : IAuthorizationRequirement
-{
-}
+public class DropMethodologyLinkRequirement : IAuthorizationRequirement { }
 
 public class DropMethodologyLinkAuthorizationHandler
     : AuthorizationHandler<DropMethodologyLinkRequirement, PublicationMethodology>
@@ -17,7 +15,8 @@ public class DropMethodologyLinkAuthorizationHandler
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public DropMethodologyLinkAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
@@ -25,11 +24,12 @@ public class DropMethodologyLinkAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DropMethodologyLinkRequirement requirement,
-        PublicationMethodology link)
+        PublicationMethodology link
+    )
     {
         if (link.Owner)
         {
-            // No user is allowed to drop the link between a methodology and its owning publication 
+            // No user is allowed to drop the link between a methodology and its owning publication
             return;
         }
 
@@ -39,12 +39,14 @@ public class DropMethodologyLinkAuthorizationHandler
             context.Succeed(requirement);
             return;
         }
-        
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    link.PublicationId,
-                    Owner))
+
+        if (
+            await _authorizationHandlerService.HasRolesOnPublication(
+                context.User.GetUserId(),
+                link.PublicationId,
+                Owner
+            )
+        )
         {
             context.Succeed(requirement);
         }

@@ -13,15 +13,15 @@ public partial class EES4668_RenameReleaseVersionIndexes : Migration
         migrationBuilder.RenameIndex(
             name: "PK_Release",
             table: "ReleaseVersion",
-            newName: "PK_ReleaseVersion");
+            newName: "PK_ReleaseVersion"
+        );
 
         migrationBuilder.RenameIndex(
             name: "IX_Release_PublicationId",
             table: "ReleaseVersion",
-            newName: "IX_ReleaseVersion_PublicationId");
+            newName: "IX_ReleaseVersion_PublicationId"
+        );
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

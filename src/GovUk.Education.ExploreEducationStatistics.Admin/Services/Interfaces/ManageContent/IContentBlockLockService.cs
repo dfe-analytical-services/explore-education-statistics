@@ -7,7 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
 public interface IContentBlockLockService
 {
-    Task<Either<ActionResult, ContentBlockLockViewModel>> LockContentBlock(Guid id, bool force = false);
+    Task<Either<ActionResult, ContentBlockLockViewModel>> LockContentBlock(
+        Guid id,
+        bool force = false
+    );
 
     Task<Either<ActionResult, Unit>> UnlockContentBlock(Guid id, bool force = false);
 }

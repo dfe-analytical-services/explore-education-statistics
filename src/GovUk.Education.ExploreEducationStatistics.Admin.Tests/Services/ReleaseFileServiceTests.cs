@@ -45,9 +45,7 @@ public class ReleaseFileServiceTests : IDisposable
         _filePaths.ForEach(System.IO.File.Delete);
     }
 
-    private readonly User _user = new DataFixture()
-        .DefaultUser()
-        .WithId(Guid.NewGuid());
+    private readonly User _user = new DataFixture().DefaultUser().WithId(Guid.NewGuid());
 
     [Fact]
     public async Task Delete()
@@ -61,8 +59,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var chartFile = new ReleaseFile
@@ -72,8 +70,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart
-            }
+                Type = Chart,
+            },
         };
 
         var imageFile = new ReleaseFile
@@ -83,8 +81,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -98,31 +96,36 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(releaseVersionId: releaseVersion.Id,
-                ancillaryFile.File.Id);
+            var result = await service.Delete(
+                releaseVersionId: releaseVersion.Id,
+                ancillaryFile.File.Id
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             Assert.True(result.IsRight);
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()),
+                Times.Once
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
-            Assert.Null(
-                await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
+            Assert.Null(await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
 
             // Check that other files remain untouched
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(chartFile.Id));
@@ -137,10 +140,7 @@ public class ReleaseFileServiceTests : IDisposable
     {
         var releaseVersion = new ReleaseVersion();
 
-        var amendmentReleaseVersion = new ReleaseVersion
-        {
-            PreviousVersionId = releaseVersion.Id
-        };
+        var amendmentReleaseVersion = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
 
         var ancillaryFile = new File
         {
@@ -149,16 +149,12 @@ public class ReleaseFileServiceTests : IDisposable
             Type = Ancillary,
         };
 
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersion = releaseVersion,
-            File = ancillaryFile
-        };
+        var releaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = ancillaryFile };
 
         var amendmentReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentReleaseVersion,
-            File = ancillaryFile
+            File = ancillaryFile,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -175,11 +171,15 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(releaseVersionId: amendmentReleaseVersion.Id,
-                fileId: ancillaryFile.Id);
+            var result = await service.Delete(
+                releaseVersionId: amendmentReleaseVersion.Id,
+                fileId: ancillaryFile.Id
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -210,8 +210,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            }
+                SubjectId = Guid.NewGuid(),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -227,8 +227,10 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-            var result = await service.Delete(releaseVersionId: releaseVersion.Id,
-                fileId: dataFile.File.Id);
+            var result = await service.Delete(
+                releaseVersionId: releaseVersion.Id,
+                fileId: dataFile.File.Id
+            );
 
             result.AssertBadRequest(FileTypeInvalid);
         }
@@ -253,8 +255,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -270,8 +272,10 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.Delete(Guid.NewGuid(), ancillaryFile.File.Id);
 
@@ -305,8 +309,10 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-            var result = await service.Delete(releaseVersionId: releaseVersion.Id,
-                fileId: Guid.NewGuid());
+            var result = await service.Delete(
+                releaseVersionId: releaseVersion.Id,
+                fileId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -324,8 +330,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var chartFile = new ReleaseFile
@@ -335,8 +341,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart
-            }
+                Type = Chart,
+            },
         };
 
         var imageFile = new ReleaseFile
@@ -346,8 +352,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -361,42 +367,48 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(releaseVersion.Id, new List<Guid>
-            {
-                ancillaryFile.File.Id,
-                chartFile.File.Id,
-                imageFile.File.Id
-            });
+            var result = await service.Delete(
+                releaseVersion.Id,
+                new List<Guid> { ancillaryFile.File.Id, chartFile.File.Id, imageFile.File.Id }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             Assert.True(result.IsRight);
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()),
+                Times.Once
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -424,8 +436,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var dataFile = new ReleaseFile
@@ -436,8 +448,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            }
+                SubjectId = Guid.NewGuid(),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -453,14 +465,15 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(releaseVersion.Id, new List<Guid>
-            {
-                ancillaryFile.File.Id,
-                dataFile.File.Id
-            });
+            var result = await service.Delete(
+                releaseVersion.Id,
+                new List<Guid> { ancillaryFile.File.Id, dataFile.File.Id }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -490,8 +503,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var chartFile = new ReleaseFile
@@ -501,8 +514,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart
-            }
+                Type = Chart,
+            },
         };
 
         var imageFile = new ReleaseFile
@@ -512,8 +525,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -529,15 +542,15 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(Guid.NewGuid(), new List<Guid>
-            {
-                ancillaryFile.File.Id,
-                chartFile.File.Id,
-                imageFile.File.Id
-            });
+            var result = await service.Delete(
+                Guid.NewGuid(),
+                new List<Guid> { ancillaryFile.File.Id, chartFile.File.Id, imageFile.File.Id }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -570,8 +583,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -587,15 +600,20 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(releaseVersion.Id, new List<Guid>
-            {
-                ancillaryFile.File.Id,
-                // Include an unknown id
-                Guid.NewGuid()
-            });
+            var result = await service.Delete(
+                releaseVersion.Id,
+                new List<Guid>
+                {
+                    ancillaryFile.File.Id,
+                    // Include an unknown id
+                    Guid.NewGuid(),
+                }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -615,41 +633,38 @@ public class ReleaseFileServiceTests : IDisposable
     {
         var releaseVersion = new ReleaseVersion();
 
-        var amendmentRelease = new ReleaseVersion
-        {
-            PreviousVersionId = releaseVersion.Id
-        };
+        var amendmentRelease = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
 
         var ancillaryFile = new File
         {
             RootPath = Guid.NewGuid(),
             Filename = "ancillary.pdf",
-            Type = Ancillary
+            Type = Ancillary,
         };
 
         var chartFile = new File
         {
             RootPath = Guid.NewGuid(),
             Filename = "chart.png",
-            Type = Chart
+            Type = Chart,
         };
 
         var ancillaryReleaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = ancillaryFile
+            File = ancillaryFile,
         };
 
         var ancillaryAmendmentReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentRelease,
-            File = ancillaryFile
+            File = ancillaryFile,
         };
 
         var chartAmendmentReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentRelease,
-            File = chartFile
+            File = chartFile,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -658,49 +673,58 @@ public class ReleaseFileServiceTests : IDisposable
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
             contentDbContext.Files.AddRange(ancillaryFile, chartFile);
-            contentDbContext.ReleaseFiles.AddRange(ancillaryReleaseFile, ancillaryAmendmentReleaseFile,
-                chartAmendmentReleaseFile);
+            contentDbContext.ReleaseFiles.AddRange(
+                ancillaryReleaseFile,
+                ancillaryAmendmentReleaseFile,
+                chartAmendmentReleaseFile
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(amendmentRelease.Id, new List<Guid>
-            {
-                ancillaryFile.Id,
-                chartFile.Id
-            });
+            var result = await service.Delete(
+                amendmentRelease.Id,
+                new List<Guid> { ancillaryFile.Id, chartFile.Id }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
             Assert.True(result.IsRight);
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()),
+                Times.Once
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             // Check that the ancillary file is unlinked from the amendment
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(ancillaryAmendmentReleaseFile.Id));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FindAsync(ancillaryAmendmentReleaseFile.Id)
+            );
 
             // Check that the ancillary file and link to the previous version remain untouched
-            Assert.NotNull(
-                await contentDbContext.Files.FindAsync(ancillaryFile.Id));
+            Assert.NotNull(await contentDbContext.Files.FindAsync(ancillaryFile.Id));
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryReleaseFile.Id));
 
             // Check that the chart file and link to the amendment are removed
             Assert.Null(await contentDbContext.Files.FindAsync(chartFile.Id));
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id)
+            );
         }
     }
 
@@ -716,8 +740,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var chartFile = new ReleaseFile
@@ -727,8 +751,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart
-            }
+                Type = Chart,
+            },
         };
 
         var dataFile = new ReleaseFile
@@ -739,8 +763,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            }
+                SubjectId = Guid.NewGuid(),
+            },
         };
 
         var imageFile = new ReleaseFile
@@ -750,8 +774,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var dataGuidanceFile = new ReleaseFile
@@ -761,8 +785,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data-guidance.txt",
-                Type = DataGuidance
-            }
+                Type = DataGuidance,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -770,32 +794,40 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(ancillaryFile, chartFile, dataFile, imageFile, dataGuidanceFile);
+            contentDbContext.ReleaseFiles.AddRange(
+                ancillaryFile,
+                chartFile,
+                dataFile,
+                imageFile,
+                dataGuidanceFile
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, dataGuidanceFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, dataGuidanceFile.Path()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.DeleteAll(releaseVersion.Id);
 
@@ -803,17 +835,25 @@ public class ReleaseFileServiceTests : IDisposable
 
             Assert.True(result.IsRight);
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, imageFile.Path()),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, dataGuidanceFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, dataGuidanceFile.Path()),
+                Times.Once
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -865,8 +905,10 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.DeleteAll(releaseVersion.Id);
 
@@ -881,23 +923,20 @@ public class ReleaseFileServiceTests : IDisposable
     {
         var releaseVersion = new ReleaseVersion();
 
-        var amendmentRelease = new ReleaseVersion
-        {
-            PreviousVersionId = releaseVersion.Id
-        };
+        var amendmentRelease = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
 
         var ancillaryFile = new File
         {
             RootPath = Guid.NewGuid(),
             Filename = "ancillary.pdf",
-            Type = Ancillary
+            Type = Ancillary,
         };
 
         var chartFile = new File
         {
             RootPath = Guid.NewGuid(),
             Filename = "chart.png",
-            Type = Chart
+            Type = Chart,
         };
 
         var dataGuidanceFile = new File
@@ -910,25 +949,25 @@ public class ReleaseFileServiceTests : IDisposable
         var ancillaryReleaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = ancillaryFile
+            File = ancillaryFile,
         };
 
         var ancillaryAmendmentReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentRelease,
-            File = ancillaryFile
+            File = ancillaryFile,
         };
 
         var chartAmendmentReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentRelease,
-            File = chartFile
+            File = chartFile,
         };
 
         var dataGuidanceAmendmentReleaseFile = new ReleaseFile
         {
             ReleaseVersion = amendmentRelease,
-            File = dataGuidanceFile
+            File = dataGuidanceFile,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -941,24 +980,27 @@ public class ReleaseFileServiceTests : IDisposable
                 ancillaryReleaseFile,
                 ancillaryAmendmentReleaseFile,
                 chartAmendmentReleaseFile,
-                dataGuidanceAmendmentReleaseFile);
+                dataGuidanceAmendmentReleaseFile
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, dataGuidanceFile.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, dataGuidanceFile.Path()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.DeleteAll(amendmentRelease.Id);
 
@@ -966,14 +1008,18 @@ public class ReleaseFileServiceTests : IDisposable
 
             Assert.True(result.IsRight);
 
-            privateBlobStorageService.Verify(mock =>
-                mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()), Times.Once);
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()),
+                Times.Once
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             // Check that the ancillary file is unlinked from the amendment
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(ancillaryAmendmentReleaseFile.Id));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FindAsync(ancillaryAmendmentReleaseFile.Id)
+            );
 
             // Check that the ancillary file and link to the previous version remain untouched
             Assert.NotNull(await contentDbContext.Files.FindAsync(ancillaryFile.Id));
@@ -981,11 +1027,15 @@ public class ReleaseFileServiceTests : IDisposable
 
             // Check that the chart file and link to the amendment are removed
             Assert.Null(await contentDbContext.Files.FindAsync(chartFile.Id));
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id)
+            );
 
             // Check that the data guidance file and link to the amendment are removed
             Assert.Null(await contentDbContext.Files.FindAsync(dataGuidanceFile.Id));
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(dataGuidanceAmendmentReleaseFile.Id));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FindAsync(dataGuidanceAmendmentReleaseFile.Id)
+            );
         }
     }
 
@@ -1040,10 +1090,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "ancillary_1.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary1@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("ancillary1@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var ancillaryFile2 = new ReleaseFile
@@ -1056,10 +1105,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "Ancillary 2.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary2@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("ancillary2@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var chartFile = new ReleaseFile
@@ -1071,10 +1119,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "chart.png",
                 ContentLength = 20480,
                 Type = Chart,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("chart@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("chart@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var dataFile = new ReleaseFile
@@ -1086,10 +1133,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("dataFile@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("dataFile@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var imageFile = new ReleaseFile
@@ -1101,10 +1147,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "image.png",
                 ContentLength = 30720,
                 Type = Image,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("image@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("image@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1112,8 +1157,13 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(ancillaryFile1, ancillaryFile2,
-                chartFile, dataFile, imageFile);
+            contentDbContext.ReleaseFiles.AddRange(
+                ancillaryFile1,
+                ancillaryFile2,
+                chartFile,
+                dataFile,
+                imageFile
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1173,10 +1223,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "ancillary_1.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary1@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("ancillary1@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var ancillaryFile2 = new ReleaseFile
@@ -1189,10 +1238,9 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "Ancillary 2.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("ancillary2@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("ancillary2@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var chartFile = new ReleaseFile
@@ -1203,10 +1251,9 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
                 Type = Chart,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("chart@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("chart@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var dataFile = new ReleaseFile
@@ -1217,10 +1264,9 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("dataFile@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("dataFile@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var imageFile = new ReleaseFile
@@ -1231,10 +1277,9 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
                 Type = Image,
-                CreatedBy = _dataFixture.DefaultUser()
-                    .WithEmail("image@test.com"),
-                Created = DateTime.UtcNow
-            }
+                CreatedBy = _dataFixture.DefaultUser().WithEmail("image@test.com"),
+                Created = DateTime.UtcNow,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1242,8 +1287,13 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(ancillaryFile1, ancillaryFile2,
-                chartFile, dataFile, imageFile);
+            contentDbContext.ReleaseFiles.AddRange(
+                ancillaryFile1,
+                ancillaryFile2,
+                chartFile,
+                dataFile,
+                imageFile
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1290,8 +1340,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 ContentLength = 10240,
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1347,8 +1397,10 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-            var result = await service.GetFile(releaseVersionId: releaseVersion.Id,
-                fileId: Guid.NewGuid());
+            var result = await service.GetFile(
+                releaseVersionId: releaseVersion.Id,
+                fileId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -1367,8 +1419,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "Ancillary.pdf",
                 ContentType = "application/pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1382,22 +1434,25 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService
-            .SetupGetDownloadToken(
-                container: PrivateReleaseFiles,
-                filename: releaseFile.File.Filename,
-                path: releaseFile.Path(),
-                contentType: releaseFile.File.ContentType);
+        privateBlobStorageService.SetupGetDownloadToken(
+            container: PrivateReleaseFiles,
+            filename: releaseFile.File.Filename,
+            path: releaseFile.Path(),
+            contentType: releaseFile.File.ContentType
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.GetBlobDownloadToken(
                 releaseVersionId: releaseVersion.Id,
                 fileId: releaseFile.File.Id,
-                cancellationToken: default);
+                cancellationToken: default
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -1423,8 +1478,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1443,7 +1498,8 @@ public class ReleaseFileServiceTests : IDisposable
             var result = await service.GetBlobDownloadToken(
                 releaseVersionId: Guid.NewGuid(),
                 fileId: releaseFile.File.Id,
-                cancellationToken: default);
+                cancellationToken: default
+            );
 
             result.AssertNotFound();
         }
@@ -1469,7 +1525,8 @@ public class ReleaseFileServiceTests : IDisposable
             var result = await service.GetBlobDownloadToken(
                 releaseVersionId: releaseVersion.Id,
                 fileId: Guid.NewGuid(),
-                cancellationToken: default);
+                cancellationToken: default
+            );
 
             result.AssertNotFound();
         }
@@ -1488,8 +1545,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 ContentType = "application/pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1507,17 +1564,21 @@ public class ReleaseFileServiceTests : IDisposable
             container: PrivateReleaseFiles,
             filename: releaseFile.File.Filename,
             path: releaseFile.Path(),
-            cancellationToken: default);
+            cancellationToken: default
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.GetBlobDownloadToken(
                 releaseVersionId: releaseVersion.Id,
                 fileId: releaseFile.File.Id,
-                cancellationToken: default);
+                cancellationToken: default
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -1528,9 +1589,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_ValidFileTypes()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1539,8 +1602,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -1549,8 +1612,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
 
@@ -1565,27 +1628,45 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data blob");
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test ancillary blob");
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile1.Path(),
+            true
+        );
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile2.Path(),
+            true
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile1.Path(),
+            "Test data blob"
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile2.Path(),
+            "Test ancillary blob"
+        );
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
         dataGuidanceFileWriter
-            .Setup(
-                s => s.WriteToStream(
+            .Setup(s =>
+                s.WriteToStream(
                     It.IsAny<Stream>(),
                     It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
-                    ListOf(releaseFile1.FileId))
+                    ListOf(releaseFile1.FileId)
+                )
             )
-            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>(
+                (stream, _, _) => Task.FromResult(stream)
+            )
             .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
-                (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                (stream, _, _) =>
+                {
+                    stream.WriteText("Test data guidance blob");
+                }
             );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1596,7 +1677,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
+                dataGuidanceFileWriter: dataGuidanceFileWriter.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -1630,9 +1712,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_DataGuidanceForMultipleDataFiles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1641,8 +1725,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data-1.csv",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -1651,8 +1735,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data-2.csv",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
 
@@ -1667,27 +1751,45 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test data 1 blob");
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test data 2 blob");
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile1.Path(),
+            true
+        );
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile2.Path(),
+            true
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile1.Path(),
+            "Test data 1 blob"
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile2.Path(),
+            "Test data 2 blob"
+        );
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
         dataGuidanceFileWriter
-            .Setup(
-                s => s.WriteToStream(
+            .Setup(s =>
+                s.WriteToStream(
                     It.IsAny<Stream>(),
                     It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
-                    ListOf(releaseFile1.FileId, releaseFile2.FileId))
+                    ListOf(releaseFile1.FileId, releaseFile2.FileId)
+                )
             )
-            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>(
+                (stream, _, _) => Task.FromResult(stream)
+            )
             .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
-                (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                (stream, _, _) =>
+                {
+                    stream.WriteText("Test data guidance blob");
+                }
             );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1698,7 +1800,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
+                dataGuidanceFileWriter: dataGuidanceFileWriter.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -1733,9 +1836,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_OrderedAlphabetically()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1745,7 +1850,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "test-2.pdf",
                 Type = Ancillary,
-            }
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -1754,8 +1859,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-3.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFile3 = new ReleaseFile
         {
@@ -1764,8 +1869,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-1.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFiles = ListOf(releaseFile1, releaseFile2, releaseFile3);
 
@@ -1783,24 +1888,43 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile2.Path(), true);
-        privateBlobStorageService
-            .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile3.Path(), true);
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile1.Path(), "Test 2 blob");
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile1.Path(),
+            true
+        );
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile2.Path(),
+            true
+        );
+        privateBlobStorageService.SetupCheckBlobExists(
+            PrivateReleaseFiles,
+            releaseFile3.Path(),
+            true
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile1.Path(),
+            "Test 2 blob"
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile2.Path(),
+            "Test 3 blob"
+        );
+        privateBlobStorageService.SetupGetDownloadStream(
+            PrivateReleaseFiles,
+            releaseFile3.Path(),
+            "Test 1 blob"
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -1830,9 +1954,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_FiltersInvalidFileTypes()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1842,7 +1968,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.meta.csv",
                 Type = Metadata,
-            }
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -1851,8 +1977,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
-                Type = DataZip
-            }
+                Type = DataZip,
+            },
         };
         var releaseFile3 = new ReleaseFile
         {
@@ -1861,8 +1987,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.jpg",
-                Type = Chart
-            }
+                Type = Chart,
+            },
         };
         var releaseFile4 = new ReleaseFile
         {
@@ -1871,8 +1997,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.jpg",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2, releaseFile3, releaseFile4);
@@ -1895,7 +2021,8 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -1918,9 +2045,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_FiltersFilesNotInBlobStorage()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1930,7 +2059,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.pdf",
                 Type = FileType.Data,
-            }
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -1939,8 +2068,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -1960,14 +2089,21 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         // Files do not exist in blob storage
-        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile1.Path());
-        privateBlobStorageService.SetupGetDownloadStreamNotFound(PrivateReleaseFiles, releaseFile2.Path());
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(
+            PrivateReleaseFiles,
+            releaseFile1.Path()
+        );
+        privateBlobStorageService.SetupGetDownloadStreamNotFound(
+            PrivateReleaseFiles,
+            releaseFile2.Path()
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -1990,9 +2126,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_FiltersFilesForOtherReleases()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         // Files are for other releases
         var releaseFile1 = new ReleaseFile
@@ -2003,7 +2141,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-1.pdf",
                 Type = Ancillary,
-            }
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -2012,8 +2150,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-2.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -2036,7 +2174,8 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -2059,9 +2198,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_Empty()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -2080,7 +2221,8 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
             var result = await service.ZipFilesToStream(releaseVersion.Id, stream, fileIds);
@@ -2099,9 +2241,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_Cancelled()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -2110,8 +2254,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-1.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -2120,8 +2264,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-2.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -2142,28 +2286,29 @@ public class ReleaseFileServiceTests : IDisposable
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        privateBlobStorageService
-            .SetupGetDownloadStream(
-                container: PrivateReleaseFiles,
-                path: releaseFile1.Path(),
-                content: "Test ancillary blob",
-                cancellationToken: tokenSource.Token);
-        
+        privateBlobStorageService.SetupGetDownloadStream(
+            container: PrivateReleaseFiles,
+            path: releaseFile1.Path(),
+            content: "Test ancillary blob",
+            cancellationToken: tokenSource.Token
+        );
+
         // After the first file has completed, we cancel the request
         // to prevent the next file from being fetched.
-        privateBlobStorageService
-            .SetupGetDownloadStream(
-                container: PrivateReleaseFiles,
-                path: releaseFile2.Path(),
-                content: "Test ancillary blob 2",
-                cancellationToken: tokenSource.Token,
-                callback: tokenSource.Cancel);
+        privateBlobStorageService.SetupGetDownloadStream(
+            container: PrivateReleaseFiles,
+            path: releaseFile2.Path(),
+            content: "Test ancillary blob 2",
+            cancellationToken: tokenSource.Token,
+            callback: tokenSource.Cancel
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -2188,10 +2333,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateDataFileDetails()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var releaseFile = new ReleaseFile
         {
@@ -2204,7 +2346,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Type = FileType.Data,
                 Created = new DateTime(),
                 CreatedBy = _dataFixture.DefaultUser(),
-            }
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -2225,7 +2367,7 @@ public class ReleaseFileServiceTests : IDisposable
                 new ReleaseDataFileUpdateRequest
                 {
                     Title = "New file title",
-                    Summary = "New file summary"
+                    Summary = "New file summary",
                 }
             );
 
@@ -2235,11 +2377,12 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var updatedReleaseFile = await contentDbContext.ReleaseFiles
-                .AsQueryable()
+            var updatedReleaseFile = await contentDbContext
+                .ReleaseFiles.AsQueryable()
                 .FirstAsync(rf =>
                     rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                    && rf.FileId == releaseFile.FileId);
+                    && rf.FileId == releaseFile.FileId
+                );
 
             Assert.Equal("New file title", updatedReleaseFile.Name);
             Assert.Equal("New file summary", updatedReleaseFile.Summary);
@@ -2254,12 +2397,10 @@ public class ReleaseFileServiceTests : IDisposable
         string? requestedFileName,
         string? expectedFileName,
         string? requestedFileSummary,
-        string? expectedFileSummary)
+        string? expectedFileSummary
+    )
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var originalPublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -2305,17 +2446,20 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var updatedReleaseFile = await contentDbContext.ReleaseFiles
-                .AsQueryable()
+            var updatedReleaseFile = await contentDbContext
+                .ReleaseFiles.AsQueryable()
                 .FirstAsync(rf =>
                     rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                    && rf.FileId == releaseFile.FileId);
+                    && rf.FileId == releaseFile.FileId
+                );
 
             Assert.Equal(expectedFileName, updatedReleaseFile.Name);
             Assert.Equal(expectedFileSummary, updatedReleaseFile.Summary);
 
-            if (string.IsNullOrWhiteSpace(requestedFileName) &&
-                string.IsNullOrWhiteSpace(requestedFileSummary))
+            if (
+                string.IsNullOrWhiteSpace(requestedFileName)
+                && string.IsNullOrWhiteSpace(requestedFileSummary)
+            )
             {
                 Assert.Equal(originalPublishedDate, updatedReleaseFile.Published);
             }
@@ -2335,10 +2479,7 @@ public class ReleaseFileServiceTests : IDisposable
         var result = await service.UpdateDataFileDetails(
             Guid.NewGuid(),
             Guid.NewGuid(),
-            new ReleaseDataFileUpdateRequest
-            {
-                Title = "New file title",
-            }
+            new ReleaseDataFileUpdateRequest { Title = "New file title" }
         );
 
         result.AssertNotFound();
@@ -2364,10 +2505,7 @@ public class ReleaseFileServiceTests : IDisposable
             var result = await service.UpdateDataFileDetails(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                new ReleaseDataFileUpdateRequest
-                {
-                    Title = "New file title",
-                }
+                new ReleaseDataFileUpdateRequest { Title = "New file title" }
             );
 
             result.AssertNotFound();
@@ -2393,22 +2531,27 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-            mock.UploadFile(PrivateReleaseFiles,
-                It.Is<string>(path =>
-                    path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
-                formFile
-            )).Returns(Task.CompletedTask);
+        privateBlobStorageService
+            .Setup(mock =>
+                mock.UploadFile(
+                    PrivateReleaseFiles,
+                    It.Is<string>(path => path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                    formFile
+                )
+            )
+            .Returns(Task.CompletedTask);
 
-        fileValidatorService.Setup(mock =>
-                mock.ValidateFileForUpload(formFile, Ancillary))
+        fileValidatorService
+            .Setup(mock => mock.ValidateFileForUpload(formFile, Ancillary))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                fileValidatorService: fileValidatorService.Object);
+                fileValidatorService: fileValidatorService.Object
+            );
 
             var result = await service.UploadAncillary(
                 releaseVersion.Id,
@@ -2416,7 +2559,7 @@ public class ReleaseFileServiceTests : IDisposable
                 {
                     Title = "Test name",
                     Summary = "Test summary",
-                    File = formFile
+                    File = formFile,
                 }
             );
 
@@ -2424,15 +2567,22 @@ public class ReleaseFileServiceTests : IDisposable
 
             var fileInfo = result.AssertRight();
 
-            fileValidatorService.Verify(mock =>
-                mock.ValidateFileForUpload(formFile, Ancillary), Times.Once);
+            fileValidatorService.Verify(
+                mock => mock.ValidateFileForUpload(formFile, Ancillary),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.UploadFile(PrivateReleaseFiles,
-                    It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
-                    formFile
-                ), Times.Once);
+            privateBlobStorageService.Verify(
+                mock =>
+                    mock.UploadFile(
+                        PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, Ancillary))
+                        ),
+                        formFile
+                    ),
+                Times.Once
+            );
 
             Assert.True(fileInfo.Id.HasValue);
             Assert.Equal("pdf", fileInfo.Extension);
@@ -2442,13 +2592,17 @@ public class ReleaseFileServiceTests : IDisposable
             Assert.Equal("10 Kb", fileInfo.Size);
             Assert.Equal(Ancillary, fileInfo.Type);
             Assert.Equal(_user.Email, fileInfo.UserName);
-            Assert.InRange(DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+            Assert.InRange(
+                DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds,
+                0,
+                1500
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var releaseFile = await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
+            var releaseFile = await contentDbContext
+                .ReleaseFiles.Include(rf => rf.File)
                 .SingleOrDefaultAsync(rf =>
                     rf.ReleaseVersionId == releaseVersion.Id
                     && rf.File.Filename == filename
@@ -2460,7 +2614,11 @@ public class ReleaseFileServiceTests : IDisposable
 
             Assert.Equal(10240, file.ContentLength);
             Assert.Equal("application/pdf", file.ContentType);
-            Assert.InRange(DateTime.UtcNow.Subtract(file.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+            Assert.InRange(
+                DateTime.UtcNow.Subtract(file.Created.GetValueOrDefault()).Milliseconds,
+                0,
+                1500
+            );
             Assert.Equal(_user.Id, file.CreatedById);
         }
     }
@@ -2468,10 +2626,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateAncillary()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var releaseFile = new ReleaseFile
         {
@@ -2501,28 +2656,31 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-                mock.DeleteBlob(
-                    PrivateReleaseFiles,
-                    releaseFile.File.Path()))
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, releaseFile.File.Path()))
             .Returns(Task.CompletedTask);
 
-        privateBlobStorageService.Setup(mock =>
-            mock.UploadFile(PrivateReleaseFiles,
-                It.Is<string>(path =>
-                    path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
-                newFormFile
-            )).Returns(Task.CompletedTask);
+        privateBlobStorageService
+            .Setup(mock =>
+                mock.UploadFile(
+                    PrivateReleaseFiles,
+                    It.Is<string>(path => path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                    newFormFile
+                )
+            )
+            .Returns(Task.CompletedTask);
 
-        fileValidatorService.Setup(mock =>
-                mock.ValidateFileForUpload(newFormFile, Ancillary))
+        fileValidatorService
+            .Setup(mock => mock.ValidateFileForUpload(newFormFile, Ancillary))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                fileValidatorService: fileValidatorService.Object);
+                fileValidatorService: fileValidatorService.Object
+            );
 
             var result = await service.UpdateAncillary(
                 releaseVersionId: releaseVersion.Id,
@@ -2532,21 +2690,29 @@ public class ReleaseFileServiceTests : IDisposable
                     File = newFormFile,
                     Title = "New ancillary name",
                     Summary = "New ancillary summary",
-                });
+                }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
             var fileInfo = result.AssertRight();
 
-            fileValidatorService.Verify(mock =>
-                mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
+            fileValidatorService.Verify(
+                mock => mock.ValidateFileForUpload(newFormFile, Ancillary),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.UploadFile(PrivateReleaseFiles,
-                    It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
-                    newFormFile
-                ), Times.Once);
+            privateBlobStorageService.Verify(
+                mock =>
+                    mock.UploadFile(
+                        PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, Ancillary))
+                        ),
+                        newFormFile
+                    ),
+                Times.Once
+            );
 
             Assert.True(fileInfo.Id.HasValue);
             Assert.Equal("pdf", fileInfo.Extension);
@@ -2556,26 +2722,35 @@ public class ReleaseFileServiceTests : IDisposable
             Assert.Equal("10 Kb", fileInfo.Size);
             Assert.Equal(Ancillary, fileInfo.Type);
             Assert.Equal(_user.Email, fileInfo.UserName);
-            Assert.InRange(DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+            Assert.InRange(
+                DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds,
+                0,
+                1500
+            );
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            Assert.Null(await contentDbContext.Files
-                .FirstOrDefaultAsync(f => f.Id == releaseFile.FileId));
+            Assert.Null(
+                await contentDbContext.Files.FirstOrDefaultAsync(f => f.Id == releaseFile.FileId)
+            );
 
-            Assert.Null(await contentDbContext.ReleaseFiles
-                .FirstOrDefaultAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersion.Id
-                    && rf.FileId == releaseFile.FileId));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FirstOrDefaultAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == releaseFile.FileId
+                )
+            );
 
-            var dbNewReleaseFile = Assert.Single(await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .Where(rf =>
-                    rf.ReleaseVersionId == releaseVersion.Id
-                    && rf.File.Filename == "newAncillary.pdf"
-                    && rf.File.Type == Ancillary)
-                .ToListAsync());
+            var dbNewReleaseFile = Assert.Single(
+                await contentDbContext
+                    .ReleaseFiles.Include(rf => rf.File)
+                    .Where(rf =>
+                        rf.ReleaseVersionId == releaseVersion.Id
+                        && rf.File.Filename == "newAncillary.pdf"
+                        && rf.File.Type == Ancillary
+                    )
+                    .ToListAsync()
+            );
 
             Assert.Equal("New ancillary name", dbNewReleaseFile.Name);
             Assert.Equal("New ancillary summary", dbNewReleaseFile.Summary);
@@ -2584,7 +2759,11 @@ public class ReleaseFileServiceTests : IDisposable
 
             Assert.Equal(10240, newFile.ContentLength);
             Assert.Equal("application/pdf", newFile.ContentType);
-            Assert.InRange(DateTime.UtcNow.Subtract(newFile.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+            Assert.InRange(
+                DateTime.UtcNow.Subtract(newFile.Created.GetValueOrDefault()).Milliseconds,
+                0,
+                1500
+            );
             Assert.Equal(_user.Id, newFile.CreatedById);
         }
     }
@@ -2592,10 +2771,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateAncillary_DoNotRemoveFileAttachedToOtherRelease()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var releaseFile = new ReleaseFile
         {
@@ -2631,22 +2807,27 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-            mock.UploadFile(PrivateReleaseFiles,
-                It.Is<string>(path =>
-                    path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
-                newFormFile
-            )).Returns(Task.CompletedTask);
+        privateBlobStorageService
+            .Setup(mock =>
+                mock.UploadFile(
+                    PrivateReleaseFiles,
+                    It.Is<string>(path => path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                    newFormFile
+                )
+            )
+            .Returns(Task.CompletedTask);
 
-        fileValidatorService.Setup(mock =>
-                mock.ValidateFileForUpload(newFormFile, Ancillary))
+        fileValidatorService
+            .Setup(mock => mock.ValidateFileForUpload(newFormFile, Ancillary))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                fileValidatorService: fileValidatorService.Object);
+                fileValidatorService: fileValidatorService.Object
+            );
 
             var result = await service.UpdateAncillary(
                 releaseVersionId: releaseVersion.Id,
@@ -2656,21 +2837,29 @@ public class ReleaseFileServiceTests : IDisposable
                     File = newFormFile,
                     Title = "New ancillary name",
                     Summary = "New ancillary summary",
-                });
+                }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService, fileValidatorService);
 
             var fileInfo = result.AssertRight();
 
-            fileValidatorService.Verify(mock =>
-                mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
+            fileValidatorService.Verify(
+                mock => mock.ValidateFileForUpload(newFormFile, Ancillary),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.UploadFile(PrivateReleaseFiles,
-                    It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
-                    newFormFile
-                ), Times.Once);
+            privateBlobStorageService.Verify(
+                mock =>
+                    mock.UploadFile(
+                        PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(releaseVersion.Id, Ancillary))
+                        ),
+                        newFormFile
+                    ),
+                Times.Once
+            );
 
             Assert.True(fileInfo.Id.HasValue);
             Assert.Equal("New ancillary name", fileInfo.Name);
@@ -2680,25 +2869,32 @@ public class ReleaseFileServiceTests : IDisposable
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             // File shouldn't be removed as its attached to another release
-            Assert.NotNull(await contentDbContext.Files
-                .FirstOrDefaultAsync(f => f.Id == releaseFile.FileId));
-            Assert.NotNull(await contentDbContext.ReleaseFiles
-                .FirstOrDefaultAsync(rf =>
+            Assert.NotNull(
+                await contentDbContext.Files.FirstOrDefaultAsync(f => f.Id == releaseFile.FileId)
+            );
+            Assert.NotNull(
+                await contentDbContext.ReleaseFiles.FirstOrDefaultAsync(rf =>
                     rf.ReleaseVersionId == otherReleaseFile.ReleaseVersionId
-                    && rf.FileId == otherReleaseFile.FileId));
+                    && rf.FileId == otherReleaseFile.FileId
+                )
+            );
 
-            Assert.Null(await contentDbContext.ReleaseFiles
-                .FirstOrDefaultAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersion.Id
-                    && rf.FileId == releaseFile.FileId));
+            Assert.Null(
+                await contentDbContext.ReleaseFiles.FirstOrDefaultAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == releaseFile.FileId
+                )
+            );
 
-            var dbNewReleaseFile = Assert.Single(await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .Where(rf =>
-                    rf.ReleaseVersionId == releaseVersion.Id
-                    && rf.File.Filename == "newAncillary.pdf"
-                    && rf.File.Type == Ancillary)
-                .ToListAsync());
+            var dbNewReleaseFile = Assert.Single(
+                await contentDbContext
+                    .ReleaseFiles.Include(rf => rf.File)
+                    .Where(rf =>
+                        rf.ReleaseVersionId == releaseVersion.Id
+                        && rf.File.Filename == "newAncillary.pdf"
+                        && rf.File.Type == Ancillary
+                    )
+                    .ToListAsync()
+            );
             Assert.Equal("New ancillary name", dbNewReleaseFile.Name);
             Assert.Equal("New ancillary summary", dbNewReleaseFile.Summary);
         }
@@ -2707,10 +2903,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateAncillary_NoFile()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var releaseFile = new ReleaseFile
         {
@@ -2747,7 +2940,8 @@ public class ReleaseFileServiceTests : IDisposable
                 {
                     Title = "New ancillary name",
                     Summary = "New ancillary summary",
-                });
+                }
+            );
 
             var fileInfo = result.AssertRight();
 
@@ -2758,8 +2952,9 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            Assert.NotNull(await contentDbContext.Files
-                .FirstOrDefaultAsync(f => f.Id == releaseFile.FileId));
+            Assert.NotNull(
+                await contentDbContext.Files.FirstOrDefaultAsync(f => f.Id == releaseFile.FileId)
+            );
 
             var dbReleaseFile = Assert.Single(await contentDbContext.ReleaseFiles.ToListAsync());
             Assert.Equal(releaseVersion.Id, dbReleaseFile.ReleaseVersionId);
@@ -2788,22 +2983,27 @@ public class ReleaseFileServiceTests : IDisposable
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         var fileValidatorService = new Mock<IFileValidatorService>(Strict);
 
-        privateBlobStorageService.Setup(mock =>
-            mock.UploadFile(PrivateReleaseFiles,
-                It.Is<string>(path =>
-                    path.Contains(FilesPath(releaseVersion.Id, Chart))),
-                formFile
-            )).Returns(Task.CompletedTask);
+        privateBlobStorageService
+            .Setup(mock =>
+                mock.UploadFile(
+                    PrivateReleaseFiles,
+                    It.Is<string>(path => path.Contains(FilesPath(releaseVersion.Id, Chart))),
+                    formFile
+                )
+            )
+            .Returns(Task.CompletedTask);
 
-        fileValidatorService.Setup(mock =>
-                mock.ValidateFileForUpload(formFile, Chart))
+        fileValidatorService
+            .Setup(mock => mock.ValidateFileForUpload(formFile, Chart))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                fileValidatorService: fileValidatorService.Object);
+                fileValidatorService: fileValidatorService.Object
+            );
 
             var result = await service.UploadChart(releaseVersion.Id, formFile);
 
@@ -2811,15 +3011,20 @@ public class ReleaseFileServiceTests : IDisposable
 
             Assert.True(result.IsRight);
 
-            fileValidatorService.Verify(mock =>
-                mock.ValidateFileForUpload(formFile, Chart), Times.Once);
+            fileValidatorService.Verify(
+                mock => mock.ValidateFileForUpload(formFile, Chart),
+                Times.Once
+            );
 
-            privateBlobStorageService.Verify(mock =>
-                mock.UploadFile(PrivateReleaseFiles,
-                    It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Chart))),
-                    formFile
-                ), Times.Once);
+            privateBlobStorageService.Verify(
+                mock =>
+                    mock.UploadFile(
+                        PrivateReleaseFiles,
+                        It.Is<string>(path => path.Contains(FilesPath(releaseVersion.Id, Chart))),
+                        formFile
+                    ),
+                Times.Once
+            );
 
             Assert.True(result.Right.Id.HasValue);
             Assert.Equal("png", result.Right.Extension);
@@ -2831,8 +3036,8 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var releaseFile = await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
+            var releaseFile = await contentDbContext
+                .ReleaseFiles.Include(rf => rf.File)
                 .SingleOrDefaultAsync(rf =>
                     rf.ReleaseVersionId == releaseVersion.Id
                     && rf.File.Filename == filename
@@ -2865,7 +3070,8 @@ public class ReleaseFileServiceTests : IDisposable
         IFileValidatorService? fileValidatorService = null,
         IReleaseFileRepository? releaseFileRepository = null,
         IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         contentDbContext.Users.Add(_user);
         contentDbContext.SaveChanges();

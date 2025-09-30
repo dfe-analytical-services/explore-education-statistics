@@ -34,7 +34,8 @@ public record SubjectViewModel
         List<string> filters,
         List<string> indicators,
         FileInfo file,
-        DateTime? lastUpdated)
+        DateTime? lastUpdated
+    )
     {
         Id = id;
         Name = name;

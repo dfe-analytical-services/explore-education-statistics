@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Valid
 
 public class TimePeriodStringValidatorsTests
 {
-   public class TimePeriodStringTests : TimePeriodStringValidatorsTests
+    public class TimePeriodStringTests : TimePeriodStringValidatorsTests
     {
         private class TestClass
         {
@@ -143,7 +143,8 @@ public class TimePeriodStringValidatorsTests
                 .WithMessageArgument("Property", "code")
                 .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.Value == code)
                 .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d =>
-                    d.AllowedCodes.SequenceEqual(TimeIdentifierUtils.Codes.Order()))
+                    d.AllowedCodes.SequenceEqual(TimeIdentifierUtils.Codes.Order())
+                )
                 .Only();
         }
 
@@ -164,19 +165,24 @@ public class TimePeriodStringValidatorsTests
                 .WithErrorMessage(ValidationMessages.TimePeriodAllowedCode.Message)
                 .WithMessageArgument("Property", "code")
                 .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.Value == code)
-                .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.AllowedCodes.All(allowedCode =>
-                {
-                    var yearFormat = EnumUtil
-                        .GetFromEnumValue<TimeIdentifier>(allowedCode)
-                        .GetEnumAttribute<TimeIdentifierMetaAttribute>()
-                        .YearFormat;
+                .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d =>
+                    d.AllowedCodes.All(allowedCode =>
+                    {
+                        var yearFormat = EnumUtil
+                            .GetFromEnumValue<TimeIdentifier>(allowedCode)
+                            .GetEnumAttribute<TimeIdentifierMetaAttribute>()
+                            .YearFormat;
 
-                    var isValidYearFormat = yearFormat is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal;
+                        var isValidYearFormat =
+                            yearFormat
+                                is TimePeriodYearFormat.Academic
+                                    or TimePeriodYearFormat.Fiscal;
 
-                    Assert.True(isValidYearFormat);
+                        Assert.True(isValidYearFormat);
 
-                    return isValidYearFormat;
-                }))
+                        return isValidYearFormat;
+                    })
+                )
                 .Only();
         }
     }

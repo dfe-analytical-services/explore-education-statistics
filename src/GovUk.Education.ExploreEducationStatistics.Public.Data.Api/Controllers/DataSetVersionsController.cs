@@ -15,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [Route("v{version:apiVersion}/data-sets/{dataSetId:guid}/versions")]
 public class DataSetVersionsController(
     IDataSetService dataSetService,
-    IDataSetVersionChangeService dataSetVersionChangeService)
-    : ControllerBase
+    IDataSetVersionChangeService dataSetVersionChangeService
+) : ControllerBase
 {
     /// <summary>
     /// List a data set's versions
@@ -26,20 +26,26 @@ public class DataSetVersionsController(
     /// </remarks>
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of data set versions.", type: typeof(DataSetVersionPaginatedListViewModel))]
+    [SwaggerResponse(
+        200,
+        "The paginated list of data set versions.",
+        type: typeof(DataSetVersionPaginatedListViewModel)
+    )]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
         [FromQuery] DataSetVersionListRequest request,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
             .ListVersions(
                 dataSetId: dataSetId,
                 page: request.Page,
                 pageSize: request.PageSize,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -56,17 +62,22 @@ public class DataSetVersionsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("""
-                          The data set version e.g. 1.0, 1.1, 2.0, etc.
-                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                          """)] string dataSetVersion,
-        CancellationToken cancellationToken)
+        [SwaggerParameter(
+            """
+                The data set version e.g. 1.0, 1.1, 2.0, etc.
+                Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                """
+        )]
+            string dataSetVersion,
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
             .GetVersion(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -78,25 +89,36 @@ public class DataSetVersionsController(
     /// </remarks>
     [HttpGet("{dataSetVersion}/changes")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The changes for the data set version.", type: typeof(DataSetVersionChangesViewModel))]
+    [SwaggerResponse(
+        200,
+        "The changes for the data set version.",
+        type: typeof(DataSetVersionChangesViewModel)
+    )]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionChangesViewModel>> GetDataSetVersionChanges(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("""
-                          The data set version e.g. 1.0, 1.1, 2.0, etc.
-                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                          """)] string dataSetVersion,
-        [SwaggerParameter("Whether to include change logs for all associated patches will be in the results."
-            )] bool includePatchHistory = false,
-        CancellationToken cancellationToken = default) 
+        [SwaggerParameter(
+            """
+                The data set version e.g. 1.0, 1.1, 2.0, etc.
+                Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                """
+        )]
+            string dataSetVersion,
+        [SwaggerParameter(
+            "Whether to include change logs for all associated patches will be in the results."
+        )]
+            bool includePatchHistory = false,
+        CancellationToken cancellationToken = default
+    )
     {
         return await dataSetVersionChangeService
             .GetChanges(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 includePatchHistory: includePatchHistory,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 }

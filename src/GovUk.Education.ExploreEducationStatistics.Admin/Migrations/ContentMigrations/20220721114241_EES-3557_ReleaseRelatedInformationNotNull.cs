@@ -11,7 +11,9 @@ public partial class EES3557_ReleaseRelatedInformationNotNull : Migration
     {
         // Update all Releases with null RelatedInformation to have an empty array instead to match expectations in code
         // accessing the RelatedInformation property which expect a non-null List<Link> value.
-        migrationBuilder.Sql("UPDATE dbo.Releases SET RelatedInformation = '[]' WHERE RelatedInformation IS NULL");
+        migrationBuilder.Sql(
+            "UPDATE dbo.Releases SET RelatedInformation = '[]' WHERE RelatedInformation IS NULL"
+        );
 
         // Make the RelatedInformation column not nullable now that every Release should have a value
         migrationBuilder.AlterColumn<string>(
@@ -22,7 +24,8 @@ public partial class EES3557_ReleaseRelatedInformationNotNull : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -33,6 +36,7 @@ public partial class EES3557_ReleaseRelatedInformationNotNull : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

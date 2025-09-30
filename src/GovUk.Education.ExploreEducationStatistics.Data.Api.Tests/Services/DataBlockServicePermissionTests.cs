@@ -16,28 +16,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
 
 public class DataBlockServicePermissionTests
 {
-    private readonly DataBlock _dataBlock = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly DataBlock _dataBlock = new() { Id = Guid.NewGuid() };
 
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task GetDataBlockTableResult()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildService(
-                        userService: userService.Object);
-                    return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id);
-                });
+            .SetupResourceCheckToFail(
+                _releaseVersion,
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
+            )
+            .AssertForbidden(userService =>
+            {
+                var service = BuildService(userService: userService.Object);
+                return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id);
+            });
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
@@ -51,7 +46,8 @@ public class DataBlockServicePermissionTests
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         ITableBuilderService? tableBuilderService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new DataBlockService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

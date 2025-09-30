@@ -21,7 +21,8 @@ public class BlobInfo
         long contentLength,
         IDictionary<string, string>? meta = null,
         DateTimeOffset? created = null,
-        DateTimeOffset? updated = null)
+        DateTimeOffset? updated = null
+    )
     {
         Path = path;
         ContentType = contentType;

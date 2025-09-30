@@ -24,7 +24,7 @@ public class LocationTests
             Country = _england,
             Region = _northWest,
             LocalAuthority = _nottingham,
-            GeographicLevel = GeographicLevel.LocalAuthority
+            GeographicLevel = GeographicLevel.LocalAuthority,
         };
 
         Assert.Equal(3, location.GetAttributes().Count());
@@ -41,7 +41,7 @@ public class LocationTests
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
             // Hierarchy will not be matched since Subject has no School level data
-            {GeographicLevel.LocalAuthority, ListOf("Country", "Region")}
+            { GeographicLevel.LocalAuthority, ListOf("Country", "Region") },
         };
 
         // Test a scenario where there are no Locations e.g. if there was no Subject data
@@ -53,24 +53,30 @@ public class LocationTests
     public void GetLocationAttributesHierarchical_HierarchyContainsInvalidAttributeName()
     {
         // Test a scenario where a hierarchy is defined but mentions an attribute not part of the Location type
-        var locations = ListOf(new Location
-        {
-            Id = Guid.NewGuid(),
-            Country = _england,
-            Region = _eastMidlands,
-            LocalAuthority = _nottingham,
-            GeographicLevel = GeographicLevel.LocalAuthority
-        });
+        var locations = ListOf(
+            new Location
+            {
+                Id = Guid.NewGuid(),
+                Country = _england,
+                Region = _eastMidlands,
+                LocalAuthority = _nottingham,
+                GeographicLevel = GeographicLevel.LocalAuthority,
+            }
+        );
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
             // Hierarchy will not be matched since Subject has no School level data
-            {GeographicLevel.LocalAuthority, ListOf("Country", "Region", "NotAPropertyOfLocation")}
+            {
+                GeographicLevel.LocalAuthority,
+                ListOf("Country", "Region", "NotAPropertyOfLocation")
+            },
         };
 
-        var exception = Assert.Throws<ArgumentException>(
-            () => { locations.GetLocationAttributesHierarchical(hierarchies); }
-        );
+        var exception = Assert.Throws<ArgumentException>(() =>
+        {
+            locations.GetLocationAttributesHierarchical(hierarchies);
+        });
 
         Assert.Equal("Location does not have a property NotAPropertyOfLocation", exception.Message);
     }
@@ -79,25 +85,26 @@ public class LocationTests
     public void GetLocationAttributesHierarchical_GeographicLevelsHaveNoRelevantHierarchy()
     {
         // Test a scenario where hierarchies are defined but none are relevant to the Subject data
-        var locations = ListOf(new Location
+        var locations = ListOf(
+            new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
-                GeographicLevel = GeographicLevel.Country
+                GeographicLevel = GeographicLevel.Country,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
                 Region = _northEast,
-                GeographicLevel = GeographicLevel.Region
+                GeographicLevel = GeographicLevel.Region,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
                 Region = _northWest,
-                GeographicLevel = GeographicLevel.Region
+                GeographicLevel = GeographicLevel.Region,
             },
             new Location
             {
@@ -105,13 +112,14 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _derby,
-                GeographicLevel = GeographicLevel.LocalAuthority
-            });
+                GeographicLevel = GeographicLevel.LocalAuthority,
+            }
+        );
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
             // School hierarchy that is insignificant since Subject has no School level data
-            {GeographicLevel.School, ListOf("LocalAuthority", "School")}
+            { GeographicLevel.School, ListOf("LocalAuthority", "School") },
         };
 
         var result = locations.GetLocationAttributesHierarchical(hierarchies);
@@ -158,7 +166,7 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _derby,
-                GeographicLevel = GeographicLevel.LocalAuthority
+                GeographicLevel = GeographicLevel.LocalAuthority,
             },
             new Location
             {
@@ -166,12 +174,13 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _nottingham,
-                GeographicLevel = GeographicLevel.LocalAuthority
-            });
+                GeographicLevel = GeographicLevel.LocalAuthority,
+            }
+        );
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {GeographicLevel.LocalAuthority, _countryRegionLaHierarchy}
+            { GeographicLevel.LocalAuthority, _countryRegionLaHierarchy },
         };
 
         var result = locations.GetLocationAttributesHierarchical(hierarchies);
@@ -219,18 +228,19 @@ public class LocationTests
             {
                 Id = Guid.NewGuid(),
                 LocalAuthority = _derby,
-                GeographicLevel = GeographicLevel.LocalAuthority
+                GeographicLevel = GeographicLevel.LocalAuthority,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 LocalAuthority = _nottingham,
-                GeographicLevel = GeographicLevel.LocalAuthority
-            });
+                GeographicLevel = GeographicLevel.LocalAuthority,
+            }
+        );
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {GeographicLevel.LocalAuthority, _countryRegionLaHierarchy}
+            { GeographicLevel.LocalAuthority, _countryRegionLaHierarchy },
         };
 
         var result = locations.GetLocationAttributesHierarchical(hierarchies);
@@ -249,7 +259,7 @@ public class LocationTests
         Assert.Single(localAuthorities[0].Children);
 
         // Region attribute at depth 2 is empty as not defined for any of the LA data
-        Assert.Equal(new Region( null, null), localAuthorities[0].Children[0].Attribute);
+        Assert.Equal(new Region(null, null), localAuthorities[0].Children[0].Attribute);
         Assert.Null(localAuthorities[0].Children[0].LocationId);
         Assert.Equal(2, localAuthorities[0].Children[0].Children.Count);
 
@@ -283,14 +293,14 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _derby,
-                GeographicLevel = GeographicLevel.LocalAuthority
+                GeographicLevel = GeographicLevel.LocalAuthority,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
                 LocalAuthority = _derby,
-                GeographicLevel = GeographicLevel.LocalAuthority
+                GeographicLevel = GeographicLevel.LocalAuthority,
             },
             new Location
             {
@@ -298,12 +308,13 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _nottingham,
-                GeographicLevel = GeographicLevel.LocalAuthority
-            });
+                GeographicLevel = GeographicLevel.LocalAuthority,
+            }
+        );
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {GeographicLevel.LocalAuthority, _countryRegionLaHierarchy}
+            { GeographicLevel.LocalAuthority, _countryRegionLaHierarchy },
         };
 
         var result = locations.GetLocationAttributesHierarchical(hierarchies);
@@ -363,28 +374,28 @@ public class LocationTests
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
-                GeographicLevel = GeographicLevel.Country
+                GeographicLevel = GeographicLevel.Country,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
                 Region = _northEast,
-                GeographicLevel = GeographicLevel.Region
+                GeographicLevel = GeographicLevel.Region,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
                 Region = _northWest,
-                GeographicLevel = GeographicLevel.Region
+                GeographicLevel = GeographicLevel.Region,
             },
             new Location
             {
                 Id = Guid.NewGuid(),
                 Country = _england,
                 Region = _eastMidlands,
-                GeographicLevel = GeographicLevel.Region
+                GeographicLevel = GeographicLevel.Region,
             },
             new Location
             {
@@ -392,7 +403,7 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _derby,
-                GeographicLevel = GeographicLevel.LocalAuthority
+                GeographicLevel = GeographicLevel.LocalAuthority,
             },
             new Location
             {
@@ -400,12 +411,13 @@ public class LocationTests
                 Country = _england,
                 Region = _eastMidlands,
                 LocalAuthority = _nottingham,
-                GeographicLevel = GeographicLevel.LocalAuthority
-            });
+                GeographicLevel = GeographicLevel.LocalAuthority,
+            }
+        );
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {GeographicLevel.LocalAuthority, _countryRegionLaHierarchy}
+            { GeographicLevel.LocalAuthority, _countryRegionLaHierarchy },
         };
 
         var result = locations.GetLocationAttributesHierarchical(hierarchies);

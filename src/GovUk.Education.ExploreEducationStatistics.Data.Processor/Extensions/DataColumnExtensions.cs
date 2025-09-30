@@ -6,7 +6,12 @@ public static class DataColumnExtensions
 {
     public static DataColumn CopyTo(this DataColumn column, DataTable table)
     {
-        var newColumn = new DataColumn(column.ColumnName, column.DataType, column.Expression, column.ColumnMapping)
+        var newColumn = new DataColumn(
+            column.ColumnName,
+            column.DataType,
+            column.Expression,
+            column.ColumnMapping
+        )
         {
             AllowDBNull = column.AllowDBNull,
             AutoIncrement = column.AutoIncrement,
@@ -17,7 +22,7 @@ public static class DataColumnExtensions
             DefaultValue = column.DefaultValue,
             MaxLength = column.MaxLength,
             ReadOnly = column.ReadOnly,
-            Unique = column.Unique
+            Unique = column.Unique,
         };
 
         table.Columns.Add(newColumn);
@@ -25,7 +30,11 @@ public static class DataColumnExtensions
         return newColumn;
     }
 
-    public static DataColumn CopyColumnTo(this DataTable sourceTable, string columnName, DataTable destinationTable)
+    public static DataColumn CopyColumnTo(
+        this DataTable sourceTable,
+        string columnName,
+        DataTable destinationTable
+    )
     {
         if (sourceTable.Columns.Contains(columnName))
         {

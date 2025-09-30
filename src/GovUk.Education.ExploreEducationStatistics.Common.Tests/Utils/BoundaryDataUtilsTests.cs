@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+
 public static class BoundaryDataUtilsTests
 {
     public class GetCodeTests
@@ -13,7 +14,9 @@ public static class BoundaryDataUtilsTests
             var properties = new Dictionary<string, object>();
 
             // Act & Assert
-            var result = Assert.Throws<ArgumentException>(() => BoundaryDataUtils.GetCode(properties));
+            var result = Assert.Throws<ArgumentException>(() =>
+                BoundaryDataUtils.GetCode(properties)
+            );
             Assert.Equal("Required key not found (expects key ending 'CD')", result.Message);
         }
 
@@ -22,13 +25,15 @@ public static class BoundaryDataUtilsTests
         {
             // Arrange
             var properties = new Dictionary<string, object>()
-        {
-            { "ctry17cd", "E92000001" },
-            { "abc123cd", "test" },
-        };
+            {
+                { "ctry17cd", "E92000001" },
+                { "abc123cd", "test" },
+            };
 
             // Act & Assert
-            var result = Assert.Throws<InvalidOperationException>(() => BoundaryDataUtils.GetCode(properties));
+            var result = Assert.Throws<InvalidOperationException>(() =>
+                BoundaryDataUtils.GetCode(properties)
+            );
             Assert.Equal("Sequence contains more than one matching element", result.Message);
         }
 
@@ -36,10 +41,7 @@ public static class BoundaryDataUtilsTests
         public void GetCode_EmptyValue_ReturnsEmptyString()
         {
             // Arrange
-            var properties = new Dictionary<string, object>()
-        {
-            { "ctry17cd", "" },
-        };
+            var properties = new Dictionary<string, object>() { { "ctry17cd", "" } };
 
             // Act
             var result = BoundaryDataUtils.GetCode(properties);
@@ -52,10 +54,7 @@ public static class BoundaryDataUtilsTests
         public void GetCode_ReturnsCode()
         {
             // Arrange
-            var properties = new Dictionary<string, object>()
-        {
-            { "ctry17cd", "E92000001" },
-        };
+            var properties = new Dictionary<string, object>() { { "ctry17cd", "E92000001" } };
 
             // Act
             var result = BoundaryDataUtils.GetCode(properties);
@@ -74,7 +73,9 @@ public static class BoundaryDataUtilsTests
             var properties = new Dictionary<string, object>();
 
             // Act & Assert
-            var result = Assert.Throws<ArgumentException>(() => BoundaryDataUtils.GetName(properties));
+            var result = Assert.Throws<ArgumentException>(() =>
+                BoundaryDataUtils.GetName(properties)
+            );
             Assert.Equal("Required key not found (expects key ending 'NM')", result.Message);
         }
 
@@ -83,13 +84,15 @@ public static class BoundaryDataUtilsTests
         {
             // Arrange
             var properties = new Dictionary<string, object>()
-        {
-            { "ctry17nm", "England" },
-            { "abc123nm", "test" },
-        };
+            {
+                { "ctry17nm", "England" },
+                { "abc123nm", "test" },
+            };
 
             // Act & Assert
-            var result = Assert.Throws<InvalidOperationException>(() => BoundaryDataUtils.GetName(properties));
+            var result = Assert.Throws<InvalidOperationException>(() =>
+                BoundaryDataUtils.GetName(properties)
+            );
             Assert.Equal("Sequence contains more than one matching element", result.Message);
         }
 
@@ -97,10 +100,7 @@ public static class BoundaryDataUtilsTests
         public void GetName_EmptyValue_ReturnsEmptyString()
         {
             // Arrange
-            var properties = new Dictionary<string, object>()
-        {
-            { "ctry17nm", "" },
-        };
+            var properties = new Dictionary<string, object>() { { "ctry17nm", "" } };
 
             // Act
             var result = BoundaryDataUtils.GetName(properties);
@@ -113,10 +113,7 @@ public static class BoundaryDataUtilsTests
         public void GetName_ReturnsName()
         {
             // Arrange
-            var properties = new Dictionary<string, object>()
-        {
-            { "ctry17nm", "England" },
-        };
+            var properties = new Dictionary<string, object>() { { "ctry17nm", "England" } };
 
             // Act
             var result = BoundaryDataUtils.GetName(properties);
@@ -133,10 +130,10 @@ public static class BoundaryDataUtilsTests
         {
             // Arrange
             var properties = new Dictionary<string, object>()
-        {
-            { "CTRY17CD", "E92000001" },
-            { "CTRY17NM", "England" },
-        };
+            {
+                { "CTRY17CD", "E92000001" },
+                { "CTRY17NM", "England" },
+            };
 
             // Act
             var codeResult = BoundaryDataUtils.GetCode(properties);

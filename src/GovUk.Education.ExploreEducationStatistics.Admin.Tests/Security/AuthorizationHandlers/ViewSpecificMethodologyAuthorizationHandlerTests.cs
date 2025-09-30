@@ -14,8 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -49,23 +48,23 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     userReleaseRoleRepository,
                     _,
                     releaseVersionRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
                 // Only the AccessAllMethodologies claim should allow a Methodology to be viewed.
                 var expectedToPassByClaimAlone = claim == AccessAllMethodologies;
 
                 if (!expectedToPassByClaimAlone)
                 {
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
-                    releaseVersionRepository.Setup(s =>
-                            s.GetLatestReleaseVersion(OwningPublication.Id, default))
+                    releaseVersionRepository
+                        .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                         .ReturnsAsync((ReleaseVersion?)null);
 
                     userPublicationRoleRepository
@@ -81,16 +80,18 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .AuthenticatedUser(userId: UserId)
                     .WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    ViewSpecificMethodologyRequirement,
+                    MethodologyVersion
+                >(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository);
+                    userReleaseRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -111,10 +112,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     userReleaseRoleRepository,
                     _,
                     releaseVersionRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
@@ -141,16 +142,18 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    ViewSpecificMethodologyRequirement,
+                    MethodologyVersion
+                >(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
                 VerifyAllMocks(
                     methodologyRepository,
                     releaseVersionRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 // As the user has Publication Owner role on the owning Publication of this Methodology, they are
                 // allowed to view it.
@@ -164,8 +167,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanViewMethodology()
         {
-            var expectedReleaseRolesToPass =
-                ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
+            var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
 
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
@@ -178,16 +180,16 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     userReleaseRoleRepository,
                     _,
                     releaseVersionRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 if (!expectedToPassByReleaseRole)
                 {
-                    methodologyRepository.Setup(s =>
-                            s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
                     releaseVersionRepository
@@ -205,9 +207,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    ViewSpecificMethodologyRequirement,
+                    MethodologyVersion
+                >(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -215,7 +218,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     methodologyRepository,
                     releaseVersionRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository);
+                    userReleaseRoleRepository
+                );
 
                 // As the user has a role on any Release of the owning Publication of this Methodology,
                 // they are allowed to view it.
@@ -232,7 +236,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
-                Published = null
+                Published = null,
             };
 
             var (
@@ -242,10 +246,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 userReleaseRoleRepository,
                 preReleaseService,
                 releaseVersionRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -256,32 +260,45 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
-            methodologyRepository.Setup(s =>
-                    s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(new List<Guid> { preReleaseForConnectedPublication.PublicationId });
 
             releaseVersionRepository
-                .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
+                .Setup(s =>
+                    s.GetLatestReleaseVersion(
+                        preReleaseForConnectedPublication.PublicationId,
+                        default
+                    )
+                )
                 .ReturnsAsync(preReleaseForConnectedPublication);
 
             userReleaseRoleRepository
-                .Setup(s => s.HasUserReleaseRole(UserId,
-                    preReleaseForConnectedPublication.Id,
-                    ReleaseRole.PrereleaseViewer))
+                .Setup(s =>
+                    s.HasUserReleaseRole(
+                        UserId,
+                        preReleaseForConnectedPublication.Id,
+                        ReleaseRole.PrereleaseViewer
+                    )
+                )
                 .ReturnsAsync(true);
 
             // Set up the release version to be within the prerelease window
             preReleaseService
-                .Setup(s => s.GetPreReleaseWindowStatus(
-                    It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
-                    It.IsAny<DateTime>()))
+                .Setup(s =>
+                    s.GetPreReleaseWindowStatus(
+                        It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
+                        It.IsAny<DateTime>()
+                    )
+                )
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -290,7 +307,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 releaseVersionRepository,
                 userPublicationRoleRepository,
                 userReleaseRoleRepository,
-                preReleaseService);
+                preReleaseService
+            );
 
             // As the user has the PrereleaseViewer role on a most recent release by time series for a publication
             // using the methodology version, and the release is approved but unpublished and within the prerelease
@@ -299,8 +317,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesAreOutsideWindow()
+        public async Task PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesAreOutsideWindow()
         {
             // Setup an approved but unpublished release version that can be in prerelease
             var preReleaseForConnectedPublication = new ReleaseVersion
@@ -308,7 +325,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
-                Published = null
+                Published = null,
             };
 
             var (
@@ -318,10 +335,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 userReleaseRoleRepository,
                 preReleaseService,
                 releaseVersionRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -332,32 +349,45 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
-            methodologyRepository.Setup(s =>
-                    s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(new List<Guid> { preReleaseForConnectedPublication.PublicationId });
 
             releaseVersionRepository
-                .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
+                .Setup(s =>
+                    s.GetLatestReleaseVersion(
+                        preReleaseForConnectedPublication.PublicationId,
+                        default
+                    )
+                )
                 .ReturnsAsync(preReleaseForConnectedPublication);
 
             userReleaseRoleRepository
-                .Setup(s => s.HasUserReleaseRole(UserId,
-                    preReleaseForConnectedPublication.Id,
-                    ReleaseRole.PrereleaseViewer))
+                .Setup(s =>
+                    s.HasUserReleaseRole(
+                        UserId,
+                        preReleaseForConnectedPublication.Id,
+                        ReleaseRole.PrereleaseViewer
+                    )
+                )
                 .ReturnsAsync(true);
 
             // Set up the release version to be outside the prerelease window
             preReleaseService
-                .Setup(s => s.GetPreReleaseWindowStatus(
-                    It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
-                    It.IsAny<DateTime>()))
+                .Setup(s =>
+                    s.GetPreReleaseWindowStatus(
+                        It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
+                        It.IsAny<DateTime>()
+                    )
+                )
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Before });
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -366,7 +396,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 releaseVersionRepository,
                 userPublicationRoleRepository,
                 userReleaseRoleRepository,
-                preReleaseService);
+                preReleaseService
+            );
 
             // As none of the publications using the methodology version have a most recent release by time series
             // which is approved but unpublished, and within the prerelease window, the user is not allowed to view
@@ -375,15 +406,14 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesAreDraft()
+        public async Task PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesAreDraft()
         {
             // Setup a draft release version that cannot be in prerelease
             var latestReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
-                ApprovalStatus = ReleaseApprovalStatus.Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft,
             };
 
             var (
@@ -393,10 +423,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 userReleaseRoleRepository,
                 _,
                 releaseVersionRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -407,8 +437,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
-            methodologyRepository.Setup(s =>
-                    s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(new List<Guid> { latestReleaseVersion.PublicationId });
 
             releaseVersionRepository
@@ -417,9 +447,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -427,7 +458,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 methodologyRepository,
                 releaseVersionRepository,
                 userPublicationRoleRepository,
-                userReleaseRoleRepository);
+                userReleaseRoleRepository
+            );
 
             // As none of the publications using the methodology version have a most recent release by time series
             // which is approved but unpublished, the user is not allowed to view it regardless of whether they have
@@ -436,8 +468,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesArePublished()
+        public async Task PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesArePublished()
         {
             // Setup a published release version that cannot be in prerelease
             var latestReleaseVersion = new ReleaseVersion
@@ -445,7 +476,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
-                Published = DateTime.UtcNow
+                Published = DateTime.UtcNow,
             };
 
             var (
@@ -455,10 +486,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 userReleaseRoleRepository,
                 _,
                 releaseVersionRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -469,8 +500,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
-            methodologyRepository.Setup(s =>
-                    s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(new List<Guid> { latestReleaseVersion.PublicationId });
 
             releaseVersionRepository
@@ -479,9 +510,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -489,7 +521,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 methodologyRepository,
                 releaseVersionRepository,
                 userPublicationRoleRepository,
-                userReleaseRoleRepository);
+                userReleaseRoleRepository
+            );
 
             // As none of the publications using the methodology version have a most recent release by time series
             // which is approved but unpublished, the user is not allowed to view it regardless of whether they have
@@ -507,10 +540,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 userReleaseRoleRepository,
                 _,
                 releaseVersionRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -521,8 +554,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
-            methodologyRepository.Setup(s =>
-                    s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
             releaseVersionRepository
@@ -531,9 +564,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -541,7 +575,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 methodologyRepository,
                 userPublicationRoleRepository,
                 userReleaseRoleRepository,
-                releaseVersionRepository);
+                releaseVersionRepository
+            );
 
             // As there are no latest Releases for the Owning Publication, the user cannot be a Prerelease Viewer
             // on it.
@@ -558,14 +593,14 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 userReleaseRoleRepository,
                 _,
                 releaseVersionRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
-            methodologyRepository.Setup(s =>
-                    s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
             userPublicationRoleRepository
@@ -582,9 +617,10 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                    (user, MethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificMethodologyRequirement,
+                MethodologyVersion
+            >(user, MethodologyVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -592,7 +628,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 methodologyRepository,
                 releaseVersionRepository,
                 userPublicationRoleRepository,
-                userReleaseRoleRepository);
+                userReleaseRoleRepository
+            );
 
             // A user with no roles on the owning Publication of this Methodology is not allowed to view it.
             Assert.False(authContext.HasSucceeded);
@@ -606,8 +643,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
         Mock<IUserReleaseRoleRepository>,
         Mock<IPreReleaseService>,
         Mock<IReleaseVersionRepository>
-        )
-        CreateHandlerAndDependencies()
+    ) CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -624,7 +660,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 userReleaseRoleRepository.Object,
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict))
+                Mock.Of<IPreReleaseService>(Strict)
+            )
         );
 
         return (

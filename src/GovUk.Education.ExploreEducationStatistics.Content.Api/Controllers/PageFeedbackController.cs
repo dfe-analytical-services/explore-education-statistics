@@ -12,8 +12,9 @@ public class PageFeedbackController(ContentDbContext context) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult> CreateFeedback(
-            [FromBody] PageFeedbackCreateRequest request,
-            CancellationToken cancellationToken)
+        [FromBody] PageFeedbackCreateRequest request,
+        CancellationToken cancellationToken
+    )
     {
         await context.PageFeedback.AddAsync(MapToEntity(request), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);

@@ -21,11 +21,12 @@ public class ReleaseImageController : ControllerBase
     [HttpPost("releases/{releaseVersionId:guid}/images")]
     [DisableRequestSizeLimit]
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-    public async Task<ActionResult<ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile file)
+    public async Task<ActionResult<ImageFileViewModel>> Upload(
+        Guid releaseVersionId,
+        IFormFile file
+    )
     {
-        return await _releaseImageService
-            .Upload(releaseVersionId, file)
-            .HandleFailuresOrOk();
+        return await _releaseImageService.Upload(releaseVersionId, file).HandleFailuresOrOk();
     }
 
     /// <summary>

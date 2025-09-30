@@ -8,16 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Rel
 
 [Route("api")]
 [ApiController]
-public class RelatedInformationController(IRelatedInformationService relatedInformationService) : ControllerBase
+public class RelatedInformationController(IRelatedInformationService relatedInformationService)
+    : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/related-information")]
     public async Task<ActionResult<RelatedInformationDto[]>> GetRelatedInformationForRelease(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default) =>
-        await relatedInformationService.GetRelatedInformationForRelease(
+        CancellationToken cancellationToken = default
+    ) =>
+        await relatedInformationService
+            .GetRelatedInformationForRelease(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug,
-                cancellationToken)
+                cancellationToken
+            )
             .HandleFailuresOrOk();
 }

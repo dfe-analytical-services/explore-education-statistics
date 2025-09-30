@@ -20,41 +20,51 @@ public class CompleteNextDataSetVersionImportFunction(
     ILogger<CompleteNextDataSetVersionImportFunction> logger,
     PublicDataDbContext publicDataDbContext,
     IValidator<NextDataSetVersionCompleteImportRequest> requestValidator,
-    IDataSetVersionMappingService mappingService)
+    IDataSetVersionMappingService mappingService
+)
 {
     [Function(nameof(CompleteNextDataSetVersionImport))]
     public async Task<IActionResult> CompleteNextDataSetVersionImport(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CompleteNextDataSetVersionImport))] [FromBody]
-        NextDataSetVersionCompleteImportRequest request,
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = nameof(CompleteNextDataSetVersionImport)
+        )]
+        [FromBody]
+            NextDataSetVersionCompleteImportRequest request,
         [DurableClient] DurableTaskClient client,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await requestValidator
             .Validate(request, cancellationToken)
-            .OnSuccess(_ => mappingService.GetManualMappingVersionAndImport(request, cancellationToken))
+            .OnSuccess(_ =>
+                mappingService.GetManualMappingVersionAndImport(request, cancellationToken)
+            )
             .OnSuccess(async versionAndImport =>
             {
                 var (nextVersion, importToContinue) = versionAndImport;
 
                 importToContinue.InstanceId = Guid.NewGuid();
                 publicDataDbContext.DataSetVersionImports.Update(importToContinue);
-                
+
                 nextVersion.Status = DataSetVersionStatus.Finalising;
                 publicDataDbContext.DataSetVersions.Update(nextVersion);
-                
+
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
                 await ProcessCompletionOfNextDataSetVersionImport(
                     client,
                     dataSetVersionId: nextVersion.Id,
                     instanceId: importToContinue.InstanceId,
-                    cancellationToken);
+                    cancellationToken
+                );
 
                 return new ProcessDataSetVersionResponseViewModel
                 {
                     DataSetId = nextVersion.DataSetId,
                     DataSetVersionId = nextVersion.Id,
-                    InstanceId = importToContinue.InstanceId
+                    InstanceId = importToContinue.InstanceId,
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
@@ -64,10 +74,12 @@ public class CompleteNextDataSetVersionImportFunction(
         DurableTaskClient client,
         Guid dataSetVersionId,
         Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        const string orchestratorName =
-            nameof(ProcessCompletionOfNextDataSetVersionOrchestration.ProcessCompletionOfNextDataSetVersionImport);
+        const string orchestratorName = nameof(
+            ProcessCompletionOfNextDataSetVersionOrchestration.ProcessCompletionOfNextDataSetVersionImport
+        );
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
@@ -77,12 +89,14 @@ public class CompleteNextDataSetVersionImportFunction(
             "Scheduling '{OrchestratorName}' (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
             orchestratorName,
             instanceId,
-            dataSetVersionId);
+            dataSetVersionId
+        );
 
         await client.ScheduleNewOrchestrationInstanceAsync(
             orchestratorName,
             input,
             options,
-            cancellationToken);
+            cancellationToken
+        );
     }
 }

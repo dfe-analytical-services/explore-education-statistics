@@ -15,8 +15,8 @@ using Xunit;
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests;
 
 public abstract class PublisherFunctionsIntegrationTest(
-    PublisherFunctionsIntegrationTestFixture fixture)
-    : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
+    PublisherFunctionsIntegrationTestFixture fixture
+) : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
 {
     public async Task InitializeAsync()
     {
@@ -36,7 +36,9 @@ public abstract class PublisherFunctionsIntegrationTest(
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
+public class PublisherFunctionsIntegrationTestFixture
+    : FunctionsIntegrationTestFixture,
+        IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
@@ -66,48 +68,56 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
 
     public override IHostBuilder ConfigureTestHostBuilder()
     {
-        return base
-            .ConfigureTestHostBuilder()
+        return base.ConfigureTestHostBuilder()
             .ConfigurePublisherHostBuilder()
             .ConfigureAppConfiguration(builder =>
             {
                 builder
-                    .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false)
-                    .AddInMemoryCollection(new Dictionary<string, string?>
-                    {
+                    .AddJsonFile(
+                        "appsettings.IntegrationTest.json",
+                        optional: true,
+                        reloadOnChange: false
+                    )
+                    .AddInMemoryCollection(
+                        new Dictionary<string, string?>
                         {
-                            $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
-                            _azuriteContainer.GetConnectionString()
-                        },
-                        {
-                            $"{AppOptions.Section}:{nameof(AppOptions.PublicStorageConnectionString)}",
-                            _azuriteContainer.GetConnectionString()
-                        },
-                        {
-                            $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
-                            _azuriteContainer.GetConnectionString()
-                        },
-                        {
-                            $"{AppOptions.Section}:{nameof(AppOptions.PublisherStorageConnectionString)}",
-                            _azuriteContainer.GetConnectionString()
+                            {
+                                $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
+                                _azuriteContainer.GetConnectionString()
+                            },
+                            {
+                                $"{AppOptions.Section}:{nameof(AppOptions.PublicStorageConnectionString)}",
+                                _azuriteContainer.GetConnectionString()
+                            },
+                            {
+                                $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
+                                _azuriteContainer.GetConnectionString()
+                            },
+                            {
+                                $"{AppOptions.Section}:{nameof(AppOptions.PublisherStorageConnectionString)}",
+                                _azuriteContainer.GetConnectionString()
+                            },
                         }
-                    });
+                    );
             })
             .ConfigureServices(services =>
             {
                 services.UseInMemoryDbContext<ContentDbContext>();
 
-                services.AddDbContext<PublicDataDbContext>(
-                    options => options
-                        .UseNpgsql(
-                            _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
+                services.AddDbContext<PublicDataDbContext>(options =>
+                    options.UseNpgsql(
+                        _postgreSqlContainer.GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()
+                    )
+                );
 
-                using var serviceScope = services.BuildServiceProvider()
+                using var serviceScope = services
+                    .BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
                     .CreateScope();
 
-                using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
+                using var context =
+                    serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
                 context.Database.Migrate();
             });
     }
@@ -124,7 +134,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(PublishTaxonomyFunction),
             typeof(RetryReleasePublishingFunction),
             typeof(StageReleaseContentFunction),
-            typeof(StageScheduledReleasesFunction)
+            typeof(StageScheduledReleasesFunction),
         ];
     }
 }

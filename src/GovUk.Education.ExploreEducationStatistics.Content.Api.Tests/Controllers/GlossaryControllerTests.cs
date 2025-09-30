@@ -21,18 +21,14 @@ public class GlossaryControllerTests
                 Heading: 'A',
                 Entries: new List<GlossaryEntryViewModel>
                 {
-                    new(
-                        Body: "A body",
-                        Slug: "A slug",
-                        Title: "A title")
-                })
+                    new(Body: "A body", Slug: "A slug", Title: "A title"),
+                }
+            ),
         };
 
         var (controller, mocks) = BuildControllerAndDependencies();
 
-        mocks.glossaryCacheService
-            .Setup(s => s.GetGlossary())
-            .ReturnsAsync(glossaryEntries);
+        mocks.glossaryCacheService.Setup(s => s.GetGlossary()).ReturnsAsync(glossaryEntries);
 
         var result = await controller.GetGlossary();
         VerifyAllMocks(mocks);
@@ -49,11 +45,10 @@ public class GlossaryControllerTests
             Title: "A title"
         );
 
-        var (controller, mocks) =
-            BuildControllerAndDependencies();
+        var (controller, mocks) = BuildControllerAndDependencies();
 
-        mocks.glossaryService
-            .Setup(s => s.GetGlossaryEntry(glossaryEntry.Slug))
+        mocks
+            .glossaryService.Setup(s => s.GetGlossaryEntry(glossaryEntry.Slug))
             .ReturnsAsync(glossaryEntry);
 
         var result = await controller.GetGlossaryEntry(glossaryEntry.Slug);
@@ -65,17 +60,18 @@ public class GlossaryControllerTests
     private static (
         GlossaryController controller,
         (
-        Mock<IGlossaryCacheService> glossaryCacheService,
-        Mock<IGlossaryService> glossaryService) mocks
-        )
-        BuildControllerAndDependencies()
+            Mock<IGlossaryCacheService> glossaryCacheService,
+            Mock<IGlossaryService> glossaryService
+        ) mocks
+    ) BuildControllerAndDependencies()
     {
         var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
         var glossaryService = new Mock<IGlossaryService>(Strict);
 
         var controller = new GlossaryController(
             glossaryCacheService.Object,
-            glossaryService.Object);
+            glossaryService.Object
+        );
         return (controller, (glossaryCacheService, glossaryService));
     }
 }

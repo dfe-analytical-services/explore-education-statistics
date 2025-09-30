@@ -13,7 +13,9 @@ public static class ServiceProviderExtensions
         return provider.GetRequiredService<IOptions<JsonOptions>>().Value;
     }
 
-    public static JsonSerializerOptions GetSystemTextJsonSerializerOptions(this IServiceProvider provider)
+    public static JsonSerializerOptions GetSystemTextJsonSerializerOptions(
+        this IServiceProvider provider
+    )
     {
         return provider.GetSystemTextJsonOptions().SerializerOptions;
     }

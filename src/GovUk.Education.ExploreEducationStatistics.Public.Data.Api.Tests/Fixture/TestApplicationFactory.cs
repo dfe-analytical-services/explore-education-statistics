@@ -25,7 +25,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
         .Build();
-    
+
     private readonly HashSet<string> _additionalAppsettingsFiles = new();
 
     public async Task Initialize()
@@ -38,7 +38,8 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         await _postgreSqlContainer.DisposeAsync();
     }
 
-    public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
+    public async Task ClearTestData<TDbContext>()
+        where TDbContext : DbContext
     {
         var context = this.GetDbContext<TDbContext, Startup>();
         await context.ClearTestData();
@@ -57,37 +58,48 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
 
     protected override IHostBuilder CreateHostBuilder()
     {
-        return base
-            .CreateHostBuilder()
-            .ConfigureAppConfiguration((_, builder) =>
-            {
-                var configuration = new ConfigurationBuilder();
-                
-                _additionalAppsettingsFiles.ForEach(settingsFile =>
+        return base.CreateHostBuilder()
+            .ConfigureAppConfiguration(
+                (_, builder) =>
                 {
-                    configuration.AddJsonFile(
-                        Path.Combine(Assembly.GetExecutingAssembly().GetDirectoryPath(),
-                            settingsFile), optional: false);
-                });
-                
-                builder.AddConfiguration(configuration.Build());
-            })
+                    var configuration = new ConfigurationBuilder();
+
+                    _additionalAppsettingsFiles.ForEach(settingsFile =>
+                    {
+                        configuration.AddJsonFile(
+                            Path.Combine(
+                                Assembly.GetExecutingAssembly().GetDirectoryPath(),
+                                settingsFile
+                            ),
+                            optional: false
+                        );
+                    });
+
+                    builder.AddConfiguration(configuration.Build());
+                }
+            )
             .ConfigureServices(services =>
             {
-                services.AddDbContext<PublicDataDbContext>(
-                    options => options
-                        .UseNpgsql(
-                            _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure()));
+                services.AddDbContext<PublicDataDbContext>(options =>
+                    options.UseNpgsql(
+                        _postgreSqlContainer.GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()
+                    )
+                );
 
                 services
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, null);
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                        JwtBearerDefaults.AuthenticationScheme,
+                        null
+                    );
 
                 services.AddSingleton<TestAuthHandlerUserProvider>();
-                
-                services
-                    .ReplaceService<IAnalyticsPathResolver>(new TestAnalyticsPathResolver(), optional: true);
+
+                services.ReplaceService<IAnalyticsPathResolver>(
+                    new TestAnalyticsPathResolver(),
+                    optional: true
+                );
             });
     }
 
@@ -95,7 +107,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     {
         public ClaimsPrincipal? User { get; set; }
     }
-    
+
     /// <summary>
     /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
     /// for authentication and authorization mechanisms to use.
@@ -104,8 +116,8 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        TestAuthHandlerUserProvider userProvider)
-        : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+        TestAuthHandlerUserProvider userProvider
+    ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -127,9 +139,11 @@ public static class TestWebApplicationFactoryExtensions
 {
     public static WebApplicationFactory<Startup> WithUser(
         this WebApplicationFactory<Startup> factory,
-        ClaimsPrincipal? user)
+        ClaimsPrincipal? user
+    )
     {
-        var authHandler = factory.Services.GetRequiredService<TestApplicationFactory.TestAuthHandlerUserProvider>();
+        var authHandler =
+            factory.Services.GetRequiredService<TestApplicationFactory.TestAuthHandlerUserProvider>();
         authHandler.User = user;
         return factory;
     }

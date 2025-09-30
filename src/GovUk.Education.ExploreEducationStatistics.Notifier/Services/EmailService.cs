@@ -11,12 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 public class EmailService(
     INotificationClient notificationClient,
     IOptions<AppOptions> appOptions,
-    ILogger<EmailService> logger) : IEmailService
+    ILogger<EmailService> logger
+) : IEmailService
 {
-    public void SendEmail(
-        string email,
-        string templateId,
-        Dictionary<string, dynamic> values)
+    public void SendEmail(string email, string templateId, Dictionary<string, dynamic> values)
     {
         try
         {
@@ -26,7 +24,8 @@ public class EmailService(
                 personalisation: values,
                 clientReference: null,
                 emailReplyToId: null,
-                oneClickUnsubscribeURL: null);
+                oneClickUnsubscribeURL: null
+            );
         }
         catch (NotifyClientException e)
         {
@@ -39,13 +38,16 @@ public class EmailService(
             //
             // In these instances we will want to catch and log these errors rather than
             // have them appear in Application Insights as alerts.
-            if (appOptions.Value.SuppressExceptionsForTeamOnlyApiKeyErrors
-                && e.Message.Contains("team-only API key"))
+            if (
+                appOptions.Value.SuppressExceptionsForTeamOnlyApiKeyErrors
+                && e.Message.Contains("team-only API key")
+            )
             {
                 logger.LogInformation(
-                    "Email could not be sent to \"{Email}\" as they are not a valid " +
-                    "recipient for this team-only API key.",
-                    email);
+                    "Email could not be sent to \"{Email}\" as they are not a valid "
+                        + "recipient for this team-only API key.",
+                    email
+                );
             }
             else
             {

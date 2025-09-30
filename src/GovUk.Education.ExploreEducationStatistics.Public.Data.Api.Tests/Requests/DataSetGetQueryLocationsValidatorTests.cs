@@ -22,13 +22,13 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         "Invalid",
         "NAT|",
         "|",
-        "||"
+        "||",
     };
 
     public static readonly TheoryData<string[]> InvalidLocationFormatsMultiple = new()
     {
-        new [] { "", " ", null! },
-        new [] { "Invalid", "NAT|", "|", "||" },
+        new[] { "", " ", null! },
+        new[] { "Invalid", "NAT|", "|", "||" },
     };
 
     public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationQueriesSingle =
@@ -36,7 +36,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
     public static readonly TheoryData<IDataSetQueryLocation[]> InvalidLocationQueriesMultiple =
         DataSetQueryCriteriaLocationsValidatorTests.InvalidLocationsMultiple;
-    
+
     public class EqTests : DataSetGetQueryLocationsValidatorTests
     {
         [Theory]
@@ -54,9 +54,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations { Eq = location };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Eq)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Eq).Only();
         }
 
         [Theory]
@@ -65,9 +63,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations { Eq = location.ToLocationString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.Eq)
-                .Only();
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.Eq).Only();
         }
     }
 
@@ -88,8 +84,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations { NotEq = location };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.NotEq);
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.NotEq);
         }
 
         [Theory]
@@ -98,8 +93,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations { NotEq = location.ToLocationString() };
 
-            _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor(q => q.NotEq);
+            _validator.TestValidate(query).ShouldHaveValidationErrorFor(q => q.NotEq);
         }
     }
 
@@ -111,7 +105,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations
             {
-                In = locations.Select(l => l.ToLocationString()).ToList()
+                In = locations.Select(l => l.ToLocationString()).ToList(),
             };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
@@ -124,7 +118,8 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.In)
+            result
+                .ShouldHaveValidationErrorFor(q => q.In)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -147,7 +142,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations
             {
-                In = [..locations.Select(l => l.ToLocationString())]
+                In = [.. locations.Select(l => l.ToLocationString())],
             };
 
             var result = _validator.TestValidate(query);
@@ -166,7 +161,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations
             {
-                NotIn = locations.Select(l => l.ToLocationString()).ToList()
+                NotIn = locations.Select(l => l.ToLocationString()).ToList(),
             };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
@@ -179,7 +174,8 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -202,7 +198,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations
             {
-                NotIn = [..locations.Select(l => l.ToLocationString())]
+                NotIn = [.. locations.Select(l => l.ToLocationString())],
             };
 
             var result = _validator.TestValidate(query);
@@ -223,20 +219,24 @@ public abstract class DataSetGetQueryLocationsValidatorTests
                 Eq = "",
                 NotEq = "",
                 In = [],
-                NotIn = []
+                NotIn = [],
             };
 
             var result = _validator.TestValidate(query);
 
             Assert.Equal(4, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor(q => q.Eq)
+            result
+                .ShouldHaveValidationErrorFor(q => q.Eq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.NotEq)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotEq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.In)
+            result
+                .ShouldHaveValidationErrorFor(q => q.In)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -248,7 +248,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
                 Eq = "NAT|id|12345",
                 NotEq = "",
                 In = ["LA|code|12345"],
-                NotIn = []
+                NotIn = [],
             };
 
             var result = _validator.TestValidate(query);
@@ -258,9 +258,11 @@ public abstract class DataSetGetQueryLocationsValidatorTests
             result.ShouldNotHaveValidationErrorFor(q => q.Eq);
             result.ShouldNotHaveValidationErrorFor(q => q.In);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotEq)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotEq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }

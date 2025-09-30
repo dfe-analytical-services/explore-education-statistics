@@ -7,7 +7,7 @@ public static class ArrayExtensions
         var jaggedArray = enumerable.ToArray();
         return jaggedArray.ToMultidimensionalArray();
     }
-    
+
     private static T[,] ToMultidimensionalArray<T>(this T[][] jaggedArray)
     {
         var rows = jaggedArray.Length;

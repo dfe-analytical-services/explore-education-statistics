@@ -20,16 +20,30 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
     public static async Task AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
         ReleaseVersion releaseVersion,
-        params ReleaseRole[] rolesExpectedToSucceed)
+        params ReleaseRole[] rolesExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
-        var inTeamScenarios = CreateUserInProductionTeamScenarios(releaseVersion, rolesExpectedToSucceed);
-        var notInTeamScenario = CreateUserNotInProductionTeamScenario(releaseVersion, rolesExpectedToSucceed);
-        var allScenarios = new List<ReleaseVersionHandlerTestScenario>(inTeamScenarios) { notInTeamScenario };
+        var inTeamScenarios = CreateUserInProductionTeamScenarios(
+            releaseVersion,
+            rolesExpectedToSucceed
+        );
+        var notInTeamScenario = CreateUserNotInProductionTeamScenario(
+            releaseVersion,
+            rolesExpectedToSucceed
+        );
+        var allScenarios = new List<ReleaseVersionHandlerTestScenario>(inTeamScenarios)
+        {
+            notInTeamScenario,
+        };
         await allScenarios
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(scenario =>
-                AssertReleaseVersionHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+                AssertReleaseVersionHandlerHandlesScenarioSuccessfully<TRequirement>(
+                    handlerSupplier,
+                    scenario
+                )
+            );
     }
 
     /**
@@ -39,20 +53,36 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
     public static async Task AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
         ReleaseVersion releaseVersion,
-        params PublicationRole[] rolesExpectedToSucceed)
+        params PublicationRole[] rolesExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
-        var inTeamScenarios = CreateUserInPublicationTeamScenarios(releaseVersion, rolesExpectedToSucceed);
-        var notInTeamScenario = CreateUserNotInPublicationTeamScenario(releaseVersion, rolesExpectedToSucceed);
-        var allScenarios = new List<ReleaseVersionHandlerTestScenario>(inTeamScenarios) { notInTeamScenario };
+        var inTeamScenarios = CreateUserInPublicationTeamScenarios(
+            releaseVersion,
+            rolesExpectedToSucceed
+        );
+        var notInTeamScenario = CreateUserNotInPublicationTeamScenario(
+            releaseVersion,
+            rolesExpectedToSucceed
+        );
+        var allScenarios = new List<ReleaseVersionHandlerTestScenario>(inTeamScenarios)
+        {
+            notInTeamScenario,
+        };
         await allScenarios
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(scenario =>
-                AssertReleaseVersionHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+                AssertReleaseVersionHandlerHandlesScenarioSuccessfully<TRequirement>(
+                    handlerSupplier,
+                    scenario
+                )
+            );
     }
 
-    private static ReleaseVersionHandlerTestScenario CreateUserNotInProductionTeamScenario(ReleaseVersion releaseVersion,
-        ReleaseRole[] rolesExpectedToSucceed)
+    private static ReleaseVersionHandlerTestScenario CreateUserNotInProductionTeamScenario(
+        ReleaseVersion releaseVersion,
+        ReleaseRole[] rolesExpectedToSucceed
+    )
     {
         var userId = Guid.NewGuid();
 
@@ -62,27 +92,35 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
 
         // add some roles to unrelated Users to ensure that only the current User is being
         // taken into consideration
-        rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-        {
-            rolesList.Add(new UserReleaseRole
+        rolesExpectedToSucceed
+            .ToList()
+            .ForEach(roleExpectedToSucceed =>
             {
-                ReleaseVersionId = releaseVersion.Id,
-                UserId = Guid.NewGuid(),
-                Role = roleExpectedToSucceed
+                rolesList.Add(
+                    new UserReleaseRole
+                    {
+                        ReleaseVersionId = releaseVersion.Id,
+                        UserId = Guid.NewGuid(),
+                        Role = roleExpectedToSucceed,
+                    }
+                );
             });
-        });
 
         // add some roles to unrelated Releases to ensure that only the Release under test is being
         // taken into consideration
-        rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-        {
-            rolesList.Add(new UserReleaseRole
+        rolesExpectedToSucceed
+            .ToList()
+            .ForEach(roleExpectedToSucceed =>
             {
-                ReleaseVersionId = Guid.NewGuid(),
-                UserId = userId,
-                Role = roleExpectedToSucceed
+                rolesList.Add(
+                    new UserReleaseRole
+                    {
+                        ReleaseVersionId = Guid.NewGuid(),
+                        UserId = userId,
+                        Role = roleExpectedToSucceed,
+                    }
+                );
             });
-        });
 
         var notInTeamScenario = new ReleaseVersionHandlerTestScenario
         {
@@ -90,71 +128,87 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             Entity = releaseVersion,
             UserReleaseRoles = rolesList,
             ExpectedToPass = false,
-            UnexpectedPassMessage = "Expected not having a role on the Release would have made the handler fail"
+            UnexpectedPassMessage =
+                "Expected not having a role on the Release would have made the handler fail",
         };
         return notInTeamScenario;
     }
 
     private static List<ReleaseVersionHandlerTestScenario> CreateUserInProductionTeamScenarios(
         ReleaseVersion releaseVersion,
-        ReleaseRole[] rolesExpectedToSucceed)
+        ReleaseRole[] rolesExpectedToSucceed
+    )
     {
-        var scenarios = GetEnums<ReleaseRole>().Select(role =>
-        {
-            var userId = Guid.NewGuid();
-
-            var user = DataFixture.AuthenticatedUser(userId: userId);
-
-            // add a new UserReleaseRole for the current User and ReleaseRole under test
-            var rolesList = new List<UserReleaseRole>
+        var scenarios = GetEnums<ReleaseRole>()
+            .Select(role =>
             {
-                new UserReleaseRole
+                var userId = Guid.NewGuid();
+
+                var user = DataFixture.AuthenticatedUser(userId: userId);
+
+                // add a new UserReleaseRole for the current User and ReleaseRole under test
+                var rolesList = new List<UserReleaseRole>
                 {
-                    ReleaseVersionId = releaseVersion.Id,
-                    UserId = userId,
-                    Role = role
-                }
-            };
+                    new UserReleaseRole
+                    {
+                        ReleaseVersionId = releaseVersion.Id,
+                        UserId = userId,
+                        Role = role,
+                    },
+                };
 
-            // add some roles to unrelated Users to ensure that only the current User is being
-            // taken into consideration
-            rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-            {
-                rolesList.Add(new UserReleaseRole
+                // add some roles to unrelated Users to ensure that only the current User is being
+                // taken into consideration
+                rolesExpectedToSucceed
+                    .ToList()
+                    .ForEach(roleExpectedToSucceed =>
+                    {
+                        rolesList.Add(
+                            new UserReleaseRole
+                            {
+                                ReleaseVersionId = releaseVersion.Id,
+                                UserId = Guid.NewGuid(),
+                                Role = roleExpectedToSucceed,
+                            }
+                        );
+                    });
+
+                // add some roles to unrelated Releases to ensure that only the Release under test is being
+                // taken into consideration
+                rolesExpectedToSucceed
+                    .ToList()
+                    .ForEach(roleExpectedToSucceed =>
+                    {
+                        rolesList.Add(
+                            new UserReleaseRole
+                            {
+                                ReleaseVersionId = Guid.NewGuid(),
+                                UserId = userId,
+                                Role = roleExpectedToSucceed,
+                            }
+                        );
+                    });
+
+                return new ReleaseVersionHandlerTestScenario
                 {
-                    ReleaseVersionId = releaseVersion.Id,
-                    UserId = Guid.NewGuid(),
-                    Role = roleExpectedToSucceed
-                });
-            });
-
-            // add some roles to unrelated Releases to ensure that only the Release under test is being
-            // taken into consideration
-            rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-            {
-                rolesList.Add(new UserReleaseRole
-                {
-                    ReleaseVersionId = Guid.NewGuid(),
-                    UserId = userId,
-                    Role = roleExpectedToSucceed
-                });
-            });
-
-            return new ReleaseVersionHandlerTestScenario
-            {
-                User = user,
-                Entity = releaseVersion,
-                UserReleaseRoles = rolesList,
-                ExpectedToPass = rolesExpectedToSucceed.Contains(role),
-                UnexpectedFailMessage = "Expected role " + role + " to have made the handler succeed",
-                UnexpectedPassMessage = "Expected role " + role + " to have made the handler fail",
-            };
-        }).ToList();
+                    User = user,
+                    Entity = releaseVersion,
+                    UserReleaseRoles = rolesList,
+                    ExpectedToPass = rolesExpectedToSucceed.Contains(role),
+                    UnexpectedFailMessage =
+                        "Expected role " + role + " to have made the handler succeed",
+                    UnexpectedPassMessage =
+                        "Expected role " + role + " to have made the handler fail",
+                };
+            })
+            .ToList();
         return scenarios;
     }
 
-    private static ReleaseVersionHandlerTestScenario CreateUserNotInPublicationTeamScenario(ReleaseVersion releaseVersion,
-        PublicationRole[] rolesExpectedToSucceed)
+    private static ReleaseVersionHandlerTestScenario CreateUserNotInPublicationTeamScenario(
+        ReleaseVersion releaseVersion,
+        PublicationRole[] rolesExpectedToSucceed
+    )
     {
         var userId = Guid.NewGuid();
 
@@ -164,27 +218,35 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
 
         // add some roles to unrelated Users to ensure that only the current User is being
         // taken into consideration
-        rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-        {
-            rolesList.Add(new UserPublicationRole
+        rolesExpectedToSucceed
+            .ToList()
+            .ForEach(roleExpectedToSucceed =>
             {
-                PublicationId = releaseVersion.Publication.Id,
-                UserId = Guid.NewGuid(),
-                Role = roleExpectedToSucceed
+                rolesList.Add(
+                    new UserPublicationRole
+                    {
+                        PublicationId = releaseVersion.Publication.Id,
+                        UserId = Guid.NewGuid(),
+                        Role = roleExpectedToSucceed,
+                    }
+                );
             });
-        });
 
         // add some roles to unrelated Publications to ensure that only the Publication under test is being
         // taken into consideration
-        rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-        {
-            rolesList.Add(new UserPublicationRole
+        rolesExpectedToSucceed
+            .ToList()
+            .ForEach(roleExpectedToSucceed =>
             {
-                PublicationId = Guid.NewGuid(),
-                UserId = userId,
-                Role = roleExpectedToSucceed
+                rolesList.Add(
+                    new UserPublicationRole
+                    {
+                        PublicationId = Guid.NewGuid(),
+                        UserId = userId,
+                        Role = roleExpectedToSucceed,
+                    }
+                );
             });
-        });
 
         var notInTeamScenario = new ReleaseVersionHandlerTestScenario
         {
@@ -192,72 +254,88 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             Entity = releaseVersion,
             UserPublicationRoles = rolesList,
             ExpectedToPass = false,
-            UnexpectedPassMessage = "Expected not having a role on the Publication would have made the handler fail"
+            UnexpectedPassMessage =
+                "Expected not having a role on the Publication would have made the handler fail",
         };
         return notInTeamScenario;
     }
 
     private static List<ReleaseVersionHandlerTestScenario> CreateUserInPublicationTeamScenarios(
         ReleaseVersion releaseVersion,
-        PublicationRole[] rolesExpectedToSucceed)
+        PublicationRole[] rolesExpectedToSucceed
+    )
     {
-        var scenarios = GetEnums<PublicationRole>().Select(role =>
-        {
-            var userId = Guid.NewGuid();
-
-            var user = DataFixture.AuthenticatedUser(userId: userId);
-
-            // add a new UserPublicationRole for the current User and PublicationRole under test
-            var rolesList = new List<UserPublicationRole>
+        var scenarios = GetEnums<PublicationRole>()
+            .Select(role =>
             {
-                new UserPublicationRole
+                var userId = Guid.NewGuid();
+
+                var user = DataFixture.AuthenticatedUser(userId: userId);
+
+                // add a new UserPublicationRole for the current User and PublicationRole under test
+                var rolesList = new List<UserPublicationRole>
                 {
-                    PublicationId = releaseVersion.Publication.Id,
-                    UserId = userId,
-                    Role = role
-                }
-            };
+                    new UserPublicationRole
+                    {
+                        PublicationId = releaseVersion.Publication.Id,
+                        UserId = userId,
+                        Role = role,
+                    },
+                };
 
-            // add some roles to unrelated Users to ensure that only the current User is being
-            // taken into consideration
-            rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-            {
-                rolesList.Add(new UserPublicationRole
+                // add some roles to unrelated Users to ensure that only the current User is being
+                // taken into consideration
+                rolesExpectedToSucceed
+                    .ToList()
+                    .ForEach(roleExpectedToSucceed =>
+                    {
+                        rolesList.Add(
+                            new UserPublicationRole
+                            {
+                                PublicationId = releaseVersion.Publication.Id,
+                                UserId = Guid.NewGuid(),
+                                Role = roleExpectedToSucceed,
+                            }
+                        );
+                    });
+
+                // add some roles to unrelated Publications to ensure that only the Publication under test is being
+                // taken into consideration
+                rolesExpectedToSucceed
+                    .ToList()
+                    .ForEach(roleExpectedToSucceed =>
+                    {
+                        rolesList.Add(
+                            new UserPublicationRole
+                            {
+                                PublicationId = Guid.NewGuid(),
+                                UserId = userId,
+                                Role = roleExpectedToSucceed,
+                            }
+                        );
+                    });
+
+                return new ReleaseVersionHandlerTestScenario
                 {
-                    PublicationId = releaseVersion.Publication.Id,
-                    UserId = Guid.NewGuid(),
-                    Role = roleExpectedToSucceed
-                });
-            });
-
-            // add some roles to unrelated Publications to ensure that only the Publication under test is being
-            // taken into consideration
-            rolesExpectedToSucceed.ToList().ForEach(roleExpectedToSucceed =>
-            {
-                rolesList.Add(new UserPublicationRole
-                {
-                    PublicationId = Guid.NewGuid(),
-                    UserId = userId,
-                    Role = roleExpectedToSucceed
-                });
-            });
-
-            return new ReleaseVersionHandlerTestScenario
-            {
-                User = user,
-                Entity = releaseVersion,
-                UserPublicationRoles = rolesList,
-                ExpectedToPass = rolesExpectedToSucceed.Contains(role),
-                UnexpectedFailMessage = "Expected role " + role + " to have made the handler succeed",
-                UnexpectedPassMessage = "Expected role " + role + " to have made the handler fail",
-            };
-        }).ToList();
+                    User = user,
+                    Entity = releaseVersion,
+                    UserPublicationRoles = rolesList,
+                    ExpectedToPass = rolesExpectedToSucceed.Contains(role),
+                    UnexpectedFailMessage =
+                        "Expected role " + role + " to have made the handler succeed",
+                    UnexpectedPassMessage =
+                        "Expected role " + role + " to have made the handler fail",
+                };
+            })
+            .ToList();
         return scenarios;
     }
 
     public static async Task AssertReleaseVersionHandlerHandlesScenarioSuccessfully<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        ReleaseVersionHandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
+        ReleaseVersionHandlerTestScenario scenario
+    )
+        where TRequirement : IAuthorizationRequirement
     {
         var contextId = Guid.NewGuid().ToString();
 
@@ -288,7 +366,8 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         TEntity handleRequirementArgument,
         Action<ContentDbContext> addToDbHandler,
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        params ReleaseRole[] rolesExpectedToSucceed)
+        params ReleaseRole[] rolesExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var allReleaseRoles = GetEnums<ReleaseRole>();
@@ -299,34 +378,51 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             .ForEachAwaitAsync(async role =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (
+                    var contentDbContext = InMemoryApplicationDbContext(contentDbContextId)
+                )
                 {
                     addToDbHandler(contentDbContext);
-                    await contentDbContext.AddAsync(new UserReleaseRole
-                    {
-                        UserId = userId,
-                        Role = role,
-                        ReleaseVersionId = releaseVersionId
-                    });
+                    await contentDbContext.AddAsync(
+                        new UserReleaseRole
+                        {
+                            UserId = userId,
+                            Role = role,
+                            ReleaseVersionId = releaseVersionId,
+                        }
+                    );
                     await contentDbContext.SaveChangesAsync();
                 }
 
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (
+                    var contentDbContext = InMemoryApplicationDbContext(contentDbContextId)
+                )
                 {
                     var user = DataFixture.AuthenticatedUser(userId: userId);
                     var authContext = new AuthorizationHandlerContext(
-                        new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                        user, handleRequirementArgument);
+                        new IAuthorizationRequirement[]
+                        {
+                            Activator.CreateInstance<TRequirement>(),
+                        },
+                        user,
+                        handleRequirementArgument
+                    );
 
                     var handler = handlerSupplier(contentDbContext);
                     await handler.HandleAsync(authContext);
                     if (rolesExpectedToSucceed.Contains(role))
                     {
-                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role.ToString()}");
+                        Assert.True(
+                            authContext.HasSucceeded,
+                            $"Should succeed with role {role.ToString()}"
+                        );
                     }
                     else
                     {
-                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role.ToString()}");
+                        Assert.False(
+                            authContext.HasSucceeded,
+                            $"Should fail with role {role.ToString()}"
+                        );
                     }
                 }
             });
@@ -343,7 +439,9 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             var user = DataFixture.AuthenticatedUser(userId: userId);
             var authContext = new AuthorizationHandlerContext(
                 new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                user, handleRequirementArgument);
+                user,
+                handleRequirementArgument
+            );
 
             var handler = handlerSupplier(contentDbContext);
             await handler.HandleAsync(authContext);

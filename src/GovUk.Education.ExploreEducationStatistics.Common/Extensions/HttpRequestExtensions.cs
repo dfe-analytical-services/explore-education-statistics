@@ -40,7 +40,11 @@ public static class HttpRequestExtensions
     /// <param name="exact">Match media types exactly. Wildcard sub-types will no longer be matched.</param>
     /// <param name="mediaTypes">The media type values to check.</param>
     /// <returns>True if the media types are accepted.</returns>
-    public static bool Accepts(this HttpRequest request, bool exact = false, params MediaTypeHeaderValue[] mediaTypes)
+    public static bool Accepts(
+        this HttpRequest request,
+        bool exact = false,
+        params MediaTypeHeaderValue[] mediaTypes
+    )
     {
         // If not exact, and no Accept header field is present, then
         // it is assumed that the client accepts all media types.
@@ -60,11 +64,16 @@ public static class HttpRequestExtensions
         }
 
         return accept?.Any(acceptedType =>
-            mediaTypes.Any(type => exact ? type.Equals(acceptedType) : type.IsSubsetOf(acceptedType))
-        ) ?? false;
+                mediaTypes.Any(type =>
+                    exact ? type.Equals(acceptedType) : type.IsSubsetOf(acceptedType)
+                )
+            ) ?? false;
     }
 
-    public static async Task<TJsonType?> GetJsonBody<TJsonType>(this HttpRequest request, bool allowEmptyBody = true)
+    public static async Task<TJsonType?> GetJsonBody<TJsonType>(
+        this HttpRequest request,
+        bool allowEmptyBody = true
+    )
         where TJsonType : class
     {
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
@@ -74,21 +83,22 @@ public static class HttpRequestExtensions
             return null;
         }
 
-        return JsonConvert.DeserializeObject<TJsonType>(requestBody) ??
-               throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
+        return JsonConvert.DeserializeObject<TJsonType>(requestBody)
+            ?? throw new ArgumentException(
+                $"Could not deserialize request body to type {typeof(TJsonType)}"
+            );
     }
 
     public static bool TryGetHeader(
         this HttpRequest httpRequest,
         string headerName,
-        out StringValues headerValues)
+        out StringValues headerValues
+    )
     {
         return httpRequest.Headers.TryGetValue(headerName, out headerValues);
     }
 
-    public static string? GetRequestParam(
-        this HttpRequest httpRequest,
-        string paramName)
+    public static string? GetRequestParam(this HttpRequest httpRequest, string paramName)
     {
         return httpRequest.Query[paramName];
     }
@@ -96,7 +106,8 @@ public static class HttpRequestExtensions
     public static string GetRequestParam(
         this HttpRequest httpRequest,
         string paramName,
-        string defaultValue)
+        string defaultValue
+    )
     {
         var value = GetRequestParam(httpRequest, paramName);
         return !value.IsNullOrEmpty() ? value : defaultValue;
@@ -105,7 +116,8 @@ public static class HttpRequestExtensions
     public static bool GetRequestParamBool(
         this HttpRequest httpRequest,
         string paramName,
-        bool defaultValue)
+        bool defaultValue
+    )
     {
         var paramValue = GetRequestParam(httpRequest, paramName, defaultValue.ToString());
         return bool.Parse(paramValue);
@@ -114,7 +126,8 @@ public static class HttpRequestExtensions
     public static int GetRequestParamInt(
         this HttpRequest httpRequest,
         string paramName,
-        int defaultValue)
+        int defaultValue
+    )
     {
         var paramValue = GetRequestParam(httpRequest, paramName, defaultValue.ToString());
         return int.Parse(paramValue);

@@ -19,9 +19,11 @@ public class PreReleaseSummaryServiceTests
     [Fact]
     public async Task GetPreReleaseSummaryViewModel()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -34,12 +36,21 @@ public class PreReleaseSummaryServiceTests
         {
             var service = BuildService(contentDbContext);
 
-            var result = await service.GetPreReleaseSummaryViewModel(releaseVersion.Id, CancellationToken.None);
+            var result = await service.GetPreReleaseSummaryViewModel(
+                releaseVersion.Id,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
 
-            Assert.Equal(releaseVersion.Release.Publication.Contact.TeamEmail, viewModel.ContactEmail);
-            Assert.Equal(releaseVersion.Release.Publication.Contact.TeamName, viewModel.ContactTeam);
+            Assert.Equal(
+                releaseVersion.Release.Publication.Contact.TeamEmail,
+                viewModel.ContactEmail
+            );
+            Assert.Equal(
+                releaseVersion.Release.Publication.Contact.TeamName,
+                viewModel.ContactTeam
+            );
             Assert.Equal(releaseVersion.Release.Publication.Slug, viewModel.PublicationSlug);
             Assert.Equal(releaseVersion.Release.Publication.Title, viewModel.PublicationTitle);
             Assert.Equal(releaseVersion.Release.Slug, viewModel.ReleaseSlug);
@@ -49,7 +60,8 @@ public class PreReleaseSummaryServiceTests
 
     private static PreReleaseSummaryService BuildService(
         ContentDbContext? contentDbContext = null,
-        UserService? userService = null)
+        UserService? userService = null
+    )
     {
         return new PreReleaseSummaryService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

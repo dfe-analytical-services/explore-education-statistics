@@ -18,40 +18,43 @@ public class CancellationTokenTimeoutAspect
     /// </para>
     /// </summary>
     public static bool Enabled { get; set; }
-    
+
     [Advice(Kind.Around)]
     public object Handle(
         [Argument(Source.Target)] Func<object[], object> target,
         [Argument(Source.Arguments)] object[] args,
         [Argument(Source.Metadata)] MethodBase method,
-        [Argument(Source.Triggers)] Attribute[] triggers)
+        [Argument(Source.Triggers)] Attribute[] triggers
+    )
     {
         var cancellationTokenParameters = method
             .GetParameters()
-            .Where(parameter => parameter.ParameterType == typeof(CancellationToken)
-                                || parameter.ParameterType == typeof(CancellationToken?))
+            .Where(parameter =>
+                parameter.ParameterType == typeof(CancellationToken)
+                || parameter.ParameterType == typeof(CancellationToken?)
+            )
             .ToArray();
-        
+
         if (cancellationTokenParameters.Count() != 1)
         {
-            throw new ArgumentException($"Method {method.Name} annotated with the " +
-                                        $"{nameof(CancellationTokenTimeoutAspect)} attribute must " +
-                                        $"accept a single {nameof(CancellationToken)} parameter");
+            throw new ArgumentException(
+                $"Method {method.Name} annotated with the "
+                    + $"{nameof(CancellationTokenTimeoutAspect)} attribute must "
+                    + $"accept a single {nameof(CancellationToken)} parameter"
+            );
         }
 
         var cancellationTokenParamPosition = method
             .GetParameters()
             .ToList()
             .IndexOf(cancellationTokenParameters.Single());
-        
+
         if (!Enabled)
         {
             return target(args);
         }
-        
-        var trigger = triggers
-            .OfType<CancellationTokenTimeoutAttribute>()
-            .Single();
+
+        var trigger = triggers.OfType<CancellationTokenTimeoutAttribute>().Single();
 
         var timeoutToken = new CancellationTokenSource(trigger.TimeoutMillis).Token;
         var passedInToken = args[cancellationTokenParamPosition] as CancellationToken?;
@@ -77,8 +80,6 @@ public class CancellationTokenTimeoutAspect
             return nonNullTokens[0];
         }
 
-        return CancellationTokenSource
-            .CreateLinkedTokenSource(nonNullTokens)
-            .Token;
+        return CancellationTokenSource.CreateLinkedTokenSource(nonNullTokens).Token;
     }
 }

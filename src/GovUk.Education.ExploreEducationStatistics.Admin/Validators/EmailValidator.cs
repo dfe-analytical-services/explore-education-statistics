@@ -10,7 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public static class EmailValidator
 {
-    public static Either<ActionResult, List<string>> ValidateEmailAddresses(IEnumerable<string> input)
+    public static Either<ActionResult, List<string>> ValidateEmailAddresses(
+        IEnumerable<string> input
+    )
     {
         var emails = input
             .Where(email => !email.IsNullOrWhitespace())

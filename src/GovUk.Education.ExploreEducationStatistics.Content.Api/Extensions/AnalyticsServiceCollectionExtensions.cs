@@ -7,11 +7,11 @@ public static class AnalyticsServiceCollectionExtensions
 {
     public static IServiceCollection AddAnalytics(
         this IServiceCollection services,
-        IConfiguration configuration) =>
+        IConfiguration configuration
+    ) =>
         services
             .AddAnalyticsCommon(configuration)
-                .WhenEnabled
-                    .AddWriteStrategy<AnalyticsWritePublicZipDownloadStrategy>()
-                    .AddWriteStrategy<AnalyticsWritePublicCsvDownloadStrategy>()
-                    .Services;
+            .WhenEnabled.AddWriteStrategy<AnalyticsWritePublicZipDownloadStrategy>()
+            .AddWriteStrategy<AnalyticsWritePublicCsvDownloadStrategy>()
+            .Services;
 }

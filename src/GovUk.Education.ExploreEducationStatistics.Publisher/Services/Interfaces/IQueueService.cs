@@ -4,9 +4,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IQueueService
 {
-    Task QueueStageReleaseContentMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys);
+    Task QueueStageReleaseContentMessages(
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys
+    );
 
     Task QueuePublishReleaseContentMessage(ReleasePublishingKey releasePublishingKey);
 
-    Task QueuePublishReleaseFilesMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys);
+    Task QueuePublishReleaseFilesMessages(
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys
+    );
 }

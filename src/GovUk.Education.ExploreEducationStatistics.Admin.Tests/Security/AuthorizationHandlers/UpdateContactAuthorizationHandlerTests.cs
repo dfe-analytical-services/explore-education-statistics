@@ -31,17 +31,23 @@ public class UpdateContactAuthorizationHandlerTests
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
             CreateHandler,
-            Owner);
+            Owner
+        );
     }
 
-    private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static UpdateContactAuthorizationHandler CreateHandler(
+        ContentDbContext contentDbContext
+    )
     {
         return new UpdateContactAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                    contentDbContext: contentDbContext
+                ),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

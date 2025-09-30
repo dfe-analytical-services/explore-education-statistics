@@ -16,9 +16,7 @@ public record MetaFileRow
     public string? IndicatorUnit { get; init; }
 
     public IndicatorUnit? ParsedIndicatorUnit =>
-        IndicatorUnit is not null
-            ? EnumUtil.GetFromEnumValue<IndicatorUnit>(IndicatorUnit)
-            : null;
+        IndicatorUnit is not null ? EnumUtil.GetFromEnumValue<IndicatorUnit>(IndicatorUnit) : null;
 
     public byte? IndicatorDp { get; init; }
 

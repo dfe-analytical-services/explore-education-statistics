@@ -16,10 +16,9 @@ public class IndicatorUnitSchemaFilterTests
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new IndicatorUnitSchemaFilter()],
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");
@@ -33,11 +32,14 @@ public class IndicatorUnitSchemaFilterTests
         Assert.Equal("string", schema.Type);
         Assert.Equal(indicatorUnits.Count, schema.Enum.Count);
 
-        Assert.All(schema.Enum, e =>
-        {
-            var enumString = Assert.IsType<OpenApiString>(e);
-            Assert.Contains(enumString.Value, indicatorUnits);
-        });
+        Assert.All(
+            schema.Enum,
+            e =>
+            {
+                var enumString = Assert.IsType<OpenApiString>(e);
+                Assert.Contains(enumString.Value, indicatorUnits);
+            }
+        );
     }
 
     private OpenApiSchema GenerateSchema()

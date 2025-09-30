@@ -19,8 +19,9 @@ public class TimePeriodFormatterTests
         [InlineData("1000000000")]
         public void SingleYearHasInvalidNumberOfDigits_Throws(string year)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => 
-                TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYear));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYear)
+            );
         }
 
         [Theory]
@@ -34,14 +35,18 @@ public class TimePeriodFormatterTests
         [InlineData("20030/2004")]
         public void InvalidRange_Throws(string year)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => 
-                TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYear));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYear)
+            );
         }
 
         [Fact]
         public void SingleYear_Success()
         {
-            var formattedTimePeriod = TimePeriodFormatter.FormatLabel("2024", TimeIdentifier.AcademicYearQ1);
+            var formattedTimePeriod = TimePeriodFormatter.FormatLabel(
+                "2024",
+                TimeIdentifier.AcademicYearQ1
+            );
 
             Assert.Equal("2024/25 Q1", formattedTimePeriod);
         }
@@ -53,7 +58,10 @@ public class TimePeriodFormatterTests
         [InlineData("2001/2002", "2001/02 Q1")]
         public void Range_Success(string year, string expected)
         {
-            var formattedTimePeriod = TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYearQ1);
+            var formattedTimePeriod = TimePeriodFormatter.FormatLabel(
+                year,
+                TimeIdentifier.AcademicYearQ1
+            );
 
             Assert.Equal(expected, formattedTimePeriod);
         }
@@ -74,7 +82,9 @@ public class TimePeriodFormatterTests
         [InlineData("1000000000")]
         public void InvalidSingleYear_Throws(string period)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => TimePeriodFormatter.FormatFromCsv(period));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                TimePeriodFormatter.FormatFromCsv(period)
+            );
         }
 
         [Theory]
@@ -85,7 +95,9 @@ public class TimePeriodFormatterTests
         [InlineData("200301")]
         public void InvalidSecondYear_Throws(string period)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => TimePeriodFormatter.FormatFromCsv(period));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                TimePeriodFormatter.FormatFromCsv(period)
+            );
         }
 
         [Fact]
@@ -120,9 +132,11 @@ public class TimePeriodFormatterTests
         [InlineData("1000000000")]
         public void InvalidSingleYear_Throws(string period)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => TimePeriodFormatter.FormatToCsv(period));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                TimePeriodFormatter.FormatToCsv(period)
+            );
         }
-        
+
         [Theory]
         [InlineData("1997/1999")]
         [InlineData("1998/2000")]
@@ -134,7 +148,9 @@ public class TimePeriodFormatterTests
         [InlineData("20030/2004")]
         public void InvalidRange_Throws(string period)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => TimePeriodFormatter.FormatToCsv(period));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                TimePeriodFormatter.FormatToCsv(period)
+            );
         }
 
         [Fact]

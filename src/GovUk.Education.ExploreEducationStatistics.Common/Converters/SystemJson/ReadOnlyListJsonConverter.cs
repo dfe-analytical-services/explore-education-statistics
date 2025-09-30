@@ -7,7 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJso
 public class ReadOnlyListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
     where TConverter : JsonConverter
 {
-    public override IReadOnlyList<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IReadOnlyList<T> Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options
+    )
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
@@ -34,7 +38,8 @@ public class ReadOnlyListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyL
                 return list;
             }
 
-            var value = (T)JsonSerializer.Deserialize(ref reader, valueType, jsonSerializerOptions)!;
+            var value = (T)
+                JsonSerializer.Deserialize(ref reader, valueType, jsonSerializerOptions)!;
 
             list.Add(value);
         }
@@ -42,7 +47,11 @@ public class ReadOnlyListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyL
         throw new JsonException();
     }
 
-    public override void Write(Utf8JsonWriter writer, IReadOnlyList<T>? value, JsonSerializerOptions options)
+    public override void Write(
+        Utf8JsonWriter writer,
+        IReadOnlyList<T>? value,
+        JsonSerializerOptions options
+    )
     {
         if (value == null)
         {

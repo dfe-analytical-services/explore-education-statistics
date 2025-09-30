@@ -17,14 +17,14 @@ public class BlobCacheAttribute : CacheAttribute
     /// </summary>
     public string? ServiceName { get; set; }
 
-    public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
-    {
-    }
+    public BlobCacheAttribute(Type key, bool forceUpdate = false)
+        : base(key, forceUpdate) { }
 
     public static void AddService(string name, IBlobCacheService service)
     {
         Services[name] = service;
     }
+
     public static void RemoveService(string name)
     {
         Services.Remove(name);
@@ -49,7 +49,9 @@ public class BlobCacheAttribute : CacheAttribute
             return service.GetItem(key, returnType);
         }
 
-        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        throw new ArgumentException(
+            $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+        );
     }
 
     public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
@@ -66,7 +68,9 @@ public class BlobCacheAttribute : CacheAttribute
             return await service.GetItemAsync(key, returnType);
         }
 
-        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        throw new ArgumentException(
+            $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+        );
     }
 
     public override void Set(ICacheKey cacheKey, object value)
@@ -85,7 +89,9 @@ public class BlobCacheAttribute : CacheAttribute
             return;
         }
 
-        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        throw new ArgumentException(
+            $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+        );
     }
 
     public override async Task SetAsync(ICacheKey cacheKey, object value)
@@ -104,7 +110,9 @@ public class BlobCacheAttribute : CacheAttribute
             return;
         }
 
-        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        throw new ArgumentException(
+            $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+        );
     }
 
     private IBlobCacheService? GetService()

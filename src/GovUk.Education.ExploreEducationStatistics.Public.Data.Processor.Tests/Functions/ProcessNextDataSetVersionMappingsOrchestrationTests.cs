@@ -29,9 +29,13 @@ public abstract class ProcessNextDataSetVersionMappingsOrchestrationTests
             {
                 mockOrchestrationContext
                     .InSequence(activitySequence)
-                    .Setup(context => context.CallActivityAsync(activityName,
-                        mockOrchestrationContext.Object.InstanceId,
-                        null))
+                    .Setup(context =>
+                        context.CallActivityAsync(
+                            activityName,
+                            mockOrchestrationContext.Object.InstanceId,
+                            null
+                        )
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -50,17 +54,23 @@ public abstract class ProcessNextDataSetVersionMappingsOrchestrationTests
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.CopyCsvFiles,
+                    context.CallActivityAsync(
+                        ActivityNames.CopyCsvFiles,
                         mockOrchestrationContext.Object.InstanceId,
-                        null))
+                        null
+                    )
+                )
                 .Throws<Exception>();
 
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.HandleProcessingFailure,
+                    context.CallActivityAsync(
+                        ActivityNames.HandleProcessingFailure,
                         mockOrchestrationContext.Object.InstanceId,
-                        null))
+                        null
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await ProcessNextDataSetVersionMappings(mockOrchestrationContext.Object);
@@ -68,19 +78,29 @@ public abstract class ProcessNextDataSetVersionMappingsOrchestrationTests
             VerifyAllMocks(mockOrchestrationContext);
         }
 
-        private async Task ProcessNextDataSetVersionMappings(TaskOrchestrationContext orchestrationContext)
+        private async Task ProcessNextDataSetVersionMappings(
+            TaskOrchestrationContext orchestrationContext
+        )
         {
             await ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings(
                 orchestrationContext,
-                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
+                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() }
+            );
         }
 
-        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(Guid? instanceId = null)
+        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
+            Guid? instanceId = null
+        )
         {
             var mock = new Mock<TaskOrchestrationContext>(MockBehavior.Strict);
 
-            mock.Setup(context => context.CreateReplaySafeLogger(
-                    nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings)))
+            mock.Setup(context =>
+                    context.CreateReplaySafeLogger(
+                        nameof(
+                            ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings
+                        )
+                    )
+                )
                 .Returns(NullLogger.Instance);
 
             mock.SetupGet(context => context.InstanceId)

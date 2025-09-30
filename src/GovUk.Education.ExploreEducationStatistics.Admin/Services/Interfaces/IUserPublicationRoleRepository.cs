@@ -5,36 +5,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserPublicationRoleRepository
 {
-    Task<UserPublicationRole> Create(Guid userId,
+    Task<UserPublicationRole> Create(
+        Guid userId,
         Guid publicationId,
         PublicationRole role,
-        Guid createdById);
+        Guid createdById
+    );
 
     Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
 
-    Task<List<PublicationRole>> GetAllRolesByUserAndPublication(
-        Guid userId,
-        Guid publicationId);
+    Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId);
 
     Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
         Guid publicationId,
-        PublicationRole role);
+        PublicationRole role
+    );
 
-    Task<bool> UserHasRoleOnPublication(
-        Guid userId,
-        Guid publicationId,
-        PublicationRole role);
+    Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role);
 
     Task Remove(
         UserPublicationRole userPublicationRole,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task RemoveMany(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    Task RemoveForUser(
-        Guid userId,
-        CancellationToken cancellationToken = default);
+    Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 }

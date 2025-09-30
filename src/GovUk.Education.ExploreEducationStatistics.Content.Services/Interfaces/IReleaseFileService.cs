@@ -10,11 +10,10 @@ public interface IReleaseFileService
 {
     Task<Either<ActionResult, IList<ReleaseFileViewModel>>> ListReleaseFiles(
         ReleaseFileListRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    Task<Either<ActionResult, FileStreamResult>> StreamFile(
-        Guid releaseVersionId,
-        Guid fileId);
+    Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId, Guid fileId);
 
     /// <summary>
     /// Pipe a zip file containing some release files to a stream.
@@ -30,5 +29,6 @@ public interface IReleaseFileService
         Stream outputStream,
         AnalyticsFromPage fromPage,
         IEnumerable<Guid>? fileIds = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

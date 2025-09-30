@@ -9,17 +9,18 @@ public static class AnalyticsServiceCollectionExtensions
 {
     public static IServiceCollection AddAnalytics(
         this IServiceCollection services,
-        IConfiguration configuration) =>
+        IConfiguration configuration
+    ) =>
         services
             .AddAnalyticsCommon(configuration)
-                .WhenEnabled
-                    .AddWriteStrategy<AnalyticsWriteTopLevelCallsStrategy>()
-                    .AddWriteStrategy<AnalyticsWritePublicationCallsStrategy>()
-                    .AddWriteStrategy<AnalyticsWriteDataSetCallsStrategy>()
-                    .AddWriteStrategy<AnalyticsWriteDataSetVersionCallsStrategy>()
-                    .AddWriteStrategy<AnalyticsWritePublicApiQueryStrategy>()
-                    .WithService(s => s.AddTransient<IAnalyticsService, AnalyticsService>())
-                .WhenDisabled
-                    .WithService(s => s.AddTransient<IAnalyticsService, NoOpAnalyticsService>())
-                .Services;
+            .WhenEnabled.AddWriteStrategy<AnalyticsWriteTopLevelCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWritePublicationCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWriteDataSetCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWriteDataSetVersionCallsStrategy>()
+            .AddWriteStrategy<AnalyticsWritePublicApiQueryStrategy>()
+            .WithService(s => s.AddTransient<IAnalyticsService, AnalyticsService>())
+            .WhenDisabled.WithService(s =>
+                s.AddTransient<IAnalyticsService, NoOpAnalyticsService>()
+            )
+            .Services;
 }

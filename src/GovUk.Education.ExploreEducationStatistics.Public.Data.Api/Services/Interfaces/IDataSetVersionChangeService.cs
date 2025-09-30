@@ -10,5 +10,6 @@ public interface IDataSetVersionChangeService
         Guid dataSetId,
         string dataSetVersion,
         bool includePatchHistory,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

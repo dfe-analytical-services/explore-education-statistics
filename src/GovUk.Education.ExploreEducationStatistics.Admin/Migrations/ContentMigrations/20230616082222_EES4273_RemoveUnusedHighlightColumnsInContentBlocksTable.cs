@@ -9,13 +9,9 @@ public partial class EES4273_RemoveUnusedHighlightColumnsInContentBlocksTable : 
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataBlock_HighlightDescription",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "DataBlock_HighlightDescription", table: "ContentBlock");
 
-        migrationBuilder.DropColumn(
-            name: "DataBlock_HighlightName",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "DataBlock_HighlightName", table: "ContentBlock");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -24,12 +20,14 @@ public partial class EES4273_RemoveUnusedHighlightColumnsInContentBlocksTable : 
             name: "DataBlock_HighlightDescription",
             table: "ContentBlock",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "DataBlock_HighlightName",
             table: "ContentBlock",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

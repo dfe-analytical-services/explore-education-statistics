@@ -23,35 +23,40 @@ public class PublicationReleaseSeriesAuthorizationHandlersTests
         [Fact]
         public async Task ManagePublicationReleaseSeries_Claims()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<Publication, ManagePublicationReleaseSeriesRequirement>(
-                CreateHandler,
-                new Publication(),
-                UpdateAllPublications
-            );
+            await AssertHandlerSucceedsWithCorrectClaims<
+                Publication,
+                ManagePublicationReleaseSeriesRequirement
+            >(CreateHandler, new Publication(), UpdateAllPublications);
         }
 
         [Fact]
         public async Task ManagePublicationReleaseSeries_PublicationRoles()
         {
             await AssertPublicationHandlerSucceedsWithPublicationRoles<ManagePublicationReleaseSeriesRequirement>(
-                CreateHandler, Owner);
+                CreateHandler,
+                Owner
+            );
         }
 
-        private static ManagePublicationReleaseSeriesAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        private static ManagePublicationReleaseSeriesAuthorizationHandler CreateHandler(
+            ContentDbContext contentDbContext
+        )
         {
             var userReleaseRoleRepository = new UserReleaseRoleRepository(
                 contentDbContext,
-                logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
+                logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+            );
 
-            var userPublicationRoleRepository = new UserPublicationRoleRepository(
-                contentDbContext);
+            var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
             return new ManagePublicationReleaseSeriesAuthorizationHandler(
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                     userReleaseRoleRepository: userReleaseRoleRepository,
                     userPublicationRoleRepository: userPublicationRoleRepository,
-                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+                )
+            );
         }
     }
 }

@@ -8,16 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Rel
 
 [Route("api")]
 [ApiController]
-public class ReleaseVersionsController(IReleaseVersionsService releaseVersionsService) : ControllerBase
+public class ReleaseVersionsController(IReleaseVersionsService releaseVersionsService)
+    : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/version-summary")]
     public async Task<ActionResult<ReleaseVersionSummaryDto>> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default) =>
-        await releaseVersionsService.GetReleaseVersionSummary(
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseVersionsService
+            .GetReleaseVersionSummary(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug,
-                cancellationToken)
+                cancellationToken
+            )
             .HandleFailuresOrOk();
 }

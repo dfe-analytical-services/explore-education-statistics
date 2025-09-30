@@ -7,27 +7,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 
 public static class IndicatorGeneratorExtensions
 {
-    public static Generator<Indicator> DefaultIndicator(this DataFixture fixture)
-        => fixture.Generator<Indicator>().WithDefaults();
+    public static Generator<Indicator> DefaultIndicator(this DataFixture fixture) =>
+        fixture.Generator<Indicator>().WithDefaults();
 
-    public static Generator<Indicator> WithDefaults(this Generator<Indicator> generator)
-        => generator.ForInstance(s => s.SetDefaults());
+    public static Generator<Indicator> WithDefaults(this Generator<Indicator> generator) =>
+        generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<Indicator> WithLabel(this Generator<Indicator> generator, string label)
-        => generator.ForInstance(s => s.SetLabel(label));
+    public static Generator<Indicator> WithLabel(
+        this Generator<Indicator> generator,
+        string label
+    ) => generator.ForInstance(s => s.SetLabel(label));
 
     public static Generator<Indicator> WithIndicatorGroup(
         this Generator<Indicator> generator,
-        IndicatorGroup indicatorGroup)
-        => generator.ForInstance(s => s.SetIndicatorGroup(indicatorGroup));
+        IndicatorGroup indicatorGroup
+    ) => generator.ForInstance(s => s.SetIndicatorGroup(indicatorGroup));
 
     public static Generator<Indicator> WithFootnotes(
         this Generator<Indicator> generator,
-        IEnumerable<Footnote> footnotes)
-        => generator.ForInstance(s => s.SetFootnotes(footnotes));
+        IEnumerable<Footnote> footnotes
+    ) => generator.ForInstance(s => s.SetFootnotes(footnotes));
 
-    public static InstanceSetters<Indicator> SetDefaults(this InstanceSetters<Indicator> setters)
-        => setters
+    public static InstanceSetters<Indicator> SetDefaults(this InstanceSetters<Indicator> setters) =>
+        setters
             .SetDefault(i => i.Id)
             .SetDefault(i => i.Label)
             .SetDefault(i => i.Name)
@@ -37,15 +39,14 @@ public static class IndicatorGeneratorExtensions
 
     public static InstanceSetters<Indicator> SetLabel(
         this InstanceSetters<Indicator> setters,
-        string label)
-        => setters
-            .Set(f => f.Label, label)
-            .Set(f => f.Name, label.SnakeCase());
+        string label
+    ) => setters.Set(f => f.Label, label).Set(f => f.Name, label.SnakeCase());
 
     public static InstanceSetters<Indicator> SetIndicatorGroup(
         this InstanceSetters<Indicator> setters,
-        IndicatorGroup indicatorGroup)
-        => setters
+        IndicatorGroup indicatorGroup
+    ) =>
+        setters
             .Set(
                 i => i.IndicatorGroup,
                 (_, indicator) =>
@@ -58,12 +59,13 @@ public static class IndicatorGeneratorExtensions
 
     public static InstanceSetters<Indicator> SetFootnotes(
         this InstanceSetters<Indicator> setters,
-        IEnumerable<Footnote> footnotes)
-        => setters.Set(
+        IEnumerable<Footnote> footnotes
+    ) =>
+        setters.Set(
             obj => obj.Footnotes,
-            (_, indicator) => footnotes
-                .Select(
-                    footnote =>
+            (_, indicator) =>
+                footnotes
+                    .Select(footnote =>
                     {
                         var indicatorFootnote = new IndicatorFootnote
                         {
@@ -76,8 +78,7 @@ public static class IndicatorGeneratorExtensions
                         footnote.Indicators.Add(indicatorFootnote);
 
                         return indicatorFootnote;
-                    }
-                )
-                .ToList()
+                    })
+                    .ToList()
         );
 }

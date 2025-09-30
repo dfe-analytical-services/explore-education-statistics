@@ -20,7 +20,9 @@ public class FrontEndServiceTests
     private readonly string _tableJson = File.ReadAllText(
         Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            $"Resources{Path.DirectorySeparatorChar}permalink-table.json"));
+            $"Resources{Path.DirectorySeparatorChar}permalink-table.json"
+        )
+    );
 
     [Fact]
     public async Task CreateTable_ClientReturnsOk()
@@ -28,21 +30,24 @@ public class FrontEndServiceTests
         var httpMessageHandler = SetupFrontendHttpMessageHandler(HttpStatusCode.OK);
         var httpClientFactory = HttpClientTestUtils.CreateHttpClientFactoryMock(
             clientName: HttpClientName,
-            httpMessageHandler: httpMessageHandler.Object);
+            httpMessageHandler: httpMessageHandler.Object
+        );
 
-        var service = BuildService(
-            httpClientFactory: httpClientFactory.Object);
+        var service = BuildService(httpClientFactory: httpClientFactory.Object);
 
         var result = await service.CreateTable(
             new TableBuilderResultViewModel(),
-            new TableBuilderConfiguration());
+            new TableBuilderConfiguration()
+        );
 
         MockUtils.VerifyAllMocks(httpMessageHandler, httpClientFactory);
 
         var viewModel = result.AssertRight();
 
-        Assert.Equal("Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
-            viewModel.Caption);
+        Assert.Equal(
+            "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
+            viewModel.Caption
+        );
         Assert.Equal(JObject.Parse(_tableJson), viewModel.Json);
     }
 
@@ -52,14 +57,15 @@ public class FrontEndServiceTests
         var httpMessageHandler = SetupFrontendHttpMessageHandler(HttpStatusCode.NotFound);
         var httpClientFactory = HttpClientTestUtils.CreateHttpClientFactoryMock(
             clientName: HttpClientName,
-            httpMessageHandler: httpMessageHandler.Object);
+            httpMessageHandler: httpMessageHandler.Object
+        );
 
-        var service = BuildService(
-            httpClientFactory: httpClientFactory.Object);
+        var service = BuildService(httpClientFactory: httpClientFactory.Object);
 
         var result = await service.CreateTable(
             new TableBuilderResultViewModel(),
-            new TableBuilderConfiguration());
+            new TableBuilderConfiguration()
+        );
 
         MockUtils.VerifyAllMocks(httpMessageHandler, httpClientFactory);
 
@@ -72,14 +78,15 @@ public class FrontEndServiceTests
         var httpMessageHandler = SetupFrontendHttpMessageHandler(HttpStatusCode.BadRequest);
         var httpClientFactory = HttpClientTestUtils.CreateHttpClientFactoryMock(
             clientName: HttpClientName,
-            httpMessageHandler: httpMessageHandler.Object);
+            httpMessageHandler: httpMessageHandler.Object
+        );
 
-        var service = BuildService(
-            httpClientFactory: httpClientFactory.Object);
+        var service = BuildService(httpClientFactory: httpClientFactory.Object);
 
         var result = await service.CreateTable(
             new TableBuilderResultViewModel(),
-            new TableBuilderConfiguration());
+            new TableBuilderConfiguration()
+        );
 
         MockUtils.VerifyAllMocks(httpMessageHandler, httpClientFactory);
 
@@ -91,23 +98,25 @@ public class FrontEndServiceTests
         var httpResponseMessage = new HttpResponseMessage
         {
             StatusCode = httpStatusCode,
-            Content = new StringContent(@$"
+            Content = new StringContent(
+                @$"
             {{
               ""caption"": ""Admission Numbers for 'Sample publication' in North East between 2022 and 2023"",
               ""json"": {_tableJson}
-            }}")
+            }}"
+            ),
         };
 
         var httpMessageHandler = HttpClientTestUtils.CreateHttpMessageHandlerMock(
             httpMethod: HttpMethod.Post,
             requestUri: "api/permalink",
-            httpResponseMessage: httpResponseMessage);
+            httpResponseMessage: httpResponseMessage
+        );
 
         return httpMessageHandler;
     }
 
-    private static FrontendService BuildService(
-        IHttpClientFactory? httpClientFactory = null)
+    private static FrontendService BuildService(IHttpClientFactory? httpClientFactory = null)
     {
         return new FrontendService(
             logger: Mock.Of<ILogger<FrontendService>>(),

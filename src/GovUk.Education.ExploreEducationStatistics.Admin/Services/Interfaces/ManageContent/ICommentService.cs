@@ -8,19 +8,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
 public interface ICommentService
 {
-    Task<Either<ActionResult, List<CommentViewModel>>> GetComments(Guid releaseVersionId,
+    Task<Either<ActionResult, List<CommentViewModel>>> GetComments(
+        Guid releaseVersionId,
         Guid contentSectionId,
-        Guid contentBlockId);
+        Guid contentBlockId
+    );
 
-    Task<Either<ActionResult, CommentViewModel>> AddComment(Guid releaseVersionId,
+    Task<Either<ActionResult, CommentViewModel>> AddComment(
+        Guid releaseVersionId,
         Guid contentSectionId,
         Guid contentBlockId,
-        CommentSaveRequest saveRequest);
+        CommentSaveRequest saveRequest
+    );
 
     Task<Either<ActionResult, CommentViewModel>> SetResolved(Guid commentId, bool resolve);
 
-    Task<Either<ActionResult, CommentViewModel>> UpdateComment(Guid commentId,
-        CommentSaveRequest saveRequest);
+    Task<Either<ActionResult, CommentViewModel>> UpdateComment(
+        Guid commentId,
+        CommentSaveRequest saveRequest
+    );
 
     Task<Either<ActionResult, bool>> DeleteComment(Guid commentId);
 }

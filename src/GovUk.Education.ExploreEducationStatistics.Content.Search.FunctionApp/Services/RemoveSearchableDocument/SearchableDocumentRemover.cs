@@ -11,21 +11,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 internal class SearchableDocumentRemover(
     IContentApiClient contentApiClient,
     IAzureBlobStorageClient azureBlobStorageClient,
-    IOptions<AppOptions> appOptions) : ISearchableDocumentRemover
+    IOptions<AppOptions> appOptions
+) : ISearchableDocumentRemover
 {
     public async Task<RemovePublicationSearchableDocumentsResponse> RemovePublicationSearchableDocuments(
         RemovePublicationSearchableDocumentsRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var releaseInfos = await contentApiClient.GetReleasesForPublication(
             request.PublicationSlug,
-            cancellationToken);
+            cancellationToken
+        );
 
         var results = new Dictionary<Guid, bool>();
 
         foreach (var releaseInfo in releaseInfos)
         {
-            var result = await RemoveSearchableDocument(new RemoveSearchableDocumentRequest{ ReleaseId = releaseInfo.ReleaseId }, cancellationToken);
+            var result = await RemoveSearchableDocument(
+                new RemoveSearchableDocumentRequest { ReleaseId = releaseInfo.ReleaseId },
+                cancellationToken
+            );
             results[releaseInfo.ReleaseId] = result.Success;
         }
 
@@ -34,14 +40,16 @@ internal class SearchableDocumentRemover(
 
     public async Task<RemoveSearchableDocumentResponse> RemoveSearchableDocument(
         RemoveSearchableDocumentRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var blobName = request.ReleaseId.ToString();
 
         var success = await azureBlobStorageClient.DeleteBlobIfExists(
             appOptions.Value.SearchableDocumentsContainerName,
             blobName,
-            cancellationToken);
+            cancellationToken
+        );
 
         return new RemoveSearchableDocumentResponse(success);
     }
@@ -50,6 +58,7 @@ internal class SearchableDocumentRemover(
     {
         await azureBlobStorageClient.DeleteAllBlobsFromContainer(
             appOptions.Value.SearchableDocumentsContainerName,
-            cancellationToken);
+            cancellationToken
+        );
     }
 }

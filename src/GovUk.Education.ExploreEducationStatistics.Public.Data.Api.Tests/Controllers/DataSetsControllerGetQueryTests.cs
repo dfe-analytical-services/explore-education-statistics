@@ -28,22 +28,26 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
+public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp)
+    : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
 
     private readonly TestDataSetVersionPathResolver _dataSetVersionPathResolver = new()
     {
-        Directory = "AbsenceSchool"
+        Directory = "AbsenceSchool",
     };
 
     private readonly TestAnalyticsPathResolver _analyticsPathResolver = new();
 
-    public class AccessTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class AccessTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        [MemberData(
+            nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+        )]
         public async Task VersionNotAvailable_Returns403(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
@@ -57,8 +61,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
 
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
-            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        [MemberData(
+            nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+        )]
         public async Task VersionAvailable_Returns200(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
@@ -68,7 +74,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(1, viewModel.Paging.Page);
             Assert.Equal(1, viewModel.Paging.TotalPages);
@@ -103,37 +111,47 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             response.AssertNotFound();
         }
-        
+
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
-            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
-        public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
+        [MemberData(
+            nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+        )]
+        public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(
+            DataSetVersionStatus versionStatus
+        )
         {
             var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
-            
+
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: "2.*",
                 previewTokenId: versions.Last().PreviewTokens[0].Id,
-                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
+            );
 
             response.AssertNotFound();
         }
-        
+
         [Fact]
         public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
         {
-            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
-            
+            var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(
+                DataSetVersionStatus.Published
+            );
+
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: "2.*",
                 previewTokenId: versions.Last().PreviewTokens[0].Id,
-                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
+            );
 
             response.AssertOk();
-            
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
             Assert.Equal(1, viewModel.Paging.Page);
             Assert.Equal(1, viewModel.Paging.TotalPages);
             Assert.Equal(216, viewModel.Paging.TotalResults);
@@ -144,18 +162,21 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class PreviewTokenTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class PreviewTokenTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
-            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        [MemberData(
+            nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+        )]
         public async Task PreviewTokenIsActive_Returns200(DataSetVersionStatus dataSetVersionStatus)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSets.Add(dataSet)
+            );
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -163,26 +184,31 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 .WithDataSetId(dataSet.Id)
                 .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.Add(dataSetVersion)
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.PublicVersion,
                 previewTokenId: dataSetVersion.PreviewTokens[0].Id,
-                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
+            );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
             Assert.NotNull(viewModel);
         }
 
         [Fact]
         public async Task PreviewTokenIsExpired_Returns403()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSets.Add(dataSet)
+            );
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -190,13 +216,16 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 .WithDataSetId(dataSet.Id)
                 .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)]);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.Add(dataSetVersion)
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.PublicVersion,
                 previewTokenId: dataSetVersion.PreviewTokens[0].Id,
-                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
+            );
 
             response.AssertForbidden();
         }
@@ -204,11 +233,11 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         [Fact]
         public async Task PreviewTokenIsForWrongDataSetVersion_Returns403()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSets.Add(dataSet)
+            );
 
             var (dataSetVersion1, dataSetVersion2) = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -219,28 +248,33 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 .ToTuple2();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2));
+                context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2)
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion1.PublicVersion,
                 previewTokenId: dataSetVersion2.PreviewTokens[0].Id,
-                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
+            );
 
             response.AssertForbidden();
         }
 
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
-            MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+        [MemberData(
+            nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
+            MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+        )]
         public async Task PreviewTokenIsForUnavailableDataSetVersion_Returns403(
-            DataSetVersionStatus dataSetVersionStatus)
+            DataSetVersionStatus dataSetVersionStatus
+        )
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSets.Add(dataSet)
+            );
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -249,19 +283,22 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()]);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersions.AddRange(dataSetVersion));
+                context.DataSetVersions.AddRange(dataSetVersion)
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.PublicVersion,
                 previewTokenId: dataSetVersion.PreviewTokens[0].Id,
-                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
+                indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
+            );
 
             response.AssertForbidden();
         }
     }
 
-    public class IndicatorValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class IndicatorValidationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Fact]
         public async Task Empty_Returns400()
@@ -270,7 +307,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var client = BuildApp().CreateClient();
 
-            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query?indicators[0]=");
+            var response = await client.GetAsync(
+                $"{BaseUrl}/{dataSetVersion.DataSetId}/query?indicators[0]="
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -336,7 +375,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class FiltersValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class FiltersValidationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData("filters.in[0]")]
@@ -348,12 +388,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, ""
-                    }
-                }
+                queryParameters: new Dictionary<string, StringValues> { { path, "" } }
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -370,22 +405,12 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] invalidFilters =
-            [
-                "",
-                " ",
-                "  ",
-                new string('a', 11),
-                new string('a', 12),
-            ];
+            string[] invalidFilters = ["", " ", "  ", new string('a', 11), new string('a', 12)];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, invalidFilters }
-                }
+                queryParameters: new Dictionary<string, StringValues> { { path, invalidFilters } }
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -404,29 +429,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] invalidFilters =
-            [
-                new string('a', 11),
-                ""
-            ];
+            string[] invalidFilters = [new string('a', 11), ""];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        "filters.eq", new string('a', 11)
-                    },
-                    {
-                        "filters.notEq", new string('a', 12)
-                    },
-                    {
-                        "filters.in[0]", ""
-                    },
-                    {
-                        "filters.notIn", invalidFilters
-                    },
+                    { "filters.eq", new string('a', 11) },
+                    { "filters.notEq", new string('a', 12) },
+                    { "filters.in[0]", "" },
+                    { "filters.notIn", invalidFilters },
                 }
             );
 
@@ -448,24 +461,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] notFoundFilters =
-            [
-                "invalid",
-                "9999999"
-            ];
+            string[] notFoundFilters = ["invalid", "9999999"];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        path, new StringValues(["IzBzg", ..notFoundFilters])
-                    }
+                    { path, new StringValues(["IzBzg", .. notFoundFilters]) },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Single(viewModel.Warnings);
 
@@ -486,12 +495,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, ""
-                    }
-                }
+                queryParameters: new Dictionary<string, StringValues> { { path, "" } }
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -520,18 +524,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 "NATT",
                 "National",
                 "Local authority",
-                "LocalAuthority"
+                "LocalAuthority",
             ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, invalidLevels
-                    }
-                }
+                queryParameters: new Dictionary<string, StringValues> { { path, invalidLevels } }
             );
 
             var allowed = GeographicLevelUtils.OrderedCodes;
@@ -540,13 +539,41 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(7, validationProblem.Errors.Count);
 
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[0]", value: null, allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[1]", value: null, allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[2]", value: invalidLevels[2], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[3]", value: invalidLevels[3], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[4]", value: invalidLevels[4], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[5]", value: invalidLevels[5], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[6]", value: invalidLevels[6], allowed);
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[0]",
+                value: null,
+                allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[1]",
+                value: null,
+                allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[2]",
+                value: invalidLevels[2],
+                allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[3]",
+                value: invalidLevels[3],
+                allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[4]",
+                value: invalidLevels[4],
+                allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[5]",
+                value: invalidLevels[5],
+                allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: $"{path}[6]",
+                value: invalidLevels[6],
+                allowed
+            );
         }
 
         [Theory]
@@ -568,18 +595,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        path, new StringValues(
-                            [
-                                "LA",
-                                ..notFoundGeographicLevels
-                            ]
-                        )
-                    }
+                    { path, new StringValues(["LA", .. notFoundGeographicLevels]) },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Single(viewModel.Warnings);
 
@@ -591,29 +613,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] invalidLevels =
-            [
-                "  ",
-                "National",
-            ];
+            string[] invalidLevels = ["  ", "National"];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        "geographicLevels.eq", "NATT"
-                    },
-                    {
-                        "geographicLevels.notEq", "LADD"
-                    },
-                    {
-                        "geographicLevels.in", invalidLevels
-                    },
-                    {
-                        "geographicLevels.notIn[0]", ""
-                    },
+                    { "geographicLevels.eq", "NATT" },
+                    { "geographicLevels.notEq", "LADD" },
+                    { "geographicLevels.in", invalidLevels },
+                    { "geographicLevels.notIn[0]", "" },
                 }
             );
 
@@ -664,12 +674,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, ""
-                    }
-                }
+                queryParameters: new Dictionary<string, StringValues> { { path, "" } }
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -692,7 +697,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        path, new StringValues(
+                        path,
+                        new StringValues(
                             [
                                 "",
                                 "invalid",
@@ -714,7 +720,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                                 $"RSC|id|{new string('a', 11)}",
                             ]
                         )
-                    }
+                    },
                 }
             );
 
@@ -723,11 +729,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(18, validationProblem.Errors.Count);
 
             validationProblem.AssertHasNotEmptyError(expectedPath: $"{path}[0]");
-            validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[1]", value: "invalid");
+            validationProblem.AssertHasLocationFormatError(
+                expectedPath: $"{path}[1]",
+                value: "invalid"
+            );
             validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[2]", value: "||");
 
-            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: $"{path}[3]", level: "LADD");
-            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: $"{path}[4]", level: "NATT");
+            validationProblem.AssertHasLocationAllowedLevelError(
+                expectedPath: $"{path}[3]",
+                level: "LADD"
+            );
+            validationProblem.AssertHasLocationAllowedLevelError(
+                expectedPath: $"{path}[4]",
+                level: "NATT"
+            );
 
             validationProblem.AssertHasLocationAllowedPropertyError(
                 expectedPath: $"{path}[5]",
@@ -754,8 +769,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 property: "code",
                 allowedProperties: ["id"]
             );
-            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[10]", property: "id");
-            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[11]", property: "code");
+            validationProblem.AssertHasLocationValueNotEmptyError(
+                expectedPath: $"{path}[10]",
+                property: "id"
+            );
+            validationProblem.AssertHasLocationValueNotEmptyError(
+                expectedPath: $"{path}[11]",
+                property: "code"
+            );
 
             validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[12]",
@@ -794,31 +815,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] invalidLocations =
-            [
-                "",
-                "||",
-                "NAT|id| ",
-                $"NAT|id|{new string('a', 11)}",
-            ];
+            string[] invalidLocations = ["", "||", "NAT|id| ", $"NAT|id|{new string('a', 11)}"];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        "locations.eq", "LADD|code|12345"
-                    },
-                    {
-                        "locations.notEq", "LA|urn|12345"
-                    },
-                    {
-                        "locations.in", invalidLocations
-                    },
-                    {
-                        "locations.notIn[0]", ""
-                    },
+                    { "locations.eq", "LADD|code|12345" },
+                    { "locations.notEq", "LA|urn|12345" },
+                    { "locations.in", invalidLocations },
+                    { "locations.notIn[0]", "" },
                 }
             );
 
@@ -826,14 +833,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(7, validationProblem.Errors.Count);
 
-            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: "locations.eq", level: "LADD");
+            validationProblem.AssertHasLocationAllowedLevelError(
+                expectedPath: "locations.eq",
+                level: "LADD"
+            );
             validationProblem.AssertHasLocationAllowedPropertyError(
                 expectedPath: "locations.notEq",
                 property: "urn",
                 allowedProperties: ["id", "code", "oldCode"]
             );
             validationProblem.AssertHasNotEmptyError(expectedPath: "locations.in[0]");
-            validationProblem.AssertHasLocationFormatError(expectedPath: "locations.in[1]", value: "||");
+            validationProblem.AssertHasLocationFormatError(
+                expectedPath: "locations.in[1]",
+                value: "||"
+            );
             validationProblem.AssertHasLocationValueNotEmptyError(
                 expectedPath: "locations.in[2]",
                 property: "id"
@@ -871,13 +884,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        path, new StringValues(["LA|code|E08000016", ..notFoundLocations])
-                    }
+                    { path, new StringValues(["LA|code|E08000016", .. notFoundLocations]) },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Single(viewModel.Warnings);
 
@@ -898,9 +911,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        "timePeriods.in[0]", ""
-                    }
+                    { "timePeriods.in[0]", "" },
                 }
             );
 
@@ -924,7 +935,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     {
-                        path, new StringValues(
+                        path,
+                        new StringValues(
                             [
                                 "",
                                 "invalid",
@@ -939,7 +951,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                                 "2020/2021|M5",
                             ]
                         )
-                    }
+                    },
                 }
             );
 
@@ -948,18 +960,48 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(11, validationProblem.Errors.Count);
 
             validationProblem.AssertHasNotEmptyError($"{path}[0]");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[2]", code: "");
+            validationProblem.AssertHasTimePeriodFormatError(
+                expectedPath: $"{path}[1]",
+                value: "invalid"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[2]",
+                code: ""
+            );
 
-            validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[3]", period: "2020/2019");
-            validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[4]", period: "2020/2022");
+            validationProblem.AssertHasTimePeriodYearRangeError(
+                expectedPath: $"{path}[3]",
+                period: "2020/2019"
+            );
+            validationProblem.AssertHasTimePeriodYearRangeError(
+                expectedPath: $"{path}[4]",
+                period: "2020/2022"
+            );
 
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[5]", code: "INVALID");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[6]", code: "CY");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[7]", code: "CYQ2");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[8]", code: "RY");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[9]", code: "W10");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[10]", code: "M5");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[5]",
+                code: "INVALID"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[6]",
+                code: "CY"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[7]",
+                code: "CYQ2"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[8]",
+                code: "RY"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[9]",
+                code: "W10"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: $"{path}[10]",
+                code: "M5"
+            );
         }
 
         [Fact]
@@ -967,30 +1009,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] invalidTimePeriods =
-            [
-                "",
-                "invalid",
-                "|"
-            ];
+            string[] invalidTimePeriods = ["", "invalid", "|"];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        "timePeriods.eq", "2020/2019|AY"
-                    },
-                    {
-                        "timePeriods.notEq", "2020/2021|W10"
-                    },
-                    {
-                        "timePeriods.in", invalidTimePeriods
-                    },
-                    {
-                        "timePeriods.notIn[0]", ""
-                    }
+                    { "timePeriods.eq", "2020/2019|AY" },
+                    { "timePeriods.notEq", "2020/2021|W10" },
+                    { "timePeriods.in", invalidTimePeriods },
+                    { "timePeriods.notIn[0]", "" },
                 }
             );
 
@@ -998,11 +1027,23 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(6, validationProblem.Errors.Count);
 
-            validationProblem.AssertHasTimePeriodYearRangeError("timePeriods.eq", period: "2020/2019");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.notEq", code: "W10");
+            validationProblem.AssertHasTimePeriodYearRangeError(
+                "timePeriods.eq",
+                period: "2020/2019"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: "timePeriods.notEq",
+                code: "W10"
+            );
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.in[0]");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.in[2]", code: "");
+            validationProblem.AssertHasTimePeriodFormatError(
+                expectedPath: "timePeriods.in[1]",
+                value: "invalid"
+            );
+            validationProblem.AssertHasTimePeriodAllowedCodeError(
+                expectedPath: "timePeriods.in[2]",
+                code: ""
+            );
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn[0]");
         }
 
@@ -1027,13 +1068,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        path, new StringValues(["2020/2021|AY", ..notFoundTimePeriods])
-                    }
+                    { path, new StringValues(["2020/2021|AY", .. notFoundTimePeriods]) },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Single(viewModel.Warnings);
 
@@ -1052,12 +1093,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "sorts[0]", ""
-                    }
-                }
+                queryParameters: new Dictionary<string, StringValues> { { "sorts[0]", "" } }
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1102,9 +1138,18 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[2]", direction: "");
             validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "invalid");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "asc");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[6]", direction: "desc");
+            validationProblem.AssertHasSortDirectionError(
+                expectedPath: "sorts[4]",
+                direction: "invalid"
+            );
+            validationProblem.AssertHasSortDirectionError(
+                expectedPath: "sorts[5]",
+                direction: "asc"
+            );
+            validationProblem.AssertHasSortDirectionError(
+                expectedPath: "sorts[6]",
+                direction: "desc"
+            );
 
             validationProblem.AssertHasSortFieldMaxLengthError(
                 expectedPath: "sorts[7]",
@@ -1136,7 +1181,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                sorts: ["timePeriod|Asc", ..notFoundSorts]
+                sorts: ["timePeriod|Asc", .. notFoundSorts]
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1147,7 +1192,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class PaginationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class PaginationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData(-1)]
@@ -1201,7 +1247,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             int page,
             int pageSize,
             int totalPages,
-            int pageResults)
+            int pageResults
+        )
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1212,7 +1259,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 pageSize: pageSize
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(pageResults, viewModel.Results.Count);
             Assert.Equal(page, viewModel.Paging.Page);
@@ -1222,7 +1271,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class FiltersQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class FiltersQueryTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData("filters.eq", 54)]
@@ -1235,14 +1285,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { path, AbsenceSchoolData.FilterNcYear4 }
+                    { path, AbsenceSchoolData.FilterNcYear4 },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1253,12 +1309,18 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 case "filters.eq":
                 case "filters.in":
                     Assert.Single(meta.Filters[AbsenceSchoolData.FilterNcYear]);
-                    Assert.Contains(AbsenceSchoolData.FilterNcYear4, meta.Filters[AbsenceSchoolData.FilterNcYear]);
+                    Assert.Contains(
+                        AbsenceSchoolData.FilterNcYear4,
+                        meta.Filters[AbsenceSchoolData.FilterNcYear]
+                    );
                     break;
                 case "filters.notEq":
                 case "filters.notIn":
                     Assert.Equal(3, meta.Filters[AbsenceSchoolData.FilterNcYear].Count);
-                    Assert.DoesNotContain(AbsenceSchoolData.FilterNcYear4, meta.Filters[AbsenceSchoolData.FilterNcYear]);
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.FilterNcYear4,
+                        meta.Filters[AbsenceSchoolData.FilterNcYear]
+                    );
                     break;
             }
         }
@@ -1270,18 +1332,25 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] filterOptionIds = [AbsenceSchoolData.FilterNcYear4, AbsenceSchoolData.FilterNcYear8];
+            string[] filterOptionIds =
+            [
+                AbsenceSchoolData.FilterNcYear4,
+                AbsenceSchoolData.FilterNcYear8,
+            ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, filterOptionIds }
-                }
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
+                queryParameters: new Dictionary<string, StringValues> { { path, filterOptionIds } }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1295,13 +1364,25 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             {
                 case "filters.in":
                     Assert.Equal(2, meta.Filters[AbsenceSchoolData.FilterNcYear].Count);
-                    Assert.Contains(filterOptionIds[0], meta.Filters[AbsenceSchoolData.FilterNcYear]);
-                    Assert.Contains(filterOptionIds[1], meta.Filters[AbsenceSchoolData.FilterNcYear]);
+                    Assert.Contains(
+                        filterOptionIds[0],
+                        meta.Filters[AbsenceSchoolData.FilterNcYear]
+                    );
+                    Assert.Contains(
+                        filterOptionIds[1],
+                        meta.Filters[AbsenceSchoolData.FilterNcYear]
+                    );
                     break;
                 case "filters.notIn":
                     Assert.Equal(2, meta.Filters[AbsenceSchoolData.FilterNcYear].Count);
-                    Assert.DoesNotContain(filterOptionIds[0], meta.Filters[AbsenceSchoolData.FilterNcYear]);
-                    Assert.DoesNotContain(filterOptionIds[1], meta.Filters[AbsenceSchoolData.FilterNcYear]);
+                    Assert.DoesNotContain(
+                        filterOptionIds[0],
+                        meta.Filters[AbsenceSchoolData.FilterNcYear]
+                    );
+                    Assert.DoesNotContain(
+                        filterOptionIds[1],
+                        meta.Filters[AbsenceSchoolData.FilterNcYear]
+                    );
                     break;
             }
         }
@@ -1311,18 +1392,28 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            string[] filterOptionIds = [AbsenceSchoolData.FilterNcYear4, AbsenceSchoolData.FilterNcYear8];
+            string[] filterOptionIds =
+            [
+                AbsenceSchoolData.FilterNcYear4,
+                AbsenceSchoolData.FilterNcYear8,
+            ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { "filters.in", filterOptionIds.JoinToString(',') }
+                    { "filters.in", filterOptionIds.JoinToString(',') },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(108, viewModel.Results.Count);
 
@@ -1336,7 +1427,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         [Theory]
         [InlineData("filters.in", 150)]
         [InlineData("filters.notIn", 66)]
-        public async Task MultipleOptionsInDifferentFilters_Returns200(string path, int expectedResults)
+        public async Task MultipleOptionsInDifferentFilters_Returns200(
+            string path,
+            int expectedResults
+        )
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1345,19 +1439,22 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 AbsenceSchoolData.FilterSchoolTypeTotal,
                 AbsenceSchoolData.FilterSchoolTypeSecondary,
                 AbsenceSchoolData.FilterAcademyTypeSecondaryFreeSchool,
-                AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed
+                AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed,
             ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, filterOptionIds }
-                }
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
+                queryParameters: new Dictionary<string, StringValues> { { path, filterOptionIds } }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1367,27 +1464,52 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             {
                 case "filters.in":
                     Assert.Equal(2, meta.Filters[AbsenceSchoolData.FilterSchoolType].Count);
-                    Assert.Contains(filterOptionIds[0], meta.Filters[AbsenceSchoolData.FilterSchoolType]);
-                    Assert.Contains(filterOptionIds[1], meta.Filters[AbsenceSchoolData.FilterSchoolType]);
+                    Assert.Contains(
+                        filterOptionIds[0],
+                        meta.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
+                    Assert.Contains(
+                        filterOptionIds[1],
+                        meta.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
 
                     Assert.Equal(2, meta.Filters[AbsenceSchoolData.FilterAcademyType].Count);
-                    Assert.Contains(filterOptionIds[2], meta.Filters[AbsenceSchoolData.FilterAcademyType]);
-                    Assert.Contains(filterOptionIds[3], meta.Filters[AbsenceSchoolData.FilterAcademyType]);
+                    Assert.Contains(
+                        filterOptionIds[2],
+                        meta.Filters[AbsenceSchoolData.FilterAcademyType]
+                    );
+                    Assert.Contains(
+                        filterOptionIds[3],
+                        meta.Filters[AbsenceSchoolData.FilterAcademyType]
+                    );
                     break;
                 case "filters.notIn":
                     Assert.Single(meta.Filters[AbsenceSchoolData.FilterSchoolType]);
-                    Assert.DoesNotContain(filterOptionIds[0], meta.Filters[AbsenceSchoolData.FilterSchoolType]);
-                    Assert.DoesNotContain(filterOptionIds[1], meta.Filters[AbsenceSchoolData.FilterSchoolType]);
+                    Assert.DoesNotContain(
+                        filterOptionIds[0],
+                        meta.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
+                    Assert.DoesNotContain(
+                        filterOptionIds[1],
+                        meta.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
 
                     Assert.Single(meta.Filters[AbsenceSchoolData.FilterAcademyType]);
-                    Assert.DoesNotContain(filterOptionIds[2], meta.Filters[AbsenceSchoolData.FilterAcademyType]);
-                    Assert.DoesNotContain(filterOptionIds[3], meta.Filters[AbsenceSchoolData.FilterAcademyType]);
+                    Assert.DoesNotContain(
+                        filterOptionIds[2],
+                        meta.Filters[AbsenceSchoolData.FilterAcademyType]
+                    );
+                    Assert.DoesNotContain(
+                        filterOptionIds[3],
+                        meta.Filters[AbsenceSchoolData.FilterAcademyType]
+                    );
                     break;
             }
         }
     }
 
-    public class GeographicLevelsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class GeographicLevelsQueryTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData("geographicLevels.eq", 132)]
@@ -1402,14 +1524,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { path, geographicLevel.GetEnumValue() }
+                    { path, geographicLevel.GetEnumValue() },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1437,18 +1565,28 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
+            GeographicLevel[] geographicLevels =
+            [
+                GeographicLevel.Region,
+                GeographicLevel.LocalAuthority,
+            ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { path, geographicLevels.Select(l => l.GetEnumValue()).ToArray() }
+                    { path, geographicLevels.Select(l => l.GetEnumValue()).ToArray() },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1474,18 +1612,31 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
+            GeographicLevel[] geographicLevels =
+            [
+                GeographicLevel.Region,
+                GeographicLevel.LocalAuthority,
+            ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { "geographicLevels.in", geographicLevels.Select(l => l.GetEnumValue()).JoinToString(',') }
+                    {
+                        "geographicLevels.in",
+                        geographicLevels.Select(l => l.GetEnumValue()).JoinToString(',')
+                    },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(180, viewModel.Results.Count);
 
@@ -1497,7 +1648,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class LocationsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class LocationsQueryTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData("locations.eq", 36)]
@@ -1513,14 +1665,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, locationStrings }
-                }
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
+                queryParameters: new Dictionary<string, StringValues> { { path, locationStrings } }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1536,7 +1691,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 case "locations.notEq":
                 case "locations.notIn":
                     Assert.Equal(3, meta.Locations["LA"].Count);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationLaSheffield, meta.Locations["LA"]);
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationLaSheffield,
+                        meta.Locations["LA"]
+                    );
                     break;
             }
         }
@@ -1549,18 +1707,25 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             // Sheffield and Barnsley
-            string[] locationStrings = ["LA|code|E08000019", $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}"];
+            string[] locationStrings =
+            [
+                "LA|code|E08000019",
+                $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}",
+            ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, locationStrings }
-                }
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
+                queryParameters: new Dictionary<string, StringValues> { { path, locationStrings } }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1575,8 +1740,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     break;
                 case "locations.notIn":
                     Assert.Equal(2, meta.Locations["LA"].Count);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationLaSheffield, meta.Locations["LA"]);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationLaBarnsley, meta.Locations["LA"]);
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationLaSheffield,
+                        meta.Locations["LA"]
+                    );
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationLaBarnsley,
+                        meta.Locations["LA"]
+                    );
                     break;
             }
         }
@@ -1587,18 +1758,28 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             // Sheffield and Barnsley
-            string[] locationStrings = ["LA|code|E08000019", $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}"];
+            string[] locationStrings =
+            [
+                "LA|code|E08000019",
+                $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}",
+            ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { "locations.in", locationStrings.JoinToString(',') }
+                    { "locations.in", locationStrings.JoinToString(',') },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(72, viewModel.Results.Count);
 
@@ -1612,7 +1793,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         [Theory]
         [InlineData("locations.in", 84)]
         [InlineData("locations.notIn", 132)]
-        public async Task MultipleOptionsInDifferentLevels_Returns200(string path, int expectedResults)
+        public async Task MultipleOptionsInDifferentLevels_Returns200(
+            string path,
+            int expectedResults
+        )
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1623,19 +1807,22 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 "LA|code|E08000019",
                 $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}",
                 "SCH|laEstab|3144001",
-                "SCH|urn|102579"
+                "SCH|urn|102579",
             ];
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, locationStrings }
-                }
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
+                queryParameters: new Dictionary<string, StringValues> { { path, locationStrings } }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1649,23 +1836,42 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     Assert.Contains(AbsenceSchoolData.LocationLaBarnsley, meta.Locations["LA"]);
 
                     Assert.Equal(6, meta.Locations["SCH"].Count);
-                    Assert.Contains(AbsenceSchoolData.LocationSchoolKingstonAcademy, meta.Locations["SCH"]);
-                    Assert.Contains(AbsenceSchoolData.LocationSchoolKingAthelstanPrimary, meta.Locations["SCH"]);
+                    Assert.Contains(
+                        AbsenceSchoolData.LocationSchoolKingstonAcademy,
+                        meta.Locations["SCH"]
+                    );
+                    Assert.Contains(
+                        AbsenceSchoolData.LocationSchoolKingAthelstanPrimary,
+                        meta.Locations["SCH"]
+                    );
                     break;
                 case "locations.notIn":
                     Assert.Equal(2, meta.Locations["LA"].Count);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationLaSheffield, meta.Locations["LA"]);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationLaBarnsley, meta.Locations["LA"]);
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationLaSheffield,
+                        meta.Locations["LA"]
+                    );
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationLaBarnsley,
+                        meta.Locations["LA"]
+                    );
 
                     Assert.Equal(2, meta.Locations["SCH"].Count);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationSchoolKingstonAcademy, meta.Locations["SCH"]);
-                    Assert.DoesNotContain(AbsenceSchoolData.LocationSchoolKingAthelstanPrimary, meta.Locations["SCH"]);
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationSchoolKingstonAcademy,
+                        meta.Locations["SCH"]
+                    );
+                    Assert.DoesNotContain(
+                        AbsenceSchoolData.LocationSchoolKingAthelstanPrimary,
+                        meta.Locations["SCH"]
+                    );
                     break;
             }
         }
     }
 
-    public class TimePeriodsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class TimePeriodsQueryTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Theory]
         [InlineData("timePeriods.eq", 72)]
@@ -1684,14 +1890,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, timePeriodString }
-                }
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
+                queryParameters: new Dictionary<string, StringValues> { { path, timePeriodString } }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1700,7 +1909,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var timePeriod = new TimePeriodViewModel
             {
                 Code = TimeIdentifier.AcademicYear,
-                Period = "2021/2022"
+                Period = "2021/2022",
             };
 
             switch (path)
@@ -1739,14 +1948,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { path, timePeriodStrings }
+                    { path, timePeriodStrings },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(expectedResults, viewModel.Results.Count);
 
@@ -1755,7 +1970,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             TimePeriodViewModel[] timePeriods =
             [
                 new() { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
-                new() { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" }
+                new() { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" },
             ];
 
             switch (path)
@@ -1782,14 +1997,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    { "timePeriods.in", timePeriodStrings }
+                    { "timePeriods.in", timePeriodStrings },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(144, viewModel.Results.Count);
 
@@ -1798,7 +2019,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             TimePeriodViewModel[] timePeriods =
             [
                 new() { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
-                new() { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" }
+                new() { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" },
             ];
 
             Assert.Equal(2, meta.TimePeriods.Count);
@@ -1807,7 +2028,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class ResultsTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class ResultsTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Fact]
         public async Task NoResults_Returns200_HasWarning()
@@ -1819,16 +2041,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
                 queryParameters: new Dictionary<string, StringValues>
                 {
-                    {
-                        "locations.eq", $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}"
-                    },
-                    {
-                        "geographicLevels.eq", "NAT"
-                    }
+                    { "locations.eq", $"LA|id|{AbsenceSchoolData.LocationLaBarnsley}" },
+                    { "geographicLevels.eq", "NAT" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(1, viewModel.Paging.Page);
             Assert.Equal(1000, viewModel.Paging.PageSize);
@@ -1852,7 +2072,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 debug: true
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             var warning = Assert.Single(viewModel.Warnings);
 
@@ -1870,7 +2092,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised]
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(1, viewModel.Paging.Page);
             Assert.Equal(1, viewModel.Paging.TotalPages);
@@ -1883,8 +2107,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var result = viewModel.Results[0];
 
             Assert.Equal(2, result.Filters.Count);
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, result.Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Equal(AbsenceSchoolData.FilterSchoolTypeTotal, result.Filters[AbsenceSchoolData.FilterSchoolType]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                result.Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Equal(
+                AbsenceSchoolData.FilterSchoolTypeTotal,
+                result.Filters[AbsenceSchoolData.FilterSchoolType]
+            );
 
             Assert.Equal(GeographicLevel.LocalAuthority, result.GeographicLevel);
 
@@ -1917,34 +2147,44 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 ]
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(216, viewModel.Results.Count);
 
-            var values = viewModel.Results
-                .SelectMany(result => result.Values)
+            var values = viewModel
+                .Results.SelectMany(result => result.Values)
                 .GroupBy(kv => kv.Key, kv => kv.Value)
                 .ToDictionary(kv => kv.Key, kv => kv.ToList());
 
-            var enrolments = values[AbsenceSchoolData.IndicatorEnrolments].Select(int.Parse).ToList();
+            var enrolments = values[AbsenceSchoolData.IndicatorEnrolments]
+                .Select(int.Parse)
+                .ToList();
 
             Assert.Equal(216, enrolments.Count);
             Assert.Equal(999598, enrolments.Max());
             Assert.Equal(1072, enrolments.Min());
 
-            var sessAuthorised = values[AbsenceSchoolData.IndicatorSessAuthorised].Select(int.Parse).ToList();
+            var sessAuthorised = values[AbsenceSchoolData.IndicatorSessAuthorised]
+                .Select(int.Parse)
+                .ToList();
 
             Assert.Equal(216, sessAuthorised.Count);
             Assert.Equal(4967515, sessAuthorised.Max());
             Assert.Equal(22441, sessAuthorised.Min());
 
-            var sessPossible = values[AbsenceSchoolData.IndicatorSessPossible].Select(int.Parse).ToList();
+            var sessPossible = values[AbsenceSchoolData.IndicatorSessPossible]
+                .Select(int.Parse)
+                .ToList();
 
             Assert.Equal(216, sessPossible.Count);
             Assert.Equal(9934276, sessPossible.Max());
             Assert.Equal(18306, sessPossible.Min());
 
-            var sessUnauthorised = values[AbsenceSchoolData.IndicatorSessUnauthorised].Select(int.Parse).ToList();
+            var sessUnauthorised = values[AbsenceSchoolData.IndicatorSessUnauthorised]
+                .Select(int.Parse)
+                .ToList();
 
             Assert.Equal(216, sessUnauthorised.Count);
             Assert.Equal(494993, sessUnauthorised.Max());
@@ -1962,7 +2202,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public async Task AllIndicators_Returns200_CorrectResultIds(bool includeIndicatorsQueryParam)
+        public async Task AllIndicators_Returns200_CorrectResultIds(
+            bool includeIndicatorsQueryParam
+        )
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -1970,17 +2212,19 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: includeIndicatorsQueryParam
                     ?
-                [
-                    AbsenceSchoolData.IndicatorEnrolments,
-                    AbsenceSchoolData.IndicatorSessAuthorised,
-                    AbsenceSchoolData.IndicatorSessPossible,
-                    AbsenceSchoolData.IndicatorSessUnauthorised,
-                    AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
-                ]
+                    [
+                        AbsenceSchoolData.IndicatorEnrolments,
+                        AbsenceSchoolData.IndicatorSessAuthorised,
+                        AbsenceSchoolData.IndicatorSessPossible,
+                        AbsenceSchoolData.IndicatorSessUnauthorised,
+                        AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
+                    ]
                     : null
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(216, viewModel.Results.Count);
 
@@ -2004,10 +2248,22 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             Assert.Equal(4, meta.Filters[AbsenceSchoolData.FilterNcYear].Count);
-            Assert.Contains(AbsenceSchoolData.FilterNcYear4, meta.Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Contains(AbsenceSchoolData.FilterNcYear6, meta.Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Contains(AbsenceSchoolData.FilterNcYear8, meta.Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Contains(AbsenceSchoolData.FilterNcYear10, meta.Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Contains(
+                AbsenceSchoolData.FilterNcYear4,
+                meta.Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Contains(
+                AbsenceSchoolData.FilterNcYear6,
+                meta.Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Contains(
+                AbsenceSchoolData.FilterNcYear8,
+                meta.Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Contains(
+                AbsenceSchoolData.FilterNcYear10,
+                meta.Filters[AbsenceSchoolData.FilterNcYear]
+            );
 
             Assert.Equal(3, meta.Filters[AbsenceSchoolData.FilterSchoolType].Count);
             Assert.Contains(
@@ -2018,7 +2274,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 AbsenceSchoolData.FilterSchoolTypeSecondary,
                 meta.Filters[AbsenceSchoolData.FilterSchoolType]
             );
-            Assert.Contains(AbsenceSchoolData.FilterSchoolTypeTotal, meta.Filters[AbsenceSchoolData.FilterSchoolType]);
+            Assert.Contains(
+                AbsenceSchoolData.FilterSchoolTypeTotal,
+                meta.Filters[AbsenceSchoolData.FilterSchoolType]
+            );
 
             Assert.Equal(4, meta.Locations.Count);
 
@@ -2036,12 +2295,27 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Contains(AbsenceSchoolData.LocationLaSheffield, meta.Locations["LA"]);
 
             Assert.Equal(8, meta.Locations["SCH"].Count);
-            Assert.Contains(AbsenceSchoolData.LocationSchoolColindalePrimary, meta.Locations["SCH"]);
-            Assert.Contains(AbsenceSchoolData.LocationSchoolGreenhillPrimary, meta.Locations["SCH"]);
+            Assert.Contains(
+                AbsenceSchoolData.LocationSchoolColindalePrimary,
+                meta.Locations["SCH"]
+            );
+            Assert.Contains(
+                AbsenceSchoolData.LocationSchoolGreenhillPrimary,
+                meta.Locations["SCH"]
+            );
             Assert.Contains(AbsenceSchoolData.LocationSchoolHoylandPrimary, meta.Locations["SCH"]);
-            Assert.Contains(AbsenceSchoolData.LocationSchoolKingAthelstanPrimary, meta.Locations["SCH"]);
-            Assert.Contains(AbsenceSchoolData.LocationSchoolNewfieldSecondary, meta.Locations["SCH"]);
-            Assert.Contains(AbsenceSchoolData.LocationSchoolPenistoneGrammar, meta.Locations["SCH"]);
+            Assert.Contains(
+                AbsenceSchoolData.LocationSchoolKingAthelstanPrimary,
+                meta.Locations["SCH"]
+            );
+            Assert.Contains(
+                AbsenceSchoolData.LocationSchoolNewfieldSecondary,
+                meta.Locations["SCH"]
+            );
+            Assert.Contains(
+                AbsenceSchoolData.LocationSchoolPenistoneGrammar,
+                meta.Locations["SCH"]
+            );
             Assert.Contains(AbsenceSchoolData.LocationSchoolKingstonAcademy, meta.Locations["SCH"]);
             Assert.Contains(AbsenceSchoolData.LocationSchoolWrenAcademy, meta.Locations["SCH"]);
 
@@ -2053,15 +2327,27 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(3, meta.TimePeriods.Count);
             Assert.Contains(
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2020/2021" },
+                new TimePeriodViewModel
+                {
+                    Code = TimeIdentifier.AcademicYear,
+                    Period = "2020/2021",
+                },
                 meta.TimePeriods
             );
             Assert.Contains(
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
+                new TimePeriodViewModel
+                {
+                    Code = TimeIdentifier.AcademicYear,
+                    Period = "2021/2022",
+                },
                 meta.TimePeriods
             );
             Assert.Contains(
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" },
+                new TimePeriodViewModel
+                {
+                    Code = TimeIdentifier.AcademicYear,
+                    Period = "2022/2023",
+                },
                 meta.TimePeriods
             );
 
@@ -2076,26 +2362,30 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels(bool includeIndicatorsQueryParam)
+        public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels(
+            bool includeIndicatorsQueryParam
+        )
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: includeIndicatorsQueryParam
-                    ? 
-                [
-                    AbsenceSchoolData.IndicatorEnrolments,
-                    AbsenceSchoolData.IndicatorSessAuthorised,
-                    AbsenceSchoolData.IndicatorSessPossible,
-                    AbsenceSchoolData.IndicatorSessUnauthorised,
-                    AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
-                ]
+                    ?
+                    [
+                        AbsenceSchoolData.IndicatorEnrolments,
+                        AbsenceSchoolData.IndicatorSessAuthorised,
+                        AbsenceSchoolData.IndicatorSessPossible,
+                        AbsenceSchoolData.IndicatorSessUnauthorised,
+                        AbsenceSchoolData.IndicatorSessUnauthorisedPercent,
+                    ]
                     : null,
                 debug: true
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(216, viewModel.Results.Count);
 
@@ -2103,7 +2393,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(3, meta.Filters.Count);
 
-            var academyTypes = meta.Filters[$"{AbsenceSchoolData.FilterAcademyType} :: academy_type"];
+            var academyTypes = meta.Filters[
+                $"{AbsenceSchoolData.FilterAcademyType} :: academy_type"
+            ];
 
             Assert.Equal(3, academyTypes.Count);
 
@@ -2131,8 +2423,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var schoolTypes = meta.Filters[$"{AbsenceSchoolData.FilterSchoolType} :: school_type"];
 
             Assert.Equal(3, schoolTypes.Count);
-            Assert.Contains($"{AbsenceSchoolData.FilterSchoolTypePrimary} :: State-funded primary", schoolTypes);
-            Assert.Contains($"{AbsenceSchoolData.FilterSchoolTypeSecondary} :: State-funded secondary", schoolTypes);
+            Assert.Contains(
+                $"{AbsenceSchoolData.FilterSchoolTypePrimary} :: State-funded primary",
+                schoolTypes
+            );
+            Assert.Contains(
+                $"{AbsenceSchoolData.FilterSchoolTypeSecondary} :: State-funded secondary",
+                schoolTypes
+            );
             Assert.Contains($"{AbsenceSchoolData.FilterSchoolTypeTotal} :: Total", schoolTypes);
 
             Assert.Equal(4, meta.Locations.Count);
@@ -2146,7 +2444,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(2, meta.Locations["REG"].Count);
             Assert.Contains(
                 $"{AbsenceSchoolData.LocationRegionOuterLondon} :: Outer London (code = E13000002)",
-                meta.Locations["REG"]);
+                meta.Locations["REG"]
+            );
             Assert.Contains(
                 $"{AbsenceSchoolData.LocationRegionYorkshire} :: Yorkshire and The Humber (code = E12000003)",
                 meta.Locations["REG"]
@@ -2212,23 +2511,47 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(3, meta.TimePeriods.Count);
             Assert.Contains(
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2020/2021" },
+                new TimePeriodViewModel
+                {
+                    Code = TimeIdentifier.AcademicYear,
+                    Period = "2020/2021",
+                },
                 meta.TimePeriods
             );
             Assert.Contains(
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
+                new TimePeriodViewModel
+                {
+                    Code = TimeIdentifier.AcademicYear,
+                    Period = "2021/2022",
+                },
                 meta.TimePeriods
             );
             Assert.Contains(
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" },
+                new TimePeriodViewModel
+                {
+                    Code = TimeIdentifier.AcademicYear,
+                    Period = "2022/2023",
+                },
                 meta.TimePeriods
             );
 
             Assert.Equal(5, meta.Indicators.Count);
-            Assert.Contains($"{AbsenceSchoolData.IndicatorEnrolments} :: enrolments", meta.Indicators);
-            Assert.Contains($"{AbsenceSchoolData.IndicatorSessAuthorised} :: sess_authorised", meta.Indicators);
-            Assert.Contains($"{AbsenceSchoolData.IndicatorSessPossible} :: sess_possible", meta.Indicators);
-            Assert.Contains($"{AbsenceSchoolData.IndicatorSessUnauthorised} :: sess_unauthorised", meta.Indicators);
+            Assert.Contains(
+                $"{AbsenceSchoolData.IndicatorEnrolments} :: enrolments",
+                meta.Indicators
+            );
+            Assert.Contains(
+                $"{AbsenceSchoolData.IndicatorSessAuthorised} :: sess_authorised",
+                meta.Indicators
+            );
+            Assert.Contains(
+                $"{AbsenceSchoolData.IndicatorSessPossible} :: sess_possible",
+                meta.Indicators
+            );
+            Assert.Contains(
+                $"{AbsenceSchoolData.IndicatorSessUnauthorised} :: sess_unauthorised",
+                meta.Indicators
+            );
             Assert.Contains(
                 $"{AbsenceSchoolData.IndicatorSessUnauthorisedPercent} :: sess_unauthorised_percent",
                 meta.Indicators
@@ -2242,37 +2565,54 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
-                indicators: [AbsenceSchoolData.IndicatorEnrolments, AbsenceSchoolData.IndicatorSessAuthorised],
+                indicators:
+                [
+                    AbsenceSchoolData.IndicatorEnrolments,
+                    AbsenceSchoolData.IndicatorSessAuthorised,
+                ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "filters.notEq", AbsenceSchoolData.FilterNcYear8 },
                     {
                         "filters.in",
                         new StringValues(
-                        [
-                            AbsenceSchoolData.FilterAcademyTypeSecondaryFreeSchool,
-                            AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed
-                        ])
+                            [
+                                AbsenceSchoolData.FilterAcademyTypeSecondaryFreeSchool,
+                                AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed,
+                            ]
+                        )
                     },
-                    {
-                        "geographicLevels.notEq", "NAT"
-                    },
+                    { "geographicLevels.notEq", "NAT" },
                     { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
                     // Outer London, Barnsley
-                    { "locations.notIn", new StringValues(["REG|code|E13000002", "LA|oldCode|370"]) },
+                    {
+                        "locations.notIn",
+                        new StringValues(["REG|code|E13000002", "LA|oldCode|370"])
+                    },
                     { "timePeriods.gt", "2020/2021|AY" },
-                    { "timePeriods.lt", "2022/2023|AY" }
+                    { "timePeriods.lt", "2022/2023|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             var result = Assert.Single(viewModel.Results);
 
             Assert.Equal(3, result.Filters.Count);
-            Assert.Equal(AbsenceSchoolData.FilterNcYear10, result.Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Equal(AbsenceSchoolData.FilterSchoolTypeSecondary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
-            Assert.Equal(AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed, result.Filters[AbsenceSchoolData.FilterAcademyType]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear10,
+                result.Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Equal(
+                AbsenceSchoolData.FilterSchoolTypeSecondary,
+                result.Filters[AbsenceSchoolData.FilterSchoolType]
+            );
+            Assert.Equal(
+                AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed,
+                result.Filters[AbsenceSchoolData.FilterAcademyType]
+            );
 
             Assert.Equal(GeographicLevel.School, result.GeographicLevel);
 
@@ -2280,7 +2620,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(AbsenceSchoolData.LocationNatEngland, result.Locations["NAT"]);
             Assert.Equal(AbsenceSchoolData.LocationRegionYorkshire, result.Locations["REG"]);
             Assert.Equal(AbsenceSchoolData.LocationLaSheffield, result.Locations["LA"]);
-            Assert.Equal(AbsenceSchoolData.LocationSchoolNewfieldSecondary, result.Locations["SCH"]);
+            Assert.Equal(
+                AbsenceSchoolData.LocationSchoolNewfieldSecondary,
+                result.Locations["SCH"]
+            );
 
             Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriod.Code);
             Assert.Equal("2021/2022", result.TimePeriod.Period);
@@ -2291,7 +2634,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         }
     }
 
-    public class SortsTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class SortsTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Fact]
         public async Task NoFields_SingleTimePeriod_Returns200()
@@ -2309,28 +2653,60 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(4, viewModel.Results.Count);
 
-            Assert.All(viewModel.Results, result =>
-            {
-                Assert.Equal(AbsenceSchoolData.FilterSchoolTypeTotal, result.Filters[AbsenceSchoolData.FilterSchoolType]);
-                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
-                Assert.Equal("2020/2021", result.TimePeriod.Period);
-            });
+            Assert.All(
+                viewModel.Results,
+                result =>
+                {
+                    Assert.Equal(
+                        AbsenceSchoolData.FilterSchoolTypeTotal,
+                        result.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
+                    Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+                    Assert.Equal("2020/2021", result.TimePeriod.Period);
+                }
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Equal("930365", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Equal(
+                "930365",
+                viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Equal("390233", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Equal(
+                "390233",
+                viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear8, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Equal("966035", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear8,
+                viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Equal(
+                "966035",
+                viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear10, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
-            Assert.Equal("687704", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear10,
+                viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]
+            );
+            Assert.Equal(
+                "687704",
+                viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
         }
 
         [Fact]
@@ -2344,43 +2720,87 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypePrimary },
-                    { "geographicLevels.eq", "NAT" }
+                    { "geographicLevels.eq", "NAT" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(6, viewModel.Results.Count);
 
-            Assert.All(viewModel.Results, result =>
-            {
-                Assert.Equal(AbsenceSchoolData.FilterSchoolTypePrimary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
-                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
-            });
+            Assert.All(
+                viewModel.Results,
+                result =>
+                {
+                    Assert.Equal(
+                        AbsenceSchoolData.FilterSchoolTypePrimary,
+                        result.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
+                    Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+                }
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2022/2023", viewModel.Results[0].TimePeriod.Period);
-            Assert.Equal("654884", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "654884",
+                viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2022/2023", viewModel.Results[1].TimePeriod.Period);
-            Assert.Equal("235647", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "235647",
+                viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2021/2022", viewModel.Results[2].TimePeriod.Period);
-            Assert.Equal("611553", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "611553",
+                viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2021/2022", viewModel.Results[3].TimePeriod.Period);
-            Assert.Equal("752711", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "752711",
+                viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2020/2021", viewModel.Results[4].TimePeriod.Period);
-            Assert.Equal("233870", viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "233870",
+                viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2020/2021", viewModel.Results[5].TimePeriod.Period);
-            Assert.Equal("510682", viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "510682",
+                viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
         }
 
         [Fact]
@@ -2395,43 +2815,87 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypePrimary },
-                    { "geographicLevels.eq", "NAT" }
+                    { "geographicLevels.eq", "NAT" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(6, viewModel.Results.Count);
 
-            Assert.All(viewModel.Results, result =>
-            {
-                Assert.Equal(AbsenceSchoolData.FilterSchoolTypePrimary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
-                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
-            });
+            Assert.All(
+                viewModel.Results,
+                result =>
+                {
+                    Assert.Equal(
+                        AbsenceSchoolData.FilterSchoolTypePrimary,
+                        result.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
+                    Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+                }
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2020/2021", viewModel.Results[0].TimePeriod.Period);
-            Assert.Equal("233870", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "233870",
+                viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2020/2021", viewModel.Results[1].TimePeriod.Period);
-            Assert.Equal("510682", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "510682",
+                viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2021/2022", viewModel.Results[2].TimePeriod.Period);
-            Assert.Equal("611553", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "611553",
+                viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2021/2022", viewModel.Results[3].TimePeriod.Period);
-            Assert.Equal("752711", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "752711",
+                viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2022/2023", viewModel.Results[4].TimePeriod.Period);
-            Assert.Equal("654884", viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "654884",
+                viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2022/2023", viewModel.Results[5].TimePeriod.Period);
-            Assert.Equal("235647", viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "235647",
+                viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
         }
 
         [Fact]
@@ -2446,43 +2910,87 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypePrimary },
-                    { "geographicLevels.eq", "NAT" }
+                    { "geographicLevels.eq", "NAT" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(6, viewModel.Results.Count);
 
-            Assert.All(viewModel.Results, result =>
-            {
-                Assert.Equal(AbsenceSchoolData.FilterSchoolTypePrimary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
-                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
-            });
+            Assert.All(
+                viewModel.Results,
+                result =>
+                {
+                    Assert.Equal(
+                        AbsenceSchoolData.FilterSchoolTypePrimary,
+                        result.Filters[AbsenceSchoolData.FilterSchoolType]
+                    );
+                    Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+                }
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2022/2023", viewModel.Results[0].TimePeriod.Period);
-            Assert.Equal("654884", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "654884",
+                viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2022/2023", viewModel.Results[1].TimePeriod.Period);
-            Assert.Equal("235647", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "235647",
+                viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2021/2022", viewModel.Results[2].TimePeriod.Period);
-            Assert.Equal("611553", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "611553",
+                viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2021/2022", viewModel.Results[3].TimePeriod.Period);
-            Assert.Equal("752711", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "752711",
+                viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear4,
+                viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2020/2021", viewModel.Results[4].TimePeriod.Period);
-            Assert.Equal("233870", viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "233870",
+                viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
 
-            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(
+                AbsenceSchoolData.FilterNcYear6,
+                viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]
+            );
             Assert.Equal("2020/2021", viewModel.Results[5].TimePeriod.Period);
-            Assert.Equal("510682", viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]);
+            Assert.Equal(
+                "510682",
+                viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]
+            );
         }
 
         [Fact]
@@ -2498,11 +3006,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
                     { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(18, viewModel.Results.Count);
 
@@ -2511,10 +3021,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 GeographicLevel.LocalAuthority,
                 GeographicLevel.Country,
                 GeographicLevel.Region,
-                GeographicLevel.School
+                GeographicLevel.School,
             ];
 
-            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.GeographicLevel)));
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.GeographicLevel))
+            );
         }
 
         [Fact]
@@ -2530,11 +3043,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
                     { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(18, viewModel.Results.Count);
 
@@ -2546,7 +3061,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 GeographicLevel.LocalAuthority,
             ];
 
-            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.GeographicLevel)));
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.GeographicLevel))
+            );
         }
 
         [Fact]
@@ -2562,11 +3080,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
                     { "geographicLevels.eq", "LA" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(11, viewModel.Results.Count);
 
@@ -2578,7 +3098,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 AbsenceSchoolData.LocationLaSheffield,
             ];
 
-            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.Locations["LA"])));
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.Locations["LA"]))
+            );
         }
 
         [Fact]
@@ -2594,11 +3117,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
                     { "geographicLevels.eq", "LA" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(11, viewModel.Results.Count);
 
@@ -2610,7 +3135,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 AbsenceSchoolData.LocationLaBarnet,
             ];
 
-            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.Locations["LA"])));
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.Locations["LA"]))
+            );
         }
 
         [Fact]
@@ -2625,11 +3153,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "geographicLevels.eq", "NAT" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(8, viewModel.Results.Count);
 
@@ -2643,7 +3173,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(
                 expectedSequence,
-                GetSequence(viewModel.Results.Select(r => r.Filters[AbsenceSchoolData.FilterNcYear]))
+                GetSequence(
+                    viewModel.Results.Select(r => r.Filters[AbsenceSchoolData.FilterNcYear])
+                )
             );
         }
 
@@ -2659,11 +3191,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "geographicLevels.eq", "NAT" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(8, viewModel.Results.Count);
 
@@ -2677,7 +3211,9 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(
                 expectedSequence,
-                GetSequence(viewModel.Results.Select(r => r.Filters[AbsenceSchoolData.FilterNcYear]))
+                GetSequence(
+                    viewModel.Results.Select(r => r.Filters[AbsenceSchoolData.FilterNcYear])
+                )
             );
         }
 
@@ -2694,25 +3230,23 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
                     { "geographicLevels.eq", "REG" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(4, viewModel.Results.Count);
 
-            string[] expectedSequence =
-            [
-                "636969",
-                "748965",
-                "794394",
-                "960185",
-            ];
+            string[] expectedSequence = ["636969", "748965", "794394", "960185"];
 
             Assert.Equal(
                 expectedSequence,
-                GetSequence(viewModel.Results.Select(r => r.Values[AbsenceSchoolData.IndicatorEnrolments]))
+                GetSequence(
+                    viewModel.Results.Select(r => r.Values[AbsenceSchoolData.IndicatorEnrolments])
+                )
             );
         }
 
@@ -2729,25 +3263,23 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
                     { "geographicLevels.eq", "REG" },
-                    { "timePeriods.eq", "2020|AY" }
+                    { "timePeriods.eq", "2020|AY" },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             Assert.Equal(4, viewModel.Results.Count);
 
-            string[] expectedSequence =
-            [
-                "960185",
-                "794394",
-                "748965",
-                "636969",
-            ];
+            string[] expectedSequence = ["960185", "794394", "748965", "636969"];
 
             Assert.Equal(
                 expectedSequence,
-                GetSequence(viewModel.Results.Select(r => r.Values[AbsenceSchoolData.IndicatorEnrolments]))
+                GetSequence(
+                    viewModel.Results.Select(r => r.Values[AbsenceSchoolData.IndicatorEnrolments])
+                )
             );
         }
 
@@ -2763,23 +3295,20 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 [
                     "timePeriod|Asc",
                     "location|LA|Desc",
-                    $"filter|{AbsenceSchoolData.FilterNcYear}|Asc"
+                    $"filter|{AbsenceSchoolData.FilterNcYear}|Asc",
                 ],
                 queryParameters: new Dictionary<string, StringValues>
                 {
                     { "geographicLevels.eq", "LA" },
-                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal }
+                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
                 }
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
-            string[] expectedTimePeriodSequence =
-            [
-                "2020/2021",
-                "2021/2022",
-                "2022/2023",
-            ];
+            string[] expectedTimePeriodSequence = ["2020/2021", "2021/2022", "2022/2023"];
 
             string[] expectedLocationSequence =
             [
@@ -2805,21 +3334,22 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 )
                 .SelectMany(
                     _ => expectedFilterSequence,
-                    (tuple, filter) => new
-                    {
-                        TimePeriod = tuple.timePeriod,
-                        Location = tuple.location,
-                        Filter = filter
-                    }
+                    (tuple, filter) =>
+                        new
+                        {
+                            TimePeriod = tuple.timePeriod,
+                            Location = tuple.location,
+                            Filter = filter,
+                        }
                 )
                 .ToList();
 
-            var actualSequence = viewModel.Results
-                .Select(result => new
+            var actualSequence = viewModel
+                .Results.Select(result => new
                 {
                     TimePeriod = result.TimePeriod.Period,
                     Location = result.Locations["LA"],
-                    Filter = result.Filters[AbsenceSchoolData.FilterNcYear]
+                    Filter = result.Filters[AbsenceSchoolData.FilterNcYear],
                 })
                 .ToList();
 
@@ -2849,7 +3379,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
     public class QueryAnalyticsEnabledTests : DataSetsControllerGetQueryTests, IDisposable
     {
-        public QueryAnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+        public QueryAnalyticsEnabledTests(TestApplicationFactory testApp)
+            : base(testApp)
         {
             testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
         }
@@ -2872,7 +3403,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
                     { "geographicLevels.eq", "NAT" },
                     { "timePeriods.eq", "2020/2021|AY" },
-                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
                 },
                 sorts: ["timePeriod|Asc"],
                 debug: true,
@@ -2880,8 +3411,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 pageSize: 3
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-            
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
+
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
@@ -2895,43 +3428,35 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     Filters = new DataSetQueryCriteriaFilters
                     {
-                        Eq = AbsenceSchoolData.FilterSchoolTypeTotal
+                        Eq = AbsenceSchoolData.FilterSchoolTypeTotal,
                     },
-                    GeographicLevels = new DataSetQueryCriteriaGeographicLevels
-                    {
-                        Eq = "NAT"
-                    },
+                    GeographicLevels = new DataSetQueryCriteriaGeographicLevels { Eq = "NAT" },
                     TimePeriods = new DataSetQueryCriteriaTimePeriods
                     {
-                        Eq = new DataSetQueryTimePeriod
-                        {
-                            Code = "AY",
-                            Period = "2020/2021"
-                        }
+                        Eq = new DataSetQueryTimePeriod { Code = "AY", Period = "2020/2021" },
                     },
                     Locations = new DataSetQueryCriteriaLocations
                     {
                         Eq = new DataSetQueryLocationId
                         {
                             Id = AbsenceSchoolData.LocationNatEngland,
-                            Level = "NAT"
-                        }
-                    }
+                            Level = "NAT",
+                        },
+                    },
                 },
-                Sorts = ListOf(new DataSetQuerySort
-                {
-                    Direction = "Asc",
-                    Field = "timePeriod"
-                }),
-                Debug = true
+                Sorts = ListOf(new DataSetQuerySort { Direction = "Asc", Field = "timePeriod" }),
+                Debug = true,
             };
-            
+
             await AnalyticsTestAssertions.AssertDataSetVersionQueryAnalyticsCaptured(
                 dataSetVersion: dataSetVersion,
-                expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths),
+                expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(
+                    AnalyticsWritePublicApiQueryStrategy.OutputSubPaths
+                ),
                 expectedRequest: expectedRequest,
                 expectedResultsCount: 1,
-                expectedTotalRows: 4);
+                expectedTotalRows: 4
+            );
         }
 
         [Fact]
@@ -2949,10 +3474,13 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             response.AssertBadRequest();
-            
+
             // Check that the folder for capturing queries for analytics was never created.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
+                _analyticsPathResolver.BuildOutputDirectory(
+                    AnalyticsWritePublicApiQueryStrategy.OutputSubPaths
+                )
+            );
         }
 
         [Fact]
@@ -2968,32 +3496,38 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
                     { "geographicLevels.eq", "NAT" },
                     { "timePeriods.eq", "2020/2021|AY" },
-                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
                 },
                 sorts: ["timePeriod|Asc"],
                 debug: true,
                 page: 2,
                 pageSize: 3,
-                requestSource: "EES");
+                requestSource: "EES"
+            );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
 
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-            
+
             // Expect the successful call to have been omitted from analytics because it originates
             // from the EES service.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
+                _analyticsPathResolver.BuildOutputDirectory(
+                    AnalyticsWritePublicApiQueryStrategy.OutputSubPaths
+                )
+            );
         }
-        
+
         [Fact]
         public async Task ExceptionThrownByQueryAnalyticsManager_SuccessfulResultsStillReturned()
         {
             // Set up the manager to throw an exception when the service attempts to add a query to it.
             var analyticsManagerMock = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            
+
             analyticsManagerMock
                 .Setup(m => m.Read(It.IsAny<CancellationToken>()))
                 .Returns(async () =>
@@ -3001,17 +3535,22 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     await Task.Delay(Timeout.Infinite);
                     return null!;
                 });
-            
+
             analyticsManagerMock
-                .Setup(m => m.Add(
-                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
-                    It.IsAny<CancellationToken>()))
+                .Setup(m =>
+                    m.Add(
+                        It.IsAny<CaptureDataSetVersionQueryRequest>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .Throws(new Exception("Error"));
 
-            var app = TestApp.ConfigureServices(services => services
-                .ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver)
-                .ReplaceService(analyticsManagerMock));
-            
+            var app = TestApp.ConfigureServices(services =>
+                services
+                    .ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver)
+                    .ReplaceService(analyticsManagerMock)
+            );
+
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
@@ -3023,25 +3562,27 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
                     { "geographicLevels.eq", "NAT" },
                     { "timePeriods.eq", "2020/2021|AY" },
-                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
                 },
                 sorts: ["timePeriod|Asc"]
             );
 
             // Verify that the manager threw the Exception as planned.
-            analyticsManagerMock
-                .Verify(s => s.Add(
-                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
-                    It.IsAny<CancellationToken>()));
+            analyticsManagerMock.Verify(s =>
+                s.Add(It.IsAny<CaptureDataSetVersionQueryRequest>(), It.IsAny<CancellationToken>())
+            );
 
             // Verify that despite the Exception being thrown, the service still returned
             // the expected successful query.
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
             Assert.Equal(4, viewModel.Results.Count);
         }
     }
 
-    public class QueryAnalyticsDisabledTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    public class QueryAnalyticsDisabledTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
     {
         [Fact]
         public async Task SuccessfulQuery_AnalyticsDisabled_NotCapturedByAnalytics()
@@ -3056,7 +3597,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal },
                     { "geographicLevels.eq", "NAT" },
                     { "timePeriods.eq", "2020/2021|AY" },
-                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" }
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
                 },
                 sorts: ["timePeriod|Asc"],
                 debug: true,
@@ -3064,19 +3605,24 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 pageSize: 3
             );
 
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-            
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(
+                useSystemJson: true
+            );
+
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-            
+
             // Expect the successful query not to have recorded its query for analytics, as this
             // feature was disabled by appsettings.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
+                _analyticsPathResolver.BuildOutputDirectory(
+                    AnalyticsWritePublicApiQueryStrategy.OutputSubPaths
+                )
+            );
         }
     }
-        
+
     private async Task<HttpResponseMessage> QueryDataSet(
         Guid dataSetId,
         IEnumerable<string>? indicators,
@@ -3088,7 +3634,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         IDictionary<string, StringValues>? queryParameters = null,
         Guid? previewTokenId = null,
         WebApplicationFactory<Startup>? app = null,
-        string? requestSource = null)
+        string? requestSource = null
+    )
     {
         var query = new Dictionary<string, StringValues>();
 
@@ -3138,11 +3685,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
     }
 
     private async Task<DataSetVersion> SetupDefaultDataSetVersion(
-        DataSetVersionStatus versionStatus = DataSetVersionStatus.Published)
+        DataSetVersionStatus versionStatus = DataSetVersionStatus.Published
+    )
     {
-        DataSet dataSet = DataFixture
-            .DefaultDataSet()
-            .WithStatusPublished();
+        DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
         await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -3150,13 +3696,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
             .WithMetaSummary(
-                DataFixture.DefaultDataSetVersionMetaSummary()
+                DataFixture
+                    .DefaultDataSetVersionMetaSummary()
                     .WithGeographicLevels(
                         [
                             GeographicLevel.Country,
                             GeographicLevel.LocalAuthority,
                             GeographicLevel.Region,
-                            GeographicLevel.School
+                            GeographicLevel.School,
                         ]
                     )
             )
@@ -3164,27 +3711,27 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
         dataSet.LatestLiveVersion = dataSetVersion;
 
-        await TestApp.AddTestData<PublicDataDbContext>(
-            context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            }
-        );
+        await TestApp.AddTestData<PublicDataDbContext>(context =>
+        {
+            context.DataSetVersions.Add(dataSetVersion);
+            context.DataSets.Update(dataSet);
+        });
 
         return dataSetVersion;
     }
 
-
     private WebApplicationFactory<Startup> BuildApp()
     {
-        return TestApp
-            .ConfigureServices(services => services
+        return TestApp.ConfigureServices(services =>
+            services
                 .ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver)
-                .ReplaceService<IAnalyticsPathResolver>(_analyticsPathResolver, optional: true));
+                .ReplaceService<IAnalyticsPathResolver>(_analyticsPathResolver, optional: true)
+        );
     }
 
-    private static QueryResultsMeta GatherQueryResultsMeta(DataSetQueryPaginatedResultsViewModel viewModel)
+    private static QueryResultsMeta GatherQueryResultsMeta(
+        DataSetQueryPaginatedResultsViewModel viewModel
+    )
     {
         var filters = new Dictionary<string, HashSet<string>>();
         var locations = new Dictionary<string, HashSet<string>>();
@@ -3242,4 +3789,3 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
         public required HashSet<string> Indicators { get; init; } = [];
     }
 }
-

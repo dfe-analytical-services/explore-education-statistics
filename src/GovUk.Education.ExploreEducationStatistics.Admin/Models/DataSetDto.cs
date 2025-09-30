@@ -25,20 +25,21 @@ public record DataSetDto
         {
             RuleLevelCascadeMode = CascadeMode.Stop;
 
-            RuleFor(dto => dto.ReleaseVersionId)
-                .NotEmpty();
+            RuleFor(dto => dto.ReleaseVersionId).NotEmpty();
 
             RuleFor(dto => dto.Title)
                 .NotEmpty()
-                    .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
+                .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
+                .WithMessage(
+                    ValidationMessages.DataSetTitleTooLong,
+                    "{PropertyValue}",
+                    "{MaxLength}"
+                );
 
-            RuleFor(dto => dto.DataFile)
-                .MustBeValidDataFile();
+            RuleFor(dto => dto.DataFile).MustBeValidDataFile();
 
-            RuleFor(dto => dto.MetaFile)
-                .MustBeValidMetaFile();
+            RuleFor(dto => dto.MetaFile).MustBeValidMetaFile();
         }
     }
 }

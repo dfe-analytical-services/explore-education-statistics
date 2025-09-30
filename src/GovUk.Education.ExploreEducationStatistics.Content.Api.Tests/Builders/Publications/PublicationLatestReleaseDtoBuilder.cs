@@ -8,12 +8,13 @@ public class PublicationLatestReleaseDtoBuilder
     private string _slug = "Slug";
     private string _title = "Title";
 
-    public PublicationLatestReleaseDto Build() => new()
-    {
-        Id = _id,
-        Slug = _slug,
-        Title = _title
-    };
+    public PublicationLatestReleaseDto Build() =>
+        new()
+        {
+            Id = _id,
+            Slug = _slug,
+            Title = _title,
+        };
 
     public PublicationLatestReleaseDtoBuilder WithId(Guid id)
     {

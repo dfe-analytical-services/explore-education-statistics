@@ -16,7 +16,8 @@ public interface IHttpClientAzureAuthenticationManager<TOptions>
 }
 
 public class DefaultAzureCredentialHttpClientAuthenticationManager<TOptions>(
-    IOptions<TOptions> options) : IHttpClientAzureAuthenticationManager<TOptions>
+    IOptions<TOptions> options
+) : IHttpClientAzureAuthenticationManager<TOptions>
     where TOptions : class, IAzureAuthenticationOptions
 {
     /// <summary>
@@ -31,27 +32,32 @@ public class DefaultAzureCredentialHttpClientAuthenticationManager<TOptions>(
     ///
     /// The other advantage of requesting the Bearer token here rather than in "AddHttpClient" is that it can be done
     /// asynchronously here.
-    /// 
+    ///
     /// </summary>
-    public async Task AddAuthentication(
-        HttpClient httpClient,
-        CancellationToken cancellationToken)
+    public async Task AddAuthentication(HttpClient httpClient, CancellationToken cancellationToken)
     {
         var accessTokenProvider = new DefaultAzureCredential();
         var tokenResponse = await accessTokenProvider.GetTokenAsync(
             new TokenRequestContext([$"api://{options.Value.AppRegistrationClientId}/.default"]),
-            cancellationToken);
-        httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", tokenResponse.Token);
+            cancellationToken
+        );
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            tokenResponse.Token
+        );
     }
 }
 
-public class HttpHeaderHttpClientAuthenticationManager<TOptions> : IHttpClientAzureAuthenticationManager<TOptions>
+public class HttpHeaderHttpClientAuthenticationManager<TOptions>
+    : IHttpClientAzureAuthenticationManager<TOptions>
     where TOptions : class, IAzureAuthenticationOptions
 {
     public Task AddAuthentication(HttpClient httpClient, CancellationToken cancellationToken)
     {
-        httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
+        httpClient.DefaultRequestHeaders.Add(
+            HeaderNames.UserAgent,
+            SecurityConstants.AdminUserAgent
+        );
         return Task.CompletedTask;
     }
 }

@@ -11,18 +11,19 @@ public class AllMethodologiesThemeViewModelTests
         var model = new AllMethodologiesThemeViewModel
         {
             Title = "ThemeWithPublications",
-            Publications = [
+            Publications =
+            [
                 new AllMethodologiesPublicationViewModel
                 {
                     Title = "PublicationWithoutMethodology",
-                    Methodologies = []
+                    Methodologies = [],
                 },
                 new AllMethodologiesPublicationViewModel
                 {
                     Title = "PublicationWithMethodology",
-                    Methodologies = [new()]
-                }
-            ]
+                    Methodologies = [new()],
+                },
+            ],
         };
 
         model.RemovePublicationNodesWithoutMethodologiesAndSort();
@@ -37,23 +38,24 @@ public class AllMethodologiesThemeViewModelTests
         var model = new AllMethodologiesThemeViewModel
         {
             Title = "ThemeWithPublications",
-            Publications = [
+            Publications =
+            [
                 new AllMethodologiesPublicationViewModel
                 {
                     Title = "Publication C",
-                    Methodologies = [new()]
+                    Methodologies = [new()],
                 },
                 new AllMethodologiesPublicationViewModel
                 {
                     Title = "Publication A",
-                    Methodologies = [new()]
+                    Methodologies = [new()],
                 },
                 new AllMethodologiesPublicationViewModel
                 {
                     Title = "Publication B",
-                    Methodologies = [new()]
-                }
-            ]
+                    Methodologies = [new()],
+                },
+            ],
         };
 
         model.RemovePublicationNodesWithoutMethodologiesAndSort();
@@ -70,7 +72,7 @@ public class AllMethodologiesThemeViewModelTests
         var model = new AllMethodologiesThemeViewModel
         {
             Title = "ThemeWithoutPublications",
-            Publications = []
+            Publications = [],
         };
 
         model.RemovePublicationNodesWithoutMethodologiesAndSort();

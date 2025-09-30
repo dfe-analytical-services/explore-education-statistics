@@ -48,14 +48,17 @@ public static class ReflectionExtensions
             switch (boxType.GetNameWithoutGenericArity())
             {
                 case "ActionResult":
-                    var actionResultType = typeof(ActionResult<>).MakeGenericType(boxType.GenericTypeArguments);
+                    var actionResultType = typeof(ActionResult<>).MakeGenericType(
+                        boxType.GenericTypeArguments
+                    );
                     var actionResult = Activator.CreateInstance(actionResultType, boxedValue);
 
                     boxedValue = actionResult;
                     break;
 
                 case "Task":
-                    var task = typeof(Task).GetMethod("FromResult")
+                    var task = typeof(Task)
+                        .GetMethod("FromResult")
                         ?.MakeGenericMethod(boxType.GenericTypeArguments)
                         .Invoke(null, new[] { boxedValue });
 
@@ -63,7 +66,9 @@ public static class ReflectionExtensions
                     break;
 
                 case "Either":
-                    var eitherType = typeof(Either<,>).MakeGenericType(boxType.GenericTypeArguments);
+                    var eitherType = typeof(Either<,>).MakeGenericType(
+                        boxType.GenericTypeArguments
+                    );
                     var either = Activator.CreateInstance(eitherType, boxedValue);
 
                     boxedValue = either;
@@ -98,7 +103,9 @@ public static class ReflectionExtensions
             if (result is Task)
             {
                 // TODO: EES-4268 Create async variant of this method
-                throw new ArgumentException("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.");
+                throw new ArgumentException(
+                    "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first."
+                );
             }
 
             var resultType = result.GetType();

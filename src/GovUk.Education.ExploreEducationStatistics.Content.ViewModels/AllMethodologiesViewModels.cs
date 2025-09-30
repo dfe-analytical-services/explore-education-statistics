@@ -10,21 +10,22 @@ public class AllMethodologiesThemeViewModel : IComparable<AllMethodologiesThemeV
 
     public void RemovePublicationNodesWithoutMethodologiesAndSort()
     {
-        Publications = Publications
-            .Where(publication => publication.Methodologies.Any())
-            .ToList();
+        Publications = Publications.Where(publication => publication.Methodologies.Any()).ToList();
         Publications.Sort();
     }
 
     public int CompareTo(AllMethodologiesThemeViewModel? other)
     {
-        if (ReferenceEquals(this, other)) return 0;
-        if (ReferenceEquals(null, other)) return 1;
+        if (ReferenceEquals(this, other))
+            return 0;
+        if (ReferenceEquals(null, other))
+            return 1;
         return string.Compare(Title, other.Title, StringComparison.Ordinal);
     }
 }
 
-public class AllMethodologiesPublicationViewModel : IComparable<AllMethodologiesPublicationViewModel>
+public class AllMethodologiesPublicationViewModel
+    : IComparable<AllMethodologiesPublicationViewModel>
 {
     public Guid Id { get; set; }
 
@@ -34,8 +35,10 @@ public class AllMethodologiesPublicationViewModel : IComparable<AllMethodologies
 
     public int CompareTo(AllMethodologiesPublicationViewModel? other)
     {
-        if (ReferenceEquals(this, other)) return 0;
-        if (ReferenceEquals(null, other)) return 1;
+        if (ReferenceEquals(this, other))
+            return 0;
+        if (ReferenceEquals(null, other))
+            return 1;
         return string.Compare(Title, other.Title, StringComparison.Ordinal);
     }
 }

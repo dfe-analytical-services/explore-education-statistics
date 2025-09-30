@@ -13,7 +13,8 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
     public override LocationOptionViewModel Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
-        JsonSerializerOptions options)
+        JsonSerializerOptions options
+    )
     {
         if (!JsonDocument.TryParseValue(ref reader, out var doc))
         {
@@ -24,34 +25,53 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
         {
             var rootElement = doc.RootElement.GetRawText();
 
-            var propertyNames = doc.RootElement
-                .EnumerateObject()
+            var propertyNames = doc
+                .RootElement.EnumerateObject()
                 .Select(p => char.ToUpper(p.Name[0]) + p.Name[1..])
                 .ToHashSet();
 
-            if (propertyNames.Contains(nameof(LocationSchoolOptionViewModel.Urn))
-                && propertyNames.Contains(nameof(LocationSchoolOptionViewModel.LaEstab)))
+            if (
+                propertyNames.Contains(nameof(LocationSchoolOptionViewModel.Urn))
+                && propertyNames.Contains(nameof(LocationSchoolOptionViewModel.LaEstab))
+            )
             {
-                return JsonSerializer.Deserialize<LocationSchoolOptionViewModel>(rootElement, options)!;
+                return JsonSerializer.Deserialize<LocationSchoolOptionViewModel>(
+                    rootElement,
+                    options
+                )!;
             }
 
             if (propertyNames.Contains(nameof(LocationProviderOptionViewModel.Ukprn)))
             {
-                return JsonSerializer.Deserialize<LocationProviderOptionViewModel>(rootElement, options)!;
+                return JsonSerializer.Deserialize<LocationProviderOptionViewModel>(
+                    rootElement,
+                    options
+                )!;
             }
 
-            if (propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.Code))
-                && propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.OldCode)))
+            if (
+                propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.Code))
+                && propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.OldCode))
+            )
             {
-                return JsonSerializer.Deserialize<LocationLocalAuthorityOptionViewModel>(rootElement, options)!;
+                return JsonSerializer.Deserialize<LocationLocalAuthorityOptionViewModel>(
+                    rootElement,
+                    options
+                )!;
             }
 
             if (propertyNames.Contains(nameof(LocationCodedOptionViewModel.Code)))
             {
-                return JsonSerializer.Deserialize<LocationCodedOptionViewModel>(rootElement, options)!;
+                return JsonSerializer.Deserialize<LocationCodedOptionViewModel>(
+                    rootElement,
+                    options
+                )!;
             }
 
-            return JsonSerializer.Deserialize<LocationRscRegionOptionViewModel>(rootElement, options)!;
+            return JsonSerializer.Deserialize<LocationRscRegionOptionViewModel>(
+                rootElement,
+                options
+            )!;
         }
         catch (JsonException exception)
         {
@@ -59,7 +79,11 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
         }
     }
 
-    public override void Write(Utf8JsonWriter writer, LocationOptionViewModel? value, JsonSerializerOptions options)
+    public override void Write(
+        Utf8JsonWriter writer,
+        LocationOptionViewModel? value,
+        JsonSerializerOptions options
+    )
     {
         if (value == null)
         {
@@ -72,19 +96,44 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
             switch (value)
             {
                 case LocationSchoolOptionViewModel:
-                    JsonSerializer.Serialize(writer, value, typeof(LocationSchoolOptionViewModel), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(LocationSchoolOptionViewModel),
+                        options
+                    );
                     break;
                 case LocationRscRegionOptionViewModel:
-                    JsonSerializer.Serialize(writer, value, typeof(LocationRscRegionOptionViewModel), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(LocationRscRegionOptionViewModel),
+                        options
+                    );
                     break;
                 case LocationProviderOptionViewModel:
-                    JsonSerializer.Serialize(writer, value, typeof(LocationProviderOptionViewModel), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(LocationProviderOptionViewModel),
+                        options
+                    );
                     break;
                 case LocationLocalAuthorityOptionViewModel:
-                    JsonSerializer.Serialize(writer, value, typeof(LocationLocalAuthorityOptionViewModel), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(LocationLocalAuthorityOptionViewModel),
+                        options
+                    );
                     break;
                 case LocationCodedOptionViewModel:
-                    JsonSerializer.Serialize(writer, value, typeof(LocationCodedOptionViewModel), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(LocationCodedOptionViewModel),
+                        options
+                    );
                     break;
             }
         }

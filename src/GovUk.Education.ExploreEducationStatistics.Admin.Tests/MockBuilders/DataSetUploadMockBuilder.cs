@@ -23,32 +23,35 @@ public class DataSetUploadMockBuilder
             MetaFileId = Guid.NewGuid(),
             MetaFileName = "meta.data.csv",
             MetaFileSizeInBytes = 157,
-            Status = _screenerResult == ScreenerResult.Failed
-                ? DataSetUploadStatus.FAILED_SCREENING
-                : DataSetUploadStatus.PENDING_IMPORT,
+            Status =
+                _screenerResult == ScreenerResult.Failed
+                    ? DataSetUploadStatus.FAILED_SCREENING
+                    : DataSetUploadStatus.PENDING_IMPORT,
             UploadedBy = "test@test.com",
             Created = DateTime.UtcNow,
             ScreenerResult = new DataSetScreenerResponse
             {
                 OverallResult = _screenerResult ?? ScreenerResult.Passed,
                 Message = "Screening complete",
-                TestResults = _testResults ??
-                [
-                    new()
-                    {
-                        TestFunctionName = "TestFunction1",
-                        Notes = "Test 1 passed",
-                        Stage = Stage.Passed,
-                        Result = TestResult.PASS,
-                    },
-                    new()
-                    {
-                        TestFunctionName = "TestFunction2",
-                        Notes = "Test 2 passed",
-                        Stage = Stage.Passed,
-                        Result = TestResult.PASS,
-                    },
-                ]
+                TestResults =
+                    _testResults
+                    ??
+                    [
+                        new()
+                        {
+                            TestFunctionName = "TestFunction1",
+                            Notes = "Test 1 passed",
+                            Stage = Stage.Passed,
+                            Result = TestResult.PASS,
+                        },
+                        new()
+                        {
+                            TestFunctionName = "TestFunction2",
+                            Notes = "Test 2 passed",
+                            Stage = Stage.Passed,
+                            Result = TestResult.PASS,
+                        },
+                    ],
             },
             ReplacingFileId = null,
         };
@@ -88,8 +91,8 @@ public class DataSetUploadMockBuilder
                         Stage = "2",
                         Result = TestResult.PASS.ToString(),
                     },
-                ]
-            }
+                ],
+            },
         };
     }
 

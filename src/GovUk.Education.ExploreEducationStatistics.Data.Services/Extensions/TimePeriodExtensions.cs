@@ -21,26 +21,32 @@ public static class TimePeriodExtensions
         return $"{observation.Year}_{observation.TimeIdentifier.GetEnumValue()}";
     }
 
-    public static (int Year, TimeIdentifier TimeIdentifier) GetTimePeriodTuple(this ObservationViewModel observation)
+    public static (int Year, TimeIdentifier TimeIdentifier) GetTimePeriodTuple(
+        this ObservationViewModel observation
+    )
     {
         var parts = observation.TimePeriod.Split('_');
 
-        if (parts.Length == 2
+        if (
+            parts.Length == 2
             && int.TryParse(parts[0], out var year)
-            && TryParseTimeIdentifier(parts[1], out var timeIdentifier))
+            && TryParseTimeIdentifier(parts[1], out var timeIdentifier)
+        )
         {
             return (year, timeIdentifier);
         }
 
         throw new ArgumentException(
-            $"Time period '{observation.TimePeriod}' is invalid and could not be parsed");
+            $"Time period '{observation.TimePeriod}' is invalid and could not be parsed"
+        );
     }
 
     private static bool TryParseTimeIdentifier(string input, out TimeIdentifier timeIdentifier)
     {
         try
         {
-            timeIdentifier = (TimeIdentifier)TimeIdentifierLookup.ConvertFromProvider.Invoke(input)!;
+            timeIdentifier = (TimeIdentifier)
+                TimeIdentifierLookup.ConvertFromProvider.Invoke(input)!;
             return true;
         }
         catch (Exception)

@@ -26,7 +26,8 @@ public class ReleasePublishingStatusService : IReleasePublishingStatusService
         IMapper mapper,
         IUserService userService,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IPublisherTableStorageService publisherTableStorageService)
+        IPublisherTableStorageService publisherTableStorageService
+    )
     {
         _mapper = mapper;
         _userService = userService;
@@ -35,16 +36,19 @@ public class ReleasePublishingStatusService : IReleasePublishingStatusService
     }
 
     public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(
-        Guid releaseVersionId)
+        Guid releaseVersionId
+    )
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
             {
-                var asyncPageable = await _publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
-                    PublisherReleaseStatusTableName,
-                    ent => ent.PartitionKey == releaseVersionId.ToString());
+                var asyncPageable =
+                    await _publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
+                        PublisherReleaseStatusTableName,
+                        ent => ent.PartitionKey == releaseVersionId.ToString()
+                    );
                 var statusList = await asyncPageable.ToListAsync();
                 var latestStatus = statusList.MaxBy(status => status.Created);
 

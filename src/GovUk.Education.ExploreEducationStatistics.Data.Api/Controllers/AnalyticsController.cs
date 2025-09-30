@@ -7,9 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 
 [Route("api")]
 [ApiController]
-public class AnalyticsController(
-    IAnalyticsManager analyticsManager) 
-    : ControllerBase
+public class AnalyticsController(IAnalyticsManager analyticsManager) : ControllerBase
 {
     /// <summary>
     /// A user can download the data in the table builder tool.
@@ -24,13 +22,14 @@ public class AnalyticsController(
     [HttpPost("tablebuilder/analytics")]
     public async Task<ActionResult> RecordDownload(
         [FromBody] RecordTableToolDownloadRequestBindingModel requestBindingModel,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var callCapture = requestBindingModel.ToModel();
         await analyticsManager.Add(callCapture, cancellationToken);
         return new AcceptedResult();
     }
-    
+
     /// <summary>
     /// A user can download the data in the table on a permaLink page.
     /// This action is implemented entirely in the front end.
@@ -47,7 +46,8 @@ public class AnalyticsController(
     [HttpPost("permalink/analytics")]
     public async Task<ActionResult> RecordDownload(
         [FromBody] RecordPermalinkTableDownloadRequestBindingModel requestBindingModel,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var callCapture = requestBindingModel.ToModel();
         await analyticsManager.Add(callCapture, cancellationToken);

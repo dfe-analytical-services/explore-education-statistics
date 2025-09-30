@@ -25,11 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class PublicationServicePermissionTests
 {
-    private readonly Theme _theme = new()
-    {
-        Id = Guid.NewGuid(),
-        Title = "Test theme"
-    };
+    private readonly Theme _theme = new() { Id = Guid.NewGuid(), Title = "Test theme" };
 
     private readonly Publication _publication = new()
     {
@@ -40,12 +36,12 @@ public class PublicationServicePermissionTests
     [Fact]
     public async Task ListPublications_NoAccessOfSystem()
     {
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(SecurityPolicies.RegisteredUser)
             .AssertForbidden(async userService =>
             {
-                var service = BuildPublicationService(
-                    userService: userService.Object);
+                var service = BuildPublicationService(userService: userService.Object);
                 return await service.ListPublications(Guid.NewGuid());
             });
     }
@@ -53,12 +49,12 @@ public class PublicationServicePermissionTests
     [Fact]
     public async Task ListPublicationSummaries()
     {
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(SecurityPolicies.CanViewAllPublications)
             .AssertForbidden(async userService =>
             {
-                var service = BuildPublicationService(
-                    userService: userService.Object);
+                var service = BuildPublicationService(userService: userService.Object);
                 return await service.ListPublicationSummaries();
             });
     }
@@ -71,19 +67,18 @@ public class PublicationServicePermissionTests
         await context.SaveChangesAsync();
 
         var userService = AlwaysTrueUserService();
-        var publicationService = BuildPublicationService(
-            userService: userService.Object);
+        var publicationService = BuildPublicationService(userService: userService.Object);
 
         PermissionTestUtil.AssertSecurityPoliciesChecked(
             async service =>
-                await service.CreatePublication(new PublicationCreateRequest
-                {
-                    ThemeId = _theme.Id,
-                }),
+                await service.CreatePublication(
+                    new PublicationCreateRequest { ThemeId = _theme.Id }
+                ),
             _theme,
             userService,
             publicationService,
-            SecurityPolicies.CanCreatePublicationForSpecificTheme);
+            SecurityPolicies.CanCreatePublicationForSpecificTheme
+        );
     }
 
     [Fact]
@@ -95,20 +90,23 @@ public class PublicationServicePermissionTests
         await context.SaveChangesAsync();
 
         var userService = AlwaysTrueUserService();
-        var publicationService = BuildPublicationService(
-            userService: userService.Object);
+        var publicationService = BuildPublicationService(userService: userService.Object);
 
         PermissionTestUtil.AssertSecurityPoliciesChecked(
             async service =>
-                await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
-                {
-                    ThemeId = _theme.Id,
-                    Title = "Updated publication",
-                }),
+                await service.UpdatePublication(
+                    _publication.Id,
+                    new PublicationSaveRequest
+                    {
+                        ThemeId = _theme.Id,
+                        Title = "Updated publication",
+                    }
+                ),
             _publication,
             userService,
             publicationService,
-            SecurityPolicies.CanUpdatePublication);
+            SecurityPolicies.CanUpdatePublication
+        );
     }
 
     [Fact]
@@ -120,20 +118,23 @@ public class PublicationServicePermissionTests
         await context.SaveChangesAsync();
 
         var userService = AlwaysTrueUserService();
-        var publicationService = BuildPublicationService(
-            userService: userService.Object);
+        var publicationService = BuildPublicationService(userService: userService.Object);
 
         PermissionTestUtil.AssertSecurityPoliciesChecked(
             async service =>
-                await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
-                {
-                    ThemeId = _theme.Id,
-                    Title = "Updated publication",
-                }),
+                await service.UpdatePublication(
+                    _publication.Id,
+                    new PublicationSaveRequest
+                    {
+                        ThemeId = _theme.Id,
+                        Title = "Updated publication",
+                    }
+                ),
             _publication,
             userService,
             publicationService,
-            SecurityPolicies.CanUpdateSpecificPublicationSummary);
+            SecurityPolicies.CanUpdateSpecificPublicationSummary
+        );
     }
 
     [Fact]
@@ -145,20 +146,23 @@ public class PublicationServicePermissionTests
         await context.SaveChangesAsync();
 
         var userService = AlwaysTrueUserService();
-        var publicationService = BuildPublicationService(
-            userService: userService.Object);
+        var publicationService = BuildPublicationService(userService: userService.Object);
 
         PermissionTestUtil.AssertSecurityPoliciesChecked(
             async service =>
-                await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
-                {
-                    ThemeId = _theme.Id,
-                    Title = "Updated publication",
-                }),
+                await service.UpdatePublication(
+                    _publication.Id,
+                    new PublicationSaveRequest
+                    {
+                        ThemeId = _theme.Id,
+                        Title = "Updated publication",
+                    }
+                ),
             _theme,
             userService,
             publicationService,
-            SecurityPolicies.CanCreatePublicationForSpecificTheme);
+            SecurityPolicies.CanCreatePublicationForSpecificTheme
+        );
     }
 
     [Fact]
@@ -183,24 +187,24 @@ public class PublicationServicePermissionTests
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Publication>(p => p.Id == publication.Id),
-                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary
+                )
+            )
             .ReturnsAsync(true);
         userService
-            .Setup(s =>
-                s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+            .Setup(s => s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var publicationService = BuildPublicationService(context,
-                userService: userService.Object);
+            var publicationService = BuildPublicationService(
+                context,
+                userService: userService.Object
+            );
 
             var result = await publicationService.UpdatePublication(
                 publication.Id,
-                new PublicationSaveRequest
-                {
-                    Title = "New publication title",
-                }
+                new PublicationSaveRequest { Title = "New publication title" }
             );
 
             VerifyAllMocks(userService);
@@ -232,17 +236,20 @@ public class PublicationServicePermissionTests
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Publication>(p => p.Id == publication.Id),
-                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary
+                )
+            )
             .ReturnsAsync(true);
         userService
-            .Setup(s =>
-                s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+            .Setup(s => s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var publicationService = BuildPublicationService(context,
-                userService: userService.Object);
+            var publicationService = BuildPublicationService(
+                context,
+                userService: userService.Object
+            );
 
             var result = await publicationService.UpdatePublication(
                 publication.Id,
@@ -262,10 +269,7 @@ public class PublicationServicePermissionTests
     [Fact]
     public async Task UpdatePublication_NoPermissionToChangeTheme()
     {
-        var newTheme = new Theme
-        {
-            Title = "New theme title"
-        };
+        var newTheme = new Theme { Title = "New theme title" };
         var publication = new Publication
         {
             Title = "Publication title",
@@ -286,28 +290,30 @@ public class PublicationServicePermissionTests
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Publication>(p => p.Id == publication.Id),
-                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary
+                )
+            )
             .ReturnsAsync(true);
 
         userService
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Theme>(t => t.Id == newTheme.Id),
-                    SecurityPolicies.CanCreatePublicationForSpecificTheme))
+                    SecurityPolicies.CanCreatePublicationForSpecificTheme
+                )
+            )
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var publicationService = BuildPublicationService(context,
-                userService: userService.Object);
+            var publicationService = BuildPublicationService(
+                context,
+                userService: userService.Object
+            );
 
             var result = await publicationService.UpdatePublication(
                 publication.Id,
-                new PublicationSaveRequest
-                {
-                    Title = "Publication title",
-                    ThemeId = newTheme.Id,
-                }
+                new PublicationSaveRequest { Title = "Publication title", ThemeId = newTheme.Id }
             );
 
             result.AssertForbidden();
@@ -317,10 +323,7 @@ public class PublicationServicePermissionTests
     [Fact]
     public async Task UpdatePublication_NoPermissionToChangeSupersededById()
     {
-        var newTheme = new Theme
-        {
-            Title = "New theme title"
-        };
+        var newTheme = new Theme { Title = "New theme title" };
         var publication = new Publication
         {
             Title = "Publication title",
@@ -341,32 +344,39 @@ public class PublicationServicePermissionTests
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Publication>(p => p.Id == publication.Id),
-                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary
+                )
+            )
             .ReturnsAsync(true);
 
         userService
-            .Setup(s =>
-                s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+            .Setup(s => s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
             .ReturnsAsync(false);
 
         userService
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Theme>(t => t.Id == newTheme.Id),
-                    SecurityPolicies.CanCreatePublicationForSpecificTheme))
+                    SecurityPolicies.CanCreatePublicationForSpecificTheme
+                )
+            )
             .ReturnsAsync(false);
 
         userService
             .Setup(s =>
                 s.MatchesPolicy(
                     It.Is<Theme>(t => t.Id == newTheme.Id),
-                    SecurityPolicies.CanCreatePublicationForSpecificTheme))
+                    SecurityPolicies.CanCreatePublicationForSpecificTheme
+                )
+            )
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var publicationService = BuildPublicationService(context,
-                userService: userService.Object);
+            var publicationService = BuildPublicationService(
+                context,
+                userService: userService.Object
+            );
 
             var result = await publicationService.UpdatePublication(
                 publication.Id,
@@ -389,7 +399,8 @@ public class PublicationServicePermissionTests
 
         _publication.Theme = _theme;
 
-        await PermissionTestUtil.PolicyCheckBuilder()
+        await PermissionTestUtil
+            .PolicyCheckBuilder()
             .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
             .AssertForbidden(async userService =>
             {
@@ -399,7 +410,8 @@ public class PublicationServicePermissionTests
 
                 var publicationService = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
 
                 return await publicationService.GetPublication(_publication.Id);
             });
@@ -414,10 +426,11 @@ public class PublicationServicePermissionTests
             {
                 Title = "Test external methodology",
                 Url = "http://test.external.methodology",
-            }
+            },
         };
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
             .AssertForbidden(async userService =>
             {
@@ -427,7 +440,8 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
                 return await service.GetExternalMethodology(publication.Id);
             });
     }
@@ -441,12 +455,15 @@ public class PublicationServicePermissionTests
             {
                 Title = "Test external methodology",
                 Url = "http://test.external.methodology",
-            }
+            },
         };
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(publication,
-                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(
+                publication,
+                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContext = InMemoryApplicationDbContext();
@@ -455,9 +472,12 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
-                return await service.UpdateExternalMethodology(publication.Id,
-                    new ExternalMethodologySaveRequest());
+                    userService: userService.Object
+                );
+                return await service.UpdateExternalMethodology(
+                    publication.Id,
+                    new ExternalMethodologySaveRequest()
+                );
             });
     }
 
@@ -470,12 +490,15 @@ public class PublicationServicePermissionTests
             {
                 Title = "Test external methodology",
                 Url = "http://test.external.methodology",
-            }
+            },
         };
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(publication,
-                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(
+                publication,
+                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContext = InMemoryApplicationDbContext();
@@ -484,7 +507,8 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
                 return await service.RemoveExternalMethodology(publication.Id);
             });
     }
@@ -503,7 +527,8 @@ public class PublicationServicePermissionTests
             },
         };
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
             .AssertForbidden(async userService =>
             {
@@ -513,7 +538,8 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
                 return await service.GetContact(publication.Id);
             });
     }
@@ -532,7 +558,8 @@ public class PublicationServicePermissionTests
             },
         };
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateContact)
             .AssertForbidden(async userService =>
             {
@@ -542,7 +569,8 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
                 return await service.UpdateContact(publication.Id, new ContactSaveRequest());
             });
     }
@@ -552,9 +580,10 @@ public class PublicationServicePermissionTests
     {
         AlwaysTrueUserService();
 
-        await PermissionTestUtil.PolicyCheckBuilder()
+        await PermissionTestUtil
+            .PolicyCheckBuilder()
             .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
-            .AssertForbidden(async userService => 
+            .AssertForbidden(async userService =>
             {
                 await using var contentDbContext = InMemoryApplicationDbContext();
                 contentDbContext.Publications.Add(_publication);
@@ -562,9 +591,13 @@ public class PublicationServicePermissionTests
 
                 var publicationService = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
 
-                return await publicationService.ListReleaseVersions(_publication.Id, ReleaseVersionsType.Latest);
+                return await publicationService.ListReleaseVersions(
+                    _publication.Id,
+                    ReleaseVersionsType.Latest
+                );
             });
     }
 
@@ -573,7 +606,8 @@ public class PublicationServicePermissionTests
     {
         var publication = new Publication();
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
             .AssertForbidden(async userService =>
             {
@@ -583,7 +617,8 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
+                    userService: userService.Object
+                );
                 return await service.GetReleaseSeries(publication.Id);
             });
     }
@@ -593,8 +628,12 @@ public class PublicationServicePermissionTests
     {
         var publication = new Publication();
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(
+                publication,
+                SecurityPolicies.CanManagePublicationReleaseSeries
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContext = InMemoryApplicationDbContext();
@@ -603,13 +642,16 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
-                return await service.AddReleaseSeriesLegacyLink(publication.Id,
+                    userService: userService.Object
+                );
+                return await service.AddReleaseSeriesLegacyLink(
+                    publication.Id,
                     new ReleaseSeriesLegacyLinkAddRequest
                     {
                         Description = "Test description",
-                        Url = "https://test.url"
-                    });
+                        Url = "https://test.url",
+                    }
+                );
             });
     }
 
@@ -618,8 +660,12 @@ public class PublicationServicePermissionTests
     {
         var publication = new Publication();
 
-        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(
+                publication,
+                SecurityPolicies.CanManagePublicationReleaseSeries
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContext = InMemoryApplicationDbContext();
@@ -628,8 +674,12 @@ public class PublicationServicePermissionTests
 
                 var service = BuildPublicationService(
                     context: contentDbContext,
-                    userService: userService.Object);
-                return await service.UpdateReleaseSeries(publication.Id, new List<ReleaseSeriesItemUpdateRequest>());
+                    userService: userService.Object
+                );
+                return await service.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>()
+                );
             });
     }
 
@@ -643,7 +693,8 @@ public class PublicationServicePermissionTests
         IReleaseCacheService? releaseCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IAdminEventRaiser? adminEventRaiser = null)
+        IAdminEventRaiser? adminEventRaiser = null
+    )
     {
         context ??= Mock.Of<ContentDbContext>();
 
@@ -659,6 +710,7 @@ public class PublicationServicePermissionTests
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
-            adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build());
+            adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build()
+        );
     }
 }

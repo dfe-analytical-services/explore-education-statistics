@@ -27,20 +27,26 @@ public class PreviewTokenService(
     public async Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await userService.CheckIsBauUser()
-            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+        return await userService
+            .CheckIsBauUser()
+            .OnSuccess(async () =>
+                await CheckDataSetVersionExists(dataSetVersionId, cancellationToken)
+            )
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
-                var previewToken = publicDataDbContext.PreviewTokens.Add(new PreviewToken
-                {
-                    DataSetVersionId = dataSetVersionId,
-                    Label = label,
-                    Expiry = DateTimeOffset.UtcNow.AddDays(1),
-                    CreatedByUserId = userService.GetUserId()
-                });
+                var previewToken = publicDataDbContext.PreviewTokens.Add(
+                    new PreviewToken
+                    {
+                        DataSetVersionId = dataSetVersionId,
+                        Label = label,
+                        Expiry = DateTimeOffset.UtcNow.AddDays(1),
+                        CreatedByUserId = userService.GetUserId(),
+                    }
+                );
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
                 return await MapPreviewToken(previewToken.Entity);
             });
@@ -48,31 +54,48 @@ public class PreviewTokenService(
 
     public async Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await userService.CheckIsBauUser()
-            .OnSuccess(async () => await publicDataDbContext.PreviewTokens
-                .AsNoTracking()
-                .SingleOrNotFoundAsync(pt => pt.Id == previewTokenId, cancellationToken: cancellationToken))
+        return await userService
+            .CheckIsBauUser()
+            .OnSuccess(async () =>
+                await publicDataDbContext
+                    .PreviewTokens.AsNoTracking()
+                    .SingleOrNotFoundAsync(
+                        pt => pt.Id == previewTokenId,
+                        cancellationToken: cancellationToken
+                    )
+            )
             .OnSuccess(MapPreviewToken);
     }
 
     public async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await userService.CheckIsBauUser()
-            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+        return await userService
+            .CheckIsBauUser()
+            .OnSuccess(async () =>
+                await CheckDataSetVersionExists(dataSetVersionId, cancellationToken)
+            )
             .OnSuccess(async () => await DoList(dataSetVersionId, cancellationToken));
     }
 
     public async Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await userService.CheckIsBauUser()
-            .OnSuccess(async () => await publicDataDbContext.PreviewTokens
-                .SingleOrNotFoundAsync(pt => pt.Id == previewTokenId, cancellationToken: cancellationToken))
+        return await userService
+            .CheckIsBauUser()
+            .OnSuccess(async () =>
+                await publicDataDbContext.PreviewTokens.SingleOrNotFoundAsync(
+                    pt => pt.Id == previewTokenId,
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccessDo(ValidatePreviewToken)
             .OnSuccess(async previewToken =>
             {
@@ -84,46 +107,53 @@ public class PreviewTokenService(
 
     private async Task<Either<ActionResult, DataSetVersion>> CheckDataSetVersionExists(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
+        return await publicDataDbContext
+            .DataSetVersions.AsNoTracking()
             .SingleOrNotFoundAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
     }
 
-    private static Either<ActionResult, Unit> ValidateDraftDataSetVersion(DataSetVersion dataSetVersion)
+    private static Either<ActionResult, Unit> ValidateDraftDataSetVersion(
+        DataSetVersion dataSetVersion
+    )
     {
         return dataSetVersion.Status != DataSetVersionStatus.Draft
-            ? ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.DataSetVersionStatusNotDraft.Code,
-                Message = ValidationMessages.DataSetVersionStatusNotDraft.Message,
-                Path = nameof(PreviewTokenCreateRequest.DataSetVersionId).ToLowerFirst(),
-                Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id)
-            })
+            ? ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetVersionStatusNotDraft.Code,
+                    Message = ValidationMessages.DataSetVersionStatusNotDraft.Message,
+                    Path = nameof(PreviewTokenCreateRequest.DataSetVersionId).ToLowerFirst(),
+                    Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                }
+            )
             : Unit.Instance;
     }
 
     private static Either<ActionResult, Unit> ValidatePreviewToken(PreviewToken previewToken)
     {
         return previewToken.Status is PreviewTokenStatus.Expired
-            ? ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = ValidationMessages.PreviewTokenExpired.Code,
-                Message = ValidationMessages.PreviewTokenExpired.Message,
-                Path = "previewTokenId",
-                Detail = new InvalidErrorDetail<Guid>(previewToken.Id)
-            })
+            ? ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.PreviewTokenExpired.Code,
+                    Message = ValidationMessages.PreviewTokenExpired.Message,
+                    Path = "previewTokenId",
+                    Detail = new InvalidErrorDetail<Guid>(previewToken.Id),
+                }
+            )
             : Unit.Instance;
     }
 
     private async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> DoList(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var previewTokens = await publicDataDbContext
-            .PreviewTokens
-            .AsNoTracking()
+            .PreviewTokens.AsNoTracking()
             .Where(pt => pt.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
 
@@ -136,8 +166,8 @@ public class PreviewTokenService(
 
     private async Task<PreviewTokenViewModel> MapPreviewToken(PreviewToken previewToken)
     {
-        var createdByEmail = await contentDbContext.Users
-            .Where(u => u.Id == previewToken.CreatedByUserId)
+        var createdByEmail = await contentDbContext
+            .Users.Where(u => u.Id == previewToken.CreatedByUserId)
             .Select(u => u.Email)
             .SingleAsync();
 
@@ -149,7 +179,7 @@ public class PreviewTokenService(
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
             Expiry = previewToken.Expiry,
-            Updated = previewToken.Updated
+            Updated = previewToken.Updated,
         };
     }
 }

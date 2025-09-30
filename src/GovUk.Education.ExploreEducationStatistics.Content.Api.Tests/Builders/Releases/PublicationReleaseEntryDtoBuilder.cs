@@ -14,18 +14,19 @@ public class PublicationReleaseEntryDtoBuilder
     private string _coverageTitle = "Calendar year";
     private string _yearTitle = "2024";
 
-    public PublicationReleaseEntryDto Build() => new()
-    {
-        ReleaseId = _releaseId,
-        IsLatestRelease = _isLatestRelease,
-        Label = _label,
-        LastUpdated = _lastUpdated,
-        Published = _published,
-        Slug = _slug,
-        Title = _title,
-        CoverageTitle = _coverageTitle,
-        YearTitle = _yearTitle
-    };
+    public PublicationReleaseEntryDto Build() =>
+        new()
+        {
+            ReleaseId = _releaseId,
+            IsLatestRelease = _isLatestRelease,
+            Label = _label,
+            LastUpdated = _lastUpdated,
+            Published = _published,
+            Slug = _slug,
+            Title = _title,
+            CoverageTitle = _coverageTitle,
+            YearTitle = _yearTitle,
+        };
 
     public PublicationReleaseEntryDtoBuilder WithReleaseId(Guid releaseId)
     {

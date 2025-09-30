@@ -16,9 +16,7 @@ public class OrderedQueryableExtensionsTests
     public void ThenByReleaseType_ReordersPublicationsByTheirReleaseType()
     {
         // Arrange
-        var publications = _dataFixture
-            .DefaultPublication()
-            .Generate(6);
+        var publications = _dataFixture.DefaultPublication().Generate(6);
 
         var publicationsResult = new List<FreeTextValueResult<Publication>>();
         var publishedDate = DateTime.UtcNow;
@@ -29,31 +27,41 @@ public class OrderedQueryableExtensionsTests
             publication.LatestPublishedReleaseVersion = new()
             {
                 Type = (ReleaseType)i,
-                Published = publishedDate
+                Published = publishedDate,
             };
 
-            publicationsResult.Add(new()
-            {
-                Rank = i,
-                Value = publication
-            });
+            publicationsResult.Add(new() { Rank = i, Value = publication });
         }
 
-        var orderedQueryable = publicationsResult
-            .AsQueryable()
-            .OrderBy(p => 1); // Initial nonsense ordering to convert to an IOrderedQueryable
+        var orderedQueryable = publicationsResult.AsQueryable().OrderBy(p => 1); // Initial nonsense ordering to convert to an IOrderedQueryable
 
         // Act
-        var result = orderedQueryable
-            .ThenByReleaseType()
-            .ToList();
+        var result = orderedQueryable.ThenByReleaseType().ToList();
 
         // Assert
-        Assert.Equal(ReleaseType.AccreditedOfficialStatistics, result[0].Value.LatestPublishedReleaseVersion!.Type);
-        Assert.Equal(ReleaseType.OfficialStatistics, result[1].Value.LatestPublishedReleaseVersion!.Type);
-        Assert.Equal(ReleaseType.OfficialStatisticsInDevelopment, result[2].Value.LatestPublishedReleaseVersion!.Type);
-        Assert.Equal(ReleaseType.ExperimentalStatistics, result[3].Value.LatestPublishedReleaseVersion!.Type);
-        Assert.Equal(ReleaseType.AdHocStatistics, result[4].Value.LatestPublishedReleaseVersion!.Type);
-        Assert.Equal(ReleaseType.ManagementInformation, result[5].Value.LatestPublishedReleaseVersion!.Type);
+        Assert.Equal(
+            ReleaseType.AccreditedOfficialStatistics,
+            result[0].Value.LatestPublishedReleaseVersion!.Type
+        );
+        Assert.Equal(
+            ReleaseType.OfficialStatistics,
+            result[1].Value.LatestPublishedReleaseVersion!.Type
+        );
+        Assert.Equal(
+            ReleaseType.OfficialStatisticsInDevelopment,
+            result[2].Value.LatestPublishedReleaseVersion!.Type
+        );
+        Assert.Equal(
+            ReleaseType.ExperimentalStatistics,
+            result[3].Value.LatestPublishedReleaseVersion!.Type
+        );
+        Assert.Equal(
+            ReleaseType.AdHocStatistics,
+            result[4].Value.LatestPublishedReleaseVersion!.Type
+        );
+        Assert.Equal(
+            ReleaseType.ManagementInformation,
+            result[5].Value.LatestPublishedReleaseVersion!.Type
+        );
     }
 }

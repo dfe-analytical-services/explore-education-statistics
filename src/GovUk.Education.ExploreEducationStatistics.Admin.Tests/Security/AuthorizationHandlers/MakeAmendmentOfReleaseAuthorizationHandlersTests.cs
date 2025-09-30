@@ -29,14 +29,21 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
+                );
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: null, Version: 0 }
+            );
 
             // Assert that no users can amend an unpublished Release that is the only version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                MakeAmendmentOfSpecificReleaseRequirement
+            >(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -44,7 +51,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -52,14 +60,17 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: not null, Version: 0 }
+            );
 
             // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the only version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                MakeAmendmentOfSpecificReleaseRequirement
+            >(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -68,7 +79,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
                     return CreateHandler(contentDbContext);
                 },
                 releaseVersion,
-                MakeAmendmentsOfAllReleases);
+                MakeAmendmentsOfAllReleases
+            );
         }
 
         [Fact]
@@ -76,14 +88,21 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(1)
+                );
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: null, Version: 1 }
+            );
 
             // Assert that no users can amend a version that is not published
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                MakeAmendmentOfSpecificReleaseRequirement
+            >(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -91,7 +110,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -99,14 +119,15 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
             // Assert that no users can amend an amendment Release if it is not the latest version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                MakeAmendmentOfSpecificReleaseRequirement
+            >(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -114,7 +135,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -122,14 +144,15 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
             // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the latest version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                MakeAmendmentOfSpecificReleaseRequirement
+            >(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -138,7 +161,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
                     return CreateHandler(contentDbContext);
                 },
                 releaseVersion,
-                MakeAmendmentsOfAllReleases);
+                MakeAmendmentsOfAllReleases
+            );
         }
     }
 
@@ -149,15 +173,18 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
+                );
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: null, Version: 0 }
+            );
 
             // Assert that no User Publication roles will allow an unpublished Release that is the only version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -165,7 +192,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -173,15 +201,14 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: not null, Version: 0 }
+            );
 
             // Assert that a User who has the Publication Owner role on a Release can amend it if it is the only version published
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -190,7 +217,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
                     return CreateHandler(contentDbContext);
                 },
                 releaseVersion,
-                Owner);
+                Owner
+            );
         }
 
         [Fact]
@@ -198,15 +226,18 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(1)
+                );
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: null, Version: 1 }
+            );
 
             // Assert that no User Publication roles will allow an amendment Release that is not yet approved to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -214,7 +245,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -222,15 +254,12 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
             // Assert that no User Publication roles will allow an amendment Release that is not the latest version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -238,7 +267,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -246,15 +276,12 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
             // Assert that a User who has the Publication Owner role on a Release can amend it if it is the latest published version
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
-                MakeAmendmentOfSpecificReleaseRequirement>(
+            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                 contentDbContext =>
                 {
                     contentDbContext.Publications.Add(publication);
@@ -263,7 +290,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
                     return CreateHandler(contentDbContext);
                 },
                 releaseVersion,
-                Owner);
+                Owner
+            );
         }
     }
 
@@ -274,11 +302,15 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
+                );
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: null, Version: 0 }
+            );
 
             // Assert that no User Release roles will allow an unpublished Release that is the only version to be amended
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -289,7 +321,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -297,11 +330,11 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: not null, Version: 0 }
+            );
 
             // Assert that no User Release roles will allow a published Release that is the only version to be amended
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -312,7 +345,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -320,11 +354,15 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(1)
+                );
 
-            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv =>
+                rv is { Published: null, Version: 1 }
+            );
 
             // Assert that no User Release roles will allow an amendment Release that is not yet approved to be amended
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -335,7 +373,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -343,9 +382,7 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
@@ -358,7 +395,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -366,9 +404,7 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
@@ -381,26 +417,30 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 
                     return CreateHandler(contentDbContext);
                 },
-                releaseVersion);
+                releaseVersion
+            );
         }
     }
 
     private static MakeAmendmentOfSpecificReleaseAuthorizationHandler CreateHandler(
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+        );
 
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext);
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
         return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: userReleaseRoleRepository,
                 userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)),
-            new ReleaseVersionRepository(contentDbContext));
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            ),
+            new ReleaseVersionRepository(contentDbContext)
+        );
     }
 }

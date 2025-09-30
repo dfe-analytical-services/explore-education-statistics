@@ -20,7 +20,7 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
             // running the Health Check.
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.BasePath());
-            
+
             var function = GetRequiredService<HealthCheckFunctions>();
 
             var httpContext = new DefaultHttpContext();
@@ -29,12 +29,13 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
             var expectedHealthCheckResult = new HealthCheckResponse(
                 PsqlConnection: HealthCheckSummary.Healthy(),
                 FileShareMount: HealthCheckSummary.Healthy(),
-                CoreStorageConnection: HealthCheckSummary.Healthy(), 
-                ContentDbConnection: HealthCheckSummary.Healthy());
-            
+                CoreStorageConnection: HealthCheckSummary.Healthy(),
+                ContentDbConnection: HealthCheckSummary.Healthy()
+            );
+
             result.AssertOkObjectResult(expectedHealthCheckResult);
         }
-        
+
         [Fact]
         public async Task Failure_NoFileShareMount()
         {
@@ -46,11 +47,17 @@ public abstract class HealthCheckFunctionTests(ProcessorFunctionsIntegrationTest
 
             var expectedHealthCheckResult = new HealthCheckResponse(
                 PsqlConnection: HealthCheckSummary.Healthy(),
-                FileShareMount: HealthCheckSummary.Unhealthy("File Share Mount folder does not exist"),
+                FileShareMount: HealthCheckSummary.Unhealthy(
+                    "File Share Mount folder does not exist"
+                ),
                 CoreStorageConnection: HealthCheckSummary.Healthy(),
-                ContentDbConnection: HealthCheckSummary.Healthy());
-            
-            result.AssertObjectResult(HttpStatusCode.InternalServerError, expectedHealthCheckResult);
+                ContentDbConnection: HealthCheckSummary.Healthy()
+            );
+
+            result.AssertObjectResult(
+                HttpStatusCode.InternalServerError,
+                expectedHealthCheckResult
+            );
         }
     }
 }

@@ -25,14 +25,14 @@ public abstract class RelatedInformationControllerTests
                 {
                     Id = Guid.NewGuid(),
                     Title = "Related information 1",
-                    Url = "https://example.com/related-1"
+                    Url = "https://example.com/related-1",
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Title = "Related information 2",
-                    Url = "https://example.com/related-2"
-                }
+                    Url = "https://example.com/related-2",
+                },
             ];
             _relatedInformationService.WhereHasRelatedInformation(relatedInformation);
 
@@ -41,12 +41,14 @@ public abstract class RelatedInformationControllerTests
             // Act
             var result = await sut.GetRelatedInformationForRelease(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
 
             // Assert
             _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
             result.AssertOkResult(relatedInformation);
         }
 
@@ -56,22 +58,26 @@ public abstract class RelatedInformationControllerTests
             // Arrange
             _relatedInformationService.WhereGetRelatedInformationForReleaseReturnsNotFound(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
 
             var sut = BuildController();
 
             // Act
             var result = await sut.GetRelatedInformationForRelease(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
 
             // Assert
             _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
             result.AssertNotFoundResult();
         }
     }
 
-    private RelatedInformationController BuildController() => new(_relatedInformationService.Build());
+    private RelatedInformationController BuildController() =>
+        new(_relatedInformationService.Build());
 }

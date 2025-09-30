@@ -22,10 +22,7 @@ internal class HtmlToTextTableRenderer
         public readonly int RemainingColSpan;
         public readonly int RemainingRowSpan;
 
-        public TableCell(
-            string text,
-            int remainingColSpan = 0,
-            int remainingRowSpan = 0)
+        public TableCell(string text, int remainingColSpan = 0, int remainingRowSpan = 0)
         {
             Lines = text.ToLinesList();
             RemainingColSpan = remainingColSpan;
@@ -46,17 +43,17 @@ internal class HtmlToTextTableRenderer
     public void AddBodyRow(IElement rowElement)
     {
         _bodyRows.Add(
-            GenerateTableCells(
-                rowElement: rowElement,
-                previousRowCells: _bodyRows.LastOrDefault()
-            )
+            GenerateTableCells(rowElement: rowElement, previousRowCells: _bodyRows.LastOrDefault())
         );
     }
 
-    private List<TableCell> GenerateTableCells(IElement rowElement, List<TableCell>? previousRowCells)
+    private List<TableCell> GenerateTableCells(
+        IElement rowElement,
+        List<TableCell>? previousRowCells
+    )
     {
-        var cellElements = rowElement.Children
-            .Where(cell => cell is IHtmlTableCellElement)
+        var cellElements = rowElement
+            .Children.Where(cell => cell is IHtmlTableCellElement)
             .Cast<IHtmlTableCellElement>()
             .ToList();
 
@@ -93,74 +90,69 @@ internal class HtmlToTextTableRenderer
                     // Initialise cells with placeholder
                     // nulls so that these can be replaced
                     // by table cells later.
-                    cellElement.ColumnSpan
-                        .ToEnumerable()
-                        .ForEach(
-                            _ => { cells.Add(null); }
-                        );
+                    cellElement
+                        .ColumnSpan.ToEnumerable()
+                        .ForEach(_ =>
+                        {
+                            cells.Add(null);
+                        });
                 }
             );
         }
 
-        cellElements
-            .ForEach(
-                child =>
-                {
-                    var converter = new HtmlToTextConverter();
-                    var text = converter.Convert(child);
+        cellElements.ForEach(child =>
+        {
+            var converter = new HtmlToTextConverter();
+            var text = converter.Convert(child);
 
-                    var cellIndex = cells.FindIndex(cell => cell == null);
+            var cellIndex = cells.FindIndex(cell => cell == null);
 
-                    var tableCell = new TableCell(
-                        text: text,
-                        remainingColSpan: child.ColumnSpan - 1,
-                        remainingRowSpan: child.RowSpan - 1
-                    );
-
-                    cells[cellIndex] = tableCell;
-
-                    // Initialise any missing column widths with 0
-                    if (_columnWidths.Count - 1 < cellIndex)
-                    {
-                        var newColumns = (_columnWidths.Count - 1 - cellIndex)
-                            .ToEnumerable()
-                            .Select(_ => 0);
-
-                        _columnWidths.AddRange(newColumns);
-                    }
-
-                    var childWidth = text.ToLines()
-                        .DefaultIfEmpty(string.Empty)
-                        .Max(line => line.Length);
-
-                    if (childWidth > _columnWidths[cellIndex])
-                    {
-                        _columnWidths[cellIndex] = childWidth;
-                    }
-
-                    if (child.ColumnSpan == 1)
-                    {
-                        return;
-                    }
-
-                    // We add empty cells with colspans so that we can
-                    // create a complete matrix of table cells (instead
-                    // of HTML's incomplete representation).
-                    var spans = child.ColumnSpan - 1;
-
-                    spans.ToEnumerable()
-                        .ForEach(
-                            span =>
-                            {
-                                cells[cellIndex + span] = new TableCell(
-                                    text: string.Empty,
-                                    remainingColSpan: spans - span,
-                                    remainingRowSpan: tableCell.RemainingRowSpan
-                                );
-                            }
-                        );
-                }
+            var tableCell = new TableCell(
+                text: text,
+                remainingColSpan: child.ColumnSpan - 1,
+                remainingRowSpan: child.RowSpan - 1
             );
+
+            cells[cellIndex] = tableCell;
+
+            // Initialise any missing column widths with 0
+            if (_columnWidths.Count - 1 < cellIndex)
+            {
+                var newColumns = (_columnWidths.Count - 1 - cellIndex)
+                    .ToEnumerable()
+                    .Select(_ => 0);
+
+                _columnWidths.AddRange(newColumns);
+            }
+
+            var childWidth = text.ToLines().DefaultIfEmpty(string.Empty).Max(line => line.Length);
+
+            if (childWidth > _columnWidths[cellIndex])
+            {
+                _columnWidths[cellIndex] = childWidth;
+            }
+
+            if (child.ColumnSpan == 1)
+            {
+                return;
+            }
+
+            // We add empty cells with colspans so that we can
+            // create a complete matrix of table cells (instead
+            // of HTML's incomplete representation).
+            var spans = child.ColumnSpan - 1;
+
+            spans
+                .ToEnumerable()
+                .ForEach(span =>
+                {
+                    cells[cellIndex + span] = new TableCell(
+                        text: string.Empty,
+                        remainingColSpan: spans - span,
+                        remainingRowSpan: tableCell.RemainingRowSpan
+                    );
+                });
+        });
 
         return cells as List<TableCell>;
     }
@@ -197,47 +189,46 @@ internal class HtmlToTextTableRenderer
 
     private void RenderRows(StringBuilder builder, List<List<TableCell>> rows)
     {
-        rows.ForEach(
-            row =>
+        rows.ForEach(row =>
+        {
+            var lineIndex = 0;
+            var hasLines = true;
+
+            // As table cells can be multi-line, we need to continue
+            // rendering each row until each cell's lines have been
+            // completely rendered out to the builder.
+            while (hasLines)
             {
-                var lineIndex = 0;
-                var hasLines = true;
+                var currentLineIndex = lineIndex;
 
-                // As table cells can be multi-line, we need to continue
-                // rendering each row until each cell's lines have been
-                // completely rendered out to the builder.
-                while (hasLines)
-                {
-                    var currentLineIndex = lineIndex;
+                row.ForEach(
+                    (cell, cellIndex) =>
+                    {
+                        var columnWidth = _columnWidths[cellIndex];
 
-                    row.ForEach(
-                        (cell, cellIndex) =>
+                        if (cell.Lines.ElementAtOrDefault(currentLineIndex) != null)
                         {
-                            var columnWidth = _columnWidths[cellIndex];
-
-                            if (cell.Lines.ElementAtOrDefault(currentLineIndex) != null)
-                            {
-                                builder.Append(cell.Lines[currentLineIndex].PadRight(columnWidth));
-                            }
-                            else
-                            {
-                                builder.Append(string.Empty.PadRight(columnWidth));
-                            }
-
-                            if (cellIndex != row.Count - 1)
-                            {
-                                builder.Append(cell.RemainingColSpan == 0 ? Separator : EmptySeparator);
-                            }
+                            builder.Append(cell.Lines[currentLineIndex].PadRight(columnWidth));
                         }
-                    );
+                        else
+                        {
+                            builder.Append(string.Empty.PadRight(columnWidth));
+                        }
 
+                        if (cellIndex != row.Count - 1)
+                        {
+                            builder.Append(cell.RemainingColSpan == 0 ? Separator : EmptySeparator);
+                        }
+                    }
+                );
 
-                    hasLines = row.Any(cell => cell.Lines.ElementAtOrDefault(currentLineIndex + 1) != null);
-                    lineIndex += 1;
+                hasLines = row.Any(cell =>
+                    cell.Lines.ElementAtOrDefault(currentLineIndex + 1) != null
+                );
+                lineIndex += 1;
 
-                    builder.AppendLine();
-                }
+                builder.AppendLine();
             }
-        );
+        });
     }
 }

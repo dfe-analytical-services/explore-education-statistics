@@ -7,6 +7,7 @@ public class EinContentSection
 {
     public Guid Id { get; set; }
     public int Order { get; set; }
+
     [MaxLength(255)]
     public string Heading { get; set; } = string.Empty;
     public Guid EducationInNumbersPageId { get; set; }

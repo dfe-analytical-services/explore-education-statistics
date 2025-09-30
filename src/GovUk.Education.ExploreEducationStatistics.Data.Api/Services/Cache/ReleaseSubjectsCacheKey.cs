@@ -12,7 +12,11 @@ public record ReleaseSubjectsCacheKey : IBlobCacheKey
 
     public Guid ReleaseVersionId { get; }
 
-    public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug, Guid releaseVersionId)
+    public ReleaseSubjectsCacheKey(
+        string publicationSlug,
+        string releaseSlug,
+        Guid releaseVersionId
+    )
     {
         PublicationSlug = publicationSlug;
         ReleaseSlug = releaseSlug;

@@ -12,14 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
-
 
 public class ReleaseInviteService(
     ContentDbContext contentDbContext,
@@ -33,16 +31,20 @@ public class ReleaseInviteService(
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
-    IOptions<NotifyOptions> notifyOptions) : IReleaseInviteService
+    IOptions<NotifyOptions> notifyOptions
+) : IReleaseInviteService
 {
     public async Task<Either<ActionResult, Unit>> InviteContributor(
         string email,
         Guid publicationId,
-        List<Guid> releaseVersionIds)
+        List<Guid> releaseVersionIds
+    )
     {
         return await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, Contributor))
+            .OnSuccessDo(publication =>
+                userService.CheckCanUpdateReleaseRole(publication, Contributor)
+            )
             .OnSuccessDo(() => ValidateReleaseVersionIds(publicationId, releaseVersionIds))
             .OnSuccess(async publication =>
             {
@@ -51,34 +53,43 @@ public class ReleaseInviteService(
                 var user = await userRepository.FindByEmail(sanitisedEmail);
                 if (user == null)
                 {
-                    return await CreateNewUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title);
+                    return await CreateNewUserContributorInvite(
+                        releaseVersionIds,
+                        sanitisedEmail,
+                        publication.Title
+                    );
                 }
 
                 return await CreateExistingUserContributorInvite(
                     releaseVersionIds,
                     user.Id,
                     sanitisedEmail,
-                    publication.Title);
+                    publication.Title
+                );
             });
     }
 
     public async Task<Either<ActionResult, Unit>> RemoveByPublication(
         string email,
         Guid publicationId,
-        ReleaseRole releaseRole)
+        ReleaseRole releaseRole
+    )
     {
         return await contentPersistenceHelper
             .CheckEntityExists<Publication>(
                 publicationId,
-                query => query
-                    .Include(p => p.ReleaseVersions))
-            .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, releaseRole))
+                query => query.Include(p => p.ReleaseVersions)
+            )
+            .OnSuccessDo(publication =>
+                userService.CheckCanUpdateReleaseRole(publication, releaseRole)
+            )
             .OnSuccess(async publication =>
             {
                 await userReleaseInviteRepository.RemoveByPublicationAndEmail(
                     publicationId: publication.Id,
                     email: email,
-                    rolesToInclude: releaseRole);
+                    rolesToInclude: releaseRole
+                );
                 return Unit.Instance;
             });
     }
@@ -86,12 +97,16 @@ public class ReleaseInviteService(
     private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(
         List<Guid> releaseVersionIds,
         string email,
-        string publicationTitle)
+        string publicationTitle
+    )
     {
-        if (await userReleaseInviteRepository.UserHasInvites(
+        if (
+            await userReleaseInviteRepository.UserHasInvites(
                 releaseVersionIds: releaseVersionIds,
                 email: email,
-                role: Contributor))
+                role: Contributor
+            )
+        )
         {
             // if the user already has UserReleaseInvites,
             // we assume they also have a UserInvite outstanding
@@ -101,7 +116,8 @@ public class ReleaseInviteService(
         var emailResult = await SendContributorInviteEmail(
             publicationTitle: publicationTitle,
             releaseVersionIds: releaseVersionIds,
-            email: email);
+            email: email
+        );
         if (emailResult.IsLeft)
         {
             return emailResult;
@@ -110,14 +126,16 @@ public class ReleaseInviteService(
         await userInviteRepository.CreateOrUpdate(
             email: email,
             role: Role.Analyst,
-            createdById: userService.GetUserId());
+            createdById: userService.GetUserId()
+        );
 
         await userReleaseInviteRepository.CreateManyIfNotExists(
             releaseVersionIds: releaseVersionIds,
             email: email,
             releaseRole: Contributor,
             emailSent: true,
-            createdById: userService.GetUserId());
+            createdById: userService.GetUserId()
+        );
 
         return Unit.Instance;
     }
@@ -126,15 +144,17 @@ public class ReleaseInviteService(
         List<Guid> releaseVersionIds,
         Guid userId,
         string email,
-        string publicationTitle)
+        string publicationTitle
+    )
     {
         // check the user doesn't already have the user release roles
-        var existingReleaseRoleReleaseVersionIds = contentDbContext.UserReleaseRoles
-            .AsQueryable()
+        var existingReleaseRoleReleaseVersionIds = contentDbContext
+            .UserReleaseRoles.AsQueryable()
             .Where(urr =>
                 releaseVersionIds.Contains(urr.ReleaseVersionId)
                 && urr.Role == Contributor
-                && urr.UserId == userId)
+                && urr.UserId == userId
+            )
             .Select(urr => urr.ReleaseVersionId)
             .ToList();
 
@@ -150,7 +170,8 @@ public class ReleaseInviteService(
         var emailResult = await SendContributorInviteEmail(
             publicationTitle: publicationTitle,
             releaseVersionIds: missingReleaseRoleReleaseVersionIds,
-            email: email);
+            email: email
+        );
         if (emailResult.IsLeft)
         {
             return emailResult;
@@ -163,24 +184,28 @@ public class ReleaseInviteService(
             createdById: userService.GetUserId()
         );
 
-        var globalRoleNameToSet = userRoleService
-            .GetAssociatedGlobalRoleNameForReleaseRole(Contributor);
+        var globalRoleNameToSet = userRoleService.GetAssociatedGlobalRoleNameForReleaseRole(
+            Contributor
+        );
         return await userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(
         Guid publicationId,
-        List<Guid> releaseVersionIds)
+        List<Guid> releaseVersionIds
+    )
     {
         var distinctReleaseVersionIds = releaseVersionIds.Distinct().ToList();
         if (distinctReleaseVersionIds.Count != releaseVersionIds.Count)
         {
             throw new ArgumentException(
                 $"{nameof(releaseVersionIds)} should not contain duplicates",
-                nameof(releaseVersionIds));
+                nameof(releaseVersionIds)
+            );
         }
 
-        var publicationReleaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
+        var publicationReleaseVersionIds =
+            await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
         if (!releaseVersionIds.All(publicationReleaseVersionIds.Contains))
         {
             return ValidationActionResult(NotAllReleasesBelongToPublication);
@@ -192,7 +217,8 @@ public class ReleaseInviteService(
     private async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
         string publicationTitle,
         List<Guid> releaseVersionIds,
-        string email)
+        string email
+    )
     {
         if (releaseVersionIds.IsNullOrEmpty())
         {
@@ -202,8 +228,8 @@ public class ReleaseInviteService(
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.ContributorTemplateId;
 
-        var releases = await contentDbContext.Releases
-            .Where(r => r.Versions.Any(rv => releaseVersionIds.Contains(rv.Id)))
+        var releases = await contentDbContext
+            .Releases.Where(r => r.Versions.Any(rv => releaseVersionIds.Contains(rv.Id)))
             .ToListAsync();
 
         var releaseTitles = releases
@@ -214,7 +240,9 @@ public class ReleaseInviteService(
 
         var emailValues = new Dictionary<string, dynamic>
         {
-            { "url", url }, { "publication name", publicationTitle }, { "release list", releaseTitles }
+            { "url", url },
+            { "publication name", publicationTitle },
+            { "release list", releaseTitles },
         };
 
         return emailService.SendEmail(email, template, emailValues);

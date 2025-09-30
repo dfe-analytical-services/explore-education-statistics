@@ -16,11 +16,8 @@ public class RedirectsServiceTests
             LatestPublishedVersionId = null,
             Versions = new List<MethodologyVersion>
             {
-                new()
-                {
-                    AlternativeSlug = "redirect-to-slug",
-                }
-            }
+                new() { AlternativeSlug = "redirect-to-slug" },
+            },
         };
 
         var methodologyRedirect = new MethodologyRedirect
@@ -71,16 +68,12 @@ public class RedirectsServiceTests
                     AlternativeSlug = "redirect-to",
                     Version = 1,
                 },
-            }
+            },
         };
 
         var methodologyRedirects = new List<MethodologyRedirect>
         {
-            new()
-            {
-                Slug = "redirect-from-1",
-                MethodologyVersion = methodology.Versions[0],
-            },
+            new() { Slug = "redirect-from-1", MethodologyVersion = methodology.Versions[0] },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -122,7 +115,6 @@ public class RedirectsServiceTests
                     Id = latestPublishedVersion1,
                     // No AlternativeSlug so uses OwningPublicationSlug
                     Version = 0,
-
                 },
                 new()
                 {
@@ -130,7 +122,7 @@ public class RedirectsServiceTests
                     AlternativeSlug = "no-redirect-to-slug-1",
                     Version = 1,
                 },
-            }
+            },
         };
 
         var latestPublishedVersion2 = Guid.NewGuid();
@@ -145,7 +137,6 @@ public class RedirectsServiceTests
                     Id = latestPublishedVersion2,
                     AlternativeSlug = "redirect-to-slug-2",
                     Version = 0,
-
                 },
                 new()
                 {
@@ -158,16 +149,8 @@ public class RedirectsServiceTests
 
         var methodologyRedirects = new List<MethodologyRedirect>
         {
-            new()
-            {
-                Slug = "redirect-from-slug-1",
-                MethodologyVersion = methodology1.Versions[0],
-            },
-            new()
-            {
-                Slug = "redirect-from-slug-2",
-                MethodologyVersion = methodology2.Versions[0],
-            }
+            new() { Slug = "redirect-from-slug-1", MethodologyVersion = methodology1.Versions[0] },
+            new() { Slug = "redirect-from-slug-2", MethodologyVersion = methodology2.Versions[0] },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -219,16 +202,12 @@ public class RedirectsServiceTests
                     AlternativeSlug = "redirect-to",
                     Version = 1,
                 },
-            }
+            },
         };
 
         var methodologyRedirects = new List<MethodologyRedirect>
         {
-            new()
-            {
-                Slug = "redirect-to",
-                MethodologyVersion = methodology.Versions[0],
-            },
+            new() { Slug = "redirect-to", MethodologyVersion = methodology.Versions[0] },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -272,21 +251,13 @@ public class RedirectsServiceTests
                     AlternativeSlug = "redirect-to",
                     Version = 1,
                 },
-            }
+            },
         };
 
         var methodologyRedirects = new List<MethodologyRedirect>
         {
-            new()
-            {
-                Slug = "duplicated-redirect",
-                MethodologyVersion = methodology.Versions[0],
-            },
-            new()
-            {
-                Slug = "duplicated-redirect",
-                MethodologyVersion = methodology.Versions[1],
-            },
+            new() { Slug = "duplicated-redirect", MethodologyVersion = methodology.Versions[0] },
+            new() { Slug = "duplicated-redirect", MethodologyVersion = methodology.Versions[1] },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -311,8 +282,7 @@ public class RedirectsServiceTests
         }
     }
 
-    private static RedirectsService SetupRedirectsService(
-        ContentDbContext? contentDbContext = null)
+    private static RedirectsService SetupRedirectsService(ContentDbContext? contentDbContext = null)
     {
         contentDbContext ??= InMemoryContentDbContext();
 

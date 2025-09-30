@@ -11,7 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions;
 
 public class RestartImportsFunction(
     ILogger<RestartImportsFunction> logger,
-    ContentDbContext contentDbContext)
+    ContentDbContext contentDbContext
+)
 {
     [Function("RestartImports")]
     [QueueOutput(ImportsPendingQueue)]
@@ -20,13 +21,13 @@ public class RestartImportsFunction(
         [QueueTrigger(RestartImportsQueue)] RestartImportsMessage message,
 #pragma warning restore IDE0060
         FunctionContext context,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
         var restartableImports = await contentDbContext
-            .DataImports
-            .AsNoTracking()
+            .DataImports.AsNoTracking()
             .Where(di => DataImportStatusExtensions.IncompleteStatuses.Contains(di.Status))
             .Select(di => new ImportMessage(di.Id))
             .ToArrayAsync(cancellationToken);

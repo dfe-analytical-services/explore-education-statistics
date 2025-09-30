@@ -15,16 +15,21 @@ public static class HttpResponseExtensions
     public static HttpResponse ContentDispositionAttachment(
         this HttpResponse response,
         MediaTypeHeaderValue contentType,
-        string? filename = null)
+        string? filename = null
+    )
     {
-        response.ContentDispositionAttachment(contentType: contentType.ToString(), filename: filename);
+        response.ContentDispositionAttachment(
+            contentType: contentType.ToString(),
+            filename: filename
+        );
         return response;
     }
 
     public static HttpResponse ContentDispositionAttachment(
         this HttpResponse response,
         string contentType,
-        string? filename = null)
+        string? filename = null
+    )
     {
         response.ContentType = contentType;
         response.Headers[HeaderNames.ContentDisposition] = filename is not null

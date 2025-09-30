@@ -6,9 +6,11 @@ public interface IDataSetMetaService
 {
     Task<DataSetVersionMappingMeta> ReadDataSetVersionMappingMeta(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task CreateDataSetVersionMeta(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

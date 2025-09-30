@@ -27,7 +27,7 @@ public class LocationRepositoryTests
             Country = _england,
             Region = _eastMidlands,
             LocalAuthority = _derby,
-            GeographicLevel = GeographicLevel.LocalAuthority
+            GeographicLevel = GeographicLevel.LocalAuthority,
         };
 
         var location2 = new Location
@@ -35,7 +35,7 @@ public class LocationRepositoryTests
             Country = _england,
             Region = _northEast,
             LocalAuthority = _derby,
-            GeographicLevel = GeographicLevel.LocalAuthority
+            GeographicLevel = GeographicLevel.LocalAuthority,
         };
 
         var location3 = new Location
@@ -43,7 +43,7 @@ public class LocationRepositoryTests
             Country = _england,
             Region = _eastMidlands,
             LocalAuthority = _nottingham,
-            GeographicLevel = GeographicLevel.LocalAuthority
+            GeographicLevel = GeographicLevel.LocalAuthority,
         };
 
         // This Location is not used by subject1
@@ -52,40 +52,20 @@ public class LocationRepositoryTests
             Country = _england,
             Region = _northWest,
             LocalAuthority = _nottingham,
-            GeographicLevel = GeographicLevel.LocalAuthority
+            GeographicLevel = GeographicLevel.LocalAuthority,
         };
 
         var subject1Observations = new List<Observation>
         {
-            new()
-            {
-                Location = location1,
-                SubjectId = subject1Id
-            },
-            new()
-            {
-                Location = location2,
-                SubjectId = subject1Id
-            },
-            new()
-            {
-                Location = location3,
-                SubjectId = subject1Id
-            },
-            new()
-            {
-                Location = location1,
-                SubjectId = subject1Id
-            }
+            new() { Location = location1, SubjectId = subject1Id },
+            new() { Location = location2, SubjectId = subject1Id },
+            new() { Location = location3, SubjectId = subject1Id },
+            new() { Location = location1, SubjectId = subject1Id },
         };
 
         var subject2Observations = new List<Observation>
         {
-            new()
-            {
-                Location = location4,
-                SubjectId = Guid.NewGuid()
-            }
+            new() { Location = location4, SubjectId = Guid.NewGuid() },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -112,7 +92,8 @@ public class LocationRepositoryTests
     }
 
     private static LocationRepository BuildRepository(
-        StatisticsDbContext? statisticsDbContext = null)
+        StatisticsDbContext? statisticsDbContext = null
+    )
     {
         return new LocationRepository(statisticsDbContext ?? Mock.Of<StatisticsDbContext>());
     }

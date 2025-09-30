@@ -147,9 +147,7 @@ public static class TypeExtensionsTests
         [Fact]
         public void EmptyWhenNoSubclasses()
         {
-            var subclasses = typeof(NotDerived)
-                .GetSubclasses()
-                .ToList();
+            var subclasses = typeof(NotDerived).GetSubclasses().ToList();
 
             Assert.Empty(subclasses);
         }
@@ -157,9 +155,7 @@ public static class TypeExtensionsTests
         [Fact]
         public void ReturnsSubclasses()
         {
-            var subclasses = typeof(Base)
-                .GetSubclasses()
-                .ToList();
+            var subclasses = typeof(Base).GetSubclasses().ToList();
 
             Assert.Equal(2, subclasses.Count);
             Assert.Equal(typeof(Derived1), subclasses[0]);
@@ -167,7 +163,9 @@ public static class TypeExtensionsTests
         }
 
         private class Base;
+
         private class Derived1 : Base;
+
         private class Derived2 : Derived1;
 
         private class NotDerived;
@@ -208,7 +206,6 @@ public static class TypeExtensionsTests
             typeof(Type),
             typeof(TestStruct),
             typeof(TestStruct?),
-
         };
 
         [Theory]
@@ -217,7 +214,7 @@ public static class TypeExtensionsTests
         {
             Assert.True(simpleType.IsSimple());
         }
-        
+
         [Theory]
         [MemberData(nameof(ComplexTypes))]
         public void ComplexType_ReturnsFalse(Type complexType)
@@ -284,8 +281,7 @@ public static class TypeExtensionsTests
         {
             var isNullableType = typeof(NullableReferenceTypeClass)
                 .GetProperty(nameof(NullableReferenceTypeClass.NullableReferenceType))!
-                .PropertyType
-                .IsNullableType();
+                .PropertyType.IsNullableType();
 
             Assert.False(isNullableType);
         }
@@ -299,7 +295,10 @@ public static class TypeExtensionsTests
         [InlineData(typeof(TestEnum?), typeof(TestEnum))]
         [InlineData(typeof(bool?), typeof(bool))]
         [InlineData(typeof(char?), typeof(char))]
-        public void NullableValueTypes_ReturnsUnderlyingType(Type nullableType, Type expectedUnderlyingType)
+        public void NullableValueTypes_ReturnsUnderlyingType(
+            Type nullableType,
+            Type expectedUnderlyingType
+        )
         {
             var underlyingType = nullableType.GetUnderlyingType();
 
@@ -312,7 +311,10 @@ public static class TypeExtensionsTests
         [InlineData(typeof(TestEnum), typeof(TestEnum))]
         [InlineData(typeof(bool), typeof(bool))]
         [InlineData(typeof(char), typeof(char))]
-        public void NonNullableValueTypes_ReturnsUnderlyingType(Type nullableType, Type expectedUnderlyingType)
+        public void NonNullableValueTypes_ReturnsUnderlyingType(
+            Type nullableType,
+            Type expectedUnderlyingType
+        )
         {
             var underlyingType = nullableType.GetUnderlyingType();
 
@@ -332,8 +334,7 @@ public static class TypeExtensionsTests
         {
             var underlyingType = typeof(NullableReferenceTypeClass)
                 .GetProperty(nameof(NullableReferenceTypeClass.NullableReferenceType))!
-                .PropertyType
-                .GetUnderlyingType();
+                .PropertyType.GetUnderlyingType();
 
             Assert.Equal(typeof(NullableReferenceTypeClass), underlyingType);
         }

@@ -20,9 +20,7 @@ public static class JsonPathUtils
 
                 if (path.StartsWith("$."))
                 {
-                    return acc == string.Empty
-                        ? acc + path[2..]
-                        : acc + path[1..];
+                    return acc == string.Empty ? acc + path[2..] : acc + path[1..];
                 }
 
                 return acc == string.Empty ? path : $"{acc}.{path}";

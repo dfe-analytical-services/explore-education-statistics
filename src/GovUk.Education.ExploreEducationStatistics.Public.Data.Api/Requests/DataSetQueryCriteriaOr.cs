@@ -36,8 +36,7 @@ public record DataSetQueryCriteriaOr : IDataSetQueryCriteria
     {
         public Validator()
         {
-            RuleFor(q => q.Or)
-                .NotEmpty();
+            RuleFor(q => q.Or).NotEmpty();
 
             RuleForEach(q => q.Or)
                 .NotNull()

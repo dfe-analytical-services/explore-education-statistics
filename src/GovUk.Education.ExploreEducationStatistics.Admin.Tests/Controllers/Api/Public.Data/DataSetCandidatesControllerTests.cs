@@ -14,17 +14,18 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class DataSetCandidatesControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetCandidatesControllerTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-set-candidates";
 
-    public class ListDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListDataSetCandidatesTests(TestApplicationFactory testApp)
+        : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             var dataImports = DataFixture
                 .DefaultDataImport()
@@ -34,11 +35,12 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             var releaseVersion = release.Versions.Single();
 
             var releaseFiles = dataImports
-                .Select(di => DataFixture
-                    .DefaultReleaseFile()
-                    .WithFile(di.File)
-                    .WithReleaseVersion(releaseVersion)
-                    .Generate()
+                .Select(di =>
+                    DataFixture
+                        .DefaultReleaseFile()
+                        .WithFile(di.File)
+                        .WithReleaseVersion(releaseVersion)
+                        .Generate()
                 )
                 .ToList();
 
@@ -54,30 +56,35 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             Assert.NotNull(candidates);
             Assert.Equal(3, candidates.Count);
-            Assert.Contains(releaseFiles, releaseFile =>
-                candidates.Any(candidate => candidate.ReleaseFileId == releaseFile.Id
-                                            && candidate.Title == releaseFile.Name));
+            Assert.Contains(
+                releaseFiles,
+                releaseFile =>
+                    candidates.Any(candidate =>
+                        candidate.ReleaseFileId == releaseFile.Id
+                        && candidate.Title == releaseFile.Name
+                    )
+            );
         }
 
         [Theory]
         [InlineData(SecurityClaimTypes.UpdateAllReleases)]
         [InlineData(SecurityClaimTypes.CreateAnyRelease)]
         [InlineData(null)]
-        public async Task NoPermissionsToViewReleaseVersion_Returns403(SecurityClaimTypes? claimType)
+        public async Task NoPermissionsToViewReleaseVersion_Returns403(
+            SecurityClaimTypes? claimType
+        )
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.ReleaseVersions.Add(releaseVersion)
+            );
 
-            var authenticatedUser =
-                claimType.HasValue
-                    ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
-                    : DataFixture.AuthenticatedUser();
+            var authenticatedUser = claimType.HasValue
+                ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
+                : DataFixture.AuthenticatedUser();
 
-            var client = TestApp
-                .SetUser(authenticatedUser)
-                .CreateClient();
+            var client = TestApp.SetUser(authenticatedUser).CreateClient();
 
             var response = await GetDataSetCandidates(releaseVersion.Id, client);
 
@@ -87,10 +94,11 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task NoReleaseFileExists_ReturnsEmptyList()
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.ReleaseVersions.Add(releaseVersion)
+            );
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -99,19 +107,14 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Assert.Empty(candidates);
         }
 
-
         [Fact]
         public async Task ReleaseFileIsReplacement_NotReturned()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
-                .WithFile(DataFixture
-                    .DefaultFile(FileType.Data)
-                    .WithReplacingId(Guid.NewGuid())
-                );
+                .WithFile(DataFixture.DefaultFile(FileType.Data).WithReplacingId(Guid.NewGuid()));
 
             var releaseVersion = release.Versions.Single();
 
@@ -136,15 +139,11 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task ReleaseFileIsReplaced_NotReturned()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
-                .WithFile(DataFixture
-                    .DefaultFile(FileType.Data)
-                    .WithReplacedById(Guid.NewGuid())
-                );
+                .WithFile(DataFixture.DefaultFile(FileType.Data).WithReplacedById(Guid.NewGuid()));
 
             var releaseVersion = release.Versions.Single();
 
@@ -169,8 +168,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task ReleaseFileHasAssociatedDataSet_NotReturned()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
@@ -208,8 +206,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [InlineData(DataImportStatus.CANCELLING)]
         public async Task ReleaseFileImportIsNotComplete_NotReturned(DataImportStatus status)
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
@@ -246,15 +243,14 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
         private async Task<HttpResponseMessage> GetDataSetCandidates(
             Guid releaseVersionId,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             var user = DataFixture
                 .AuthenticatedUser()
                 .WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
 
-            client ??= TestApp
-                .SetUser(user)
-                .CreateClient();
+            client ??= TestApp.SetUser(user).CreateClient();
 
             var query = new Dictionary<string, string?>
             {

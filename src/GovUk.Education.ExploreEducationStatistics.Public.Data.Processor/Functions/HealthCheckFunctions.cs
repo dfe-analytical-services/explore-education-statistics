@@ -18,13 +18,15 @@ public class HealthCheckFunctions(
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IOptions<AppOptions> appOptions)
+    IOptions<AppOptions> appOptions
+)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
     public async Task<IActionResult> HealthCheck(
 #pragma warning disable IDE0060
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request
+    )
 #pragma warning restore IDE0060
     {
         var psqlConnectionHealthCheck = await CheckPsqlConnectionHealth();
@@ -36,18 +38,20 @@ public class HealthCheckFunctions(
             PsqlConnection: psqlConnectionHealthCheck,
             FileShareMount: fileShareMountHealthCheck,
             CoreStorageConnection: coreStorageConnectionHealthCheck,
-            ContentDbConnection: contentDbConnectionHealthCheck);
+            ContentDbConnection: contentDbConnectionHealthCheck
+        );
 
         if (healthCheckResponse.Healthy)
         {
             return new OkObjectResult(healthCheckResponse);
         }
-        
-        return new ObjectResult(healthCheckResponse) {
-            StatusCode = StatusCodes.Status500InternalServerError
+
+        return new ObjectResult(healthCheckResponse)
+        {
+            StatusCode = StatusCodes.Status500InternalServerError,
         };
     }
-    
+
     private async Task<HealthCheckSummary> CheckPsqlConnectionHealth()
     {
         logger.LogInformation("Attempting to test PSQL connection health");
@@ -63,18 +67,18 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-    
+
     private HealthCheckSummary CheckFileShareMountHealth()
     {
         logger.LogInformation("Attempting to read from file share");
-        
+
         try
         {
             if (Directory.Exists(dataSetVersionPathResolver.BasePath()))
             {
                 return HealthCheckSummary.Healthy();
             }
-            
+
             return HealthCheckSummary.Unhealthy("File Share Mount folder does not exist");
         }
         catch (Exception e)
@@ -83,7 +87,7 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-    
+
     private async Task<HealthCheckSummary> CheckCoreStorageConnectionHealth()
     {
         logger.LogInformation("Attempting to test Core Storage connection health");
@@ -103,7 +107,7 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-    
+
     private async Task<HealthCheckSummary> CheckContentDbConnectionHealth()
     {
         logger.LogInformation("Attempting to test Content DB connection health");
@@ -124,10 +128,11 @@ public class HealthCheckFunctions(
         HealthCheckSummary PsqlConnection,
         HealthCheckSummary FileShareMount,
         HealthCheckSummary CoreStorageConnection,
-        HealthCheckSummary ContentDbConnection)
+        HealthCheckSummary ContentDbConnection
+    )
     {
-        public bool Healthy => 
-            PsqlConnection.IsHealthy 
+        public bool Healthy =>
+            PsqlConnection.IsHealthy
             && FileShareMount.IsHealthy
             && CoreStorageConnection.IsHealthy
             && ContentDbConnection.IsHealthy;
@@ -140,19 +145,12 @@ public class HealthCheckFunctions(
 
         public static HealthCheckSummary Healthy()
         {
-            return new HealthCheckSummary
-            {
-                IsHealthy = true
-            };
+            return new HealthCheckSummary { IsHealthy = true };
         }
 
         public static HealthCheckSummary Unhealthy(string reason)
         {
-            return new HealthCheckSummary
-            {
-                IsHealthy = false,
-                UnhealthyReason = reason
-            };
+            return new HealthCheckSummary { IsHealthy = false, UnhealthyReason = reason };
         }
     }
 }

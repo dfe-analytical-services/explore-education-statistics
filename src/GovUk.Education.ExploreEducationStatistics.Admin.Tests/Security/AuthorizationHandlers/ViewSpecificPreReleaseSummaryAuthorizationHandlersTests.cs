@@ -21,13 +21,10 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         // Assert that any users with the "AccessAllReleases" claim can view an arbitrary PreRelease Summary
         // (and no other claim allows this)
-        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewSpecificPreReleaseSummaryRequirement>(
-            CreateHandler,
-            new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            },
-            AccessAllReleases);
+        await AssertHandlerSucceedsWithCorrectClaims<
+            ReleaseVersion,
+            ViewSpecificPreReleaseSummaryRequirement
+        >(CreateHandler, new ReleaseVersion { Id = Guid.NewGuid() }, AccessAllReleases);
     }
 
     [Fact]
@@ -36,40 +33,41 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
         await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
-            new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            },
-            ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
+            new ReleaseVersion { Id = Guid.NewGuid() },
+            ReleaseRole.Contributor,
+            ReleaseRole.Approver,
+            ReleaseRole.PrereleaseViewer
+        );
     }
 
     [Fact]
     public async Task ViewSpecificPreReleaseSummary_SucceedsWithPublicationRoles()
     {
-        var publication = new Publication
-        {
-            Id = Guid.NewGuid()
-        };
+        var publication = new Publication { Id = Guid.NewGuid() };
         await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
-            new ReleaseVersion
-            {
-                PublicationId = publication.Id,
-                Publication = publication
-            },
-            PublicationRole.Owner, PublicationRole.Allower);
+            new ReleaseVersion { PublicationId = publication.Id, Publication = publication },
+            PublicationRole.Owner,
+            PublicationRole.Allower
+        );
     }
 
-    private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(
+        ContentDbContext contentDbContext
+    )
     {
         return new ViewSpecificPreReleaseSummaryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: new UserReleaseRoleRepository(
                     contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                ),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                    contentDbContext: contentDbContext
+                ),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

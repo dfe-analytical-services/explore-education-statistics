@@ -8,11 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public abstract class ReleaseSearchableDocumentsControllerTests
 {
-    private readonly ReleaseSearchableDocumentsServiceMockBuilder _releaseSearchableDocumentsService = new();
+    private readonly ReleaseSearchableDocumentsServiceMockBuilder _releaseSearchableDocumentsService =
+        new();
 
     private const string PublicationSlug = "test-publication";
 
-    public class GetLatestReleaseAsSearchableDocumentTests : ReleaseSearchableDocumentsControllerTests
+    public class GetLatestReleaseAsSearchableDocumentTests
+        : ReleaseSearchableDocumentsControllerTests
     {
         [Fact]
         public async Task WhenServiceReturnsSearchableDocument_ReturnsOk()
@@ -27,7 +29,9 @@ public abstract class ReleaseSearchableDocumentsControllerTests
             var result = await sut.GetLatestReleaseAsSearchableDocument(PublicationSlug);
 
             // Assert
-            _releaseSearchableDocumentsService.Assert.GetLatestReleaseAsSearchableDocumentWasCalled(PublicationSlug);
+            _releaseSearchableDocumentsService.Assert.GetLatestReleaseAsSearchableDocumentWasCalled(
+                PublicationSlug
+            );
             result.AssertOkResult(searchableDocument);
         }
 
@@ -43,10 +47,13 @@ public abstract class ReleaseSearchableDocumentsControllerTests
             var result = await sut.GetLatestReleaseAsSearchableDocument(PublicationSlug);
 
             // Assert
-            _releaseSearchableDocumentsService.Assert.GetLatestReleaseAsSearchableDocumentWasCalled(PublicationSlug);
+            _releaseSearchableDocumentsService.Assert.GetLatestReleaseAsSearchableDocumentWasCalled(
+                PublicationSlug
+            );
             result.AssertNotFoundResult();
         }
     }
 
-    private ReleaseSearchableDocumentsController BuildController() => new(_releaseSearchableDocumentsService.Build());
+    private ReleaseSearchableDocumentsController BuildController() =>
+        new(_releaseSearchableDocumentsService.Build());
 }

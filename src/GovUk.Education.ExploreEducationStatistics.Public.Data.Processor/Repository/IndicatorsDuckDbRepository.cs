@@ -8,29 +8,33 @@ using InterpolatedSql.Dapper;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
-public class IndicatorsDuckDbRepository(PublicDataDbContext publicDataDbContext) : IIndicatorsDuckDbRepository
+public class IndicatorsDuckDbRepository(PublicDataDbContext publicDataDbContext)
+    : IIndicatorsDuckDbRepository
 {
     public async Task CreateIndicatorsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await publicDataDbContext
             .Entry(dataSetVersion)
             .Collection(dsv => dsv.IndicatorMetas)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.SqlBuilder(
-            $"""
-             CREATE TABLE {IndicatorsTable.TableName:raw}(
-                 {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
-                 {IndicatorsTable.Cols.Column:raw} VARCHAR,
-                 {IndicatorsTable.Cols.Label:raw} VARCHAR,
-                 {IndicatorsTable.Cols.Unit:raw} VARCHAR,
-                 {IndicatorsTable.Cols.DecimalPlaces:raw} TINYINT,
-             )
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
+        await duckDbConnection
+            .SqlBuilder(
+                $"""
+                CREATE TABLE {IndicatorsTable.TableName:raw}(
+                    {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
+                    {IndicatorsTable.Cols.Column:raw} VARCHAR,
+                    {IndicatorsTable.Cols.Label:raw} VARCHAR,
+                    {IndicatorsTable.Cols.Unit:raw} VARCHAR,
+                    {IndicatorsTable.Cols.DecimalPlaces:raw} TINYINT,
+                )
+                """
+            )
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         using var appender = duckDbConnection.CreateAppender(table: IndicatorsTable.TableName);
 

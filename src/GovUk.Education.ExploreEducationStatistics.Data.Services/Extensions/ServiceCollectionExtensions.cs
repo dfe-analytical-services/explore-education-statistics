@@ -8,12 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAnalytics(this IServiceCollection services, IConfiguration configuration) =>
+    public static IServiceCollection AddAnalytics(
+        this IServiceCollection services,
+        IConfiguration configuration
+    ) =>
         services
             .AddAnalyticsCommon(configuration)
-                .WhenEnabled
-                    .AddWriteStrategy<CaptureTableToolDownloadCallAnalyticsWriteStrategy>()
-                    .AddWriteStrategy<CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy>()
-                    .Services
-        ;
+            .WhenEnabled.AddWriteStrategy<CaptureTableToolDownloadCallAnalyticsWriteStrategy>()
+            .AddWriteStrategy<CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy>()
+            .Services;
 }

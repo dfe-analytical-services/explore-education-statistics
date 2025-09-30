@@ -20,11 +20,9 @@ public class MethodologyControllerTests
 
         var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-        methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
-            .ReturnsAsync(new MethodologyVersionViewModel
-            {
-                Id = methodologyId
-            });
+        methodologyService
+            .Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
+            .ReturnsAsync(new MethodologyVersionViewModel { Id = methodologyId });
 
         var controller = new MethodologyController(methodologyService.Object);
 
@@ -41,7 +39,8 @@ public class MethodologyControllerTests
     {
         var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-        methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
+        methodologyService
+            .Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
             .ReturnsAsync(new NotFoundResult());
 
         var controller = new MethodologyController(methodologyService.Object);
@@ -58,15 +57,18 @@ public class MethodologyControllerTests
     {
         var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-        methodologyService.Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<MethodologySitemapItemViewModel>
-            {
-                new()
+        methodologyService
+            .Setup(mock => mock.ListSitemapItems(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                new List<MethodologySitemapItemViewModel>
                 {
-                    Slug = "test-methodology",
-                    LastModified = DateTime.Parse(SitemapItemLastModifiedTime)
+                    new()
+                    {
+                        Slug = "test-methodology",
+                        LastModified = DateTime.Parse(SitemapItemLastModifiedTime),
+                    },
                 }
-            });
+            );
 
         var controller = new MethodologyController(methodologyService.Object);
 

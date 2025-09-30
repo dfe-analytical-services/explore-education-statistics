@@ -24,15 +24,14 @@ public class KeyStatisticServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupKeyStatisticService(userService: userService.Object);
-                    return service.CreateKeyStatisticDataBlock(
-                        _releaseVersion.Id,
-                        new KeyStatisticDataBlockCreateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupKeyStatisticService(userService: userService.Object);
+                return service.CreateKeyStatisticDataBlock(
+                    _releaseVersion.Id,
+                    new KeyStatisticDataBlockCreateRequest()
+                );
+            });
     }
 
     [Fact]
@@ -40,15 +39,14 @@ public class KeyStatisticServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupKeyStatisticService(userService: userService.Object);
-                    return service.CreateKeyStatisticText(
-                        _releaseVersion.Id,
-                        new KeyStatisticTextCreateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupKeyStatisticService(userService: userService.Object);
+                return service.CreateKeyStatisticText(
+                    _releaseVersion.Id,
+                    new KeyStatisticTextCreateRequest()
+                );
+            });
     }
 
     [Fact]
@@ -56,15 +54,14 @@ public class KeyStatisticServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupKeyStatisticService(userService: userService.Object);
-                    return service.CreateKeyStatisticDataBlock(
-                        _releaseVersion.Id,
-                        new KeyStatisticDataBlockCreateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupKeyStatisticService(userService: userService.Object);
+                return service.CreateKeyStatisticDataBlock(
+                    _releaseVersion.Id,
+                    new KeyStatisticDataBlockCreateRequest()
+                );
+            });
     }
 
     [Fact]
@@ -72,15 +69,14 @@ public class KeyStatisticServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupKeyStatisticService(userService: userService.Object);
-                    return service.CreateKeyStatisticText(
-                        _releaseVersion.Id,
-                        new KeyStatisticTextCreateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupKeyStatisticService(userService: userService.Object);
+                return service.CreateKeyStatisticText(
+                    _releaseVersion.Id,
+                    new KeyStatisticTextCreateRequest()
+                );
+            });
     }
 
     [Fact]
@@ -88,15 +84,11 @@ public class KeyStatisticServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupKeyStatisticService(userService: userService.Object);
-                    return service.Delete(
-                        _releaseVersion.Id,
-                        Guid.NewGuid());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupKeyStatisticService(userService: userService.Object);
+                return service.Delete(_releaseVersion.Id, Guid.NewGuid());
+            });
     }
 
     [Fact]
@@ -104,22 +96,19 @@ public class KeyStatisticServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupKeyStatisticService(userService: userService.Object);
-                    return service.Reorder(
-                        _releaseVersion.Id,
-                        new List<Guid>());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupKeyStatisticService(userService: userService.Object);
+                return service.Reorder(_releaseVersion.Id, new List<Guid>());
+            });
     }
 
     private KeyStatisticService SetupKeyStatisticService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IDataBlockService? dataBlockService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new KeyStatisticService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,

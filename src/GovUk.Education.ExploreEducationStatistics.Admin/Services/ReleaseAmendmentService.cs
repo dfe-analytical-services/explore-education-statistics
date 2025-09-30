@@ -21,8 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReleaseAmendmentService : IReleaseAmendmentService
 {
-    private static readonly Regex CommentsRegex =
-        new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
+    private static readonly Regex CommentsRegex = new(
+        ContentFilterUtils.CommentsFilterPattern,
+        RegexOptions.Compiled
+    );
 
     private readonly ContentDbContext _context;
     private readonly IFootnoteRepository _footnoteRepository;
@@ -33,7 +35,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ContentDbContext context,
         IUserService userService,
         IFootnoteRepository footnoteRepository,
-        StatisticsDbContext statisticsDbContext)
+        StatisticsDbContext statisticsDbContext
+    )
     {
         _context = context;
         _userService = userService;
@@ -41,42 +44,51 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         _statisticsDbContext = statisticsDbContext;
     }
 
-    public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
+    public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(
+        Guid releaseVersionId
+    )
     {
         var createdDate = DateTime.UtcNow;
 
         return await _context
-            .ReleaseVersions
-            .HydrateReleaseVersionForAmendment()
+            .ReleaseVersions.HydrateReleaseVersionForAmendment()
             .SingleOrDefault(releaseVersion => releaseVersion.Id == releaseVersionId)
             .OrNotFound()
             .OnSuccess(_userService.CheckCanMakeAmendmentOfReleaseVersion)
             .OnSuccess(originalReleaseVersion =>
                 CreateBasicReleaseAmendment(originalReleaseVersion, createdDate)
                     .OnSuccessDo(CreateStatisticsReleaseAmendment)
-                    .OnSuccessDo(amendment => CopyReleaseRoles(releaseVersionId, amendment.Id, createdDate))
+                    .OnSuccessDo(amendment =>
+                        CopyReleaseRoles(releaseVersionId, amendment.Id, createdDate)
+                    )
                     .OnSuccessDo(amendment => CopyFootnotes(releaseVersionId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalReleaseVersion, amendment))
-                    .OnSuccess(amendment => new IdViewModel(amendment.Id)));
+                    .OnSuccess(amendment => new IdViewModel(amendment.Id))
+            );
     }
 
     private async Task<Either<ActionResult, ReleaseVersion>> CreateBasicReleaseAmendment(
         ReleaseVersion originalReleaseVersion,
-        DateTime createdDate)
+        DateTime createdDate
+    )
     {
         var createdByUserId = _userService.GetUserId();
 
         var amendmentReleaseVersionId = Guid.NewGuid();
 
-        var dataBlockVersionAmendments =
-            CopyDataBlockVersions(originalReleaseVersion, amendmentReleaseVersionId, createdDate);
+        var dataBlockVersionAmendments = CopyDataBlockVersions(
+            originalReleaseVersion,
+            amendmentReleaseVersionId,
+            createdDate
+        );
 
         // Create a map of the original DataBlocks to their amended counterparts.
         var originalDataBlockVersionsToAmendments = dataBlockVersionAmendments
             .Select(dataBlockVersionAmendment => dataBlockVersionAmendment.DataBlockParent)
             .ToDictionary(
                 dataBlockParent => dataBlockParent.LatestPublishedVersion!,
-                dataBlockParent => dataBlockParent.LatestDraftVersion!);
+                dataBlockParent => dataBlockParent.LatestDraftVersion!
+            );
 
         var amendmentReleaseVersion = new ReleaseVersion
         {
@@ -102,11 +114,31 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             PreviousVersionId = originalReleaseVersion.Id,
 
             DataBlockVersions = dataBlockVersionAmendments,
-            KeyStatistics = CopyKeyStatistics(originalReleaseVersion, amendmentReleaseVersionId, createdByUserId, originalDataBlockVersionsToAmendments),
-            Content = CopyContent(originalReleaseVersion, createdDate, amendmentReleaseVersionId, originalDataBlockVersionsToAmendments),
-            FeaturedTables = CopyFeaturedTables(originalReleaseVersion, amendmentReleaseVersionId, createdByUserId, originalDataBlockVersionsToAmendments),
+            KeyStatistics = CopyKeyStatistics(
+                originalReleaseVersion,
+                amendmentReleaseVersionId,
+                createdByUserId,
+                originalDataBlockVersionsToAmendments
+            ),
+            Content = CopyContent(
+                originalReleaseVersion,
+                createdDate,
+                amendmentReleaseVersionId,
+                originalDataBlockVersionsToAmendments
+            ),
+            FeaturedTables = CopyFeaturedTables(
+                originalReleaseVersion,
+                amendmentReleaseVersionId,
+                createdByUserId,
+                originalDataBlockVersionsToAmendments
+            ),
             RelatedInformation = CopyRelatedInformation(originalReleaseVersion),
-            Updates = CopyUpdates(originalReleaseVersion, amendmentReleaseVersionId, createdDate, createdByUserId)
+            Updates = CopyUpdates(
+                originalReleaseVersion,
+                amendmentReleaseVersionId,
+                createdDate,
+                createdByUserId
+            ),
         };
 
         _context.ReleaseVersions.Add(amendmentReleaseVersion);
@@ -118,16 +150,16 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
         Guid createdByUserId,
-        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments)
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
+    )
     {
-        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments
-            .ToDictionary(
-                kvp => kvp.Key.ContentBlockId,
-                kvp => kvp.Value.ContentBlock);
+        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments.ToDictionary(
+            kvp => kvp.Key.ContentBlockId,
+            kvp => kvp.Value.ContentBlock
+        );
 
         return originalReleaseVersion
-            .KeyStatistics
-            .Select<KeyStatistic, KeyStatistic>(originalKeyStat =>
+            .KeyStatistics.Select<KeyStatistic, KeyStatistic>(originalKeyStat =>
             {
                 if (originalKeyStat is KeyStatisticText originalKeyStatText)
                 {
@@ -148,7 +180,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                         GuidanceTitle = originalKeyStatText.GuidanceTitle,
 
                         // Mark this as being created by the current user.
-                        CreatedById = createdByUserId
+                        CreatedById = createdByUserId,
                     };
                 }
 
@@ -170,15 +202,18 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                         DataBlockParentId = originalKeyStatDataBlock.DataBlockParentId,
 
                         // Link to the new version of the DataBlock from the original.
-                        DataBlockId = originalDataBlockIdsToAmendments[originalKeyStatDataBlock.DataBlockId].Id,
+                        DataBlockId = originalDataBlockIdsToAmendments[
+                            originalKeyStatDataBlock.DataBlockId
+                        ].Id,
 
                         // Mark this as being created by the current user.
-                        CreatedById = createdByUserId
+                        CreatedById = createdByUserId,
                     };
                 }
 
                 throw new ArgumentException(
-                    $"Unknown {nameof(KeyStatistic)} subclass {originalKeyStat.GetType()} during amendment");
+                    $"Unknown {nameof(KeyStatistic)} subclass {originalKeyStat.GetType()} during amendment"
+                );
             })
             .ToList();
     }
@@ -186,19 +221,23 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private List<DataBlockVersion> CopyDataBlockVersions(
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
-        DateTime createdDate)
+        DateTime createdDate
+    )
     {
         return originalReleaseVersion
-            .DataBlockVersions
-            .Select(originalDataBlockVersion =>
+            .DataBlockVersions.Select(originalDataBlockVersion =>
             {
                 // Create a new entry in the DataBlock history in the form of a new DataBlockVersion.
-                var copiedDataBlockVersion =
-                    CopyDataBlockVersion(originalDataBlockVersion, amendmentReleaseVersionId, createdDate);
+                var copiedDataBlockVersion = CopyDataBlockVersion(
+                    originalDataBlockVersion,
+                    amendmentReleaseVersionId,
+                    createdDate
+                );
 
                 // Set the new DataBlockVersion to be the new Draft version.
                 copiedDataBlockVersion.DataBlockParent.LatestDraftVersion = copiedDataBlockVersion;
-                copiedDataBlockVersion.DataBlockParent.LatestDraftVersionId = copiedDataBlockVersion.Id;
+                copiedDataBlockVersion.DataBlockParent.LatestDraftVersionId =
+                    copiedDataBlockVersion.Id;
                 return copiedDataBlockVersion;
             })
             .ToList();
@@ -207,7 +246,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private DataBlockVersion CopyDataBlockVersion(
         DataBlockVersion originalDataBlockVersion,
         Guid amendmentReleaseVersionId,
-        DateTime createdDate)
+        DateTime createdDate
+    )
     {
         var originalContentBlock = originalDataBlockVersion.ContentBlock;
 
@@ -275,13 +315,13 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ReleaseVersion originalReleaseVersion,
         DateTime createdDate,
         Guid amendmentReleaseVersionId,
-        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments)
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
+    )
     {
         // Copy ContentSections, using the newly-cloned ContentBlocks and DataBlocks in the new ContentSections
         // rather than the original ones.
         var amendedContent = originalReleaseVersion
-            .Content
-            .Select(originalSection =>
+            .Content.Select(originalSection =>
             {
                 var contentSectionAmendmentId = Guid.NewGuid();
 
@@ -303,7 +343,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                         contentSectionAmendmentId: contentSectionAmendmentId,
                         amendmentReleaseVersionId: amendmentReleaseVersionId,
                         createdDate: createdDate,
-                        originalDataBlockVersionsToAmendments: originalDataBlockVersionsToAmendments)
+                        originalDataBlockVersionsToAmendments: originalDataBlockVersionsToAmendments
+                    ),
                 };
             })
             .ToList();
@@ -311,12 +352,14 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         // If the original Release did not contain a RelatedDashboards section, add an empty one to its amendment.
         if (originalReleaseVersion.RelatedDashboardsSection == null)
         {
-            amendedContent.Add(new ContentSection
-            {
-                Id = Guid.NewGuid(),
-                Type = ContentSectionType.RelatedDashboards,
-                ReleaseVersionId = amendmentReleaseVersionId
-            });
+            amendedContent.Add(
+                new ContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    Type = ContentSectionType.RelatedDashboards,
+                    ReleaseVersionId = amendmentReleaseVersionId,
+                }
+            );
         }
 
         return amendedContent;
@@ -327,12 +370,13 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         Guid contentSectionAmendmentId,
         Guid amendmentReleaseVersionId,
         DateTime createdDate,
-        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments)
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
+    )
     {
-        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments
-            .ToDictionary(
-                kvp => kvp.Key.ContentBlockId,
-                kvp => kvp.Value.ContentBlock);
+        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments.ToDictionary(
+            kvp => kvp.Key.ContentBlockId,
+            kvp => kvp.Value.ContentBlock
+        );
 
         return originalSectionContent
             .Select<ContentBlock, ContentBlock>(originalContentBlock =>
@@ -379,13 +423,14 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                             Id = Guid.NewGuid(),
                             Created = createdDate,
                             Title = originalEmbedBlockLink.EmbedBlock.Title,
-                            Url = originalEmbedBlockLink.EmbedBlock.Url
+                            Url = originalEmbedBlockLink.EmbedBlock.Url,
                         },
                     };
                 }
 
                 throw new ArgumentException(
-                    $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment");
+                    $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment"
+                );
             })
             .ToList();
     }
@@ -394,16 +439,16 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
         Guid createdByUserId,
-        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments)
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
+    )
     {
-        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments
-            .ToDictionary(
-                kvp => kvp.Key.ContentBlockId,
-                kvp => kvp.Value.ContentBlock);
+        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments.ToDictionary(
+            kvp => kvp.Key.ContentBlockId,
+            kvp => kvp.Value.ContentBlock
+        );
 
         return originalReleaseVersion
-            .FeaturedTables
-            .Select(originalFeaturedTable => new FeaturedTable
+            .FeaturedTables.Select(originalFeaturedTable => new FeaturedTable
             {
                 // Assign a new Id.
                 Id = Guid.NewGuid(),
@@ -421,7 +466,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 Name = originalFeaturedTable.Name,
                 Order = originalFeaturedTable.Order,
 
-                CreatedById = createdByUserId
+                CreatedById = createdByUserId,
             })
             .ToList();
     }
@@ -429,8 +474,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private List<Link> CopyRelatedInformation(ReleaseVersion originalReleaseVersion)
     {
         return originalReleaseVersion
-            .RelatedInformation
-            .Select(originalRelatedInformation => new Link
+            .RelatedInformation.Select(originalRelatedInformation => new Link
             {
                 // Assign a new Id.
                 Id = Guid.NewGuid(),
@@ -446,11 +490,11 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
         DateTime createdDate,
-        Guid createdByUserId)
+        Guid createdByUserId
+    )
     {
         return originalReleaseVersion
-            .Updates
-            .Select(originalUpdate => new Update
+            .Updates.Select(originalUpdate => new Update
             {
                 // Assign a new Id.
                 Id = Guid.NewGuid(),
@@ -464,17 +508,18 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
                 // Assign the new created date.
                 Created = createdDate,
-                CreatedById = createdByUserId
+                CreatedById = createdByUserId,
             })
             .ToList();
     }
 
     private async Task<Either<ActionResult, Unit>> CreateStatisticsReleaseAmendment(
-        ReleaseVersion amendmentReleaseVersion)
+        ReleaseVersion amendmentReleaseVersion
+    )
     {
-        var statsReleaseVersion = await _statisticsDbContext
-            .ReleaseVersion
-            .FirstOrDefaultAsync(rv => rv.Id == amendmentReleaseVersion.PreviousVersionId);
+        var statsReleaseVersion = await _statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(
+            rv => rv.Id == amendmentReleaseVersion.PreviousVersionId
+        );
 
         // Release does not have to have stats uploaded but if it has then
         // create a link row to link back to the original subject
@@ -483,12 +528,13 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             var statsAmendmentVersion = new Data.Model.ReleaseVersion
             {
                 Id = amendmentReleaseVersion.Id,
-                PublicationId = amendmentReleaseVersion.PublicationId
+                PublicationId = amendmentReleaseVersion.PublicationId,
             };
 
             var statsAmendmentSubjectLinks = _statisticsDbContext
-                .ReleaseSubject
-                .Where(rs => rs.ReleaseVersionId == amendmentReleaseVersion.PreviousVersionId)
+                .ReleaseSubject.Where(rs =>
+                    rs.ReleaseVersionId == amendmentReleaseVersion.PreviousVersionId
+                )
                 .Select(originalReleaseSubject => new ReleaseSubject
                 {
                     // Assign it to the new release version.
@@ -509,13 +555,15 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private async Task<Either<ActionResult, Unit>> CopyReleaseRoles(
         Guid originalReleaseId,
         Guid amendmentReleaseVersionId,
-        DateTime createdDate)
+        DateTime createdDate
+    )
     {
         // Copy all current roles apart from Prerelease Users to the Release amendment.
         var newRoles = _context
-            .UserReleaseRoles
-            .Where(releaseRole => releaseRole.ReleaseVersionId == originalReleaseId
-                                  && releaseRole.Role != ReleaseRole.PrereleaseViewer)
+            .UserReleaseRoles.Where(releaseRole =>
+                releaseRole.ReleaseVersionId == originalReleaseId
+                && releaseRole.Role != ReleaseRole.PrereleaseViewer
+            )
             .Select(originalReleaseRole => new UserReleaseRole
             {
                 // Assign a new Id.
@@ -540,7 +588,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
     private async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(
         Guid originalReleaseVersionId,
-        Guid amendmentReleaseVersionId)
+        Guid amendmentReleaseVersionId
+    )
     {
         var originalFootnotes = await _footnoteRepository.GetFootnotes(originalReleaseVersionId);
 
@@ -548,35 +597,43 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             .ToAsyncEnumerable()
             .SelectAwait(async originalFootnote =>
             {
-                var filterIds = originalFootnote.Filters
-                    .Select(filterFootnote => filterFootnote.FilterId).ToHashSet();
-                var filterGroupIds = originalFootnote.FilterGroups
-                    .Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId).ToHashSet();
-                var filterItemIds = originalFootnote.FilterItems
-                    .Select(filterItemFootnote => filterItemFootnote.FilterItemId).ToHashSet();
-                var indicatorIds = originalFootnote.Indicators
-                    .Select(indicatorFootnote => indicatorFootnote.IndicatorId).ToHashSet();
-                var subjectIds = originalFootnote.Subjects
-                    .Select(subjectFootnote => subjectFootnote.SubjectId).ToHashSet();
+                var filterIds = originalFootnote
+                    .Filters.Select(filterFootnote => filterFootnote.FilterId)
+                    .ToHashSet();
+                var filterGroupIds = originalFootnote
+                    .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
+                    .ToHashSet();
+                var filterItemIds = originalFootnote
+                    .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItemId)
+                    .ToHashSet();
+                var indicatorIds = originalFootnote
+                    .Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
+                    .ToHashSet();
+                var subjectIds = originalFootnote
+                    .Subjects.Select(subjectFootnote => subjectFootnote.SubjectId)
+                    .ToHashSet();
 
-                return await _footnoteRepository.CreateFootnote(amendmentReleaseVersionId,
+                return await _footnoteRepository.CreateFootnote(
+                    amendmentReleaseVersionId,
                     originalFootnote.Content,
                     filterIds: filterIds,
                     filterGroupIds: filterGroupIds,
                     filterItemIds: filterItemIds,
                     indicatorIds: indicatorIds,
                     subjectIds: subjectIds,
-                    originalFootnote.Order);
+                    originalFootnote.Order
+                );
             })
             .ToListAsync();
     }
 
-    private async Task<Either<ActionResult, ReleaseVersion>> CopyFileLinks(ReleaseVersion originalReleaseVersion,
-        ReleaseVersion amendmentReleaseVersion)
+    private async Task<Either<ActionResult, ReleaseVersion>> CopyFileLinks(
+        ReleaseVersion originalReleaseVersion,
+        ReleaseVersion amendmentReleaseVersion
+    )
     {
         var releaseFileCopies = _context
-            .ReleaseFiles
-            .Include(f => f.File)
+            .ReleaseFiles.Include(f => f.File)
             .Where(f => f.ReleaseVersionId == originalReleaseVersion.Id)
             .Select(originalFile => new ReleaseFile
             {
@@ -618,7 +675,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 internal static class ReleaseAmendmentQueryableExtensions
 {
     internal static IQueryable<ReleaseVersion> HydrateReleaseVersionForAmendment(
-        this IQueryable<ReleaseVersion> queryable)
+        this IQueryable<ReleaseVersion> queryable
+    )
     {
         return queryable
             .AsSplitQuery()
@@ -641,6 +699,8 @@ internal static class ReleaseAmendmentQueryableExtensions
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
             .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-            .ThenInclude(dataBlockVersion => dataBlockVersion != null ? dataBlockVersion.ContentBlock : null);
+            .ThenInclude(dataBlockVersion =>
+                dataBlockVersion != null ? dataBlockVersion.ContentBlock : null
+            );
     }
 }

@@ -11,15 +11,26 @@ public class OnPublicationChangedFunction(IEventGridEventHandler eventGridEventH
     [Function(nameof(OnPublicationChanged))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnPublicationChanged(
-        [QueueTrigger("%PublicationChangedQueueName%")]
-        EventGridEvent eventDto,
-        FunctionContext context) =>
-        await eventGridEventHandler.Handle<PublicationChangedEventDto, RefreshSearchableDocumentMessageDto[]>(
-            context, 
+        [QueueTrigger("%PublicationChangedQueueName%")] EventGridEvent eventDto,
+        FunctionContext context
+    ) =>
+        await eventGridEventHandler.Handle<
+            PublicationChangedEventDto,
+            RefreshSearchableDocumentMessageDto[]
+        >(
+            context,
             eventDto,
-            (payload, _) => 
+            (payload, _) =>
                 Task.FromResult<RefreshSearchableDocumentMessageDto[]>(
                     string.IsNullOrEmpty(payload.Slug) || payload.IsPublicationArchived == true
-                    ? []
-                    : [ new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.Slug } ]));
+                        ? []
+                        :
+                        [
+                            new RefreshSearchableDocumentMessageDto
+                            {
+                                PublicationSlug = payload.Slug,
+                            },
+                        ]
+                )
+        );
 }

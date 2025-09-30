@@ -9,7 +9,8 @@ public static class HttpContentExtensions
     public static Task<T?> ReadFromJsonAsync<T>(
         this HttpContent content,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return content.ReadFromJsonAsync<T>(Encoding.UTF8, settings, cancellationToken);
     }
@@ -39,10 +40,15 @@ public static class HttpContentExtensions
         this HttpContent content,
         Encoding sourceEncoding,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        await using var contentStream =
-            await GetContentStreamAsync(content, sourceEncoding, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await GetContentStreamAsync(
+                content,
+                sourceEncoding,
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
         using var streamReader = new StreamReader(contentStream);
         await using var reader = new JsonTextReader(streamReader);
@@ -56,7 +62,8 @@ public static class HttpContentExtensions
     public static T? ReadFromJson<T>(
         this HttpContent content,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return content.ReadFromJson<T>(Encoding.UTF8, settings, cancellationToken);
     }
@@ -80,7 +87,8 @@ public static class HttpContentExtensions
         this HttpContent content,
         Encoding sourceEncoding,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         using var contentStream = GetContentStream(content, sourceEncoding, cancellationToken);
         using var streamReader = new StreamReader(contentStream);
@@ -92,7 +100,8 @@ public static class HttpContentExtensions
     private static Stream GetContentStream(
         HttpContent content,
         Encoding sourceEncoding,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var contentStream = content.ReadAsStream(cancellationToken);
 
@@ -104,9 +113,12 @@ public static class HttpContentExtensions
     private static async Task<Stream> GetContentStreamAsync(
         HttpContent content,
         Encoding sourceEncoding,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var contentStream = await content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var contentStream = await content
+            .ReadAsStreamAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         return sourceEncoding.Equals(Encoding.UTF8)
             ? contentStream

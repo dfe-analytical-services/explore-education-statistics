@@ -14,27 +14,30 @@ public class PublicationDtoBuilder
 
     private PublicationContactDto _contact = new PublicationContactDtoBuilder().Build();
 
-    private PublicationLatestReleaseDto _latestRelease = new PublicationLatestReleaseDtoBuilder().Build();
+    private PublicationLatestReleaseDto _latestRelease =
+        new PublicationLatestReleaseDtoBuilder().Build();
 
-    private PublicationNextReleaseDateDto? _nextReleaseDate = new PublicationNextReleaseDateDtoBuilder().Build();
+    private PublicationNextReleaseDateDto? _nextReleaseDate =
+        new PublicationNextReleaseDateDtoBuilder().Build();
 
     private PublicationSupersededByPublicationDto? _supersededByPublication =
         new PublicationSupersededByPublicationDtoBuilder().Build();
 
     private PublicationThemeDto _theme = new PublicationThemeDtoBuilder().Build();
 
-    public PublicationDto Build() => new()
-    {
-        Id = _id,
-        Slug = _slug,
-        Summary = _summary,
-        Title = _title,
-        Contact = _contact,
-        LatestRelease = _latestRelease,
-        NextReleaseDate = _nextReleaseDate,
-        SupersededByPublication = _supersededByPublication,
-        Theme = _theme
-    };
+    public PublicationDto Build() =>
+        new()
+        {
+            Id = _id,
+            Slug = _slug,
+            Summary = _summary,
+            Title = _title,
+            Contact = _contact,
+            LatestRelease = _latestRelease,
+            NextReleaseDate = _nextReleaseDate,
+            SupersededByPublication = _supersededByPublication,
+            Theme = _theme,
+        };
 
     public PublicationDtoBuilder WithId(Guid id)
     {
@@ -53,7 +56,6 @@ public class PublicationDtoBuilder
         _summary = summary;
         return this;
     }
-
 
     public PublicationDtoBuilder WithTitle(string title)
     {
@@ -80,7 +82,8 @@ public class PublicationDtoBuilder
     }
 
     public PublicationDtoBuilder WithSupersededByPublication(
-        PublicationSupersededByPublicationDto? supersededByPublication)
+        PublicationSupersededByPublicationDto? supersededByPublication
+    )
     {
         _supersededByPublication = supersededByPublication;
         return this;

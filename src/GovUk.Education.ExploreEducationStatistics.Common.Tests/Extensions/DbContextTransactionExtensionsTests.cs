@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 /// * Transactions can be nested within each other and the parent has control of completing
 ///   or failing the transaction. If the child transaction fails, the parent needs to
 ///   acknowledge that failure in order to fail itself (e.g. rethrow an exception, return a
-///   failing Either etc). 
+///   failing Either etc).
 /// * only a single DbContext that supports RetryOnFailure need be the one to create an
 ///   ExecutionContext, and thereafter all DbContexts supporting RetryOnFailure will
 ///   operate successfully.
@@ -41,16 +41,24 @@ public abstract class DbContextTransactionExtensionsTests
 
     public DbContextTransactionExtensionsTests(DbContextTransactionExtensionsTestFixture fixture)
     {
-        _testApp = new TestApplicationFactory<TestStartup>()
-            .ConfigureServices(services => services
+        _testApp = new TestApplicationFactory<TestStartup>().ConfigureServices(services =>
+            services
                 .AddDbContext<TestDbContext1>(options =>
-                    options.UseNpgsql(fixture.PostgreSqlContainers[0].GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure()))
+                    options.UseNpgsql(
+                        fixture.PostgreSqlContainers[0].GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()
+                    )
+                )
                 .AddDbContext<TestDbContext2>(options =>
-                    options.UseNpgsql(fixture.PostgreSqlContainers[1].GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure()))
+                    options.UseNpgsql(
+                        fixture.PostgreSqlContainers[1].GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()
+                    )
+                )
                 .AddDbContext<TestDbContext3WithoutRetry>(options =>
-                    options.UseNpgsql(fixture.PostgreSqlContainers[2].GetConnectionString())));
+                    options.UseNpgsql(fixture.PostgreSqlContainers[2].GetConnectionString())
+                )
+        );
     }
 
     public Task InitializeAsync()
@@ -65,8 +73,7 @@ public abstract class DbContextTransactionExtensionsTests
         await ClearTestData<TestDbContext3WithoutRetry>();
     }
 
-    public class NoTransactionTests(
-        DbContextTransactionExtensionsTestFixture fixture)
+    public class NoTransactionTests(DbContextTransactionExtensionsTestFixture fixture)
         : DbContextTransactionExtensionsTests(fixture)
     {
         [Fact]
@@ -77,12 +84,10 @@ public abstract class DbContextTransactionExtensionsTests
         }
     }
 
-    public class RequireTransactionTests(
-        DbContextTransactionExtensionsTestFixture fixture)
+    public class RequireTransactionTests(DbContextTransactionExtensionsTestFixture fixture)
         : DbContextTransactionExtensionsTests(fixture)
     {
-        public class FlatTransactionTests(
-            DbContextTransactionExtensionsTestFixture fixture)
+        public class FlatTransactionTests(DbContextTransactionExtensionsTestFixture fixture)
             : RequireTransactionTests(fixture)
         {
             [Fact]
@@ -90,8 +95,7 @@ public abstract class DbContextTransactionExtensionsTests
             {
                 await using var dbContext1 = GetDbContext1();
 
-                await dbContext1.RequireTransaction(() =>
-                    WriteToAllDbContexts());
+                await dbContext1.RequireTransaction(() => WriteToAllDbContexts());
 
                 AssertEntitiesInAllDbContexts();
             }
@@ -120,7 +124,8 @@ public abstract class DbContextTransactionExtensionsTests
                     {
                         await WriteToAllDbContexts();
                         throw new SimulateFailureException();
-                    }));
+                    })
+                );
 
                 AssertNoEntitiesInAnyDbContexts();
             }
@@ -140,8 +145,7 @@ public abstract class DbContextTransactionExtensionsTests
             }
         }
 
-        public class NestedTransactionTests(
-            DbContextTransactionExtensionsTestFixture fixture)
+        public class NestedTransactionTests(DbContextTransactionExtensionsTestFixture fixture)
             : RequireTransactionTests(fixture)
         {
             [Fact]
@@ -172,8 +176,9 @@ public abstract class DbContextTransactionExtensionsTests
                     await dbContext2.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts(2);
-                        await dbContext3WithoutRetry.RequireTransaction(
-                            () => WriteToAllDbContexts(3));
+                        await dbContext3WithoutRetry.RequireTransaction(() =>
+                            WriteToAllDbContexts(3)
+                        );
                     });
                 });
 
@@ -194,7 +199,8 @@ public abstract class DbContextTransactionExtensionsTests
                         await WriteToAllDbContexts();
                         // ReSharper disable once AccessToDisposedClosure
                         await dbContext2.RequireTransaction(() => WriteToAllDbContexts(2));
-                    }));
+                    })
+                );
 
                 AssertNoEntitiesInAnyDbContexts();
             }
@@ -214,7 +220,8 @@ public abstract class DbContextTransactionExtensionsTests
                             await WriteToAllDbContexts(2);
                             throw new SimulateFailureException();
                         });
-                    }));
+                    })
+                );
 
                 AssertNoEntitiesInAnyDbContexts();
             }
@@ -243,14 +250,15 @@ public abstract class DbContextTransactionExtensionsTests
             {
                 await using var dbContext1 = GetDbContext1();
 
-                await Assert.ThrowsAsync<SimulateFailureException>(() => dbContext1
-                    .RequireTransaction(async () =>
+                await Assert.ThrowsAsync<SimulateFailureException>(() =>
+                    dbContext1.RequireTransaction(async () =>
                     {
                         await WriteToAllDbContexts();
                         // ReSharper disable once AccessToDisposedClosure
                         await dbContext1.RequireTransaction(() => WriteToAllDbContexts(2));
                         throw new SimulateFailureException();
-                    }));
+                    })
+                );
 
                 AssertNoEntitiesInAnyDbContexts();
             }
@@ -278,17 +286,11 @@ public abstract class DbContextTransactionExtensionsTests
         using var dbContext2 = GetDbContext2();
         using var dbContext3 = GetDbContext3WithoutRetry();
 
-        Assert.NotNull(dbContext1
-            .Entities
-            .SingleOrDefault(entity => entity.Id == expectedId));
+        Assert.NotNull(dbContext1.Entities.SingleOrDefault(entity => entity.Id == expectedId));
 
-        Assert.NotNull(dbContext2
-            .Entities
-            .SingleOrDefault(entity => entity.Id == expectedId));
+        Assert.NotNull(dbContext2.Entities.SingleOrDefault(entity => entity.Id == expectedId));
 
-        Assert.NotNull(dbContext3
-            .Entities
-            .SingleOrDefault(entity => entity.Id == expectedId));
+        Assert.NotNull(dbContext3.Entities.SingleOrDefault(entity => entity.Id == expectedId));
     }
 
     private void AssertNoEntitiesInAnyDbContexts()
@@ -307,20 +309,18 @@ public abstract class DbContextTransactionExtensionsTests
         public int Id { get; set; }
     }
 
-    internal class TestDbContext1(
-        DbContextOptions<TestDbContext1> options) : DbContext(options)
+    internal class TestDbContext1(DbContextOptions<TestDbContext1> options) : DbContext(options)
     {
         public DbSet<TestEntity> Entities { get; init; } = null!;
     }
 
-    internal class TestDbContext2(
-        DbContextOptions<TestDbContext2> options) : DbContext(options)
+    internal class TestDbContext2(DbContextOptions<TestDbContext2> options) : DbContext(options)
     {
         public DbSet<TestEntity> Entities { get; init; } = null!;
     }
 
-    internal class TestDbContext3WithoutRetry(
-        DbContextOptions<TestDbContext3WithoutRetry> options) : DbContext(options)
+    internal class TestDbContext3WithoutRetry(DbContextOptions<TestDbContext3WithoutRetry> options)
+        : DbContext(options)
     {
         public DbSet<TestEntity> Entities { get; init; } = null!;
     }
@@ -328,15 +328,17 @@ public abstract class DbContextTransactionExtensionsTests
     private class SimulateFailureException : Exception;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class DbContextTransactionExtensionsTestFixture :
-        IAsyncLifetime
+    public class DbContextTransactionExtensionsTestFixture : IAsyncLifetime
     {
-        public readonly PostgreSqlContainer[] PostgreSqlContainers =
-            Enumerable.Range(0, 3).Select(_ => new PostgreSqlBuilder()
+        public readonly PostgreSqlContainer[] PostgreSqlContainers = Enumerable
+            .Range(0, 3)
+            .Select(_ =>
+                new PostgreSqlBuilder()
                     .WithImage("postgres:16.1-alpine")
                     .WithCommand("-c", "max_prepared_transactions=100")
-                    .Build())
-                .ToArray();
+                    .Build()
+            )
+            .ToArray();
 
         /// <summary>
         /// Add prepared transaction support to the PostgreSQL containers so that a shared transaction
@@ -345,38 +347,46 @@ public abstract class DbContextTransactionExtensionsTests
         /// Create an "Entities" table in each database for Entity Framework to read and write to.
         /// </summary>
         public async Task InitializeAsync() =>
-            await Task.WhenAll(PostgreSqlContainers.Select(async container =>
-            {
-                await container.StartAsync();
-                await container.ExecScriptAsync("""CREATE TABLE IF NOT EXISTS "Entities" ("Id" int PRIMARY KEY)""");
-                return Task.CompletedTask;
-            }));
+            await Task.WhenAll(
+                PostgreSqlContainers.Select(async container =>
+                {
+                    await container.StartAsync();
+                    await container.ExecScriptAsync(
+                        """CREATE TABLE IF NOT EXISTS "Entities" ("Id" int PRIMARY KEY)"""
+                    );
+                    return Task.CompletedTask;
+                })
+            );
 
         public async Task DisposeAsync() =>
-            await Task.WhenAll(PostgreSqlContainers.Select(async container =>
-                await container.DisposeAsync()));
+            await Task.WhenAll(
+                PostgreSqlContainers.Select(async container => await container.DisposeAsync())
+            );
     }
 
     private async Task WriteToAllDbContexts(int id = 1)
     {
         var dbContext1 = _testApp.Services.GetRequiredService<TestDbContext1>();
         var dbContext2 = _testApp.Services.GetRequiredService<TestDbContext2>();
-        var dbContext3WithoutRetry = _testApp.Services.GetRequiredService<TestDbContext3WithoutRetry>();
-        await dbContext1.Entities.AddAsync(new TestEntity {Id = id});
+        var dbContext3WithoutRetry =
+            _testApp.Services.GetRequiredService<TestDbContext3WithoutRetry>();
+        await dbContext1.Entities.AddAsync(new TestEntity { Id = id });
         await dbContext1.SaveChangesAsync();
-        await dbContext2.Entities.AddAsync(new TestEntity {Id = id});
+        await dbContext2.Entities.AddAsync(new TestEntity { Id = id });
         await dbContext2.SaveChangesAsync();
-        await dbContext3WithoutRetry.Entities.AddAsync(new TestEntity {Id = id});
+        await dbContext3WithoutRetry.Entities.AddAsync(new TestEntity { Id = id });
         await dbContext3WithoutRetry.SaveChangesAsync();
     }
 
-    private async Task ClearTestData<TDbContext>() where TDbContext : DbContext
+    private async Task ClearTestData<TDbContext>()
+        where TDbContext : DbContext
     {
         var context = _testApp.GetDbContext<TDbContext, TestStartup>();
         await context.ClearTestData();
     }
 
-    private TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext
+    private TDbContext GetDbContext<TDbContext>()
+        where TDbContext : DbContext
     {
         return _testApp.GetDbContext<TDbContext, TestStartup>();
     }

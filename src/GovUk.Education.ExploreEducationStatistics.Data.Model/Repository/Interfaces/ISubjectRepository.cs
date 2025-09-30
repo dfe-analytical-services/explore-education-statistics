@@ -3,6 +3,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
 public interface ISubjectRepository
 {
-    Task<Guid?> FindPublicationIdForSubject(Guid subjectId,
-        CancellationToken cancellationToken = default);
+    Task<Guid?> FindPublicationIdForSubject(
+        Guid subjectId,
+        CancellationToken cancellationToken = default
+    );
 }

@@ -18,25 +18,22 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
 {
     public class PublishTaxonomyTests(
         PublisherFunctionsIntegrationTestFixture fixture,
-        CacheServiceTestFixture cacheFixture)
-        : PublishTaxonomyFunctionTests(fixture), IClassFixture<CacheServiceTestFixture>
+        CacheServiceTestFixture cacheFixture
+    ) : PublishTaxonomyFunctionTests(fixture), IClassFixture<CacheServiceTestFixture>
     {
         [Fact]
         public async Task MethodologyTree()
         {
             var theme = DataFixture.DefaultTheme().Generate();
 
-            var publication = DataFixture
-                .DefaultPublication()
-                .WithTheme(theme)
-                .Generate();
+            var publication = DataFixture.DefaultPublication().WithTheme(theme).Generate();
 
             var methodology = DataFixture
                 .DefaultMethodology()
-                .WithMethodologyVersions(DataFixture
-                    .DefaultMethodologyVersion()
-                    .Generate(1))
-                .FinishWith(methodology => methodology.LatestPublishedVersion = methodology.Versions[0])
+                .WithMethodologyVersions(DataFixture.DefaultMethodologyVersion().Generate(1))
+                .FinishWith(methodology =>
+                    methodology.LatestPublishedVersion = methodology.Versions[0]
+                )
                 .WithOwningPublication(publication)
                 .Generate();
 
@@ -63,22 +60,30 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
                                 {
                                     Id = methodology.Versions[0].Id,
                                     Title = methodology.Versions[0].Title,
-                                    Slug = methodology.Versions[0].Slug
-                                }
-                            ]
-                        }
-                    ]
-                }
+                                    Slug = methodology.Versions[0].Slug,
+                                },
+                            ],
+                        },
+                    ],
+                },
             ];
 
-            cacheFixture.PublicBlobCacheService
-                .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(),
-                    ItIs.DeepEqualTo(expectedMethodologyTree)))
+            cacheFixture
+                .PublicBlobCacheService.Setup(s =>
+                    s.SetItemAsync<object>(
+                        new AllMethodologiesCacheKey(),
+                        ItIs.DeepEqualTo(expectedMethodologyTree)
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
-            cacheFixture.PublicBlobCacheService
-                .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(),
-                    new List<PublicationTreeThemeViewModel>()))
+            cacheFixture
+                .PublicBlobCacheService.Setup(s =>
+                    s.SetItemAsync<object>(
+                        new PublicationTreeCacheKey(),
+                        new List<PublicationTreeThemeViewModel>()
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             var function = GetRequiredService<PublishTaxonomyFunction>();

@@ -28,33 +28,33 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
     public static readonly TheoryData<IDataSetQueryLocation[]> ValidLocationsMultiple = new()
     {
-         new IDataSetQueryLocation[]
-         {
-             new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
-             new DataSetQueryLocationCode { Level = "NAT", Code = "E92000001" },
-         },
-         new IDataSetQueryLocation[]
-         {
-             new DataSetQueryLocationId { Level = "REG", Id = "12345" },
-             new DataSetQueryLocationCode { Level = "REG", Code = "E12000003" },
-         },
-         new IDataSetQueryLocation[]
-         {
-             new DataSetQueryLocationId { Level = "LA", Id = "12345" },
-             new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" },
-             new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "373" },
-         },
-         new IDataSetQueryLocation[]
-         {
-             new DataSetQueryLocationId { Level = "SCH", Id = "12345" },
-             new DataSetQueryLocationSchoolUrn { Urn = "107029" },
-             new DataSetQueryLocationSchoolLaEstab { LaEstab = "3732060" },
-         },
-         new IDataSetQueryLocation[]
-         {
-             new DataSetQueryLocationId { Level = "PROV", Id = "12345" },
-             new DataSetQueryLocationProviderUkprn { Ukprn = "10066874" },
-         }
+        new IDataSetQueryLocation[]
+        {
+            new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
+            new DataSetQueryLocationCode { Level = "NAT", Code = "E92000001" },
+        },
+        new IDataSetQueryLocation[]
+        {
+            new DataSetQueryLocationId { Level = "REG", Id = "12345" },
+            new DataSetQueryLocationCode { Level = "REG", Code = "E12000003" },
+        },
+        new IDataSetQueryLocation[]
+        {
+            new DataSetQueryLocationId { Level = "LA", Id = "12345" },
+            new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" },
+            new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "373" },
+        },
+        new IDataSetQueryLocation[]
+        {
+            new DataSetQueryLocationId { Level = "SCH", Id = "12345" },
+            new DataSetQueryLocationSchoolUrn { Urn = "107029" },
+            new DataSetQueryLocationSchoolLaEstab { LaEstab = "3732060" },
+        },
+        new IDataSetQueryLocation[]
+        {
+            new DataSetQueryLocationId { Level = "PROV", Id = "12345" },
+            new DataSetQueryLocationProviderUkprn { Ukprn = "10066874" },
+        },
     };
 
     public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationsSingle = new()
@@ -119,8 +119,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("Eq", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("Eq", error.PropertyName));
         }
     }
 
@@ -145,8 +144,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("NotEq", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("NotEq", error.PropertyName));
         }
     }
 
@@ -171,10 +169,10 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
             Assert.True(
                 result.Errors.Count >= locations.Length,
-                "Must have at least as many errors as locations");
+                "Must have at least as many errors as locations"
+            );
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("In", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("In", error.PropertyName));
         }
 
         [Fact]
@@ -184,7 +182,8 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.In)
+            result
+                .ShouldHaveValidationErrorFor(q => q.In)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
@@ -210,10 +209,10 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
             Assert.True(
                 result.Errors.Count >= locations.Length,
-                "Must have at least as many errors as locations");
+                "Must have at least as many errors as locations"
+            );
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("NotIn", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("NotIn", error.PropertyName));
         }
 
         [Fact]
@@ -223,7 +222,8 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
@@ -246,7 +246,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
                 Eq = new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
                 NotEq = null,
                 In = [new DataSetQueryLocationCode { Level = "REG", Code = "12345" }],
-                NotIn = []
+                NotIn = [],
             };
 
             var result = _validator.TestValidate(query);
@@ -257,7 +257,8 @@ public class DataSetQueryCriteriaLocationsValidatorTests
             result.ShouldNotHaveValidationErrorFor(q => q.In);
             result.ShouldNotHaveValidationErrorFor(q => q.NotEq);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
+            result
+                .ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }

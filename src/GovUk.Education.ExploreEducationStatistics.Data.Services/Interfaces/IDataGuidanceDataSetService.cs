@@ -7,10 +7,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
 public interface IDataGuidanceDataSetService
 {
-    Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(Guid releaseVersionId,
+    Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(
+        Guid releaseVersionId,
         IList<Guid>? dataFileIds = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    Task<List<string>> ListGeographicLevels(Guid subjectId,
-        CancellationToken cancellationToken = default);
+    Task<List<string>> ListGeographicLevels(
+        Guid subjectId,
+        CancellationToken cancellationToken = default
+    );
 }

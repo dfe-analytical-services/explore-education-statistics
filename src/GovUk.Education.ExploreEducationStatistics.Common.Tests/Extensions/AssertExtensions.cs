@@ -24,7 +24,8 @@ public static class AssertExtensions
         this T actual,
         T expected,
         bool ignoreCollectionOrders = false,
-        Expression<Func<T, object?>>[]? ignoreProperties = null)
+        Expression<Func<T, object?>>[]? ignoreProperties = null
+    )
     {
         var compareLogic = new CompareLogic();
         ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
@@ -38,7 +39,8 @@ public static class AssertExtensions
     public static bool IsDeepEqualTo<T>(
         this T actual,
         T expected,
-        Expression<Func<T, object>>[]? ignoreProperties = null)
+        Expression<Func<T, object>>[]? ignoreProperties = null
+    )
     {
         var compareLogic = new CompareLogic();
         ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
@@ -67,15 +69,25 @@ public static class AssertExtensions
     /// <summary>
     /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
     /// </summary>
-    public static void AssertUtcNow(this DateTimeOffset dateTimeOffset, int withinMillis = TimeWithinMillis)
+    public static void AssertUtcNow(
+        this DateTimeOffset dateTimeOffset,
+        int withinMillis = TimeWithinMillis
+    )
     {
-        Assert.Equal(DateTimeOffset.UtcNow, dateTimeOffset, TimeSpan.FromMilliseconds(withinMillis));
+        Assert.Equal(
+            DateTimeOffset.UtcNow,
+            dateTimeOffset,
+            TimeSpan.FromMilliseconds(withinMillis)
+        );
     }
 
     /// <summary>
     /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
     /// </summary>
-    public static void AssertUtcNow(this DateTimeOffset? dateTimeOffset, int withinMillis = TimeWithinMillis)
+    public static void AssertUtcNow(
+        this DateTimeOffset? dateTimeOffset,
+        int withinMillis = TimeWithinMillis
+    )
     {
         Assert.NotNull(dateTimeOffset);
         dateTimeOffset.Value.AssertUtcNow(withinMillis: withinMillis);
@@ -87,7 +99,8 @@ public static class AssertExtensions
     public static void AssertEqual(
         this DateTime dateTime,
         DateTime expectedDateTime,
-        int withinMillis = TimeWithinMillis)
+        int withinMillis = TimeWithinMillis
+    )
     {
         Assert.Equal(expectedDateTime, dateTime, TimeSpan.FromMilliseconds(withinMillis));
     }
@@ -98,9 +111,14 @@ public static class AssertExtensions
     public static void AssertEqual(
         this DateTimeOffset dateTimeOffset,
         DateTimeOffset expectedDateTimeOffset,
-        int withinMillis = TimeWithinMillis)
+        int withinMillis = TimeWithinMillis
+    )
     {
-        Assert.Equal(expectedDateTimeOffset, dateTimeOffset, TimeSpan.FromMilliseconds(withinMillis));
+        Assert.Equal(
+            expectedDateTimeOffset,
+            dateTimeOffset,
+            TimeSpan.FromMilliseconds(withinMillis)
+        );
     }
 
     /// <summary>
@@ -108,11 +126,15 @@ public static class AssertExtensions
     /// </summary>
     /// <param name="expectedDateTimeOffset">the expected timestamp.</param>
     public static void AssertEqual(
-        this DateTimeOffset? dateTimeOffset, 
-        DateTimeOffset expectedDateTimeOffset, 
-        int withinMillis = TimeWithinMillis)
+        this DateTimeOffset? dateTimeOffset,
+        DateTimeOffset expectedDateTimeOffset,
+        int withinMillis = TimeWithinMillis
+    )
     {
         Assert.NotNull(dateTimeOffset);
-        dateTimeOffset.Value.AssertEqual(expectedDateTimeOffset: expectedDateTimeOffset, withinMillis: withinMillis);
+        dateTimeOffset.Value.AssertEqual(
+            expectedDateTimeOffset: expectedDateTimeOffset,
+            withinMillis: withinMillis
+        );
     }
 }

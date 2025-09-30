@@ -19,27 +19,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public static class HostBuilderExtension
 {
-    public static IHost BuildHost(this IHostBuilder hostBuilder) => hostBuilder
-        .ConfigureFunctionsWebApplication()
-        .ConfigureAppConfiguration(
-            (context, configurationBuilder) =>
-                configurationBuilder
-                    // When running in Azure, the default path from which it attempts to load appsettings.Production.json is wrong.
-                    // context.HostingEnvironment.ContentRootPath = "/azure-functions-host"
-                    // However, the file resides in the current directory, "/home/site/wwwroot".
-                    // See: https://stackoverflow.com/questions/78119200/appsettings-for-azurefunction-on-net-8-isolated
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile(
-                        "appsettings.json", 
-                        optional:false, 
-                        reloadOnChange:false)
-                    .AddJsonFile(
-                        $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                        optional:false,
-                        reloadOnChange:false)
-                    .AddEnvironmentVariables())
-        .ConfigureHostServices()
-        .Build();
+    public static IHost BuildHost(this IHostBuilder hostBuilder) =>
+        hostBuilder
+            .ConfigureFunctionsWebApplication()
+            .ConfigureAppConfiguration(
+                (context, configurationBuilder) =>
+                    configurationBuilder
+                        // When running in Azure, the default path from which it attempts to load appsettings.Production.json is wrong.
+                        // context.HostingEnvironment.ContentRootPath = "/azure-functions-host"
+                        // However, the file resides in the current directory, "/home/site/wwwroot".
+                        // See: https://stackoverflow.com/questions/78119200/appsettings-for-azurefunction-on-net-8-isolated
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                        .AddJsonFile(
+                            $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
+                            optional: false,
+                            reloadOnChange: false
+                        )
+                        .AddEnvironmentVariables()
+            )
+            .ConfigureHostServices()
+            .Build();
 
     public static IHostBuilder InitialiseSerilog(this IHostBuilder hostBuilder)
     {
@@ -51,7 +51,7 @@ public static class HostBuilderExtension
             // See https://github.com/serilog/serilog-aspnetcore#two-stage-initialization
             .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
-        
+
         return hostBuilder;
     }
 
@@ -62,8 +62,12 @@ public static class HostBuilderExtension
                     .ConfigureLogging(context.Configuration)
                     // Config
                     .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
-                    .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
-                    .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
+                    .Configure<ContentApiOptions>(
+                        context.Configuration.GetSection(ContentApiOptions.Section)
+                    )
+                    .Configure<AzureSearchOptions>(
+                        context.Configuration.GetSection(AzureSearchOptions.Section)
+                    )
                     // Services
                     .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
                     .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
@@ -75,27 +79,38 @@ public static class HostBuilderExtension
                     .AddHealthChecks()
                     // Clients
                     .AddTransient<ISearchIndexerClient, SearchIndexerClient>()
-                    .AddTransient<IAzureSearchIndexerClientFactory, AzureSearchIndexerClientFactory>()
+                    .AddTransient<
+                        IAzureSearchIndexerClientFactory,
+                        AzureSearchIndexerClientFactory
+                    >()
                     .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
-                    .AddAzureClientsInline(
-                        clientBuilder =>
-                        {
-                            clientBuilder.AddClient<BlobServiceClient, BlobClientOptions>(
-                                (_, _, serviceProvider) =>
-                                {
-                                    var appOptions = serviceProvider.GetRequiredService<IOptions<AppOptions>>().Value;
-                                    return new BlobServiceClient(appOptions.SearchStorageConnectionString);
-                                });
-                            clientBuilder.UseCredential(new DefaultAzureCredential());
-                        })
+                    .AddAzureClientsInline(clientBuilder =>
+                    {
+                        clientBuilder.AddClient<BlobServiceClient, BlobClientOptions>(
+                            (_, _, serviceProvider) =>
+                            {
+                                var appOptions = serviceProvider
+                                    .GetRequiredService<IOptions<AppOptions>>()
+                                    .Value;
+                                return new BlobServiceClient(
+                                    appOptions.SearchStorageConnectionString
+                                );
+                            }
+                        );
+                        clientBuilder.UseCredential(new DefaultAzureCredential());
+                    })
                     .AddHttpClient<IContentApiClient, ContentApiClient>(
                         (provider, httpClient) =>
                         {
-                            var options = provider.GetRequiredService<IOptions<ContentApiOptions>>().Value;
+                            var options = provider
+                                .GetRequiredService<IOptions<ContentApiOptions>>()
+                                .Value;
                             httpClient.BaseAddress = new Uri(options.Url);
                             httpClient.DefaultRequestHeaders.Add(
                                 HeaderNames.UserAgent,
-                                "EES Content Search Function App");
-                        })
+                                "EES Content Search Function App"
+                            );
+                        }
+                    )
         );
 }

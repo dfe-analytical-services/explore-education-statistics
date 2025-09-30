@@ -5,14 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 public static class LocationRscRegionOptionMetaGeneratorExtensions
 {
     public static Generator<LocationRscRegionOptionMeta> DefaultLocationRscRegionOptionMeta(
-        this DataFixture fixture)
-        => fixture.Generator<LocationRscRegionOptionMeta>().WithDefaults();
+        this DataFixture fixture
+    ) => fixture.Generator<LocationRscRegionOptionMeta>().WithDefaults();
 
     public static Generator<LocationRscRegionOptionMeta> WithDefaults(
-        this Generator<LocationRscRegionOptionMeta> generator)
-        => generator.ForInstance(s => s.SetDefaults());
+        this Generator<LocationRscRegionOptionMeta> generator
+    ) => generator.ForInstance(s => s.SetDefaults());
 
     public static InstanceSetters<LocationRscRegionOptionMeta> SetDefaults(
-        this InstanceSetters<LocationRscRegionOptionMeta> setters)
-        => setters.SetBaseDefaults();
+        this InstanceSetters<LocationRscRegionOptionMeta> setters
+    ) => setters.SetBaseDefaults();
 }

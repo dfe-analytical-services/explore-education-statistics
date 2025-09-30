@@ -12,7 +12,9 @@ public static class ValidationUtils
         return Common.Validators.ValidationUtils.ValidationResult(message);
     }
 
-    public static BadRequestObjectResult ValidationActionResult(IEnumerable<ValidationErrorMessages> messages)
+    public static BadRequestObjectResult ValidationActionResult(
+        IEnumerable<ValidationErrorMessages> messages
+    )
     {
         return Common.Validators.ValidationUtils.ValidationResult(messages);
     }
@@ -27,12 +29,15 @@ public static class ValidationUtils
         return actionResult is NotFoundResult;
     }
 
-    public static bool HasValidationError(ActionResult actionResult, ValidationErrorMessages validationMessage)
+    public static bool HasValidationError(
+        ActionResult actionResult,
+        ValidationErrorMessages validationMessage
+    )
     {
         var badRequest = actionResult as BadRequestObjectResult;
         var validationProblem = badRequest?.Value as ValidationProblemViewModel;
         var validationErrors = validationProblem?.Errors;
         return validationErrors != null
-               && validationErrors.Any(error => error.Code == validationMessage.ToString());
+            && validationErrors.Any(error => error.Code == validationMessage.ToString());
     }
 }

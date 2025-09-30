@@ -31,7 +31,9 @@ public class FileValidatorServiceTests
         var file = CreateFormFileMock("test.csv").Object;
 
         var (service, _) = BuildService();
-        await Assert.ThrowsAsync<ArgumentException>(() => service.ValidateFileForUpload(file, FileType.Data));
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            service.ValidateFileForUpload(file, FileType.Data)
+        );
     }
 
     [Fact]
@@ -68,10 +70,9 @@ public class FileValidatorServiceTests
         result.AssertBadRequest(FileTypeInvalid);
     }
 
-    private static (
-        FileValidatorService,
-        Mock<IFileTypeService> fileTypeService)
-        BuildService(Mock<IFileTypeService>? fileTypeService = null)
+    private static (FileValidatorService, Mock<IFileTypeService> fileTypeService) BuildService(
+        Mock<IFileTypeService>? fileTypeService = null
+    )
     {
         fileTypeService ??= new Mock<IFileTypeService>(Strict);
         var service = new FileValidatorService(fileTypeService.Object);

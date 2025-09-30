@@ -8,7 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public static class DbUtils
 {
-    public static ContentDbContext InMemoryApplicationDbContext(string dbName, bool updateTimestamps = true)
+    public static ContentDbContext InMemoryApplicationDbContext(
+        string dbName,
+        bool updateTimestamps = true
+    )
     {
         return InMemoryContentDbContext(dbName, updateTimestamps);
     }
@@ -18,7 +21,10 @@ public static class DbUtils
         return InMemoryContentDbContext(updateTimestamps);
     }
 
-    public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName, bool updateTimestamps = true)
+    public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(
+        string dbName,
+        bool updateTimestamps = true
+    )
     {
         var builder = new DbContextOptionsBuilder<UsersAndRolesDbContext>();
         builder.UseInMemoryDatabase(databaseName: dbName, b => b.EnableNullChecks(false));

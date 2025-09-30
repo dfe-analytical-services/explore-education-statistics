@@ -18,14 +18,17 @@ public class CacheKeyService : ICacheKeyService
         _contentPersistenceHelper = contentPersistenceHelper;
     }
 
-    public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
-        Guid releaseVersionId,
-        Guid dataBlockVersionId)
+    public async Task<
+        Either<ActionResult, DataBlockTableResultCacheKey>
+    > CreateCacheKeyForDataBlock(Guid releaseVersionId, Guid dataBlockVersionId)
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<DataBlockVersion>(query => query
-                .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockVersionId
-                                           && dataBlockVersion.ReleaseVersionId == releaseVersionId))
+            .CheckEntityExists<DataBlockVersion>(query =>
+                query.Where(dataBlockVersion =>
+                    dataBlockVersion.Id == dataBlockVersionId
+                    && dataBlockVersion.ReleaseVersionId == releaseVersionId
+                )
+            )
             .OnSuccess(dataBlockVersion => new DataBlockTableResultCacheKey(dataBlockVersion));
     }
 }

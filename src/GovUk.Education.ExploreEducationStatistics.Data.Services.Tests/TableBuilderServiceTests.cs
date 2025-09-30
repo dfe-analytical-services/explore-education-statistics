@@ -43,16 +43,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var indicator1Id = Guid.NewGuid();
         var indicator2Id = Guid.NewGuid();
@@ -68,17 +68,19 @@ public class TableBuilderServiceTests
                 Location = new Location
                 {
                     Id = location1Id,
-                    GeographicLevel = GeographicLevel.Country
+                    GeographicLevel = GeographicLevel.Country,
                 },
                 Measures = new Dictionary<Guid, string>
                 {
                     { indicator1Id, "123" },
                     { indicator2Id, "456" },
                 },
-                FilterItems = ListOf(new ObservationFilterItem
-                {
-                    FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid())
-                }),
+                FilterItems = ListOf(
+                    new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid()),
+                    }
+                ),
                 Year = 2019,
                 TimeIdentifier = AcademicYear,
             },
@@ -88,16 +90,15 @@ public class TableBuilderServiceTests
                 Location = new Location
                 {
                     Id = location2Id,
-                    GeographicLevel = GeographicLevel.Institution
+                    GeographicLevel = GeographicLevel.Institution,
                 },
-                Measures = new Dictionary<Guid, string>
-                {
-                    { indicator1Id, "678" },
-                },
-                FilterItems = ListOf(new ObservationFilterItem
-                {
-                    FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid())
-                }),
+                Measures = new Dictionary<Guid, string> { { indicator1Id, "678" } },
+                FilterItems = ListOf(
+                    new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid()),
+                    }
+                ),
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
             },
@@ -107,7 +108,7 @@ public class TableBuilderServiceTests
                 Location = new Location
                 {
                     Id = location3Id,
-                    GeographicLevel = GeographicLevel.Provider
+                    GeographicLevel = GeographicLevel.Provider,
                 },
                 Measures = new Dictionary<Guid, string>
                 {
@@ -115,24 +116,20 @@ public class TableBuilderServiceTests
                     { Guid.NewGuid(), "1123" },
                     { Guid.NewGuid(), "1456" },
                 },
-                FilterItems = ListOf(new ObservationFilterItem
-                {
-                    FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid())
-                }),
+                FilterItems = ListOf(
+                    new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid()),
+                    }
+                ),
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
-            }
+            },
         };
 
         var subjectMeta = new SubjectResultMetaViewModel
         {
-            Indicators = new List<IndicatorMetaViewModel>
-            {
-                new()
-                {
-                    Label = "Test indicator"
-                }
-            }
+            Indicators = new List<IndicatorMetaViewModel> { new() { Label = "Test indicator" } },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -165,7 +162,7 @@ public class TableBuilderServiceTests
                     StartCode = AcademicYear,
                     EndYear = 2020,
                     EndCode = AcademicYear,
-                }
+                },
             };
 
             var observationService = new Mock<IObservationService>(Strict);
@@ -177,12 +174,8 @@ public class TableBuilderServiceTests
             var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
             subjectResultMetaService
-                .Setup(
-                    s => s.GetSubjectMeta(
-                        releaseVersion.Id,
-                        query,
-                        It.IsAny<IList<Observation>>()
-                    )
+                .Setup(s =>
+                    s.GetSubjectMeta(releaseVersion.Id, query, It.IsAny<IList<Observation>>())
                 )
                 .ReturnsAsync(subjectMeta);
 
@@ -195,10 +188,7 @@ public class TableBuilderServiceTests
 
             var result = await service.Query(query);
 
-            VerifyAllMocks(
-                observationService,
-                subjectResultMetaService
-            );
+            VerifyAllMocks(observationService, subjectResultMetaService);
 
             var observationResults = result.AssertRight().Results.ToList();
 
@@ -238,16 +228,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -263,7 +253,10 @@ public class TableBuilderServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
+            var service = BuildTableBuilderService(
+                statisticsDbContext,
+                contentDbContext: contentDbContext
+            );
 
             var query = new FullTableQuery
             {
@@ -284,17 +277,17 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         // Set up a ReleaseSubject that references a non-existent publication
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(Guid.NewGuid()));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(Guid.NewGuid())
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -310,12 +303,12 @@ public class TableBuilderServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
+            var service = BuildTableBuilderService(
+                statisticsDbContext,
+                contentDbContext: contentDbContext
+            );
 
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-            };
+            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
             var result = await service.Query(query);
 
@@ -329,8 +322,7 @@ public class TableBuilderServiceTests
         // Set up a ReleaseSubject that references a non-existent release version
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion());
+            .WithReleaseVersion(_fixture.DefaultStatsReleaseVersion());
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -343,13 +335,13 @@ public class TableBuilderServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
+            var service = BuildTableBuilderService(
+                statisticsDbContext,
+                contentDbContext: contentDbContext
+            );
 
             // SubjectId exists, but no Content.Model.Release
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-            };
+            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
             var result = await service.Query(query);
 
@@ -364,16 +356,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -400,29 +392,32 @@ public class TableBuilderServiceTests
                     StartYear = 2019,
                     StartCode = AcademicYear,
                     EndYear = 2020,
-                    EndCode = AcademicYear
-                }
+                    EndCode = AcademicYear,
+                },
             };
 
             var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
             filterItemRepository
                 .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
-                .ReturnsAsync(new Dictionary<Guid, int>
-                {
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
                     {
-                        // For the purpose of calculating the potential table size,
-                        // treat all the Filter Items as belonging to the same Filter
-                        Guid.NewGuid(), query.GetFilterItemIds().Count()
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
                     }
-                });
+                );
 
             var options = new TableBuilderOptions
             {
                 // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                 // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                 // Configure a maximum table size limit lower than 8.
-                MaxTableCellsAllowed = 7
+                MaxTableCellsAllowed = 7,
             };
 
             var service = BuildTableBuilderService(
@@ -447,16 +442,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var indicator1Id = Guid.NewGuid();
         var indicator2Id = Guid.NewGuid();
@@ -472,17 +467,19 @@ public class TableBuilderServiceTests
                 Location = new Location
                 {
                     Id = location1Id,
-                    GeographicLevel = GeographicLevel.Country
+                    GeographicLevel = GeographicLevel.Country,
                 },
                 Measures = new Dictionary<Guid, string>
                 {
                     { indicator1Id, "123" },
                     { indicator2Id, "456" },
                 },
-                FilterItems = ListOf(new ObservationFilterItem
-                {
-                    FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid())
-                }),
+                FilterItems = ListOf(
+                    new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid()),
+                    }
+                ),
                 Year = 2019,
                 TimeIdentifier = AcademicYear,
             },
@@ -492,16 +489,15 @@ public class TableBuilderServiceTests
                 Location = new Location
                 {
                     Id = location2Id,
-                    GeographicLevel = GeographicLevel.Institution
+                    GeographicLevel = GeographicLevel.Institution,
                 },
-                Measures = new Dictionary<Guid, string>
-                {
-                    { indicator1Id, "678" },
-                },
-                FilterItems = ListOf(new ObservationFilterItem
-                {
-                    FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid())
-                }),
+                Measures = new Dictionary<Guid, string> { { indicator1Id, "678" } },
+                FilterItems = ListOf(
+                    new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid()),
+                    }
+                ),
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
             },
@@ -511,7 +507,7 @@ public class TableBuilderServiceTests
                 Location = new Location
                 {
                     Id = location3Id,
-                    GeographicLevel = GeographicLevel.Provider
+                    GeographicLevel = GeographicLevel.Provider,
                 },
                 Measures = new Dictionary<Guid, string>
                 {
@@ -519,24 +515,20 @@ public class TableBuilderServiceTests
                     { Guid.NewGuid(), "1123" },
                     { Guid.NewGuid(), "1456" },
                 },
-                FilterItems = ListOf(new ObservationFilterItem
-                {
-                    FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid())
-                }),
+                FilterItems = ListOf(
+                    new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid()),
+                    }
+                ),
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
-            }
+            },
         };
 
         var subjectMeta = new SubjectResultMetaViewModel
         {
-            Indicators = new List<IndicatorMetaViewModel>
-            {
-                new()
-                {
-                    Label = "Test indicator"
-                }
-            }
+            Indicators = new List<IndicatorMetaViewModel> { new() { Label = "Test indicator" } },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -560,7 +552,7 @@ public class TableBuilderServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = new[] { indicator1Id, indicator2Id, },
+                Indicators = new[] { indicator1Id, indicator2Id },
                 LocationIds = ListOf(location1Id, location2Id, location3Id),
                 TimePeriod = new TimePeriodQuery
                 {
@@ -568,7 +560,7 @@ public class TableBuilderServiceTests
                     StartCode = AcademicYear,
                     EndYear = 2020,
                     EndCode = AcademicYear,
-                }
+                },
             };
 
             var observationService = new Mock<IObservationService>(Strict);
@@ -580,8 +572,8 @@ public class TableBuilderServiceTests
             var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
             subjectResultMetaService
-                .Setup(
-                    s => s.GetSubjectMeta(
+                .Setup(s =>
+                    s.GetSubjectMeta(
                         releaseSubject.ReleaseVersionId,
                         query,
                         It.IsAny<IList<Observation>>()
@@ -637,16 +629,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -663,15 +655,10 @@ public class TableBuilderServiceTests
         {
             var service = BuildTableBuilderService(statisticsDbContext);
 
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId
-            };
+            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
             // Query using a non-existent release version id
-            var result = await service.Query(
-                releaseVersionId: Guid.NewGuid(),
-                query);
+            var result = await service.Query(releaseVersionId: Guid.NewGuid(), query);
 
             result.AssertNotFound();
         }
@@ -684,16 +671,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -716,9 +703,7 @@ public class TableBuilderServiceTests
                 SubjectId = Guid.NewGuid(),
             };
 
-            var result = await service.Query(
-                releaseVersionId: releaseVersion.Id,
-                query);
+            var result = await service.Query(releaseVersionId: releaseVersion.Id, query);
 
             result.AssertNotFound();
         }
@@ -731,16 +716,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -766,30 +751,32 @@ public class TableBuilderServiceTests
                     StartYear = 2019,
                     StartCode = AcademicYear,
                     EndYear = 2020,
-                    EndCode = AcademicYear
-                }
+                    EndCode = AcademicYear,
+                },
             };
 
             var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
             filterItemRepository
-                .Setup(s => s.CountFilterItemsByFilter(
-                    query.GetFilterItemIds()))
-                .ReturnsAsync(new Dictionary<Guid, int>
-                {
+                .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
                     {
-                        // For the purpose of calculating the potential table size,
-                        // treat all the Filter Items as belonging to the same Filter
-                        Guid.NewGuid(), query.GetFilterItemIds().Count()
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
                     }
-                });
+                );
 
             var options = new TableBuilderOptions
             {
                 // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                 // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                 // Configure a maximum table size limit lower than 8.
-                MaxTableCellsAllowed = 7
+                MaxTableCellsAllowed = 7,
             };
 
             var service = BuildTableBuilderService(
@@ -800,7 +787,8 @@ public class TableBuilderServiceTests
 
             var result = await service.Query(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
-                query);
+                query
+            );
 
             VerifyAllMocks(filterItemRepository);
 
@@ -815,90 +803,121 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var filters = _fixture.DefaultFilter()
-            .ForIndex(0, s =>
-                s.SetGroupCsvColumn("filter_0_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(setters => setters.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(1, s =>
-                s.SetGroupCsvColumn("filter_1_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(setters => setters.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(2, s =>
-                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
-                    .Generate(1)))
-            .GenerateList();
-
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
-
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
-
-        var filter2Items = filters[2].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
-
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, i => i
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
+        var filters = _fixture
+            .DefaultFilter()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetGroupCsvColumn("filter_0_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(setters =>
+                                    setters.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
             )
-            .ForIndex(1, i => i
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+            .ForIndex(
+                1,
+                s =>
+                    s.SetGroupCsvColumn("filter_1_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(setters =>
+                                    setters.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                2,
+                s => s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1))
             )
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForRange(2..4, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var filter2Items = filters[2].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, i => i.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, i => i.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var observations = _fixture.DefaultObservation()
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
+
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..4,
+                l =>
+                    l.SetPresetRegionAndLocalAuthority()
+                        .SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
+            .GenerateList();
+
+        var observations = _fixture
+            .DefaultObservation()
             .WithMeasures(indicators)
-            .ForRange(..2, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                .SetLocation(locations[0])
-                .SetTimePeriod(2022, AcademicYear))
-            .ForRange(2..4, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                .SetLocation(locations[1])
-                .SetTimePeriod(2022, AcademicYear))
-            .ForRange(4..6, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                .SetLocation(locations[2])
-                .SetTimePeriod(2023, AcademicYear))
-            .ForRange(6..8, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                .SetLocation(locations[3])
-                .SetTimePeriod(2023, AcademicYear))
+            .ForRange(
+                ..2,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[0])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                2..4,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[1])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                4..6,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[2])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
+            .ForRange(
+                6..8,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[3])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
             .GenerateList();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(publication.Releases[0].Versions[0].Id)
-                .WithPublicationId(publication.Id))
-            .WithSubject(_fixture.DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(publication.Releases[0].Versions[0].Id)
+                    .WithPublicationId(publication.Id)
+            )
+            .WithSubject(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(filters)
+                    .WithIndicatorGroups(indicatorGroups)
+                    .WithObservations(observations)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -929,7 +948,7 @@ public class TableBuilderServiceTests
                     StartCode = AcademicYear,
                     EndYear = 2023,
                     EndCode = AcademicYear,
-                }
+                },
             };
 
             var observationService = new Mock<IObservationService>(Strict);
@@ -941,7 +960,8 @@ public class TableBuilderServiceTests
             var subjectCsvMeta = new SubjectCsvMetaViewModel
             {
                 Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
-                    filter0Items.Concat(filter1Items).Concat(filter2Items)),
+                    filter0Items.Concat(filter1Items).Concat(filter2Items)
+                ),
                 Indicators = indicators
                     .Select(i => new IndicatorCsvMetaViewModel(i))
                     .ToDictionary(i => i.Name),
@@ -965,18 +985,19 @@ public class TableBuilderServiceTests
                     filters[2].Name,
                     indicators[0].Name,
                     indicators[1].Name,
-                    indicators[2].Name
-                }
+                    indicators[2].Name,
+                },
             };
 
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             subjectCsvMetaService
-                .Setup(
-                    s => s.GetSubjectCsvMeta(
+                .Setup(s =>
+                    s.GetSubjectCsvMeta(
                         It.Is<ReleaseSubject>(rs =>
                             rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                            && rs.SubjectId == releaseSubject.SubjectId),
+                            && rs.SubjectId == releaseSubject.SubjectId
+                        ),
                         query,
                         It.IsAny<IList<Observation>>(),
                         default
@@ -1011,8 +1032,7 @@ public class TableBuilderServiceTests
         // Set up a ReleaseSubject that references a non-existent release
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion());
+            .WithReleaseVersion(_fixture.DefaultStatsReleaseVersion());
 
         var contextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -1030,10 +1050,7 @@ public class TableBuilderServiceTests
             );
 
             // SubjectId exists, but no Content.Model.Release
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-            };
+            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
             using var stream = new MemoryStream();
 
@@ -1050,16 +1067,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -1078,10 +1095,7 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
             // SubjectId does not exist
-            var query = new FullTableQuery
-            {
-                SubjectId = Guid.NewGuid(),
-            };
+            var query = new FullTableQuery { SubjectId = Guid.NewGuid() };
 
             using var stream = new MemoryStream();
 
@@ -1098,16 +1112,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -1134,29 +1148,32 @@ public class TableBuilderServiceTests
                     StartYear = 2019,
                     StartCode = AcademicYear,
                     EndYear = 2020,
-                    EndCode = AcademicYear
-                }
+                    EndCode = AcademicYear,
+                },
             };
 
             var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
             filterItemRepository
                 .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
-                .ReturnsAsync(new Dictionary<Guid, int>
-                {
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
                     {
-                        // For the purpose of calculating the potential table size,
-                        // treat all the Filter Items as belonging to the same Filter
-                        Guid.NewGuid(), query.GetFilterItemIds().Count()
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
                     }
-                });
+                );
 
             var options = new TableBuilderOptions
             {
                 // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                 // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                 // Configure a maximum table size limit lower than 8.
-                MaxTableCellsAllowed = 7
+                MaxTableCellsAllowed = 7,
             };
 
             var service = BuildTableBuilderService(
@@ -1183,82 +1200,104 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        var filters = _fixture.DefaultFilter()
-            .ForIndex(0, s =>
-                s.SetGroupCsvColumn("filter_0_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(setters => setters.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(1, s =>
-                s.SetGroupCsvColumn("filter_1_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(setters => setters.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(2, s =>
-                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
-                    .Generate(1)))
+        var filters = _fixture
+            .DefaultFilter()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetGroupCsvColumn("filter_0_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(setters =>
+                                    setters.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetGroupCsvColumn("filter_1_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(setters =>
+                                    setters.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                2,
+                s => s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1))
+            )
             .GenerateList();
 
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter2Items = filters[2].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter2Items = filters[2].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, i => i
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
-            )
-            .ForIndex(1, i => i
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
-            )
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, i => i.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, i => i.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var locations = _fixture.DefaultLocation()
+        var locations = _fixture
+            .DefaultLocation()
             .WithPresetRegion()
             .WithGeographicLevel(GeographicLevel.Region)
             .GenerateList(2);
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithMeasures(indicators)
-            .ForRange(..2, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                .SetLocation(locations[0])
-                .SetTimePeriod(2022, AcademicYear))
-            .ForRange(2..4, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                .SetLocation(locations[1])
-                .SetTimePeriod(2023, AcademicYear))
+            .ForRange(
+                ..2,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[0])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                2..4,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[1])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
             .GenerateList();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id))
-            .WithSubject(_fixture.DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            )
+            .WithSubject(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(filters)
+                    .WithIndicatorGroups(indicatorGroups)
+                    .WithObservations(observations)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -1289,7 +1328,7 @@ public class TableBuilderServiceTests
                     StartCode = AcademicYear,
                     EndYear = 2023,
                     EndCode = AcademicYear,
-                }
+                },
             };
 
             var observationService = new Mock<IObservationService>(Strict);
@@ -1301,7 +1340,8 @@ public class TableBuilderServiceTests
             var subjectCsvMeta = new SubjectCsvMetaViewModel
             {
                 Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
-                    filter0Items.Concat(filter1Items).Concat(filter2Items)),
+                    filter0Items.Concat(filter1Items).Concat(filter2Items)
+                ),
                 Indicators = indicators
                     .Select(i => new IndicatorCsvMetaViewModel(i))
                     .ToDictionary(i => i.Name),
@@ -1322,18 +1362,19 @@ public class TableBuilderServiceTests
                     filters[2].Name,
                     indicators[0].Name,
                     indicators[1].Name,
-                    indicators[2].Name
-                }
+                    indicators[2].Name,
+                },
             };
 
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             subjectCsvMetaService
-                .Setup(
-                    s => s.GetSubjectCsvMeta(
+                .Setup(s =>
+                    s.GetSubjectCsvMeta(
                         It.Is<ReleaseSubject>(rs =>
                             rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                            && rs.SubjectId == releaseSubject.SubjectId),
+                            && rs.SubjectId == releaseSubject.SubjectId
+                        ),
                         query,
                         It.IsAny<IList<Observation>>(),
                         default
@@ -1350,7 +1391,11 @@ public class TableBuilderServiceTests
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(
+                releaseSubject.ReleaseVersionId,
+                query,
+                stream
+            );
 
             VerifyAllMocks(observationService, subjectCsvMetaService);
 
@@ -1369,39 +1414,37 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id))
-            .WithSubject(_fixture
-                .DefaultSubject());
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            )
+            .WithSubject(_fixture.DefaultSubject());
 
-        var indicators = _fixture.DefaultIndicator()
+        var indicators = _fixture
+            .DefaultIndicator()
             .WithIndicatorGroup(
-                _fixture.DefaultIndicatorGroup()
-                    .WithSubject(releaseSubject.Subject))
+                _fixture.DefaultIndicatorGroup().WithSubject(releaseSubject.Subject)
+            )
             .GenerateList(3);
 
-        var locations = _fixture.DefaultLocation()
+        var locations = _fixture
+            .DefaultLocation()
             .WithPresetRegion()
             .WithGeographicLevel(GeographicLevel.Region)
             .GenerateList(2);
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithSubject(releaseSubject.Subject)
             .WithMeasures(indicators)
-            .ForRange(..2, o => o
-                .SetLocation(locations[0])
-                .SetTimePeriod(2022, AcademicYear))
-            .ForRange(2..4, o => o
-                .SetLocation(locations[1])
-                .SetTimePeriod(2022, AcademicYear))
+            .ForRange(..2, o => o.SetLocation(locations[0]).SetTimePeriod(2022, AcademicYear))
+            .ForRange(2..4, o => o.SetLocation(locations[1]).SetTimePeriod(2022, AcademicYear))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1433,7 +1476,7 @@ public class TableBuilderServiceTests
                     StartCode = AcademicYear,
                     EndYear = 2023,
                     EndCode = AcademicYear,
-                }
+                },
             };
 
             var observationService = new Mock<IObservationService>(Strict);
@@ -1458,18 +1501,19 @@ public class TableBuilderServiceTests
                     "region_code",
                     "region_name",
                     indicators[0].Name,
-                    indicators[1].Name
-                }
+                    indicators[1].Name,
+                },
             };
 
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             subjectCsvMetaService
-                .Setup(
-                    s => s.GetSubjectCsvMeta(
+                .Setup(s =>
+                    s.GetSubjectCsvMeta(
                         It.Is<ReleaseSubject>(rs =>
                             rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                            && rs.SubjectId == releaseSubject.SubjectId),
+                            && rs.SubjectId == releaseSubject.SubjectId
+                        ),
                         query,
                         It.IsAny<IList<Observation>>(),
                         default
@@ -1486,7 +1530,11 @@ public class TableBuilderServiceTests
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(
+                releaseSubject.ReleaseVersionId,
+                query,
+                stream
+            );
 
             VerifyAllMocks(observationService, subjectCsvMetaService);
 
@@ -1505,16 +1553,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -1532,10 +1580,7 @@ public class TableBuilderServiceTests
         {
             var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-            };
+            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
             using var stream = new MemoryStream();
 
@@ -1543,7 +1588,8 @@ public class TableBuilderServiceTests
             var result = await service.QueryToCsvStream(
                 releaseVersionId: Guid.NewGuid(),
                 query,
-                stream);
+                stream
+            );
 
             result.AssertNotFound();
         }
@@ -1556,16 +1602,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -1584,14 +1630,15 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
             // SubjectId does not exist
-            var query = new FullTableQuery
-            {
-                SubjectId = Guid.NewGuid(),
-            };
+            var query = new FullTableQuery { SubjectId = Guid.NewGuid() };
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(
+                releaseSubject.ReleaseVersionId,
+                query,
+                stream
+            );
 
             result.AssertNotFound();
         }
@@ -1604,16 +1651,16 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication
-            .Releases.Single()
-            .Versions.Single();
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         ReleaseSubject releaseSubject = _fixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id));
+            .WithReleaseVersion(
+                _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id)
+            );
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -1639,29 +1686,32 @@ public class TableBuilderServiceTests
                     StartYear = 2019,
                     StartCode = AcademicYear,
                     EndYear = 2020,
-                    EndCode = AcademicYear
-                }
+                    EndCode = AcademicYear,
+                },
             };
 
             var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
             filterItemRepository
                 .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
-                .ReturnsAsync(new Dictionary<Guid, int>
-                {
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
                     {
-                        // For the purpose of calculating the potential table size,
-                        // treat all the Filter Items as belonging to the same Filter
-                        Guid.NewGuid(), query.GetFilterItemIds().Count()
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
                     }
-                });
+                );
 
             var options = new TableBuilderOptions
             {
                 // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                 // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                 // Configure a maximum table size limit lower than 8.
-                MaxTableCellsAllowed = 7
+                MaxTableCellsAllowed = 7,
             }.ToOptionsWrapper();
 
             var service = BuildTableBuilderService(
@@ -1672,7 +1722,11 @@ public class TableBuilderServiceTests
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(
+                releaseSubject.ReleaseVersionId,
+                query,
+                stream
+            );
 
             VerifyAllMocks(filterItemRepository);
 
@@ -1694,7 +1748,7 @@ public class TableBuilderServiceTests
                 { GeographicLevel.LocalAuthority, ["Region"] },
                 { GeographicLevel.LocalAuthorityDistrict, ["Region"] },
                 { GeographicLevel.School, ["LocalAuthority"] },
-            }
+            },
         }.ToOptionsWrapper();
     }
 
@@ -1710,7 +1764,8 @@ public class TableBuilderServiceTests
         ISubjectRepository? subjectRepository = null,
         IUserService? userService = null,
         IOptions<TableBuilderOptions>? tableBuilderOptions = null,
-        IOptions<LocationsOptions>? locationsOptions = null)
+        IOptions<LocationsOptions>? locationsOptions = null
+    )
     {
         return new(
             statisticsDbContext,
@@ -1718,7 +1773,8 @@ public class TableBuilderServiceTests
             filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
             locationService ?? Mock.Of<ILocationService>(Strict),
             observationService ?? Mock.Of<IObservationService>(Strict),
-            statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
+            statisticsPersistenceHelper
+                ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
             subjectRepository ?? new SubjectRepository(statisticsDbContext),

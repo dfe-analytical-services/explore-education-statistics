@@ -5,18 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 public record ThemeChangedEvent : IEvent
 {
-    public ThemeChangedEvent(
-        Guid themeId,
-        string themeTitle,
-        string themeSummary,
-        string themeSlug)
+    public ThemeChangedEvent(Guid themeId, string themeTitle, string themeSummary, string themeSlug)
     {
         Subject = themeId.ToString();
         Payload = new EventPayload
         {
             Title = themeTitle,
             Summary = themeSummary,
-            Slug = themeSlug
+            Slug = themeSlug,
         };
     }
 

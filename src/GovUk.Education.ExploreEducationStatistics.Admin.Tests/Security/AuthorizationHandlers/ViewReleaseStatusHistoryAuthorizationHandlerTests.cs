@@ -22,11 +22,10 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         [Fact]
         public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseStatusHistoryRequirement>(
-                CreateHandler,
-                new ReleaseVersion(),
-                AccessAllReleases
-            );
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                ViewReleaseStatusHistoryRequirement
+            >(CreateHandler, new ReleaseVersion(), AccessAllReleases);
         }
     }
 
@@ -58,16 +57,22 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         }
     }
 
-    private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(
+        ContentDbContext contentDbContext
+    )
     {
         return new ViewReleaseStatusHistoryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: new UserReleaseRoleRepository(
                     contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                ),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                    contentDbContext: contentDbContext
+                ),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

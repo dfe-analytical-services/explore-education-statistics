@@ -9,5 +9,6 @@ public interface IEmailService
     Either<ActionResult, Unit> SendEmail(
         string email,
         string templateId,
-        Dictionary<string, dynamic> values);
+        Dictionary<string, dynamic> values
+    );
 }

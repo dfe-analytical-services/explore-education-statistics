@@ -30,12 +30,16 @@ public class ReplacementBatchServiceTests
 
         var replacementService = new Mock<IReplacementService>(Strict);
 
-        replacementService.Setup(mock => mock.Replace(
-                releaseVersion.Id, originalFileValid1Id, It.IsAny<CancellationToken>()))
+        replacementService
+            .Setup(mock =>
+                mock.Replace(releaseVersion.Id, originalFileValid1Id, It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(Unit.Instance);
 
-        replacementService.Setup(mock => mock.Replace(
-                releaseVersion.Id, originalFileValid2Id, It.IsAny<CancellationToken>()))
+        replacementService
+            .Setup(mock =>
+                mock.Replace(releaseVersion.Id, originalFileValid2Id, It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(Unit.Instance);
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -49,11 +53,13 @@ public class ReplacementBatchServiceTests
         {
             var replacementBatchService = BuildReplacementBatchService(
                 contentDbContext,
-                replacementService.Object);
+                replacementService.Object
+            );
 
             var result = await replacementBatchService.Replace(
                 releaseVersionId: releaseVersion.Id,
-                originalFileIds: [originalFileValid1Id, originalFileValid2Id]);
+                originalFileIds: [originalFileValid1Id, originalFileValid2Id]
+            );
 
             result.AssertRight();
 
@@ -70,11 +76,13 @@ public class ReplacementBatchServiceTests
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
         var replacementBatchService = BuildReplacementBatchService(
             contentDbContext,
-            replacementService.Object);
+            replacementService.Object
+        );
 
         var result = await replacementBatchService.Replace(
             releaseVersionId: Guid.NewGuid(), // releaseVersion does not exist
-            originalFileIds: [Guid.NewGuid()]);
+            originalFileIds: [Guid.NewGuid()]
+        );
 
         result.AssertNotFound();
 
@@ -93,20 +101,40 @@ public class ReplacementBatchServiceTests
 
         var replacementService = new Mock<IReplacementService>(Strict);
 
-        replacementService.Setup(mock => mock.Replace(
-                releaseVersion.Id, originalFileValidId, It.IsAny<CancellationToken>()))
+        replacementService
+            .Setup(mock =>
+                mock.Replace(releaseVersion.Id, originalFileValidId, It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(Unit.Instance);
 
-        replacementService.Setup(mock => mock.Replace(
-                releaseVersion.Id, originalFileNotFoundId, It.IsAny<CancellationToken>()))
+        replacementService
+            .Setup(mock =>
+                mock.Replace(
+                    releaseVersion.Id,
+                    originalFileNotFoundId,
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new NotFoundResult());
 
-        replacementService.Setup(mock => mock.Replace(
-                releaseVersion.Id, originalFileInvalidId, It.IsAny<CancellationToken>()))
+        replacementService
+            .Setup(mock =>
+                mock.Replace(
+                    releaseVersion.Id,
+                    originalFileInvalidId,
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(ValidationUtils.ValidationActionResult(ReplacementMustBeValid));
 
-        replacementService.Setup(mock => mock.Replace(
-                releaseVersion.Id, originalFileImportNotCompleteId, It.IsAny<CancellationToken>()))
+        replacementService
+            .Setup(mock =>
+                mock.Replace(
+                    releaseVersion.Id,
+                    originalFileImportNotCompleteId,
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(ValidationUtils.ValidationActionResult(ReplacementImportMustBeComplete));
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -120,20 +148,32 @@ public class ReplacementBatchServiceTests
         {
             var replacementBatchService = BuildReplacementBatchService(
                 contentDbContext,
-                replacementService.Object);
+                replacementService.Object
+            );
 
             var result = await replacementBatchService.Replace(
                 releaseVersionId: releaseVersion.Id,
-                originalFileIds: [originalFileValidId, originalFileInvalidId, originalFileNotFoundId, originalFileImportNotCompleteId]);
+                originalFileIds:
+                [
+                    originalFileValidId,
+                    originalFileInvalidId,
+                    originalFileNotFoundId,
+                    originalFileImportNotCompleteId,
+                ]
+            );
 
             // The valid replacement completes, but we still return errors for the invalid and not found
             // replacements as in normal usage the user should never see one of these errors.
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-            validationProblem.AssertHasErrors([
-                ValidationMessages.GenerateErrorReplacementNotFound(originalFileNotFoundId),
-                ValidationMessages.GenerateErrorReplacementMustBeValid(originalFileInvalidId),
-                ValidationMessages.GenerateErrorReplacementImportMustBeComplete(originalFileImportNotCompleteId),
-            ]);
+            validationProblem.AssertHasErrors(
+                [
+                    ValidationMessages.GenerateErrorReplacementNotFound(originalFileNotFoundId),
+                    ValidationMessages.GenerateErrorReplacementMustBeValid(originalFileInvalidId),
+                    ValidationMessages.GenerateErrorReplacementImportMustBeComplete(
+                        originalFileImportNotCompleteId
+                    ),
+                ]
+            );
 
             VerifyAllMocks(replacementService);
         }

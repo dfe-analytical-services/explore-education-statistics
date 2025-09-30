@@ -27,7 +27,8 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
         await _postgreSqlContainer.DisposeAsync();
     }
 
-    public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
+    public async Task ClearTestData<TDbContext>()
+        where TDbContext : DbContext
     {
         var context = GetDbContext<TDbContext>();
         await context.ClearTestData();
@@ -35,25 +36,24 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
 
     protected override IHostBuilder CreateHostBuilder()
     {
-        return base
-            .CreateHostBuilder()
+        return base.CreateHostBuilder()
             .ConfigureServices(services =>
             {
                 services
                     .UseInMemoryDbContext<ContentDbContext>()
                     .UseInMemoryDbContext<StatisticsDbContext>()
-                    .AddDbContext<PublicDataDbContext>(
-                        options =>
-                        {
-                            options.UseNpgsql(
-                                _postgreSqlContainer.GetConnectionString());
-                        });
+                    .AddDbContext<PublicDataDbContext>(options =>
+                    {
+                        options.UseNpgsql(_postgreSqlContainer.GetConnectionString());
+                    });
 
-                using var serviceScope = services.BuildServiceProvider()
+                using var serviceScope = services
+                    .BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
                     .CreateScope();
 
-                using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
+                using var context =
+                    serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
                 context.Database.Migrate();
             });
     }

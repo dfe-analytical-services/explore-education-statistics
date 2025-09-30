@@ -20,14 +20,20 @@ public class DateTimeFormatValidator : ValidationAttribute
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        var stringValue = (string) value;
+        var stringValue = (string)value;
 
-        if (stringValue == null || stringValue == "") {
+        if (stringValue == null || stringValue == "")
+        {
             return ValidationResult.Success;
         }
 
-        return DateTime.TryParseExact(stringValue, "yyyy-MM-dd", CultureInfo.InvariantCulture,
-            DateTimeStyles.None, out _)
+        return DateTime.TryParseExact(
+            stringValue,
+            "yyyy-MM-dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out _
+        )
             ? ValidationResult.Success
             : new ValidationResult(GetErrorMessage());
     }

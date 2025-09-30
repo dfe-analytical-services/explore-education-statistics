@@ -39,15 +39,17 @@ public static class GeographicLevelUtilTests
 
         public static IEnumerable<object[]> GeographicLevelColumns()
         {
-            return EnumUtil.GetEnums<GeographicLevel>()
-                .SelectMany(
-                    level =>
+            return EnumUtil
+                .GetEnums<GeographicLevel>()
+                .SelectMany(level =>
+                {
+                    var columns = new List<string>(level.CsvCodeColumns())
                     {
-                        var columns = new List<string>(level.CsvCodeColumns()) { level.CsvNameColumn() };
+                        level.CsvNameColumn(),
+                    };
 
-                        return columns.Select(column => new object[] { column, level });
-                    }
-                );
+                    return columns.Select(column => new object[] { column, level });
+                });
         }
     }
 }

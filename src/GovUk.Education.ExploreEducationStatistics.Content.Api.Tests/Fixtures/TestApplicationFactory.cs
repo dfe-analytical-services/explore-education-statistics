@@ -30,21 +30,26 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
 
     protected override IHostBuilder CreateHostBuilder()
     {
-        return base
-            .CreateHostBuilder()
-            .ConfigureAppConfiguration((_, builder) =>
-            {
-                var configuration = new ConfigurationBuilder();
-
-                _additionalAppsettingsFiles.ForEach(settingsFile =>
+        return base.CreateHostBuilder()
+            .ConfigureAppConfiguration(
+                (_, builder) =>
                 {
-                    configuration.AddJsonFile(
-                        Path.Combine(Assembly.GetExecutingAssembly().GetDirectoryPath(),
-                            settingsFile), optional: false);
-                });
+                    var configuration = new ConfigurationBuilder();
 
-                builder.AddConfiguration(configuration.Build());
-            })
+                    _additionalAppsettingsFiles.ForEach(settingsFile =>
+                    {
+                        configuration.AddJsonFile(
+                            Path.Combine(
+                                Assembly.GetExecutingAssembly().GetDirectoryPath(),
+                                settingsFile
+                            ),
+                            optional: false
+                        );
+                    });
+
+                    builder.AddConfiguration(configuration.Build());
+                }
+            )
             .ConfigureServices(services =>
             {
                 services

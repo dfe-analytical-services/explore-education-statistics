@@ -3,8 +3,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class CollectionExtensions
 {
-    public static void AddRange<T>(this ICollection<T> source, params T[] items)
-        => source.AddRange(items.ToList());
+    public static void AddRange<T>(this ICollection<T> source, params T[] items) =>
+        source.AddRange(items.ToList());
 
     public static void AddRange<T>(this ICollection<T> source, IEnumerable<T> items)
     {
@@ -16,5 +16,6 @@ public static class CollectionExtensions
 
     public static int LastIndex<T>(this ICollection<T> source) => source.Count - 1;
 
-    public static bool IsLastIndex<T>(this ICollection<T> source, int index) => index == source.LastIndex();
+    public static bool IsLastIndex<T>(this ICollection<T> source, int index) =>
+        index == source.LastIndex();
 }

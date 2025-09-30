@@ -10,8 +10,7 @@ public static class LoggerConfigurationExtensions
     /// <summary>
     /// Initializes the Serilog <paramref name="logger"/> with default configuration.
     /// </summary>
-    public static LoggerConfiguration ConfigureBootstrapLogger(
-        this LoggerConfiguration logger) =>
+    public static LoggerConfiguration ConfigureBootstrapLogger(this LoggerConfiguration logger) =>
         logger
             // default log level settings from ASP.NET Core Visual Studio template (appsettings.json)
             .MinimumLevel.Debug()
@@ -24,10 +23,8 @@ public static class LoggerConfigurationExtensions
 
     public static LoggerConfiguration ConfigureSerilogLogger(
         this LoggerConfiguration logger,
-        IConfiguration configuration) =>
-        logger
-            .AddEnrichers()
-            .ReadFrom.Configuration(configuration);
+        IConfiguration configuration
+    ) => logger.AddEnrichers().ReadFrom.Configuration(configuration);
 
     private static LoggerConfiguration AddEnrichers(this LoggerConfiguration loggerConfiguration) =>
         // To simply the config, specify the common enrichers here.

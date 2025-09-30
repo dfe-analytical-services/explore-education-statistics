@@ -13,82 +13,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [ApiController]
 [Authorize(Roles = GlobalRoles.RoleNames.BauUser)]
 public class EducationInNumbersContentController(
-    IEducationInNumbersContentService einContentService) : ControllerBase
+    IEducationInNumbersContentService einContentService
+) : ControllerBase
 {
     [HttpGet("education-in-numbers/{pageId:guid}/content")]
-    public async Task<ActionResult<EinContentViewModel>> GetPageContent(
-        [FromRoute] Guid pageId)
+    public async Task<ActionResult<EinContentViewModel>> GetPageContent([FromRoute] Guid pageId)
     {
-        return await einContentService.GetPageContent(pageId)
-            .HandleFailuresOrOk();
+        return await einContentService.GetPageContent(pageId).HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers/{pageId:guid}/content/sections/add")]
     public async Task<ActionResult<EinContentSectionViewModel>> AddSection(
         [FromRoute] Guid pageId,
-        [FromBody] EinContentSectionAddRequest request)
+        [FromBody] EinContentSectionAddRequest request
+    )
     {
-        return await einContentService.AddSection(pageId, request.Order)
-            .HandleFailuresOrOk();
+        return await einContentService.AddSection(pageId, request.Order).HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/heading")]
     public async Task<ActionResult<EinContentSectionViewModel>> UpdateSectionHeading(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromBody] EinContentSectionUpdateHeadingRequest request)
+        [FromBody] EinContentSectionUpdateHeadingRequest request
+    )
     {
-        return await einContentService.UpdateSectionHeading(pageId, sectionId, request.Heading)
+        return await einContentService
+            .UpdateSectionHeading(pageId, sectionId, request.Heading)
             .HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/{pageId:guid}/content/sections/order")]
     public async Task<ActionResult<List<EinContentSectionViewModel>>> UpdatePageSectionOrder(
         [FromRoute] Guid pageId,
-        [FromBody] List<Guid> order)
+        [FromBody] List<Guid> order
+    )
     {
-        return await einContentService.ReorderSections(pageId, order)
-            .HandleFailuresOrOk();
+        return await einContentService.ReorderSections(pageId, order).HandleFailuresOrOk();
     }
 
     [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}")]
     public async Task<ActionResult<List<EinContentSectionViewModel>>> DeleteSection(
         [FromRoute] Guid pageId,
-        [FromRoute] Guid sectionId)
+        [FromRoute] Guid sectionId
+    )
     {
-        return await einContentService.DeleteSection(pageId, sectionId)
-            .HandleFailuresOrOk();
+        return await einContentService.DeleteSection(pageId, sectionId).HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/blocks/add")]
     public async Task<ActionResult<EinContentBlockViewModel>> AddBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromBody] EinContentBlockAddRequest request)
+        [FromBody] EinContentBlockAddRequest request
+    )
     {
-        return await einContentService.AddBlock(pageId, sectionId, request.Type, request.Order)
+        return await einContentService
+            .AddBlock(pageId, sectionId, request.Type, request.Order)
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}/html")]
+    [HttpPut(
+        "education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}/html"
+    )]
     public async Task<ActionResult<EinContentBlockViewModel>> UpdateHtmlBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromRoute] Guid blockId,
-        [FromBody] EinHtmlBlockUpdateRequest request)
+        [FromBody] EinHtmlBlockUpdateRequest request
+    )
     {
-        return await einContentService.UpdateHtmlBlock(pageId, sectionId, blockId, request)
+        return await einContentService
+            .UpdateHtmlBlock(pageId, sectionId, blockId, request)
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}/tile-group")]
+    [HttpPut(
+        "education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}/tile-group"
+    )]
     public async Task<ActionResult<EinContentBlockViewModel>> UpdateTileGroupBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
         [FromRoute] Guid blockId,
-        [FromBody] EinTileGroupBlockUpdateRequest request)
+        [FromBody] EinTileGroupBlockUpdateRequest request
+    )
     {
-        return await einContentService.UpdateTileGroupBlock(pageId, sectionId, blockId, request)
+        return await einContentService
+            .UpdateTileGroupBlock(pageId, sectionId, blockId, request)
             .HandleFailuresOrOk();
     }
 
@@ -96,30 +107,35 @@ public class EducationInNumbersContentController(
     public async Task<ActionResult<List<EinContentBlockViewModel>>> ReorderBlocks(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromBody] List<Guid> order)
+        [FromBody] List<Guid> order
+    )
     {
-        return await einContentService.ReorderBlocks(pageId, sectionId, order)
-            .HandleFailuresOrOk();
+        return await einContentService.ReorderBlocks(pageId, sectionId, order).HandleFailuresOrOk();
     }
 
-    [HttpDelete("education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}")]
+    [HttpDelete(
+        "education-in-numbers/{pageId:guid}/content/section/{sectionId:guid}/block/{blockId:guid}"
+    )]
     public async Task<ActionResult> DeleteBlock(
         [FromRoute] Guid pageId,
         [FromRoute] Guid sectionId,
-        [FromRoute] Guid blockId)
+        [FromRoute] Guid blockId
+    )
     {
-        return await einContentService.DeleteBlock(pageId, sectionId, blockId)
+        return await einContentService
+            .DeleteBlock(pageId, sectionId, blockId)
             .HandleFailuresOrNoContent();
     }
-
 
     [HttpPost("education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tiles/add")]
     public async Task<ActionResult<EinTileViewModel>> AddTile(
         [FromRoute] Guid pageId,
         [FromRoute] Guid blockId,
-        [FromBody] EinTileAddRequest request)
+        [FromBody] EinTileAddRequest request
+    )
     {
-        return await einContentService.AddTile(pageId, blockId, request.Type, request.Order)
+        return await einContentService
+            .AddTile(pageId, blockId, request.Type, request.Order)
             .HandleFailuresOrOk();
     }
 
@@ -127,9 +143,11 @@ public class EducationInNumbersContentController(
     public async Task<ActionResult<EinTileViewModel>> UpdateFreeTextStatTile(
         [FromRoute] Guid pageId,
         [FromRoute] Guid tileId,
-        [FromBody] EinFreeTextStatTileUpdateRequest request)
+        [FromBody] EinFreeTextStatTileUpdateRequest request
+    )
     {
-        return await einContentService.UpdateFreeTextStatTile(pageId, tileId, request)
+        return await einContentService
+            .UpdateFreeTextStatTile(pageId, tileId, request)
             .HandleFailuresOrOk();
     }
 
@@ -137,19 +155,23 @@ public class EducationInNumbersContentController(
     public async Task<ActionResult<List<EinTileViewModel>>> ReorderTiles(
         [FromRoute] Guid pageId,
         [FromRoute] Guid blockId,
-        [FromBody] List<Guid> order)
+        [FromBody] List<Guid> order
+    )
     {
-        return await einContentService.ReorderTiles(pageId, blockId, order)
-            .HandleFailuresOrOk();
+        return await einContentService.ReorderTiles(pageId, blockId, order).HandleFailuresOrOk();
     }
 
-    [HttpDelete("education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tile/{tileId:guid}")]
+    [HttpDelete(
+        "education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tile/{tileId:guid}"
+    )]
     public async Task<ActionResult> DeleteTile(
         [FromRoute] Guid pageId,
         [FromRoute] Guid blockId,
-        [FromRoute] Guid tileId)
+        [FromRoute] Guid tileId
+    )
     {
-        return await einContentService.DeleteTile(pageId, blockId, tileId)
+        return await einContentService
+            .DeleteTile(pageId, blockId, tileId)
             .HandleFailuresOrNoContent();
     }
 }

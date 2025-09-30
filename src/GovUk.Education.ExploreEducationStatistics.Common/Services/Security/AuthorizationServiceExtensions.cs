@@ -7,17 +7,17 @@ public static class AuthorizationServiceExtensions
 {
     public static async Task<bool> MatchesPolicy(
         this IAuthorizationService authorizationService,
-        ClaimsPrincipal user, 
+        ClaimsPrincipal user,
         Enum policy
     )
     {
         var result = await authorizationService.AuthorizeAsync(user, policy.ToString());
         return result.Succeeded;
     }
-    
+
     public static async Task<bool> MatchesPolicy(
         this IAuthorizationService authorizationService,
-        ClaimsPrincipal user, 
+        ClaimsPrincipal user,
         object resource,
         Enum policy
     )

@@ -35,18 +35,12 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
             {
                 new(2020, AcademicYear),
                 new(2021, AcademicYear),
-            }
+            },
         },
         Results = new List<ObservationViewModel>
         {
-            new()
-            {
-                TimePeriod = "2020_AY"
-            },
-            new()
-            {
-                TimePeriod = "2021_AY"
-            }
+            new() { TimePeriod = "2020_AY" },
+            new() { TimePeriod = "2021_AY" },
         },
     };
 
@@ -62,10 +56,12 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersionId(ReleaseVersionId)
-                .WithQuery(FullTableQueryRequest.AsFullTableQuery()))
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersionId(ReleaseVersionId)
+                    .WithQuery(FullTableQueryRequest.AsFullTableQuery())
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -75,12 +71,16 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
 
         var controller = BuildController(
             dataBlockService: dataBlockService.Object,
-            tableBuilderService: tableBuilderService.Object);
+            tableBuilderService: tableBuilderService.Object
+        );
 
         BlobCacheService
-            .Setup(s => s.GetItemAsync(
-                ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
-                typeof(TableBuilderResultViewModel)))
+            .Setup(s =>
+                s.GetItemAsync(
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
+                    typeof(TableBuilderResultViewModel)
+                )
+            )
             .ReturnsAsync(null!);
 
         dataBlockService
@@ -88,27 +88,29 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
             .ReturnsAsync(dataBlockVersion);
 
         tableBuilderService
-            .Setup(
-                s =>
-                    s.Query(
-                        ReleaseVersionId,
-                        It.Is<FullTableQuery>(
-                            q => q.SubjectId == FullTableQueryRequest.SubjectId
-                        ),
-                        cancellationToken
-                    )
+            .Setup(s =>
+                s.Query(
+                    ReleaseVersionId,
+                    It.Is<FullTableQuery>(q => q.SubjectId == FullTableQueryRequest.SubjectId),
+                    cancellationToken
+                )
             )
             .ReturnsAsync(TableBuilderResults);
 
         BlobCacheService
-            .Setup(s => s.SetItemAsync<object>(
-                ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
-                TableBuilderResults))
+            .Setup(s =>
+                s.SetItemAsync<object>(
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
+                    TableBuilderResults
+                )
+            )
             .Returns(Task.CompletedTask);
 
-        var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId,
+        var result = await controller.QueryForDataBlock(
+            releaseVersionId: ReleaseVersionId,
             dataBlockVersion.Id,
-            cancellationToken);
+            cancellationToken
+        );
         VerifyAllMocks(dataBlockService, tableBuilderService);
 
         result.AssertOkResult(TableBuilderResults);
@@ -127,7 +129,8 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
 
         var result = await controller.QueryForDataBlock(
             releaseVersionId: ReleaseVersionId,
-            dataBlockParentId: DataBlockId);
+            dataBlockParentId: DataBlockId
+        );
         VerifyAllMocks(dataBlockService);
 
         result.AssertNotFoundResult();
@@ -136,13 +139,16 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
     [Fact]
     public void TableBuilderResultViewModel_SerializeAndDeserialize()
     {
-        var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(TableBuilderResults));
+        var converted = DeserializeObject<TableBuilderResultViewModel>(
+            SerializeObject(TableBuilderResults)
+        );
         converted.AssertDeepEqualTo(TableBuilderResults);
     }
 
     private static TableBuilderController BuildController(
         ITableBuilderService? tableBuilderService = null,
-        IDataBlockService? dataBlockService = null)
+        IDataBlockService? dataBlockService = null
+    )
     {
         return new TableBuilderController(
             tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict),

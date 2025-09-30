@@ -6,31 +6,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
 public class DataImportStatusExtensionTests
 {
-    private static readonly List<DataImportStatus> ExpectedFinishedStatuses = new List<DataImportStatus>
-    {
-        COMPLETE,
-        FAILED,
-        NOT_FOUND,
-        CANCELLED
-    };
+    private static readonly List<DataImportStatus> ExpectedFinishedStatuses =
+        new List<DataImportStatus> { COMPLETE, FAILED, NOT_FOUND, CANCELLED };
 
-    private static readonly List<DataImportStatus> ExpectedAbortingStatuses = new List<DataImportStatus>
-    {
-        CANCELLING
-    };
+    private static readonly List<DataImportStatus> ExpectedAbortingStatuses =
+        new List<DataImportStatus> { CANCELLING };
 
     [Fact]
     public void FinishedAndAbortingStatuses()
     {
-        EnumUtil.GetEnums<DataImportStatus>().ForEach(importStatus =>
-        {
-            var expectingToBeFinished = ExpectedFinishedStatuses.Contains(importStatus);
-            var expectingToBeAborting = ExpectedAbortingStatuses.Contains(importStatus);
+        EnumUtil
+            .GetEnums<DataImportStatus>()
+            .ForEach(importStatus =>
+            {
+                var expectingToBeFinished = ExpectedFinishedStatuses.Contains(importStatus);
+                var expectingToBeAborting = ExpectedAbortingStatuses.Contains(importStatus);
 
-            Assert.Equal(expectingToBeFinished, importStatus.IsFinished());
-            Assert.Equal(expectingToBeAborting, importStatus.IsAborting());
-            Assert.Equal(expectingToBeFinished || expectingToBeAborting, importStatus.IsFinishedOrAborting());
-        });
+                Assert.Equal(expectingToBeFinished, importStatus.IsFinished());
+                Assert.Equal(expectingToBeAborting, importStatus.IsAborting());
+                Assert.Equal(
+                    expectingToBeFinished || expectingToBeAborting,
+                    importStatus.IsFinishedOrAborting()
+                );
+            });
     }
 
     [Fact]
@@ -42,12 +40,16 @@ public class DataImportStatusExtensionTests
     [Fact]
     public void NoOtherAbortingFinishStates()
     {
-        EnumUtil.GetEnums<DataImportStatus>().ForEach(status =>
-        {
-            if (status != CANCELLING)
+        EnumUtil
+            .GetEnums<DataImportStatus>()
+            .ForEach(status =>
             {
-                Assert.Throws<ArgumentOutOfRangeException>(() => status.GetFinishingStateOfAbortProcess());
-            }
-        });
+                if (status != CANCELLING)
+                {
+                    Assert.Throws<ArgumentOutOfRangeException>(() =>
+                        status.GetFinishingStateOfAbortProcess()
+                    );
+                }
+            });
     }
 }

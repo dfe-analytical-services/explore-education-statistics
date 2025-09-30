@@ -25,10 +25,17 @@ public class DataSetFilesController : ControllerBase
     }
 
     [HttpGet("data-set-files")]
-    [MemoryCache(typeof(ListDataSetFilesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
+    [MemoryCache(
+        typeof(ListDataSetFilesCacheKey),
+        durationInSeconds: 10,
+        expiryScheduleCron: HalfHourlyExpirySchedule
+    )]
+    public async Task<
+        ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>
+    > ListDataSetFiles(
         [FromQuery] DataSetFileListRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await _dataSetFileService
             .ListDataSetFiles(
@@ -43,14 +50,16 @@ public class DataSetFilesController : ControllerBase
                 sortDirection: request.SortDirection,
                 page: request.Page,
                 pageSize: request.PageSize,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
     [HttpGet("data-set-files/{dataSetFileId:guid}")]
     public async Task<ActionResult<DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetFileId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _dataSetFileService
             .GetDataSetFile(dataSetFileId, cancellationToken)
@@ -60,17 +69,16 @@ public class DataSetFilesController : ControllerBase
     [HttpGet("data-set-files/{dataSetFileId:guid}/download")]
     public async Task<ActionResult> DownloadDataSetFile(
         Guid dataSetFileId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         HttpContext.Response.Headers["X-Robots-Tag"] = "noindex";
 
-        return await _dataSetFileService
-            .DownloadDataSetFile(dataSetFileId, cancellationToken);
+        return await _dataSetFileService.DownloadDataSetFile(dataSetFileId, cancellationToken);
     }
 
     [HttpGet("data-set-files/sitemap-items")]
     public async Task<ActionResult<List<DataSetSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await _dataSetFileService.ListSitemapItems(cancellationToken)
-            .HandleFailuresOrOk();
+        CancellationToken cancellationToken = default
+    ) => await _dataSetFileService.ListSitemapItems(cancellationToken).HandleFailuresOrOk();
 }

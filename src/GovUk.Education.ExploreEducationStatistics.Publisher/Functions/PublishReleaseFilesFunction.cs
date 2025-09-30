@@ -11,7 +11,8 @@ public class PublishReleaseFilesFunction(
     ILogger<PublishReleaseFilesFunction> logger,
     IPublishingService publishingService,
     IReleasePublishingStatusService releasePublishingStatusService,
-    IPublishingCompletionService publishingCompletionService)
+    IPublishingCompletionService publishingCompletionService
+)
 {
     /// <summary>
     /// Azure function which publishes the files for a Release by copying them between storage accounts.
@@ -22,31 +23,36 @@ public class PublishReleaseFilesFunction(
     [Function("PublishReleaseFiles")]
     public async Task PublishReleaseFiles(
         [QueueTrigger(PublishReleaseFilesQueue)] PublishReleaseFilesMessage message,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
-        logger.LogInformation("{FunctionName} triggered: {Message}",
+        logger.LogInformation(
+            "{FunctionName} triggered: {Message}",
             context.FunctionDefinition.Name,
-            message);
+            message
+        );
 
         await UpdateFilesStage(message.ReleasePublishingKeys, Started);
 
         var successfulReleases = await message
-            .ReleasePublishingKeys
-            .ToAsyncEnumerable()
+            .ReleasePublishingKeys.ToAsyncEnumerable()
             .WhereAwait(async key =>
             {
                 try
                 {
                     await publishingService.PublishMethodologyFilesIfApplicableForRelease(
-                        key.ReleaseVersionId);
+                        key.ReleaseVersionId
+                    );
                     await publishingService.PublishReleaseFiles(key.ReleaseVersionId);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e,
+                    logger.LogError(
+                        e,
                         "Exception occured while executing {FunctionName}",
-                        context.FunctionDefinition.Name);
+                        context.FunctionDefinition.Name
+                    );
 
                     return false;
                 }
@@ -54,8 +60,7 @@ public class PublishReleaseFilesFunction(
             .ToListAsync();
 
         var unsuccessfulReleases = message
-            .ReleasePublishingKeys
-            .Except(successfulReleases)
+            .ReleasePublishingKeys.Except(successfulReleases)
             .ToList();
 
         await UpdateFilesStage(successfulReleases, Complete);
@@ -63,21 +68,30 @@ public class PublishReleaseFilesFunction(
 
         try
         {
-            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(successfulReleases);
+            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                successfulReleases
+            );
         }
         catch (Exception e)
         {
-            logger.LogError(e,
+            logger.LogError(
+                e,
                 "Exception occured while completing publishing in {FunctionName}",
-                context.FunctionDefinition.Name);
+                context.FunctionDefinition.Name
+            );
 
             await UpdatePublishingStage(
-                successfulReleases.Select(release =>
-                    new ReleasePublishingKey(release.ReleaseVersionId, release.ReleaseStatusId)
-                ).ToList(),
+                successfulReleases
+                    .Select(release => new ReleasePublishingKey(
+                        release.ReleaseVersionId,
+                        release.ReleaseStatusId
+                    ))
+                    .ToList(),
                 ReleasePublishingStatusPublishingStage.Failed,
                 new ReleasePublishingStatusLogMessage(
-                    $"Failed during completion of the Publishing process: {e.Message}"));
+                    $"Failed during completion of the Publishing process: {e.Message}"
+                )
+            );
         }
 
         logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
@@ -86,20 +100,26 @@ public class PublishReleaseFilesFunction(
     private async Task UpdateFilesStage(
         IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
         ReleasePublishingStatusFilesStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null)
+        ReleasePublishingStatusLogMessage? logMessage = null
+    )
     {
         await releasePublishingKeys
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(key => releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage));
+            .ForEachAwaitAsync(key =>
+                releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage)
+            );
     }
 
     private async Task UpdatePublishingStage(
         IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
         ReleasePublishingStatusPublishingStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null)
+        ReleasePublishingStatusLogMessage? logMessage = null
+    )
     {
         await releasePublishingKeys
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(key => releasePublishingStatusService.UpdatePublishingStage(key, stage, logMessage));
+            .ForEachAwaitAsync(key =>
+                releasePublishingStatusService.UpdatePublishingStage(key, stage, logMessage)
+            );
     }
 }

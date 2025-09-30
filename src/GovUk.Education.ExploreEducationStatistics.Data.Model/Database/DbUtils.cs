@@ -17,7 +17,7 @@ public static class DbUtils
         return new SqlParameter(parameterName, value)
         {
             SqlDbType = SqlDbType.Structured,
-            TypeName = typeName
+            TypeName = typeName,
         };
     }
 }

@@ -12,11 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
             migrationBuilder.DropIndex(
                 name: "IX_UserReleaseInvites_ReleaseVersionId",
-                table: "UserReleaseInvites");
+                table: "UserReleaseInvites"
+            );
 
             migrationBuilder.DropIndex(
                 name: "IX_UserPublicationInvites_PublicationId",
-                table: "UserPublicationInvites");
+                table: "UserPublicationInvites"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
@@ -24,7 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(450)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -32,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(450)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
@@ -40,7 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(450)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -48,19 +53,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(450)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserReleaseInvites_ReleaseVersionId_Email_Role",
                 table: "UserReleaseInvites",
                 columns: new[] { "ReleaseVersionId", "Email", "Role" },
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserPublicationInvites_PublicationId_Email_Role",
                 table: "UserPublicationInvites",
                 columns: new[] { "PublicationId", "Email", "Role" },
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
@@ -68,11 +76,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
             migrationBuilder.DropIndex(
                 name: "IX_UserReleaseInvites_ReleaseVersionId_Email_Role",
-                table: "UserReleaseInvites");
+                table: "UserReleaseInvites"
+            );
 
             migrationBuilder.DropIndex(
                 name: "IX_UserPublicationInvites_PublicationId_Email_Role",
-                table: "UserPublicationInvites");
+                table: "UserPublicationInvites"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
@@ -80,7 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+                oldType: "nvarchar(450)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -88,7 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+                oldType: "nvarchar(450)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
@@ -96,7 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+                oldType: "nvarchar(450)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -104,17 +117,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+                oldType: "nvarchar(450)"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserReleaseInvites_ReleaseVersionId",
                 table: "UserReleaseInvites",
-                column: "ReleaseVersionId");
+                column: "ReleaseVersionId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserPublicationInvites_PublicationId",
                 table: "UserPublicationInvites",
-                column: "PublicationId");
+                column: "PublicationId"
+            );
         }
     }
 }

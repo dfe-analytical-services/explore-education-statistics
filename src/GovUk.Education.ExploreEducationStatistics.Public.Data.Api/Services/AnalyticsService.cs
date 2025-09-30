@@ -19,75 +19,90 @@ public class AnalyticsService(
     IContentApiClient contentApiClient,
     DateTimeProvider dateTimeProvider,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<AnalyticsService> logger) : IAnalyticsService
+    ILogger<AnalyticsService> logger
+) : IAnalyticsService
 {
     public async Task CaptureTopLevelCall(
         TopLevelCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await DoCaptureCall(
-            requestSupplier: () => Task.FromResult(
-                new CaptureTopLevelCallRequest(
-                    Type: type,
-                    Parameters: parameters,
-                    StartTime: dateTimeProvider.UtcNow))!,
-            cancellationToken: cancellationToken);
+            requestSupplier: () =>
+                Task.FromResult(
+                    new CaptureTopLevelCallRequest(
+                        Type: type,
+                        Parameters: parameters,
+                        StartTime: dateTimeProvider.UtcNow
+                    )
+                )!,
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task CapturePublicationCall(
         Guid publicationId,
         PublicationCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await DoCaptureCall(
             requestSupplier: async () =>
             {
                 return await contentApiClient
                     .GetPublication(publicationId, cancellationToken)
-                    .OnSuccess(publication =>
-                        new CapturePublicationCallRequest(
-                            PublicationId: publicationId,
-                            PublicationTitle: publication.Title,
-                            Parameters: parameters,
-                            StartTime: dateTimeProvider.UtcNow,
-                            Type: type))!
+                    .OnSuccess(publication => new CapturePublicationCallRequest(
+                        PublicationId: publicationId,
+                        PublicationTitle: publication.Title,
+                        Parameters: parameters,
+                        StartTime: dateTimeProvider.UtcNow,
+                        Type: type
+                    ))!
                     .OrElse(CapturePublicationCallRequest? () => null);
             },
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
-    
+
     public async Task CapturePublicationCall(
         Guid publicationId,
         string publicationTitle,
         PublicationCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await DoCaptureCall(
-            requestSupplier: () => Task.FromResult<CapturePublicationCallRequest?>(
-                new CapturePublicationCallRequest(
-                    PublicationId: publicationId,
-                    PublicationTitle: publicationTitle,
-                    Parameters: parameters,
-                    StartTime: dateTimeProvider.UtcNow,
-                    Type: type)),
-            cancellationToken: cancellationToken);
+            requestSupplier: () =>
+                Task.FromResult<CapturePublicationCallRequest?>(
+                    new CapturePublicationCallRequest(
+                        PublicationId: publicationId,
+                        PublicationTitle: publicationTitle,
+                        Parameters: parameters,
+                        StartTime: dateTimeProvider.UtcNow,
+                        Type: type
+                    )
+                ),
+            cancellationToken: cancellationToken
+        );
     }
-    
+
     public async Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await DoCaptureCall(
             requestSupplier: async () =>
             {
-                var dataSet = await publicDataDbContext
-                    .DataSets
-                    .SingleAsync(ds => ds.Id == dataSetId, cancellationToken);
+                var dataSet = await publicDataDbContext.DataSets.SingleAsync(
+                    ds => ds.Id == dataSetId,
+                    cancellationToken
+                );
 
                 return new CaptureDataSetCallRequest(
                     DataSetId: dataSet.Id,
@@ -95,24 +110,26 @@ public class AnalyticsService(
                     Parameters: parameters,
                     PreviewToken: await GetPreviewTokenRequest(),
                     StartTime: dateTimeProvider.UtcNow,
-                    Type: type);
+                    Type: type
+                );
             },
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
-    
+
     public async Task CaptureDataSetVersionCall(
         Guid dataSetVersionId,
         DataSetVersionCallType type,
         string? requestedDataSetVersion,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await DoCaptureCall(
             requestSupplier: async () =>
             {
                 var dataSetVersion = await publicDataDbContext
-                    .DataSetVersions
-                    .Include(dsv => dsv.DataSet)
+                    .DataSetVersions.Include(dsv => dsv.DataSet)
                     .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
 
                 return new CaptureDataSetVersionCallRequest(
@@ -124,18 +141,21 @@ public class AnalyticsService(
                     PreviewToken: await GetPreviewTokenRequest(),
                     RequestedDataSetVersion: requestedDataSetVersion,
                     StartTime: dateTimeProvider.UtcNow,
-                    Type: type);
+                    Type: type
+                );
             },
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
-    
+
     public async Task CaptureDataSetVersionQuery(
         DataSetVersion dataSetVersion,
         string? requestedDataSetVersion,
         DataSetQueryRequest query,
         DataSetQueryPaginatedResultsViewModel results,
         DateTime startTime,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await DoCaptureCall(
             requestSupplier: async () =>
@@ -150,13 +170,16 @@ public class AnalyticsService(
                     ResultsCount: results.Results.Count,
                     TotalRowsCount: results.Paging.TotalResults,
                     StartTime: startTime,
-                    EndTime: DateTime.UtcNow),
-            cancellationToken: cancellationToken);
+                    EndTime: DateTime.UtcNow
+                ),
+            cancellationToken: cancellationToken
+        );
     }
 
     private async Task DoCaptureCall<TAnalyticsCaptureRequest>(
         Func<Task<TAnalyticsCaptureRequest?>> requestSupplier,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TAnalyticsCaptureRequest : IAnalyticsCaptureRequest
     {
         try
@@ -167,9 +190,10 @@ public class AnalyticsService(
             {
                 logger.LogDebug(
                     message: """
-                             Ignoring capturing analytics for call of type "{Type}".
-                             """,
-                    typeof(TAnalyticsCaptureRequest).Name);
+                    Ignoring capturing analytics for call of type "{Type}".
+                    """,
+                    typeof(TAnalyticsCaptureRequest).Name
+                );
                 return;
             }
 
@@ -187,7 +211,8 @@ public class AnalyticsService(
             logger.LogError(
                 exception: e,
                 message: """Error whilst capturing analytics for "{Type}" call""",
-                typeof(TAnalyticsCaptureRequest).Name);
+                typeof(TAnalyticsCaptureRequest).Name
+            );
         }
     }
 
@@ -204,7 +229,8 @@ public class AnalyticsService(
             Label: previewToken.Label,
             DataSetVersionId: previewToken.DataSetVersionId,
             Created: previewToken.Created,
-            Expiry: previewToken.Expiry);
+            Expiry: previewToken.Expiry
+        );
     }
 
     /// <summary>
@@ -213,9 +239,10 @@ public class AnalyticsService(
     /// </summary>
     private bool IncludeAnalyticsCall()
     {
-        return !httpContextAccessor
-            .HttpContext
-            .TryGetRequestHeader(RequestHeaderNames.RequestSource, out _);
+        return !httpContextAccessor.HttpContext.TryGetRequestHeader(
+            RequestHeaderNames.RequestSource,
+            out _
+        );
     }
 }
 
@@ -224,7 +251,8 @@ public class NoOpAnalyticsService : IAnalyticsService
     public Task CaptureTopLevelCall(
         TopLevelCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.CompletedTask;
     }
@@ -233,7 +261,8 @@ public class NoOpAnalyticsService : IAnalyticsService
         Guid publicationId,
         PublicationCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.CompletedTask;
     }
@@ -243,7 +272,8 @@ public class NoOpAnalyticsService : IAnalyticsService
         string publicationTitle,
         PublicationCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.CompletedTask;
     }
@@ -252,7 +282,8 @@ public class NoOpAnalyticsService : IAnalyticsService
         Guid dataSetId,
         DataSetCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.CompletedTask;
     }
@@ -262,7 +293,8 @@ public class NoOpAnalyticsService : IAnalyticsService
         DataSetVersionCallType type,
         string? requestedDataSetVersion,
         object? parameters = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.CompletedTask;
     }
@@ -273,7 +305,8 @@ public class NoOpAnalyticsService : IAnalyticsService
         DataSetQueryRequest query,
         DataSetQueryPaginatedResultsViewModel results,
         DateTime startTime,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return Task.CompletedTask;
     }

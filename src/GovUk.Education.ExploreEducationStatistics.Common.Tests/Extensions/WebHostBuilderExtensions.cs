@@ -13,41 +13,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class WebHostBuilderExtensions
 {
-    public static IWebHostBuilder ResetDbContext<TDbContext>(this IWebHostBuilder builder) where TDbContext : DbContext
+    public static IWebHostBuilder ResetDbContext<TDbContext>(this IWebHostBuilder builder)
+        where TDbContext : DbContext
     {
-        return builder.ConfigureServices(
-            services =>
-            {
-                var provider = services.BuildServiceProvider();
+        return builder.ConfigureServices(services =>
+        {
+            var provider = services.BuildServiceProvider();
 
-                using var scope = provider.CreateScope();
-                using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
+            using var scope = provider.CreateScope();
+            using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-            }
-        );
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+        });
     }
 
     public static IWebHostBuilder AddTestData<TDbContext>(
         this IWebHostBuilder builder,
-        Action<TDbContext> testData) where TDbContext : DbContext
+        Action<TDbContext> testData
+    )
+        where TDbContext : DbContext
     {
-        return builder.ConfigureServices(
-            services =>
-            {
-                var provider = services.BuildServiceProvider();
+        return builder.ConfigureServices(services =>
+        {
+            var provider = services.BuildServiceProvider();
 
-                using var scope = provider.CreateScope();
-                using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
+            using var scope = provider.CreateScope();
+            using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-                db.Database.EnsureCreated();
+            db.Database.EnsureCreated();
 
-                testData(db);
+            testData(db);
 
-                db.SaveChanges();
-            }
-        );
+            db.SaveChanges();
+        });
     }
 
     /// <summary>
@@ -56,29 +55,33 @@ public static class WebHostBuilderExtensions
     /// https://tpodolak.com/blog/2020/06/22/asp-net-core-adding-controllers-directly-integration-tests/ and
     /// https://andrewlock.net/controller-activation-and-dependency-injection-in-asp-net-core-mvc/.
     /// </summary>
-    public static IWebHostBuilder WithAdditionalControllers(this IWebHostBuilder builder, params Type[] controllers)
+    public static IWebHostBuilder WithAdditionalControllers(
+        this IWebHostBuilder builder,
+        params Type[] controllers
+    )
     {
-        return builder.ConfigureTestServices(
-            services =>
-            {
-                var partManager = GetApplicationPartManager(services);
+        return builder.ConfigureTestServices(services =>
+        {
+            var partManager = GetApplicationPartManager(services);
 
-                // Register each controller with MVC.
-                partManager.FeatureProviders.Add(new ExternalControllersFeatureProvider(controllers));
+            // Register each controller with MVC.
+            partManager.FeatureProviders.Add(new ExternalControllersFeatureProvider(controllers));
 
-                // Register each controller with DI.
-                controllers.ForEach(controller => services.TryAddTransient(controller, controller));
-            });
+            // Register each controller with DI.
+            controllers.ForEach(controller => services.TryAddTransient(controller, controller));
+        });
     }
 
     private static ApplicationPartManager GetApplicationPartManager(IServiceCollection services)
     {
-        return (ApplicationPartManager)services
-            .Last(descriptor => descriptor.ServiceType == typeof(ApplicationPartManager))
-            .ImplementationInstance!;
+        return (ApplicationPartManager)
+            services
+                .Last(descriptor => descriptor.ServiceType == typeof(ApplicationPartManager))
+                .ImplementationInstance!;
     }
 
-    private class ExternalControllersFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
+    private class ExternalControllersFeatureProvider
+        : IApplicationFeatureProvider<ControllerFeature>
     {
         private readonly Type[] _controllers;
 
@@ -89,7 +92,9 @@ public static class WebHostBuilderExtensions
 
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
-            feature.Controllers.AddRange(_controllers.Select(controller => controller.GetTypeInfo()));
+            feature.Controllers.AddRange(
+                _controllers.Select(controller => controller.GetTypeInfo())
+            );
         }
     }
 }

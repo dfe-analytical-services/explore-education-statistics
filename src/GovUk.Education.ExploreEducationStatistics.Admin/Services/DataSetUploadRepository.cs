@@ -16,14 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class DataSetUploadRepository(
     ContentDbContext contentDbContext,
     IPrivateBlobStorageService privateBlobStorageService,
-    IMapper mapper) : IDataSetUploadRepository
+    IMapper mapper
+) : IDataSetUploadRepository
 {
     public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> ListAll(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await contentDbContext.DataSetUploads
-            .Where(uploads => uploads.ReleaseVersionId == releaseVersionId)
+        return await contentDbContext
+            .DataSetUploads.Where(uploads => uploads.ReleaseVersionId == releaseVersionId)
             .Select(entity => mapper.Map<DataSetUploadViewModel>(entity))
             .ToListAsync(cancellationToken);
     }
@@ -31,13 +33,15 @@ public class DataSetUploadRepository(
     public async Task<Either<ActionResult, Unit>> Delete(
         Guid releaseVersionId,
         Guid dataSetUploadId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await contentDbContext.DataSetUploads
-            .SingleOrNotFoundAsync(upload =>
-                upload.ReleaseVersionId == releaseVersionId &&
-                upload.Id == dataSetUploadId,
-                cancellationToken)
+        return await contentDbContext
+            .DataSetUploads.SingleOrNotFoundAsync(
+                upload =>
+                    upload.ReleaseVersionId == releaseVersionId && upload.Id == dataSetUploadId,
+                cancellationToken
+            )
             .OnSuccessDo(async dataSetUpload =>
             {
                 contentDbContext.Remove(dataSetUpload);
@@ -45,28 +49,44 @@ public class DataSetUploadRepository(
             })
             .OnSuccessVoid(async dataSetUpload =>
             {
-                await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, dataSetUpload.DataFilePath);
-                await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, dataSetUpload.MetaFilePath);
+                await privateBlobStorageService.DeleteBlob(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.DataFilePath
+                );
+                await privateBlobStorageService.DeleteBlob(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.MetaFilePath
+                );
             });
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteAll(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            var uploads = await contentDbContext.DataSetUploads
-                .Where(d => d.ReleaseVersionId == releaseVersionId)
+            var uploads = await contentDbContext
+                .DataSetUploads.Where(d => d.ReleaseVersionId == releaseVersionId)
                 .ToListAsync(cancellationToken);
 
             await uploads
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async upload =>
-            {
-                await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, upload.DataFilePath);
-                await privateBlobStorageService.DeleteBlob(PrivateReleaseTempFiles, upload.MetaFilePath);
-            }, cancellationToken);
+                .ForEachAwaitAsync(
+                    async upload =>
+                    {
+                        await privateBlobStorageService.DeleteBlob(
+                            PrivateReleaseTempFiles,
+                            upload.DataFilePath
+                        );
+                        await privateBlobStorageService.DeleteBlob(
+                            PrivateReleaseTempFiles,
+                            upload.MetaFilePath
+                        );
+                    },
+                    cancellationToken
+                );
 
             contentDbContext.DataSetUploads.RemoveRange(uploads);
             await contentDbContext.SaveChangesAsync(cancellationToken);

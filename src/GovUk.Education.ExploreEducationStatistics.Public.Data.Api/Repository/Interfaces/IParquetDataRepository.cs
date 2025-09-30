@@ -9,7 +9,8 @@ public interface IParquetDataRepository
     Task<long> CountRows(
         DataSetVersion dataSetVersion,
         IInterpolatedSql where,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<IList<IDictionary<string, object?>>> ListRows(
         DataSetVersion dataSetVersion,
@@ -18,9 +19,11 @@ public interface IParquetDataRepository
         IEnumerable<Sort>? sorts = null,
         int page = 1,
         int pageSize = 1000,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<ISet<string>> ListColumns(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

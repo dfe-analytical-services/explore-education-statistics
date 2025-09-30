@@ -12,10 +12,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
 {
-    protected override string ResourcesPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "PublicCsvDownloads");
+    protected override string ResourcesPath =>
+        Path.Combine(
+            Assembly.GetExecutingAssembly().GetDirectoryPath(),
+            "Resources",
+            "PublicCsvDownloads"
+        );
 
     public class ProcessTests : PublicCsvDownloadsProcessorTests
     {
@@ -30,12 +32,12 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var csvDownloadsReport = Assert.Single(reports);
 
@@ -48,15 +50,9 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
 
             Assert.Equal(2, csvDownloadReportRows.Count);
 
-            await AssertReportRow(
-                csvDownloadReportRows[0],
-                "CsvDownloadRequestFile1.json",
-                1);
+            await AssertReportRow(csvDownloadReportRows[0], "CsvDownloadRequestFile1.json", 1);
 
-            await AssertReportRow(
-                csvDownloadReportRows[1],
-                "CsvDownloadRequestFile2.json",
-                1);
+            await AssertReportRow(csvDownloadReportRows[1], "CsvDownloadRequestFile2.json", 1);
         }
 
         [Fact]
@@ -80,18 +76,19 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
 
             var csvDownloadReportRow = Assert.Single(csvDownloadReportRows);
 
-            await AssertReportRow(
-                csvDownloadReportRow,
-                "CsvDownloadRequestFile1.json",
-                2);
+            await AssertReportRow(csvDownloadReportRow, "CsvDownloadRequestFile1.json", 2);
         }
 
-        private static async Task<List<CsvDownloadReportLine>> ReadReport(DuckDbConnection duckDbConnection,
-            string reportFile)
+        private static async Task<List<CsvDownloadReportLine>> ReadReport(
+            DuckDbConnection duckDbConnection,
+            string reportFile
+        )
         {
-            return (await duckDbConnection
+            return (
+                await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
-                    .QueryAsync<CsvDownloadReportLine>())
+                    .QueryAsync<CsvDownloadReportLine>()
+            )
                 .OrderBy(row => row.DataSetTitle)
                 .ToList();
         }
@@ -99,15 +96,14 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
 
     private PublicCsvDownloadsProcessor BuildService()
     {
-        return new PublicCsvDownloadsProcessor(
-            pathResolver: PathResolver,
-            workflow: Workflow);
+        return new PublicCsvDownloadsProcessor(pathResolver: PathResolver, workflow: Workflow);
     }
 
     private async Task AssertReportRow(
         CsvDownloadReportLine row,
         string jsonFileName,
-        int numRequests)
+        int numRequests
+    )
     {
         var jsonText = await File.ReadAllTextAsync(Path.Combine(ResourcesPath, jsonFileName));
 
@@ -122,7 +118,8 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
         Assert.Equal(request.DataSetTitle, row.DataSetTitle);
 
         // Generate expected CsvDownloadHash
-        var strToHash = $"{request.SubjectId.ToString().ToLower()}{request.ReleaseVersionId.ToString().ToLower()}";
+        var strToHash =
+            $"{request.SubjectId.ToString().ToLower()}{request.ReleaseVersionId.ToString().ToLower()}";
         var bytesToHash = Encoding.UTF8.GetBytes(strToHash);
         var hash = MD5.Create().ComputeHash(bytesToHash);
         var hashSb = new StringBuilder();
@@ -138,7 +135,8 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
         string ReleaseName,
         string? ReleaseLabel,
         Guid SubjectId,
-        string DataSetTitle);
+        string DataSetTitle
+    );
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record CsvDownloadReportLine(
@@ -149,5 +147,6 @@ public abstract class PublicCsvDownloadsProcessorTests : ProcessorTestsBase
         string? ReleaseLabel,
         Guid SubjectId,
         string DataSetTitle,
-        int Downloads);
+        int Downloads
+    );
 }

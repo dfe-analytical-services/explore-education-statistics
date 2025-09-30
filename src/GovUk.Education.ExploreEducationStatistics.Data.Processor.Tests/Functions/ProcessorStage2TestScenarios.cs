@@ -14,7 +14,6 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
         return "ordering-test-4.csv";
     }
 
-
     public Guid GetSubjectId()
     {
         return _subjectId;
@@ -32,13 +31,10 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            })
-                    }),
-                SubjectId = _subjectId
+                        FilterItems = ListOf(new FilterItem { Label = "Total" }),
+                    }
+                ),
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -49,23 +45,15 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
                     new FilterGroup
                     {
                         Label = "One group",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "One"
-                            })
+                        FilterItems = ListOf(new FilterItem { Label = "One" }),
                     },
                     new FilterGroup
                     {
                         Label = "Two group",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Two"
-                            })
+                        FilterItems = ListOf(new FilterItem { Label = "Two" }),
                     }
                 ),
-                SubjectId = _subjectId
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -76,14 +64,10 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            })
+                        FilterItems = ListOf(new FilterItem { Label = "Total" }),
                     }
                 ),
-                SubjectId = _subjectId
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -95,31 +79,22 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
                     {
                         Label = "One group",
                         FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "One"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Two"
-                            })
+                            new FilterItem { Label = "One" },
+                            new FilterItem { Label = "Two" }
+                        ),
                     },
                     new FilterGroup
                     {
                         Label = "Two group",
                         FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "One"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Two"
-                            })
+                            new FilterItem { Label = "One" },
+                            new FilterItem { Label = "Two" }
+                        ),
                     }
                 ),
-                SubjectId = _subjectId
-            });
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<IndicatorGroup> GetExpectedIndicatorGroups()
@@ -128,13 +103,10 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
             new IndicatorGroup
             {
                 Label = "Default",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Indicator one"
-                    }),
-                SubjectId = _subjectId
-            });
+                Indicators = ListOf(new Indicator { Label = "Indicator one" }),
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<Location> GetExpectedLocations()
@@ -144,36 +116,38 @@ public class OrderingCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
+                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
-            });
+                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden"),
+            }
+        );
     }
 
     public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
-    [
-        new AutoSelectFilterValue("Filter one", "Total"),
-        new AutoSelectFilterValue("Filter three", "Total"),
-    ];
+        [
+            new AutoSelectFilterValue("Filter one", "Total"),
+            new AutoSelectFilterValue("Filter three", "Total"),
+        ];
 }
 
-public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null) : IProcessorStage2TestScenario
+public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null)
+    : IProcessorStage2TestScenario
 {
     private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
@@ -199,13 +173,10 @@ public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null) : IP
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            })
-                    }),
-                SubjectId = _subjectId
+                        FilterItems = ListOf(new FilterItem { Label = "Total" }),
+                    }
+                ),
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -215,15 +186,12 @@ public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null) : IP
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Not specified"
-                            })
+                        FilterItems = ListOf(new FilterItem { Label = "Not specified" }),
                     }
                 ),
-                SubjectId = _subjectId
-            });
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<IndicatorGroup> GetExpectedIndicatorGroups()
@@ -233,16 +201,12 @@ public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null) : IP
             {
                 Label = "Default",
                 Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Indicator one"
-                    },
-                    new Indicator
-                    {
-                        Label = "Additional indicator"
-                    }),
-                SubjectId = _subjectId
-            });
+                    new Indicator { Label = "Indicator one" },
+                    new Indicator { Label = "Additional indicator" }
+                ),
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<Location> GetExpectedLocations()
@@ -252,26 +216,27 @@ public class AdditionalFiltersAndIndicatorsScenario(Guid? subjectId = null) : IP
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
+                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
-            });
+                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden"),
+            }
+        );
     }
 
     public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
@@ -307,19 +272,16 @@ public class SpecialFilterItemsScenario(Guid? subjectId = null) : IProcessorStag
                         FilterItems = ListOf(
                             // Despite various differences in case and additional whitespace,
                             // only one "Value 1" Filter Item should be created for them all.
-                            new FilterItem
-                            {
-                                Label = "Value 1"
-                            },
+                            new FilterItem { Label = "Value 1" },
                             // Some values for "Filter one" are blank. They will be assigned the
                             // special "Not specified" value.
-                            new FilterItem
-                            {
-                                Label = "Not specified"
-                            })
-                    }),
-                SubjectId = _subjectId
-            });
+                            new FilterItem { Label = "Not specified" }
+                        ),
+                    }
+                ),
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<IndicatorGroup> GetExpectedIndicatorGroups()
@@ -328,13 +290,10 @@ public class SpecialFilterItemsScenario(Guid? subjectId = null) : IProcessorStag
             new IndicatorGroup
             {
                 Label = "Default",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Indicator one"
-                    }),
-                SubjectId = _subjectId
-            });
+                Indicators = ListOf(new Indicator { Label = "Indicator one" }),
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<Location> GetExpectedLocations()
@@ -344,26 +303,28 @@ public class SpecialFilterItemsScenario(Guid? subjectId = null) : IProcessorStag
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
-            });
+                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich"),
+            }
+        );
     }
 
     public List<AutoSelectFilterValue> GetAutoSelectFilterValues() => [];
 }
 
-public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IProcessorStage2TestScenario
+public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null)
+    : IProcessorStage2TestScenario
 {
     private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
@@ -392,20 +353,13 @@ public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IPr
                     {
                         Label = "Default",
                         FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "OneOne"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            },
-                            new FilterItem
-                            {
-                                Label = "OneThree"
-                            })
-                    }),
-                SubjectId = _subjectId
+                            new FilterItem { Label = "OneOne" },
+                            new FilterItem { Label = "Total" },
+                            new FilterItem { Label = "OneThree" }
+                        ),
+                    }
+                ),
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -419,21 +373,13 @@ public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IPr
                     {
                         Label = "Default",
                         FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "TwoOne"
-                            },
-                            new FilterItem
-                            {
-                                Label = "TwoTwo"
-                            },
-                            new FilterItem
-                            {
-                                Label = "TwoThree"
-                            })
+                            new FilterItem { Label = "TwoOne" },
+                            new FilterItem { Label = "TwoTwo" },
+                            new FilterItem { Label = "TwoThree" }
+                        ),
                     }
                 ),
-                SubjectId = _subjectId
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -445,22 +391,15 @@ public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IPr
                     {
                         Label = "Default",
                         FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "ThreeOne"
-                            },
-                            new FilterItem
-                            {
-                                Label = "ThreeTwo"
-                            },
-                            new FilterItem
-                            {
-                                Label = "ThreeThree"
-                            })
+                            new FilterItem { Label = "ThreeOne" },
+                            new FilterItem { Label = "ThreeTwo" },
+                            new FilterItem { Label = "ThreeThree" }
+                        ),
                     }
                 ),
-                SubjectId = _subjectId
-            });
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<IndicatorGroup> GetExpectedIndicatorGroups()
@@ -469,13 +408,10 @@ public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IPr
             new IndicatorGroup
             {
                 Label = "Default",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Indicator one"
-                    }),
-                SubjectId = _subjectId
-            });
+                Indicators = ListOf(new Indicator { Label = "Indicator one" }),
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<Location> GetExpectedLocations()
@@ -485,31 +421,33 @@ public class AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null) : IPr
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
-            });
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley"),
+            }
+        );
     }
 
     public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
-    [
-        new AutoSelectFilterValue("Filter with Total", "Total"),
-        new AutoSelectFilterValue("Filter with default TwoTwo", "TwoTwo"),
-    ];
+        [
+            new AutoSelectFilterValue("Filter with Total", "Total"),
+            new AutoSelectFilterValue("Filter with default TwoTwo", "TwoTwo"),
+        ];
 }
 
 public record AutoSelectFilterValue(string FilterLabel, string AutoSelectFilterItemLabel);
 
-public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProcessorStage2TestScenario
+public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null)
+    : IProcessorStage2TestScenario
 {
     private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
     public string GetFilenameUnderTest()
-    { 
+    {
         return "ignored-filter-rows.csv";
     }
 
@@ -530,13 +468,10 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Filter 1 Choice 1"
-                            })
-                    }),
-                SubjectId = _subjectId
+                        FilterItems = ListOf(new FilterItem { Label = "Filter 1 Choice 1" }),
+                    }
+                ),
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -547,14 +482,10 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Filter 2 Choice 1"
-                            })
+                        FilterItems = ListOf(new FilterItem { Label = "Filter 2 Choice 1" }),
                     }
                 ),
-                SubjectId = _subjectId
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -565,13 +496,10 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
                     new FilterGroup
                     {
                         Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Filter 3 Choice 1"
-                            })
-                    }),
-                SubjectId = _subjectId
+                        FilterItems = ListOf(new FilterItem { Label = "Filter 3 Choice 1" }),
+                    }
+                ),
+                SubjectId = _subjectId,
             },
             new Filter
             {
@@ -582,15 +510,12 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
                     new FilterGroup
                     {
                         Label = "Filter 4 Group 1",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Filter 4 Choice 1"
-                            })
+                        FilterItems = ListOf(new FilterItem { Label = "Filter 4 Choice 1" }),
                     }
                 ),
-                SubjectId = _subjectId
-            });
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<IndicatorGroup> GetExpectedIndicatorGroups()
@@ -599,13 +524,10 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
             new IndicatorGroup
             {
                 Label = "Default",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Indicator one"
-                    }),
-                SubjectId = _subjectId
-            });
+                Indicators = ListOf(new Indicator { Label = "Indicator one" }),
+                SubjectId = _subjectId,
+            }
+        );
     }
 
     public List<Location> GetExpectedLocations()
@@ -615,26 +537,27 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
+                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich"),
             },
             new Location
             {
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
-            });
+                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden"),
+            }
+        );
     }
 
     public List<AutoSelectFilterValue> GetAutoSelectFilterValues() => [];

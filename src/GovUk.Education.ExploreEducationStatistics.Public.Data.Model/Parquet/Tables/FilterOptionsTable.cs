@@ -18,8 +18,8 @@ public static class FilterOptionsTable
 
     private static readonly TableRef DefaultRef = new(TableName);
 
-    public static TableRef Ref(FilterMeta? filter = null)
-        => filter is not null ? new(Alias(filter)) : DefaultRef;
+    public static TableRef Ref(FilterMeta? filter = null) =>
+        filter is not null ? new(Alias(filter)) : DefaultRef;
 
     public class TableRef(string table)
     {

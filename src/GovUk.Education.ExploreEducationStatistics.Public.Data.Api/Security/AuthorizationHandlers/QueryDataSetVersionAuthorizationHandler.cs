@@ -6,16 +6,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Au
 
 public class QueryDataSetVersionRequirement : IAuthorizationRequirement;
 
-public class QueryDataSetVersionAuthorizationHandler(
-    IPreviewTokenService previewTokenService)
+public class QueryDataSetVersionAuthorizationHandler(IPreviewTokenService previewTokenService)
     : AuthorizationHandler<QueryDataSetVersionRequirement, DataSetVersion>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         QueryDataSetVersionRequirement requirement,
-        DataSetVersion dataSetVersion)
+        DataSetVersion dataSetVersion
+    )
     {
-        if (dataSetVersion.Status is DataSetVersionStatus.Published or DataSetVersionStatus.Deprecated)
+        if (
+            dataSetVersion.Status
+            is DataSetVersionStatus.Published
+                or DataSetVersionStatus.Deprecated
+        )
         {
             context.Succeed(requirement);
             return;

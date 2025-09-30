@@ -27,7 +27,7 @@ public class MethodologyNoteServiceTests
         var request = new MethodologyNoteAddRequest
         {
             Content = "Adding note",
-            DisplayDate = DateTime.Today.ToUniversalTime()
+            DisplayDate = DateTime.Today.ToUniversalTime(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -42,9 +42,9 @@ public class MethodologyNoteServiceTests
         {
             var service = SetupMethodologyNoteService(contentDbContext);
 
-            var result = (await service.AddNote(
-                methodologyVersionId: methodologyVersion.Id,
-                request: request)).AssertRight();
+            var result = (
+                await service.AddNote(methodologyVersionId: methodologyVersion.Id, request: request)
+            ).AssertRight();
 
             Assert.NotEqual(Guid.Empty, result.Id);
             Assert.Equal(request.Content, result.Content);
@@ -55,9 +55,9 @@ public class MethodologyNoteServiceTests
         {
             Assert.Single(contentDbContext.MethodologyVersions);
 
-            var addedNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n =>
-                    n.MethodologyVersionId == methodologyVersion.Id);
+            var addedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.Equal(request.Content, addedNote.Content);
             Assert.Equal(request.DisplayDate, addedNote.DisplayDate);
@@ -69,11 +69,7 @@ public class MethodologyNoteServiceTests
     {
         var methodologyVersion = new MethodologyVersion();
 
-        var request = new MethodologyNoteAddRequest
-        {
-            Content = "Adding note",
-            DisplayDate = null
-        };
+        var request = new MethodologyNoteAddRequest { Content = "Adding note", DisplayDate = null };
 
         var today = DateTime.Today.ToUniversalTime();
 
@@ -89,9 +85,9 @@ public class MethodologyNoteServiceTests
         {
             var service = SetupMethodologyNoteService(contentDbContext);
 
-            var result = (await service.AddNote(
-                methodologyVersionId: methodologyVersion.Id,
-                request: request)).AssertRight();
+            var result = (
+                await service.AddNote(methodologyVersionId: methodologyVersion.Id, request: request)
+            ).AssertRight();
 
             Assert.NotEqual(Guid.Empty, result.Id);
             Assert.Equal(request.Content, result.Content);
@@ -102,9 +98,9 @@ public class MethodologyNoteServiceTests
         {
             Assert.Single(contentDbContext.MethodologyVersions);
 
-            var addedNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n =>
-                    n.MethodologyVersionId == methodologyVersion.Id);
+            var addedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.Equal(request.Content, addedNote.Content);
             Assert.Equal(today, addedNote.DisplayDate);
@@ -125,8 +121,9 @@ public class MethodologyNoteServiceTests
                 request: new MethodologyNoteAddRequest
                 {
                     Content = "Adding note",
-                    DisplayDate = DateTime.Today.ToUniversalTime()
-                });
+                    DisplayDate = DateTime.Today.ToUniversalTime(),
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -144,15 +141,9 @@ public class MethodologyNoteServiceTests
         {
             Notes = new List<MethodologyNote>
             {
-                new()
-                {
-                    Content = "Note 1"
-                },
-                new()
-                {
-                    Content = "Note 2"
-                }
-            }
+                new() { Content = "Note 1" },
+                new() { Content = "Note 2" },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -169,7 +160,8 @@ public class MethodologyNoteServiceTests
 
             var result = await service.DeleteNote(
                 methodologyVersionId: methodologyVersion.Id,
-                methodologyNoteId: methodologyVersion.Notes[0].Id);
+                methodologyNoteId: methodologyVersion.Notes[0].Id
+            );
 
             result.AssertRight();
         }
@@ -177,8 +169,12 @@ public class MethodologyNoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             Assert.Single(contentDbContext.MethodologyNotes);
-            Assert.Null(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id));
-            Assert.NotNull(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[1].Id));
+            Assert.Null(
+                await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id)
+            );
+            Assert.NotNull(
+                await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[1].Id)
+            );
         }
     }
 
@@ -187,10 +183,7 @@ public class MethodologyNoteServiceTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            Notes = new List<MethodologyNote>
-            {
-                new()
-            }
+            Notes = new List<MethodologyNote> { new() },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -208,7 +201,8 @@ public class MethodologyNoteServiceTests
             // Attempt to delete the note using a different methodology version
             var result = await service.DeleteNote(
                 methodologyVersionId: Guid.NewGuid(),
-                methodologyNoteId: methodologyVersion.Notes[0].Id);
+                methodologyNoteId: methodologyVersion.Notes[0].Id
+            );
 
             result.AssertNotFound();
         }
@@ -216,7 +210,9 @@ public class MethodologyNoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             Assert.Single(contentDbContext.MethodologyNotes);
-            Assert.NotNull(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id));
+            Assert.NotNull(
+                await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id)
+            );
         }
     }
 
@@ -225,10 +221,7 @@ public class MethodologyNoteServiceTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            Notes = new List<MethodologyNote>
-            {
-                new()
-            }
+            Notes = new List<MethodologyNote> { new() },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -245,7 +238,8 @@ public class MethodologyNoteServiceTests
 
             var result = await service.DeleteNote(
                 methodologyVersionId: methodologyVersion.Id,
-                methodologyNoteId: Guid.NewGuid());
+                methodologyNoteId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -253,7 +247,9 @@ public class MethodologyNoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             Assert.Single(contentDbContext.MethodologyNotes);
-            Assert.NotNull(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id));
+            Assert.NotNull(
+                await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id)
+            );
         }
     }
 
@@ -267,15 +263,15 @@ public class MethodologyNoteServiceTests
                 new()
                 {
                     Content = "Original note",
-                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime()
-                }
-            }
+                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime(),
+                },
+            },
         };
 
         var request = new MethodologyNoteUpdateRequest
         {
             Content = "Updating note",
-            DisplayDate = DateTime.Today.ToUniversalTime()
+            DisplayDate = DateTime.Today.ToUniversalTime(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -290,10 +286,13 @@ public class MethodologyNoteServiceTests
         {
             var service = SetupMethodologyNoteService(contentDbContext);
 
-            var result = (await service.UpdateNote(
-                methodologyVersionId: methodologyVersion.Id,
-                methodologyNoteId: methodologyVersion.Notes[0].Id,
-                request: request)).AssertRight();
+            var result = (
+                await service.UpdateNote(
+                    methodologyVersionId: methodologyVersion.Id,
+                    methodologyNoteId: methodologyVersion.Notes[0].Id,
+                    request: request
+                )
+            ).AssertRight();
 
             Assert.Equal(methodologyVersion.Notes[0].Id, result.Id);
             Assert.Equal(request.Content, result.Content);
@@ -302,8 +301,9 @@ public class MethodologyNoteServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var updatedNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyVersion.Notes[0].Id);
+            var updatedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.Id == methodologyVersion.Notes[0].Id
+            );
 
             Assert.Equal(request.Content, updatedNote.Content);
             Assert.Equal(request.DisplayDate, updatedNote.DisplayDate);
@@ -320,15 +320,15 @@ public class MethodologyNoteServiceTests
                 new()
                 {
                     Content = "Original note",
-                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime()
-                }
-            }
+                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime(),
+                },
+            },
         };
 
         var request = new MethodologyNoteUpdateRequest
         {
             Content = "Updating note",
-            DisplayDate = null
+            DisplayDate = null,
         };
 
         var today = DateTime.Today.ToUniversalTime();
@@ -345,10 +345,13 @@ public class MethodologyNoteServiceTests
         {
             var service = SetupMethodologyNoteService(contentDbContext);
 
-            var result = (await service.UpdateNote(
-                methodologyVersionId: methodologyVersion.Id,
-                methodologyNoteId: methodologyVersion.Notes[0].Id,
-                request: request)).AssertRight();
+            var result = (
+                await service.UpdateNote(
+                    methodologyVersionId: methodologyVersion.Id,
+                    methodologyNoteId: methodologyVersion.Notes[0].Id,
+                    request: request
+                )
+            ).AssertRight();
 
             Assert.Equal(methodologyVersion.Notes[0].Id, result.Id);
             Assert.Equal(request.Content, result.Content);
@@ -357,8 +360,9 @@ public class MethodologyNoteServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var updatedNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyVersion.Notes[0].Id);
+            var updatedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.Id == methodologyVersion.Notes[0].Id
+            );
 
             Assert.Equal(request.Content, updatedNote.Content);
             Assert.Equal(today, updatedNote.DisplayDate);
@@ -375,9 +379,9 @@ public class MethodologyNoteServiceTests
                 new()
                 {
                     Content = "Original note",
-                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime()
-                }
-            }
+                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime(),
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -399,16 +403,18 @@ public class MethodologyNoteServiceTests
                 request: new MethodologyNoteUpdateRequest
                 {
                     Content = "Updating note",
-                    DisplayDate = DateTime.Today.ToUniversalTime()
-                });
+                    DisplayDate = DateTime.Today.ToUniversalTime(),
+                }
+            );
 
             result.AssertNotFound();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var methodologyNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyVersion.Notes[0].Id);
+            var methodologyNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.Id == methodologyVersion.Notes[0].Id
+            );
 
             Assert.Equal("Original note", methodologyNote.Content);
             Assert.Equal(DateTime.Today.AddDays(-7).ToUniversalTime(), methodologyNote.DisplayDate);
@@ -425,9 +431,9 @@ public class MethodologyNoteServiceTests
                 new()
                 {
                     Content = "Original note",
-                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime()
-                }
-            }
+                    DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime(),
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -448,16 +454,18 @@ public class MethodologyNoteServiceTests
                 request: new MethodologyNoteUpdateRequest
                 {
                     Content = "Updating note",
-                    DisplayDate = DateTime.Today.ToUniversalTime()
-                });
+                    DisplayDate = DateTime.Today.ToUniversalTime(),
+                }
+            );
 
             result.AssertNotFound();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var methodologyNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyVersion.Notes[0].Id);
+            var methodologyNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.Id == methodologyVersion.Notes[0].Id
+            );
 
             Assert.Equal("Original note", methodologyNote.Content);
             Assert.Equal(DateTime.Today.AddDays(-7).ToUniversalTime(), methodologyNote.DisplayDate);
@@ -468,12 +476,14 @@ public class MethodologyNoteServiceTests
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IMethodologyNoteRepository? methodologyNoteRepository = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             AdminMapper(),
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             methodologyNoteRepository ?? new MethodologyNoteRepository(contentDbContext),
-            userService ?? AlwaysTrueUserService(UserId).Object);
+            userService ?? AlwaysTrueUserService(UserId).Object
+        );
     }
 }

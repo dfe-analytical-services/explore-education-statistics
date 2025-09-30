@@ -8,11 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class AzureBlobStorageIntegrationHelper
 {
-    public static async Task<Blob> DownloadAsync(BlobServiceClient blobServiceClient, string containerName, string blobName, CancellationToken cancellationToken = default)
+    public static async Task<Blob> DownloadAsync(
+        BlobServiceClient blobServiceClient,
+        string containerName,
+        string blobName,
+        CancellationToken cancellationToken = default
+    )
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = blobContainerClient.GetBlobClient(blobName);
-        
+
         var existsResponse = await blobClient.ExistsAsync(cancellationToken);
         if (existsResponse.Value == false)
         {
@@ -25,7 +30,11 @@ public class AzureBlobStorageIntegrationHelper
             response = await blobClient.DownloadAsync(cancellationToken);
             if (!response.HasValue)
             {
-                throw new AzureBlobStorageException(containerName, blobName, $"Response was empty.");
+                throw new AzureBlobStorageException(
+                    containerName,
+                    blobName,
+                    $"Response was empty."
+                );
             }
         }
         catch (Exception e)
@@ -39,7 +48,12 @@ public class AzureBlobStorageIntegrationHelper
         return new Blob(content, metadata);
     }
 
-    public static async Task DeleteAsync(BlobServiceClient blobServiceClient, string containerName, string blobName, CancellationToken cancellationToken = default)
+    public static async Task DeleteAsync(
+        BlobServiceClient blobServiceClient,
+        string containerName,
+        string blobName,
+        CancellationToken cancellationToken = default
+    )
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = blobContainerClient.GetBlobClient(blobName);
@@ -52,17 +66,22 @@ public class AzureBlobStorageIntegrationHelper
 
         try
         {
-            var response = await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
+            var response = await blobClient.DeleteAsync(
+                DeleteSnapshotsOption.IncludeSnapshots,
+                cancellationToken: cancellationToken
+            );
             if (response.IsError)
             {
-                throw new Exception($"""Blob "{blobName}" could not be deleted from container "{containerName}". {response.ReasonPhrase}({response.Status})""");
+                throw new Exception(
+                    $"""Blob "{blobName}" could not be deleted from container "{containerName}". {response.ReasonPhrase}({response.Status})"""
+                );
             }
         }
         catch (Exception e)
         {
-            throw new Exception($"""Blob "{blobName}" could not be deleted from container "{containerName}". {e.Message}""");
+            throw new Exception(
+                $"""Blob "{blobName}" could not be deleted from container "{containerName}". {e.Message}"""
+            );
         }
     }
 }
-
-

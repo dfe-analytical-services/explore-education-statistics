@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class HandleProcessingFailureFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+public abstract class HandleProcessingFailureFunctionTests(
+    ProcessorFunctionsIntegrationTestFixture fixture
+) : ProcessorFunctionsIntegrationTest(fixture)
 {
     public class HandleProcessingFailureTests(ProcessorFunctionsIntegrationTestFixture fixture)
         : HandleProcessingFailureFunctionTests(fixture)
@@ -25,8 +26,8 @@ public abstract class HandleProcessingFailureFunctionTests(ProcessorFunctionsInt
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(i => i.DataSetVersion)
+            var savedImport = await publicDataDbContext
+                .DataSetVersionImports.Include(i => i.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(failedStage, savedImport.Stage);

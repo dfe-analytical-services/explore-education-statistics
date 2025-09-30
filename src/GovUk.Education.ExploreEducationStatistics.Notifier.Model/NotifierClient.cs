@@ -8,28 +8,37 @@ public class NotifierClient(string connectionString) : INotifierClient
 
     public async Task NotifyPublicationSubscribers(
         IReadOnlyList<ReleaseNotificationMessage> messages,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ReleaseNotificationQueue,
+        await _queueServiceClient.SendMessagesAsJson(
+            NotifierQueueStorage.ReleaseNotificationQueue,
             messages,
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task NotifyApiSubscribers(
         IReadOnlyList<ApiNotificationMessage> messages,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ApiNotificationQueue,
+        await _queueServiceClient.SendMessagesAsJson(
+            NotifierQueueStorage.ApiNotificationQueue,
             messages,
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task NotifyReleasePublishingFeedbackUsers(
         IReadOnlyList<ReleasePublishingFeedbackMessage> messages,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessagesAsJson(NotifierQueueStorage.ReleasePublishingFeedbackQueue,
+        await _queueServiceClient.SendMessagesAsJson(
+            NotifierQueueStorage.ReleasePublishingFeedbackQueue,
             messages,
-            cancellationToken);
+            cancellationToken
+        );
     }
 }

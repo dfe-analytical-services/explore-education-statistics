@@ -27,7 +27,8 @@ public class ContentBlockLockService : IContentBlockLockService
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IUserService userService,
-        IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext)
+        IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext
+    )
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
@@ -45,26 +46,28 @@ public class ContentBlockLockService : IContentBlockLockService
     /// </returns>
     public async Task<Either<ActionResult, ContentBlockLockViewModel>> LockContentBlock(
         Guid id,
-        bool force = false)
+        bool force = false
+    )
     {
         var userId = _userService.GetUserId();
 
         return await GetContentBlock(id)
             .OnSuccessDo(CheckCanUpdateBlock)
-            .OnSuccess(
-                async block =>
+            .OnSuccess(async block =>
+            {
+                if (TryFindConflictingLock(block, userId, force, out var conflictingLock))
                 {
-                    if (TryFindConflictingLock(block, userId, force, out var conflictingLock))
-                    {
-                        return conflictingLock;
-                    }
-
-                    return await DoContentBlockLock(block, userId);
+                    return conflictingLock;
                 }
-            );
+
+                return await DoContentBlockLock(block, userId);
+            });
     }
 
-    private async Task<ContentBlockLockViewModel> DoContentBlockLock(ContentBlock block, Guid userId)
+    private async Task<ContentBlockLockViewModel> DoContentBlockLock(
+        ContentBlock block,
+        Guid userId
+    )
     {
         var user = await _contentDbContext.Users.FindAsync(userId);
 
@@ -91,8 +94,8 @@ public class ContentBlockLockService : IContentBlockLockService
             LockedBy: new UserDetailsViewModel(user)
         );
 
-        await _hubContext.Clients
-            .Group(viewModel.ReleaseVersionId.ToString())
+        await _hubContext
+            .Clients.Group(viewModel.ReleaseVersionId.ToString())
             .ContentBlockLocked(viewModel);
 
         return viewModel;
@@ -110,27 +113,25 @@ public class ContentBlockLockService : IContentBlockLockService
         return await GetContentBlock(id)
             .OnSuccessDo(CheckCanUpdateBlock)
             .OnSuccessDo(block => CheckNoConflictingLock(block, userId, force))
-            .OnSuccessVoid(
-                async block =>
-                {
-                    block.Locked = null;
-                    block.LockedById = null;
+            .OnSuccessVoid(async block =>
+            {
+                block.Locked = null;
+                block.LockedById = null;
 
-                    _contentDbContext.ContentBlocks.Update(block);
+                _contentDbContext.ContentBlocks.Update(block);
 
-                    await _contentDbContext.SaveChangesAsync();
+                await _contentDbContext.SaveChangesAsync();
 
-                    var viewModel = new ContentBlockUnlockViewModel(
-                        Id: block.Id,
-                        SectionId: block.ContentSection!.Id,
-                        ReleaseVersionId: block.ContentSection!.ReleaseVersionId
-                    );
+                var viewModel = new ContentBlockUnlockViewModel(
+                    Id: block.Id,
+                    SectionId: block.ContentSection!.Id,
+                    ReleaseVersionId: block.ContentSection!.ReleaseVersionId
+                );
 
-                    await _hubContext.Clients
-                        .Group(viewModel.ReleaseVersionId.ToString())
-                        .ContentBlockUnlocked(viewModel);
-                }
-            );
+                await _hubContext
+                    .Clients.Group(viewModel.ReleaseVersionId.ToString())
+                    .ContentBlockUnlocked(viewModel);
+            });
     }
 
     private async Task<Either<ActionResult, ContentBlock>> GetContentBlock(Guid contentBlockId)
@@ -139,8 +140,8 @@ public class ContentBlockLockService : IContentBlockLockService
             contentBlockId,
             q =>
                 q.Include(block => block.ContentSection)
-                 .Include(contentBlock => contentBlock.ReleaseVersion)
-                 .Include(block => block.LockedBy)
+                    .Include(contentBlock => contentBlock.ReleaseVersion)
+                    .Include(block => block.LockedBy)
         );
     }
 
@@ -160,7 +161,8 @@ public class ContentBlockLockService : IContentBlockLockService
         ContentBlock contentBlock,
         Guid userId,
         bool force,
-        out ContentBlockLockViewModel conflictingLock)
+        out ContentBlockLockViewModel conflictingLock
+    )
     {
         conflictingLock = null!;
 
@@ -197,7 +199,8 @@ public class ContentBlockLockService : IContentBlockLockService
     private Either<ActionResult, Unit> CheckNoConflictingLock(
         ContentBlock contentBlock,
         Guid userId,
-        bool force)
+        bool force
+    )
     {
         if (TryFindConflictingLock(contentBlock, userId, force, out _))
         {

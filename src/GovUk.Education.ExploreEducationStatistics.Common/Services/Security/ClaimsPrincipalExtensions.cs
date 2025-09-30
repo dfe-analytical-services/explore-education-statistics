@@ -22,7 +22,8 @@ public static class ClaimsPrincipalExtensions
         // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" Claim, depending on its configuration.
         //
         // We need to account for either scenario so as not to rely one one Entra ID setup.
-        return principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue(ClaimTypes.Name);
+        return principal.FindFirstValue(ClaimTypes.Email)
+            ?? principal.FindFirstValue(ClaimTypes.Name);
     }
 
     public static (string FirstName, string LastName) GetNameParts(this ClaimsPrincipal principal)
@@ -42,7 +43,8 @@ public static class ClaimsPrincipalExtensions
         var givenName = principal.FindFirstValue(ClaimTypes.GivenName);
         var surname = principal.FindFirstValue(ClaimTypes.Surname);
 
-        if (givenName != null && surname != null) {
+        if (givenName != null && surname != null)
+        {
             return (FirstName: givenName, LastName: surname);
         }
 
@@ -55,7 +57,8 @@ public static class ClaimsPrincipalExtensions
 
         var nameClaimParts = nameClaim.Trim().Split(' ');
 
-        if (nameClaimParts.Length > 1) {
+        if (nameClaimParts.Length > 1)
+        {
             return (FirstName: nameClaimParts.First(), LastName: nameClaimParts.Last());
         }
 
@@ -64,8 +67,9 @@ public static class ClaimsPrincipalExtensions
 
     public static bool HasScope(this ClaimsPrincipal principal, string scope)
     {
-        var scopesString = principal.FindFirstValue(EesClaimTypes.SupportedMsalScope) ??
-                           principal.FindFirstValue(EesClaimTypes.SupportedMsalScope2);
+        var scopesString =
+            principal.FindFirstValue(EesClaimTypes.SupportedMsalScope)
+            ?? principal.FindFirstValue(EesClaimTypes.SupportedMsalScope2);
 
         if (scopesString == null)
         {

@@ -15,16 +15,17 @@ public static class FileStoragePathUtils
 
     public static string PublicContentStagingPath() => "staging";
 
-    private static string PublicContentPublicationParentPath(string publicationSlug, bool staging = false)
+    private static string PublicContentPublicationParentPath(
+        string publicationSlug,
+        bool staging = false
+    )
     {
-        return
-            $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
+        return $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
     }
 
     public static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
     {
-        return
-            $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
+        return $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
     }
 
     public static string PublicContentPublicationPath(string publicationSlug)
@@ -32,18 +33,27 @@ public static class FileStoragePathUtils
         return $"{PublicContentPublicationParentPath(publicationSlug)}/{PublicationFileName}";
     }
 
-    public static string PublicContentLatestReleasePath(string publicationSlug, bool staging = false)
+    public static string PublicContentLatestReleasePath(
+        string publicationSlug,
+        bool staging = false
+    )
     {
         return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{LatestReleaseFileName}";
     }
 
-    public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, bool staging = false)
+    public static string PublicContentReleasePath(
+        string publicationSlug,
+        string releaseSlug,
+        bool staging = false
+    )
     {
-        return
-            $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}.json";
+        return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}.json";
     }
 
-    public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
+    public static string PublicContentDataBlockParentPath(
+        string publicationSlug,
+        string releaseSlug
+    )
     {
         return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{DataBlocksDirectory}";
     }
@@ -56,7 +66,8 @@ public static class FileStoragePathUtils
     public static string PrivateContentDataBlockLocationsPath(
         Guid releaseVersionId,
         Guid dataBlockId,
-        long boundaryLevelId)
+        long boundaryLevelId
+    )
     {
         return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
     }
@@ -69,7 +80,8 @@ public static class FileStoragePathUtils
     public static string PublicContentDataBlockPath(
         string publicationSlug,
         string releaseSlug,
-        Guid dataBlockId)
+        Guid dataBlockId
+    )
     {
         return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}.json";
     }
@@ -78,22 +90,33 @@ public static class FileStoragePathUtils
         string publicationSlug,
         string releaseSlug,
         Guid dataBlockId,
-        long boundaryLevelId)
+        long boundaryLevelId
+    )
     {
         return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
     }
 
-    public static string PublicContentSubjectMetaParentPath(string publicationSlug, string releaseSlug)
+    public static string PublicContentSubjectMetaParentPath(
+        string publicationSlug,
+        string releaseSlug
+    )
     {
         return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{SubjectMetaDirectory}";
     }
 
-    public static string PublicContentSubjectMetaPath(string publicationSlug, string releaseSlug, Guid subjectId)
+    public static string PublicContentSubjectMetaPath(
+        string publicationSlug,
+        string releaseSlug,
+        Guid subjectId
+    )
     {
         return $"{PublicContentSubjectMetaParentPath(publicationSlug, releaseSlug)}/{subjectId}.json";
     }
 
-    public static string PublicContentReleaseSubjectsPath(string publicationSlug, string releaseSlug)
+    public static string PublicContentReleaseSubjectsPath(
+        string publicationSlug,
+        string releaseSlug
+    )
     {
         return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subjects.json";
     }

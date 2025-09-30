@@ -30,7 +30,8 @@ public class TableBuilderServicePermissionTests
     [Fact]
     public async Task Query_LatestRelease_CanViewSubjectData()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
@@ -56,27 +57,26 @@ public class TableBuilderServicePermissionTests
 
         await PolicyCheckBuilder<DataSecurityPolicies>()
             .SetupResourceCheckToFail(releaseSubject, DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = BuildTableBuilderService(
-                        contextDbContext,
-                        userService: userService.Object,
-                        subjectRepository: subjectRepository.Object,
-                        statisticsPersistenceHelper: statisticsPersistenceHelper.Object
-                    );
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildTableBuilderService(
+                    contextDbContext,
+                    userService: userService.Object,
+                    subjectRepository: subjectRepository.Object,
+                    statisticsPersistenceHelper: statisticsPersistenceHelper.Object
+                );
 
-                    return await service.Query(
-                        new FullTableQuery { SubjectId = releaseSubject.SubjectId }
-                    );
-                }
-            );
+                return await service.Query(
+                    new FullTableQuery { SubjectId = releaseSubject.SubjectId }
+                );
+            });
     }
 
     [Fact]
     public async Task Query_ReleaseVersionId_CanViewSubjectData()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
@@ -96,20 +96,18 @@ public class TableBuilderServicePermissionTests
 
         await PolicyCheckBuilder<DataSecurityPolicies>()
             .SetupResourceCheckToFail(releaseSubject, DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = BuildTableBuilderService(
-                        contextDbContext,
-                        userService: userService.Object,
-                        statisticsPersistenceHelper: statisticsPersistenceHelper.Object
-                    );
-                    return await service.Query(
-                        releaseVersionId: releaseVersion.Id,
-                        new FullTableQuery { SubjectId = releaseSubject.SubjectId }
-                    );
-                }
-            );
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildTableBuilderService(
+                    contextDbContext,
+                    userService: userService.Object,
+                    statisticsPersistenceHelper: statisticsPersistenceHelper.Object
+                );
+                return await service.Query(
+                    releaseVersionId: releaseVersion.Id,
+                    new FullTableQuery { SubjectId = releaseSubject.SubjectId }
+                );
+            });
     }
 
     private TableBuilderService BuildTableBuilderService(
@@ -123,7 +121,8 @@ public class TableBuilderServicePermissionTests
         ISubjectRepository? subjectRepository = null,
         IUserService? userService = null,
         IOptions<TableBuilderOptions>? tableBuilderOptions = null,
-        IOptions<LocationsOptions>? locationsOptions = null)
+        IOptions<LocationsOptions>? locationsOptions = null
+    )
     {
         return new(
             Mock.Of<StatisticsDbContext>(),
@@ -131,7 +130,8 @@ public class TableBuilderServicePermissionTests
             filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
             locationService ?? Mock.Of<ILocationService>(Strict),
             observationService ?? Mock.Of<IObservationService>(Strict),
-            statisticsPersistenceHelper ?? MockUtils.MockPersistenceHelper<StatisticsDbContext>().Object,
+            statisticsPersistenceHelper
+                ?? MockUtils.MockPersistenceHelper<StatisticsDbContext>().Object,
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
             subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),

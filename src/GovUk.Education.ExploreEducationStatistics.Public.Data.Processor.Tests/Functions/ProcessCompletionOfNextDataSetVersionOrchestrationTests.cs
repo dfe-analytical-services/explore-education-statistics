@@ -22,7 +22,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
             // Expect an entity lock to be acquired for calling the ImportMetadata activity
             var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
             mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
-            mockOrchestrationContext.SetupGet(context => context.Entities)
+            mockOrchestrationContext
+                .SetupGet(context => context.Entities)
                 .Returns(mockEntityFeature.Object);
 
             string[] expectedActivitySequence =
@@ -31,16 +32,20 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
                 ActivityNames.CreateChanges,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
-                ActivityNames.CompleteNextDataSetVersionImportProcessing
+                ActivityNames.CompleteNextDataSetVersionImportProcessing,
             ];
 
             foreach (var activityName in expectedActivitySequence)
             {
                 mockOrchestrationContext
                     .InSequence(activitySequence)
-                    .Setup(context => context.CallActivityAsync(activityName,
-                        mockOrchestrationContext.Object.InstanceId,
-                        null))
+                    .Setup(context =>
+                        context.CallActivityAsync(
+                            activityName,
+                            mockOrchestrationContext.Object.InstanceId,
+                            null
+                        )
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -58,23 +63,30 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
 
             var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
             mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
-            mockOrchestrationContext.SetupGet(context => context.Entities)
+            mockOrchestrationContext
+                .SetupGet(context => context.Entities)
                 .Returns(mockEntityFeature.Object);
-                
+
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.ImportMetadata,
+                    context.CallActivityAsync(
+                        ActivityNames.ImportMetadata,
                         mockOrchestrationContext.Object.InstanceId,
-                        null))
+                        null
+                    )
+                )
                 .Throws<Exception>();
 
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.HandleProcessingFailure,
+                    context.CallActivityAsync(
+                        ActivityNames.HandleProcessingFailure,
                         mockOrchestrationContext.Object.InstanceId,
-                        null))
+                        null
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await ProcessCompletionOfNextDataSetVersionImport(mockOrchestrationContext.Object);
@@ -83,21 +95,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
         }
 
         private static async Task ProcessCompletionOfNextDataSetVersionImport(
-            TaskOrchestrationContext orchestrationContext)
+            TaskOrchestrationContext orchestrationContext
+        )
         {
             await ProcessCompletionOfNextDataSetVersionOrchestration.ProcessCompletionOfNextDataSetVersionImport(
                 orchestrationContext,
-                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
+                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() }
+            );
         }
 
-        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(Guid? instanceId = null)
+        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(
+            Guid? instanceId = null
+        )
         {
             var mock = new Mock<TaskOrchestrationContext>(MockBehavior.Strict);
 
             mock.Setup(context =>
                     context.CreateReplaySafeLogger(
-                        nameof(ProcessCompletionOfNextDataSetVersionOrchestration
-                            .ProcessCompletionOfNextDataSetVersionImport)))
+                        nameof(
+                            ProcessCompletionOfNextDataSetVersionOrchestration.ProcessCompletionOfNextDataSetVersionImport
+                        )
+                    )
+                )
                 .Returns(NullLogger.Instance);
 
             mock.SetupGet(context => context.InstanceId)

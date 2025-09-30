@@ -50,8 +50,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_SingleElement()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            "<p>Test paragraph</p>");
+        var text = await HtmlToTextUtils.HtmlToText("<p>Test paragraph</p>");
 
         Assert.Equal("Test paragraph", text);
     }
@@ -59,8 +58,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_SingleElement_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            "<div><p>Test paragraph</p></div>");
+        var text = await HtmlToTextUtils.HtmlToText("<div><p>Test paragraph</p></div>");
 
         Assert.Equal("Test paragraph", text);
     }
@@ -69,7 +67,8 @@ public class HtmlToTextUtilsTests
     public async Task HtmlToText_InlineElements()
     {
         var text = await HtmlToTextUtils.HtmlToText(
-            "<p>Test paragraph with <strong>bold text</strong> and <em>italic text</em></p>");
+            "<p>Test paragraph with <strong>bold text</strong> and <em>italic text</em></p>"
+        );
 
         Assert.Equal("Test paragraph with bold text and italic text", text);
     }
@@ -83,7 +82,8 @@ public class HtmlToTextUtilsTests
                     <strong>bold text</strong> 
                     and <em>italic text</em> and
                     <small>small text</small>
-                  </p>");
+                  </p>"
+        );
 
         Assert.Equal("Test paragraph with bold text and italic text and small text", text);
     }
@@ -100,16 +100,19 @@ public class HtmlToTextUtilsTests
                     <strong>Next sentence?</strong>
                     <a href=""https://test.com"">A link</a>
                     over here.
-                  </p>");
+                  </p>"
+        );
 
-        Assert.Equal("Test paragraph with bold text, italic text! And small text. Next sentence? A link (https://test.com) over here.", text);
+        Assert.Equal(
+            "Test paragraph with bold text, italic text! And small text. Next sentence? A link (https://test.com) over here.",
+            text
+        );
     }
 
     [Fact]
     public async Task HtmlToText_Paragraph_AfterInlineText()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            @"Something before <p>Test paragraph</p>");
+        var text = await HtmlToTextUtils.HtmlToText(@"Something before <p>Test paragraph</p>");
 
         Assert.Equal("Something before\r\n\r\nTest paragraph", text);
     }
@@ -117,8 +120,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_Paragraph_AfterInlineTextWithLineBreak()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            @"Something before<br/><p>Test paragraph</p>");
+        var text = await HtmlToTextUtils.HtmlToText(@"Something before<br/><p>Test paragraph</p>");
 
         Assert.Equal("Something before\r\n\r\nTest paragraph", text);
     }
@@ -126,8 +128,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_Link()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            @"<a href=""https://test.com"">Page link</a>");
+        var text = await HtmlToTextUtils.HtmlToText(@"<a href=""https://test.com"">Page link</a>");
 
         Assert.Equal("Page link (https://test.com)", text);
     }
@@ -136,7 +137,8 @@ public class HtmlToTextUtilsTests
     public async Task HtmlToText_Link_Inline()
     {
         var text = await HtmlToTextUtils.HtmlToText(
-            @"<p>Test paragraph with <a href=""https://test.com"">page link</a> inline</p>");
+            @"<p>Test paragraph with <a href=""https://test.com"">page link</a> inline</p>"
+        );
 
         Assert.Equal("Test paragraph with page link (https://test.com) inline", text);
     }
@@ -145,7 +147,8 @@ public class HtmlToTextUtilsTests
     public async Task HtmlToText_Link_Inline_InDiv()
     {
         var text = await HtmlToTextUtils.HtmlToText(
-            @"<div>Test <a href=""https://test.com"">page link</a> inline</div>");
+            @"<div>Test <a href=""https://test.com"">page link</a> inline</div>"
+        );
 
         Assert.Equal("Test page link (https://test.com) inline", text);
     }
@@ -154,7 +157,8 @@ public class HtmlToTextUtilsTests
     public async Task HtmlToText_Link_Inline_InText()
     {
         var text = await HtmlToTextUtils.HtmlToText(
-            @"Test <a href=""https://test.com"">page link</a> in some text");
+            @"Test <a href=""https://test.com"">page link</a> in some text"
+        );
 
         Assert.Equal("Test page link (https://test.com) in some text", text);
     }
@@ -168,16 +172,21 @@ public class HtmlToTextUtilsTests
                     <a href=""https://test.com"">page link</a> 
                     and <a href=""https://test-2.com"">other page link</a>
                     on another row.
-                  </p>");
+                  </p>"
+        );
 
-        Assert.Equal("Test paragraph with page link (https://test.com) and other page link (https://test-2.com) on another row.", text);
+        Assert.Equal(
+            "Test paragraph with page link (https://test.com) and other page link (https://test-2.com) on another row.",
+            text
+        );
     }
 
     [Fact]
     public async Task HtmlToText_InlineElements_NestedOneLevel()
     {
         var text = await HtmlToTextUtils.HtmlToText(
-            @"<span>Test <a href=""https://test.com"">page link</a> and <strong>strong text</strong></span>");
+            @"<span>Test <a href=""https://test.com"">page link</a> and <strong>strong text</strong></span>"
+        );
 
         Assert.Equal("Test page link (https://test.com) and strong text", text);
     }
@@ -192,7 +201,8 @@ public class HtmlToTextUtilsTests
                     <a href=""https://test.com"">page link</a> 
                     and 
                     <strong>strong text</strong>
-                </span>");
+                </span>"
+        );
 
         Assert.Equal("Test page link (https://test.com) and strong text", text);
     }
@@ -201,11 +211,11 @@ public class HtmlToTextUtilsTests
     public async Task HtmlToText_InlineElements_NestedTwoLevels()
     {
         var text = await HtmlToTextUtils.HtmlToText(
-            @"<span>Test <a href=""https://test.com"">page <em>link</em></a> and <strong>strong text</strong></span>");
+            @"<span>Test <a href=""https://test.com"">page <em>link</em></a> and <strong>strong text</strong></span>"
+        );
 
         Assert.Equal("Test page link (https://test.com) and strong text", text);
     }
-
 
     [Fact]
     public async Task HtmlToText_InlineElements_NestedTwoLevels_Multiline()
@@ -220,7 +230,8 @@ public class HtmlToTextUtilsTests
                     <strong>
                         strong text
                     </strong>
-                </span>");
+                </span>"
+        );
 
         Assert.Equal("Test page link (https://test.com) and strong text", text);
     }
@@ -228,7 +239,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_MultipleElements_Blocks_CrlfLineEndingsOnly()
     {
-        var lines = new []
+        var lines = new[]
         {
             "<h1>Test heading 1</h1>",
             "<h2>Test heading 2</h2>",
@@ -241,7 +252,7 @@ public class HtmlToTextUtilsTests
 
         var text = await HtmlToTextUtils.HtmlToText(lines.JoinToString());
 
-        var expectedLines = new []
+        var expectedLines = new[]
         {
             "Test heading 1",
             "Test heading 2",
@@ -268,7 +279,8 @@ public class HtmlToTextUtilsTests
                 <h4>Test heading 4</h4>
                 <h5>Test heading 5</h5>
                 <h6>Test heading 6</h6>
-                <p>Test paragraph 1</p>");
+                <p>Test paragraph 1</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -286,7 +298,8 @@ public class HtmlToTextUtilsTests
                     <h5>Test heading 5</h5>
                     <h6>Test heading 6</h6>
                     <p>Test paragraph 1</p>
-                </div>");
+                </div>"
+        );
 
         Snapshot.Match(text);
     }
@@ -304,7 +317,8 @@ public class HtmlToTextUtilsTests
                 </section>
                 <section>
                     <h2>Test heading 2</h2>
-                </section>");
+                </section>"
+        );
         Snapshot.Match(text);
     }
 
@@ -316,7 +330,8 @@ public class HtmlToTextUtilsTests
                 <span>Test span 1</span>
                 <a href=""https://test.com"">Test link 1</a>
                 <strong>Test strong 1</strong>
-                <em>Test emphasis 1</em>");
+                <em>Test emphasis 1</em>"
+        );
 
         Snapshot.Match(text);
     }
@@ -331,7 +346,8 @@ public class HtmlToTextUtilsTests
                     <a href=""https://test.com"">Test link 1</a>
                     <strong>Test strong 1</strong>
                     <em>Test emphasis 1</em>
-                </div>");
+                </div>"
+        );
 
         Snapshot.Match(text);
     }
@@ -351,7 +367,8 @@ public class HtmlToTextUtilsTests
                 <em>Test emphasis 1</em>
                 <h5>Test heading 5</h5>
                 <h6>Test heading 6</h6>
-                <p>Test paragraph 1</p>");
+                <p>Test paragraph 1</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -373,7 +390,8 @@ public class HtmlToTextUtilsTests
                     <h5>Test heading 5</h5>
                     <h6>Test heading 6</h6>
                     <p>Test paragraph 1</p>
-                </div>");
+                </div>"
+        );
 
         Snapshot.Match(text);
     }
@@ -386,7 +404,8 @@ public class HtmlToTextUtilsTests
                 <span>Test span 1</span>
                 <p>Test paragraph 1</p>
                 <strong>Test strong 1</strong>
-                <h1>Test heading 1</h1>");
+                <h1>Test heading 1</h1>"
+        );
 
         Snapshot.Match(text);
     }
@@ -401,7 +420,8 @@ public class HtmlToTextUtilsTests
                     <p>Test paragraph 1</p>
                     <strong>Test strong 1</strong>
                     <h1>Test heading 1</h1>
-                </div>");
+                </div>"
+        );
 
         Snapshot.Match(text);
     }
@@ -414,7 +434,8 @@ public class HtmlToTextUtilsTests
                 <span>Test span 1 <br/></span>
                 <p>Test paragraph 1</p>
                 <strong>Test strong 1 <br/></strong>
-                <h1>Test heading 1</h1>");
+                <h1>Test heading 1</h1>"
+        );
 
         Snapshot.Match(text);
     }
@@ -427,7 +448,8 @@ public class HtmlToTextUtilsTests
                 <p>Test paragraph 1</p>
                 <hr/>
                 <p>Test paragraph 2</p>
-                ");
+                "
+        );
 
         Snapshot.Match(text);
     }
@@ -441,7 +463,8 @@ public class HtmlToTextUtilsTests
                     <br/>with line break</p>
                 <br/>
                 <p>Test paragraph 2</p>
-                ");
+                "
+        );
 
         Snapshot.Match(text);
     }
@@ -454,7 +477,8 @@ public class HtmlToTextUtilsTests
                 <ul>
                     <li>List item 1</li>
                     <li>List item 2</li>
-                </ul>");
+                </ul>"
+        );
 
         Snapshot.Match(text);
     }
@@ -468,7 +492,8 @@ public class HtmlToTextUtilsTests
                     <li>List item 1</li>
                     <li>List item 2</li>
                 </ul>
-                <p>Paragraph after</p>");
+                <p>Paragraph after</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -481,7 +506,8 @@ public class HtmlToTextUtilsTests
                 <ol>
                     <li>List item 1</li>
                     <li>List item 2</li>
-                </ol>");
+                </ol>"
+        );
 
         Snapshot.Match(text);
     }
@@ -495,7 +521,8 @@ public class HtmlToTextUtilsTests
                     <li>List item 1</li>
                     <li>List item 2</li>
                 </ol>
-                <p>Paragraph after</p>");
+                <p>Paragraph after</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -523,7 +550,8 @@ public class HtmlToTextUtilsTests
                         <p>List item 11</p>
                         <p>Over multiple lines</p>
                     </li>
-                </ol>");
+                </ol>"
+        );
 
         Snapshot.Match(text);
     }
@@ -541,7 +569,8 @@ public class HtmlToTextUtilsTests
                         <p>List item 2 paragraph 2</p>
                     </li>
                     <li>List item 3</li>
-                </ul>");
+                </ul>"
+        );
 
         Snapshot.Match(text);
     }
@@ -560,7 +589,8 @@ public class HtmlToTextUtilsTests
                             <li>Nested list item 2</li>
                         </ul>
                     </li>
-                </ul>");
+                </ul>"
+        );
 
         Snapshot.Match(text);
     }
@@ -585,7 +615,8 @@ public class HtmlToTextUtilsTests
                             </li>
                         </ul>
                     </li>
-                </ul>");
+                </ul>"
+        );
 
         Snapshot.Match(text);
     }
@@ -613,7 +644,8 @@ public class HtmlToTextUtilsTests
                         <p>List item 11</p>
                         <p>Over multiple lines</p>
                     </li>
-                </ul>");
+                </ul>"
+        );
 
         Snapshot.Match(text);
     }
@@ -631,7 +663,8 @@ public class HtmlToTextUtilsTests
                     <dt>Term 3</dt>
                     <dd>Description 3</dd>
                 </dl>
-                <p>Paragraph after</p>");
+                <p>Paragraph after</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -649,11 +682,11 @@ public class HtmlToTextUtilsTests
                     <dt>Term 3</dt>
                     <dd>Description 3</dd>
                 </dl>
-                <p>Paragraph after</p>");
+                <p>Paragraph after</p>"
+        );
 
         Snapshot.Match(text);
     }
-
 
     [Fact]
     public async Task HtmlToText_DescriptionList_WithMultilineItem()
@@ -674,7 +707,8 @@ public class HtmlToTextUtilsTests
                     </dd>
                     <dt>Term 3</dt>
                     <dd>Description 3</dd>
-                </dl>");
+                </dl>"
+        );
 
         Snapshot.Match(text);
     }
@@ -682,8 +716,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_Blockquote()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            "<blockquote>Test quote</blockquote>");
+        var text = await HtmlToTextUtils.HtmlToText("<blockquote>Test quote</blockquote>");
 
         Assert.Equal("Test quote", text);
     }
@@ -694,7 +727,8 @@ public class HtmlToTextUtilsTests
         var text = await HtmlToTextUtils.HtmlToText(
             @"
                 <blockquote>Test quote</blockquote>
-                <p>Paragraph after</p>");
+                <p>Paragraph after</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -707,7 +741,8 @@ public class HtmlToTextUtilsTests
                 <blockquote>
                     <p>Test paragraph quote 1</p>
                     <p>Test paragraph quote 2</p>
-                </blockquote>");
+                </blockquote>"
+        );
 
         Snapshot.Match(text);
     }
@@ -725,7 +760,8 @@ public class HtmlToTextUtilsTests
                     <figcaption>
                         <cite>Test citation</cite>
                     </figcaption>
-                </figure>");
+                </figure>"
+        );
 
         Snapshot.Match(text);
     }
@@ -744,7 +780,8 @@ public class HtmlToTextUtilsTests
                         <cite>Test citation</cite>
                     </figcaption>
                 </figure>
-                <p>Paragraph after</p>");
+                <p>Paragraph after</p>"
+        );
 
         Snapshot.Match(text);
     }
@@ -765,7 +802,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 4</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -799,7 +837,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 9</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -827,7 +866,8 @@ public class HtmlToTextUtilsTests
                             <td></td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -854,7 +894,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 4</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -875,7 +916,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 2</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -902,7 +944,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 2</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -929,7 +972,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 8</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -962,7 +1006,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 8</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -996,7 +1041,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 6</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1018,7 +1064,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 2</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1042,7 +1089,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 5</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1072,7 +1120,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 5</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1106,7 +1155,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 6</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1128,7 +1178,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 2</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1153,7 +1204,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 6</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1181,7 +1233,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 8</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1206,7 +1259,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 6</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1236,7 +1290,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 9</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1266,7 +1321,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 8</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1291,7 +1347,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 6</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1319,7 +1376,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 8</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1344,7 +1402,8 @@ public class HtmlToTextUtilsTests
                             <td>Cell 6</td>
                         </tr>
                     </tbody>
-                </table>");
+                </table>"
+        );
 
         Snapshot.Match(text);
     }
@@ -1366,11 +1425,11 @@ public class HtmlToTextUtilsTests
                         </tr>
                     </tbody>
                 </table>
-                <p>Test paragraph</p>");
+                <p>Test paragraph</p>"
+        );
 
         Snapshot.Match(text);
     }
-
 
     [Fact]
     public async Task HtmlToText_TableElement_InFigure_LineAfter()
@@ -1391,7 +1450,8 @@ public class HtmlToTextUtilsTests
                         </tbody>
                     </table>
                 </figure>
-                <p>Test paragraph</p>");
+                <p>Test paragraph</p>"
+        );
 
         Snapshot.Match(text);
     }

@@ -31,7 +31,8 @@ public class KeyStatisticService : IKeyStatisticService
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IDataBlockService dataBlockService,
         IUserService userService,
-        IMapper mapper)
+        IMapper mapper
+    )
     {
         _context = context;
         _persistenceHelper = persistenceHelper;
@@ -40,19 +41,26 @@ public class KeyStatisticService : IKeyStatisticService
         _mapper = mapper;
     }
 
-    public async Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
-        Guid releaseVersionId,
-        KeyStatisticDataBlockCreateRequest request)
+    public async Task<
+        Either<ActionResult, KeyStatisticDataBlockViewModel>
+    > CreateKeyStatisticDataBlock(Guid releaseVersionId, KeyStatisticDataBlockCreateRequest request)
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
-                query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
-                                                && dataBlockVersion.ReleaseVersionId == releaseVersionId)))
+            .OnSuccess(_ =>
+                _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
+                    query.Where(dataBlockVersion =>
+                        dataBlockVersion.Id == request.DataBlockId
+                        && dataBlockVersion.ReleaseVersionId == releaseVersionId
+                    )
+                )
+            )
             .OnSuccessDo(async dataBlockVersion =>
                 await _dataBlockService.IsUnattachedDataBlock(releaseVersionId, dataBlockVersion)
                     ? new Either<ActionResult, Unit>(Unit.Instance)
-                    : ValidationActionResult(DataBlockShouldBeUnattached))
+                    : ValidationActionResult(DataBlockShouldBeUnattached)
+            )
             .OnSuccess(async dataBlockVersion =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
@@ -60,11 +68,13 @@ public class KeyStatisticService : IKeyStatisticService
                 keyStatisticDataBlock.CreatedById = _userService.GetUserId();
                 keyStatisticDataBlock.DataBlockParentId = dataBlockVersion.DataBlockParentId;
 
-                var currentMaxOrder = await _context.KeyStatistics
-                    .Where(ks => ks.ReleaseVersionId == releaseVersionId)
+                var currentMaxOrder = await _context
+                    .KeyStatistics.Where(ks => ks.ReleaseVersionId == releaseVersionId)
                     .Select(ks => ks.Order)
                     .MaxAsync(order => (int?)order);
-                keyStatisticDataBlock.Order = currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
+                keyStatisticDataBlock.Order = currentMaxOrder.HasValue
+                    ? currentMaxOrder.Value + 1
+                    : 0;
 
                 await _context.KeyStatisticsDataBlock.AddAsync(keyStatisticDataBlock);
                 await _context.SaveChangesAsync();
@@ -75,9 +85,11 @@ public class KeyStatisticService : IKeyStatisticService
 
     public async Task<Either<ActionResult, KeyStatisticTextViewModel>> CreateKeyStatisticText(
         Guid releaseVersionId,
-        KeyStatisticTextCreateRequest request)
+        KeyStatisticTextCreateRequest request
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -85,8 +97,8 @@ public class KeyStatisticService : IKeyStatisticService
                 keyStatisticText.ReleaseVersionId = releaseVersionId;
                 keyStatisticText.CreatedById = _userService.GetUserId();
 
-                var currentMaxOrder = await _context.KeyStatistics
-                    .Where(ks => ks.ReleaseVersionId == releaseVersionId)
+                var currentMaxOrder = await _context
+                    .KeyStatistics.Where(ks => ks.ReleaseVersionId == releaseVersionId)
                     .Select(ks => ks.Order)
                     .MaxAsync(order => (int?)order);
                 keyStatisticText.Order = currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
@@ -98,16 +110,23 @@ public class KeyStatisticService : IKeyStatisticService
             });
     }
 
-    public async Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
+    public async Task<
+        Either<ActionResult, KeyStatisticDataBlockViewModel>
+    > UpdateKeyStatisticDataBlock(
         Guid releaseVersionId,
         Guid keyStatisticId,
-        KeyStatisticDataBlockUpdateRequest request)
+        KeyStatisticDataBlockUpdateRequest request
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
-                await _persistenceHelper.CheckEntityExists<KeyStatisticDataBlock>(keyStatisticId, query =>
-                    query.Where(keyStat => keyStat.ReleaseVersionId == releaseVersion.Id)))
+                await _persistenceHelper.CheckEntityExists<KeyStatisticDataBlock>(
+                    keyStatisticId,
+                    query => query.Where(keyStat => keyStat.ReleaseVersionId == releaseVersion.Id)
+                )
+            )
             .OnSuccess(async keyStat =>
             {
                 _context.KeyStatisticsDataBlock.Update(keyStat);
@@ -126,13 +145,18 @@ public class KeyStatisticService : IKeyStatisticService
     public async Task<Either<ActionResult, KeyStatisticTextViewModel>> UpdateKeyStatisticText(
         Guid releaseVersionId,
         Guid keyStatisticId,
-        KeyStatisticTextUpdateRequest request)
+        KeyStatisticTextUpdateRequest request
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
-                await _persistenceHelper.CheckEntityExists<KeyStatisticText>(keyStatisticId, query =>
-                    query.Where(keyStat => keyStat.ReleaseVersionId == releaseVersion.Id)))
+                await _persistenceHelper.CheckEntityExists<KeyStatisticText>(
+                    keyStatisticId,
+                    query => query.Where(keyStat => keyStat.ReleaseVersionId == releaseVersion.Id)
+                )
+            )
             .OnSuccess(async keyStat =>
             {
                 _context.KeyStatisticsText.Update(keyStat);
@@ -152,12 +176,17 @@ public class KeyStatisticService : IKeyStatisticService
 
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid keyStatisticId)
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await _persistenceHelper.CheckEntityExists<KeyStatistic>(query =>
-                    query.Where(keyStat => keyStat.Id == keyStatisticId
-                                           && keyStat.ReleaseVersionId == releaseVersion.Id)))
+                    query.Where(keyStat =>
+                        keyStat.Id == keyStatisticId
+                        && keyStat.ReleaseVersionId == releaseVersion.Id
+                    )
+                )
+            )
             .OnSuccessVoid(async keyStat =>
             {
                 _context.KeyStatistics.Remove(keyStat);
@@ -167,38 +196,45 @@ public class KeyStatisticService : IKeyStatisticService
 
     public async Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
         Guid releaseVersionId,
-        List<Guid> newOrder)
+        List<Guid> newOrder
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess<ActionResult, ReleaseVersion, List<KeyStatisticViewModel>>(async release =>
             {
-                var keyStatistics = await _context.KeyStatistics
-                    .Where(ks => ks.ReleaseVersionId == release.Id)
+                var keyStatistics = await _context
+                    .KeyStatistics.Where(ks => ks.ReleaseVersionId == release.Id)
                     .ToListAsync();
 
-                if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                if (
+                    !ComparerUtils.SequencesAreEqualIgnoringOrder(
                         newOrder,
-                        keyStatistics.Select(ks => ks.Id)))
+                        keyStatistics.Select(ks => ks.Id)
+                    )
+                )
                 {
-                    return ValidationActionResult(
-                        ProvidedKeyStatIdsDifferFromReleaseKeyStatIds);
+                    return ValidationActionResult(ProvidedKeyStatIdsDifferFromReleaseKeyStatIds);
                 }
 
                 var updatingUserId = _userService.GetUserId();
 
-                newOrder.ForEach((keyStatisticId, order) =>
-                {
-                    var matchingKeyStat = keyStatistics.Single(ks => ks.Id == keyStatisticId);
-                    matchingKeyStat.Order = order;
-                    matchingKeyStat.UpdatedById = updatingUserId;
-                });
+                newOrder.ForEach(
+                    (keyStatisticId, order) =>
+                    {
+                        var matchingKeyStat = keyStatistics.Single(ks => ks.Id == keyStatisticId);
+                        matchingKeyStat.Order = order;
+                        matchingKeyStat.UpdatedById = updatingUserId;
+                    }
+                );
 
                 _context.KeyStatistics.UpdateRange(keyStatistics);
                 await _context.SaveChangesAsync();
 
                 return _mapper.Map<List<KeyStatisticViewModel>>(
-                    keyStatistics.OrderBy(ks => ks.Order));
+                    keyStatistics.OrderBy(ks => ks.Order)
+                );
             });
     }
 }

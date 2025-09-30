@@ -18,8 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static Moq.MockBehavior;
-using ReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -29,7 +28,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
     private static readonly ReleaseVersion ReleaseVersion = new()
     {
         Id = Guid.NewGuid(),
-        Publication = new Publication { Id = Guid.NewGuid() }
+        Publication = new Publication { Id = Guid.NewGuid() },
     };
 
     private static readonly DataFixture DataFixture = new();
@@ -48,7 +47,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     return CreateHandler(contentDbContext);
                 },
                 ReleaseVersion,
-                claimsExpectedToSucceed: AccessAllReleases);
+                claimsExpectedToSucceed: AccessAllReleases
+            );
         }
     }
 
@@ -64,7 +64,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     return CreateHandler(contentDbContext);
                 },
                 ReleaseVersion,
-                rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Allower });
+                rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Allower }
+            );
         }
     }
 
@@ -81,10 +82,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     return CreateHandler(contentDbContext);
                 },
                 ReleaseVersion,
-                rolesExpectedToSucceed:
-                [
-                    ReleaseRole.Contributor, ReleaseRole.Approver
-                ]);
+                rolesExpectedToSucceed: [ReleaseRole.Contributor, ReleaseRole.Approver]
+            );
         }
 
         [Fact]
@@ -102,12 +101,12 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     {
                         ReleaseVersionId = ReleaseVersion.Id,
                         UserId = userId,
-                        Role = ReleaseRole.PrereleaseViewer
-                    }
+                        Role = ReleaseRole.PrereleaseViewer,
+                    },
                 },
                 ExpectedToPass = true,
                 UnexpectedFailMessage =
-                    "Expected the test to succeed because the Pre Release window is currently open"
+                    "Expected the test to succeed because the Pre Release window is currently open",
             };
 
             var preReleaseService = new Mock<IPreReleaseService>(Strict);
@@ -120,7 +119,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
             // if the Pre Release window is currently open.
             await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
                 contentDbContext => CreateHandler(contentDbContext, preReleaseService.Object),
-                successScenario);
+                successScenario
+            );
 
             VerifyAllMocks(preReleaseService);
         }
@@ -140,13 +140,13 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     {
                         ReleaseVersionId = ReleaseVersion.Id,
                         UserId = userId,
-                        Role = ReleaseRole.PrereleaseViewer
-                    }
+                        Role = ReleaseRole.PrereleaseViewer,
+                    },
                 },
                 ExpectedToPass = false,
                 UnexpectedPassMessage =
-                    "Expected the test to fail because the Pre Release window is not open at the " +
-                    "current time"
+                    "Expected the test to fail because the Pre Release window is not open at the "
+                    + "current time",
             };
 
             await GetEnums<PreReleaseAccess>()
@@ -158,7 +158,9 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
                     preReleaseService
-                        .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
+                        .Setup(s =>
+                            s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>())
+                        )
                         .Returns(new PreReleaseWindowStatus { Access = access });
 
                     // Assert that a User who specifically has the Pre Release role will cause this handler to fail
@@ -169,7 +171,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                             contentDbContext.Attach(ReleaseVersion);
                             return CreateHandler(contentDbContext, preReleaseService.Object);
                         },
-                        failureScenario);
+                        failureScenario
+                    );
 
                     VerifyAllMocks(preReleaseService);
                 });
@@ -178,24 +181,30 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
 
     private static ViewSpecificReleaseAuthorizationHandler CreateHandler(
         ContentDbContext contentDbContext,
-        IPreReleaseService? preReleaseService = null)
+        IPreReleaseService? preReleaseService = null
+    )
     {
         return new ViewSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: new UserReleaseRoleRepository(
                     contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
+                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                ),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: preReleaseService ?? new PreReleaseService(
-                    new PreReleaseAccessOptions
-                    {
-                        AccessWindow = new AccessWindowOptions
+                    contentDbContext: contentDbContext
+                ),
+                preReleaseService: preReleaseService
+                    ?? new PreReleaseService(
+                        new PreReleaseAccessOptions
                         {
-                            MinutesBeforeReleaseTimeStart = 200,
-                        }
-                    }.ToOptionsWrapper()
-                )));
+                            AccessWindow = new AccessWindowOptions
+                            {
+                                MinutesBeforeReleaseTimeStart = 200,
+                            },
+                        }.ToOptionsWrapper()
+                    )
+            )
+        );
     }
 }

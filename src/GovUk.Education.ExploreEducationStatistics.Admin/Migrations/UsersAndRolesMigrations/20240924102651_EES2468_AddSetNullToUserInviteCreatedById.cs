@@ -13,7 +13,8 @@ public partial class EES2468_AddSetNullToUserInviteCreatedById : Migration
     {
         migrationBuilder.DropForeignKey(
             name: "FK_UserInvites_AspNetUsers_CreatedById",
-            table: "UserInvites");
+            table: "UserInvites"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_UserInvites_AspNetUsers_CreatedById",
@@ -21,7 +22,8 @@ public partial class EES2468_AddSetNullToUserInviteCreatedById : Migration
             column: "CreatedById",
             principalTable: "AspNetUsers",
             principalColumn: "Id",
-            onDelete: ReferentialAction.SetNull);
+            onDelete: ReferentialAction.SetNull
+        );
     }
 
     /// <inheritdoc />
@@ -29,13 +31,15 @@ public partial class EES2468_AddSetNullToUserInviteCreatedById : Migration
     {
         migrationBuilder.DropForeignKey(
             name: "FK_UserInvites_AspNetUsers_CreatedById",
-            table: "UserInvites");
+            table: "UserInvites"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_UserInvites_AspNetUsers_CreatedById",
             table: "UserInvites",
             column: "CreatedById",
             principalTable: "AspNetUsers",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 }

@@ -9,8 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;
 public class CacheAspect : BaseUniversalWrapperAspect
 {
     private const BindingFlags ConstructorBindingFlags =
-        BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance |
-        BindingFlags.OptionalParamBinding;
+        BindingFlags.Instance
+        | BindingFlags.Public
+        | BindingFlags.CreateInstance
+        | BindingFlags.OptionalParamBinding;
 
     /// <summary>
     /// Enables cache attribute processing.
@@ -32,7 +34,8 @@ public class CacheAspect : BaseUniversalWrapperAspect
         [Argument(Source.Name)] string name,
         [Argument(Source.Arguments)] object[] args,
         [Argument(Source.ReturnType)] Type returnType,
-        [Argument(Source.Triggers)] Attribute[] triggers)
+        [Argument(Source.Triggers)] Attribute[] triggers
+    )
     {
         if (!Enabled)
         {
@@ -46,7 +49,9 @@ public class CacheAspect : BaseUniversalWrapperAspect
 
         if (typeof(Task).IsAssignableFrom(returnType) && !returnType.IsConstructedGenericType)
         {
-            throw new ArgumentException("Method return type cannot be Task. Consider using Task<TResult>");
+            throw new ArgumentException(
+                "Method return type cannot be Task. Consider using Task<TResult>"
+            );
         }
 
         return BaseHandle(instance, type, method, target, name, args, returnType, triggers);

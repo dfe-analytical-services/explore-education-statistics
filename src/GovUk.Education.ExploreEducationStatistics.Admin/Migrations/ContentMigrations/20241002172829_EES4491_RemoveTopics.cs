@@ -13,18 +13,14 @@ public partial class EES4491_RemoveTopics : Migration
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Publications_Topics_TopicId",
-            table: "Publications");
+            table: "Publications"
+        );
 
-        migrationBuilder.DropTable(
-            name: "Topics");
+        migrationBuilder.DropTable(name: "Topics");
 
-        migrationBuilder.DropIndex(
-            name: "IX_Publications_TopicId",
-            table: "Publications");
+        migrationBuilder.DropIndex(name: "IX_Publications_TopicId", table: "Publications");
 
-        migrationBuilder.DropColumn(
-            name: "TopicId",
-            table: "Publications");
+        migrationBuilder.DropColumn(name: "TopicId", table: "Publications");
     }
 
     /// <inheritdoc />
@@ -35,7 +31,8 @@ public partial class EES4491_RemoveTopics : Migration
             table: "Publications",
             type: "uniqueidentifier",
             nullable: false,
-            defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+            defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+        );
 
         migrationBuilder.CreateTable(
             name: "Topics",
@@ -44,7 +41,7 @@ public partial class EES4491_RemoveTopics : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 ThemeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Slug = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
             },
             constraints: table =>
             {
@@ -54,18 +51,18 @@ public partial class EES4491_RemoveTopics : Migration
                     column: x => x.ThemeId,
                     principalTable: "Themes",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
+                    onDelete: ReferentialAction.Cascade
+                );
+            }
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Publications_TopicId",
             table: "Publications",
-            column: "TopicId");
+            column: "TopicId"
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Topics_ThemeId",
-            table: "Topics",
-            column: "ThemeId");
+        migrationBuilder.CreateIndex(name: "IX_Topics_ThemeId", table: "Topics", column: "ThemeId");
 
         migrationBuilder.AddForeignKey(
             name: "FK_Publications_Topics_TopicId",
@@ -73,6 +70,7 @@ public partial class EES4491_RemoveTopics : Migration
             column: "TopicId",
             principalTable: "Topics",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 }

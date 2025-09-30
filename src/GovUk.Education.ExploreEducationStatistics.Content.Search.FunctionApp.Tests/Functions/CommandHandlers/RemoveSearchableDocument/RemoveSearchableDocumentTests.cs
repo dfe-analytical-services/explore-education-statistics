@@ -8,11 +8,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class RemoveSearchableDocumentTests
 {
-    private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder = new();
-    private RemoveSearchableDocumentFunction GetSut() => new(
-        new NullLogger<RemoveSearchableDocumentFunction>(),
-        _searchableDocumentRemoverMockBuilder.Build(), 
-        new TestableCommandHandler());
+    private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder =
+        new();
+
+    private RemoveSearchableDocumentFunction GetSut() =>
+        new(
+            new NullLogger<RemoveSearchableDocumentFunction>(),
+            _searchableDocumentRemoverMockBuilder.Build(),
+            new TestableCommandHandler()
+        );
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
@@ -24,14 +28,16 @@ public class RemoveSearchableDocumentTests
 
         await GetSut().RemoveSearchableDocument(command, new FunctionContextMockBuilder().Build());
 
-        _searchableDocumentRemoverMockBuilder.Assert
-            .RemoveSearchableDocumentCalledFor(command.ReleaseId.Value);
+        _searchableDocumentRemoverMockBuilder.Assert.RemoveSearchableDocumentCalledFor(
+            command.ReleaseId.Value
+        );
     }
-
 
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Guids), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task WhenMessageDoesNotContainReleaseId_ThenDocumentRemoverNotCalled(Guid? missingReleaseId)
+    public async Task WhenMessageDoesNotContainReleaseId_ThenDocumentRemoverNotCalled(
+        Guid? missingReleaseId
+    )
     {
         var command = new RemoveSearchableDocumentDto { ReleaseId = missingReleaseId };
 

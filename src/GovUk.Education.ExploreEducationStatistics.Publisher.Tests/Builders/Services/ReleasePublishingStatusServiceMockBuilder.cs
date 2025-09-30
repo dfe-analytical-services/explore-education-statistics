@@ -14,58 +14,67 @@ public class ReleasePublishingStatusServiceMockBuilder
     public ReleasePublishingStatusServiceMockBuilder()
     {
         _mock
-            .Setup(
-                m => m.UpdatePublishingStage(
+            .Setup(m =>
+                m.UpdatePublishingStage(
                     It.IsAny<ReleasePublishingKey>(),
                     It.IsAny<ReleasePublishingStatusPublishingStage>(),
-                    It.IsAny<ReleasePublishingStatusLogMessage?>()))
+                    It.IsAny<ReleasePublishingStatusLogMessage?>()
+                )
+            )
             .Returns(Task.CompletedTask);
-
     }
-    
+
     public ReleasePublishingStatusServiceMockBuilder WhereGetReturns(
         ReleasePublishingKey releasePublishingKey,
-        ReleasePublishingStatus releasePublishingStatus)
+        ReleasePublishingStatus releasePublishingStatus
+    )
     {
-        _mock
-            .Setup(m => m.Get(releasePublishingKey))
-            .ReturnsAsync(releasePublishingStatus);
+        _mock.Setup(m => m.Get(releasePublishingKey)).ReturnsAsync(releasePublishingStatus);
         return this;
     }
-    
+
     public class Asserter(Mock<IReleasePublishingStatusService> mock)
     {
         public void UpdatePublishingStageWasNotCalled()
         {
             mock.Verify(
-                m => m.UpdatePublishingStage(
-                    It.IsAny<ReleasePublishingKey>(),
-                    It.IsAny<ReleasePublishingStatusPublishingStage>(),
-                    It.IsAny<ReleasePublishingStatusLogMessage?>()
-                ),
-                Times.Never);
+                m =>
+                    m.UpdatePublishingStage(
+                        It.IsAny<ReleasePublishingKey>(),
+                        It.IsAny<ReleasePublishingStatusPublishingStage>(),
+                        It.IsAny<ReleasePublishingStatusLogMessage?>()
+                    ),
+                Times.Never
+            );
         }
 
         public void UpdatePublishingStageWasNotCalled(ReleasePublishingKey key)
         {
             mock.Verify(
-                m => m.UpdatePublishingStage(
-                    key,
-                    It.IsAny<ReleasePublishingStatusPublishingStage>(),
-                    It.IsAny<ReleasePublishingStatusLogMessage?>()
-                ),
-                Times.Never);
+                m =>
+                    m.UpdatePublishingStage(
+                        key,
+                        It.IsAny<ReleasePublishingStatusPublishingStage>(),
+                        It.IsAny<ReleasePublishingStatusLogMessage?>()
+                    ),
+                Times.Never
+            );
         }
-        
-        public void UpdatePublishingStageWasCalled(ReleasePublishingKey key, ReleasePublishingStatusPublishingStage publishingStage)
+
+        public void UpdatePublishingStageWasCalled(
+            ReleasePublishingKey key,
+            ReleasePublishingStatusPublishingStage publishingStage
+        )
         {
             mock.Verify(
-                m => m.UpdatePublishingStage(
-                    key,
-                    publishingStage,
-                    It.IsAny<ReleasePublishingStatusLogMessage?>()
-                ),
-                Times.Once);
+                m =>
+                    m.UpdatePublishingStage(
+                        key,
+                        publishingStage,
+                        It.IsAny<ReleasePublishingStatusLogMessage?>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

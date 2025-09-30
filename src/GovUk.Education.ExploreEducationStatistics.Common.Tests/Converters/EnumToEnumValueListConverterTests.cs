@@ -11,9 +11,14 @@ public abstract class EnumToEnumValueListConverterTests
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     private enum Numbers
     {
-        [EnumLabelValue("1", "Value-1")] One,
-        [EnumLabelValue("2", "Value-2")] Two,
-        [EnumLabelValue("3", "Value-3")] Three
+        [EnumLabelValue("1", "Value-1")]
+        One,
+
+        [EnumLabelValue("2", "Value-2")]
+        Two,
+
+        [EnumLabelValue("3", "Value-3")]
+        Three,
     }
 
     private readonly EnumToEnumValueListConverter<Numbers> _converter = new();

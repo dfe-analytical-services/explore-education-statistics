@@ -22,7 +22,13 @@ public partial class E2328UpdateLocationTypeAndUpsertLocation : Migration
     {
         migrationBuilder.Sql("DROP PROCEDURE UpsertLocation");
         migrationBuilder.Sql("DROP TYPE LocationType");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousLocationTypeMigrationId}_TableType_LocationType.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousUpsertLocationMigrationId}_Routine_UpsertLocation.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousLocationTypeMigrationId}_TableType_LocationType.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousUpsertLocationMigrationId}_Routine_UpsertLocation.sql"
+        );
     }
 }

@@ -51,7 +51,9 @@ public abstract class SqidEncoderTests
         [InlineData(" abc")]
         public void InvalidSqid_Throws(string invalidSqid)
         {
-            Assert.Throws<InvalidOperationException>(() => SqidEncoder.DecodeSingleNumber(invalidSqid));
+            Assert.Throws<InvalidOperationException>(() =>
+                SqidEncoder.DecodeSingleNumber(invalidSqid)
+            );
         }
 
         [Theory]
@@ -70,7 +72,10 @@ public abstract class SqidEncoderTests
         {
             var encodedNumber = SqidEncoder.Encode(1);
 
-            var successful = SqidEncoder.TryDecodeSingleNumber(encodedNumber, out var decodedNumber);
+            var successful = SqidEncoder.TryDecodeSingleNumber(
+                encodedNumber,
+                out var decodedNumber
+            );
 
             Assert.True(successful);
             Assert.Equal(1, decodedNumber);

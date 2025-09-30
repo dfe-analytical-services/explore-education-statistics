@@ -28,57 +28,67 @@ public static class AuthorizationHandlersTestUtil
     public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
         IAuthorizationHandler handler,
         TEntity entity,
-        params SecurityClaimTypes[] claimsExpectedToSucceed)
-        where TRequirement : IAuthorizationRequirement
-    {
-        var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
-        await scenarios
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(
-                scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
-    }
-
-    public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
-        Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        TEntity entity,
-        params SecurityClaimTypes[] claimsExpectedToSucceed)
+        params SecurityClaimTypes[] claimsExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
         await scenarios
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(scenario =>
-                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario)
+            );
+    }
+
+    public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
+        Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+        TEntity entity,
+        params SecurityClaimTypes[] claimsExpectedToSucceed
+    )
+        where TRequirement : IAuthorizationRequirement
+    {
+        var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
+        await scenarios
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(scenario =>
+                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario)
+            );
     }
 
     public static async Task AssertHandlerSucceedsWithCorrectGlobalRoles<TEntity, TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
         TEntity entity,
-        params GlobalRoles.Role[] rolesExpectedToSucceed)
+        params GlobalRoles.Role[] rolesExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var scenarios = GetGlobalRoleTestScenarios(entity, rolesExpectedToSucceed);
         await scenarios
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(scenario =>
-                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario)
+            );
     }
 
     public static async Task AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        params SecurityClaimTypes[] claimsExpectedToSucceed)
+        params SecurityClaimTypes[] claimsExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var scenarios = GetClaimTestScenarios(null, claimsExpectedToSucceed);
         await scenarios
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(scenario =>
-                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+                AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario)
+            );
     }
 
     public static async Task AssertHandlerHandlesScenarioSuccessfully<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        HandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
+        HandlerTestScenario scenario
+    )
+        where TRequirement : IAuthorizationRequirement
     {
         using (var context = InMemoryApplicationDbContext())
         {
@@ -89,59 +99,56 @@ public static class AuthorizationHandlersTestUtil
 
     private static List<HandlerTestScenario> GetClaimTestScenarios(
         object entity,
-        SecurityClaimTypes[] claimsExpectedToSucceed)
+        SecurityClaimTypes[] claimsExpectedToSucceed
+    )
     {
         return GetEnums<SecurityClaimTypes>()
-            .Select(
-                claim =>
-                {
-                    var user = DataFixture
-                        .AuthenticatedUser()
-                        .WithClaim(claim.ToString());
+            .Select(claim =>
+            {
+                var user = DataFixture.AuthenticatedUser().WithClaim(claim.ToString());
 
-                    return new HandlerTestScenario
-                    {
-                        User = user,
-                        Entity = entity,
-                        ExpectedToPass = claimsExpectedToSucceed.Contains(claim),
-                        UnexpectedFailMessage =
-                            "Expected claim " + claim + " to have caused the handler to succeed",
-                        UnexpectedPassMessage = "Expected claim " + claim + " to have caused the handler to fail"
-                    };
-                }
-            )
+                return new HandlerTestScenario
+                {
+                    User = user,
+                    Entity = entity,
+                    ExpectedToPass = claimsExpectedToSucceed.Contains(claim),
+                    UnexpectedFailMessage =
+                        "Expected claim " + claim + " to have caused the handler to succeed",
+                    UnexpectedPassMessage =
+                        "Expected claim " + claim + " to have caused the handler to fail",
+                };
+            })
             .ToList();
     }
 
     private static List<HandlerTestScenario> GetGlobalRoleTestScenarios(
         object entity,
-        GlobalRoles.Role[] rolesExpectedToSucceed)
+        GlobalRoles.Role[] rolesExpectedToSucceed
+    )
     {
         return GetEnums<GlobalRoles.Role>()
-            .Select(
-                role =>
-                {
-                    var user = DataFixture
-                        .AuthenticatedUser()
-                        .WithRole(role.GetEnumLabel());
+            .Select(role =>
+            {
+                var user = DataFixture.AuthenticatedUser().WithRole(role.GetEnumLabel());
 
-                    return new HandlerTestScenario
-                    {
-                        User = user,
-                        Entity = entity,
-                        ExpectedToPass = rolesExpectedToSucceed.Contains(role),
-                        UnexpectedFailMessage =
-                            "Expected role " + role + " to have caused the handler to succeed",
-                        UnexpectedPassMessage = "Expected role " + role + " to have caused the handler to fail"
-                    };
-                }
-            )
+                return new HandlerTestScenario
+                {
+                    User = user,
+                    Entity = entity,
+                    ExpectedToPass = rolesExpectedToSucceed.Contains(role),
+                    UnexpectedFailMessage =
+                        "Expected role " + role + " to have caused the handler to succeed",
+                    UnexpectedPassMessage =
+                        "Expected role " + role + " to have caused the handler to fail",
+                };
+            })
             .ToList();
     }
 
     public static async Task AssertHandlerHandlesScenarioSuccessfully<TRequirement>(
         IAuthorizationHandler handler,
-        HandlerTestScenario scenario)
+        HandlerTestScenario scenario
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var authContext = CreateAuthContext<TRequirement>(scenario.User, scenario.Entity);
@@ -165,27 +172,24 @@ public static class AuthorizationHandlersTestUtil
 
     public static Task ForEachSecurityClaimAsync(Func<SecurityClaimTypes, Task> action)
     {
-        return GetEnums<SecurityClaimTypes>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(action.Invoke);
+        return GetEnums<SecurityClaimTypes>().ToAsyncEnumerable().ForEachAwaitAsync(action.Invoke);
     }
 
     public static Task ForEachReleaseRoleAsync(Func<ReleaseRole, Task> action)
     {
-        return GetEnums<ReleaseRole>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(action.Invoke);
+        return GetEnums<ReleaseRole>().ToAsyncEnumerable().ForEachAwaitAsync(action.Invoke);
     }
 
     public static Task ForEachPublicationRoleAsync(Func<PublicationRole, Task> action)
     {
-        return GetEnums<PublicationRole>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(action.Invoke);
+        return GetEnums<PublicationRole>().ToAsyncEnumerable().ForEachAwaitAsync(action.Invoke);
     }
 
-    public static AuthorizationHandlerContext CreateAuthorizationHandlerContext<TRequirement, TEntity>(
-        ClaimsPrincipal user, TEntity entity) where TRequirement : IAuthorizationRequirement
+    public static AuthorizationHandlerContext CreateAuthorizationHandlerContext<
+        TRequirement,
+        TEntity
+    >(ClaimsPrincipal user, TEntity entity)
+        where TRequirement : IAuthorizationRequirement
     {
         return CreateAuthContext<TRequirement, TEntity>(user, entity);
     }
@@ -194,7 +198,8 @@ public static class AuthorizationHandlersTestUtil
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
         TEntity entity,
         Guid publicationId,
-        params PublicationRole[] publicationRolesExpectedToPass)
+        params PublicationRole[] publicationRolesExpectedToPass
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var user = DataFixture.AuthenticatedUser().Generate();
@@ -202,7 +207,8 @@ public static class AuthorizationHandlersTestUtil
         await ForEachPublicationRoleAsync(async role =>
         {
             // Test the handler succeeds with the Owner role on the Publication for the User
-            await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
+            await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(
+                handlerSupplier,
                 new PublicationRoleTestScenario
                 {
                     User = user,
@@ -213,15 +219,18 @@ public static class AuthorizationHandlersTestUtil
                         {
                             PublicationId = publicationId,
                             UserId = user.GetUserId(),
-                            Role = role
-                        }),
+                            Role = role,
+                        }
+                    ),
                     ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
                     UnexpectedFailMessage =
                         $"Expected having role {role} on the Publication to have made the handler succeed",
-                });
-        
+                }
+            );
+
             // Test the handler fails without the role on the correct Publication or the correct User
-            await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
+            await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(
+                handlerSupplier,
                 new PublicationRoleTestScenario
                 {
                     User = user,
@@ -230,27 +239,31 @@ public static class AuthorizationHandlersTestUtil
                     UserPublicationRoles = ListOf(
                         new UserPublicationRole
                         {
-                            PublicationId = publicationId, 
-                            UserId = Guid.NewGuid(), 
-                            Role = role
+                            PublicationId = publicationId,
+                            UserId = Guid.NewGuid(),
+                            Role = role,
                         },
                         // Setup a UserPublicationRoles for this User but a different Publication
                         new UserPublicationRole
                         {
-                            PublicationId = Guid.NewGuid(), 
-                            UserId = user.GetUserId(), 
-                            Role = role
-                        }),
+                            PublicationId = Guid.NewGuid(),
+                            UserId = user.GetUserId(),
+                            Role = role,
+                        }
+                    ),
                     ExpectedToPass = false,
                     UnexpectedPassMessage =
-                        $"Expected not having {role} role on the Publication would have made the handler fail"
-                });
+                        $"Expected not having {role} role on the Publication would have made the handler fail",
+                }
+            );
         });
     }
 
     private static async Task AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        PublicationRoleTestScenario scenario) where TRequirement : IAuthorizationRequirement
+        PublicationRoleTestScenario scenario
+    )
+        where TRequirement : IAuthorizationRequirement
     {
         var contextId = Guid.NewGuid().ToString();
 

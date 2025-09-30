@@ -16,7 +16,9 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<string> literals,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
         return builder.AppendRange(
             items: literals,
@@ -35,7 +37,9 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<FormattableString> fragments,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
         return builder.AppendRange(
             items: fragments,
@@ -53,7 +57,9 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<IBuildable<IInterpolatedSql>> builders,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
         return builder.AppendRange(
             items: builders,
@@ -71,7 +77,9 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<IInterpolatedSql> fragments,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
         return builder.AppendRange(
             items: fragments,
@@ -84,7 +92,9 @@ public static class SqlBuilderExtensions
         this TBuilder builder,
         IEnumerable<TItem> items,
         Action<TItem> append,
-        string? joinString) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
         var itemsList = items.ToList();
 

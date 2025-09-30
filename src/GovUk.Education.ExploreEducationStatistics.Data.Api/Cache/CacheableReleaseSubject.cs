@@ -9,7 +9,10 @@ public record CacheableReleaseSubject
     public ReleaseSubject ReleaseSubject { get; }
     private ReleaseVersion ContentReleaseVersion { get; }
 
-    public CacheableReleaseSubject(ReleaseSubject releaseSubject, ReleaseVersion contentReleaseVersion)
+    public CacheableReleaseSubject(
+        ReleaseSubject releaseSubject,
+        ReleaseVersion contentReleaseVersion
+    )
     {
         ReleaseSubject = releaseSubject;
         ContentReleaseVersion = contentReleaseVersion;

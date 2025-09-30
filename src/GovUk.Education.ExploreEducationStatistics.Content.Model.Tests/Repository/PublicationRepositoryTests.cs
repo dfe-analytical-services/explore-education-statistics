@@ -14,9 +14,11 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task IsPublicationPublished_FalseWhenPublicationHasNoPublishedRelease()
     {
-        Publication publication = _dataFixture.DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                .Generate(1));
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(
+                _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1)
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -37,9 +39,9 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task IsPublicationPublished_TrueWhenPublicationHasPublishedRelease()
     {
-        Publication publication = _dataFixture.DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1)
-                .Generate(1));
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -58,10 +60,9 @@ public class PublicationRepositoryTests
     }
 
     private static PublicationRepository BuildPublicationRepository(
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
-        return new(
-            contentDbContext: contentDbContext
-        );
+        return new(contentDbContext: contentDbContext);
     }
 }

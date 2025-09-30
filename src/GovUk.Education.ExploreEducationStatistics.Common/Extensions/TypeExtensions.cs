@@ -9,7 +9,7 @@ public static class TypeExtensions
     {
         // Remove our namespace as it really clutters up the logs
         return type.FullName?.Replace("GovUk.Education.ExploreEducationStatistics.", string.Empty)
-               ?? string.Empty;
+            ?? string.Empty;
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public static class TypeExtensions
     /// </remarks>
     public static List<Type> GetUnboxedResultTypePath(this Type type)
     {
-        var path = new List<Type>{ type };
+        var path = new List<Type> { type };
 
         while (true)
         {
@@ -126,11 +126,9 @@ public static class TypeExtensions
     /// </summary>
     public static bool IsComplex(this Type type) => !type.IsSimple();
 
-    public static bool IsNullableType(this Type type)
-        => Nullable.GetUnderlyingType(type) is not null;
+    public static bool IsNullableType(this Type type) =>
+        Nullable.GetUnderlyingType(type) is not null;
 
-    public static Type GetUnderlyingType(this Type type)
-        => type.IsNullableType()
-        ? Nullable.GetUnderlyingType(type)!
-        : type;
+    public static Type GetUnderlyingType(this Type type) =>
+        type.IsNullableType() ? Nullable.GetUnderlyingType(type)! : type;
 }

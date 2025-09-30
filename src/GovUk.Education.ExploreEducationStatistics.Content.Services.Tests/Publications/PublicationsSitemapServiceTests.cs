@@ -19,12 +19,14 @@ public abstract class PublicationsSitemapServiceTests
         public async Task MultiplePublicationsAndReleases_ReturnsExpectedSitemapItems()
         {
             // Arrange
-            var (publication1, publication2) = _dataFixture.DefaultPublication()
+            var (publication1, publication2) = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1),
-                    _dataFixture.DefaultRelease(publishedVersions: 1)
-                ])
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1),
+                        _dataFixture.DefaultRelease(publishedVersions: 1),
+                    ]
+                )
                 .GenerateTuple2();
             var (publication1Release1, publication1Release2) = publication1.Releases.ToTuple2();
             var (publication2Release1, publication2Release2) = publication2.Releases.ToTuple2();
@@ -54,23 +56,38 @@ public abstract class PublicationsSitemapServiceTests
 
                 // Assert
                 Assert.Equal(2, result.Length);
-                Assert.All(result, publicationItem => Assert.Equal(2, publicationItem.Releases.Length));
+                Assert.All(
+                    result,
+                    publicationItem => Assert.Equal(2, publicationItem.Releases.Length)
+                );
 
                 // Publications should be ordered by the latest published release date descending
                 // Each publication's releases should be ordered by published date descending
                 var publicationItem1 = result[0];
                 Assert.Equal(publication1.Slug, publicationItem1.Slug);
                 Assert.Equal(publication1Release2.Slug, publicationItem1.Releases[0].Slug);
-                Assert.Equal(publication1Release2.Versions[0].Published, publicationItem1.Releases[0].LastModified);
+                Assert.Equal(
+                    publication1Release2.Versions[0].Published,
+                    publicationItem1.Releases[0].LastModified
+                );
                 Assert.Equal(publication1Release1.Slug, publicationItem1.Releases[1].Slug);
-                Assert.Equal(publication1Release1.Versions[0].Published, publicationItem1.Releases[1].LastModified);
+                Assert.Equal(
+                    publication1Release1.Versions[0].Published,
+                    publicationItem1.Releases[1].LastModified
+                );
 
                 var publicationItem2 = result[1];
                 Assert.Equal(publication2.Slug, publicationItem2.Slug);
                 Assert.Equal(publication2Release1.Slug, publicationItem2.Releases[0].Slug);
-                Assert.Equal(publication2Release1.Versions[0].Published, publicationItem2.Releases[0].LastModified);
+                Assert.Equal(
+                    publication2Release1.Versions[0].Published,
+                    publicationItem2.Releases[0].LastModified
+                );
                 Assert.Equal(publication2Release2.Slug, publicationItem2.Releases[1].Slug);
-                Assert.Equal(publication2Release2.Versions[0].Published, publicationItem2.Releases[1].LastModified);
+                Assert.Equal(
+                    publication2Release2.Versions[0].Published,
+                    publicationItem2.Releases[1].LastModified
+                );
             }
         }
 
@@ -78,7 +95,8 @@ public abstract class PublicationsSitemapServiceTests
         public async Task PublicationWithUpdatedDate_UpdatedDateIsReflectedInSitemapItem()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
                 .WithUpdated(DateTime.Parse("2025-01-01T12:00:00Z"));
 
@@ -106,11 +124,14 @@ public abstract class PublicationsSitemapServiceTests
         public async Task SupersededPublications_SupersedingPublicationHasPublishedRelease_AreExcluded()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
-                .WithSupersededBy(_dataFixture
-                    .DefaultPublication()
-                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]));
+                .WithSupersededBy(
+                    _dataFixture
+                        .DefaultPublication()
+                        .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
+                );
             var supersedingPublication = publication.SupersededBy!;
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -138,7 +159,8 @@ public abstract class PublicationsSitemapServiceTests
         public async Task SupersededPublications_SupersedingPublicationHasNoPublishedRelease_AreIncluded()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
                 .WithSupersededBy(_dataFixture.DefaultPublication());
 
@@ -168,8 +190,11 @@ public abstract class PublicationsSitemapServiceTests
         public async Task ReleasesWithMultipleVersions_LatestPublishedVersionIsReturned()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)]
+                );
             var release = publication.Releases[0];
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -199,8 +224,11 @@ public abstract class PublicationsSitemapServiceTests
         public async Task PublicationsWithoutPublishedReleases_AreExcluded()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+                );
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -247,5 +275,6 @@ public abstract class PublicationsSitemapServiceTests
         }
     }
 
-    private static PublicationsSitemapService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
+    private static PublicationsSitemapService BuildService(ContentDbContext contentDbContext) =>
+        new(contentDbContext);
 }

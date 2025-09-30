@@ -10,12 +10,14 @@ public partial class EES2455_AddScheduledWithReleaseToMethodology : Migration
         migrationBuilder.AddColumn<Guid>(
             name: "ScheduledWithReleaseId",
             table: "Methodologies",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Methodologies_ScheduledWithReleaseId",
             table: "Methodologies",
-            column: "ScheduledWithReleaseId");
+            column: "ScheduledWithReleaseId"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Methodologies_Releases_ScheduledWithReleaseId",
@@ -23,21 +25,22 @@ public partial class EES2455_AddScheduledWithReleaseToMethodology : Migration
             column: "ScheduledWithReleaseId",
             principalTable: "Releases",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Methodologies_Releases_ScheduledWithReleaseId",
-            table: "Methodologies");
+            table: "Methodologies"
+        );
 
         migrationBuilder.DropIndex(
             name: "IX_Methodologies_ScheduledWithReleaseId",
-            table: "Methodologies");
+            table: "Methodologies"
+        );
 
-        migrationBuilder.DropColumn(
-            name: "ScheduledWithReleaseId",
-            table: "Methodologies");
+        migrationBuilder.DropColumn(name: "ScheduledWithReleaseId", table: "Methodologies");
     }
 }

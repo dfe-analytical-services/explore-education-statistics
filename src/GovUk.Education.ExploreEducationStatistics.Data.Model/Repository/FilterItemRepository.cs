@@ -15,20 +15,25 @@ public class FilterItemRepository : IFilterItemRepository
         _context = context;
     }
 
-    public async Task<Dictionary<Guid, int>> CountFilterItemsByFilter(IEnumerable<Guid> filterItemIds)
+    public async Task<Dictionary<Guid, int>> CountFilterItemsByFilter(
+        IEnumerable<Guid> filterItemIds
+    )
     {
-        var filterItems = await _context.FilterItem
-            .Include(filterItem => filterItem.FilterGroup)
+        var filterItems = await _context
+            .FilterItem.Include(filterItem => filterItem.FilterGroup)
             .Where(filterItem => filterItemIds.Contains(filterItem.Id))
             .ToListAsync();
 
-        var notFound = filterItemIds.Where(id => filterItems.All(found => found.Id != id))
+        var notFound = filterItemIds
+            .Where(id => filterItems.All(found => found.Id != id))
             .Select(filterItemId => filterItemId.ToString())
             .ToList();
 
         if (notFound.Any())
         {
-            throw new ArgumentException($"Could not find filter items: {notFound.JoinToString(", ")}");
+            throw new ArgumentException(
+                $"Could not find filter items: {notFound.JoinToString(", ")}"
+            );
         }
 
         return filterItems
@@ -38,13 +43,13 @@ public class FilterItemRepository : IFilterItemRepository
 
     public async Task<IEnumerable<FilterItem>> GetFilterItemsFromMatchedObservationIds(
         Guid subjectId,
-        IQueryable<MatchedObservation> matchedObservations)
+        IQueryable<MatchedObservation> matchedObservations
+    )
     {
         var matchedObservationIds = matchedObservations.Select(o => o.Id);
 
         var filtersForSubject = await _context
-            .Filter
-            .AsNoTracking()
+            .Filter.AsNoTracking()
             .Include(filter => filter.FilterGroups)
             .Where(filter => filter.SubjectId == subjectId)
             .ToListAsync();
@@ -54,35 +59,39 @@ public class FilterItemRepository : IFilterItemRepository
             .Select(filterGroup => filterGroup.Id);
 
         var filterItems = await _context
-            .FilterItem
-            .AsNoTracking()
+            .FilterItem.AsNoTracking()
             .Where(filterItem =>
-                filterGroupIds.Contains(filterItem.FilterGroupId) &&
-                _context.ObservationFilterItem.Any(ofi =>
-                    ofi.FilterItemId == filterItem.Id && matchedObservationIds.Contains(ofi.ObservationId)))
+                filterGroupIds.Contains(filterItem.FilterGroupId)
+                && _context.ObservationFilterItem.Any(ofi =>
+                    ofi.FilterItemId == filterItem.Id
+                    && matchedObservationIds.Contains(ofi.ObservationId)
+                )
+            )
             .ToListAsync();
 
         var filterGroupsById = filtersForSubject
             .SelectMany(filter => filter.FilterGroups)
             .ToDictionary(filterGroup => filterGroup.Id);
 
-        filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
+        filterItems.ForEach(filterItem =>
+            filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]
+        );
 
         return filterItems;
     }
 
-    public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)
+    public async Task<IList<FilterItem>> GetFilterItemsFromObservations(
+        IEnumerable<Observation> observations
+    )
     {
-        var filterItemIds =
-            observations
-                .SelectMany(observation => observation.FilterItems)
-                .Select(ofi => ofi.FilterItemId)
-                .Distinct()
-                .ToList();
+        var filterItemIds = observations
+            .SelectMany(observation => observation.FilterItems)
+            .Select(ofi => ofi.FilterItemId)
+            .Distinct()
+            .ToList();
 
         return await _context
-            .FilterItem
-            .AsNoTracking()
+            .FilterItem.AsNoTracking()
             .Include(fi => fi.FilterGroup)
             .ThenInclude(fg => fg.Filter)
             .Where(fi => filterItemIds.Contains(fi.Id))

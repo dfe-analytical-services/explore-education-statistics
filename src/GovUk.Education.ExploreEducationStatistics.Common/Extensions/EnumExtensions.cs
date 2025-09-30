@@ -14,11 +14,13 @@ public static class EnumExtensions
         return GetEnumLabelValueAttribute(enumValue)?.Value ?? enumValue.ToString();
     }
 
-    public static TAttribute GetEnumAttribute<TAttribute>(this Enum enumValue) where TAttribute : Attribute
+    public static TAttribute GetEnumAttribute<TAttribute>(this Enum enumValue)
+        where TAttribute : Attribute
     {
         var memberInfo = enumValue.GetType().GetMember(enumValue.ToString());
 
-        return memberInfo[0].GetCustomAttributes(typeof(TAttribute), false)
+        return memberInfo[0]
+            .GetCustomAttributes(typeof(TAttribute), false)
             .OfType<TAttribute>()
             .FirstOrDefault();
     }
@@ -27,13 +29,16 @@ public static class EnumExtensions
     {
         return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
     }
-    
-    
-    public static List<EnumValue> GetValues<T>() where T: Enum
+
+    public static List<EnumValue> GetValues<T>()
+        where T : Enum
     {
-        return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue {Name = Enum.GetName(typeof(T), itemType), Value = (int) itemType}).ToList();
+        return (
+            from object itemType in Enum.GetValues(typeof(T))
+            select new EnumValue { Name = Enum.GetName(typeof(T), itemType), Value = (int)itemType }
+        ).ToList();
     }
-    
+
     public class EnumValue
     {
         public string Name { get; set; }

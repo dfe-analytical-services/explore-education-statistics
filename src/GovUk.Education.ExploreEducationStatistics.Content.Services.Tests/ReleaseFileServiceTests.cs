@@ -50,8 +50,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 ContentType = "application/pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -64,16 +64,23 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test blob");
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile.PublicPath(),
+            "Test blob"
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                publicBlobStorageService: publicBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object
+            );
 
-            var result = await service.StreamFile(releaseVersionId: releaseFile.ReleaseVersionId,
-                fileId: releaseFile.File.Id);
+            var result = await service.StreamFile(
+                releaseVersionId: releaseFile.ReleaseVersionId,
+                fileId: releaseFile.File.Id
+            );
 
             Assert.True(result.IsRight);
 
@@ -93,8 +100,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -132,8 +139,10 @@ public class ReleaseFileServiceTests : IDisposable
         {
             var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-            var result = await service.StreamFile(releaseVersionId: releaseVersion.Id,
-                fileId: Guid.NewGuid());
+            var result = await service.StreamFile(
+                releaseVersionId: releaseVersion.Id,
+                fileId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -149,8 +158,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -163,15 +172,22 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService.SetupGetDownloadStreamNotFound(PublicReleaseFiles, releaseFile.PublicPath());
+        publicBlobStorageService.SetupGetDownloadStreamNotFound(
+            PublicReleaseFiles,
+            releaseFile.PublicPath()
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                publicBlobStorageService: publicBlobStorageService.Object);
+            var service = SetupReleaseFileService(
+                contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object
+            );
 
-            var result = await service.StreamFile(releaseVersionId: releaseFile.ReleaseVersionId,
-                fileId: releaseFile.File.Id);
+            var result = await service.StreamFile(
+                releaseVersionId: releaseFile.ReleaseVersionId,
+                fileId: releaseFile.File.Id
+            );
 
             result.AssertNotFound();
         }
@@ -180,9 +196,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_ValidFileTypes()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -191,8 +209,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -201,8 +219,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
 
@@ -217,27 +235,45 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-        publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
+        publicBlobStorageService.SetupCheckBlobExists(
+            PublicReleaseFiles,
+            releaseFile1.PublicPath(),
+            true
+        );
+        publicBlobStorageService.SetupCheckBlobExists(
+            PublicReleaseFiles,
+            releaseFile2.PublicPath(),
+            true
+        );
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile1.PublicPath(),
+            "Test data blob"
+        );
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile2.PublicPath(),
+            "Test ancillary blob"
+        );
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
         dataGuidanceFileWriter
-            .Setup(
-                s => s.WriteToStream(
+            .Setup(s =>
+                s.WriteToStream(
                     It.IsAny<Stream>(),
                     It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
-                    ListOf(releaseFile1.FileId))
+                    ListOf(releaseFile1.FileId)
+                )
             )
-            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>(
+                (stream, _, _) => Task.FromResult(stream)
+            )
             .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
-                (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                (stream, _, _) =>
+                {
+                    stream.WriteText("Test data guidance blob");
+                }
             );
 
         // This should not happen during normal usage, as the public frontend doesn't allow users to request
@@ -258,7 +294,8 @@ public class ReleaseFileServiceTests : IDisposable
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 dataGuidanceFileWriter: dataGuidanceFileWriter.Object,
-                logger: logger.Object);
+                logger: logger.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -292,9 +329,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_DataGuidanceForSingleDataFile()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile = new ReleaseFile
         {
@@ -303,8 +342,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data-1.csv",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -318,23 +357,35 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath(), true);
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test data 1 blob");
+        publicBlobStorageService.SetupCheckBlobExists(
+            PublicReleaseFiles,
+            releaseFile.PublicPath(),
+            true
+        );
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile.PublicPath(),
+            "Test data 1 blob"
+        );
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
         dataGuidanceFileWriter
-            .Setup(
-                s => s.WriteToStream(
+            .Setup(s =>
+                s.WriteToStream(
                     It.IsAny<Stream>(),
                     It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
-                    ListOf(releaseFile.FileId))
+                    ListOf(releaseFile.FileId)
+                )
             )
-            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>(
+                (stream, _, _) => Task.FromResult(stream)
+            )
             .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
-                (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                (stream, _, _) =>
+                {
+                    stream.WriteText("Test data guidance blob");
+                }
             );
 
         var captureRequest = new CaptureZipDownloadRequest
@@ -348,9 +399,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(captureRequest),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(captureRequest), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -362,7 +412,8 @@ public class ReleaseFileServiceTests : IDisposable
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 dataGuidanceFileWriter: dataGuidanceFileWriter.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var fileId = releaseFile.FileId;
 
@@ -370,7 +421,8 @@ public class ReleaseFileServiceTests : IDisposable
                 releaseVersionId: releaseVersion.Id,
                 outputStream: stream,
                 fileIds: [fileId],
-                fromPage: AnalyticsFromPage.DataCatalogue);
+                fromPage: AnalyticsFromPage.DataCatalogue
+            );
 
             MockUtils.VerifyAllMocks(dataGuidanceFileWriter);
 
@@ -392,9 +444,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_FiltersInvalidFileTypes()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -404,7 +458,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.meta.csv",
                 Type = Metadata,
-            }
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -413,8 +467,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
-                Type = DataZip
-            }
+                Type = DataZip,
+            },
         };
         var releaseFile3 = new ReleaseFile
         {
@@ -423,8 +477,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.jpg",
-                Type = Chart
-            }
+                Type = Chart,
+            },
         };
         var releaseFile4 = new ReleaseFile
         {
@@ -433,8 +487,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.jpg",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2, releaseFile3, releaseFile4);
@@ -462,9 +516,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(captureRequest),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(captureRequest), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -472,7 +525,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -496,9 +550,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_FiltersFilesNotInBlobStorage()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile = new ReleaseFile
         {
@@ -508,7 +564,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.pdf",
                 Type = FileType.Data,
-            }
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -528,7 +584,8 @@ public class ReleaseFileServiceTests : IDisposable
         // File does not exist in blob storage
         publicBlobStorageService.SetupGetDownloadStreamNotFound(
             PublicReleaseFiles,
-            releaseFile.PublicPath());
+            releaseFile.PublicPath()
+        );
 
         var request = new CaptureZipDownloadRequest
         {
@@ -539,9 +596,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(request),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -549,7 +605,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var result = await service.ZipFilesToStream(
                 releaseVersionId: releaseVersion.Id,
@@ -571,9 +628,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_FiltersFilesForOtherReleases()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         // Files are for other releases
         var releaseFile1 = new ReleaseFile
@@ -584,7 +643,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-1.pdf",
                 Type = Ancillary,
-            }
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -593,8 +652,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-2.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -622,9 +681,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.ReleaseDownloads,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(request),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -632,7 +690,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -656,9 +715,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_Empty()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -682,9 +743,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(request),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -692,14 +752,16 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
             var result = await service.ZipFilesToStream(
                 releaseVersion.Id,
                 stream,
                 AnalyticsFromPage.ReleaseUsefulInfo,
-                fileIds);
+                fileIds
+            );
 
             MockUtils.VerifyAllMocks(publicBlobStorageService);
 
@@ -717,8 +779,9 @@ public class ReleaseFileServiceTests : IDisposable
     {
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -727,8 +790,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-1.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -737,8 +800,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary-2.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -759,22 +822,22 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService
-            .SetupGetDownloadStream(
-                container: PublicReleaseFiles,
-                path: releaseFile1.PublicPath(),
-                content: "Test ancillary blob",
-                cancellationToken: tokenSource.Token);
-        
+        publicBlobStorageService.SetupGetDownloadStream(
+            container: PublicReleaseFiles,
+            path: releaseFile1.PublicPath(),
+            content: "Test ancillary blob",
+            cancellationToken: tokenSource.Token
+        );
+
         // After the first file has completed, we cancel the request
         // to prevent the next file from being fetched.
-        publicBlobStorageService
-            .SetupGetDownloadStream(
-                container: PublicReleaseFiles,
-                path: releaseFile2.PublicPath(),
-                content: "Test ancillary blob 2",
-                cancellationToken: tokenSource.Token,
-                callback: tokenSource.Cancel);
+        publicBlobStorageService.SetupGetDownloadStream(
+            container: PublicReleaseFiles,
+            path: releaseFile2.PublicPath(),
+            content: "Test ancillary blob 2",
+            cancellationToken: tokenSource.Token,
+            callback: tokenSource.Cancel
+        );
 
         // This should not happen during normal usage, as the public frontend doesn't allow users to request
         // multiple files. At the time of writing, the service only officially allows users to download all data
@@ -790,7 +853,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                logger: logger.Object);
+                logger: logger.Object
+            );
 
             var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -816,10 +880,13 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_NoFileIds_NoCachedAllFilesZip()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()
-                    .WithSlug("publication-slug")));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -828,8 +895,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
         var releaseFile2 = new ReleaseFile
         {
@@ -838,8 +905,8 @@ public class ReleaseFileServiceTests : IDisposable
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
 
@@ -854,48 +921,64 @@ public class ReleaseFileServiceTests : IDisposable
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-        publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
+        publicBlobStorageService.SetupCheckBlobExists(
+            PublicReleaseFiles,
+            releaseFile1.PublicPath(),
+            true
+        );
+        publicBlobStorageService.SetupCheckBlobExists(
+            PublicReleaseFiles,
+            releaseFile2.PublicPath(),
+            true
+        );
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile1.PublicPath(),
+            "Test data blob"
+        );
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile2.PublicPath(),
+            "Test ancillary blob"
+        );
 
         var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
         // No 'All files' zip can be found in blob storage - not cached
-        publicBlobStorageService
-            .SetupFindBlob(PublicReleaseFiles, allFilesZipPath, null);
+        publicBlobStorageService.SetupFindBlob(PublicReleaseFiles, allFilesZipPath, null);
 
         // 'All files' zip will be uploaded to blob storage to be cached
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.UploadStream(
-                        PublicReleaseFiles,
-                        allFilesZipPath,
-                        It.IsAny<Stream>(),
-                        MediaTypeNames.Application.Zip,
-                        null,
-                        It.IsAny<CancellationToken>()
-                    )
+            .Setup(s =>
+                s.UploadStream(
+                    PublicReleaseFiles,
+                    allFilesZipPath,
+                    It.IsAny<Stream>(),
+                    MediaTypeNames.Application.Zip,
+                    null,
+                    It.IsAny<CancellationToken>()
+                )
             )
             .Returns(Task.CompletedTask);
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
         dataGuidanceFileWriter
-            .Setup(
-                s => s.WriteToStream(
+            .Setup(s =>
+                s.WriteToStream(
                     It.IsAny<Stream>(),
                     It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
-                    ListOf(releaseFile1.FileId))
+                    ListOf(releaseFile1.FileId)
+                )
             )
-            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+            .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>(
+                (stream, _, _) => Task.FromResult(stream)
+            )
             .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
-                (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
+                (stream, _, _) =>
+                {
+                    stream.WriteText("Test data guidance blob");
+                }
             );
 
         var request = new CaptureZipDownloadRequest
@@ -907,9 +990,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.ReleaseDownloads,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(request),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -921,7 +1003,8 @@ public class ReleaseFileServiceTests : IDisposable
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 dataGuidanceFileWriter: dataGuidanceFileWriter.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var result = await service.ZipFilesToStream(
                 releaseVersionId: releaseVersion.Id,
@@ -952,10 +1035,13 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_NoFileIds_CachedAllFilesZip()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()
-                    .WithSlug("publication-slug")));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -970,20 +1056,22 @@ public class ReleaseFileServiceTests : IDisposable
         var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
         // 'All files' zip is in blob storage - cached
-        publicBlobStorageService
-            .SetupFindBlob(
-                PublicReleaseFiles,
-                allFilesZipPath,
-                new BlobInfo(
-                    path: allFilesZipPath,
-                    contentType: "application/zip",
-                    contentLength: 1000L,
-                    updated: DateTimeOffset.UtcNow.AddMinutes(-5)
-                )
-            );
+        publicBlobStorageService.SetupFindBlob(
+            PublicReleaseFiles,
+            allFilesZipPath,
+            new BlobInfo(
+                path: allFilesZipPath,
+                contentType: "application/zip",
+                contentLength: 1000L,
+                updated: DateTimeOffset.UtcNow.AddMinutes(-5)
+            )
+        );
 
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            allFilesZipPath,
+            "Test cached all files zip"
+        );
 
         var request = new CaptureZipDownloadRequest
         {
@@ -994,9 +1082,8 @@ public class ReleaseFileServiceTests : IDisposable
             FromPage = AnalyticsFromPage.DataCatalogue,
         };
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(request),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1007,7 +1094,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var result = await service.ZipFilesToStream(
                 releaseVersionId: releaseVersion.Id,
@@ -1016,7 +1104,7 @@ public class ReleaseFileServiceTests : IDisposable
             );
 
             result.AssertRight();
-            
+
             await stream.DisposeAsync();
             await using var zip = File.OpenRead(path);
             Assert.Equal("Test cached all files zip", zip.ReadToEnd());
@@ -1026,10 +1114,13 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ZipFilesToStream_NoFileIds_StaleCachedAllFilesZip()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()
-                    .WithSlug("publication-slug")));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            );
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1039,7 +1130,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 Type = Ancillary,
-            }
+            },
         };
 
         var releaseFiles = ListOf(releaseFile1);
@@ -1058,35 +1149,39 @@ public class ReleaseFileServiceTests : IDisposable
         var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
         // 'All files' zip is in blob storage - cached, but stale
-        publicBlobStorageService
-            .SetupFindBlob(
-                PublicReleaseFiles,
-                allFilesZipPath,
-                new BlobInfo(
-                    path: allFilesZipPath,
-                    contentType: "application/zip",
-                    contentLength: 1000L,
-                    updated: DateTimeOffset.UtcNow.AddMinutes(-60)
-                )
-            );
+        publicBlobStorageService.SetupFindBlob(
+            PublicReleaseFiles,
+            allFilesZipPath,
+            new BlobInfo(
+                path: allFilesZipPath,
+                contentType: "application/zip",
+                contentLength: 1000L,
+                updated: DateTimeOffset.UtcNow.AddMinutes(-60)
+            )
+        );
 
-        publicBlobStorageService
-            .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test ancillary blob");
+        publicBlobStorageService.SetupCheckBlobExists(
+            PublicReleaseFiles,
+            releaseFile1.PublicPath(),
+            true
+        );
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicReleaseFiles,
+            releaseFile1.PublicPath(),
+            "Test ancillary blob"
+        );
 
         // 'All files' zip will be uploaded to blob storage to be re-cached
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.UploadStream(
-                        PublicReleaseFiles,
-                        allFilesZipPath,
-                        It.IsAny<Stream>(),
-                        MediaTypeNames.Application.Zip,
-                        null,
-                        It.IsAny<CancellationToken>()
-                    )
+            .Setup(s =>
+                s.UploadStream(
+                    PublicReleaseFiles,
+                    allFilesZipPath,
+                    It.IsAny<Stream>(),
+                    MediaTypeNames.Application.Zip,
+                    null,
+                    It.IsAny<CancellationToken>()
+                )
             )
             .Returns(Task.CompletedTask);
 
@@ -1100,9 +1195,8 @@ public class ReleaseFileServiceTests : IDisposable
         };
 
         var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-        analyticsManager.Setup(m => m.Add(
-                ItIs.DeepEqualTo(request),
-                It.IsAny<CancellationToken>()))
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1113,7 +1207,8 @@ public class ReleaseFileServiceTests : IDisposable
             var service = SetupReleaseFileService(
                 contentDbContext: contentDbContext,
                 publicBlobStorageService: publicBlobStorageService.Object,
-                analyticsManager: analyticsManager.Object);
+                analyticsManager: analyticsManager.Object
+            );
 
             var result = await service.ZipFilesToStream(
                 releaseVersionId: releaseVersion.Id,
@@ -1147,7 +1242,8 @@ public class ReleaseFileServiceTests : IDisposable
         IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
         IUserService? userService = null,
         IAnalyticsManager? analyticsManager = null,
-        ILogger<ReleaseFileService>? logger = null)
+        ILogger<ReleaseFileService>? logger = null
+    )
     {
         return new(
             contentDbContext,

@@ -23,11 +23,16 @@ public abstract class PublishingServicePermissionTests
         [Fact]
         public async Task SecurityPolicyChecked()
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved);
 
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(releaseVersion, SecurityPolicies.CanPublishSpecificRelease)
+            await PermissionTestUtils
+                .PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(
+                    releaseVersion,
+                    SecurityPolicies.CanPublishSpecificRelease
+                )
                 .AssertForbidden(async userService =>
                 {
                     await using var context = InMemoryApplicationDbContext();
@@ -43,12 +48,14 @@ public abstract class PublishingServicePermissionTests
     private static PublishingService BuildService(
         ContentDbContext context,
         IPublisherClient? publisherClient = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new PublishingService(
             context,
             publisherClient ?? Mock.Of<IPublisherClient>(MockBehavior.Strict),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
-            Mock.Of<ILogger<PublishingService>>());
+            Mock.Of<ILogger<PublishingService>>()
+        );
     }
 }

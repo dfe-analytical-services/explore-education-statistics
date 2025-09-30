@@ -21,19 +21,24 @@ public class DatabaseHelper : IDatabaseHelper
 
     public async Task DoInTransaction<TDbContext>(
         TDbContext context,
-        Func<TDbContext, Task> transactionalUnit)
+        Func<TDbContext, Task> transactionalUnit
+    )
         where TDbContext : DbContext
     {
-        await DoInTransaction(context, async ctxDelegate =>
-        {
-            await transactionalUnit.Invoke(ctxDelegate);
-            return Unit.Instance;
-        });
+        await DoInTransaction(
+            context,
+            async ctxDelegate =>
+            {
+                await transactionalUnit.Invoke(ctxDelegate);
+                return Unit.Instance;
+            }
+        );
     }
 
     public Task<TResult> DoInTransaction<TDbContext, TResult>(
         TDbContext context,
-        Func<TDbContext, Task<TResult>> transactionalUnit)
+        Func<TDbContext, Task<TResult>> transactionalUnit
+    )
         where TDbContext : DbContext
     {
         var strategy = context.Database.CreateExecutionStrategy();
@@ -57,19 +62,24 @@ public class DatabaseHelper : IDatabaseHelper
 
     public Task DoInTransaction<TDbContext>(
         TDbContext context,
-        Action<TDbContext> transactionalUnit)
+        Action<TDbContext> transactionalUnit
+    )
         where TDbContext : DbContext
     {
-        return DoInTransaction(context, ctxDelegate =>
-        {
-            transactionalUnit.Invoke(ctxDelegate);
-            return Task.CompletedTask;
-        });
+        return DoInTransaction(
+            context,
+            ctxDelegate =>
+            {
+                transactionalUnit.Invoke(ctxDelegate);
+                return Task.CompletedTask;
+            }
+        );
     }
 
     public Task<TResult> DoInTransaction<TDbContext, TResult>(
         TDbContext context,
-        Func<TDbContext, TResult> transactionalUnit)
+        Func<TDbContext, TResult> transactionalUnit
+    )
         where TDbContext : DbContext
     {
         return DoInTransaction(context, ctx => Task.FromResult(transactionalUnit.Invoke(ctx)));
@@ -78,15 +88,21 @@ public class DatabaseHelper : IDatabaseHelper
     public Task ExecuteWithExclusiveLock<TDbContext>(
         TDbContext dbContext,
         string lockName,
-        Func<TDbContext, Task> action)
+        Func<TDbContext, Task> action
+    )
         where TDbContext : DbContext
     {
-        return DoInTransaction(dbContext, async ctx =>
-        {
+        return DoInTransaction(
+            dbContext,
+            async ctx =>
+            {
 #pragma warning disable EF1002
-            await ctx.Database.ExecuteSqlRawAsync($"exec sp_getapplock '{lockName}', 'exclusive'");
+                await ctx.Database.ExecuteSqlRawAsync(
+                    $"exec sp_getapplock '{lockName}', 'exclusive'"
+                );
 #pragma warning restore EF1002
-            await action.Invoke(ctx);
-        });
+                await action.Invoke(ctx);
+            }
+        );
     }
 }

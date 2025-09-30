@@ -52,15 +52,15 @@ public class ProcessorStage1Tests
             {
                 Id = Guid.NewGuid(),
                 Filename = scenario.GetFilenameUnderTest(),
-                Type = FileType.Data
+                Type = FileType.Data,
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = metaFileUnderTest,
-                Type = FileType.Metadata
+                Type = FileType.Metadata,
             },
-            Status = DataImportStatus.STAGE_1
+            Status = DataImportStatus.STAGE_1,
         };
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -77,33 +77,45 @@ public class ProcessorStage1Tests
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-        var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources", scenario.GetFilenameUnderTest());
+        var dataFilePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources",
+            scenario.GetFilenameUnderTest()
+        );
 
-        var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources", metaFileUnderTest);
+        var metaFilePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources",
+            metaFileUnderTest
+        );
 
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
-            dataFilePath);
+            dataFilePath
+        );
 
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
-            metaFilePath);
+            metaFilePath
+        );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
-            statisticsDbContextId: _statisticsDbContextId);
+            statisticsDbContextId: _statisticsDbContextId
+        );
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>());
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
+        var importerLocationCache = new ImporterLocationCache(
+            Mock.Of<ILogger<ImporterLocationCache>>()
+        );
 
         var guidGenerator = new SequentialGuidGenerator();
 
@@ -115,23 +127,27 @@ public class ProcessorStage1Tests
             new ImporterLocationService(
                 guidGenerator,
                 importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()),
+                Mock.Of<ILogger<ImporterLocationCache>>()
+            ),
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper);
+            transactionHelper
+        );
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService
+        );
 
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             privateBlobStorageService.Object,
             new FileTypeService(new ConfigurationBuilder().Build()),
-            dataImportService);
+            dataImportService
+        );
 
         var processorService = BuildProcessorService(
             dbContextSupplier,
@@ -139,7 +155,8 @@ public class ProcessorStage1Tests
             privateBlobStorageService: privateBlobStorageService.Object,
             importerService: importerService,
             fileImportService: fileImportService,
-            validatorService: validatorService);
+            validatorService: validatorService
+        );
 
         var importMessage = new ImportMessage(import.Id);
 
@@ -147,7 +164,8 @@ public class ProcessorStage1Tests
 
         var outputMessages = await function.ProcessUploads(
             importMessage,
-            new TestFunctionContext());
+            new TestFunctionContext()
+        );
 
         VerifyAllMocks(privateBlobStorageService);
 
@@ -156,9 +174,7 @@ public class ProcessorStage1Tests
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {
-            var dataImports = await contentDbContext
-                .DataImports
-                .ToListAsync();
+            var dataImports = await contentDbContext.DataImports.ToListAsync();
 
             // Verify that the import status has moved onto Stage 2.
             dataImports.ForEach(dataImport =>
@@ -176,7 +192,8 @@ public class ProcessorStage1Tests
         IPrivateBlobStorageService? privateBlobStorageService = null,
         IImporterService? importerService = null,
         IFileImportService? fileImportService = null,
-        IValidatorService? validatorService = null)
+        IValidatorService? validatorService = null
+    )
     {
         return new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(),
@@ -185,17 +202,20 @@ public class ProcessorStage1Tests
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier);
+            dbContextSupplier
+        );
     }
 
     private static Processor.Functions.Processor BuildFunction(
         IProcessorService? processorService = null,
-        IDataImportService? dataImportService = null)
+        IDataImportService? dataImportService = null
+    )
     {
         return new Processor.Functions.Processor(
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
             Mock.Of<ILogger<Processor.Functions.Processor>>(),
-            rethrowExceptions: true);
+            rethrowExceptions: true
+        );
     }
 }

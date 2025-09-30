@@ -28,7 +28,10 @@ public abstract class ReleaseVersionsControllerTests
             var result = await sut.GetReleaseVersionSummary(PublicationSlug, ReleaseSlug);
 
             // Assert
-            _releaseVersionsService.Assert.GetReleaseVersionSummaryWasCalled(PublicationSlug, ReleaseSlug);
+            _releaseVersionsService.Assert.GetReleaseVersionSummaryWasCalled(
+                PublicationSlug,
+                ReleaseSlug
+            );
             result.AssertOkResult(releaseVersionSummary);
         }
 
@@ -36,7 +39,10 @@ public abstract class ReleaseVersionsControllerTests
         public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
         {
             // Arrange
-            _releaseVersionsService.WhereGetReleaseVersionSummaryReturnsNotFound(PublicationSlug, ReleaseSlug);
+            _releaseVersionsService.WhereGetReleaseVersionSummaryReturnsNotFound(
+                PublicationSlug,
+                ReleaseSlug
+            );
 
             var sut = BuildController();
 
@@ -44,7 +50,10 @@ public abstract class ReleaseVersionsControllerTests
             var result = await sut.GetReleaseVersionSummary(PublicationSlug, ReleaseSlug);
 
             // Assert
-            _releaseVersionsService.Assert.GetReleaseVersionSummaryWasCalled(PublicationSlug, ReleaseSlug);
+            _releaseVersionsService.Assert.GetReleaseVersionSummaryWasCalled(
+                PublicationSlug,
+                ReleaseSlug
+            );
             result.AssertNotFoundResult();
         }
     }

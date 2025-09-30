@@ -15,14 +15,12 @@ public class VersionedPathsDocumentFilter : IDocumentFilter
 
             newPaths[versionedPath] = path.Value;
 
-            path.Value.Parameters = path.Value.Parameters
-                .Where(p => p.Name != "version")
-                .ToList();
+            path.Value.Parameters = path.Value.Parameters.Where(p => p.Name != "version").ToList();
 
             foreach (var operation in path.Value.Operations.Values)
             {
-                operation.Parameters = operation.Parameters
-                    .Where(p => p.Name != "version")
+                operation.Parameters = operation
+                    .Parameters.Where(p => p.Name != "version")
                     .ToList();
             }
         }

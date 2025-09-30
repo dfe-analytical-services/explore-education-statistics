@@ -12,16 +12,17 @@ public partial class EES2385_AddMethodologyPublishingStrategy : Migration
             name: "PublishingStrategy",
             table: "Methodologies",
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
 
         // Set all existing Methodologies to have Immediately as their publishing strategy
-        migrationBuilder.Sql($"Update Methodologies SET PublishingStrategy='{Immediately.ToString()}'");
+        migrationBuilder.Sql(
+            $"Update Methodologies SET PublishingStrategy='{Immediately.ToString()}'"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "PublishingStrategy",
-            table: "Methodologies");
+        migrationBuilder.DropColumn(name: "PublishingStrategy", table: "Methodologies");
     }
 }

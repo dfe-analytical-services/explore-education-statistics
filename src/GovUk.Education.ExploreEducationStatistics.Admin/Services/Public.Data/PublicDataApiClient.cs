@@ -13,33 +13,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class PublicDataApiClient(
     ILogger<PublicDataApiClient> logger,
     HttpClient httpClient,
-    IHttpClientAzureAuthenticationManager<PublicDataApiOptions> authenticationManager)
-    : IPublicDataApiClient
+    IHttpClientAzureAuthenticationManager<PublicDataApiOptions> authenticationManager
+) : IPublicDataApiClient
 {
     public async Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await SendRequest(
-            () => httpClient.GetAsync(
-                $"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes",
-                cancellationToken
-            ),
+            () =>
+                httpClient.GetAsync(
+                    $"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes",
+                    cancellationToken
+                ),
             cancellationToken
         );
     }
 
     private async Task<Either<ActionResult, HttpResponseMessage>> SendRequest(
         Func<Task<HttpResponseMessage>> requestFunction,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
         // Add an HTTP header to signal to the Public API that this call originates from the
         // EES service.
         httpClient.DefaultRequestHeaders.Add(RequestHeaderNames.RequestSource, "EES Admin");
-            
+
         var response = await requestFunction();
 
         if (!response.IsSuccessStatusCode)
@@ -48,7 +51,9 @@ public class PublicDataApiClient(
             {
                 case HttpStatusCode.BadRequest:
                     return new BadRequestObjectResult(
-                        await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken)
+                        await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>(
+                            cancellationToken
+                        )
                     );
                 default:
                     var body = await response.Content.ReadAsStringAsync(cancellationToken);

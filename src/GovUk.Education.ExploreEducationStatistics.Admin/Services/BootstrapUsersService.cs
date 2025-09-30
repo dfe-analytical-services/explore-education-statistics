@@ -16,7 +16,8 @@ public class BootstrapUsersService
     public BootstrapUsersService(
         IConfiguration configuration,
         UsersAndRolesDbContext usersAndRolesDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
         _configuration = configuration;
         _usersAndRolesDbContext = usersAndRolesDbContext;
@@ -29,9 +30,9 @@ public class BootstrapUsersService
     public void AddBootstrapUsers()
     {
         var bauBootstrapUserEmailAddresses = _configuration
-            .GetSection("BootstrapUsers")?
-            .GetValue<string>("BAU")?
-            .Split(',');
+            .GetSection("BootstrapUsers")
+            ?.GetValue<string>("BAU")
+            ?.Split(',');
 
         if (bauBootstrapUserEmailAddresses.IsNullOrEmpty())
         {
@@ -39,29 +40,27 @@ public class BootstrapUsersService
         }
 
         var existingEmailInvites = _usersAndRolesDbContext
-            .UserInvites
-            .AsQueryable()
+            .UserInvites.AsQueryable()
             .Select(i => i.Email.ToLower())
             .ToList();
 
         var existingUserEmails = _contentDbContext
-            .Users
-            .AsQueryable()
+            .Users.AsQueryable()
             .Select(u => u.Email.ToLower())
             .ToList();
 
         var newInvitesToCreate = bauBootstrapUserEmailAddresses!
             .Where(email =>
-                !existingEmailInvites.Contains(email.ToLower()) &&
-                !existingUserEmails.Contains(email.ToLower()))
-            .Select(email =>
-                new UserInvite
-                {
-                    Email = email,
-                    RoleId = Role.BauUser.GetEnumValue(),
-                    Accepted = false,
-                    Created = DateTime.UtcNow,
-                })
+                !existingEmailInvites.Contains(email.ToLower())
+                && !existingUserEmails.Contains(email.ToLower())
+            )
+            .Select(email => new UserInvite
+            {
+                Email = email,
+                RoleId = Role.BauUser.GetEnumValue(),
+                Accepted = false,
+                Created = DateTime.UtcNow,
+            })
             .ToList();
 
         if (newInvitesToCreate.IsNullOrEmpty())

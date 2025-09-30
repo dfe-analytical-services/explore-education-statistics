@@ -7,36 +7,40 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ManageExternalMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
-{
-}
+public class ManageExternalMethodologyForSpecificPublicationRequirement
+    : IAuthorizationRequirement { }
 
-public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler 
+public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
     : AuthorizationHandler<ManageExternalMethodologyForSpecificPublicationRequirement, Publication>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         ManageExternalMethodologyForSpecificPublicationRequirement requirement,
-        Publication publication)
+        Publication publication
+    )
     {
         if (SecurityUtils.HasClaim(context.User, CreateAnyMethodology))
         {
             context.Succeed(requirement);
             return;
         }
-        
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+
+        if (
+            await _authorizationHandlerService.HasRolesOnPublication(
+                context.User.GetUserId(),
+                publication.Id,
+                Owner
+            )
+        )
         {
             context.Succeed(requirement);
         }

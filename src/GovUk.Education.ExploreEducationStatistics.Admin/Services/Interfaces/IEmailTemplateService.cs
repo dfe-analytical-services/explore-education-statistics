@@ -10,23 +10,29 @@ public interface IEmailTemplateService
     Either<ActionResult, Unit> SendInviteEmail(
         string email,
         List<UserReleaseInvite> userReleaseInvites,
-        List<UserPublicationInvite> userPublicationInvites);
+        List<UserPublicationInvite> userPublicationInvites
+    );
 
     Either<ActionResult, Unit> SendPublicationRoleEmail(
         string email,
         Publication publication,
-        PublicationRole role);
+        PublicationRole role
+    );
 
     Either<ActionResult, Unit> SendReleaseRoleEmail(
         string email,
         ReleaseVersion releaseVersion,
-        ReleaseRole role);
+        ReleaseRole role
+    );
 
-    Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email,
-        ReleaseVersion releaseVersion);
+    Either<ActionResult, Unit> SendReleaseHigherReviewEmail(
+        string email,
+        ReleaseVersion releaseVersion
+    );
 
     Either<ActionResult, Unit> SendMethodologyHigherReviewEmail(
         string email,
         Guid methodologyVersionId,
-        string methodologyTitle);
+        string methodologyTitle
+    );
 }

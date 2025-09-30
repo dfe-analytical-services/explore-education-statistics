@@ -17,20 +17,17 @@ public class PageFeedbackController(ContentDbContext context) : ControllerBase
     [HttpGet("feedback/page")]
     public async Task<ActionResult> ListFeedback(
         [FromQuery] bool showRead,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var query = context.PageFeedback
-            .OrderByDescending(x => x.Created)
-            .AsQueryable();
+        var query = context.PageFeedback.OrderByDescending(x => x.Created).AsQueryable();
 
         if (!showRead)
         {
             query = query.Where(x => !x.Read);
         }
 
-        var feedback = await query
-            .Select(f => MapToViewModel(f))
-            .ToListAsync(cancellationToken);
+        var feedback = await query.Select(f => MapToViewModel(f)).ToListAsync(cancellationToken);
 
         return Ok(feedback);
     }

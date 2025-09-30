@@ -14,7 +14,8 @@ public class ReleasePublishingStatusState : INotifyPropertyChanged
         ReleasePublishingStatusContentStage content,
         ReleasePublishingStatusFilesStage files,
         ReleasePublishingStatusPublishingStage publishing,
-        ReleasePublishingStatusOverallStage overall)
+        ReleasePublishingStatusOverallStage overall
+    )
     {
         _content = content;
         _files = files;
@@ -22,13 +23,18 @@ public class ReleasePublishingStatusState : INotifyPropertyChanged
         _overall = overall;
     }
 
-    public ReleasePublishingStatusState(string content, string files, string publishing, string overall) : this(
-        Enum.Parse<ReleasePublishingStatusContentStage>(content),
-        Enum.Parse<ReleasePublishingStatusFilesStage>(files),
-        Enum.Parse<ReleasePublishingStatusPublishingStage>(publishing),
-        Enum.Parse<ReleasePublishingStatusOverallStage>(overall))
-    {
-    }
+    public ReleasePublishingStatusState(
+        string content,
+        string files,
+        string publishing,
+        string overall
+    )
+        : this(
+            Enum.Parse<ReleasePublishingStatusContentStage>(content),
+            Enum.Parse<ReleasePublishingStatusFilesStage>(files),
+            Enum.Parse<ReleasePublishingStatusPublishingStage>(publishing),
+            Enum.Parse<ReleasePublishingStatusOverallStage>(overall)
+        ) { }
 
     public ReleasePublishingStatusContentStage Content
     {
@@ -92,19 +98,25 @@ public class ReleasePublishingStatusState : INotifyPropertyChanged
 
     private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
-        if (Content == ReleasePublishingStatusContentStage.Complete
+        if (
+            Content == ReleasePublishingStatusContentStage.Complete
             && Files == ReleasePublishingStatusFilesStage.Complete
-            && Publishing == ReleasePublishingStatusPublishingStage.Complete)
+            && Publishing == ReleasePublishingStatusPublishingStage.Complete
+        )
         {
             Overall = ReleasePublishingStatusOverallStage.Complete;
         }
 
-        if (Content == ReleasePublishingStatusContentStage.Failed
+        if (
+            Content == ReleasePublishingStatusContentStage.Failed
             || Files == ReleasePublishingStatusFilesStage.Failed
-            || Publishing == ReleasePublishingStatusPublishingStage.Failed)
+            || Publishing == ReleasePublishingStatusPublishingStage.Failed
+        )
         {
-            if (Content == ReleasePublishingStatusContentStage.Failed
-                || Files == ReleasePublishingStatusFilesStage.Failed)
+            if (
+                Content == ReleasePublishingStatusContentStage.Failed
+                || Files == ReleasePublishingStatusFilesStage.Failed
+            )
             {
                 Publishing = ReleasePublishingStatusPublishingStage.Cancelled;
             }
@@ -125,7 +137,7 @@ public enum ReleasePublishingStatusContentStage
     Queued,
     NotStarted,
     Started,
-    Scheduled
+    Scheduled,
 }
 
 public enum ReleasePublishingStatusFilesStage
@@ -135,7 +147,7 @@ public enum ReleasePublishingStatusFilesStage
     Failed,
     Queued,
     NotStarted,
-    Started
+    Started,
 }
 
 public enum ReleasePublishingStatusOverallStage
@@ -145,7 +157,7 @@ public enum ReleasePublishingStatusOverallStage
     Invalid,
     Scheduled,
     Started,
-    Superseded
+    Superseded,
 }
 
 public enum ReleasePublishingStatusPublishingStage
@@ -155,5 +167,5 @@ public enum ReleasePublishingStatusPublishingStage
     Failed,
     Scheduled,
     NotStarted,
-    Started
+    Started,
 }

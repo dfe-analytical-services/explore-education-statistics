@@ -12,26 +12,31 @@ public interface ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
     Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
         TAnalyticsRequest request,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 }
 
 public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
     DateTimeProvider dateTimeProvider,
-    ILogger<CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>> logger)
-    : ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
+    ILogger<CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>> logger
+) : ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public async Task Report(
         IWorkflowActor<TAnalyticsRequest> workflowActor,
         TAnalyticsRequest analyticsRequest,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        logger.LogDebug("Capturing request of type {RequestType} for analytics", typeof(TAnalyticsRequest));
+        logger.LogDebug(
+            "Capturing request of type {RequestType} for analytics",
+            typeof(TAnalyticsRequest)
+        );
 
         var filename =
-            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_" +
-            $"{workflowActor.GetFilenamePart(analyticsRequest)}_" +
-            $"{RandomUtils.RandomString()}.json";
+            $"{dateTimeProvider.UtcNow:yyyyMMdd-HHmmss}_"
+            + $"{workflowActor.GetFilenamePart(analyticsRequest)}_"
+            + $"{RandomUtils.RandomString()}.json";
 
         try
         {
@@ -46,27 +51,32 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
             await File.WriteAllTextAsync(
                 path: filePath,
                 contents: serialisedRequest,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error whilst writing {RequestType} to disk", typeof(TAnalyticsRequest));
+            logger.LogError(
+                e,
+                "Error whilst writing {RequestType} to disk",
+                typeof(TAnalyticsRequest)
+            );
         }
     }
 }
 
-public interface IWorkflowActor<TAnalyticsRequest> 
+public interface IWorkflowActor<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     string GetAnalyticsPath();
-    
+
     string GetFilenamePart(TAnalyticsRequest request);
-    
+
     TAnalyticsRequest PrepareForSerialisation(TAnalyticsRequest originalRequest);
 }
 
-public abstract class WorkflowActorBase<TAnalyticsRequest>(string analyticsPath) 
-    : IWorkflowActor<TAnalyticsRequest> 
+public abstract class WorkflowActorBase<TAnalyticsRequest>(string analyticsPath)
+    : IWorkflowActor<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public string GetAnalyticsPath()

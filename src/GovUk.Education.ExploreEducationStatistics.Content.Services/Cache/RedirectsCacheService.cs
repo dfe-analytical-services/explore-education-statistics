@@ -17,13 +17,13 @@ public class RedirectsCacheService : IRedirectsCacheService
     }
 
     [BlobCache(typeof(RedirectsCacheKey), ServiceName = "public")]
-    public async Task<Either<ActionResult,RedirectsViewModel>> List()
+    public async Task<Either<ActionResult, RedirectsViewModel>> List()
     {
         return await _redirectsService.List();
     }
 
     [BlobCache(typeof(RedirectsCacheKey), forceUpdate: true, ServiceName = "public")]
-    public async Task<Either<ActionResult,RedirectsViewModel>> UpdateRedirects()
+    public async Task<Either<ActionResult, RedirectsViewModel>> UpdateRedirects()
     {
         return await _redirectsService.List();
     }

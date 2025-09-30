@@ -18,7 +18,8 @@ public class TestFunctionContext : FunctionContext
 
     public override FunctionDefinition FunctionDefinition { get; } = new TestFunctionDefinition();
 
-    public override IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
+    public override IDictionary<object, object> Items { get; set; } =
+        new Dictionary<object, object>();
 
     public override IInvocationFeatures Features { get; }
 }

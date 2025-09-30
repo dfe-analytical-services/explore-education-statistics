@@ -17,17 +17,21 @@ public class EventGridClientMockBuilder
         if (_sendEventAsyncException is null)
         {
             _mock
-                .Setup(m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()))
-                .Callback((EventGridEvent eventGridEvent, CancellationToken _) => _eventsPublished.Add(eventGridEvent))
-                .ReturnsAsync(() => new MockResponse
-                {
-                    StatusCode = _httpStatusCode
-                });
+                .Setup(m =>
+                    m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>())
+                )
+                .Callback(
+                    (EventGridEvent eventGridEvent, CancellationToken _) =>
+                        _eventsPublished.Add(eventGridEvent)
+                )
+                .ReturnsAsync(() => new MockResponse { StatusCode = _httpStatusCode });
         }
         else
         {
             _mock
-                .Setup(m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()))
+                .Setup(m =>
+                    m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>())
+                )
                 .ThrowsAsync(_sendEventAsyncException);
         }
         return _mock.Object;
@@ -44,13 +48,17 @@ public class EventGridClientMockBuilder
         _sendEventAsyncException = exception;
         return this;
     }
-    
+
     public Asserter Assert => new(_mock, _eventsPublished);
+
     public class Asserter(Mock<IEventGridClient> mock, List<EventGridEvent> eventsPublished)
     {
         public IEnumerable<EventGridEvent> EventsPublished => eventsPublished;
-        
-        public void NoEventsWerePublished() => mock.Verify(m => 
-            m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        public void NoEventsWerePublished() =>
+            mock.Verify(
+                m => m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
     }
 }

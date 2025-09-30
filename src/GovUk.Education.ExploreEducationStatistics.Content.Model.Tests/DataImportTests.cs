@@ -5,13 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests;
 
 public class DataImportTests
 {
-    private static readonly List<DataImportStatus> StatusesWithZeroProgress = new List<DataImportStatus>
-    {
-        CANCELLING,
-        QUEUED,
-        FAILED,
-        NOT_FOUND
-    };
+    private static readonly List<DataImportStatus> StatusesWithZeroProgress =
+        new List<DataImportStatus> { CANCELLING, QUEUED, FAILED, NOT_FOUND };
 
     private const int StagePercentageComplete = 50;
 
@@ -21,7 +16,7 @@ public class DataImportTests
         var import = new DataImport
         {
             StagePercentageComplete = StagePercentageComplete,
-            Status = STAGE_1
+            Status = STAGE_1,
         };
 
         Assert.Equal(StagePercentageComplete * 0.1, import.PercentageComplete());
@@ -33,7 +28,7 @@ public class DataImportTests
         var import = new DataImport
         {
             StagePercentageComplete = StagePercentageComplete,
-            Status = STAGE_2
+            Status = STAGE_2,
         };
 
         Assert.Equal(100 * 0.1 + StagePercentageComplete * 0.1, import.PercentageComplete());
@@ -45,11 +40,13 @@ public class DataImportTests
         var import = new DataImport
         {
             StagePercentageComplete = StagePercentageComplete,
-            Status = STAGE_3
+            Status = STAGE_3,
         };
 
-        Assert.Equal(100 * 0.1 + 100 * 0.1 + StagePercentageComplete * 0.8,
-            import.PercentageComplete());
+        Assert.Equal(
+            100 * 0.1 + 100 * 0.1 + StagePercentageComplete * 0.8,
+            import.PercentageComplete()
+        );
     }
 
     [Fact]
@@ -58,7 +55,7 @@ public class DataImportTests
         var import = new DataImport
         {
             StagePercentageComplete = StagePercentageComplete,
-            Status = CANCELLED
+            Status = CANCELLED,
         };
 
         Assert.Equal(100, import.PercentageComplete());
@@ -70,7 +67,7 @@ public class DataImportTests
         var import = new DataImport
         {
             StagePercentageComplete = StagePercentageComplete,
-            Status = COMPLETE
+            Status = COMPLETE,
         };
 
         Assert.Equal(100, import.PercentageComplete());
@@ -84,7 +81,7 @@ public class DataImportTests
             var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
-                Status = status
+                Status = status,
             };
 
             Assert.Equal(0, import.PercentageComplete());

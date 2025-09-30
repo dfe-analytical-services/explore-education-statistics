@@ -14,8 +14,14 @@ public record TimePeriodRangeViewModel
     {
         return new TimePeriodRangeViewModel
         {
-            Start = TimePeriodFormatter.FormatLabel(timePeriodRange.Start.Period, timePeriodRange.Start.Code),
-            End = TimePeriodFormatter.FormatLabel(timePeriodRange.End.Period, timePeriodRange.End.Code),
+            Start = TimePeriodFormatter.FormatLabel(
+                timePeriodRange.Start.Period,
+                timePeriodRange.Start.Code
+            ),
+            End = TimePeriodFormatter.FormatLabel(
+                timePeriodRange.End.Period,
+                timePeriodRange.End.Code
+            ),
         };
     }
 }

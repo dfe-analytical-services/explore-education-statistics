@@ -17,10 +17,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                Filters = new DataSetGetQueryFilters
-                {
-                    Eq = "abc"
-                },
+                Filters = new DataSetGetQueryFilters { Eq = "abc" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
@@ -32,14 +29,12 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                Filters = new DataSetGetQueryFilters
-                {
-                    Eq = ""
-                },
+                Filters = new DataSetGetQueryFilters { Eq = "" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Filters!.Eq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
@@ -52,10 +47,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                GeographicLevels = new DataSetGetQueryGeographicLevels
-                {
-                    Eq = "NAT"
-                },
+                GeographicLevels = new DataSetGetQueryGeographicLevels { Eq = "NAT" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
@@ -67,14 +59,12 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                GeographicLevels = new DataSetGetQueryGeographicLevels
-                {
-                    Eq = "invalid"
-                },
+                GeographicLevels = new DataSetGetQueryGeographicLevels { Eq = "invalid" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.GeographicLevels!.Eq)
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
         }
@@ -87,10 +77,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                Locations = new DataSetGetQueryLocations
-                {
-                    Eq = "NAT|id|12345"
-                },
+                Locations = new DataSetGetQueryLocations { Eq = "NAT|id|12345" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
@@ -102,14 +89,12 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                Locations = new DataSetGetQueryLocations
-                {
-                    Eq = "invalid"
-                },
+                Locations = new DataSetGetQueryLocations { Eq = "invalid" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Locations!.Eq)
                 .WithErrorCode(ValidationMessages.LocationFormat.Code);
         }
@@ -122,10 +107,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                TimePeriods = new DataSetGetQueryTimePeriods
-                {
-                    Eq = "2020|AY"
-                },
+                TimePeriods = new DataSetGetQueryTimePeriods { Eq = "2020|AY" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
@@ -137,14 +119,12 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                TimePeriods = new DataSetGetQueryTimePeriods
-                {
-                    Eq = "invalid"
-                },
+                TimePeriods = new DataSetGetQueryTimePeriods { Eq = "invalid" },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.TimePeriods!.Eq)
                 .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
         }
@@ -159,10 +139,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         [InlineData("indicator1", "indicator2")]
         public void Success(params string[]? indicators)
         {
-            var query = new DataSetGetQueryRequest
-            {
-                Indicators = indicators,
-            };
+            var query = new DataSetGetQueryRequest { Indicators = indicators };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
@@ -174,16 +151,14 @@ public abstract class DataSetGetQueryRequestValidatorTests
         [InlineData("", " ")]
         public void Failure_EmptyStrings(params string[] indicators)
         {
-            var query = new DataSetGetQueryRequest
-            {
-                Indicators = indicators
-            };
+            var query = new DataSetGetQueryRequest { Indicators = indicators };
 
             var result = _validator.TestValidate(query);
 
             foreach (var (_, index) in indicators.WithIndex())
             {
-                result.ShouldHaveValidationErrorFor($"Indicators[{index}]")
+                result
+                    .ShouldHaveValidationErrorFor($"Indicators[{index}]")
                     .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             }
         }
@@ -193,7 +168,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         {
             var query = new DataSetGetQueryRequest
             {
-                Indicators = [new string('a', 101), new string('a', 200)]
+                Indicators = [new string('a', 101), new string('a', 200)],
             };
 
             var result = _validator.TestValidate(query);
@@ -210,10 +185,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
         [Fact]
         public void Failure_Mixture()
         {
-            var query = new DataSetGetQueryRequest
-            {
-                Indicators = [new string('a', 101), ""]
-            };
+            var query = new DataSetGetQueryRequest { Indicators = [new string('a', 101), ""] };
 
             var result = _validator.TestValidate(query);
 
@@ -247,10 +219,11 @@ public abstract class DataSetGetQueryRequestValidatorTests
             var query = new DataSetGetQueryRequest
             {
                 Indicators = ["indicator1", "indicator2"],
-                Sorts = []
+                Sorts = [],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Sorts)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
@@ -261,7 +234,13 @@ public abstract class DataSetGetQueryRequestValidatorTests
             var query = new DataSetGetQueryRequest
             {
                 Indicators = ["indicator1", "indicator2"],
-                Sorts = ["", "Invalid", "TimePeriod|asc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|Asc"]
+                Sorts =
+                [
+                    "",
+                    "Invalid",
+                    "TimePeriod|asc",
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|Asc",
+                ],
             };
 
             var result = _validator.TestValidate(query);
@@ -301,8 +280,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
                 Page = page,
             };
 
-            _validator.TestValidate(query)
-                .ShouldNotHaveAnyValidationErrors();
+            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Theory]
@@ -318,7 +296,8 @@ public abstract class DataSetGetQueryRequestValidatorTests
                 Page = page,
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Page)
                 .WithErrorCode(FluentValidationKeys.GreaterThanOrEqualValidator);
         }
@@ -339,8 +318,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
                 PageSize = pageSize,
             };
 
-            _validator.TestValidate(query)
-                .ShouldNotHaveAnyValidationErrors();
+            _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
 
         [Theory]
@@ -355,7 +333,8 @@ public abstract class DataSetGetQueryRequestValidatorTests
                 PageSize = pageSize,
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.PageSize)
                 .WithErrorCode(FluentValidationKeys.InclusiveBetweenValidator);
         }

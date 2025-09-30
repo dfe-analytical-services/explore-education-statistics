@@ -11,7 +11,10 @@ public class ReleaseChecklistViewModel
     public List<ReleaseChecklistIssue> Errors { get; }
     public List<ReleaseChecklistIssue> Warnings { get; }
 
-    public ReleaseChecklistViewModel(List<ReleaseChecklistIssue> errors, List<ReleaseChecklistIssue> warnings)
+    public ReleaseChecklistViewModel(
+        List<ReleaseChecklistIssue> errors,
+        List<ReleaseChecklistIssue> warnings
+    )
     {
         Errors = errors;
         Warnings = warnings;
@@ -33,7 +36,8 @@ public class MethodologyNotApprovedWarning : ReleaseChecklistIssue
 {
     public Guid MethodologyId { get; }
 
-    public MethodologyNotApprovedWarning(Guid methodologyId) : base(ValidationErrorMessages.MethodologyNotApproved)
+    public MethodologyNotApprovedWarning(Guid methodologyId)
+        : base(ValidationErrorMessages.MethodologyNotApproved)
     {
         MethodologyId = methodologyId;
     }
@@ -43,7 +47,8 @@ public class NoFootnotesOnSubjectsWarning : ReleaseChecklistIssue
 {
     public int TotalSubjects { get; }
 
-    public NoFootnotesOnSubjectsWarning(int totalSubjects) : base(ValidationErrorMessages.NoFootnotesOnSubjects)
+    public NoFootnotesOnSubjectsWarning(int totalSubjects)
+        : base(ValidationErrorMessages.NoFootnotesOnSubjects)
     {
         TotalSubjects = totalSubjects;
     }

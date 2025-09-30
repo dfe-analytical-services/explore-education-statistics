@@ -30,25 +30,22 @@ public class ReleaseFileService(
     IDataGuidanceFileWriter dataGuidanceFileWriter,
     IUserService userService,
     IAnalyticsManager analyticsManager,
-    ILogger<ReleaseFileService> logger)
-    : IReleaseFileService
+    ILogger<ReleaseFileService> logger
+) : IReleaseFileService
 {
     /// How long the all files zip should be
     /// cached in blob storage, in seconds.
     private const int AllFilesZipTtl = 60 * 60;
 
-    private static readonly FileType[] AllowedFileTypes =
-    [
-        FileType.Ancillary,
-        FileType.Data
-    ];
+    private static readonly FileType[] AllowedFileTypes = [FileType.Ancillary, FileType.Data];
 
     public async Task<Either<ActionResult, IList<ReleaseFileViewModel>>> ListReleaseFiles(
         ReleaseFileListRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var releaseFiles = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.ReleaseVersion)
+        var releaseFiles = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.ReleaseVersion)
             .ThenInclude(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .Include(rf => rf.File)
@@ -57,8 +54,7 @@ public class ReleaseFileService(
             .Where(rv => rv.Published != null)
             .ToListAsync(cancellationToken);
 
-        var releaseVersions = releaseFiles.Select(rf => rf.ReleaseVersion)
-            .ToHashSet();
+        var releaseVersions = releaseFiles.Select(rf => rf.ReleaseVersion).ToHashSet();
 
         var allowedReleaseVersions = new HashSet<ReleaseVersion>();
 
@@ -87,31 +83,43 @@ public class ReleaseFileService(
             Id = releaseFile.Id,
             File = releaseFile.ToPublicFileInfo(),
             DataSetFileId = releaseFile.File.DataSetFileId,
-            Release = new ReleaseSummaryViewModel(releaseVersion, latestPublishedRelease: isLatestPublishedRelease)
+            Release = new ReleaseSummaryViewModel(
+                releaseVersion,
+                latestPublishedRelease: isLatestPublishedRelease
+            )
             {
-                Publication = new PublicationSummaryViewModel(releaseVersion.Release.Publication)
+                Publication = new PublicationSummaryViewModel(releaseVersion.Release.Publication),
             },
         };
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId, Guid fileId)
+    public async Task<Either<ActionResult, FileStreamResult>> StreamFile(
+        Guid releaseVersionId,
+        Guid fileId
+    )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseFile>(q => q
-                .Include(rf => rf.File)
-                .Include(rf => rf.ReleaseVersion)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
+            .CheckEntityExists<ReleaseFile>(q =>
+                q.Include(rf => rf.File)
+                    .Include(rf => rf.ReleaseVersion)
+                    .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
             )
-            .OnSuccessDo(releaseFile => userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion))
-            .OnSuccessCombineWith(releaseFile => publicBlobStorageService
-                .GetDownloadStream(PublicReleaseFiles, releaseFile.PublicPath()))
+            .OnSuccessDo(releaseFile =>
+                userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion)
+            )
+            .OnSuccessCombineWith(releaseFile =>
+                publicBlobStorageService.GetDownloadStream(
+                    PublicReleaseFiles,
+                    releaseFile.PublicPath()
+                )
+            )
             .OnSuccess(releaseFileAndStream =>
             {
                 var (releaseFile, stream) = releaseFileAndStream;
 
                 return new FileStreamResult(stream, releaseFile.File.ContentType)
                 {
-                    FileDownloadName = releaseFile.File.Filename
+                    FileDownloadName = releaseFile.File.Filename,
                 };
             });
     }
@@ -121,48 +129,66 @@ public class ReleaseFileService(
         Stream outputStream,
         AnalyticsFromPage fromPage,
         IEnumerable<Guid>? fileIds = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await contentDbContext.ReleaseVersions
-            .Include(rv => rv.Release)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+            .SingleOrNotFoundAsync(
+                rv => rv.Id == releaseVersionId,
+                cancellationToken: cancellationToken
+            )
             .OnSuccess(userService.CheckCanViewReleaseVersion)
-            .OnSuccessVoid(
-                async releaseVersion =>
+            .OnSuccessVoid(async releaseVersion =>
+            {
+                List<ReleaseFile>? releaseFiles = null;
+
+                if (fileIds is null)
                 {
-                    List<ReleaseFile>? releaseFiles = null;
+                    var successfullyStreamCachedAllFilesZip = await TryStreamCachedAllFilesZip(
+                        releaseVersion,
+                        outputStream,
+                        cancellationToken
+                    );
 
-                    if (fileIds is null)
+                    if (!successfullyStreamCachedAllFilesZip)
                     {
-                        var successfullyStreamCachedAllFilesZip =
-                            await TryStreamCachedAllFilesZip(releaseVersion, outputStream, cancellationToken);
-
-                        if (!successfullyStreamCachedAllFilesZip)
-                        {
-                            await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
-                        }
+                        await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
                     }
-                    else
-                    {
-                        releaseFiles = (await QueryReleaseFiles(releaseVersionId)
-                            .Where(rf => fileIds.Contains(rf.FileId))
-                            .ToListAsync(cancellationToken: cancellationToken))
-                            .OrderBy(rf => rf.File.ZipFileEntryName())
-                            .ToList();
-
-                        await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
-                    }
-
-                    await RecordZipDownloadAnalytics(releaseVersion, releaseFiles, fromPage, cancellationToken);
                 }
-            );
+                else
+                {
+                    releaseFiles = (
+                        await QueryReleaseFiles(releaseVersionId)
+                            .Where(rf => fileIds.Contains(rf.FileId))
+                            .ToListAsync(cancellationToken: cancellationToken)
+                    )
+                        .OrderBy(rf => rf.File.ZipFileEntryName())
+                        .ToList();
+
+                    await DoZipFilesToStream(
+                        releaseFiles,
+                        releaseVersion,
+                        outputStream,
+                        cancellationToken
+                    );
+                }
+
+                await RecordZipDownloadAnalytics(
+                    releaseVersion,
+                    releaseFiles,
+                    fromPage,
+                    cancellationToken
+                );
+            });
     }
 
     private async Task<bool> TryStreamCachedAllFilesZip(
         ReleaseVersion releaseVersion,
         Stream outputStream,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var path = releaseVersion.AllFilesZipPath();
         var allFilesZip = await publicBlobStorageService.FindBlob(PublicReleaseFiles, path);
@@ -171,13 +197,16 @@ public class ReleaseFileService(
         // but this a chunk of work to get working properly as piping
         // the cached file to target stream isn't super trivial.
         // For now, we'll just do this manually as it's way easier.
-        if (allFilesZip?.Updated is not null
-            && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
+        if (
+            allFilesZip?.Updated is not null
+            && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow
+        )
         {
             var streamResult = await publicBlobStorageService.GetDownloadStream(
                 containerName: PublicReleaseFiles,
                 path: path,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             if (streamResult.IsLeft)
             {
@@ -195,10 +224,13 @@ public class ReleaseFileService(
     private async Task ZipAllFilesToStream(
         ReleaseVersion releaseVersion,
         Stream outputStream,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var releaseFiles = (await QueryReleaseFiles(releaseVersion.Id)
-            .ToListAsync(cancellationToken: cancellationToken))
+        var releaseFiles = (
+            await QueryReleaseFiles(releaseVersion.Id)
+                .ToListAsync(cancellationToken: cancellationToken)
+        )
             .OrderBy(rf => rf.File.ZipFileEntryName())
             .ToList();
 
@@ -230,7 +262,8 @@ public class ReleaseFileService(
         List<ReleaseFile> releaseFiles,
         ReleaseVersion releaseVersion,
         Stream outputStream,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
 
@@ -238,31 +271,32 @@ public class ReleaseFileService(
 
         foreach (var releaseFile in releaseFiles)
         {
-            var streamResult = await publicBlobStorageService
-                .GetDownloadStream(
-                    containerName: PublicReleaseFiles,
-                    path: releaseFile.PublicPath(),
-                    cancellationToken: cancellationToken);
-                
+            var streamResult = await publicBlobStorageService.GetDownloadStream(
+                containerName: PublicReleaseFiles,
+                path: releaseFile.PublicPath(),
+                cancellationToken: cancellationToken
+            );
+
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
-            
+
             // Ignore files where we cannot successfully get their blob download streams.
             if (streamResult.IsLeft)
             {
                 continue;
             }
-            
+
             await using var blobStream = streamResult.Right;
-            
+
             var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
             await using var entryStream = entry.Open();
             await blobStream.CopyToAsync(
                 destination: entryStream,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             releaseFilesWithZipEntries.Add(releaseFile);
         }
@@ -270,7 +304,9 @@ public class ReleaseFileService(
         // Add data guidance file if there are any data files in this zip.
         if (releaseFilesWithZipEntries.Any(rf => rf.File.Type == FileType.Data))
         {
-            var entry = archive.CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt");
+            var entry = archive.CreateEntry(
+                FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt"
+            );
 
             await using var entryStream = entry.Open();
 
@@ -285,22 +321,27 @@ public class ReleaseFileService(
 
     private IQueryable<ReleaseFile> QueryReleaseFiles(Guid releaseVersionId)
     {
-        return contentDbContext.ReleaseFiles
-            .Include(f => f.ReleaseVersion)
+        return contentDbContext
+            .ReleaseFiles.Include(f => f.ReleaseVersion)
             .Include(f => f.File)
-            .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
-                                  && AllowedFileTypes.Contains(releaseFile.File.Type));
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId == releaseVersionId
+                && AllowedFileTypes.Contains(releaseFile.File.Type)
+            );
     }
 
     private async Task RecordZipDownloadAnalytics(
         ReleaseVersion releaseVersion,
         List<ReleaseFile>? releaseFiles,
         AnalyticsFromPage fromPage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         if (releaseFiles is not null && releaseFiles.Count > 1)
         {
-            logger.LogWarning("We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?");
+            logger.LogWarning(
+                "We only record analytics for zip downloads for an entire release or one specific data set. So this means someone manually attempted to download a zip with more than one specific file?"
+            );
             return;
         }
 
@@ -326,7 +367,8 @@ public class ReleaseFileService(
                     SubjectId = subjectId,
                     DataSetTitle = dataSetName,
                 },
-                cancellationToken);
+                cancellationToken
+            );
         }
         catch (Exception e)
         {
@@ -335,7 +377,8 @@ public class ReleaseFileService(
                 logger.LogError(
                     exception: e,
                     message: "Error whilst capturing zip download analytics for releaseVersion {ReleaseVersion}",
-                    releaseVersion.Id);
+                    releaseVersion.Id
+                );
             }
             else
             {
@@ -343,8 +386,8 @@ public class ReleaseFileService(
                     exception: e,
                     message: "Error whilst capturing zip download analytics for releaseVersion {ReleaseVersionId} and subject {SubjectId}",
                     releaseVersion.Id,
-                    subjectId);
-
+                    subjectId
+                );
             }
         }
     }

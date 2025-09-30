@@ -23,20 +23,20 @@ public class RelatedInformationServiceTests
         {
             Id = Guid.NewGuid(),
             Description = "Related page 1",
-            Url = "related-page-1"
+            Url = "related-page-1",
         },
         new()
         {
             Id = Guid.NewGuid(),
             Description = "Related page 2",
-            Url = "related-page-2"
+            Url = "related-page-2",
         },
         new()
         {
             Id = Guid.NewGuid(),
             Description = "Related page 3",
-            Url = "related-page-3"
-        }
+            Url = "related-page-3",
+        },
     ];
 
     [Fact]
@@ -96,16 +96,8 @@ public class RelatedInformationServiceTests
         // Act
         var linkUpdateRequest = new List<CreateUpdateLinkRequest>
         {
-            new()
-            {
-                Description = "Related page 2",
-                Url = "related-page-2"
-            },
-            new()
-            {
-                Description = "Related page 1",
-                Url = "related-page-1"
-            }
+            new() { Description = "Related page 2", Url = "related-page-2" },
+            new() { Description = "Related page 1", Url = "related-page-1" },
         };
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -114,7 +106,8 @@ public class RelatedInformationServiceTests
 
             var result = await service.UpdateRelatedInformation(
                 releaseVersion.Id,
-                linkUpdateRequest);
+                linkUpdateRequest
+            );
 
             // Assert
             var links = result.AssertRight();
@@ -128,9 +121,10 @@ public class RelatedInformationServiceTests
     }
 
     private static RelatedInformationService BuildRelatedInformationService(
-            ContentDbContext? contentDbContext = null,
-            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IUserService? userService = null)
+        ContentDbContext? contentDbContext = null,
+        IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IUserService? userService = null
+    )
     {
         contentDbContext ??= InMemoryContentDbContext();
 

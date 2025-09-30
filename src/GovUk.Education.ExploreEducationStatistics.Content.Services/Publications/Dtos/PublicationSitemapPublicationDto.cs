@@ -12,12 +12,13 @@ public record PublicationSitemapPublicationDto
 
     public static PublicationSitemapPublicationDto FromPublication(
         Publication publication,
-        PublicationSitemapReleaseDto[] releases) =>
+        PublicationSitemapReleaseDto[] releases
+    ) =>
         new()
         {
             Slug = publication.Slug,
             LastModified = publication.Updated,
-            Releases = releases
+            Releases = releases,
         };
 }
 
@@ -31,6 +32,8 @@ public record PublicationSitemapReleaseDto
         new()
         {
             Slug = releaseVersion.Release.Slug,
-            LastModified = releaseVersion.Published ?? throw new ArgumentException("ReleaseVersion must be published")
+            LastModified =
+                releaseVersion.Published
+                ?? throw new ArgumentException("ReleaseVersion must be published"),
         };
 }

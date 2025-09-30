@@ -13,16 +13,12 @@ public class WorkflowActorMockBuilder
     {
         Assert = new Asserter(_mock);
     }
-    
+
     public IWorkflowActor Build()
     {
-        _mock
-            .Setup(s => s.GetSourceDirectory())
-            .Returns("source");
-            
-        _mock
-            .Setup(s => s.GetReportsDirectory())
-            .Returns("reports");
+        _mock.Setup(s => s.GetSourceDirectory()).Returns("source");
+
+        _mock.Setup(s => s.GetReportsDirectory()).Returns("reports");
 
         return _mock.Object;
     }
@@ -34,7 +30,7 @@ public class WorkflowActorMockBuilder
             .Returns(Task.CompletedTask);
         return this;
     }
-    
+
     public WorkflowActorMockBuilder WhereDuckDbInitialisedWithErrors()
     {
         _mock
@@ -44,47 +40,60 @@ public class WorkflowActorMockBuilder
     }
 
     public WorkflowActorMockBuilder WhereSourceFileBatchIsProcessedSuccessfully(
-        string batchProcessingFolder)
+        string batchProcessingFolder
+    )
     {
         _mock
-            .Setup(a => a.ProcessSourceFiles(
-                Path.Combine(batchProcessingFolder, "*"),
-                ItIsOpenDuckDbConnection()))
+            .Setup(a =>
+                a.ProcessSourceFiles(
+                    Path.Combine(batchProcessingFolder, "*"),
+                    ItIsOpenDuckDbConnection()
+                )
+            )
             .Returns(Task.CompletedTask);
         return this;
     }
 
     public WorkflowActorMockBuilder WhereSourceFilesAreProcessedWithErrors(
-        string batchProcessingFolder)
+        string batchProcessingFolder
+    )
     {
         _mock
-            .Setup(a => a.ProcessSourceFiles(
-                batchProcessingFolder,
-                ItIsOpenDuckDbConnection()))
-            .ThrowsAsync(new ArgumentException($"Mock error processing batch folder {batchProcessingFolder}"));
+            .Setup(a => a.ProcessSourceFiles(batchProcessingFolder, ItIsOpenDuckDbConnection()))
+            .ThrowsAsync(
+                new ArgumentException($"Mock error processing batch folder {batchProcessingFolder}")
+            );
         return this;
     }
-    
+
     public WorkflowActorMockBuilder WhereReportsAreCreatedSuccessfully(
         string reportsFolder,
-        string reportsFilenamePrefix)
+        string reportsFilenamePrefix
+    )
     {
         _mock
-            .Setup(m => m.CreateParquetReports(
-                Path.Combine(reportsFolder, reportsFilenamePrefix),
-                ItIsOpenDuckDbConnection()))
+            .Setup(m =>
+                m.CreateParquetReports(
+                    Path.Combine(reportsFolder, reportsFilenamePrefix),
+                    ItIsOpenDuckDbConnection()
+                )
+            )
             .Returns(Task.CompletedTask);
         return this;
     }
-    
+
     public WorkflowActorMockBuilder WhereReportsAreGeneratedWithErrors(
         string reportsFolder,
-        string reportsFilenamePrefix)
+        string reportsFilenamePrefix
+    )
     {
         _mock
-            .Setup(m => m.CreateParquetReports(
-                Path.Combine(reportsFolder, reportsFilenamePrefix),
-                ItIsOpenDuckDbConnection()))
+            .Setup(m =>
+                m.CreateParquetReports(
+                    Path.Combine(reportsFolder, reportsFilenamePrefix),
+                    ItIsOpenDuckDbConnection()
+                )
+            )
             .ThrowsAsync(new ArgumentException("Mock error generating Parquet reports"));
         return this;
     }
@@ -95,38 +104,42 @@ public class WorkflowActorMockBuilder
     {
         public Asserter InitialiseDuckDbCalled()
         {
-            mock.Verify(m => 
-                m.InitialiseDuckDb(It.IsAny<DuckDbConnection>()),
-                Times.Once);
+            mock.Verify(m => m.InitialiseDuckDb(It.IsAny<DuckDbConnection>()), Times.Once);
             return this;
         }
 
-        public Asserter ProcessSourceFileBatchCalledFor(
-            string batchProcessingDirectory)
+        public Asserter ProcessSourceFileBatchCalledFor(string batchProcessingDirectory)
         {
-            mock.Verify(a =>
+            mock.Verify(
+                a =>
                     a.ProcessSourceFiles(
                         Path.Combine(batchProcessingDirectory, "*"),
-                        It.IsAny<DuckDbConnection>()),
-                Times.Once);
+                        It.IsAny<DuckDbConnection>()
+                    ),
+                Times.Once
+            );
             return this;
         }
-        
+
         public Asserter CreateParquetReportsCalledFor(
             string reportsFolder,
-            string reportsFilenamePrefix)
+            string reportsFilenamePrefix
+        )
         {
-            mock.Verify(m => 
-                m.CreateParquetReports(
-                    Path.Combine(reportsFolder, reportsFilenamePrefix),
-                    It.IsAny<DuckDbConnection>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.CreateParquetReports(
+                        Path.Combine(reportsFolder, reportsFilenamePrefix),
+                        It.IsAny<DuckDbConnection>()
+                    ),
+                Times.Once
+            );
             return this;
         }
     }
 
     private static DuckDbConnection ItIsOpenDuckDbConnection()
     {
-        return It.Is<DuckDbConnection>(c => c.State == ConnectionState.Open);   
+        return It.Is<DuckDbConnection>(c => c.State == ConnectionState.Open);
     }
 }

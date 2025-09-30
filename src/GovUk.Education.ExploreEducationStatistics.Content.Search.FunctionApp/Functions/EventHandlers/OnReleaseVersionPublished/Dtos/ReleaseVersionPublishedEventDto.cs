@@ -52,13 +52,15 @@ public record ReleaseVersionPublishedEventDto
     /// <summary>
     /// Is this newly published release version the new latest version?
     /// </summary>
-    public bool NewlyPublishedReleaseVersionIsLatest => LatestPublishedReleaseVersionId == ReleaseVersionId;
+    public bool NewlyPublishedReleaseVersionIsLatest =>
+        LatestPublishedReleaseVersionId == ReleaseVersionId;
 
     /// <summary>
     /// Has a different release become the new latest?
     /// </summary>
-    public bool NewlyPublishedReleaseVersionIsForDifferentRelease => PreviousLatestPublishedReleaseId != ReleaseId;
-    
+    public bool NewlyPublishedReleaseVersionIsForDifferentRelease =>
+        PreviousLatestPublishedReleaseId != ReleaseId;
+
     /// <summary>
     /// Indicates whether the associated publication is archived
     /// </summary>

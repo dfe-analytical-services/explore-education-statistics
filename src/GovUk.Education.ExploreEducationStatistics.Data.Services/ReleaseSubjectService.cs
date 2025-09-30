@@ -17,31 +17,32 @@ public class ReleaseSubjectService : IReleaseSubjectService
 
     public ReleaseSubjectService(
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
         _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId,
-        Guid? releaseVersionId = null)
+    public async Task<Either<ActionResult, ReleaseSubject>> Find(
+        Guid subjectId,
+        Guid? releaseVersionId = null
+    )
     {
         return await (
-                releaseVersionId.HasValue
-                    ? _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(
-                        rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId
-                    )
-                    : FindForLatestPublishedVersion(subjectId)
-            )
-            .OrNotFound();
+            releaseVersionId.HasValue
+                ? _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(rs =>
+                    rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId
+                )
+                : FindForLatestPublishedVersion(subjectId)
+        ).OrNotFound();
     }
 
     public async Task<ReleaseSubject?> FindForLatestPublishedVersion(Guid subjectId)
     {
         // Find all versions of a Release that this Subject is linked to.
         var releaseSubjects = await _statisticsDbContext
-            .ReleaseSubject
-            .AsNoTracking()
+            .ReleaseSubject.AsNoTracking()
             .Where(releaseSubject => releaseSubject.SubjectId == subjectId)
             .ToListAsync();
 
@@ -53,8 +54,7 @@ public class ReleaseSubjectService : IReleaseSubjectService
         // or in the past have been live before being amended. Order them by Version to get the latest
         // Live one at the end of the list.
         var latestLiveReleaseVersionLinkedToSubject = _contentDbContext
-            .ReleaseVersions
-            .AsNoTracking()
+            .ReleaseVersions.AsNoTracking()
             .Where(releaseVersion => releaseVersionIdsLinkedToSubject.Contains(releaseVersion.Id))
             .ToList()
             .Where(releaseVersion => releaseVersion.Live)
@@ -68,6 +68,7 @@ public class ReleaseSubjectService : IReleaseSubjectService
         // Finally, now that we have identified the latest Release version linked to this Subject, return the
         // appropriate ReleaseSubject record.
         return releaseSubjects.SingleOrDefault(releaseSubject =>
-            releaseSubject.ReleaseVersionId == latestLiveReleaseVersionLinkedToSubject.Id);
+            releaseSubject.ReleaseVersionId == latestLiveReleaseVersionLinkedToSubject.Id
+        );
     }
 }

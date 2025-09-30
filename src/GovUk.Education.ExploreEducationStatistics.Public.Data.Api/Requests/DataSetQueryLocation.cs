@@ -51,11 +51,7 @@ public interface IDataSetQueryLocation
 
         if (property == nameof(DataSetQueryLocationId.Id))
         {
-            return new DataSetQueryLocationId
-            {
-                Id = value,
-                Level = level
-            };
+            return new DataSetQueryLocationId { Id = value, Level = level };
         }
 
         return parsedLevel switch
@@ -70,7 +66,8 @@ public interface IDataSetQueryLocation
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
-                    message: $"Invalid {nameof(GeographicLevel.LocalAuthority)} property")
+                    message: $"Invalid {nameof(GeographicLevel.LocalAuthority)} property"
+                ),
             },
             GeographicLevel.Provider => property switch
             {
@@ -79,29 +76,37 @@ public interface IDataSetQueryLocation
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
-                    message: $"Invalid {nameof(GeographicLevel.Provider)} property")
+                    message: $"Invalid {nameof(GeographicLevel.Provider)} property"
+                ),
             },
             GeographicLevel.School => property switch
             {
-                nameof(DataSetQueryLocationSchoolUrn.Urn) =>
-                    new DataSetQueryLocationSchoolUrn { Urn = value },
+                nameof(DataSetQueryLocationSchoolUrn.Urn) => new DataSetQueryLocationSchoolUrn
+                {
+                    Urn = value,
+                },
 
                 nameof(DataSetQueryLocationSchoolLaEstab.LaEstab) =>
                     new DataSetQueryLocationSchoolLaEstab { LaEstab = value },
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
-                    message: $"Invalid {nameof(GeographicLevel.School)} property")
+                    message: $"Invalid {nameof(GeographicLevel.School)} property"
+                ),
             },
             _ => property switch
             {
-                nameof(DataSetQueryLocationCode.Code) =>
-                    new DataSetQueryLocationCode { Code = value, Level = level },
+                nameof(DataSetQueryLocationCode.Code) => new DataSetQueryLocationCode
+                {
+                    Code = value,
+                    Level = level,
+                },
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
-                    message: "Invalid location property")
-            }
+                    message: "Invalid location property"
+                ),
+            },
         };
     }
 
@@ -142,12 +147,9 @@ public record DataSetQueryLocationId : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue(GeographicLevelUtils.OrderedCodes);
+            RuleFor(l => l.Level).AllowedValue(GeographicLevelUtils.OrderedCodes);
 
-            RuleFor(l => l.Id)
-                .NotEmpty()
-                .MaximumLength(10);
+            RuleFor(l => l.Id).NotEmpty().MaximumLength(10);
         }
     }
 }
@@ -185,12 +187,9 @@ public record DataSetQueryLocationCode : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue(GeographicLevelUtils.OrderedCodes);
+            RuleFor(l => l.Level).AllowedValue(GeographicLevelUtils.OrderedCodes);
 
-            RuleFor(l => l.Code)
-                .NotEmpty()
-                .MaximumLength(30);
+            RuleFor(l => l.Code).NotEmpty().MaximumLength(30);
         }
     }
 }
@@ -226,12 +225,9 @@ public record DataSetQueryLocationLocalAuthorityCode : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue([GeographicLevel.LocalAuthority.GetEnumValue()]);
+            RuleFor(l => l.Level).AllowedValue([GeographicLevel.LocalAuthority.GetEnumValue()]);
 
-            RuleFor(l => l.Code)
-                .NotEmpty()
-                .MaximumLength(30);
+            RuleFor(l => l.Code).NotEmpty().MaximumLength(30);
         }
     }
 }
@@ -266,12 +262,9 @@ public record DataSetQueryLocationLocalAuthorityOldCode : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue([GeographicLevel.LocalAuthority.GetEnumValue()]);
+            RuleFor(l => l.Level).AllowedValue([GeographicLevel.LocalAuthority.GetEnumValue()]);
 
-            RuleFor(l => l.OldCode)
-                .NotEmpty()
-                .MaximumLength(20);
+            RuleFor(l => l.OldCode).NotEmpty().MaximumLength(20);
         }
     }
 }
@@ -306,12 +299,9 @@ public record DataSetQueryLocationProviderUkprn : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue([GeographicLevel.Provider.GetEnumValue()]);
+            RuleFor(l => l.Level).AllowedValue([GeographicLevel.Provider.GetEnumValue()]);
 
-            RuleFor(l => l.Ukprn)
-                .NotEmpty()
-                .MaximumLength(20);
+            RuleFor(l => l.Ukprn).NotEmpty().MaximumLength(20);
         }
     }
 }
@@ -346,12 +336,9 @@ public record DataSetQueryLocationSchoolUrn : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue([GeographicLevel.School.GetEnumValue()]);
+            RuleFor(l => l.Level).AllowedValue([GeographicLevel.School.GetEnumValue()]);
 
-            RuleFor(l => l.Urn)
-                .NotEmpty()
-                .MaximumLength(20);
+            RuleFor(l => l.Urn).NotEmpty().MaximumLength(20);
         }
     }
 }
@@ -385,12 +372,9 @@ public record DataSetQueryLocationSchoolLaEstab : IDataSetQueryLocation
     {
         public Validator()
         {
-            RuleFor(l => l.Level)
-                .AllowedValue([GeographicLevel.School.GetEnumValue()]);
+            RuleFor(l => l.Level).AllowedValue([GeographicLevel.School.GetEnumValue()]);
 
-            RuleFor(l => l.LaEstab)
-                .NotEmpty()
-                .MaximumLength(20);
+            RuleFor(l => l.LaEstab).NotEmpty().MaximumLength(20);
         }
     }
 }

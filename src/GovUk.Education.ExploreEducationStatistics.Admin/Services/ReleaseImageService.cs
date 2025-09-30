@@ -26,12 +26,14 @@ public class ReleaseImageService : IReleaseImageService
     private readonly IReleaseFileRepository _releaseFileRepository;
     private readonly IUserService _userService;
 
-    public ReleaseImageService(ContentDbContext contentDbContext,
+    public ReleaseImageService(
+        ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IPrivateBlobStorageService privateBlobStorageService,
         IFileValidatorService fileValidatorService,
         IReleaseFileRepository releaseFileRepository,
-        IUserService userService)
+        IUserService userService
+    )
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
@@ -41,43 +43,54 @@ public class ReleaseImageService : IReleaseImageService
         _userService = userService;
     }
 
-    public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId, Guid fileId)
+    public async Task<Either<ActionResult, FileStreamResult>> Stream(
+        Guid releaseVersionId,
+        Guid fileId
+    )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseFile>(q => q
-                .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId))
+            .CheckEntityExists<ReleaseFile>(q =>
+                q.Include(rf => rf.File)
+                    .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
+            )
             .OnSuccessCombineWith(rf =>
-                _privateBlobStorageService.GetDownloadStream(PrivateReleaseFiles, rf.Path()))
+                _privateBlobStorageService.GetDownloadStream(PrivateReleaseFiles, rf.Path())
+            )
             .OnSuccess(releaseFileAndStream =>
             {
                 var (releaseFile, stream) = releaseFileAndStream;
                 return new FileStreamResult(stream, releaseFile.File.ContentType)
                 {
-                    FileDownloadName = releaseFile.File.Filename
+                    FileDownloadName = releaseFile.File.Filename,
                 };
             });
     }
 
-    public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile formFile)
+    public Task<Either<ActionResult, ImageFileViewModel>> Upload(
+        Guid releaseVersionId,
+        IFormFile formFile
+    )
     {
         return _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
-            .OnSuccess(async () => await Upload(
-                releaseVersionId,
-                Image,
-                formFile))
-            .OnSuccess(releaseFile => new ImageFileViewModel($"/api/releases/{releaseVersionId}/images/{releaseFile.File.Id}")
+            .OnSuccess(async () =>
+                await _fileValidatorService.ValidateFileForUpload(formFile, Image)
+            )
+            .OnSuccess(async () => await Upload(releaseVersionId, Image, formFile))
+            .OnSuccess(releaseFile => new ImageFileViewModel(
+                $"/api/releases/{releaseVersionId}/images/{releaseFile.File.Id}"
+            )
             {
                 // TODO EES-1922 Add support for resizing the image
             });
     }
 
-    private async Task<Either<ActionResult, ReleaseFile>> Upload(Guid releaseVersionId,
+    private async Task<Either<ActionResult, ReleaseFile>> Upload(
+        Guid releaseVersionId,
         FileType type,
-        IFormFile formFile)
+        IFormFile formFile
+    )
     {
         var releaseFile = await _releaseFileRepository.Create(
             releaseVersionId: releaseVersionId,
@@ -85,14 +98,16 @@ public class ReleaseImageService : IReleaseImageService
             contentLength: formFile.Length,
             contentType: formFile.ContentType,
             type: type,
-            createdById: _userService.GetUserId());
+            createdById: _userService.GetUserId()
+        );
 
         await _contentDbContext.SaveChangesAsync();
 
         await _privateBlobStorageService.UploadFile(
             containerName: PrivateReleaseFiles,
             path: releaseFile.Path(),
-            file: formFile);
+            file: formFile
+        );
 
         return releaseFile;
     }

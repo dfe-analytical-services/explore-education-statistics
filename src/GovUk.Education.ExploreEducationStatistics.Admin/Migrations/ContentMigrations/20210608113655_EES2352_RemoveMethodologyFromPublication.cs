@@ -9,15 +9,12 @@ public partial class EES2352_RemoveMethodologyFromPublication : Migration
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Publications_Methodologies_MethodologyId",
-            table: "Publications");
+            table: "Publications"
+        );
 
-        migrationBuilder.DropIndex(
-            name: "IX_Publications_MethodologyId",
-            table: "Publications");
+        migrationBuilder.DropIndex(name: "IX_Publications_MethodologyId", table: "Publications");
 
-        migrationBuilder.DropColumn(
-            name: "MethodologyId",
-            table: "Publications");
+        migrationBuilder.DropColumn(name: "MethodologyId", table: "Publications");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -26,12 +23,14 @@ public partial class EES2352_RemoveMethodologyFromPublication : Migration
             name: "MethodologyId",
             table: "Publications",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Publications_MethodologyId",
             table: "Publications",
-            column: "MethodologyId");
+            column: "MethodologyId"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Publications_Methodologies_MethodologyId",
@@ -39,6 +38,7 @@ public partial class EES2352_RemoveMethodologyFromPublication : Migration
             column: "MethodologyId",
             principalTable: "Methodologies",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
     }
 }

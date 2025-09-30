@@ -1,3 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 
-public enum SubscriptionStatus { NotSubscribed, SubscriptionPending, Subscribed }
+public enum SubscriptionStatus
+{
+    NotSubscribed,
+    SubscriptionPending,
+    Subscribed,
+}

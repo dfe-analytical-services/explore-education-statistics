@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserReleaseInviteRepository(
     ContentDbContext contentDbContext,
-    ILogger<UserReleaseInviteRepository> logger) : IUserReleaseInviteRepository
+    ILogger<UserReleaseInviteRepository> logger
+) : IUserReleaseInviteRepository
 {
     public async Task Create(
         Guid releaseVersionId,
@@ -18,7 +19,8 @@ public class UserReleaseInviteRepository(
         ReleaseRole releaseRole,
         bool emailSent,
         Guid createdById,
-        DateTime? createdDate = null)
+        DateTime? createdDate = null
+    )
     {
         await contentDbContext.AddAsync(
             new UserReleaseInvite
@@ -41,53 +43,53 @@ public class UserReleaseInviteRepository(
         ReleaseRole releaseRole,
         bool emailSent,
         Guid createdById,
-        DateTime? createdDate = null)
+        DateTime? createdDate = null
+    )
     {
         var invites = await releaseVersionIds
             .ToAsyncEnumerable()
-            .WhereAwait(async releaseVersionId => !await UserHasInvite(releaseVersionId, email, releaseRole))
-            .Select(releaseVersionId =>
-                new UserReleaseInvite
-                {
-                    Email = email.ToLower(),
-                    ReleaseVersionId = releaseVersionId,
-                    Role = releaseRole,
-                    EmailSent = emailSent,
-                    Created = createdDate ?? DateTime.UtcNow,
-                    CreatedById = createdById,
-                }
-            ).ToListAsync();
+            .WhereAwait(async releaseVersionId =>
+                !await UserHasInvite(releaseVersionId, email, releaseRole)
+            )
+            .Select(releaseVersionId => new UserReleaseInvite
+            {
+                Email = email.ToLower(),
+                ReleaseVersionId = releaseVersionId,
+                Role = releaseRole,
+                EmailSent = emailSent,
+                Created = createdDate ?? DateTime.UtcNow,
+                CreatedById = createdById,
+            })
+            .ToListAsync();
 
         await contentDbContext.AddRangeAsync(invites);
         await contentDbContext.SaveChangesAsync();
     }
 
-    public async Task<bool> UserHasInvite(
-        Guid releaseVersionId,
-        string email,
-        ReleaseRole role)
+    public async Task<bool> UserHasInvite(Guid releaseVersionId, string email, ReleaseRole role)
     {
         return await contentDbContext
-            .UserReleaseInvites
-            .AsQueryable()
+            .UserReleaseInvites.AsQueryable()
             .AnyAsync(i =>
                 i.ReleaseVersionId == releaseVersionId
                 && i.Email.ToLower().Equals(email.ToLower())
-                && i.Role == role);
+                && i.Role == role
+            );
     }
 
     public async Task<bool> UserHasInvites(
         List<Guid> releaseVersionIds,
         string email,
-        ReleaseRole role)
+        ReleaseRole role
+    )
     {
         var inviteReleaseVersionIds = await contentDbContext
-            .UserReleaseInvites
-            .AsQueryable()
+            .UserReleaseInvites.AsQueryable()
             .Where(i =>
                 releaseVersionIds.Contains(i.ReleaseVersionId)
                 && i.Email.ToLower().Equals(email.ToLower())
-                && i.Role == role)
+                && i.Role == role
+            )
             .Select(i => i.ReleaseVersionId)
             .ToListAsync();
 
@@ -96,11 +98,11 @@ public class UserReleaseInviteRepository(
 
     public async Task<List<UserReleaseInvite>> GetInvitesByEmail(
         string email,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await contentDbContext
-            .UserReleaseInvites
-            .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
+            .UserReleaseInvites.Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
             .ToListAsync(cancellationToken);
     }
 
@@ -108,14 +110,16 @@ public class UserReleaseInviteRepository(
         Guid releaseVersionId,
         string email,
         ReleaseRole role,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var invite = await contentDbContext.UserReleaseInvites
-            .AsQueryable()
+        var invite = await contentDbContext
+            .UserReleaseInvites.AsQueryable()
             .Where(uri =>
                 uri.ReleaseVersionId == releaseVersionId
                 && uri.Role == role
-                && uri.Email.ToLower().Equals(email!.ToLower()))
+                && uri.Email.ToLower().Equals(email!.ToLower())
+            )
             .SingleOrDefaultAsync(cancellationToken);
 
         if (invite is null)
@@ -129,7 +133,8 @@ public class UserReleaseInviteRepository(
 
     public async Task RemoveMany(
         IReadOnlyList<UserReleaseInvite> userReleaseInvites,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (!userReleaseInvites.Any())
         {
@@ -143,26 +148,30 @@ public class UserReleaseInviteRepository(
     public async Task RemoveByPublication(
         Guid publicationId,
         CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude)
+        params ReleaseRole[] rolesToInclude
+    )
     {
         await RemoveByPublication(
             publicationId: publicationId,
             email: null,
             cancellationToken: cancellationToken,
-            rolesToInclude:rolesToInclude);
+            rolesToInclude: rolesToInclude
+        );
     }
 
     public async Task RemoveByPublicationAndEmail(
         Guid publicationId,
         string email,
         CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude)
+        params ReleaseRole[] rolesToInclude
+    )
     {
         if (email is null)
         {
             logger.LogError(
-                "Trying to remove invites for a publication and email combination, " +
-                $"but the supplied '{nameof(email)}' is NULL. '{nameof(email)}' must not be NULL.");
+                "Trying to remove invites for a publication and email combination, "
+                    + $"but the supplied '{nameof(email)}' is NULL. '{nameof(email)}' must not be NULL."
+            );
 
             throw new ArgumentNullException(nameof(email), $"{nameof(email)} must not be NULL.");
         }
@@ -171,32 +180,37 @@ public class UserReleaseInviteRepository(
             publicationId: publicationId,
             email: email,
             cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude);
+            rolesToInclude: rolesToInclude
+        );
     }
 
     public async Task RemoveByReleaseVersion(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude)
+        params ReleaseRole[] rolesToInclude
+    )
     {
         await RemoveByReleaseVersion(
             releaseVersionId: releaseVersionId,
             email: null,
             cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude);
+            rolesToInclude: rolesToInclude
+        );
     }
 
     public async Task RemoveByReleaseVersionAndEmail(
         Guid releaseVersionId,
         string email,
         CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude)
+        params ReleaseRole[] rolesToInclude
+    )
     {
         if (email is null)
         {
             logger.LogError(
-                "Trying to remove invites for a release version and email combination, " +
-                $"but the supplied '{nameof(email)}' is NULL. '{nameof(email)}' must not be NULL.");
+                "Trying to remove invites for a release version and email combination, "
+                    + $"but the supplied '{nameof(email)}' is NULL. '{nameof(email)}' must not be NULL."
+            );
 
             throw new ArgumentNullException(nameof(email), $"{nameof(email)} must not be NULL.");
         }
@@ -205,12 +219,11 @@ public class UserReleaseInviteRepository(
             releaseVersionId: releaseVersionId,
             email: email,
             cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude);
+            rolesToInclude: rolesToInclude
+        );
     }
 
-    public async Task RemoveByUserEmail(
-        string email,
-        CancellationToken cancellationToken = default)
+    public async Task RemoveByUserEmail(string email, CancellationToken cancellationToken = default)
     {
         var invites = await GetInvitesByEmail(email, cancellationToken);
 
@@ -221,19 +234,20 @@ public class UserReleaseInviteRepository(
         Guid publicationId,
         string? email = null,
         CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude)
+        params ReleaseRole[] rolesToInclude
+    )
     {
-        var releaseVersionIds = contentDbContext.ReleaseVersions
-            .Where(rv => rv.Release.PublicationId == publicationId)
+        var releaseVersionIds = contentDbContext
+            .ReleaseVersions.Where(rv => rv.Release.PublicationId == publicationId)
             .Select(rv => rv.Id)
             .ToHashSet();
 
-        var invites = await contentDbContext.UserReleaseInvites
-            .Where(i => releaseVersionIds.Contains(i.ReleaseVersionId))
+        var invites = await contentDbContext
+            .UserReleaseInvites.Where(i => releaseVersionIds.Contains(i.ReleaseVersionId))
             .If(!string.IsNullOrEmpty(email))
-                .ThenWhere(i => i.Email.ToLower().Equals(email!.ToLower()))
+            .ThenWhere(i => i.Email.ToLower().Equals(email!.ToLower()))
             .If(rolesToInclude.Any())
-                .ThenWhere(i => rolesToInclude.Contains(i.Role))
+            .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);
@@ -243,14 +257,15 @@ public class UserReleaseInviteRepository(
         Guid releaseVersionId,
         string? email = null,
         CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude)
+        params ReleaseRole[] rolesToInclude
+    )
     {
-        var invites = await contentDbContext.UserReleaseInvites
-            .Where(i => i.ReleaseVersionId == releaseVersionId)
+        var invites = await contentDbContext
+            .UserReleaseInvites.Where(i => i.ReleaseVersionId == releaseVersionId)
             .If(!string.IsNullOrEmpty(email))
-                .ThenWhere(i => i.Email.ToLower().Equals(email!.ToLower()))
+            .ThenWhere(i => i.Email.ToLower().Equals(email!.ToLower()))
             .If(rolesToInclude.Any())
-                .ThenWhere(i => rolesToInclude.Contains(i.Role))
+            .ThenWhere(i => rolesToInclude.Contains(i.Role))
             .ToListAsync(cancellationToken);
 
         await RemoveMany(invites, cancellationToken);

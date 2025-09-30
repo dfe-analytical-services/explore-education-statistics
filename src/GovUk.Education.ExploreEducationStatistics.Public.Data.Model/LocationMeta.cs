@@ -30,25 +30,26 @@ public class LocationMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
     {
         public void Configure(EntityTypeBuilder<LocationMeta> builder)
         {
-            builder.HasMany(m => m.Options)
+            builder
+                .HasMany(m => m.Options)
                 .WithMany(o => o.Metas)
                 .UsingEntity<LocationOptionMetaLink>(
-                    b => b
-                        .HasOne(l => l.Option)
-                        .WithMany(o => o.MetaLinks)
-                        .HasForeignKey(l => l.OptionId),
-                    b => b
-                        .HasOne(l => l.Meta)
-                        .WithMany(m => m.OptionLinks)
-                        .HasForeignKey(l => l.MetaId)
+                    b =>
+                        b.HasOne(l => l.Option)
+                            .WithMany(o => o.MetaLinks)
+                            .HasForeignKey(l => l.OptionId),
+                    b =>
+                        b.HasOne(l => l.Meta)
+                            .WithMany(m => m.OptionLinks)
+                            .HasForeignKey(l => l.MetaId)
                 );
 
-            builder.Property(m => m.Level)
+            builder
+                .Property(m => m.Level)
                 .HasMaxLength(5)
                 .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
 
-            builder.HasIndex(m => new { m.DataSetVersionId, m.Level })
-                .IsUnique();
+            builder.HasIndex(m => new { m.DataSetVersionId, m.Level }).IsUnique();
         }
     }
 }

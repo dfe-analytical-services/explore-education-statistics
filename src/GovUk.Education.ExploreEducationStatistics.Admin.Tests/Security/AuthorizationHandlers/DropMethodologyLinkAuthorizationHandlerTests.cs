@@ -25,14 +25,14 @@ public class DropMethodologyLinkAuthorizationHandlerTests
     {
         Owner = true,
         PublicationId = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid()
+        MethodologyId = Guid.NewGuid(),
     };
 
     private static readonly PublicationMethodology NonOwningLink = new()
     {
         Owner = false,
         PublicationId = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid()
+        MethodologyId = Guid.NewGuid(),
     };
 
     private static readonly DataFixture DataFixture = new();
@@ -44,7 +44,9 @@ public class DropMethodologyLinkAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(
+                    Strict
+                );
 
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
@@ -52,10 +54,10 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                     .AuthenticatedUser(userId: UserId)
                     .WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                        user,
-                        OwningLink);
+                var authContext = CreateAuthorizationHandlerContext<
+                    DropMethodologyLinkRequirement,
+                    PublicationMethodology
+                >(user, OwningLink);
 
                 await handler.HandleAsync(authContext);
 
@@ -71,7 +73,9 @@ public class DropMethodologyLinkAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(
+                    Strict
+                );
 
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
@@ -81,7 +85,9 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                        .Setup(s =>
+                            s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId)
+                        )
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
@@ -89,10 +95,10 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                     .AuthenticatedUser(userId: UserId)
                     .WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                        user,
-                        NonOwningLink);
+                var authContext = CreateAuthorizationHandlerContext<
+                    DropMethodologyLinkRequirement,
+                    PublicationMethodology
+                >(user, NonOwningLink);
 
                 await handler.HandleAsync(authContext);
 
@@ -115,10 +121,10 @@ public class DropMethodologyLinkAuthorizationHandlerTests
             // Deliberately set no expectations for checking user has any publication owner roles
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
-            var authContext =
-                CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                    user,
-                    OwningLink);
+            var authContext = CreateAuthorizationHandlerContext<
+                DropMethodologyLinkRequirement,
+                PublicationMethodology
+            >(user, OwningLink);
 
             await handler.HandleAsync(authContext);
 
@@ -136,19 +142,23 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 // If the user has Publication Owner role on the publication they are allowed to drop methodology links
                 var expectedToPassByPublicationRole = publicationRole == Owner;
 
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(
+                    Strict
+                );
 
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                    .Setup(s =>
+                        s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId)
+                    )
                     .ReturnsAsync(ListOf(publicationRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
-                var authContext =
-                    CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                        user,
-                        NonOwningLink);
+                var authContext = CreateAuthorizationHandlerContext<
+                    DropMethodologyLinkRequirement,
+                    PublicationMethodology
+                >(user, NonOwningLink);
 
                 await handler.HandleAsync(authContext);
 
@@ -170,10 +180,10 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 .ReturnsAsync(new List<PublicationRole>());
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
-            var authContext =
-                CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                    user,
-                    NonOwningLink);
+            var authContext = CreateAuthorizationHandlerContext<
+                DropMethodologyLinkRequirement,
+                PublicationMethodology
+            >(user, NonOwningLink);
 
             await handler.HandleAsync(authContext);
 
@@ -193,6 +203,8 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

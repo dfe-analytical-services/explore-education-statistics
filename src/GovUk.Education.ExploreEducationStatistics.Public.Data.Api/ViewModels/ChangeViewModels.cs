@@ -102,7 +102,7 @@ public record LocationOptionChangeViewModel : ChangeViewModel<LocationOptionView
         if (CurrentState is not null && PreviousState is not null)
         {
             return CurrentState.Id != PreviousState.Id
-                   || CurrentState.HasMajorChange(PreviousState);
+                || CurrentState.HasMajorChange(PreviousState);
         }
 
         return CurrentState is null && PreviousState is not null;

@@ -9,4 +9,3 @@ public record RedirectsCacheKey : IBlobCacheKey
 
     public IBlobContainer Container => BlobContainers.PublicContent;
 }
-

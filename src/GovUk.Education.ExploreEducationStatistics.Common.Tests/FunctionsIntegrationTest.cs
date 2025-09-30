@@ -14,17 +14,16 @@ using Xunit;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests;
 
 public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>(
-    FunctionsIntegrationTestFixture fixture) :
-    IClassFixture<TFunctionsIntegrationTestFixture>
+    FunctionsIntegrationTestFixture fixture
+) : IClassFixture<TFunctionsIntegrationTestFixture>
     where TFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture
 {
     protected readonly DataFixture DataFixture = new();
 
-    private readonly IHost _host = fixture
-        .ConfigureTestHostBuilder()
-        .Build();
+    private readonly IHost _host = fixture.ConfigureTestHostBuilder().Build();
 
-    protected async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
+    protected async Task AddTestData<TDbContext>(Action<TDbContext> supplier)
+        where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();
 
@@ -32,19 +31,22 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         await context.SaveChangesAsync();
     }
 
-    protected async Task EnsureDatabaseDeleted<TDbContext>() where TDbContext : DbContext
+    protected async Task EnsureDatabaseDeleted<TDbContext>()
+        where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();
         await context.Database.EnsureDeletedAsync();
     }
 
-    protected TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext
+    protected TDbContext GetDbContext<TDbContext>()
+        where TDbContext : DbContext
     {
         var scope = _host.Services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
-    protected async Task ClearTestData<TDbContext>() where TDbContext : DbContext
+    protected async Task ClearTestData<TDbContext>()
+        where TDbContext : DbContext
     {
         var context = GetDbContext<TDbContext>();
         await context.ClearTestData();
@@ -63,20 +65,30 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
             var entities = await dataTableStorageService.QueryEntities<TableEntity>(
                 tableName: table.Name,
                 filter: null, // overload disambiguation
-                select: new List<string>() { nameof(TableEntity.PartitionKey), nameof(TableEntity.RowKey) });
+                select: new List<string>()
+                {
+                    nameof(TableEntity.PartitionKey),
+                    nameof(TableEntity.RowKey),
+                }
+            );
 
-            await entities.AsPages().ForEachAwaitAsync(async page => {
-                // Since we don't know how many rows the table has and the results are ordered by PartitonKey+RowKey
-                // we'll delete each page immediately and not cache the whole table in memory
-                await dataTableStorageService.BatchManipulateEntities(
-                    tableName: table.Name, 
-                    entities: page.Values, 
-                    tableTransactionActionType: TableTransactionActionType.Delete);
-            });
+            await entities
+                .AsPages()
+                .ForEachAwaitAsync(async page =>
+                {
+                    // Since we don't know how many rows the table has and the results are ordered by PartitonKey+RowKey
+                    // we'll delete each page immediately and not cache the whole table in memory
+                    await dataTableStorageService.BatchManipulateEntities(
+                        tableName: table.Name,
+                        entities: page.Values,
+                        tableTransactionActionType: TableTransactionActionType.Delete
+                    );
+                });
         }
     }
 
-    protected void ResetDbContext<TDbContext>() where TDbContext : DbContext
+    protected void ResetDbContext<TDbContext>()
+        where TDbContext : DbContext
     {
         var scope = _host.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
@@ -103,15 +115,18 @@ public abstract class FunctionsIntegrationTestFixture
     public virtual IHostBuilder ConfigureTestHostBuilder()
     {
         return new HostBuilder()
-            .ConfigureAppConfiguration((_, config) =>
-            {
-                config
-                    .AddJsonFile("local.settings.json", optional: true, reloadOnChange: false)
-                    .AddEnvironmentVariables();
-            })
+            .ConfigureAppConfiguration(
+                (_, config) =>
+                {
+                    config
+                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: false)
+                        .AddEnvironmentVariables();
+                }
+            )
             .ConfigureWebHostDefaults(builder => builder.UseIntegrationTestEnvironment())
             .ConfigureServices(services =>
-                GetFunctionTypes().ForEach(functionType => services.AddScoped(functionType)));
+                GetFunctionTypes().ForEach(functionType => services.AddScoped(functionType))
+            );
     }
 
     protected virtual IEnumerable<Type> GetFunctionTypes()

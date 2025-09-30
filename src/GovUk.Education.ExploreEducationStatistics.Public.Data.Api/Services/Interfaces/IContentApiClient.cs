@@ -7,14 +7,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IContentApiClient
 {
-    Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
+    Task<
+        Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>
+    > ListPublications(
         int page,
         int pageSize,
         string? search = null,
         IEnumerable<Guid>? publicationIds = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
         Guid publicationId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

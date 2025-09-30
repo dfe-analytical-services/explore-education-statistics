@@ -35,83 +35,111 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta()
     {
-        var filters = _fixture.DefaultFilter()
-            .ForIndex(0, s =>
-                s.SetGroupCsvColumn("filter_0_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(s => s.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(1, s =>
-                s.SetGroupCsvColumn("filter_1_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(s => s.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(2, s =>
-                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
-                    .Generate(1)))
-            .GenerateList();
-
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
-
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
-
-        var filter2Items = filters[2].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
-
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+        var filters = _fixture
+            .DefaultFilter()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetGroupCsvColumn("filter_0_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(s =>
+                                    s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetGroupCsvColumn("filter_1_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(s =>
+                                    s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                2,
+                s => s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1))
             )
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForRange(2..4, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var filter2Items = filters[2].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var observations = _fixture.DefaultObservation()
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
+
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..4,
+                l =>
+                    l.SetPresetRegionAndLocalAuthority()
+                        .SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
+            .GenerateList();
+
+        var observations = _fixture
+            .DefaultObservation()
             .WithMeasures(indicators)
-            .ForRange(..2, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                .SetLocation(locations[0])
-                .SetTimePeriod(2022, AcademicYear))
-            .ForRange(2..4, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                .SetLocation(locations[1])
-                .SetTimePeriod(2022, AcademicYear))
-            .ForRange(4..6, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                .SetLocation(locations[2])
-                .SetTimePeriod(2023, AcademicYear))
-            .ForRange(6..8, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                .SetLocation(locations[3])
-                .SetTimePeriod(2023, AcademicYear))
+            .ForRange(
+                ..2,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[0])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                2..4,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[1])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                4..6,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[2])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
+            .ForRange(
+                6..8,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[3])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -119,15 +147,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -149,23 +170,22 @@ public class SubjectCsvMetaServiceTests
 
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
+                .Setup(s => s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList()
+                Indicators = indicators.Select(i => i.Id).ToList(),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -184,83 +204,105 @@ public class SubjectCsvMetaServiceTests
             var viewModelFilter0Items = viewModelFilter0.Items;
             Assert.Equal(2, viewModelFilter0Items.Count);
 
-            AssertFilterItemCsvViewModel(filter0Items[0], viewModelFilter0Items[filter0Items[0].Id]);
-            AssertFilterItemCsvViewModel(filter0Items[1], viewModelFilter0Items[filter0Items[1].Id]);
+            AssertFilterItemCsvViewModel(
+                filter0Items[0],
+                viewModelFilter0Items[filter0Items[0].Id]
+            );
+            AssertFilterItemCsvViewModel(
+                filter0Items[1],
+                viewModelFilter0Items[filter0Items[1].Id]
+            );
 
             var viewModelFilter1Items = viewModelFilter1.Items;
             Assert.Equal(2, viewModelFilter1Items.Count);
 
-            AssertFilterItemCsvViewModel(filter1Items[0], viewModelFilter1Items[filter1Items[0].Id]);
-            AssertFilterItemCsvViewModel(filter1Items[1], viewModelFilter1Items[filter1Items[1].Id]);
+            AssertFilterItemCsvViewModel(
+                filter1Items[0],
+                viewModelFilter1Items[filter1Items[0].Id]
+            );
+            AssertFilterItemCsvViewModel(
+                filter1Items[1],
+                viewModelFilter1Items[filter1Items[1].Id]
+            );
 
             var viewModelFilter2Items = viewModelFilter2.Items;
             Assert.Equal(2, viewModelFilter2Items.Count);
 
-            AssertFilterItemCsvViewModel(filter2Items[0], viewModelFilter2Items[filter2Items[0].Id]);
-            AssertFilterItemCsvViewModel(filter2Items[1], viewModelFilter2Items[filter2Items[1].Id]);
+            AssertFilterItemCsvViewModel(
+                filter2Items[0],
+                viewModelFilter2Items[filter2Items[0].Id]
+            );
+            AssertFilterItemCsvViewModel(
+                filter2Items[1],
+                viewModelFilter2Items[filter2Items[1].Id]
+            );
 
             Assert.Equal(3, viewModel.Indicators.Count);
-            AssertIndicatorCsvMetaViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
-            AssertIndicatorCsvMetaViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
-            AssertIndicatorCsvMetaViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
+            AssertIndicatorCsvMetaViewModel(
+                indicators[0],
+                viewModel.Indicators[indicators[0].Name]
+            );
+            AssertIndicatorCsvMetaViewModel(
+                indicators[1],
+                viewModel.Indicators[indicators[1].Name]
+            );
+            AssertIndicatorCsvMetaViewModel(
+                indicators[2],
+                viewModel.Indicators[indicators[2].Name]
+            );
 
             var viewModelLocations = viewModel.Locations;
 
             Assert.Equal(4, viewModelLocations.Count);
-            Assert.Equal(locations[0].GetCsvValues(),viewModelLocations[locations[0].Id]);
-            Assert.Equal(locations[1].GetCsvValues(),viewModelLocations[locations[1].Id]);
-            Assert.Equal(locations[2].GetCsvValues(),viewModelLocations[locations[2].Id]);
-            Assert.Equal(locations[3].GetCsvValues(),viewModelLocations[locations[3].Id]);
+            Assert.Equal(locations[0].GetCsvValues(), viewModelLocations[locations[0].Id]);
+            Assert.Equal(locations[1].GetCsvValues(), viewModelLocations[locations[1].Id]);
+            Assert.Equal(locations[2].GetCsvValues(), viewModelLocations[locations[2].Id]);
+            Assert.Equal(locations[3].GetCsvValues(), viewModelLocations[locations[3].Id]);
         }
     }
 
     [Fact]
     public async Task GetSubjectCsvMeta_OnlyFiltersItemsWithObservations()
     {
-        var filters = _fixture.DefaultFilter()
-            .ForIndex(0, f => f
-                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1))
+        var filters = _fixture
+            .DefaultFilter()
+            .ForIndex(
+                0,
+                f => f.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1))
             )
-            .ForIndex(1, f => f
-                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(2))
+            .ForIndex(
+                1,
+                f => f.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(2))
             )
-            .ForIndex(2, f => f
-                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(2))
+            .ForIndex(
+                2,
+                f => f.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(2))
             )
             .GenerateList();
 
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter2Items = filters[2].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter2Items = filters[2].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 3)
-            .GenerateList(1);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 3).GenerateList(1);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithLocation(_fixture.DefaultLocation())
             .WithMeasures(indicators)
-            .ForIndex(0, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0]))
-            .ForIndex(1, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1]))
+            .ForIndex(0, o => o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0]))
+            .ForIndex(1, o => o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1]))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -268,15 +310,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -298,23 +333,22 @@ public class SubjectCsvMetaServiceTests
 
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
+                .Setup(s => s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id)
+                Indicators = indicators.Select(i => i.Id),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -349,7 +383,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_OnlyIndicatorsFromQuery()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
         var filterItems = filters
@@ -357,14 +392,12 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2)
-            .GenerateList(3);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2).GenerateList(3);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToArray();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithLocation(_fixture.DefaultLocation())
             .WithFilterItems(filterItems)
             .WithMeasures(indicators)
@@ -373,7 +406,8 @@ public class SubjectCsvMetaServiceTests
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -381,15 +415,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -414,26 +441,23 @@ public class SubjectCsvMetaServiceTests
 
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
+                .Setup(s => s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             // Only indicators from the query will be included in the meta
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators[1..2]
-                    .Concat(indicators[4..6])
-                    .Select(i => i.Id)
+                Indicators = indicators[1..2].Concat(indicators[4..6]).Select(i => i.Id),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -449,7 +473,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_NoIndicatorsFromQuery()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
         var filterItems = filters
@@ -457,14 +482,12 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2)
-            .GenerateList(2);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2).GenerateList(2);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToArray();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithLocation(_fixture.DefaultLocation())
             .WithFilterItems(filterItems)
             .WithMeasures(indicators)
@@ -473,7 +496,8 @@ public class SubjectCsvMetaServiceTests
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -481,15 +505,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -511,10 +528,7 @@ public class SubjectCsvMetaServiceTests
 
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
-                .Setup(
-                    s =>
-                        s.GetDownloadStream(It.IsAny<ReleaseFile>(), default)
-                )
+                .Setup(s => s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
@@ -527,11 +541,10 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid())
+                Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid()),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -545,7 +558,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_OnlyLocationsWithObservations()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
         var filterItems = filters
@@ -553,35 +567,34 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 3)
-            .GenerateList(1);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 3).GenerateList(1);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToArray();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
 
-        var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForRange(2..4, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..4,
+                l =>
+                    l.SetPresetRegionAndLocalAuthority()
+                        .SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
             .GenerateList();
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithFilterItems(filterItems)
             .WithMeasures(indicators)
-            .ForRange(..2, o => o
-                .SetLocation(locations[0]))
-            .ForRange(2..4, o => o
-                .SetLocation(locations[3]))
+            .ForRange(..2, o => o.SetLocation(locations[0]))
+            .ForRange(2..4, o => o.SetLocation(locations[3]))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -589,15 +602,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -619,23 +625,22 @@ public class SubjectCsvMetaServiceTests
 
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
+                .Setup(s => s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id)
+                Indicators = indicators.Select(i => i.Id),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -650,40 +655,36 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_EmptyObservations()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 3)
-            .GenerateList(1);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 3).GenerateList(1);
 
-        var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForRange(2..4, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..4,
+                l =>
+                    l.SetPresetRegionAndLocalAuthority()
+                        .SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups),
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -706,22 +707,22 @@ public class SubjectCsvMetaServiceTests
 
             // Stubbing this out as testing headers in other methods
             releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
+                .Setup(s => s.GetDownloadStream(It.IsAny<ReleaseFile>(), default))
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-            };
+            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, new List<Observation>());
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                query,
+                new List<Observation>()
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -736,7 +737,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(2);
 
         var filterItems = filters
@@ -744,31 +746,34 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToArray();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0], filterItems[1])
-                .SetLocation(_fixture.DefaultLocation()
-                    .WithPresetRegionAndLocalAuthority()
-                    .WithGeographicLevel(GeographicLevel.LocalAuthority))
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0], filterItems[1])
+                    .SetLocation(
+                        _fixture
+                            .DefaultLocation()
+                            .WithPresetRegionAndLocalAuthority()
+                            .WithGeographicLevel(GeographicLevel.LocalAuthority)
+                    )
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -776,15 +781,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -827,10 +825,11 @@ public class SubjectCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId
+                            && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -840,16 +839,16 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList()
+                Indicators = indicators.Select(i => i.Id).ToList(),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -882,68 +881,91 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_FiltersHaveNonDefaultGroups()
     {
-        var filters = _fixture.DefaultFilter()
-            .ForIndex(0, s =>
-                s.SetGroupCsvColumn("filter_0_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(s => s.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(1, s =>
-                s.SetGroupCsvColumn("filter_1_grouping")
-                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                        .ForInstance(s => s.Set(
-                            fg => fg.Label,
-                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                        .Generate(2)))
-            .ForIndex(2, s =>
-                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1).Generate(1)))
+        var filters = _fixture
+            .DefaultFilter()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetGroupCsvColumn("filter_0_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(s =>
+                                    s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetGroupCsvColumn("filter_1_grouping")
+                        .SetFilterGroups(
+                            _fixture
+                                .DefaultFilterGroup(filterItemCount: 1)
+                                .ForInstance(s =>
+                                    s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) =>
+                                            $"Filter group {context.FixtureTypeIndex}"
+                                    )
+                                )
+                                .Generate(2)
+                        )
+            )
+            .ForIndex(
+                2,
+                s => s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1).Generate(1))
+            )
             .GenerateList();
 
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter2Items = filters[2].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter2Items = filters[2].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToArray();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
 
-        var location = _fixture.DefaultLocation()
+        var location = _fixture
+            .DefaultLocation()
             .WithPresetRegionAndLocalAuthority()
             .WithGeographicLevel(GeographicLevel.LocalAuthority)
             .Generate();
 
-        var observations = _fixture.DefaultObservation()
+        var observations = _fixture
+            .DefaultObservation()
             .WithMeasures(indicators)
-            .ForIndex(0, o => o
-                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                .SetLocation(location))
-            .ForIndex(1, o => o
-                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[0])
-                .SetLocation(location)
-                .SetTimePeriod(2022, AcademicYear))
+            .ForIndex(
+                0,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(location)
+            )
+            .ForIndex(
+                1,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[0])
+                        .SetLocation(location)
+                        .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -951,15 +973,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1005,10 +1020,11 @@ public class SubjectCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId
+                            && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -1018,16 +1034,16 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList()
+                Indicators = indicators.Select(i => i.Id).ToList(),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1063,7 +1079,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_OnlyIndicatorsFromQuery()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
         var filterItems = filters
@@ -1071,25 +1088,25 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2)
-            .GenerateList(2);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2).GenerateList(2);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0])
-                .SetLocation(_fixture.DefaultLocation())
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0])
+                    .SetLocation(_fixture.DefaultLocation())
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -1097,15 +1114,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1140,10 +1150,11 @@ public class SubjectCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId
+                            && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -1153,16 +1164,16 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = ListOf(indicators[1].Id, indicators[3].Id)
+                Indicators = ListOf(indicators[1].Id, indicators[3].Id),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1188,7 +1199,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_NoIndicatorsFromQuery()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
         var filterItems = filters
@@ -1196,25 +1208,25 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2)
-            .GenerateList(2);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2).GenerateList(2);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0])
-                .SetLocation(_fixture.DefaultLocation())
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0])
+                    .SetLocation(_fixture.DefaultLocation())
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -1222,15 +1234,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1263,10 +1268,11 @@ public class SubjectCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId
+                            && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -1276,17 +1282,17 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             // Indicator ids don't matching any saved in the database
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid())
+                Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid()),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1309,7 +1315,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_DoNotMatchAnyMeta()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(1);
 
         var filterItems = filters
@@ -1317,25 +1324,25 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2)
-            .GenerateList(1);
+        var indicatorGroups = _fixture.DefaultIndicatorGroup(indicatorCount: 2).GenerateList(1);
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0])
-                .SetLocation(_fixture.DefaultLocation())
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0])
+                    .SetLocation(_fixture.DefaultLocation())
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -1343,15 +1350,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1387,10 +1387,11 @@ public class SubjectCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId
+                            && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -1400,16 +1401,16 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id)
+                Indicators = indicators.Select(i => i.Id),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1434,7 +1435,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_MultipleReleaseFilesExist()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(2);
 
         var filterItems = filters
@@ -1442,74 +1444,59 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToArray();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0], filterItems[1])
-                .SetLocation(_fixture.DefaultLocation()
-                    .WithPresetRegionAndLocalAuthority()
-                    .WithGeographicLevel(GeographicLevel.LocalAuthority))
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0], filterItems[1])
+                    .SetLocation(
+                        _fixture
+                            .DefaultLocation()
+                            .WithPresetRegionAndLocalAuthority()
+                            .WithGeographicLevel(GeographicLevel.LocalAuthority)
+                    )
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
         };
 
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = releaseSubject.ReleaseVersion.Id
-        };
+        var releaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id };
 
         var releaseDataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         // Create a file for the subject and release which is not a data file
         var releaseMetadataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Metadata
-            }
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Metadata },
         };
 
         // Create a data file for the subject but for a different release
         var releaseDataFileOtherRelease = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1518,9 +1505,11 @@ public class SubjectCsvMetaServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(releaseDataFile,
+            contentDbContext.ReleaseFiles.AddRange(
+                releaseDataFile,
                 releaseMetadataFile,
-                releaseDataFileOtherRelease);
+                releaseDataFileOtherRelease
+            );
             await contentDbContext.SaveChangesAsync();
 
             await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
@@ -1555,10 +1544,11 @@ public class SubjectCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseDataFile.FileId
+                            && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -1568,16 +1558,16 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList()
+                Indicators = indicators.Select(i => i.Id).ToList(),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1610,7 +1600,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_ReleaseFileNotFound()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(2);
 
         var filterItems = filters
@@ -1618,31 +1609,34 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0], filterItems[1])
-                .SetLocation(_fixture.DefaultLocation()
-                    .WithPresetRegionAndLocalAuthority()
-                    .WithGeographicLevel(GeographicLevel.LocalAuthority))
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0], filterItems[1])
+                    .SetLocation(
+                        _fixture
+                            .DefaultLocation()
+                            .WithPresetRegionAndLocalAuthority()
+                            .WithGeographicLevel(GeographicLevel.LocalAuthority)
+                    )
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -1661,16 +1655,16 @@ public class SubjectCsvMetaServiceTests
         {
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext);
+                contentDbContext: contentDbContext
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList()
+                Indicators = indicators.Select(i => i.Id).ToList(),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             var viewModel = result.AssertRight();
 
@@ -1701,7 +1695,8 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta_Headers_BlobNotFound()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
             .GenerateList(2);
 
         var filterItems = filters
@@ -1709,31 +1704,34 @@ public class SubjectCsvMetaServiceTests
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var observations = _fixture.DefaultObservation()
-            .ForInstance(o => o
-                .SetMeasures(indicators)
-                .SetFilterItems(filterItems[0], filterItems[1])
-                .SetLocation(_fixture.DefaultLocation()
-                    .WithPresetRegionAndLocalAuthority()
-                    .WithGeographicLevel(GeographicLevel.LocalAuthority))
-                .SetTimePeriod(2022, AcademicYear))
+        var observations = _fixture
+            .DefaultObservation()
+            .ForInstance(o =>
+                o.SetMeasures(indicators)
+                    .SetFilterItems(filterItems[0], filterItems[1])
+                    .SetLocation(
+                        _fixture
+                            .DefaultLocation()
+                            .WithPresetRegionAndLocalAuthority()
+                            .WithGeographicLevel(GeographicLevel.LocalAuthority)
+                    )
+                    .SetTimePeriod(2022, AcademicYear)
+            )
             .GenerateList(1);
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
+            Subject = _fixture
+                .DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
@@ -1741,15 +1739,8 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1772,10 +1763,11 @@ public class SubjectCsvMetaServiceTests
 
             // Blob for release file does not exist in storage
             releaseFileBlobService
-                .Setup(
-                    s => s.GetDownloadStream(
-                        It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId
+                            && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         default
                     )
@@ -1785,16 +1777,16 @@ public class SubjectCsvMetaServiceTests
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object);
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
 
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList()
+                Indicators = indicators.Select(i => i.Id).ToList(),
             };
 
-            var result =
-                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1831,14 +1823,20 @@ public class SubjectCsvMetaServiceTests
         Assert.Equal(filter.GroupCsvColumn, viewModel.GroupCsvColumn);
     }
 
-    private static void AssertFilterItemCsvViewModel(FilterItem filterItem, FilterItemCsvMetaViewModel viewModel)
+    private static void AssertFilterItemCsvViewModel(
+        FilterItem filterItem,
+        FilterItemCsvMetaViewModel viewModel
+    )
     {
         Assert.Equal(filterItem.Id, viewModel.Id);
         Assert.Equal(filterItem.Label, viewModel.Label);
         Assert.Equal(filterItem.FilterGroup.Label, viewModel.GroupLabel);
     }
 
-    private static void AssertIndicatorCsvMetaViewModel(Indicator indicator, IndicatorCsvMetaViewModel viewModel)
+    private static void AssertIndicatorCsvMetaViewModel(
+        Indicator indicator,
+        IndicatorCsvMetaViewModel viewModel
+    )
     {
         Assert.Equal(indicator.Id, viewModel.Id);
         Assert.Equal(indicator.Name, viewModel.Name);
@@ -1850,7 +1848,8 @@ public class SubjectCsvMetaServiceTests
     private static SubjectCsvMetaService BuildService(
         StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
-        IReleaseFileBlobService? releaseFileBlobService = null)
+        IReleaseFileBlobService? releaseFileBlobService = null
+    )
     {
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
@@ -1858,7 +1857,8 @@ public class SubjectCsvMetaServiceTests
             contentDbContext: contentDbContext,
             userService: AlwaysTrueUserService().Object,
             filterItemRepository: new FilterItemRepository(statisticsDbContext),
-            releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
+            releaseFileBlobService: releaseFileBlobService
+                ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }
 }

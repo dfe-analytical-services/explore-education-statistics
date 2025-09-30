@@ -7,15 +7,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class CompleteInitialDataSetVersionProcessingFunction(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(ActivityNames.CompleteInitialDataSetVersionProcessing)]
     public async Task CompleteInitialDataSetVersionProcessing(
         [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.Completing, cancellationToken);
+        await UpdateImportStage(
+            dataSetVersionImport,
+            DataSetVersionImportStage.Completing,
+            cancellationToken
+        );
 
         var dataSetVersion = dataSetVersionImport.DataSetVersion;
 

@@ -13,8 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Qu
 
 internal class GeographicLevelFacetsParser(
     QueryState queryState,
-    HashSet<GeographicLevel> allowedGeographicLevels)
-    : IFacetsParser
+    HashSet<GeographicLevel> allowedGeographicLevels
+) : IFacetsParser
 {
     public IInterpolatedSql Parse(DataSetQueryCriteriaFacets facets, string path)
     {
@@ -70,15 +70,14 @@ internal class GeographicLevelFacetsParser(
             );
         }
 
-        return new DuckDbSqlBuilder()
-            .AppendRange(fragments, "\nAND ")
-            .Build();
+        return new DuckDbSqlBuilder().AppendRange(fragments, "\nAND ").Build();
     }
 
     private IInterpolatedSql EqFragment(
         GeographicLevel geographicLevel,
         string path,
-        bool negate = false)
+        bool negate = false
+    )
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -86,9 +85,7 @@ internal class GeographicLevelFacetsParser(
         {
             queryState.Warnings.Add(CreateNotFoundWarning([geographicLevel], path));
 
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         builder +=
@@ -100,13 +97,12 @@ internal class GeographicLevelFacetsParser(
     private IInterpolatedSql InFragment(
         IReadOnlyList<GeographicLevel> geographicLevels,
         string path,
-        bool negate = false)
+        bool negate = false
+    )
     {
         var builder = new DuckDbSqlBuilder();
 
-        var levels = geographicLevels
-            .Where(allowedGeographicLevels.Contains)
-            .ToHashSet();
+        var levels = geographicLevels.Where(allowedGeographicLevels.Contains).ToHashSet();
 
         if (levels.Count < geographicLevels.Count)
         {
@@ -115,30 +111,31 @@ internal class GeographicLevelFacetsParser(
 
         if (levels.Count == 0)
         {
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
-        var parameters = levels
-            .Select(level => level.GetEnumLabel())
-            .ToList();
+        var parameters = levels.Select(level => level.GetEnumLabel()).ToList();
 
-        builder += $"{DataTable.Ref().GeographicLevel:raw} {(negate ? "NOT IN" : "IN"):raw} ({parameters})";
+        builder +=
+            $"{DataTable.Ref().GeographicLevel:raw} {(negate ? "NOT IN" : "IN"):raw} ({parameters})";
 
         return builder.Build();
     }
 
-    private WarningViewModel CreateNotFoundWarning(IEnumerable<GeographicLevel> geographicLevels, string path) => new()
-    {
-        Code = ValidationMessages.GeographicLevelsNotFound.Code,
-        Message = ValidationMessages.GeographicLevelsNotFound.Message,
-        Path = path,
-        Detail = new NotFoundItemsErrorDetail<string>(
-            geographicLevels
-                .Where(level => !allowedGeographicLevels.Contains(level))
-                .Select(level => level.GetEnumValue())
-                .ToList()
-        )
-    };
+    private WarningViewModel CreateNotFoundWarning(
+        IEnumerable<GeographicLevel> geographicLevels,
+        string path
+    ) =>
+        new()
+        {
+            Code = ValidationMessages.GeographicLevelsNotFound.Code,
+            Message = ValidationMessages.GeographicLevelsNotFound.Message,
+            Path = path,
+            Detail = new NotFoundItemsErrorDetail<string>(
+                geographicLevels
+                    .Where(level => !allowedGeographicLevels.Contains(level))
+                    .Select(level => level.GetEnumValue())
+                    .ToList()
+            ),
+        };
 }

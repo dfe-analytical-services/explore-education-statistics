@@ -27,10 +27,11 @@ public class TableBuilderMetaController : ControllerBase
     [BlobCache(typeof(PrivateSubjectMetaCacheKey))]
     public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
         Guid releaseVersionId,
-        Guid subjectId)
+        Guid subjectId
+    )
     {
-        return _subjectMetaService.GetSubjectMeta(releaseVersionId: releaseVersionId,
-                subjectId: subjectId)
+        return _subjectMetaService
+            .GetSubjectMeta(releaseVersionId: releaseVersionId, subjectId: subjectId)
             .HandleFailuresOrOk();
     }
 
@@ -38,9 +39,11 @@ public class TableBuilderMetaController : ControllerBase
     public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
         Guid releaseVersionId,
         [FromBody] LocationsOrTimePeriodsQueryRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return _subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken)
+        return _subjectMetaService
+            .FilterSubjectMeta(releaseVersionId, request, cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -48,11 +51,11 @@ public class TableBuilderMetaController : ControllerBase
     public Task<ActionResult<Unit>> UpdateFilters(
         Guid releaseVersionId,
         Guid subjectId,
-        List<FilterUpdateViewModel> request)
+        List<FilterUpdateViewModel> request
+    )
     {
-        return _subjectMetaService.UpdateSubjectFilters(releaseVersionId: releaseVersionId,
-                subjectId: subjectId,
-                request)
+        return _subjectMetaService
+            .UpdateSubjectFilters(releaseVersionId: releaseVersionId, subjectId: subjectId, request)
             .HandleFailuresOrOk();
     }
 
@@ -60,11 +63,15 @@ public class TableBuilderMetaController : ControllerBase
     public Task<ActionResult<Unit>> UpdateIndicators(
         Guid releaseVersionId,
         Guid subjectId,
-        List<IndicatorGroupUpdateViewModel> request)
+        List<IndicatorGroupUpdateViewModel> request
+    )
     {
-        return _subjectMetaService.UpdateSubjectIndicators(releaseVersionId: releaseVersionId,
+        return _subjectMetaService
+            .UpdateSubjectIndicators(
+                releaseVersionId: releaseVersionId,
                 subjectId: subjectId,
-                request)
+                request
+            )
             .HandleFailuresOrOk();
     }
 }

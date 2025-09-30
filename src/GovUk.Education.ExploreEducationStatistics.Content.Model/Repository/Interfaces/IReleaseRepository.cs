@@ -11,7 +11,8 @@ public interface IReleaseRepository
     /// <returns>A collection of the published releases in release series order associated with the publication.</returns>
     Task<List<Release>> ListPublishedReleases(
         Guid publicationId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves the id's of all published releases that are associated with a publication.
@@ -21,5 +22,6 @@ public interface IReleaseRepository
     /// <returns>A collection of the id's of all published releases associated with the publication.</returns>
     Task<List<Guid>> ListPublishedReleaseIds(
         Guid publicationId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

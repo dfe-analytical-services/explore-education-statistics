@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
     IOptions<AppOptions> appOptions,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : ILocationMetaRepository
 {
     private readonly AppOptions _appOptions = appOptions.Value;
 
@@ -31,7 +32,8 @@ public class LocationMetaRepository(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var metas = GetLocationMetas(dataSetVersion, allowedColumns);
 
@@ -44,15 +46,18 @@ public class LocationMetaRepository(
                         duckDbConnection,
                         dataSetVersion,
                         meta,
-                        cancellationToken),
-                cancellationToken);
+                        cancellationToken
+                    ),
+                cancellationToken
+            );
     }
 
     public async Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var metas = GetLocationMetas(dataSetVersion, allowedColumns);
         publicDataDbContext.LocationMetas.AddRange(metas);
@@ -66,7 +71,8 @@ public class LocationMetaRepository(
                 duckDbConnection,
                 dataSetVersion,
                 meta,
-                cancellationToken);
+                cancellationToken
+            );
 
             var optionTable = publicDataDbContext
                 .GetTable<LocationOptionMetaRow>()
@@ -76,35 +82,36 @@ public class LocationMetaRepository(
 
             while (current < options.Count)
             {
-                var batch = options
-                    .Skip(current)
-                    .Take(_appOptions.MetaInsertBatchSize)
-                    .ToList();
+                var batch = options.Skip(current).Take(_appOptions.MetaInsertBatchSize).ToList();
 
                 // We create a 'row key' for each option that allows us to quickly
                 // find the option rows that exist in the database. It's typically
                 // much slower to have multiple WHERE clauses for each row that check
                 // against every other row. Out of several such attempts, the 'row key'
                 // technique was the fastest and simplest way to create the links.
-                var batchRowKeys = batch
-                    .Select(o => o.GetRowKey())
-                    .ToHashSet();
+                var batchRowKeys = batch.Select(o => o.GetRowKey()).ToHashSet();
 
-                Expression<Func<LocationOptionMetaRow, bool>> hasBatchRowKey =
-                    o => o.Type == batch[0].Type &&
-                         batchRowKeys.Contains(
-                             o.Type + ',' +
-                             o.Label + ',' +
-                             (o.Code ?? "null") + ',' +
-                             (o.OldCode ?? "null") + ',' +
-                             (o.Urn ?? "null") + ',' +
-                             (o.LaEstab ?? "null") + ',' +
-                             (o.Ukprn ?? "null")
-                         );
+                Expression<Func<LocationOptionMetaRow, bool>> hasBatchRowKey = o =>
+                    o.Type == batch[0].Type
+                    && batchRowKeys.Contains(
+                        o.Type
+                            + ','
+                            + o.Label
+                            + ','
+                            + (o.Code ?? "null")
+                            + ','
+                            + (o.OldCode ?? "null")
+                            + ','
+                            + (o.Urn ?? "null")
+                            + ','
+                            + (o.LaEstab ?? "null")
+                            + ','
+                            + (o.Ukprn ?? "null")
+                    );
 
-                var existingRowKeys = (await optionTable
-                        .Where(hasBatchRowKey)
-                        .ToListAsync(token: cancellationToken))
+                var existingRowKeys = (
+                    await optionTable.Where(hasBatchRowKey).ToListAsync(token: cancellationToken)
+                )
                     .Select(o => o.GetRowKey())
                     .ToHashSet();
 
@@ -116,7 +123,8 @@ public class LocationMetaRepository(
 
                     var startIndex = await publicDataDbContext.NextSequenceValue(
                         PublicDataDbContext.LocationOptionMetasIdSequence,
-                        cancellationToken);
+                        cancellationToken
+                    );
 
                     foreach (var option in newOptions)
                     {
@@ -126,22 +134,31 @@ public class LocationMetaRepository(
                     await optionTable.BulkCopyAsync(
                         new BulkCopyOptions { KeepIdentity = true },
                         newOptions,
-                        cancellationToken);
+                        cancellationToken
+                    );
 
                     await publicDataDbContext.SetSequenceValue(
                         PublicDataDbContext.LocationOptionMetasIdSequence,
                         startIndex - 1,
-                        cancellationToken);
+                        cancellationToken
+                    );
                 }
 
                 var links = await optionTable
                     .Where(hasBatchRowKey)
-                    .Select((option, index) => new LocationOptionMetaLink
-                    {
-                        PublicId = CreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
-                        MetaId = meta.Id,
-                        OptionId = option.Id
-                    })
+                    .Select(
+                        (option, index) =>
+                            new LocationOptionMetaLink
+                            {
+                                PublicId = CreatePublicIdForLocationOptionMetaLink(
+                                    publicIdMappings,
+                                    meta,
+                                    option
+                                ),
+                                MetaId = meta.Id,
+                                OptionId = option.Id,
+                            }
+                    )
                     .ToListAsync(token: cancellationToken);
 
                 publicDataDbContext.LocationOptionMetaLinks.AddRange(links);
@@ -150,14 +167,16 @@ public class LocationMetaRepository(
                 current += _appOptions.MetaInsertBatchSize;
             }
 
-            var insertedLinks = await publicDataDbContext.LocationOptionMetaLinks
-                .CountAsync(l => l.MetaId == meta.Id, cancellationToken: cancellationToken);
+            var insertedLinks = await publicDataDbContext.LocationOptionMetaLinks.CountAsync(
+                l => l.MetaId == meta.Id,
+                cancellationToken: cancellationToken
+            );
 
             if (insertedLinks != options.Count)
             {
                 throw new InvalidOperationException(
-                    $"Inserted incorrect number of location option meta links for {meta.Level}. " +
-                    $"Inserted: {insertedLinks}, expected: {options.Count}"
+                    $"Inserted incorrect number of location option meta links for {meta.Level}. "
+                        + $"Inserted: {insertedLinks}, expected: {options.Count}"
                 );
             }
         }
@@ -166,47 +185,51 @@ public class LocationMetaRepository(
     private static string CreatePublicIdForLocationOptionMetaLink(
         PublicIdMappings publicIdMappings,
         GeographicLevel level,
-        LocationOptionMetaRow option)
+        LocationOptionMetaRow option
+    )
     {
-        return publicIdMappings
-                   .GetPublicIdForCandidate(
-                       level: level,
-                       candidateKey: MappingKeyGenerators.LocationOptionMetaRow(option))
-               ?? SqidEncoder.Encode(option.Id);
+        return publicIdMappings.GetPublicIdForCandidate(
+                level: level,
+                candidateKey: MappingKeyGenerators.LocationOptionMetaRow(option)
+            ) ?? SqidEncoder.Encode(option.Id);
     }
 
     private async Task<List<LocationOptionMetaRow>> GetLocationOptionMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         LocationMeta meta,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var nameCol = meta.Level.CsvNameColumn();
         var codeCols = meta.Level.CsvCodeColumns();
-        string[] cols = [..codeCols, nameCol];
+        string[] cols = [.. codeCols, nameCol];
 
-        return (await duckDbConnection.SqlBuilder(
+        return (
+            await duckDbConnection
+                .SqlBuilder(
                     $"""
-                     SELECT {cols.JoinToString(", "):raw}
-                     FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                     WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
-                     GROUP BY {cols.JoinToString(", "):raw}
-                     ORDER BY {cols.JoinToString(", "):raw}
-                     """
-                ).QueryAsync(cancellationToken: cancellationToken)
-            )
+                    SELECT {cols.JoinToString(", "):raw}
+                    FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(
+                        dataSetVersion
+                    ):raw}', ALL_VARCHAR = true)
+                    WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
+                    GROUP BY {cols.JoinToString(", "):raw}
+                    ORDER BY {cols.JoinToString(", "):raw}
+                    """
+                )
+                .QueryAsync(cancellationToken: cancellationToken)
+        )
             .Cast<IDictionary<string, object?>>()
-            .Select(row => row.ToDictionary(
-                kv => kv.Key,
-                kv => (string)kv.Value!
-            ))
+            .Select(row => row.ToDictionary(kv => kv.Key, kv => (string)kv.Value!))
             .Select(row => MapLocationOptionMeta(row, meta.Level).ToRow())
             .ToList();
     }
 
     private static List<LocationMeta> GetLocationMetas(
         DataSetVersion dataSetVersion,
-        IReadOnlySet<string> allowedColumns)
+        IReadOnlySet<string> allowedColumns
+    )
     {
         var levels = ListLocationLevels(allowedColumns);
 
@@ -214,7 +237,7 @@ public class LocationMetaRepository(
             .Select(level => new LocationMeta
             {
                 DataSetVersionId = dataSetVersion.Id,
-                Level = level
+                Level = level,
             })
             .ToList();
     }
@@ -231,7 +254,8 @@ public class LocationMetaRepository(
 
     private static LocationOptionMeta MapLocationOptionMeta(
         IDictionary<string, string> row,
-        GeographicLevel level)
+        GeographicLevel level
+    )
     {
         var cols = level.CsvColumns();
         var label = row[level.CsvNameColumn()];
@@ -242,56 +266,52 @@ public class LocationMetaRepository(
             {
                 Label = label,
                 Code = row[LocalAuthorityCsvColumns.NewCode],
-                OldCode = row[LocalAuthorityCsvColumns.OldCode]
+                OldCode = row[LocalAuthorityCsvColumns.OldCode],
             },
             GeographicLevel.School => new LocationSchoolOptionMeta
             {
                 Label = label,
                 Urn = row[SchoolCsvColumns.Urn],
-                LaEstab = row[SchoolCsvColumns.LaEstab]
+                LaEstab = row[SchoolCsvColumns.LaEstab],
             },
             GeographicLevel.Provider => new LocationProviderOptionMeta
             {
                 Label = label,
-                Ukprn = row[ProviderCsvColumns.Ukprn]
+                Ukprn = row[ProviderCsvColumns.Ukprn],
             },
             GeographicLevel.RscRegion => new LocationRscRegionOptionMeta { Label = label },
-            _ => new LocationCodedOptionMeta
-            {
-                Label = label,
-                Code = row[cols.Codes.First()]
-            }
+            _ => new LocationCodedOptionMeta { Label = label, Code = row[cols.Codes.First()] },
         };
     }
 
     private async Task<PublicIdMappings> CreatePublicIdMappings(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var mappings = await EntityFrameworkQueryableExtensions
-            .SingleOrDefaultAsync(publicDataDbContext
-                    .DataSetVersionMappings,
-                mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
-                cancellationToken);
+        var mappings = await EntityFrameworkQueryableExtensions.SingleOrDefaultAsync(
+            publicDataDbContext.DataSetVersionMappings,
+            mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
+            cancellationToken
+        );
 
         if (mappings is null)
         {
             return new PublicIdMappings();
         }
 
-        var mappingsByLevel = mappings
-            .LocationMappingPlan
-            .Levels
-            .ToDictionary(
-                keySelector: level => level.Key,
-                elementSelector: level => level
-                    .Value
-                    .Mappings
-                    .Values
-                    .Where(mapping => mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped)
+        var mappingsByLevel = mappings.LocationMappingPlan.Levels.ToDictionary(
+            keySelector: level => level.Key,
+            elementSelector: level =>
+                level
+                    .Value.Mappings.Values.Where(mapping =>
+                        mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped
+                    )
                     .ToDictionary(
                         keySelector: mapping => mapping.CandidateKey!,
-                        elementSelector: mapping => mapping.PublicId));
+                        elementSelector: mapping => mapping.PublicId
+                    )
+        );
 
         return new PublicIdMappings { Levels = mappingsByLevel };
     }

@@ -15,21 +15,24 @@ public partial class EES5563_AddDeletedMetaFlagsToDataSetVersionMapping : Migrat
             table: "DataSetVersionMappings",
             type: "boolean",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
 
         migrationBuilder.AddColumn<bool>(
             name: "HasDeletedIndicators",
             table: "DataSetVersionMappings",
             type: "boolean",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
 
         migrationBuilder.AddColumn<bool>(
             name: "HasDeletedTimePeriods",
             table: "DataSetVersionMappings",
             type: "boolean",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
     }
 
     /// <inheritdoc />
@@ -37,14 +40,11 @@ public partial class EES5563_AddDeletedMetaFlagsToDataSetVersionMapping : Migrat
     {
         migrationBuilder.DropColumn(
             name: "HasDeletedGeographicLevels",
-            table: "DataSetVersionMappings");
+            table: "DataSetVersionMappings"
+        );
 
-        migrationBuilder.DropColumn(
-            name: "HasDeletedIndicators",
-            table: "DataSetVersionMappings");
+        migrationBuilder.DropColumn(name: "HasDeletedIndicators", table: "DataSetVersionMappings");
 
-        migrationBuilder.DropColumn(
-            name: "HasDeletedTimePeriods",
-            table: "DataSetVersionMappings");
+        migrationBuilder.DropColumn(name: "HasDeletedTimePeriods", table: "DataSetVersionMappings");
     }
 }

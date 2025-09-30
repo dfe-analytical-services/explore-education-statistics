@@ -6,11 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Function
 
 public class ConsumeAnalyticsRequestFilesFunction(
     IEnumerable<IRequestFileProcessor> processors,
-    ILogger<ConsumeAnalyticsRequestFilesFunction> logger)
+    ILogger<ConsumeAnalyticsRequestFilesFunction> logger
+)
 {
     [Function(nameof(ConsumeAnalyticsRequestFilesFunction))]
     public async Task Run(
-        [TimerTrigger("%App:ConsumeAnalyticsRequestFilesCronSchedule%")] TimerInfo timer)
+        [TimerTrigger("%App:ConsumeAnalyticsRequestFilesCronSchedule%")] TimerInfo timer
+    )
     {
         logger.LogInformation($"{nameof(ConsumeAnalyticsRequestFilesFunction)} triggered");
 
@@ -25,7 +27,8 @@ public class ConsumeAnalyticsRequestFilesFunction(
                 logger.LogError(
                     e,
                     "Failed to process request files with processor {RequestFileProcessorType}",
-                    requestFileProcessor.GetType());
+                    requestFileProcessor.GetType()
+                );
             }
         }
     }

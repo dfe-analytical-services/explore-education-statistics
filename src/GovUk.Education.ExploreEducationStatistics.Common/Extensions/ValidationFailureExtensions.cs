@@ -10,14 +10,15 @@ public static class ValidationFailureExtensions
         "PropertyName",
         "PropertyPath",
         "PropertyValue",
-        "CollectionIndex"
+        "CollectionIndex",
     ];
 
     public static Dictionary<string, object?> GetErrorDetail(this ValidationFailure failure)
     {
-        var detail = (failure.FormattedMessagePlaceholderValues ?? [])
-            .Where(kv => !IgnoredMessagePlaceholders.Contains(kv.Key))
-            .ToDictionary(kv => kv.Key.ToLowerFirst(), kv => kv.Value)
+        var detail =
+            (failure.FormattedMessagePlaceholderValues ?? [])
+                .Where(kv => !IgnoredMessagePlaceholders.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key.ToLowerFirst(), kv => kv.Value)
             as Dictionary<string, object?>;
 
         if (!detail.ContainsKey("value"))
@@ -34,11 +35,9 @@ public static class ValidationFailureExtensions
 
         if (type is { IsClass: true, IsPrimitive: false, IsEnum: false, IsValueType: false })
         {
-            var customKeyValues = failure.CustomState
-                .ToDictionary()
-                .ToDictionary(
-                    kv => kv.Key.CamelCase(),
-                    kv => kv.Value);
+            var customKeyValues = failure
+                .CustomState.ToDictionary()
+                .ToDictionary(kv => kv.Key.CamelCase(), kv => kv.Value);
 
             foreach (var keyValue in customKeyValues)
             {

@@ -12,7 +12,7 @@ public class EnumToEnumValueJsonConverterTests
     private enum SampleEnum
     {
         [EnumLabelValue("SampleLabel", "SampleValue")]
-        Sample
+        Sample,
     }
 
     private record SampleClass
@@ -24,12 +24,12 @@ public class EnumToEnumValueJsonConverterTests
     [Fact]
     public void SerializeObject()
     {
-        var objectToSerialize = new SampleClass
-        {
-            SampleField = SampleEnum.Sample
-        };
+        var objectToSerialize = new SampleClass { SampleField = SampleEnum.Sample };
 
-        Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonSerializer.Serialize(objectToSerialize));
+        Assert.Equal(
+            "{\"SampleField\":\"SampleValue\"}",
+            JsonSerializer.Serialize(objectToSerialize)
+        );
     }
 
     [Fact]
@@ -37,10 +37,7 @@ public class EnumToEnumValueJsonConverterTests
     {
         const string jsonText = "{\"SampleField\":\"SampleValue\"}";
 
-        var expected = new SampleClass
-        {
-            SampleField = SampleEnum.Sample
-        };
+        var expected = new SampleClass { SampleField = SampleEnum.Sample };
 
         Assert.Equal(expected, JsonSerializer.Deserialize<SampleClass>(jsonText));
     }
@@ -50,7 +47,9 @@ public class EnumToEnumValueJsonConverterTests
     {
         const string jsonText = "{\"SampleField\":null}";
 
-        Assert.Throws<NullReferenceException>(() => JsonSerializer.Deserialize<SampleClass>(jsonText));
+        Assert.Throws<NullReferenceException>(() =>
+            JsonSerializer.Deserialize<SampleClass>(jsonText)
+        );
     }
 
     [Fact]
@@ -58,6 +57,8 @@ public class EnumToEnumValueJsonConverterTests
     {
         const string jsonText = "{\"SampleField\":\"Invalid label\"}";
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => JsonSerializer.Deserialize<SampleClass>(jsonText));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            JsonSerializer.Deserialize<SampleClass>(jsonText)
+        );
     }
 }

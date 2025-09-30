@@ -18,10 +18,13 @@ public abstract class OrganisationServiceTests
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(10)]
-        public async Task GetAllOrganisations_ReturnsExpectedOrganisationsInOrderByTitle(int numOrganisations)
+        public async Task GetAllOrganisations_ReturnsExpectedOrganisationsInOrderByTitle(
+            int numOrganisations
+        )
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
+            var organisations = _dataFixture
+                .DefaultOrganisation()
                 .GenerateArray(numOrganisations)
                 .Shuffle();
 
@@ -47,8 +50,6 @@ public abstract class OrganisationServiceTests
 
     private static OrganisationService BuildService(ContentDbContext context = null)
     {
-        return new OrganisationService(
-            context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict)
-        );
+        return new OrganisationService(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
     }
 }

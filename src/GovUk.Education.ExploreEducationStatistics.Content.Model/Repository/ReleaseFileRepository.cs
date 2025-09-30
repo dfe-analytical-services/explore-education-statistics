@@ -13,15 +13,9 @@ public class ReleaseFileRepository : IReleaseFileRepository
 {
     private readonly ContentDbContext _contentDbContext;
 
-    private static readonly List<FileType> SupportedFileTypes = new()
-    {
-        Ancillary,
-        Chart,
-        Image
-    };
+    private static readonly List<FileType> SupportedFileTypes = new() { Ancillary, Chart, Image };
 
-    public ReleaseFileRepository(
-        ContentDbContext contentDbContext)
+    public ReleaseFileRepository(ContentDbContext contentDbContext)
     {
         _contentDbContext = contentDbContext;
     }
@@ -35,11 +29,16 @@ public class ReleaseFileRepository : IReleaseFileRepository
         Guid createdById,
         string? name = null,
         string? summary = null,
-        Guid? newFileId = null)
+        Guid? newFileId = null
+    )
     {
         if (!SupportedFileTypes.Contains(type))
         {
-            throw new ArgumentOutOfRangeException(nameof(type), type, "Cannot create file for file type");
+            throw new ArgumentOutOfRangeException(
+                nameof(type),
+                type,
+                "Cannot create file for file type"
+            );
         }
 
         var releaseFile = new ReleaseFile
@@ -55,8 +54,8 @@ public class ReleaseFileRepository : IReleaseFileRepository
                 Filename = filename,
                 ContentLength = contentLength,
                 ContentType = contentType,
-                Type = type
-            }
+                Type = type,
+            },
         };
 
         var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
@@ -64,8 +63,7 @@ public class ReleaseFileRepository : IReleaseFileRepository
         return created;
     }
 
-    public async Task Delete(Guid releaseVersionId,
-        Guid fileId)
+    public async Task Delete(Guid releaseVersionId, Guid fileId)
     {
         var releaseFileToRemove = await Find(releaseVersionId, fileId);
 
@@ -77,59 +75,61 @@ public class ReleaseFileRepository : IReleaseFileRepository
         }
     }
 
-    public async Task<ReleaseFile?> Find(Guid releaseVersionId,
-        Guid fileId)
+    public async Task<ReleaseFile?> Find(Guid releaseVersionId, Guid fileId)
     {
-        return await _contentDbContext.ReleaseFiles
-            .Include(releaseFile => releaseFile.File.CreatedBy)
+        return await _contentDbContext
+            .ReleaseFiles.Include(releaseFile => releaseFile.File.CreatedBy)
             .SingleOrDefaultAsync(releaseFile =>
-                releaseFile.ReleaseVersionId == releaseVersionId
-                && releaseFile.FileId == fileId);
+                releaseFile.ReleaseVersionId == releaseVersionId && releaseFile.FileId == fileId
+            );
     }
 
-    public async Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId,
-        Guid fileId)
+    public async Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(
+        Guid releaseVersionId,
+        Guid fileId
+    )
     {
-        return await Find(releaseVersionId, fileId) ?? new Either<ActionResult, ReleaseFile>(new NotFoundResult());
+        return await Find(releaseVersionId, fileId)
+            ?? new Either<ActionResult, ReleaseFile>(new NotFoundResult());
     }
 
     public async Task<List<ReleaseFile>> GetByFileType(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default,
-        params FileType[] types)
+        params FileType[] types
+    )
     {
         return await _contentDbContext
-            .ReleaseFiles
-            .Include(f => f.File)
+            .ReleaseFiles.Include(f => f.File)
             .Where(releaseFile =>
                 releaseFile.ReleaseVersionId == releaseVersionId
-                && types.Contains(releaseFile.File.Type))
+                && types.Contains(releaseFile.File.Type)
+            )
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId,
-        Guid fileId)
+    public async Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId, Guid fileId)
     {
-        return await _contentDbContext.ReleaseFiles
-            .AsQueryable()
+        return await _contentDbContext
+            .ReleaseFiles.AsQueryable()
             .AnyAsync(releaseFile =>
-                releaseFile.ReleaseVersionId != releaseVersionId
-                && releaseFile.FileId == fileId);
+                releaseFile.ReleaseVersionId != releaseVersionId && releaseFile.FileId == fileId
+            );
     }
 
-    public async Task<ReleaseFile> Update(Guid releaseVersionId,
+    public async Task<ReleaseFile> Update(
+        Guid releaseVersionId,
         Guid fileId,
         Guid? newFileId = null,
         string? name = null,
         string? fileName = null,
-        string? summary = null)
+        string? summary = null
+    )
     {
         // Ensure file is linked to the ReleaseVersion by getting the ReleaseFile first
-        var releaseFile = await _contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .SingleAsync(rf =>
-                rf.ReleaseVersionId == releaseVersionId
-                && rf.FileId == fileId);
+        var releaseFile = await _contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .SingleAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId);
 
         _contentDbContext.Update(releaseFile);
 
@@ -143,33 +143,34 @@ public class ReleaseFileRepository : IReleaseFileRepository
         return releaseFile;
     }
 
-    public async Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
-        CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
-            Guid originalFileId)
+    public async Task<
+        Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>
+    > CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId, Guid originalFileId)
     {
-        return await _contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(rf => rf.ReleaseVersionId == releaseVersionId
-                         && rf.FileId == originalFileId
-                         && rf.File.Type == Data
-                         && rf.File.ReplacedById != null)
+        return await _contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.FileId == originalFileId
+                && rf.File.Type == Data
+                && rf.File.ReplacedById != null
+            )
             .Join(
                 _contentDbContext.ReleaseFiles.Include(rf => rf.File),
                 original => original.File.ReplacedById,
                 replacement => replacement.FileId,
-                (original, replacement) => new
-                {
-                    Original = original,
-                    Replacement = replacement
-                })
+                (original, replacement) => new { Original = original, Replacement = replacement }
+            )
             .FirstOrNotFoundAsync(joined =>
                 joined.Replacement.ReleaseVersionId == releaseVersionId
                 && joined.Replacement.File.Type == Data
-                && joined.Original.FileId == joined.Replacement.File.ReplacingId)
+                && joined.Original.FileId == joined.Replacement.File.ReplacingId
+            )
             .OnSuccess(releaseFiles =>
                 new Tuple<ReleaseFile, ReleaseFile>(
-                        releaseFiles.Original,
-                        releaseFiles.Replacement)
-                    .ToValueTuple());
+                    releaseFiles.Original,
+                    releaseFiles.Replacement
+                ).ToValueTuple()
+            );
     }
 }

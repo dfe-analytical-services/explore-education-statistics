@@ -9,11 +9,13 @@ public interface ILocationMetaRepository
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task CreateLocationMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

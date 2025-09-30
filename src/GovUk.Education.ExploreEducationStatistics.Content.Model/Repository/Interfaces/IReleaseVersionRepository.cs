@@ -3,9 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IReleaseVersionRepository
 {
-    Task<DateTime> GetPublishedDate(
-        Guid releaseVersionId,
-        DateTime actualPublishedDate);
+    Task<DateTime> GetPublishedDate(Guid releaseVersionId, DateTime actualPublishedDate);
 
     /// <summary>
     /// Retrieves the latest published version of a release matching a given slug associated with a publication.
@@ -17,7 +15,8 @@ public interface IReleaseVersionRepository
     Task<ReleaseVersion?> GetLatestPublishedReleaseVersionByReleaseSlug(
         Guid publicationId,
         string releaseSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves the latest version of the latest release in release series order associated with a publication.
@@ -27,7 +26,8 @@ public interface IReleaseVersionRepository
     /// <returns>The latest version of the latest release in release series order associated with the publication.</returns>
     Task<ReleaseVersion?> GetLatestReleaseVersion(
         Guid publicationId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Determines if a release version is the latest published version of a release.
@@ -37,7 +37,8 @@ public interface IReleaseVersionRepository
     /// <returns>True if no newer published version of the release exists.</returns>
     Task<bool> IsLatestPublishedReleaseVersion(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Determines if a release version is the latest version of a release.
@@ -47,7 +48,8 @@ public interface IReleaseVersionRepository
     /// <returns>True if no newer version of the release exists.</returns>
     Task<bool> IsLatestReleaseVersion(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves the latest version id's of all releases associated with a publication.
@@ -59,7 +61,8 @@ public interface IReleaseVersionRepository
     Task<List<Guid>> ListLatestReleaseVersionIds(
         Guid publicationId,
         bool publishedOnly = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves the latest versions of all releases in release series order associated with a given publication.
@@ -71,5 +74,6 @@ public interface IReleaseVersionRepository
     Task<List<ReleaseVersion>> ListLatestReleaseVersions(
         Guid publicationId,
         bool publishedOnly = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

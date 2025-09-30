@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Bau;
 
-public class PageFeedbackControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class PageFeedbackControllerTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     private static readonly DateTime Now = DateTime.UtcNow;
     private const string BaseUrl = "api/feedback/page";
@@ -21,7 +22,8 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
             Created = Now,
             Response = PageFeedbackResponse.Useful,
             Url = "/",
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            UserAgent =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "",
             Intent = "",
             Issue = "",
@@ -33,7 +35,8 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
             Created = Now,
             Response = PageFeedbackResponse.NotUseful,
             Url = "/",
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            UserAgent =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "What were you doing?",
             Intent = "What did you hope to achieve?",
             Issue = "",
@@ -45,24 +48,24 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
             Created = Now,
             Response = PageFeedbackResponse.ProblemEncountered,
             Url = "/",
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            UserAgent =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             Context = "What were you doing?",
             Intent = "",
             Issue = "What went wrong?",
             Read = false,
-        }
+        },
     ];
 
     [Fact]
     public async Task ListFeedback_NoQueryParameters_ReturnsOnlyUnreadFeedback()
     {
         // Arrange
-        await TestApp.AddTestData<ContentDbContext>(context
-            => context.PageFeedback.AddRange(_feedback));
+        await TestApp.AddTestData<ContentDbContext>(context =>
+            context.PageFeedback.AddRange(_feedback)
+        );
 
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
         // Act
         var response = await client.GetAsync(BaseUrl);
@@ -79,12 +82,11 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
     public async Task ListFeedback_ShowRead_ReturnsAllFeedback()
     {
         // Arrange
-        await TestApp.AddTestData<ContentDbContext>(context
-            => context.PageFeedback.AddRange(_feedback));
+        await TestApp.AddTestData<ContentDbContext>(context =>
+            context.PageFeedback.AddRange(_feedback)
+        );
 
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
         // Act
         var response = await client.GetAsync(BaseUrl + "?showRead=true");
@@ -108,14 +110,11 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
             Read = false,
         };
 
-        await TestApp.AddTestData<ContentDbContext>(context
-            => context.PageFeedback.Add(feedback));
+        await TestApp.AddTestData<ContentDbContext>(context => context.PageFeedback.Add(feedback));
 
         await using var context = TestApp.GetDbContext<ContentDbContext>();
 
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
         // Act
         await client.PatchAsync($"{BaseUrl}/{feedback.Id}", content: null);

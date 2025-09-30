@@ -12,14 +12,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class PreReleaseSummaryService(
-    ContentDbContext contentDbContext,
-    IUserService userService)
+public class PreReleaseSummaryService(ContentDbContext contentDbContext, IUserService userService)
     : IPreReleaseSummaryService
 {
-    public async Task<Either<ActionResult, PreReleaseSummaryViewModel>> GetPreReleaseSummaryViewModel(
-        Guid releaseVersionId,
-        CancellationToken cancellationToken)
+    public async Task<
+        Either<ActionResult, PreReleaseSummaryViewModel>
+    > GetPreReleaseSummaryViewModel(Guid releaseVersionId, CancellationToken cancellationToken)
     {
         return await GetReleaseVersion(releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanViewPreReleaseSummary)
@@ -30,18 +28,22 @@ public class PreReleaseSummaryService(
                 ReleaseSlug = releaseVersion.Release.Slug,
                 ReleaseTitle = releaseVersion.Release.Title,
                 ContactEmail = releaseVersion.Publication.Contact.TeamEmail,
-                ContactTeam = releaseVersion.Publication.Contact.TeamName
+                ContactTeam = releaseVersion.Publication.Contact.TeamName,
             });
     }
 
     private async Task<Either<ActionResult, ReleaseVersion>> GetReleaseVersion(
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await contentDbContext.ReleaseVersions
-            .Include(rv => rv.Release)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .ThenInclude(p => p.Contact)
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
+            .SingleOrNotFoundAsync(
+                rv => rv.Id == releaseVersionId,
+                cancellationToken: cancellationToken
+            );
     }
 }

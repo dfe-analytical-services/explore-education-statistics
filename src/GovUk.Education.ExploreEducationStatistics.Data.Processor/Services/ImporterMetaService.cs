@@ -31,15 +31,11 @@ public class ImporterMetaService : IImporterMetaService
     private readonly IDatabaseHelper _databaseHelper;
 
     public static readonly string[] RequiredMetaColumns = Enum.GetValues<MetaColumns>()
-        .Where(col =>
-            col != MetaColumns.parent_filter
-            && col != MetaColumns.filter_default) // if we make other columns optional, screener would also need updating
+        .Where(col => col != MetaColumns.parent_filter && col != MetaColumns.filter_default) // if we make other columns optional, screener would also need updating
         .Select(col => col.ToString())
         .ToArray();
 
-    public ImporterMetaService(
-        IGuidGenerator guidGenerator,
-        IDatabaseHelper databaseHelper)
+    public ImporterMetaService(IGuidGenerator guidGenerator, IDatabaseHelper databaseHelper)
     {
         _guidGenerator = guidGenerator;
         _databaseHelper = databaseHelper;
@@ -49,7 +45,8 @@ public class ImporterMetaService : IImporterMetaService
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
         Subject subject,
-        StatisticsDbContext context)
+        StatisticsDbContext context
+    )
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
@@ -58,12 +55,15 @@ public class ImporterMetaService : IImporterMetaService
         var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, subject);
         var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, subject);
 
-        var filtersAlreadyImported = filtersAndMeta.Count > 0 &&
-                                     await context.Filter.AnyAsync(filter => filter.SubjectId == subject.Id);
+        var filtersAlreadyImported =
+            filtersAndMeta.Count > 0
+            && await context.Filter.AnyAsync(filter => filter.SubjectId == subject.Id);
 
-        var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 &&
-                                        await context.IndicatorGroup.AnyAsync(indicator =>
-                                            indicator.SubjectId == subject.Id);
+        var indicatorsAlreadyImported =
+            indicatorsAndMeta.Count > 0
+            && await context.IndicatorGroup.AnyAsync(indicator =>
+                indicator.SubjectId == subject.Id
+            );
 
         if (!filtersAlreadyImported || !indicatorsAlreadyImported)
         {
@@ -80,7 +80,8 @@ public class ImporterMetaService : IImporterMetaService
                     await ctxDelegate.Filter.AddRangeAsync(filters);
                     await ctxDelegate.Indicator.AddRangeAsync(indicators);
                     await ctxDelegate.SaveChangesAsync();
-                });
+                }
+            );
         }
 
         return await GetSubjectMeta(metaFileCsvHeaders, metaFileRows, subject, context);
@@ -90,28 +91,27 @@ public class ImporterMetaService : IImporterMetaService
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
         Subject subject,
-        StatisticsDbContext context)
+        StatisticsDbContext context
+    )
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);
-        
+
         var filters = (await GetFilters(metaRows, subject, context)).ToList();
         var indicators = GetIndicators(metaRows, subject, context).ToList();
 
-        return new SubjectMeta
-        {
-            Filters = filters,
-            Indicators = indicators
-        };
+        return new SubjectMeta { Filters = filters, Indicators = indicators };
     }
 
     private async Task<IEnumerable<(Filter Filter, string Column)>> GetFilters(
-        IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
+        IEnumerable<MetaRow> metaRows,
+        Subject subject,
+        StatisticsDbContext context
+    )
     {
         var filters = await context
-            .Filter
-            .AsNoTracking()
+            .Filter.AsNoTracking()
             .Include(filter => filter.FilterGroups)
             .ThenInclude(group => group.FilterItems)
             .Where(filter => filter.SubjectId == subject.Id)
@@ -119,9 +119,12 @@ public class ImporterMetaService : IImporterMetaService
 
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
-            .Select(filter => (
-                filter: filters.Single(f => f.Name == filter.ColumnName),
-                column: filter.ColumnName))
+            .Select(filter =>
+                (
+                    filter: filters.Single(f => f.Name == filter.ColumnName),
+                    column: filter.ColumnName
+                )
+            )
             .ToList();
     }
 
@@ -129,16 +132,21 @@ public class ImporterMetaService : IImporterMetaService
     {
         var groupingColumns = metaRows
             .Select(mr => mr.FilterGroupingColumn?.ToLower())
-            .WhereNotNull() ;
+            .WhereNotNull();
 
         return metaRows
-            .Where(r => r.ColumnType != ColumnType.Filter 
-                    || !groupingColumns.Contains(r.ColumnName.ToLower()))
+            .Where(r =>
+                r.ColumnType != ColumnType.Filter
+                || !groupingColumns.Contains(r.ColumnName.ToLower())
+            )
             .ToList();
     }
 
-    private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
-        Subject subject, StatisticsDbContext context)
+    private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(
+        IEnumerable<MetaRow> metaRows,
+        Subject subject,
+        StatisticsDbContext context
+    )
     {
         var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
 
@@ -154,21 +162,24 @@ public class ImporterMetaService : IImporterMetaService
             .GroupBy(row => row.IndicatorGrouping!)
             .ToDictionary(
                 rows => rows.Key,
-                rows => context.IndicatorGroup.Single(ig =>
-                    ig.SubjectId == subject.Id && ig.Label == rows.Key));
+                rows =>
+                    context.IndicatorGroup.Single(ig =>
+                        ig.SubjectId == subject.Id && ig.Label == rows.Key
+                    )
+            );
 
-        return indicatorRows
-            .Select(row =>
-            {
-                var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
+        return indicatorRows.Select(row =>
+        {
+            var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
 
-                return (
-                    indicator:
-                    context.Indicator.Single(i =>
-                        i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
-                        i.Unit == row.IndicatorUnit),
-                    column: row.ColumnName
-                );
-            });
+            return (
+                indicator: context.Indicator.Single(i =>
+                    i.IndicatorGroupId == indicatorGroup.Id
+                    && i.Label == row.Label
+                    && i.Unit == row.IndicatorUnit
+                ),
+                column: row.ColumnName
+            );
+        });
     }
 }

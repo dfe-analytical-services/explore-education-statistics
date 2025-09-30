@@ -6,9 +6,15 @@
 /// </summary>
 public interface IEventRaiser
 {
-    Task RaiseEvent<TEventBuilder>(TEventBuilder eventBuilder, CancellationToken cancellationToken = default)
+    Task RaiseEvent<TEventBuilder>(
+        TEventBuilder eventBuilder,
+        CancellationToken cancellationToken = default
+    )
         where TEventBuilder : IEvent;
-    
-    Task RaiseEvents<TEventBuilder>(IEnumerable<TEventBuilder> eventBuilders, CancellationToken cancellationToken = default)
+
+    Task RaiseEvents<TEventBuilder>(
+        IEnumerable<TEventBuilder> eventBuilders,
+        CancellationToken cancellationToken = default
+    )
         where TEventBuilder : IEvent;
 }

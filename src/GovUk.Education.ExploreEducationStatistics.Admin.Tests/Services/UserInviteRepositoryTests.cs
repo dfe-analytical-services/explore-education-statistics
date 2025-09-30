@@ -15,10 +15,16 @@ public class UserInviteRepositoryTests
     public async Task CreateOrUpdate_RoleArgument()
     {
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
             var repository = new UserInviteRepository(usersAndRolesDbContext);
-            var userInvite = await repository.CreateOrUpdate("test@test.com", Role.Analyst, CreatedById);
+            var userInvite = await repository.CreateOrUpdate(
+                "test@test.com",
+                Role.Analyst,
+                CreatedById
+            );
 
             Assert.Equal("test@test.com", userInvite.Email);
             Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);
@@ -26,11 +32,11 @@ public class UserInviteRepositoryTests
             Assert.InRange(DateTime.UtcNow.Subtract(userInvite.Created).Milliseconds, 0, 1500);
         }
 
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
-            var userInvite = usersAndRolesDbContext.UserInvites
-                .AsQueryable()
-                .Single();
+            var userInvite = usersAndRolesDbContext.UserInvites.AsQueryable().Single();
 
             Assert.Equal("test@test.com", userInvite.Email);
             Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);
@@ -39,35 +45,41 @@ public class UserInviteRepositoryTests
         }
     }
 
-
     [Fact]
     public async Task CreateOrUpdate_RoleArgument_ExistingInvite()
     {
         var originalCreatedDate = DateTime.UtcNow.AddDays(-1);
         var newCreatedDate = DateTime.UtcNow;
-        
+
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-        
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
-            await usersAndRolesDbContext.AddAsync(new UserInvite
-            {
-                Email = "test@test.com",
-                RoleId = Role.BauUser.GetEnumValue(),
-                CreatedById = CreatedById.ToString(),
-                Created = originalCreatedDate
-            });
+            await usersAndRolesDbContext.AddAsync(
+                new UserInvite
+                {
+                    Email = "test@test.com",
+                    RoleId = Role.BauUser.GetEnumValue(),
+                    CreatedById = CreatedById.ToString(),
+                    Created = originalCreatedDate,
+                }
+            );
             await usersAndRolesDbContext.SaveChangesAsync();
         }
 
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
             var repository = new UserInviteRepository(usersAndRolesDbContext);
             var userInvite = await repository.CreateOrUpdate(
-                "test@test.com", 
-                Role.Analyst, 
-                CreatedById, 
-                createdDate: newCreatedDate);
+                "test@test.com",
+                Role.Analyst,
+                CreatedById,
+                createdDate: newCreatedDate
+            );
 
             Assert.Equal("test@test.com", userInvite.Email);
             Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);
@@ -75,11 +87,11 @@ public class UserInviteRepositoryTests
             Assert.Equal(newCreatedDate, userInvite.Created);
         }
 
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
-            var userInvite = usersAndRolesDbContext.UserInvites
-                .AsQueryable()
-                .Single();
+            var userInvite = usersAndRolesDbContext.UserInvites.AsQueryable().Single();
 
             Assert.Equal("test@test.com", userInvite.Email);
             Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);
@@ -92,11 +104,16 @@ public class UserInviteRepositoryTests
     public async Task CreateOrUpdate_RoleIdStringArgument()
     {
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
             var repository = new UserInviteRepository(usersAndRolesDbContext);
-            var userInvite =
-                await repository.CreateOrUpdate("test@test.com", Role.Analyst.GetEnumValue(), CreatedById);
+            var userInvite = await repository.CreateOrUpdate(
+                "test@test.com",
+                Role.Analyst.GetEnumValue(),
+                CreatedById
+            );
 
             Assert.Equal("test@test.com", userInvite.Email);
             Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);
@@ -104,11 +121,11 @@ public class UserInviteRepositoryTests
             Assert.InRange(DateTime.UtcNow.Subtract(userInvite.Created).Milliseconds, 0, 1500);
         }
 
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+        await using (
+            var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId)
+        )
         {
-            var userInvite = usersAndRolesDbContext.UserInvites
-                .AsQueryable()
-                .Single();
+            var userInvite = usersAndRolesDbContext.UserInvites.AsQueryable().Single();
 
             Assert.Equal("test@test.com", userInvite.Email);
             Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);

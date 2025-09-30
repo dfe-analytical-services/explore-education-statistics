@@ -34,34 +34,47 @@ public class DataSetScreenerClientTests
             {
                 Message = "",
                 OverallResult = ScreenerResult.Failed,
-                TestResults = []
+                TestResults = [],
             };
 
-            _mockHttp.Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
-                .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
+            _mockHttp
+                .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
+                .Respond(
+                    HttpStatusCode.Accepted,
+                    "application/json",
+                    JsonSerializer.Serialize(responseBody)
+                );
 
-            var authenticationManager =
-                new Mock<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(MockBehavior.Strict);
+            var authenticationManager = new Mock<
+                IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>
+            >(MockBehavior.Strict);
 
             authenticationManager
                 .Setup(m =>
-                    m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()))
+                    m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>())
+                )
                 .Returns(Task.CompletedTask);
 
             var dataSetScreenerClient = BuildService(
-                azureAuthenticationManager: authenticationManager.Object);
+                azureAuthenticationManager: authenticationManager.Object
+            );
 
-            await dataSetScreenerClient.ScreenDataSet(new DataSetScreenerRequest
-            {
-                DataFileName = "",
-                DataFilePath = "",
-                MetaFileName = "",
-                MetaFilePath = "",
-                StorageContainerName = ""
-            }, default);
+            await dataSetScreenerClient.ScreenDataSet(
+                new DataSetScreenerRequest
+                {
+                    DataFileName = "",
+                    DataFilePath = "",
+                    MetaFileName = "",
+                    MetaFilePath = "",
+                    StorageContainerName = "",
+                },
+                default
+            );
 
-            authenticationManager.Verify(m =>
-                m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()), Times.Once);
+            authenticationManager.Verify(
+                m => m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
         }
     }
 
@@ -76,34 +89,39 @@ public class DataSetScreenerClientTests
                 DataFilePath = "data-file-path",
                 MetaFileName = "meta-file-name",
                 MetaFilePath = "meta-file-path",
-                StorageContainerName = "storage-container-name"
+                StorageContainerName = "storage-container-name",
             };
 
             var responseBody = new DataSetScreenerResponse
             {
                 Message = "A message",
                 OverallResult = ScreenerResult.Failed,
-                TestResults = [
+                TestResults =
+                [
                     new DataScreenerTestResult
                     {
                         Stage = Stage.PreScreening1,
                         Result = TestResult.WARNING,
                         Notes = "Some notes",
-                        TestFunctionName = "Test 1"
+                        TestFunctionName = "Test 1",
                     },
                     new DataScreenerTestResult
                     {
                         Stage = Stage.Passed,
                         Result = TestResult.PASS,
-                        TestFunctionName = "Test 2"
-                    }
-                ]
+                        TestFunctionName = "Test 2",
+                    },
+                ],
             };
 
             _mockHttp
                 .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
                 .WithJsonContent(request, _requestSerializerOptions)
-                .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
+                .Respond(
+                    HttpStatusCode.Accepted,
+                    "application/json",
+                    JsonSerializer.Serialize(responseBody)
+                );
 
             var dataSetScreenerClient = BuildService();
 
@@ -116,17 +134,19 @@ public class DataSetScreenerClientTests
     }
 
     private DataSetScreenerClient BuildService(
-        IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>? azureAuthenticationManager = null)
+        IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>? azureAuthenticationManager =
+            null
+    )
     {
         var client = _mockHttp.ToHttpClient();
         client.BaseAddress = BaseUri;
 
-        var authenticationManager = azureAuthenticationManager ??
-                                    Mock.Of<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(
-                                        MockBehavior.Loose);
+        var authenticationManager =
+            azureAuthenticationManager
+            ?? Mock.Of<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(
+                MockBehavior.Loose
+            );
 
-        return new DataSetScreenerClient(
-            client,
-            authenticationManager);
+        return new DataSetScreenerClient(client, authenticationManager);
     }
 }

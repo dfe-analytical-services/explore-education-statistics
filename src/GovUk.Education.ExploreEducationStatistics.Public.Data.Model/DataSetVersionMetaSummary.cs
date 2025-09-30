@@ -16,11 +16,13 @@ public class DataSetVersionMetaSummary
     {
         if (dataSetVersion.TimePeriodMetas.Count < 2)
         {
-            throw new IndexOutOfRangeException("Must have at least two time periods for meta summary");
+            throw new IndexOutOfRangeException(
+                "Must have at least two time periods for meta summary"
+            );
         }
 
-        var timePeriods = dataSetVersion.TimePeriodMetas
-            .OrderBy(t => t.Period)
+        var timePeriods = dataSetVersion
+            .TimePeriodMetas.OrderBy(t => t.Period)
             .ThenBy(t => t.Code)
             .ToList();
 
@@ -32,8 +34,8 @@ public class DataSetVersionMetaSummary
             TimePeriodRange = new TimePeriodRange
             {
                 Start = TimePeriodRangeBound.Create(timePeriods[0]),
-                End = TimePeriodRangeBound.Create(timePeriods[^1])
-            }
+                End = TimePeriodRangeBound.Create(timePeriods[^1]),
+            },
         };
     }
 }

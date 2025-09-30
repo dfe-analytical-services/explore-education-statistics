@@ -34,14 +34,9 @@ public class ContentServicePermissionTests
             new ContentSection
             {
                 Id = ContentSectionId,
-                Content = new List<ContentBlock>
-                {
-                    new DataBlock
-                    {
-                        Id = ContentBlockId
-                    }
-                }
-            })
+                Content = new List<ContentBlock> { new DataBlock { Id = ContentBlockId } },
+            }
+        ),
     };
 
     [Fact]
@@ -49,16 +44,15 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.AddContentBlock(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        new ContentBlockAddRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.AddContentBlock(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    new ContentBlockAddRequest()
+                );
+            });
     }
 
     [Fact]
@@ -66,15 +60,14 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.AddContentSectionAsync(
-                        _releaseVersion.Id,
-                        new ContentSectionAddRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.AddContentSectionAsync(
+                    _releaseVersion.Id,
+                    new ContentSectionAddRequest()
+                );
+            });
     }
 
     [Fact]
@@ -82,16 +75,15 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.AttachDataBlock(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        new DataBlockAttachRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.AttachDataBlock(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    new DataBlockAttachRequest()
+                );
+            });
     }
 
     [Fact]
@@ -99,13 +91,11 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.GetContentBlocks<HtmlBlock>(_releaseVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.GetContentBlocks<HtmlBlock>(_releaseVersion.Id);
+            });
     }
 
     [Fact]
@@ -113,16 +103,15 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.RemoveContentBlock(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        ContentBlockId);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.RemoveContentBlock(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    ContentBlockId
+                );
+            });
     }
 
     [Fact]
@@ -130,15 +119,11 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.RemoveContentSection(
-                        _releaseVersion.Id,
-                        ContentSectionId);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.RemoveContentSection(_releaseVersion.Id, ContentSectionId);
+            });
     }
 
     [Fact]
@@ -146,16 +131,15 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.ReorderContentBlocks(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        new Dictionary<Guid, int>());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.ReorderContentBlocks(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    new Dictionary<Guid, int>()
+                );
+            });
     }
 
     [Fact]
@@ -163,15 +147,14 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.ReorderContentSections(
-                        _releaseVersion.Id,
-                        new Dictionary<Guid, int>());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.ReorderContentSections(
+                    _releaseVersion.Id,
+                    new Dictionary<Guid, int>()
+                );
+            });
     }
 
     [Fact]
@@ -179,16 +162,15 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.UpdateContentSectionHeading(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        "");
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.UpdateContentSectionHeading(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    ""
+                );
+            });
     }
 
     [Fact]
@@ -196,17 +178,16 @@ public class ContentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupContentService(userService: userService.Object);
-                    return service.UpdateTextBasedContentBlock(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        new ContentBlockUpdateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupContentService(userService: userService.Object);
+                return service.UpdateTextBasedContentBlock(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    ContentBlockId,
+                    new ContentBlockUpdateRequest()
+                );
+            });
     }
 
     private ContentService SetupContentService(
@@ -215,7 +196,8 @@ public class ContentServicePermissionTests
         IContentSectionRepository contentSectionRepository = null,
         IContentBlockService contentBlockService = null,
         IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
-        IUserService userService = null)
+        IUserService userService = null
+    )
     {
         var dbContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
 

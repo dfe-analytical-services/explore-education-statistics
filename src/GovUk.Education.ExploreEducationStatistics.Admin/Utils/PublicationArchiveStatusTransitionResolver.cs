@@ -14,7 +14,7 @@ public class PublicationArchiveStatusTransitionResolver
         NotArchivedToNotArchived,
         NotArchivedToArchived,
         ArchivedToNotArchived,
-        ArchivedToArchived
+        ArchivedToArchived,
     }
 
     /// <summary>
@@ -26,13 +26,16 @@ public class PublicationArchiveStatusTransitionResolver
     /// <returns>
     /// A <see cref="PublicationArchiveStatusTransition"/> value representing the transition of the publication's archive status.
     /// </returns>
-    internal static PublicationArchiveStatusTransition GetTransition(Publication? before, Publication? after) =>
+    internal static PublicationArchiveStatusTransition GetTransition(
+        Publication? before,
+        Publication? after
+    ) =>
         (IsSupersededByLivePublication(before), IsSupersededByLivePublication(after)) switch
         {
             (false, false) => PublicationArchiveStatusTransition.NotArchivedToNotArchived,
             (false, true) => PublicationArchiveStatusTransition.NotArchivedToArchived,
             (true, false) => PublicationArchiveStatusTransition.ArchivedToNotArchived,
-            (true, true) => PublicationArchiveStatusTransition.ArchivedToArchived
+            (true, true) => PublicationArchiveStatusTransition.ArchivedToArchived,
         };
 
     private static bool IsSupersededByLivePublication(Publication? publication) =>

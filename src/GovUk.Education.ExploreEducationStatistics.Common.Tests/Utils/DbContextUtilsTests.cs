@@ -61,7 +61,8 @@ public class DbContextUtilsTests
             public DateTime? Updated { get; set; }
         }
 
-        private class CreatedUpdatedDateTimeOffsetEntity : ICreatedUpdatedTimestamps<DateTimeOffset?, DateTimeOffset?>
+        private class CreatedUpdatedDateTimeOffsetEntity
+            : ICreatedUpdatedTimestamps<DateTimeOffset?, DateTimeOffset?>
         {
             public Guid Id { get; set; }
             public string Name { get; set; } = string.Empty;
@@ -99,22 +100,29 @@ public class DbContextUtilsTests
         private sealed class TestContext : DbContext
         {
             public DbSet<CreatedDateTimeEntity> CreatedDateTimeEntity { get; set; } = null!;
-            public DbSet<CreatedDateTimeOffsetEntity> CreatedDateTimeOffsetEntity { get; set; } = null!;
+            public DbSet<CreatedDateTimeOffsetEntity> CreatedDateTimeOffsetEntity { get; set; } =
+                null!;
             public DbSet<CreatedInvalidEntity> CreatedInvalidEntity { get; set; } = null!;
 
             public DbSet<UpdatedDateTimeEntity> UpdateDateTimeEntity { get; set; } = null!;
-            public DbSet<UpdatedDateTimeOffsetEntity> UpdatedDateTimeOffsetEntity { get; set; } = null!;
+            public DbSet<UpdatedDateTimeOffsetEntity> UpdatedDateTimeOffsetEntity { get; set; } =
+                null!;
             public DbSet<UpdatedInvalidEntity> UpdatedInvalidEntity { get; set; } = null!;
 
-            public DbSet<CreatedUpdatedDateTimeEntity> CreatedUpdatedDateTimeEntity { get; set; } = null!;
-            public DbSet<CreatedUpdatedDateTimeOffsetEntity> CreatedUpdatedDateTimeOffsetEntity { get; set; } = null!;
-            public DbSet<CreatedUpdatedInvalidEntity> CreatedUpdatedInvalidEntity { get; set; } = null!;
+            public DbSet<CreatedUpdatedDateTimeEntity> CreatedUpdatedDateTimeEntity { get; set; } =
+                null!;
+            public DbSet<CreatedUpdatedDateTimeOffsetEntity> CreatedUpdatedDateTimeOffsetEntity { get; set; } =
+                null!;
+            public DbSet<CreatedUpdatedInvalidEntity> CreatedUpdatedInvalidEntity { get; set; } =
+                null!;
 
             public DbSet<SoftDeletedDateTimeEntity> SoftDeletedDateTimeEntity { get; set; } = null!;
-            public DbSet<SoftDeletedDateTimeOffsetEntity> SoftDeletedDateTimeOffsetEntity { get; set; } = null!;
+            public DbSet<SoftDeletedDateTimeOffsetEntity> SoftDeletedDateTimeOffsetEntity { get; set; } =
+                null!;
             public DbSet<SoftDeletedInvalidEntity> SoftDeletedInvalidEntity { get; set; } = null!;
 
-            public TestContext(string contextName) : base(GetOptions(contextName))
+            public TestContext(string contextName)
+                : base(GetOptions(contextName))
             {
                 ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
                 ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
@@ -127,6 +135,7 @@ public class DbContextUtilsTests
                     .Options;
             }
         }
+
         // ReSharper enable UnusedAutoPropertyAccessor.Local, MemberHidesStaticFromOuterClass
 
         [Fact]
@@ -176,16 +185,13 @@ public class DbContextUtilsTests
                 Assert.True(DateTime.UtcNow > saved.Created);
             }
         }
-        
+
         [Fact]
         public async Task CreatedTimestamp_DateTime_AlreadySet()
         {
             var entityCreated = DateTime.UtcNow.AddDays(-10);
-            
-            var entity = new CreatedDateTimeEntity
-            {
-                Created = entityCreated
-            };
+
+            var entity = new CreatedDateTimeEntity { Created = entityCreated };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -209,10 +215,7 @@ public class DbContextUtilsTests
         {
             var entityCreated = DateTimeOffset.UtcNow.AddDays(-10);
 
-            var entity = new CreatedDateTimeOffsetEntity
-            {
-                Created = entityCreated
-            };
+            var entity = new CreatedDateTimeOffsetEntity { Created = entityCreated };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -240,13 +243,11 @@ public class DbContextUtilsTests
 
             await using var context = new TestContext(contextId);
 
-            var exception = await Assert.ThrowsAsync<NotImplementedException>(
-                async () =>
-                {
-                    await context.AddAsync(entity);
-                    await context.SaveChangesAsync();
-                }
-            );
+            var exception = await Assert.ThrowsAsync<NotImplementedException>(async () =>
+            {
+                await context.AddAsync(entity);
+                await context.SaveChangesAsync();
+            });
 
             Assert.Equal(
                 "Entity does not implement valid timestamp field for ICreatedTimestamp",
@@ -257,10 +258,7 @@ public class DbContextUtilsTests
         [Fact]
         public async Task UpdatedTimestamp_DateTime()
         {
-            var entity = new UpdatedDateTimeEntity
-            {
-                Name = "Old name"
-            };
+            var entity = new UpdatedDateTimeEntity { Name = "Old name" };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -305,10 +303,7 @@ public class DbContextUtilsTests
         [Fact]
         public async Task UpdatedTimestamp_DateTimeOffset()
         {
-            var entity = new UpdatedDateTimeOffsetEntity
-            {
-                Name = "Old name"
-            };
+            var entity = new UpdatedDateTimeOffsetEntity { Name = "Old name" };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -365,16 +360,14 @@ public class DbContextUtilsTests
 
             await using (var context = new TestContext(contextId))
             {
-                var exception = await Assert.ThrowsAsync<NotImplementedException>(
-                    async () =>
-                    {
-                        context.Update(entity);
+                var exception = await Assert.ThrowsAsync<NotImplementedException>(async () =>
+                {
+                    context.Update(entity);
 
-                        entity.Name = "New name";
+                    entity.Name = "New name";
 
-                        await context.SaveChangesAsync();
-                    }
-                );
+                    await context.SaveChangesAsync();
+                });
 
                 Assert.Equal(
                     "Entity does not implement valid timestamp field for IUpdatedTimestamp",
@@ -386,10 +379,7 @@ public class DbContextUtilsTests
         [Fact]
         public async Task CreatedUpdatedTimestamps_DateTime()
         {
-            var entity = new CreatedUpdatedDateTimeEntity
-            {
-                Name = "Old name"
-            };
+            var entity = new CreatedUpdatedDateTimeEntity { Name = "Old name" };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -448,10 +438,7 @@ public class DbContextUtilsTests
         [Fact]
         public async Task CreatedUpdatedTimestamps_DateTimeOffsets()
         {
-            var entity = new CreatedUpdatedDateTimeOffsetEntity
-            {
-                Name = "Old name"
-            };
+            var entity = new CreatedUpdatedDateTimeOffsetEntity { Name = "Old name" };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -516,17 +503,15 @@ public class DbContextUtilsTests
 
             await using var context = new TestContext(contextId);
 
-            var exception = await Assert.ThrowsAsync<NotImplementedException>(
-                async () =>
-                {
-                    await context.AddAsync(entity);
-                    await context.SaveChangesAsync();
+            var exception = await Assert.ThrowsAsync<NotImplementedException>(async () =>
+            {
+                await context.AddAsync(entity);
+                await context.SaveChangesAsync();
 
-                    entity.Name = "New name";
+                entity.Name = "New name";
 
-                    await context.SaveChangesAsync();
-                }
-            );
+                await context.SaveChangesAsync();
+            });
 
             Assert.Equal(
                 "Entity does not implement valid timestamp field for ICreatedTimestamp",
@@ -615,14 +600,12 @@ public class DbContextUtilsTests
 
             await using (var context = new TestContext(contextId))
             {
-                var exception = await Assert.ThrowsAsync<NotImplementedException>(
-                    async () =>
-                    {
-                        context.Remove(entity);
+                var exception = await Assert.ThrowsAsync<NotImplementedException>(async () =>
+                {
+                    context.Remove(entity);
 
-                        await context.SaveChangesAsync();
-                    }
-                );
+                    await context.SaveChangesAsync();
+                });
 
                 Assert.Equal(
                     "Entity does not implement valid timestamp field for ISoftDeletedTimestamp",

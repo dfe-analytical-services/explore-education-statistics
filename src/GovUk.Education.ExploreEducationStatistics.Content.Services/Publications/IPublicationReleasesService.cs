@@ -7,9 +7,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publicatio
 
 public interface IPublicationReleasesService
 {
-    Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>> GetPublicationReleases(
+    Task<
+        Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>
+    > GetPublicationReleases(
         string publicationSlug,
         int page = 1,
         int pageSize = 10,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

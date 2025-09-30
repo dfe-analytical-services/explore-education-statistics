@@ -9,7 +9,9 @@ public record PreReleaseAccessListViewModel : ReleaseSummaryViewModel
     [SetsRequiredMembers]
     public PreReleaseAccessListViewModel(
         ReleaseCacheViewModel release,
-        PublicationCacheViewModel publication) : base(release, publication)
+        PublicationCacheViewModel publication
+    )
+        : base(release, publication)
     {
         PreReleaseAccessList = release.PreReleaseAccessList;
     }

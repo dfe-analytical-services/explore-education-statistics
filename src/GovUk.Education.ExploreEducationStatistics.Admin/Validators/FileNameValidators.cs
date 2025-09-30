@@ -11,10 +11,10 @@ public static class FileNameValidators
         return fileNamePart.Length is > 0 and <= MaxFileNameSize;
     }
 
-    public static bool ContainsSpaces(string fileName)
-        => fileName.Contains(' ', StringComparison.Ordinal);
+    public static bool ContainsSpaces(string fileName) =>
+        fileName.Contains(' ', StringComparison.Ordinal);
 
-    public static bool ContainsSpecialChars(string fileName)
-        => fileName.Contains('&', StringComparison.Ordinal) ||
-           fileName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1;
+    public static bool ContainsSpecialChars(string fileName) =>
+        fileName.Contains('&', StringComparison.Ordinal)
+        || fileName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1;
 }

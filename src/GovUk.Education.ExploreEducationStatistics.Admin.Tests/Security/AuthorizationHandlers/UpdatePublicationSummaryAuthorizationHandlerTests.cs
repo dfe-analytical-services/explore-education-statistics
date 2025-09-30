@@ -19,11 +19,10 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
     [Fact]
     public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithClaim()
     {
-        await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationSummaryRequirement>(
-            CreateHandler,
-            new Publication(),
-            UpdateAllPublications
-        );
+        await AssertHandlerSucceedsWithCorrectClaims<
+            Publication,
+            UpdatePublicationSummaryRequirement
+        >(CreateHandler, new Publication(), UpdateAllPublications);
     }
 
     [Fact]
@@ -31,17 +30,23 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
             CreateHandler,
-            Owner);
+            Owner
+        );
     }
 
-    private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(
+        ContentDbContext contentDbContext
+    )
     {
         return new UpdatePublicationSummaryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                    contentDbContext: contentDbContext
+                ),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

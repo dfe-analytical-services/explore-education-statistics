@@ -120,9 +120,7 @@ public static class ReflectionExtensionsTests
         [Fact]
         public void List_ActionResults()
         {
-            var list = ListOf(
-                new ActionResult<string>("test1"), new ActionResult<string>("test2")
-            );
+            var list = ListOf(new ActionResult<string>("test1"), new ActionResult<string>("test2"));
 
             Assert.True(list.TryBoxToResult(typeof(List<ActionResult<string>>), out var boxed));
             Assert.Equal(list, boxed);
@@ -140,9 +138,7 @@ public static class ReflectionExtensionsTests
         [Fact]
         public void List_Eithers()
         {
-            var list = ListOf(
-                new Either<int, string>("test1"), new Either<int, string>("test2")
-            );
+            var list = ListOf(new Either<int, string>("test1"), new Either<int, string>("test2"));
 
             Assert.True(list.TryBoxToResult(typeof(List<Either<int, string>>), out var boxed));
             Assert.Equal(list, boxed);
@@ -160,11 +156,13 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, string>
             {
-                {"key1", "value1"},
-                {"key2", "value2"}
+                { "key1", "value1" },
+                { "key2", "value2" },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, string>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(typeof(Dictionary<string, string>), out var boxed)
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -173,11 +171,13 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, string>
             {
-                {"key1", "value1"},
-                {"key2", "value2"}
+                { "key1", "value1" },
+                { "key2", "value2" },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(IDictionary<string, string>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(typeof(IDictionary<string, string>), out var boxed)
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -186,11 +186,16 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, string>
             {
-                {"key1", "value1"},
-                {"key2", "value2"}
+                { "key1", "value1" },
+                { "key2", "value2" },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(ICollection<KeyValuePair<string, string>>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(
+                    typeof(ICollection<KeyValuePair<string, string>>),
+                    out var boxed
+                )
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -199,11 +204,16 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, string>
             {
-                {"key1", "value1"},
-                {"key2", "value2"}
+                { "key1", "value1" },
+                { "key2", "value2" },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(IEnumerable<KeyValuePair<string, string>>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(
+                    typeof(IEnumerable<KeyValuePair<string, string>>),
+                    out var boxed
+                )
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -212,11 +222,13 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, Task<string>>
             {
-                {"key1", FromResult("test1")},
-                {"key2", FromResult("test2")}
+                { "key1", FromResult("test1") },
+                { "key2", FromResult("test2") },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, Task<string>>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(typeof(Dictionary<string, Task<string>>), out var boxed)
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -225,8 +237,8 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, Task>
             {
-                {"key1", CompletedTask},
-                {"key2", CompletedTask}
+                { "key1", CompletedTask },
+                { "key2", CompletedTask },
             };
 
             Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, Task>), out var boxed));
@@ -238,11 +250,16 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, ActionResult<string>>
             {
-                {"key1", new ActionResult<string>("value1")},
-                {"key2", new ActionResult<string>("value2")}
+                { "key1", new ActionResult<string>("value1") },
+                { "key2", new ActionResult<string>("value2") },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, ActionResult<string>>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(
+                    typeof(Dictionary<string, ActionResult<string>>),
+                    out var boxed
+                )
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -251,8 +268,8 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, string>
             {
-                {"key1", "value1"},
-                {"key2", "value2"}
+                { "key1", "value1" },
+                { "key2", "value2" },
             };
 
             Assert.False(dictionary.TryBoxToResult(typeof(List<ActionResult>), out var boxed));
@@ -264,11 +281,16 @@ public static class ReflectionExtensionsTests
         {
             var dictionary = new Dictionary<string, Either<int, string>>
             {
-                {"key1", new Either<int, string>("value1")},
-                {"key2", new Either<int, string>("value2")}
+                { "key1", new Either<int, string>("value1") },
+                { "key2", new Either<int, string>("value2") },
             };
 
-            Assert.True(dictionary.TryBoxToResult(typeof(Dictionary<string, Either<int, string>>), out var boxed));
+            Assert.True(
+                dictionary.TryBoxToResult(
+                    typeof(Dictionary<string, Either<int, string>>),
+                    out var boxed
+                )
+            );
             Assert.Equal(dictionary, boxed);
         }
 
@@ -295,7 +317,9 @@ public static class ReflectionExtensionsTests
         [Fact]
         public void Either_List_DoesNotBox()
         {
-            Assert.False(TestString.TryBoxToResult(typeof(Either<Unit, List<string>>), out var boxed));
+            Assert.False(
+                TestString.TryBoxToResult(typeof(Either<Unit, List<string>>), out var boxed)
+            );
             Assert.Equal(TestString, boxed);
         }
 
@@ -382,7 +406,9 @@ public static class ReflectionExtensionsTests
         [Fact]
         public async Task Task_Either()
         {
-            Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, string>>), out var boxed));
+            Assert.True(
+                TestString.TryBoxToResult(typeof(Task<Either<Unit, string>>), out var boxed)
+            );
 
             var value = Assert.IsType<Task<Either<Unit, string>>>(boxed);
             Assert.Equal(TestString, (await value).Right);
@@ -391,7 +417,12 @@ public static class ReflectionExtensionsTests
         [Fact]
         public async Task Task_Either_ActionResult()
         {
-            Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, ActionResult<string>>>), out var boxed));
+            Assert.True(
+                TestString.TryBoxToResult(
+                    typeof(Task<Either<Unit, ActionResult<string>>>),
+                    out var boxed
+                )
+            );
 
             var value = Assert.IsType<Task<Either<Unit, ActionResult<string>>>>(boxed);
             Assert.Equal(TestString, (await value).Right.Value);
@@ -456,7 +487,9 @@ public static class ReflectionExtensionsTests
         {
             var list = ListOf("test");
 
-            Assert.True(list.TryBoxToResult(typeof(ActionResult<ICollection<string>>), out var boxed));
+            Assert.True(
+                list.TryBoxToResult(typeof(ActionResult<ICollection<string>>), out var boxed)
+            );
 
             var value = Assert.IsType<ActionResult<ICollection<string>>>(boxed);
             Assert.Equal(list, value.Value);
@@ -467,7 +500,9 @@ public static class ReflectionExtensionsTests
         {
             var list = ListOf("test");
 
-            Assert.True(list.TryBoxToResult(typeof(ActionResult<IEnumerable<string>>), out var boxed));
+            Assert.True(
+                list.TryBoxToResult(typeof(ActionResult<IEnumerable<string>>), out var boxed)
+            );
 
             var value = Assert.IsType<ActionResult<IEnumerable<string>>>(boxed);
             Assert.Equal(list, value.Value);
@@ -476,14 +511,18 @@ public static class ReflectionExtensionsTests
         [Fact]
         public void ActionResult_List_DoesNotBox()
         {
-            Assert.False(TestString.TryBoxToResult(typeof(ActionResult<List<string>>), out var boxed));
+            Assert.False(
+                TestString.TryBoxToResult(typeof(ActionResult<List<string>>), out var boxed)
+            );
             Assert.Equal(TestString, boxed);
         }
 
         [Fact]
         public async Task Task_ActionResult()
         {
-            Assert.True(TestString.TryBoxToResult(typeof(Task<ActionResult<string>>), out var boxed));
+            Assert.True(
+                TestString.TryBoxToResult(typeof(Task<ActionResult<string>>), out var boxed)
+            );
 
             var value = Assert.IsType<Task<ActionResult<string>>>(boxed);
             Assert.Equal(TestString, (await value).Value);
@@ -506,7 +545,9 @@ public static class ReflectionExtensionsTests
         [Fact]
         public async Task Either_Task()
         {
-            Assert.True(TestString.TryBoxToResult(typeof(Either<Unit, Task<string>>), out var boxed));
+            Assert.True(
+                TestString.TryBoxToResult(typeof(Either<Unit, Task<string>>), out var boxed)
+            );
 
             var value = Assert.IsType<Either<Unit, Task<string>>>(boxed);
             Assert.Equal(TestString, await value.Right);
@@ -515,7 +556,12 @@ public static class ReflectionExtensionsTests
         [Fact]
         public async Task Either_Task_ActionResult()
         {
-            Assert.True(TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<string>>>), out var boxed));
+            Assert.True(
+                TestString.TryBoxToResult(
+                    typeof(Either<Unit, Task<ActionResult<string>>>),
+                    out var boxed
+                )
+            );
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<string>>>>(boxed);
             Assert.Equal(TestString, (await value.Right).Value);
@@ -526,7 +572,12 @@ public static class ReflectionExtensionsTests
         {
             var list = ListOf("test");
 
-            Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<List<string>>>>), out var boxed));
+            Assert.True(
+                list.TryBoxToResult(
+                    typeof(Either<Unit, Task<ActionResult<List<string>>>>),
+                    out var boxed
+                )
+            );
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<List<string>>>>>(boxed);
             Assert.Equal(list, (await value.Right).Value);
@@ -537,7 +588,12 @@ public static class ReflectionExtensionsTests
         {
             var list = ListOf("test");
 
-            Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<IList<string>>>>), out var boxed));
+            Assert.True(
+                list.TryBoxToResult(
+                    typeof(Either<Unit, Task<ActionResult<IList<string>>>>),
+                    out var boxed
+                )
+            );
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<IList<string>>>>>(boxed);
             Assert.Equal(list, (await value.Right).Value);
@@ -548,7 +604,12 @@ public static class ReflectionExtensionsTests
         {
             var list = ListOf("test");
 
-            Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<ICollection<string>>>>), out var boxed));
+            Assert.True(
+                list.TryBoxToResult(
+                    typeof(Either<Unit, Task<ActionResult<ICollection<string>>>>),
+                    out var boxed
+                )
+            );
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<ICollection<string>>>>>(boxed);
             Assert.Equal(list, (await value.Right).Value);
@@ -559,7 +620,12 @@ public static class ReflectionExtensionsTests
         {
             var list = ListOf("test");
 
-            Assert.True(list.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<IEnumerable<string>>>>), out var boxed));
+            Assert.True(
+                list.TryBoxToResult(
+                    typeof(Either<Unit, Task<ActionResult<IEnumerable<string>>>>),
+                    out var boxed
+                )
+            );
 
             var value = Assert.IsType<Either<Unit, Task<ActionResult<IEnumerable<string>>>>>(boxed);
             Assert.Equal(list, (await value.Right).Value);
@@ -568,21 +634,30 @@ public static class ReflectionExtensionsTests
         [Fact]
         public void Either_Task_ActionResult_DoesNotBox()
         {
-            Assert.False(TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult<List<string>>>>), out var boxed));
+            Assert.False(
+                TestString.TryBoxToResult(
+                    typeof(Either<Unit, Task<ActionResult<List<string>>>>),
+                    out var boxed
+                )
+            );
             Assert.Equal(TestString, boxed);
         }
 
         [Fact]
         public void Either_Task_ActionResult_Void_DoesNotBox()
         {
-            Assert.False(TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult>>), out var boxed));
+            Assert.False(
+                TestString.TryBoxToResult(typeof(Either<Unit, Task<ActionResult>>), out var boxed)
+            );
             Assert.Equal(TestString, boxed);
         }
 
         [Fact]
         public void Either_Either()
         {
-            Assert.True(TestString.TryBoxToResult(typeof(Either<Unit, Either<Unit, string>>), out var boxed));
+            Assert.True(
+                TestString.TryBoxToResult(typeof(Either<Unit, Either<Unit, string>>), out var boxed)
+            );
 
             var value = Assert.IsType<Either<Unit, Either<Unit, string>>>(boxed);
             Assert.Equal(TestString, value.Right.Right);
@@ -666,8 +741,8 @@ public static class ReflectionExtensionsTests
         {
             var dict = new Dictionary<string, string>
             {
-                {"key1", "value1"},
-                {"key2", "value2"}
+                { "key1", "value1" },
+                { "key2", "value2" },
             };
 
             Assert.True(dict.TryUnboxResult(out var unboxed));
@@ -679,8 +754,8 @@ public static class ReflectionExtensionsTests
         {
             var dict = new Dictionary<string, Task<string>>
             {
-                {"key1", FromResult("value1")},
-                {"key2", FromResult("value2")}
+                { "key1", FromResult("value1") },
+                { "key2", FromResult("value2") },
             };
 
             Assert.True(dict.TryUnboxResult(out var unboxed));
@@ -692,8 +767,8 @@ public static class ReflectionExtensionsTests
         {
             var dict = new Dictionary<string, Task>
             {
-                {"key1", CompletedTask},
-                {"key2", CompletedTask}
+                { "key1", CompletedTask },
+                { "key2", CompletedTask },
             };
 
             Assert.True(dict.TryUnboxResult(out var unboxed));
@@ -705,8 +780,8 @@ public static class ReflectionExtensionsTests
         {
             var dict = new Dictionary<string, ActionResult<string>>
             {
-                {"key1", new ActionResult<string>("value1")},
-                {"key2", new ActionResult<string>("value2")}
+                { "key1", new ActionResult<string>("value1") },
+                { "key2", new ActionResult<string>("value2") },
             };
 
             Assert.True(dict.TryUnboxResult(out var unboxed));
@@ -718,8 +793,8 @@ public static class ReflectionExtensionsTests
         {
             var dict = new Dictionary<string, ActionResult>
             {
-                {"key1", new OkResult()},
-                {"key2", new OkResult()}
+                { "key1", new OkResult() },
+                { "key2", new OkResult() },
             };
 
             Assert.True(dict.TryUnboxResult(out var unboxed));
@@ -731,8 +806,8 @@ public static class ReflectionExtensionsTests
         {
             var dict = new Dictionary<string, Either<int, string>>
             {
-                {"key1", new Either<int, string>("value1")},
-                {"key2", new Either<int, string>("value2")}
+                { "key1", new Either<int, string>("value1") },
+                { "key2", new Either<int, string>("value2") },
             };
 
             Assert.True(dict.TryUnboxResult(out var unboxed));
@@ -764,7 +839,10 @@ public static class ReflectionExtensionsTests
             var boxed = FromResult(TestString);
 
             var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
-            Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
+            Assert.Equal(
+                "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.",
+                exception.Message
+            );
         }
 
         [Fact]
@@ -773,7 +851,10 @@ public static class ReflectionExtensionsTests
             var boxed = CompletedTask;
 
             var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
-            Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
+            Assert.Equal(
+                "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.",
+                exception.Message
+            );
         }
 
         [Fact]
@@ -810,7 +891,10 @@ public static class ReflectionExtensionsTests
             var boxed = new Either<Unit, Task<string>>(FromResult(TestString));
 
             var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
-            Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
+            Assert.Equal(
+                "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.",
+                exception.Message
+            );
         }
 
         [Fact]
@@ -819,7 +903,10 @@ public static class ReflectionExtensionsTests
             var boxed = new Either<Unit, Task>(CompletedTask);
 
             var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out _));
-            Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
+            Assert.Equal(
+                "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.",
+                exception.Message
+            );
         }
 
         [Fact]

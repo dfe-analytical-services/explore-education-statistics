@@ -11,7 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Filters;
 
-public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class InvalidRequestInputFilterTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     [Fact]
     public async Task TestPersonBody_ValidBody_Returns200()
@@ -20,10 +21,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsJsonAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            value: new TestPerson
-            {
-                Name = "Test name"
-            });
+            value: new TestPerson { Name = "Test name" }
+        );
 
         var person = response.AssertOk<TestPerson>();
 
@@ -40,7 +39,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -61,7 +61,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -79,7 +80,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -100,7 +102,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
             content: new StringContent(
                 "{ \"name\": null }",
                 mediaType: "application/json",
-                encoding: Encoding.UTF8));
+                encoding: Encoding.UTF8
+            )
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -118,13 +122,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsJsonAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            value: new TestGroup
-            {
-                Owner = new TestPerson
-                {
-                    Name = "Test name"
-                }
-            });
+            value: new TestGroup { Owner = new TestPerson { Name = "Test name" } }
+        );
 
         var group = response.AssertOk<TestGroup>();
 
@@ -143,7 +142,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -164,7 +164,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -182,7 +183,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -203,7 +205,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
             content: new StringContent(
                 content: "{ \"owner\": { \"name\": null } }",
                 mediaType: "application/json",
-                encoding: Encoding.UTF8));
+                encoding: Encoding.UTF8
+            )
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -226,11 +230,14 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         string query,
         string expectedName,
         int? expectedAge = null,
-        params string[] expectedAliases)
+        params string[] expectedAliases
+    )
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestPersonQuery)}{query}"
+        );
 
         var person = response.AssertOk<TestPerson>();
 
@@ -258,22 +265,30 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Theory]
     [InlineData("?name=Test&firstName=First", "firstName")]
     [InlineData("?name=Test&firstName=First&lastName=Last", "firstName", "lastName")]
-    public async Task TestPersonQuery_UnknownFields_Returns400(string query, params string[] unknownFields)
+    public async Task TestPersonQuery_UnknownFields_Returns400(
+        string query,
+        params string[] unknownFields
+    )
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestPersonQuery)}{query}"
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
         Assert.Equal(unknownFields.Length, validationProblem.Errors.Count);
 
-        Assert.All(unknownFields, field =>
-        {
-            var error = validationProblem.AssertHasUnknownFieldError(field);
+        Assert.All(
+            unknownFields,
+            field =>
+            {
+                var error = validationProblem.AssertHasUnknownFieldError(field);
 
-            Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
-        });
+                Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
+            }
+        );
     }
 
     [Theory]
@@ -282,7 +297,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestPersonQuery)}{query}"
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -299,17 +316,26 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("?owner.name=123", "123")]
     [InlineData("?owner.name=true", "true")]
     [InlineData("?owner.name=", "")]
-    [InlineData("?owner.name=Test&owner.aliases[0]=Alias1&owner.aliases[1]=Alias2", "Test", null, "Alias1", "Alias2")]
+    [InlineData(
+        "?owner.name=Test&owner.aliases[0]=Alias1&owner.aliases[1]=Alias2",
+        "Test",
+        null,
+        "Alias1",
+        "Alias2"
+    )]
     [InlineData("?owner.name=Test&owner.aliases=Alias1,Alias2", "Test", null, "Alias1", "Alias2")]
     public async Task TestGroupQuery_ValidQuery_Returns200(
         string query,
         string expectedName,
         int? expectedAge = null,
-        params string[] expectedAliases)
+        params string[] expectedAliases
+    )
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestGroupQuery)}{query}"
+        );
 
         var group = response.AssertOk<TestGroup>();
 
@@ -337,24 +363,36 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Theory]
     [InlineData("?owner.name=Test&owner=Owner", "owner")]
     [InlineData("?owner.name=Test&owner.firstName=First", "owner.firstName")]
-    [InlineData("?owner.name=Test&owner.firstName=First&owner.lastName=Last", "owner.firstName", "owner.lastName")]
+    [InlineData(
+        "?owner.name=Test&owner.firstName=First&owner.lastName=Last",
+        "owner.firstName",
+        "owner.lastName"
+    )]
     [InlineData("?owner.name=Test&name=Test", "name")]
-    public async Task TestGroupQuery_UnknownFields_Returns400(string query, params string[] unknownFields)
+    public async Task TestGroupQuery_UnknownFields_Returns400(
+        string query,
+        params string[] unknownFields
+    )
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestGroupQuery)}{query}"
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
         Assert.Equal(unknownFields.Length, validationProblem.Errors.Count);
 
-        Assert.All(unknownFields, field =>
-        {
-            var error = validationProblem.AssertHasUnknownFieldError(field);
+        Assert.All(
+            unknownFields,
+            field =>
+            {
+                var error = validationProblem.AssertHasUnknownFieldError(field);
 
-            Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
-        });
+                Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
+            }
+        );
     }
 
     [Theory]
@@ -363,7 +401,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestGroupQuery)}{query}"
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -382,11 +422,14 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         string query,
         string expectedName,
         int? expectedAge = null,
-        params string[] expectedAliases)
+        params string[] expectedAliases
+    )
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestQueryArgs)}{query}");
+        var response = await client.GetAsync(
+            requestUri: $"{nameof(TestController.TestQueryArgs)}{query}"
+        );
 
         var group = response.AssertOk<TestPerson>();
 
@@ -427,14 +470,17 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
             string name,
             [FromQuery(Name = "age")] int? ageNumber,
             [FromQuery] List<string>? aliases,
-            CancellationToken _)
+            CancellationToken _
+        )
         {
-            return Ok(new TestPerson
-            {
-                Name = name,
-                Age = ageNumber,
-                Aliases = aliases ?? []
-            });
+            return Ok(
+                new TestPerson
+                {
+                    Name = name,
+                    Age = ageNumber,
+                    Aliases = aliases ?? [],
+                }
+            );
         }
     }
 
@@ -453,13 +499,18 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     {
         public required TestPerson Owner { get; init; }
     }
+
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp
-            .WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)))
+            .WithWebHostBuilder(builder =>
+                builder.WithAdditionalControllers(typeof(TestController))
+            )
             .ConfigureServices(s =>
             {
-                s.Configure<ApiVersioningOptions>(options => options.AssumeDefaultVersionWhenUnspecified = true);
+                s.Configure<ApiVersioningOptions>(options =>
+                    options.AssumeDefaultVersionWhenUnspecified = true
+                );
             });
     }
 }

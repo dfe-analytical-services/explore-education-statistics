@@ -12,8 +12,9 @@ public static class ValidationProblemViewModelTestExtensions
 {
     public static ErrorViewModel AssertHasEmailError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.EmailValidator
         );
@@ -21,7 +22,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasGreaterThanOrEqualError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        int comparisonValue)
+        int comparisonValue
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -38,7 +40,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasGreaterThanError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        int comparisonValue)
+        int comparisonValue
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -54,8 +57,9 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasLengthError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.LengthValidator
         );
@@ -63,7 +67,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasMinimumLengthError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        int minLength)
+        int minLength
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -80,7 +85,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasMaximumLengthError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        int maxLength)
+        int maxLength
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -97,7 +103,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasLessThanOrEqualError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        int comparisonValue)
+        int comparisonValue
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -114,7 +121,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasLessThanError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        int comparisonValue)
+        int comparisonValue
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -131,7 +139,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasNotEqualError<T>(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        T comparisonValue)
+        T comparisonValue
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -147,40 +156,45 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasNotEmptyError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.NotEmptyValidator
         );
 
     public static ErrorViewModel AssertHasNotNullError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.NotNullValidator
         );
 
     public static ErrorViewModel AssertHasPredicateError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.PredicateValidator
         );
 
     public static ErrorViewModel AssertHasAsyncPredicateError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.AsyncPredicateValidator
         );
 
     public static ErrorViewModel AssertHasRegularExpressionError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.RegularExpressionValidator
         );
@@ -188,7 +202,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasEqualError<T>(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        T comparisonValue)
+        T comparisonValue
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -206,13 +221,13 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         int minLength,
-        int maxLength)
+        int maxLength
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.ExactLengthValidator
         );
-
 
         var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
 
@@ -226,7 +241,8 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         int from,
-        int to)
+        int to
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -245,7 +261,8 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         int from,
-        int to)
+        int to
+    )
     {
         var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
@@ -262,40 +279,45 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasCreditCardError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.CreditCardValidator
         );
 
     public static ErrorViewModel AssertHasScalePrecisionError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.ScalePrecisionValidator
         );
 
     public static ErrorViewModel AssertHasEmptyError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.EmptyValidator
         );
 
     public static ErrorViewModel AssertHasNullError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.NullValidator
         );
 
     public static ErrorViewModel AssertHasEnumError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath
+    ) =>
+        validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.EnumValidator
         );
@@ -303,7 +325,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasAllowedValueError<TValue>(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        TValue? value)
+        TValue? value
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -321,7 +344,8 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         TValue? value,
-        IEnumerable<TValue> allowed)
+        IEnumerable<TValue> allowed
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -337,7 +361,8 @@ public static class ValidationProblemViewModelTestExtensions
     }
 
     public static ErrorViewModel AssertHasNotEmptyBodyError(
-        this ValidationProblemViewModel validationProblem)
+        this ValidationProblemViewModel validationProblem
+    )
     {
         return validationProblem.AssertHasError(
             expectedPath: null,
@@ -347,7 +372,8 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasInvalidInputError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
+        string expectedPath
+    )
     {
         return validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -357,7 +383,8 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasRequiredValueError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
+        string expectedPath
+    )
     {
         return validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -367,7 +394,8 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasInvalidValueError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
+        string expectedPath
+    )
     {
         return validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -377,7 +405,8 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasUnknownFieldError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
+        string expectedPath
+    )
     {
         return validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -390,7 +419,8 @@ public static class ValidationProblemViewModelTestExtensions
         string? expectedPath,
         string expectedCode,
         string? expectedMessage = null,
-        object? expectedDetail = null)
+        object? expectedDetail = null
+    )
     {
         Predicate<ErrorViewModel> predicate = error =>
         {
@@ -399,7 +429,10 @@ public static class ValidationProblemViewModelTestExtensions
                 return false;
             }
 
-            if (expectedDetail is not null && (error.Detail is null || !error.Detail.Equals(expectedDetail)))
+            if (
+                expectedDetail is not null
+                && (error.Detail is null || !error.Detail.Equals(expectedDetail))
+            )
             {
                 return false;
             }
@@ -411,13 +444,14 @@ public static class ValidationProblemViewModelTestExtensions
 
         return validationProblem.Errors.First(new Func<ErrorViewModel, bool>(predicate));
     }
-    
+
     public static void AssertDoesNotHaveError(
         this ValidationProblemViewModel validationProblem,
         string? expectedPath,
         string expectedCode,
         string? expectedMessage = null,
-        object? expectedDetail = null)
+        object? expectedDetail = null
+    )
     {
         Predicate<ErrorViewModel> predicate = error =>
         {
@@ -426,7 +460,10 @@ public static class ValidationProblemViewModelTestExtensions
                 return false;
             }
 
-            if (expectedDetail is not null && (error.Detail is null || !error.Detail.Equals(expectedDetail)))
+            if (
+                expectedDetail is not null
+                && (error.Detail is null || !error.Detail.Equals(expectedDetail))
+            )
             {
                 return false;
             }
@@ -439,7 +476,8 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static void AssertHasErrors(
         this ValidationProblemViewModel validationProblem,
-        List<ErrorViewModel> expectedErrors)
+        List<ErrorViewModel> expectedErrors
+    )
     {
         var errors = validationProblem.Errors.ToList();
         AssertHasErrors(errors, expectedErrors);
@@ -447,35 +485,36 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static void AssertDoesNotContainErrors(
         List<ErrorViewModel> errors,
-        List<ErrorViewModel> expectedNotToContain)
+        List<ErrorViewModel> expectedNotToContain
+    )
     {
         var matchedErrors = errors
             .Where(error => expectedNotToContain.Any(expected => ErrorsMatch(error, expected)))
             .ToArray();
-    
+
         if (matchedErrors.Length == 0)
         {
             return;
         }
-    
-        var matchedErrorMessages = matchedErrors
-            .Select(e => e.Message)
-            .JoinToString('\n');
-    
-        Assert.Fail($"""
+
+        var matchedErrorMessages = matchedErrors.Select(e => e.Message).JoinToString('\n');
+
+        Assert.Fail(
+            $"""
             Error message(s) found in expectedMissingErrors that should not be present:
             {matchedErrorMessages}
-            """);
+            """
+        );
 
         return;
         static bool ErrorsMatch(ErrorViewModel current, ErrorViewModel expected) =>
-            current.Code == expected.Code &&
-            current.Path == expected.Path;
+            current.Code == expected.Code && current.Path == expected.Path;
     }
-    
+
     public static void AssertHasErrors(
         List<ErrorViewModel> errors,
-        List<ErrorViewModel> expectedErrors)
+        List<ErrorViewModel> expectedErrors
+    )
     {
         List<ErrorViewModel> notFoundErrors = [];
 
@@ -502,7 +541,8 @@ public static class ValidationProblemViewModelTestExtensions
                 .Select(e => e.Message)
                 .ToList()
                 .JoinToString('\n');
-            assertFailMessage += $"Error message(s) not found in expectedErrors:\n{notFoundErrorMessages}\n";
+            assertFailMessage +=
+                $"Error message(s) not found in expectedErrors:\n{notFoundErrorMessages}\n";
         }
 
         if (expectedErrors.Count != 0)
@@ -511,7 +551,8 @@ public static class ValidationProblemViewModelTestExtensions
                 .Select(e => e.Message)
                 .ToList()
                 .JoinToString('\n');
-            assertFailMessage += $"expectedErrors message(s) were not in the response:\n{expectedErrorMessages}\n";
+            assertFailMessage +=
+                $"expectedErrors message(s) were not in the response:\n{expectedErrorMessages}\n";
         }
 
         if (assertFailMessage != string.Empty)
@@ -522,18 +563,19 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasGlobalError(
         this ValidationProblemViewModel validationProblem,
-        Enum expectedCode) =>
-        validationProblem.AssertHasGlobalError(expectedCode.ToString());
+        Enum expectedCode
+    ) => validationProblem.AssertHasGlobalError(expectedCode.ToString());
 
     public static ErrorViewModel AssertHasGlobalError(
         this ValidationProblemViewModel validationProblem,
-        string expectedCode) =>
-        validationProblem.AssertHasError(expectedPath: null, expectedCode);
+        string expectedCode
+    ) => validationProblem.AssertHasError(expectedPath: null, expectedCode);
 
     private static ErrorViewModel AssertHasFluentValidationError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string expectedKey)
+        string expectedKey
+    )
     {
         var expectedCode = expectedKey.Replace("Validator", "");
 

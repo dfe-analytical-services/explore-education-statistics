@@ -7,13 +7,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Au
 
 public class ViewDataSetVersionRequirement : IAuthorizationRequirement;
 
-public class ViewDataSetVersionAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
-    : AuthorizationHandler<ViewDataSetVersionRequirement, DataSetVersion>
+public class ViewDataSetVersionAuthorizationHandler(
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<ViewDataSetVersionRequirement, DataSetVersion>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewDataSetVersionRequirement requirement,
-        DataSetVersion dataSetVersion)
+        DataSetVersion dataSetVersion
+    )
     {
         if (authorizationHandlerService.CanAccessUnpublishedData())
         {

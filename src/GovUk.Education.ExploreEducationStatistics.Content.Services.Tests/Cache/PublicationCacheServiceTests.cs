@@ -32,13 +32,9 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             ContactName = "",
             TeamEmail = "",
             TeamName = "",
-            ContactTelNo = ""
+            ContactTelNo = "",
         },
-        ExternalMethodology = new ExternalMethodologyViewModel
-        {
-            Title = "",
-            Url = ""
-        },
+        ExternalMethodology = new ExternalMethodologyViewModel { Title = "", Url = "" },
         LatestReleaseId = Guid.NewGuid(),
         Releases =
         [
@@ -46,8 +42,8 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             {
                 Id = Guid.NewGuid(),
                 Slug = "",
-                Title = ""
-            }
+                Title = "",
+            },
         ],
         ReleaseSeries =
         [
@@ -55,15 +51,15 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             {
                 Description = "legacy link description",
                 LegacyLinkUrl = "http://test.com/",
-            }
+            },
         ],
         Theme = new ThemeViewModel
         {
             Id = Guid.NewGuid(),
             Slug = "",
             Title = "",
-            Summary = ""
-        }
+            Summary = "",
+        },
     };
 
     [Fact]
@@ -81,9 +77,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.Get(PublicationSlug))
-            .ReturnsAsync(_publicationViewModel);
+        publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(_publicationViewModel);
 
         var service = BuildService(publicationService: publicationService.Object);
 
@@ -123,9 +117,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.Get(PublicationSlug))
-            .ReturnsAsync(new NotFoundResult());
+        publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(new NotFoundResult());
 
         var service = BuildService(publicationService: publicationService.Object);
 
@@ -139,30 +131,35 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_NoCachedTreeExists()
     {
-        var publicationTree = ListOf(new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
+        var publicationTree = ListOf(
+            new PublicationTreeThemeViewModel
             {
-                Title = "Publication A",
-                AnyLiveReleaseHasData = true
-            })
-        });
+                Title = "Theme A",
+                Publications = ListOf(
+                    new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        AnyLiveReleaseHasData = true,
+                    }
+                ),
+            }
+        );
 
         PublicBlobCacheService
-            .Setup(s => s.GetItemAsync(
-                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .Setup(s =>
+                s.GetItemAsync(
+                    new PublicationTreeCacheKey(),
+                    typeof(IList<PublicationTreeThemeViewModel>)
+                )
+            )
             .ReturnsAsync((object?)null);
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.GetPublicationTree())
-            .ReturnsAsync(publicationTree);
+        publicationService.Setup(s => s.GetPublicationTree()).ReturnsAsync(publicationTree);
 
         PublicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(
-                new PublicationTreeCacheKey(), publicationTree))
+            .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
 
         var service = BuildService(publicationService.Object);
@@ -181,16 +178,22 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                AnyLiveReleaseHasData = true
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    AnyLiveReleaseHasData = true,
+                }
+            ),
         };
 
         PublicBlobCacheService
-            .Setup(s => s.GetItemAsync(
-                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .Setup(s =>
+                s.GetItemAsync(
+                    new PublicationTreeCacheKey(),
+                    typeof(IList<PublicationTreeThemeViewModel>)
+                )
+            )
             .ReturnsAsync(ListOf(publicationTree));
 
         var service = BuildService();
@@ -209,11 +212,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                AnyLiveReleaseHasData = true
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    AnyLiveReleaseHasData = true,
+                }
+            ),
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataCatalogue);
@@ -225,11 +230,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                AnyLiveReleaseHasData = false
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    AnyLiveReleaseHasData = false,
+                }
+            ),
         };
 
         await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataCatalogue);
@@ -241,12 +248,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                IsSuperseded = false,
-                LatestReleaseHasData = true
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    IsSuperseded = false,
+                    LatestReleaseHasData = true,
+                }
+            ),
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
@@ -258,12 +267,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                IsSuperseded = true,
-                LatestReleaseHasData = true
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    IsSuperseded = true,
+                    LatestReleaseHasData = true,
+                }
+            ),
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
@@ -275,12 +286,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                IsSuperseded = false,
-                LatestReleaseHasData = false
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    IsSuperseded = false,
+                    LatestReleaseHasData = false,
+                }
+            ),
         };
 
         await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataTables);
@@ -292,11 +305,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                AnyLiveReleaseHasData = true
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    AnyLiveReleaseHasData = true,
+                }
+            ),
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FastTrack);
@@ -308,11 +323,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Publications = ListOf(new PublicationTreePublicationViewModel
-            {
-                Title = "Publication A",
-                AnyLiveReleaseHasData = false
-            })
+            Publications = ListOf(
+                new PublicationTreePublicationViewModel
+                {
+                    Title = "Publication A",
+                    AnyLiveReleaseHasData = false,
+                }
+            ),
         };
 
         await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FastTrack);
@@ -325,9 +342,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.Get(PublicationSlug))
-            .ReturnsAsync(_publicationViewModel);
+        publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(_publicationViewModel);
 
         PublicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
@@ -347,22 +362,16 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task UpdatePublicationTree()
     {
-        var publicationTree = ListOf(new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-        });
+        var publicationTree = ListOf(new PublicationTreeThemeViewModel { Title = "Theme A" });
 
         var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.GetPublicationTree())
-            .ReturnsAsync(publicationTree);
+        publicationService.Setup(s => s.GetPublicationTree()).ReturnsAsync(publicationTree);
 
         // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
         // of the latest tree and then it being cached.
         PublicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(
-                new PublicationTreeCacheKey(), publicationTree))
+            .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
 
         var service = BuildService(publicationService.Object);
@@ -377,7 +386,9 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public void PublicationCacheViewModel_SerializeAndDeserialize()
     {
-        var converted = DeserializeObject<PublicationCacheViewModel>(SerializeObject(_publicationViewModel));
+        var converted = DeserializeObject<PublicationCacheViewModel>(
+            SerializeObject(_publicationViewModel)
+        );
         converted.AssertDeepEqualTo(_publicationViewModel);
     }
 
@@ -386,23 +397,27 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var publicationTree = new PublicationTreeThemeViewModel
         {
-            Publications = new List<PublicationTreePublicationViewModel>
-            {
-                new()
-            }
+            Publications = new List<PublicationTreePublicationViewModel> { new() },
         };
 
-        var converted = DeserializeObject<PublicationTreeThemeViewModel>(SerializeObject(publicationTree));
+        var converted = DeserializeObject<PublicationTreeThemeViewModel>(
+            SerializeObject(publicationTree)
+        );
         converted.AssertDeepEqualTo(publicationTree);
     }
 
     private async Task AssertPublicationTreeUnfiltered(
         PublicationTreeThemeViewModel publicationTree,
-        PublicationTreeFilter filter)
+        PublicationTreeFilter filter
+    )
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItemAsync(
-                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .Setup(s =>
+                s.GetItemAsync(
+                    new PublicationTreeCacheKey(),
+                    typeof(IList<PublicationTreeThemeViewModel>)
+                )
+            )
             .ReturnsAsync(ListOf(publicationTree));
 
         var service = BuildService();
@@ -417,11 +432,16 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
     private async Task AssertPublicationTreeEmpty(
         PublicationTreeThemeViewModel publicationTree,
-        PublicationTreeFilter filter)
+        PublicationTreeFilter filter
+    )
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItemAsync(
-                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .Setup(s =>
+                s.GetItemAsync(
+                    new PublicationTreeCacheKey(),
+                    typeof(IList<PublicationTreeThemeViewModel>)
+                )
+            )
             .ReturnsAsync(ListOf(publicationTree));
 
         var service = BuildService();
@@ -441,7 +461,8 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         return new PublicationCacheService(
             publicationService: publicationService ?? Mock.Of<IPublicationService>(Strict),
-            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
+            publicBlobStorageService: publicBlobStorageService
+                ?? Mock.Of<IPublicBlobStorageService>(Strict),
             Mock.Of<ILogger<PublicationCacheService>>()
         );
     }

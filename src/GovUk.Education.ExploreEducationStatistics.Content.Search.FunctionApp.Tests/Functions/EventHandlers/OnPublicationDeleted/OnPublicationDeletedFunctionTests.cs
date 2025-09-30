@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnPublicationDeletedFunctionTests
 {
-    private OnPublicationDeletedFunction GetSut() => new(
-        new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+    private OnPublicationDeletedFunction GetSut() =>
+        new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
@@ -24,16 +24,17 @@ public class OnPublicationDeletedFunctionTests
             LatestPublishedRelease = new LatestPublishedReleaseInfo
             {
                 LatestPublishedReleaseId = Guid.NewGuid(),
-                LatestPublishedReleaseVersionId = Guid.NewGuid()
-            }
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
+            },
         };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
         var expected = new RemoveSearchableDocumentDto
         {
-            ReleaseId = payload.LatestPublishedRelease.LatestPublishedReleaseId
+            ReleaseId = payload.LatestPublishedRelease.LatestPublishedReleaseId,
         };
 
-        var response = await GetSut().OnPublicationDeleted(eventGridEvent, new FunctionContextMockBuilder().Build());
+        var response = await GetSut()
+            .OnPublicationDeleted(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         var actual = Assert.Single(response);
         Assert.Equal(expected, actual);
@@ -45,7 +46,8 @@ public class OnPublicationDeletedFunctionTests
         var payload = new PublicationDeletedEventDto();
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
-        var response = await GetSut().OnPublicationDeleted(eventGridEvent, new FunctionContextMockBuilder().Build());
+        var response = await GetSut()
+            .OnPublicationDeleted(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         Assert.Empty(response);
     }

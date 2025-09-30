@@ -10,10 +10,14 @@ public interface IDataBlockService
 {
     Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
         Guid releaseVersionId,
-        Guid dataBlockVersionId);
+        Guid dataBlockVersionId
+    );
 
-    Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocationsForDataBlock(
+    Task<
+        Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>
+    > GetLocationsForDataBlock(
         Guid releaseVersionId,
         Guid dataBlockVersionId,
-        long boundaryLevelId);
+        long boundaryLevelId
+    );
 }

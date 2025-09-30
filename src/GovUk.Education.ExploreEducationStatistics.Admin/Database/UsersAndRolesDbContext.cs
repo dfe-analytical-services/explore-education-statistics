@@ -16,7 +16,9 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
 
     public UsersAndRolesDbContext(
         DbContextOptions<UsersAndRolesDbContext> options,
-        bool updateTimestamps = true) : base(options)
+        bool updateTimestamps = true
+    )
+        : base(options)
     {
         Configure(updateTimestamps);
     }
@@ -45,26 +47,30 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<UserInvite>()
+        modelBuilder
+            .Entity<UserInvite>()
             .HasOne(c => c.CreatedBy)
             .WithMany()
             .HasForeignKey("CreatedById")
             .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<UserInvite>()
+        modelBuilder
+            .Entity<UserInvite>()
             .Property(invite => invite.Created)
-            .HasConversion(
-                v => v,
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         // Note that this logic is also present in UserInvite.Expired.
         // It is implemented here as well because EF is not able to translate the "Expired" computed field for
         // use in this QueryFilter.
-        modelBuilder.Entity<UserInvite>()
-            .HasQueryFilter(invite => invite.Accepted ||
-                                      invite.Created >= DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays));
+        modelBuilder
+            .Entity<UserInvite>()
+            .HasQueryFilter(invite =>
+                invite.Accepted
+                || invite.Created >= DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays)
+            );
 
-        modelBuilder.Entity<IdentityRole>()
+        modelBuilder
+            .Entity<IdentityRole>()
             .HasData(
                 CreateRole(Role.BauUser),
                 CreateRole(Role.Analyst),
@@ -77,7 +83,8 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
 
         // Note that when amending this list of Claims to add or remove Claims from a given Role,
         // we also need to check to see if updates need to be addressed in ClaimsPrincipalUtils as well.
-        modelBuilder.Entity<IdentityRoleClaim<string>>()
+        modelBuilder
+            .Entity<IdentityRoleClaim<string>>()
             .HasData(
                 new IdentityRoleClaim<string>
                 {

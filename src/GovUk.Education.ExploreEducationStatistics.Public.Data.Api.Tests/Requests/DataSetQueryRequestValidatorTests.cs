@@ -17,10 +17,7 @@ public class DataSetQueryRequestValidatorTests
             {
                 Criteria = new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetGetQueryFilters
-                    {
-                        Eq = "abc"
-                    },
+                    Filters = new DataSetGetQueryFilters { Eq = "abc" },
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
@@ -35,15 +32,13 @@ public class DataSetQueryRequestValidatorTests
             {
                 Criteria = new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetGetQueryFilters
-                    {
-                        Eq = ""
-                    },
+                    Filters = new DataSetGetQueryFilters { Eq = "" },
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor("Criteria.Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -60,12 +55,9 @@ public class DataSetQueryRequestValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetGetQueryFilters
-                            {
-                                Eq = "abc"
-                            },
-                        }
-                    ]
+                            Filters = new DataSetGetQueryFilters { Eq = "abc" },
+                        },
+                    ],
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
@@ -84,17 +76,15 @@ public class DataSetQueryRequestValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetGetQueryFilters
-                            {
-                                Eq = ""
-                            },
-                        }
-                    ]
+                            Filters = new DataSetGetQueryFilters { Eq = "" },
+                        },
+                    ],
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor("Criteria.And[0].Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -111,12 +101,9 @@ public class DataSetQueryRequestValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetGetQueryFilters
-                            {
-                                Eq = "abc"
-                            },
-                        }
-                    ]
+                            Filters = new DataSetGetQueryFilters { Eq = "abc" },
+                        },
+                    ],
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
@@ -135,17 +122,15 @@ public class DataSetQueryRequestValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetGetQueryFilters
-                            {
-                                Eq = ""
-                            },
-                        }
-                    ]
+                            Filters = new DataSetGetQueryFilters { Eq = "" },
+                        },
+                    ],
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor("Criteria.Or[0].Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -160,11 +145,8 @@ public class DataSetQueryRequestValidatorTests
                 {
                     Not = new DataSetQueryCriteriaFacets
                     {
-                        Filters = new DataSetGetQueryFilters
-                        {
-                            Eq = "abc"
-                        },
-                    }
+                        Filters = new DataSetGetQueryFilters { Eq = "abc" },
+                    },
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
@@ -181,16 +163,14 @@ public class DataSetQueryRequestValidatorTests
                 {
                     Not = new DataSetQueryCriteriaFacets
                     {
-                        Filters = new DataSetGetQueryFilters
-                        {
-                            Eq = ""
-                        },
-                    }
+                        Filters = new DataSetGetQueryFilters { Eq = "" },
+                    },
                 },
                 Indicators = ["indicator1", "indicator2"],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor("Criteria.Not.Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -206,10 +186,7 @@ public class DataSetQueryRequestValidatorTests
         [InlineData("indicator1", "indicator2")]
         public void Success(params string[]? indicators)
         {
-            var query = new DataSetQueryRequest
-            {
-                Indicators = indicators,
-            };
+            var query = new DataSetQueryRequest { Indicators = indicators };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
@@ -217,25 +194,26 @@ public class DataSetQueryRequestValidatorTests
         [Fact]
         public void Failure_EmptyValues()
         {
-            var query = new DataSetQueryRequest
-            {
-                Indicators = ["", " ", "  ", null!]
-            };
+            var query = new DataSetQueryRequest { Indicators = ["", " ", "  ", null!] };
 
             var result = _validator.TestValidate(query);
 
             Assert.Equal(query.Indicators.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("Indicators[0]")
+            result
+                .ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("Indicators[1]")
+            result
+                .ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("Indicators[2]")
+            result
+                .ShouldHaveValidationErrorFor("Indicators[2]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("Indicators[3]")
+            result
+                .ShouldHaveValidationErrorFor("Indicators[3]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -244,27 +222,26 @@ public class DataSetQueryRequestValidatorTests
         {
             var query = new DataSetQueryRequest
             {
-                Indicators = [new string('x', 41), new string('x', 42)]
+                Indicators = [new string('x', 41), new string('x', 42)],
             };
 
             var result = _validator.TestValidate(query);
 
             Assert.Equal(query.Indicators.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("Indicators[0]")
+            result
+                .ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
-            result.ShouldHaveValidationErrorFor("Indicators[1]")
+            result
+                .ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
 
         [Fact]
         public void Failure_Mixture()
         {
-            var query = new DataSetQueryRequest
-            {
-                Indicators = [new string('x', 101), ""]
-            };
+            var query = new DataSetQueryRequest { Indicators = [new string('x', 101), ""] };
 
             var result = _validator.TestValidate(query);
 
@@ -304,10 +281,11 @@ public class DataSetQueryRequestValidatorTests
             var query = new DataSetQueryRequest
             {
                 Indicators = ["indicator1", "indicator2"],
-                Sorts = []
+                Sorts = [],
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Sorts)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
@@ -333,19 +311,24 @@ public class DataSetQueryRequestValidatorTests
 
             Assert.Equal(query.Sorts.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("Sorts[0]")
+            result
+                .ShouldHaveValidationErrorFor("Sorts[0]")
                 .WithErrorCode(FluentValidationKeys.NotNullValidator);
 
-            result.ShouldHaveValidationErrorFor("Sorts[1].Field")
+            result
+                .ShouldHaveValidationErrorFor("Sorts[1].Field")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("Sorts[2].Direction")
+            result
+                .ShouldHaveValidationErrorFor("Sorts[2].Direction")
                 .WithErrorCode(ValidationMessages.AllowedValue.Code);
 
-            result.ShouldHaveValidationErrorFor("Sorts[3].Direction")
+            result
+                .ShouldHaveValidationErrorFor("Sorts[3].Direction")
                 .WithErrorCode(ValidationMessages.AllowedValue.Code);
 
-            result.ShouldHaveValidationErrorFor("Sorts[4].Field")
+            result
+                .ShouldHaveValidationErrorFor("Sorts[4].Field")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
     }
@@ -381,7 +364,8 @@ public class DataSetQueryRequestValidatorTests
                 Page = page,
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Page)
                 .WithErrorCode(FluentValidationKeys.GreaterThanOrEqualValidator)
                 .Only();
@@ -418,7 +402,8 @@ public class DataSetQueryRequestValidatorTests
                 PageSize = pageSize,
             };
 
-            _validator.TestValidate(query)
+            _validator
+                .TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.PageSize)
                 .WithErrorCode(FluentValidationKeys.InclusiveBetweenValidator)
                 .Only();

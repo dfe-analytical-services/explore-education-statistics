@@ -25,10 +25,7 @@ public class ImporterLocationCache : IImporterLocationCache
     {
         _logger.LogInformation("Loading all Locations into cache");
 
-        var existingLocations = context
-            .Location
-            .AsNoTracking()
-            .ToList();
+        var existingLocations = context.Location.AsNoTracking().ToList();
 
         existingLocations.ForEach(location =>
         {
@@ -38,8 +35,10 @@ public class ImporterLocationCache : IImporterLocationCache
 
             if (!added)
             {
-                _logger.LogError("Duplicate Location has already been added to the Locations cache, indicating " +
-                                 $"a duplicate Location in the environment's database - {locationCacheKey}");
+                _logger.LogError(
+                    "Duplicate Location has already been added to the Locations cache, indicating "
+                        + $"a duplicate Location in the environment's database - {locationCacheKey}"
+                );
             }
         });
 
@@ -51,7 +50,10 @@ public class ImporterLocationCache : IImporterLocationCache
         return _locations[GetLocationCacheKey(locationFromCsv)];
     }
 
-    public async Task<Location> GetOrCreateAndCache(Location locationFromCsv, Func<Task<Location>> locationProvider)
+    public async Task<Location> GetOrCreateAndCache(
+        Location locationFromCsv,
+        Func<Task<Location>> locationProvider
+    )
     {
         var locationCacheKey = GetLocationCacheKey(locationFromCsv);
 
@@ -66,14 +68,14 @@ public class ImporterLocationCache : IImporterLocationCache
         // Note that we can't use ConcurrentDictionary's GetOrAdd() method to more cleanly write all of this, as it is
         // not thread-safe. Instead we manually invoke "locationProvider" to get a new Location and then use TryAdd()
         // which is a thread-safe way to add to the dictionary, and ignore collisions in the rare scenario when 2
-        // import processes are trying to add the same Location at the same time.  
+        // import processes are trying to add the same Location at the same time.
         var providedLocation = await locationProvider.Invoke();
 
         var added = _locations.TryAdd(locationCacheKey, providedLocation);
 
-        // Due to the way that concurrent import processes take it in turns (via an exclusive lock) to add any new 
+        // Due to the way that concurrent import processes take it in turns (via an exclusive lock) to add any new
         // Locations they need to add to the database (and this cache), we should never run into a scenario whereby
-        // 2 or more import processes attempt to add the same Location at any point. 
+        // 2 or more import processes attempt to add the same Location at any point.
         if (!added)
         {
             throw new ArgumentException($"Location already added to cache - {locationCacheKey}");
@@ -101,7 +103,8 @@ public class ImporterLocationCache : IImporterLocationCache
         RscRegion? rscRegion,
         School? school,
         Sponsor? sponsor,
-        Ward? ward)
+        Ward? ward
+    )
     {
         var locationAttributes = new LocationAttribute?[]
         {
@@ -122,7 +125,7 @@ public class ImporterLocationCache : IImporterLocationCache
             rscRegion,
             school,
             sponsor,
-            ward
+            ward,
         };
 
         var tokens = locationAttributes
@@ -155,6 +158,7 @@ public class ImporterLocationCache : IImporterLocationCache
             location.RscRegion,
             location.School,
             location.Sponsor,
-            location.Ward);
+            location.Ward
+        );
     }
 }

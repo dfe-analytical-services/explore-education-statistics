@@ -15,12 +15,11 @@ public class RequiredPropertySchemaFilterTests
         {
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new RequiredPropertySchemaFilter()],
-            SupportNonNullableReferenceTypes = true
+            SupportNonNullableReferenceTypes = true,
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");
@@ -51,8 +50,14 @@ public class RequiredPropertySchemaFilterTests
         var schema = GenerateSchema<TestClassReferenceTypes>();
 
         Assert.Equal(2, schema.Required.Count);
-        Assert.Contains(nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst(), schema.Required);
-        Assert.Contains(nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst(), schema.Required);
+        Assert.Contains(
+            nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst(),
+            schema.Required
+        );
+        Assert.Contains(
+            nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst(),
+            schema.Required
+        );
     }
 
     [Fact]
@@ -60,8 +65,16 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassReferenceTypes>();
 
-        Assert.True(schema.Properties[nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst()].Nullable);
-        Assert.False(schema.Properties[nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst()].Nullable);
+        Assert.True(
+            schema
+                .Properties[nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst()]
+                .Nullable
+        );
+        Assert.False(
+            schema
+                .Properties[nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst()]
+                .Nullable
+        );
     }
 
     [Fact]

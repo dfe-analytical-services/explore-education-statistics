@@ -17,10 +17,9 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// </summary>
     /// <param name="theme">The theme that has been updated.</param>
     public async Task OnThemeUpdated(Theme theme) =>
-        await eventRaiser.RaiseEvent(new ThemeChangedEvent(theme.Id,
-            theme.Title,
-            theme.Summary,
-            theme.Slug));
+        await eventRaiser.RaiseEvent(
+            new ThemeChangedEvent(theme.Id, theme.Title, theme.Summary, theme.Slug)
+        );
 
     /// <summary>
     /// On Release Slug changed
@@ -35,12 +34,17 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
         string newReleaseSlug,
         Guid publicationId,
         string publicationSlug,
-        bool isPublicationArchived) =>
-        await eventRaiser.RaiseEvent(new ReleaseSlugChangedEvent(releaseId,
-            newReleaseSlug,
-            publicationId,
-            publicationSlug,
-            isPublicationArchived));
+        bool isPublicationArchived
+    ) =>
+        await eventRaiser.RaiseEvent(
+            new ReleaseSlugChangedEvent(
+                releaseId,
+                newReleaseSlug,
+                publicationId,
+                publicationSlug,
+                isPublicationArchived
+            )
+        );
 
     /// <summary>
     /// Publishes an event when a publication is archived.
@@ -51,24 +55,26 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     public async Task OnPublicationArchived(
         Guid publicationId,
         string publicationSlug,
-        Guid supersededByPublicationId) =>
-        await eventRaiser.RaiseEvent(new PublicationArchivedEvent(
-            publicationId,
-            publicationSlug,
-            supersededByPublicationId));
+        Guid supersededByPublicationId
+    ) =>
+        await eventRaiser.RaiseEvent(
+            new PublicationArchivedEvent(publicationId, publicationSlug, supersededByPublicationId)
+        );
 
     /// <summary>
     /// On Publication Changed
     /// </summary>
     /// <param name="publication">The publication that has been changed.</param>
     public async Task OnPublicationChanged(Publication publication) =>
-        await eventRaiser.RaiseEvent(new PublicationChangedEvent(
-            publication.Id,
-            publication.Slug,
-            publication.Title,
-            publication.Summary,
-            publication.IsArchived()
-        ));
+        await eventRaiser.RaiseEvent(
+            new PublicationChangedEvent(
+                publication.Id,
+                publication.Slug,
+                publication.Title,
+                publication.Summary,
+                publication.IsArchived()
+            )
+        );
 
     /// <summary>
     /// Publishes an event when a publication is deleted.
@@ -81,13 +87,12 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     public async Task OnPublicationDeleted(
         Guid publicationId,
         string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease)
+        LatestPublishedReleaseInfo? latestPublishedRelease
+    )
     {
-        await eventRaiser.RaiseEvent(new PublicationDeletedEvent(
-            publicationId,
-            publicationSlug,
-            latestPublishedRelease
-        ));
+        await eventRaiser.RaiseEvent(
+            new PublicationDeletedEvent(publicationId, publicationSlug, latestPublishedRelease)
+        );
     }
 
     /// <summary>
@@ -108,7 +113,8 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     public async Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,
         Guid previousLatestPublishedReleaseId,
-        Guid previousLatestPublishedReleaseVersionId)
+        Guid previousLatestPublishedReleaseVersionId
+    )
     {
         // Should the publication not have a latest published release version for some reason, do nothing.
         if (publication.LatestPublishedReleaseVersionId is null)
@@ -118,7 +124,9 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
 
         if (publication.LatestPublishedReleaseVersion is null)
         {
-            throw new ArgumentException("The latest published release version object can not be null.");
+            throw new ArgumentException(
+                "The latest published release version object can not be null."
+            );
         }
 
         await eventRaiser.RaiseEvent(
@@ -130,7 +138,9 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
                 publication.LatestPublishedReleaseVersionId.Value,
                 previousLatestPublishedReleaseId,
                 previousLatestPublishedReleaseVersionId,
-                publication.IsArchived()));
+                publication.IsArchived()
+            )
+        );
     }
 
     /// <summary>
@@ -142,9 +152,13 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     public async Task OnPublicationRestored(
         Guid publicationId,
         string publicationSlug,
-        Guid previousSupersededByPublicationId) =>
-        await eventRaiser.RaiseEvent(new PublicationRestoredEvent(
-            publicationId,
-            publicationSlug,
-            previousSupersededByPublicationId));
+        Guid previousSupersededByPublicationId
+    ) =>
+        await eventRaiser.RaiseEvent(
+            new PublicationRestoredEvent(
+                publicationId,
+                publicationSlug,
+                previousSupersededByPublicationId
+            )
+        );
 }

@@ -10,7 +10,8 @@ public record PublicationChangedEvent : IEvent
         string publicationSlug,
         string publicationTitle,
         string publicationSummary,
-        bool isPublicationArchived)
+        bool isPublicationArchived
+    )
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
@@ -18,7 +19,7 @@ public record PublicationChangedEvent : IEvent
             Title = publicationTitle,
             Summary = publicationSummary,
             Slug = publicationSlug,
-            IsPublicationArchived = isPublicationArchived
+            IsPublicationArchived = isPublicationArchived,
         };
     }
 

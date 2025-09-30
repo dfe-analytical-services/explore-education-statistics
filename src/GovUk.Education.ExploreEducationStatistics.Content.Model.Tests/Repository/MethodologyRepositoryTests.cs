@@ -23,21 +23,22 @@ public class MethodologyRepositoryTests
                 {
                     Publication = publication,
                     Methodology = methodology1,
-                    Owner = true
+                    Owner = true,
                 },
                 new PublicationMethodology
                 {
                     Publication = publication,
                     Methodology = methodology2,
-                    Owner = false
+                    Owner = false,
                 },
                 // Add a methodology linked to a different publication to check its not returned
                 new PublicationMethodology
                 {
                     Publication = new Publication(),
                     Methodology = methodology1,
-                    Owner = true
-                });
+                    Owner = true,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -61,12 +62,14 @@ public class MethodologyRepositoryTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             // Add a methodology linked to a different publication to check its not returned
-            await contentDbContext.PublicationMethodologies.AddAsync(new PublicationMethodology
-            {
-                Publication = new Publication(),
-                Methodology = new Methodology(),
-                Owner = true
-            });
+            await contentDbContext.PublicationMethodologies.AddAsync(
+                new PublicationMethodology
+                {
+                    Publication = new Publication(),
+                    Methodology = new Methodology(),
+                    Owner = true,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -91,12 +94,14 @@ public class MethodologyRepositoryTests
             await contentDbContext.Publications.AddAsync(publication);
 
             // Add a methodology linked to a different publication to check its not returned
-            await contentDbContext.PublicationMethodologies.AddAsync(new PublicationMethodology
-            {
-                Publication = new Publication(),
-                Methodology = new Methodology(),
-                Owner = true
-            });
+            await contentDbContext.PublicationMethodologies.AddAsync(
+                new PublicationMethodology
+                {
+                    Publication = new Publication(),
+                    Methodology = new Methodology(),
+                    Owner = true,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -121,30 +126,21 @@ public class MethodologyRepositoryTests
                 {
                     new()
                     {
-                        Publication = new Publication
-                        {
-                            Title = "Adopting publication 1"
-                        },
-                        Owner = false
+                        Publication = new Publication { Title = "Adopting publication 1" },
+                        Owner = false,
                     },
                     new()
                     {
-                        Publication = new Publication
-                        {
-                            Title = "Owning publication"
-                        },
-                        Owner = true
+                        Publication = new Publication { Title = "Owning publication" },
+                        Owner = true,
                     },
                     new()
                     {
-                        Publication = new Publication
-                        {
-                            Title = "Adopting publication 2"
-                        },
-                        Owner = false
-                    }
-                }
-            }
+                        Publication = new Publication { Title = "Adopting publication 2" },
+                        Owner = false,
+                    },
+                },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -175,17 +171,9 @@ public class MethodologyRepositoryTests
             LatestPublishedVersionId = Guid.NewGuid(),
             Publications = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Publication = publication,
-                    Owner = true
-                },
-                new()
-                {
-                    Publication = new Publication(),
-                    Owner = false
-                }
-            }
+                new() { Publication = publication, Owner = true },
+                new() { Publication = new Publication(), Owner = false },
+            },
         };
 
         var methodologyAdoptedByThisPublication = new Methodology
@@ -193,17 +181,9 @@ public class MethodologyRepositoryTests
             LatestPublishedVersionId = Guid.NewGuid(),
             Publications = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Publication = new Publication(),
-                    Owner = true
-                },
-                new()
-                {
-                    Publication = publication,
-                    Owner = false
-                }
-            }
+                new() { Publication = new Publication(), Owner = true },
+                new() { Publication = publication, Owner = false },
+            },
         };
 
         var unpublishedMethodologyUnrelatedToThisPublication = new Methodology
@@ -211,17 +191,9 @@ public class MethodologyRepositoryTests
             LatestPublishedVersionId = null,
             Publications = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Publication = new Publication(),
-                    Owner = true
-                },
-                new()
-                {
-                    Publication = new Publication(),
-                    Owner = false
-                }
-            }
+                new() { Publication = new Publication(), Owner = true },
+                new() { Publication = new Publication(), Owner = false },
+            },
         };
 
         var methodologyUnrelatedToThisPublication = new Methodology
@@ -229,17 +201,9 @@ public class MethodologyRepositoryTests
             LatestPublishedVersionId = Guid.NewGuid(),
             Publications = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Publication = new Publication(),
-                    Owner = true
-                },
-                new()
-                {
-                    Publication = new Publication(),
-                    Owner = false
-                }
-            }
+                new() { Publication = new Publication(), Owner = true },
+                new() { Publication = new Publication(), Owner = false },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -261,14 +225,18 @@ public class MethodologyRepositoryTests
         {
             var service = BuildMethodologyRepository(contentDbContext);
 
-            var result = await service.GetPublishedMethodologiesUnrelatedToPublication(publication.Id);
+            var result = await service.GetPublishedMethodologiesUnrelatedToPublication(
+                publication.Id
+            );
 
             Assert.Single(result);
             Assert.Equal(methodologyUnrelatedToThisPublication.Id, result[0].Id);
         }
     }
 
-    private static MethodologyRepository BuildMethodologyRepository(ContentDbContext contentDbContext)
+    private static MethodologyRepository BuildMethodologyRepository(
+        ContentDbContext contentDbContext
+    )
     {
         return new(contentDbContext);
     }

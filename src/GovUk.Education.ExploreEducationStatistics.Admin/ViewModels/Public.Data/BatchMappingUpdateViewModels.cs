@@ -6,22 +6,32 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
-public record LocationMappingUpdateResponseViewModel : MappingUpdateResponseViewModel<LocationOptionMapping, MappableLocationOption>
+public record LocationMappingUpdateResponseViewModel
+    : MappingUpdateResponseViewModel<LocationOptionMapping, MappableLocationOption>
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public GeographicLevel Level { get; init; }
 }
 
-public record FilterOptionMappingUpdateResponseViewModel : MappingUpdateResponseViewModel<FilterOptionMapping, MappableFilterOption>
+public record FilterOptionMappingUpdateResponseViewModel
+    : MappingUpdateResponseViewModel<FilterOptionMapping, MappableFilterOption>
 {
     public string FilterKey { get; init; } = string.Empty;
 }
 
-public record BatchLocationMappingUpdatesResponseViewModel : BatchMappingUpdatesResponseViewModel
-    <LocationMappingUpdateResponseViewModel, LocationOptionMapping, MappableLocationOption>;
+public record BatchLocationMappingUpdatesResponseViewModel
+    : BatchMappingUpdatesResponseViewModel<
+        LocationMappingUpdateResponseViewModel,
+        LocationOptionMapping,
+        MappableLocationOption
+    >;
 
-public record BatchFilterOptionMappingUpdatesResponseViewModel : BatchMappingUpdatesResponseViewModel
-    <FilterOptionMappingUpdateResponseViewModel, FilterOptionMapping, MappableFilterOption>;
+public record BatchFilterOptionMappingUpdatesResponseViewModel
+    : BatchMappingUpdatesResponseViewModel<
+        FilterOptionMappingUpdateResponseViewModel,
+        FilterOptionMapping,
+        MappableFilterOption
+    >;
 
 public abstract record MappingUpdateResponseViewModel<TMapping, TMappableElement>
     where TMapping : Mapping<TMappableElement>
@@ -32,7 +42,11 @@ public abstract record MappingUpdateResponseViewModel<TMapping, TMappableElement
     public TMapping Mapping { get; init; } = null!;
 }
 
-public abstract record BatchMappingUpdatesResponseViewModel<TMappingUpdateResponse, TMapping, TMappableElement>
+public abstract record BatchMappingUpdatesResponseViewModel<
+    TMappingUpdateResponse,
+    TMapping,
+    TMappableElement
+>
     where TMappingUpdateResponse : MappingUpdateResponseViewModel<TMapping, TMappableElement>
     where TMapping : Mapping<TMappableElement>
     where TMappableElement : MappableElement

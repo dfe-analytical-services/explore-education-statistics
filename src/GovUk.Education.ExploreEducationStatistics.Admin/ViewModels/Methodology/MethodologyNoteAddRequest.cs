@@ -5,7 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
 public class MethodologyNoteAddRequest
 {
-    [Required] public string Content { get; set; } = string.Empty;
+    [Required]
+    public string Content { get; set; } = string.Empty;
 
-    [Required] public DateTime? DisplayDate { get; set; }
+    [Required]
+    public DateTime? DisplayDate { get; set; }
 }

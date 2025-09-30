@@ -34,11 +34,10 @@ public class EitherTest
     [Fact]
     public void Fold_Right()
     {
-        var result = new Either<int, string>("a success")
-            .Fold(
-                value => value.ToString(),
-                value => value.ToUpper()
-            );
+        var result = new Either<int, string>("a success").Fold(
+            value => value.ToString(),
+            value => value.ToUpper()
+        );
 
         Assert.Equal("A SUCCESS", result);
     }
@@ -46,11 +45,10 @@ public class EitherTest
     [Fact]
     public void Fold_Left()
     {
-        var result = new Either<int, string>(10)
-            .Fold(
-                value => value.ToString(),
-                value => value.ToUpper()
-            );
+        var result = new Either<int, string>(10).Fold(
+            value => value.ToString(),
+            value => value.ToUpper()
+        );
 
         Assert.Equal("10", result);
     }
@@ -58,8 +56,10 @@ public class EitherTest
     [Fact]
     public void FoldRight_Right()
     {
-        var result = new Either<int, string>("a success")
-            .FoldRight(value => value.ToUpper(), "a default");
+        var result = new Either<int, string>("a success").FoldRight(
+            value => value.ToUpper(),
+            "a default"
+        );
 
         Assert.Equal("A SUCCESS", result);
     }
@@ -67,8 +67,7 @@ public class EitherTest
     [Fact]
     public void FoldRight_Left()
     {
-        var result = new Either<int, string>(10)
-            .FoldRight(value => value.ToUpper(), "a default");
+        var result = new Either<int, string>(10).FoldRight(value => value.ToUpper(), "a default");
 
         Assert.Equal("a default", result);
     }
@@ -76,8 +75,7 @@ public class EitherTest
     [Fact]
     public void FoldLeft_Left()
     {
-        var result = new Either<int, string>(10)
-            .FoldLeft(value => value.ToString(), "a default");
+        var result = new Either<int, string>(10).FoldLeft(value => value.ToString(), "a default");
 
         Assert.Equal("10", result);
     }
@@ -85,8 +83,10 @@ public class EitherTest
     [Fact]
     public void FoldLeft_Right()
     {
-        var result = new Either<int, string>("a success")
-            .FoldLeft(value => value.ToString(), "a default");
+        var result = new Either<int, string>("a success").FoldLeft(
+            value => value.ToString(),
+            "a default"
+        );
 
         Assert.Equal("a default", result);
     }
@@ -94,9 +94,9 @@ public class EitherTest
     [Fact]
     public void OnSuccess()
     {
-        var result =
-            new Either<int, string>("either1")
-                .OnSuccess(previousResult => previousResult + " either2");
+        var result = new Either<int, string>("either1").OnSuccess(previousResult =>
+            previousResult + " either2"
+        );
 
         result.AssertRight("either1 either2");
     }
@@ -106,13 +106,11 @@ public class EitherTest
     {
         var results = new List<string>();
 
-        var result =
-            new Either<int, string>(500)
-                .OnSuccess(previousResult =>
-                {
-                    results.Add(previousResult + " either2");
-                    return previousResult + "either2";
-                });
+        var result = new Either<int, string>(500).OnSuccess(previousResult =>
+        {
+            results.Add(previousResult + " either2");
+            return previousResult + "either2";
+        });
 
         result.AssertLeft(500);
 
@@ -122,9 +120,7 @@ public class EitherTest
     [Fact]
     public void OnSuccess_NoArg()
     {
-        var result =
-            new Either<int, string>("either1")
-                .OnSuccess(() => "either2");
+        var result = new Either<int, string>("either1").OnSuccess(() => "either2");
 
         result.AssertRight("either2");
     }
@@ -134,13 +130,11 @@ public class EitherTest
     {
         var results = new List<string>();
 
-        var result =
-            new Either<int, string>(500)
-                .OnSuccess(() =>
-                {
-                    results.Add("either2");
-                    return "either2";
-                });
+        var result = new Either<int, string>(500).OnSuccess(() =>
+        {
+            results.Add("either2");
+            return "either2";
+        });
 
         result.AssertLeft(500);
 
@@ -150,22 +144,19 @@ public class EitherTest
     [Fact]
     public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsRight_ReturnsLeft()
     {
-        var result =
-            await new Either<int, string>(1)
-                .OnSuccess(() =>
-                    Task.FromResult(new Either<int, string>("either 2")));
+        var result = await new Either<int, string>(1).OnSuccess(() =>
+            Task.FromResult(new Either<int, string>("either 2"))
+        );
 
         result.AssertLeft(1);
     }
 
     [Fact]
-    public async Task
-        OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsLeft_ReturnsFirstLeft()
+    public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsLeft_ReturnsFirstLeft()
     {
-        var result =
-            await new Either<int, string>(1)
-                .OnSuccess(() =>
-                    Task.FromResult(new Either<int, string>(2)));
+        var result = await new Either<int, string>(1).OnSuccess(() =>
+            Task.FromResult(new Either<int, string>(2))
+        );
 
         result.AssertLeft(1);
     }
@@ -173,22 +164,19 @@ public class EitherTest
     [Fact]
     public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsLeft_ReturnsLeft()
     {
-        var result =
-            await new Either<int, string>("either1")
-                .OnSuccess(() =>
-                    Task.FromResult(new Either<int, string>(2)));
+        var result = await new Either<int, string>("either1").OnSuccess(() =>
+            Task.FromResult(new Either<int, string>(2))
+        );
 
         result.AssertLeft(2);
     }
 
     [Fact]
-    public async Task
-        OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsRight_ReturnsSecondRight()
+    public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsRight_ReturnsSecondRight()
     {
-        var result =
-            await new Either<int, string>("either1")
-                .OnSuccess(() =>
-                    Task.FromResult(new Either<int, string>("either2")));
+        var result = await new Either<int, string>("either1").OnSuccess(() =>
+            Task.FromResult(new Either<int, string>("either2"))
+        );
 
         result.AssertRight("either2");
     }
@@ -196,10 +184,9 @@ public class EitherTest
     [Fact]
     public async Task OnSuccess_WithEitherTask()
     {
-        var result =
-            await new Either<int, string>("either1")
-                .OnSuccess(previousResult =>
-                    Task.FromResult(new Either<int, string>(previousResult + " either2")));
+        var result = await new Either<int, string>("either1").OnSuccess(previousResult =>
+            Task.FromResult(new Either<int, string>(previousResult + " either2"))
+        );
 
         result.AssertRight("either1 either2");
     }
@@ -207,9 +194,7 @@ public class EitherTest
     [Fact]
     public void OrElse_NoArg()
     {
-        var result =
-            new Either<int, string>(500)
-                .OrElse(() => "either2");
+        var result = new Either<int, string>(500).OrElse(() => "either2");
 
         result.AssertRight("either2");
     }
@@ -219,13 +204,11 @@ public class EitherTest
     {
         var results = new List<string>();
 
-        var result =
-            new Either<int, string>("either1")
-                .OrElse(() =>
-                {
-                    results.Add("either2");
-                    return "either2";
-                });
+        var result = new Either<int, string>("either1").OrElse(() =>
+        {
+            results.Add("either2");
+            return "either2";
+        });
 
         result.AssertRight("either1");
 
@@ -237,20 +220,23 @@ public class EitherTest
     {
         var results = new List<string>();
 
-        var result =
-            await new Either<int, string>("either1")
-                .OnSuccess(previousResult => Task.Run(async () =>
+        var result = await new Either<int, string>("either1")
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
                 {
                     await Task.Delay(20);
                     results.Add(previousResult + " task1");
                     return new Either<int, string>(500);
-                }))
-                .OnSuccess(previousResult => Task.Run(async () =>
+                })
+            )
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
                 {
                     await Task.Delay(10);
                     results.Add(previousResult + " task2");
                     return new Either<int, string>(previousResult + " task2");
-                }));
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -262,13 +248,13 @@ public class EitherTest
     {
         var results = new List<string>();
 
-        var result =
-            await new Either<int, string>(500)
-                .OnSuccess(previousResult => Task.Run(() =>
-                {
-                    results.Add(previousResult + " task1");
-                    return new Either<int, string>(600);
-                }));
+        var result = await new Either<int, string>(500).OnSuccess(previousResult =>
+            Task.Run(() =>
+            {
+                results.Add(previousResult + " task1");
+                return new Either<int, string>(600);
+            })
+        );
 
         result.AssertLeft(500);
 
@@ -296,11 +282,7 @@ public class EitherTest
     [Fact]
     public void AggregateSuccessesAndFailures_AllSuccesses()
     {
-        Either<int, string>[] eithers =
-        [
-            new("success 1"),
-            new("success 2")
-        ];
+        Either<int, string>[] eithers = [new("success 1"), new("success 2")];
 
         var aggregate = eithers.AggregateSuccessesAndFailures();
         Assert.True(aggregate.IsRight);
@@ -310,11 +292,7 @@ public class EitherTest
     [Fact]
     public void AggregateSuccessesAndFailures_AllFailures()
     {
-        Either<string, int>[] eithers =
-        [
-            new("failure 1"),
-            new("failure 2")
-        ];
+        Either<string, int>[] eithers = [new("failure 1"), new("failure 2")];
 
         var aggregate = eithers.AggregateSuccessesAndFailures();
         Assert.True(aggregate.IsLeft);
@@ -324,17 +302,13 @@ public class EitherTest
     [Fact]
     public void AggregateSuccessesAndFailures_MixedFailuresAndSuccess()
     {
-        Either<string, int>[] eithers =
-        [
-            new("failure 1"),
-            new(1)
-        ];
+        Either<string, int>[] eithers = [new("failure 1"), new(1)];
 
         var aggregate = eithers.AggregateSuccessesAndFailures();
         Assert.True(aggregate.IsLeft);
         Assert.Equal(["failure 1"], aggregate.Left);
     }
-    
+
     [Fact]
     public void OnSuccessAll()
     {
@@ -364,7 +338,7 @@ public class EitherTest
         Assert.True(results.IsLeft);
         Assert.Equal(2, results.Left);
     }
-    
+
     [Fact]
     public void OnSuccessAllReturnVoid()
     {
@@ -437,18 +411,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(5);
-                results.Add(previousResult + " task2");
-            }))
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(5);
+                    results.Add(previousResult + " task2");
+                })
+            )
             // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                Assert.IsType<Unit>(previousResult);
-                await Task.Delay(15);
-                results.Add("task3");
-            }));
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    Assert.IsType<Unit>(previousResult);
+                    await Task.Delay(15);
+                    results.Add("task3");
+                })
+            );
 
         Assert.True(result.IsRight);
         Assert.Equal(3, results.Count);
@@ -469,17 +447,22 @@ public class EitherTaskTest
                     results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(5);
-                    results.Add(previousResult + " task2");
-                    throw new Exception("exception thrown");
-                }))
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(15);
-                    results.Add(previousResult + " task3");
-                })));
+                .OnSuccess(previousResult =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(5);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
+                    })
+                )
+                .OnSuccess(previousResult =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(15);
+                        results.Add(previousResult + " task3");
+                    })
+                )
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -497,16 +480,20 @@ public class EitherTaskTest
                 await Task.Delay(20);
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                return previousResult + " task2";
-            }))
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                return previousResult + " task3";
-            }));
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    return previousResult + " task2";
+                })
+            )
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    return previousResult + " task3";
+                })
+            );
 
         result.AssertRight("task1 task2 task3");
     }
@@ -523,21 +510,26 @@ public class EitherTaskTest
                     results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add(previousResult + " task2");
-                    throw new Exception("exception thrown");
+                .OnSuccess(previousResult =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
-                    return previousResult + " task2";
+                        return previousResult + " task2";
 #pragma warning restore 162
-                }))
-                .OnSuccess(previousResult => Task.Run(async () =>
-                {
-                    await Task.Delay(0);
-                    results.Add(previousResult + " task3");
-                    return previousResult + " task3";
-                })));
+                    })
+                )
+                .OnSuccess(previousResult =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add(previousResult + " task3");
+                        return previousResult + " task3";
+                    })
+                )
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -557,18 +549,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add("task2");
-                return "task2";
-            }))
-            .OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add("task3");
-                return "task3";
-            }));
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add("task2");
+                    return "task2";
+                })
+            )
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    results.Add("task3");
+                    return "task3";
+                })
+            );
 
         result.AssertRight("task3");
 
@@ -590,21 +586,26 @@ public class EitherTaskTest
                     results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(() => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add("task2");
-                    throw new Exception("exception thrown");
+                .OnSuccess(() =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
-                    return "task2";
+                        return "task2";
 #pragma warning restore 162
-                }))
-                .OnSuccess(() => Task.Run(async () =>
-                {
-                    await Task.Delay(0);
-                    results.Add("task3");
-                    return "task3";
-                })));
+                    })
+                )
+                .OnSuccess(() =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add("task3");
+                        return "task3";
+                    })
+                )
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -624,12 +625,14 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>(500);
             })
-            .OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add("task2");
-                return "task2";
-            }));
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add("task2");
+                    return "task2";
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -644,16 +647,20 @@ public class EitherTaskTest
                 await Task.Delay(20);
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                return new Either<int, string>(previousResult + " task2");
-            }))
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                return new Either<int, string>(previousResult + " task3");
-            }));
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    return new Either<int, string>(previousResult + " task2");
+                })
+            )
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    return new Either<int, string>(previousResult + " task3");
+                })
+            );
 
         result.AssertRight("task1 task2 task3");
     }
@@ -669,18 +676,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add(previousResult + " task2");
-                return new Either<int, string>(500);
-            }))
-            .OnSuccess(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add(previousResult + " task3");
-                return new Either<int, string>(previousResult + " task3");
-            }));
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add(previousResult + " task2");
+                    return new Either<int, string>(500);
+                })
+            )
+            .OnSuccess(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    results.Add(previousResult + " task3");
+                    return new Either<int, string>(previousResult + " task3");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -700,17 +711,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add("task2");
-                return new Either<int, string>("task2");
-            })).OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add("task3");
-                return new Either<int, string>("task3");
-            }));
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add("task2");
+                    return new Either<int, string>("task2");
+                })
+            )
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    results.Add("task3");
+                    return new Either<int, string>("task3");
+                })
+            );
 
         result.AssertRight("task3");
 
@@ -731,18 +747,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add("task2");
-                return new Either<int, string>(500);
-            }))
-            .OnSuccess(() => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add("task3");
-                return new Either<int, string>("task3");
-            }));
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add("task2");
+                    return new Either<int, string>(500);
+                })
+            )
+            .OnSuccess(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    results.Add("task3");
+                    return new Either<int, string>("task3");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -762,18 +782,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccessVoid(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add(previousResult + " task2");
-            }))
+            .OnSuccessVoid(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add(previousResult + " task2");
+                })
+            )
             // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-            .OnSuccessVoid(previousResult => Task.Run(async () =>
-            {
-                Assert.IsType<Unit>(previousResult);
-                await Task.Delay(0);
-                results.Add("task3");
-            }));
+            .OnSuccessVoid(previousResult =>
+                Task.Run(async () =>
+                {
+                    Assert.IsType<Unit>(previousResult);
+                    await Task.Delay(0);
+                    results.Add("task3");
+                })
+            );
 
         result.AssertRight(Unit.Instance);
 
@@ -788,23 +812,29 @@ public class EitherTaskTest
     {
         var results = new List<string>();
 
-        var exception = await Assert.ThrowsAsync<Exception>(async () => await Task.Run(async () =>
-            {
-                await Task.Delay(20);
-                results.Add("task1");
-                return new Either<int, string>("task1");
-            })
-            .OnSuccessVoid(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add(previousResult + " task2");
-                throw new Exception("exception thrown");
-            }))
-            .OnSuccessVoid(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add(previousResult + " task3");
-            })));
+        var exception = await Assert.ThrowsAsync<Exception>(async () =>
+            await Task.Run(async () =>
+                {
+                    await Task.Delay(20);
+                    results.Add("task1");
+                    return new Either<int, string>("task1");
+                })
+                .OnSuccessVoid(previousResult =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
+                    })
+                )
+                .OnSuccessVoid(previousResult =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add(previousResult + " task3");
+                    })
+                )
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -812,7 +842,6 @@ public class EitherTaskTest
         Assert.Equal("task1", results[0]);
         Assert.Equal("task1 task2", results[1]);
     }
-
 
     [Fact]
     public async Task OnSuccessVoid_WithTask_Left_PriorFailure()
@@ -825,11 +854,13 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>(500);
             })
-            .OnSuccessVoid(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add(previousResult + " task2");
-            }));
+            .OnSuccessVoid(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add(previousResult + " task2");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -847,16 +878,20 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccessVoid(() => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add("task2");
-            }))
-            .OnSuccessVoid(() => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add("task3");
-            }));
+            .OnSuccessVoid(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add("task2");
+                })
+            )
+            .OnSuccessVoid(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    results.Add("task3");
+                })
+            );
 
         result.AssertRight(Unit.Instance);
 
@@ -878,17 +913,22 @@ public class EitherTaskTest
                     results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessVoid(() => Task.Run(async () =>
-                {
-                    await Task.Delay(10);
-                    results.Add("task2");
-                    throw new Exception("exception thrown");
-                }))
-                .OnSuccessVoid(() => Task.Run(async () =>
-                {
-                    await Task.Delay(0);
-                    results.Add("task3");
-                })));
+                .OnSuccessVoid(() =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(10);
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
+                    })
+                )
+                .OnSuccessVoid(() =>
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(0);
+                        results.Add("task3");
+                    })
+                )
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -902,18 +942,19 @@ public class EitherTaskTest
     {
         var results = new List<string>();
 
-        var result = await
-            Task.Run(async () =>
-                {
-                    await Task.Delay(20);
-                    results.Add("task1");
-                    return new Either<int, string>(500);
-                })
-                .OnSuccessVoid(() => Task.Run(async () =>
+        var result = await Task.Run(async () =>
+            {
+                await Task.Delay(20);
+                results.Add("task1");
+                return new Either<int, string>(500);
+            })
+            .OnSuccessVoid(() =>
+                Task.Run(async () =>
                 {
                     await Task.Delay(10);
                     results.Add("task2");
-                }));
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -963,7 +1004,8 @@ public class EitherTaskTest
                 .OnSuccessVoid(() =>
                 {
                     results.Add("task3");
-                }));
+                })
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -1030,7 +1072,8 @@ public class EitherTaskTest
                 .OnSuccessVoid(() =>
                 {
                     results.Add("task3");
-                }));
+                })
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -1087,7 +1130,8 @@ public class EitherTaskTest
                 {
                     results.Add(previousResult + " task3");
                     return Task.FromResult(new Either<int, string>("task3"));
-                }));
+                })
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -1144,7 +1188,8 @@ public class EitherTaskTest
                 {
                     results.Add("task3");
                     return Task.FromResult(new Either<int, string>("task3"));
-                }));
+                })
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -1189,12 +1234,14 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccessDo(async () => await Task.Run(() =>
-            {
-                Task.Delay(20);
-                results.Add("task2");
-                return new Either<int, string>("task2");
-            }));
+            .OnSuccessDo(async () =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(20);
+                    results.Add("task2");
+                    return new Either<int, string>("task2");
+                })
+            );
 
         result.AssertRight("task1");
 
@@ -1214,18 +1261,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccessDo(async () => await Task.Run(() =>
-            {
-                Task.Delay(10);
-                results.Add("task2");
-                return new Either<int, string>(500);
-            }))
-            .OnSuccessDo(async () => await Task.Run(() =>
-            {
-                Task.Delay(20);
-                results.Add("task3");
-                return new Either<int, string>(600);
-            }));
+            .OnSuccessDo(async () =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(10);
+                    results.Add("task2");
+                    return new Either<int, string>(500);
+                })
+            )
+            .OnSuccessDo(async () =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(20);
+                    results.Add("task3");
+                    return new Either<int, string>(600);
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -1245,12 +1296,14 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>(500);
             })
-            .OnSuccessDo(async () => await Task.Run(() =>
-            {
-                Task.Delay(20);
-                results.Add("task2");
-                return new Either<int, string>("task2");
-            }));
+            .OnSuccessDo(async () =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(20);
+                    results.Add("task2");
+                    return new Either<int, string>("task2");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -1341,16 +1394,20 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccessDo(async previousResult => await Task.Run(() =>
-            {
-                Task.Delay(20);
-                results.Add(previousResult + " task2");
-            }))
-            .OnSuccessDo(async previousResult => await Task.Run(() =>
-            {
-                Task.Delay(20);
-                results.Add(previousResult + " task3");
-            }));
+            .OnSuccessDo(async previousResult =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(20);
+                    results.Add(previousResult + " task2");
+                })
+            )
+            .OnSuccessDo(async previousResult =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(20);
+                    results.Add(previousResult + " task3");
+                })
+            );
 
         result.AssertRight("task1");
 
@@ -1372,17 +1429,22 @@ public class EitherTaskTest
                     results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessDo(async previousResult => await Task.Run(() =>
-                {
-                    Task.Delay(10);
-                    results.Add(previousResult + " task2");
-                    throw new Exception("exception thrown");
-                }))
-                .OnSuccessDo(async previousResult => await Task.Run(() =>
-                {
-                    Task.Delay(20);
-                    results.Add(previousResult + " task3");
-                })));
+                .OnSuccessDo(async previousResult =>
+                    await Task.Run(() =>
+                    {
+                        Task.Delay(10);
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
+                    })
+                )
+                .OnSuccessDo(async previousResult =>
+                    await Task.Run(() =>
+                    {
+                        Task.Delay(20);
+                        results.Add(previousResult + " task3");
+                    })
+                )
+        );
 
         Assert.Equal("exception thrown", exception.Message);
 
@@ -1402,11 +1464,13 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>(500);
             })
-            .OnSuccessDo(async task1Result => await Task.Run(() =>
-            {
-                Task.Delay(20);
-                results.Add(task1Result + " task2");
-            }));
+            .OnSuccessDo(async task1Result =>
+                await Task.Run(() =>
+                {
+                    Task.Delay(20);
+                    results.Add(task1Result + " task2");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -1502,14 +1566,13 @@ public class EitherTaskTest
     [Fact]
     public async Task OnSuccessCombineWith_AllSuccessMixedTypes()
     {
-        var result = await
-            Task.FromResult(new Either<int, string>("Success number one!"))
-                // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessCombineWith(firstSuccess =>
-                {
-                    Assert.Equal("Success number one!", firstSuccess);
-                    return Task.FromResult(new Either<int, char>('2'));
-                });
+        var result = await Task.FromResult(new Either<int, string>("Success number one!"))
+            // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
+            .OnSuccessCombineWith(firstSuccess =>
+            {
+                Assert.Equal("Success number one!", firstSuccess);
+                return Task.FromResult(new Either<int, char>('2'));
+            });
 
         result.AssertRight(TupleOf("Success number one!", '2'));
     }
@@ -1544,11 +1607,13 @@ public class EitherTaskTest
                 await Task.Delay(20);
                 return new Either<int, string>("task1");
             })
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                return new Either<int, string>(previousResult + " task2");
-            }));
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    return new Either<int, string>(previousResult + " task2");
+                })
+            );
 
         Assert.True(result.IsRight);
         Assert.Equal("task1", result.Right.Item1);
@@ -1566,18 +1631,22 @@ public class EitherTaskTest
                 results.Add("task1");
                 return new Either<int, string>("task1");
             })
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                results.Add(previousResult + " task2");
-                return new Either<int, string>(500);
-            }))
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                await Task.Delay(0);
-                results.Add(previousResult + " task3");
-                return new Either<int, string>(previousResult + " task3");
-            }));
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    results.Add(previousResult + " task2");
+                    return new Either<int, string>(500);
+                })
+            )
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(0);
+                    results.Add(previousResult + " task3");
+                    return new Either<int, string>(previousResult + " task3");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -1595,20 +1664,24 @@ public class EitherTaskTest
                 return new Either<int, string>("task1");
             })
             // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                Assert.Equal("task1", previousResult);
-                await Task.Delay(10);
-                return new Either<int, string>("task2");
-            }))
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    Assert.Equal("task1", previousResult);
+                    await Task.Delay(10);
+                    return new Either<int, string>("task2");
+                })
+            )
             // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                Assert.Equal("task1", previousResult.Item1);
-                Assert.Equal("task2", previousResult.Item2);
-                await Task.Delay(10);
-                return new Either<int, string>("task3");
-            }));
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    Assert.Equal("task1", previousResult.Item1);
+                    Assert.Equal("task2", previousResult.Item2);
+                    await Task.Delay(10);
+                    return new Either<int, string>("task3");
+                })
+            );
 
         Assert.True(result.IsRight);
         var (value1, value2, value3) = result.Right;
@@ -1629,22 +1702,26 @@ public class EitherTaskTest
                 return new Either<int, string>("task1");
             })
             // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                Assert.Equal("task1", previousResult);
-                await Task.Delay(10);
-                results.Add("task2");
-                return new Either<int, string>(500);
-            }))
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    Assert.Equal("task1", previousResult);
+                    await Task.Delay(10);
+                    results.Add("task2");
+                    return new Either<int, string>(500);
+                })
+            )
             // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-            .OnSuccessCombineWith(previousResult => Task.Run(async () =>
-            {
-                Assert.Equal("task1", previousResult.Item1);
-                Assert.Equal("task2", previousResult.Item2);
-                await Task.Delay(0);
-                results.Add("task3");
-                return new Either<int, string>("task3");
-            }));
+            .OnSuccessCombineWith(previousResult =>
+                Task.Run(async () =>
+                {
+                    Assert.Equal("task1", previousResult.Item1);
+                    Assert.Equal("task2", previousResult.Item2);
+                    await Task.Delay(0);
+                    results.Add("task3");
+                    return new Either<int, string>("task3");
+                })
+            );
 
         result.AssertLeft(500);
 
@@ -1717,7 +1794,8 @@ public class EitherTaskTest
 #pragma warning disable 162
                     return "failure";
 #pragma warning restore 162
-                }));
+                })
+        );
 
         Assert.Equal("exception thrown", exception.Message);
     }
@@ -1725,30 +1803,28 @@ public class EitherTaskTest
     [Fact]
     public async Task OrElse_GenericTaskNoArg_PriorSuccess()
     {
-        var result = await
-            Task.FromResult(new Either<int, string>("Success1"))
-                .OrElse(() => "Success2");
+        var result = await Task.FromResult(new Either<int, string>("Success1"))
+            .OrElse(() => "Success2");
 
         Assert.Equal("Success1", result);
     }
-    
+
     [Fact]
     public async Task OrThrow_EitherTask_FirstSucceeds()
     {
-        var result = await
-            Task.FromResult(new Either<int, string>("Success1"))
-                .OrThrow(failure => new ArgumentException($"Error {failure}"));
+        var result = await Task.FromResult(new Either<int, string>("Success1"))
+            .OrThrow(failure => new ArgumentException($"Error {failure}"));
 
         Assert.Equal("Success1", result);
     }
-    
+
     [Fact]
     public async Task OrThrow_EitherTask_FirstFails()
     {
-        var exception = await 
-            Assert.ThrowsAsync<ArgumentException>(() => 
-                Task.FromResult(new Either<int, string>(1))
-                    .OrThrow(failure => new ArgumentException($"Error {failure}")));
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+            Task.FromResult(new Either<int, string>(1))
+                .OrThrow(failure => new ArgumentException($"Error {failure}"))
+        );
 
         Assert.Equal("Error 1", exception.Message);
     }
@@ -1773,12 +1849,10 @@ public class EitherTaskTest
         var failures = new List<int>();
 
         var result = await Task.FromResult(new Either<int, string>("Success"))
-            .OnFailureVoid(
-                failure =>
-                {
-                    failures.Add(failure);
-                }
-            );
+            .OnFailureVoid(failure =>
+            {
+                failures.Add(failure);
+            });
 
         result.AssertRight("Success");
 

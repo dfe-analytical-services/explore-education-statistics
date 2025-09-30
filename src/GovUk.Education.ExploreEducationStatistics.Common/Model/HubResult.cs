@@ -46,7 +46,7 @@ public record HubResult
         {
             ForbidResult => StatusCodes.Status403Forbidden,
             StatusCodeResult statusCodeResult => statusCodeResult.StatusCode,
-            _ => StatusCodes.Status204NoContent
+            _ => StatusCodes.Status204NoContent,
         };
     }
 }
@@ -56,25 +56,27 @@ public record HubResult
 /// hub method, returning some data as part of the response.
 /// </summary>
 /// <typeparam name="TData">The data returned by the response</typeparam>
-public record HubResult<TData> : HubResult where TData : class
+public record HubResult<TData> : HubResult
+    where TData : class
 {
     private const int DefaultStatusCode = StatusCodes.Status200OK;
 
     public TData? Data { get; }
 
-    public HubResult(TData data, int status = DefaultStatusCode) : base(status)
+    public HubResult(TData data, int status = DefaultStatusCode)
+        : base(status)
     {
         Data = data;
     }
 
-    public HubResult(
-        ActionResult<TData> result,
-        int status = DefaultStatusCode) : base(status)
+    public HubResult(ActionResult<TData> result, int status = DefaultStatusCode)
+        : base(status)
     {
         Data = result.Value;
     }
 
-    public HubResult(ActionResult result) : base(result)
+    public HubResult(ActionResult result)
+        : base(result)
     {
         Data = null!;
     }

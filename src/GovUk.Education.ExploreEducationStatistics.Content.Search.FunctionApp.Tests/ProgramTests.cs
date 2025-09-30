@@ -15,27 +15,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class ProgramTests
 {
     private const string FullConfig = """
-                                        {
-                                            "App": {
-                                                "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
-                                                "SearchableDocumentsContainerName": "searchable-documents-container-name"
-                                            },
-                                            "ContentApi": {
-                                                "Url": "http://contentapi.test.url:8123"
-                                            }
-                                        }
-                                       """;
+         {
+             "App": {
+                 "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
+                 "SearchableDocumentsContainerName": "searchable-documents-container-name"
+             },
+             "ContentApi": {
+                 "Url": "http://contentapi.test.url:8123"
+             }
+         }
+        """;
 
     private IHost GetSut() => GetSutWithConfig(FullConfig);
 
-    private IHost GetSutWithConfig(params string[] jsonConfig) => GetSut(builder =>
-        builder.ConfigureAppConfiguration((_, configurationBuilder) =>
-        {
-            foreach (var s in jsonConfig)
-            {
-                configurationBuilder.AddJsonString(s);
-            }
-        }));
+    private IHost GetSutWithConfig(params string[] jsonConfig) =>
+        GetSut(builder =>
+            builder.ConfigureAppConfiguration(
+                (_, configurationBuilder) =>
+                {
+                    foreach (var s in jsonConfig)
+                    {
+                        configurationBuilder.AddJsonString(s);
+                    }
+                }
+            )
+        );
 
     private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) =>
         modifyHostBuilder(new HostBuilder().UseEnvironment("Development"))
@@ -106,14 +110,16 @@ public class ProgramTests
             public void BaseAddressShouldBeConfigured()
             {
                 // ARRANGE
-                var sut = base.GetSutWithConfig(FullConfig,
+                var sut = base.GetSutWithConfig(
+                    FullConfig,
                     """
                     {
                      "ContentApi": {
                           "Url": "http://my.test.url:123"
                      }
                     }
-                    """);
+                    """
+                );
 
                 // ACT
                 var actual = sut.Services.GetRequiredService<IContentApiClient>();
@@ -121,7 +127,10 @@ public class ProgramTests
                 // ASSERT
                 Assert.NotNull(actual);
                 var contentApiClient = Assert.IsType<ContentApiClient>(actual);
-                Assert.Equal("http://my.test.url:123/", contentApiClient.HttpClient.BaseAddress?.ToString());
+                Assert.Equal(
+                    "http://my.test.url:123/",
+                    contentApiClient.HttpClient.BaseAddress?.ToString()
+                );
             }
 
             [Fact]
@@ -129,13 +138,16 @@ public class ProgramTests
             {
                 // ARRANGE
                 IHost StartupHost() =>
-                    base.GetSutWithConfig(FullConfig, """
-                                                      {
-                                                       "ContentApi": {
-                                                            "Url": null
-                                                       }
-                                                      }
-                                                      """);
+                    base.GetSutWithConfig(
+                        FullConfig,
+                        """
+                        {
+                         "ContentApi": {
+                              "Url": null
+                         }
+                        }
+                        """
+                    );
 
                 // ACT
                 var actual = StartupHost();
@@ -152,7 +164,8 @@ public class ProgramTests
             public void ShouldBeConfigured()
             {
                 // ARRANGE
-                var sut = base.GetSutWithConfig(FullConfig,
+                var sut = base.GetSutWithConfig(
+                    FullConfig,
                     """
                     {
                        "App": {
@@ -160,7 +173,8 @@ public class ProgramTests
                             "SearchableDocumentsContainerName": "searchable-documents-container-name"
                        }
                     }
-                    """);
+                    """
+                );
 
                 // ACT
                 var actual = sut.Services.GetRequiredService<IAzureBlobStorageClient>();
@@ -169,7 +183,10 @@ public class ProgramTests
                 Assert.NotNull(actual);
                 var azureBlobStorageClient = Assert.IsType<AzureBlobStorageClient>(actual);
                 var blobServiceClient = azureBlobStorageClient.BlobServiceClient;
-                Assert.Equal("https://mystorageaccount.blob.core.windows.net/", blobServiceClient.Uri.ToString());
+                Assert.Equal(
+                    "https://mystorageaccount.blob.core.windows.net/",
+                    blobServiceClient.Uri.ToString()
+                );
                 Assert.Equal("mystorageaccount", blobServiceClient.AccountName);
             }
 
@@ -178,14 +195,17 @@ public class ProgramTests
             {
                 // ARRANGE
                 IHost StartupHost() =>
-                    base.GetSutWithConfig(FullConfig, """
-                                                      {
-                                                         "App": {
-                                                              "SearchStorageConnectionString": null,
-                                                              "SearchableDocumentsContainerName": "searchable-documents-container-name"
-                                                         }
-                                                      }
-                                                      """);
+                    base.GetSutWithConfig(
+                        FullConfig,
+                        """
+                        {
+                           "App": {
+                                "SearchStorageConnectionString": null,
+                                "SearchableDocumentsContainerName": "searchable-documents-container-name"
+                           }
+                        }
+                        """
+                    );
 
                 // ACT
                 var host = StartupHost();
@@ -200,14 +220,17 @@ public class ProgramTests
             {
                 // ARRANGE
                 IHost StartupHost() =>
-                    base.GetSutWithConfig(FullConfig, """
-                                                      {
-                                                         "App": {
-                                                              "SearchStorageConnectionString": "UseDevelopmentStorage=true",
-                                                              "SearchableDocumentsContainerName": null
-                                                         }
-                                                      }
-                                                      """);
+                    base.GetSutWithConfig(
+                        FullConfig,
+                        """
+                        {
+                           "App": {
+                                "SearchStorageConnectionString": "UseDevelopmentStorage=true",
+                                "SearchableDocumentsContainerName": null
+                           }
+                        }
+                        """
+                    );
 
                 // ACT
                 var host = StartupHost();
@@ -227,7 +250,9 @@ public class ProgramTests
                 var sut = GetSut();
 
                 // ACT
-                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(
+                    sut.Services
+                );
 
                 // ASSERT
                 Assert.NotNull(actual);
@@ -240,7 +265,9 @@ public class ProgramTests
                 var sut = GetSutWithConfig("{}");
 
                 // ACT
-                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                var actual = sut.Services.GetRequiredService<
+                    IOptions<ReindexSearchableDocumentsFunction>
+                >();
 
                 // ASSERT
                 Assert.NotNull(actual);
@@ -268,10 +295,12 @@ public class ProgramTests
             public static TheoryData<Type> GetAzureFunctionTypes()
             {
                 var types = typeof(Program)
-                    .Assembly
-                    .GetTypes()
-                    .Where(type => type.Namespace?.StartsWith(
-                            "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.") == true)
+                    .Assembly.GetTypes()
+                    .Where(type =>
+                        type.Namespace?.StartsWith(
+                            "GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions."
+                        ) == true
+                    )
                     .Where(type => type.Name.EndsWith("Function"));
 
                 return new TheoryData<Type>(types);

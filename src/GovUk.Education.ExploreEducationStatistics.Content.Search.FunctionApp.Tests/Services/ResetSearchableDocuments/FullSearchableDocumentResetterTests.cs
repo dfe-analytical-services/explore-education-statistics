@@ -14,7 +14,8 @@ public class FullSearchableDocumentResetterTests
         new FullSearchableDocumentResetter(
             _contentApi.Build(),
             _searchableDocumentRemover.Build(),
-            new NullLogger<FullSearchableDocumentResetter>());
+            new NullLogger<FullSearchableDocumentResetter>()
+        );
 
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
@@ -24,34 +25,37 @@ public class FullSearchableDocumentResetterTests
     {
         // Arrange
         var sut = GetSut();
-        
+
         // Act
         await sut.PerformReset();
-        
+
         // Assert
         _searchableDocumentRemover.Assert.AllSearchableDocumentsRemoved();
     }
-    
+
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(10)]
     [InlineData(100)]
-    public async Task WhenPerformFullReset_ThenReturnsListOfAllPublications(int numberOfPublications)
+    public async Task WhenPerformFullReset_ThenReturnsListOfAllPublications(
+        int numberOfPublications
+    )
     {
         // Arrange
-        var publications = Enumerable.Range(0, numberOfPublications)
+        var publications = Enumerable
+            .Range(0, numberOfPublications)
             .Select(i => new PublicationInfo
             {
                 PublicationSlug = $"publication-slug-{i}",
-                LatestReleaseSlug = $"release-slug-{i}"
+                LatestReleaseSlug = $"release-slug-{i}",
             })
-            .ToArray(); 
+            .ToArray();
 
         _contentApi.WhereHasPublications(publications);
-            
+
         var sut = GetSut();
-        
+
         // Act
         var response = await sut.PerformReset();
 
@@ -60,5 +64,4 @@ public class FullSearchableDocumentResetterTests
         var actual = response.AllPublications;
         Assert.Equal(publications, actual);
     }
-    
 }

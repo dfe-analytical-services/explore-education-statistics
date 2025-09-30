@@ -16,7 +16,8 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
     public override IDataSetQueryLocation? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
-        JsonSerializerOptions options)
+        JsonSerializerOptions options
+    )
     {
         if (!JsonDocument.TryParseValue(ref reader, out var doc))
         {
@@ -25,12 +26,17 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
 
         var rootElement = doc.RootElement.GetRawText();
 
-        var propertyNames = doc.RootElement
-            .EnumerateObject()
+        var propertyNames = doc
+            .RootElement.EnumerateObject()
             .Select(p => p.Name.ToUpperFirst())
             .ToHashSet();
 
-        if (!doc.RootElement.TryGetProperty(nameof(IDataSetQueryLocation.Level).ToLowerFirst(), out var levelProperty))
+        if (
+            !doc.RootElement.TryGetProperty(
+                nameof(IDataSetQueryLocation.Level).ToLowerFirst(),
+                out var levelProperty
+            )
+        )
         {
             throw new JsonException();
         }
@@ -44,27 +50,47 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
                 switch (level)
                 {
                     case GeographicLevel.LocalAuthority
-                        when propertyNames.Contains(nameof(DataSetQueryLocationLocalAuthorityCode.Code)):
-                        return JsonSerializer.Deserialize<DataSetQueryLocationLocalAuthorityCode>(rootElement, options);
+                        when propertyNames.Contains(
+                            nameof(DataSetQueryLocationLocalAuthorityCode.Code)
+                        ):
+                        return JsonSerializer.Deserialize<DataSetQueryLocationLocalAuthorityCode>(
+                            rootElement,
+                            options
+                        );
 
                     case GeographicLevel.LocalAuthority
-                        when propertyNames.Contains(nameof(DataSetQueryLocationLocalAuthorityOldCode.OldCode)):
+                        when propertyNames.Contains(
+                            nameof(DataSetQueryLocationLocalAuthorityOldCode.OldCode)
+                        ):
                         return JsonSerializer.Deserialize<DataSetQueryLocationLocalAuthorityOldCode>(
                             rootElement,
                             options
                         );
 
                     case GeographicLevel.School
-                        when propertyNames.Contains(nameof(DataSetQueryLocationSchoolLaEstab.LaEstab)):
-                        return JsonSerializer.Deserialize<DataSetQueryLocationSchoolLaEstab>(rootElement, options);
+                        when propertyNames.Contains(
+                            nameof(DataSetQueryLocationSchoolLaEstab.LaEstab)
+                        ):
+                        return JsonSerializer.Deserialize<DataSetQueryLocationSchoolLaEstab>(
+                            rootElement,
+                            options
+                        );
 
                     case GeographicLevel.School
                         when propertyNames.Contains(nameof(DataSetQueryLocationSchoolUrn.Urn)):
-                        return JsonSerializer.Deserialize<DataSetQueryLocationSchoolUrn>(rootElement, options);
+                        return JsonSerializer.Deserialize<DataSetQueryLocationSchoolUrn>(
+                            rootElement,
+                            options
+                        );
 
                     case GeographicLevel.Provider
-                        when propertyNames.Contains(nameof(DataSetQueryLocationProviderUkprn.Ukprn)):
-                        return JsonSerializer.Deserialize<DataSetQueryLocationProviderUkprn>(rootElement, options);
+                        when propertyNames.Contains(
+                            nameof(DataSetQueryLocationProviderUkprn.Ukprn)
+                        ):
+                        return JsonSerializer.Deserialize<DataSetQueryLocationProviderUkprn>(
+                            rootElement,
+                            options
+                        );
                 }
             }
 
@@ -81,32 +107,71 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
         }
     }
 
-    public override void Write(Utf8JsonWriter writer, IDataSetQueryLocation value, JsonSerializerOptions options)
+    public override void Write(
+        Utf8JsonWriter writer,
+        IDataSetQueryLocation value,
+        JsonSerializerOptions options
+    )
     {
         try
         {
             switch (value)
             {
                 case DataSetQueryLocationLocalAuthorityCode:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationLocalAuthorityCode), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationLocalAuthorityCode),
+                        options
+                    );
                     return;
                 case DataSetQueryLocationLocalAuthorityOldCode:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationLocalAuthorityOldCode), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationLocalAuthorityOldCode),
+                        options
+                    );
                     return;
                 case DataSetQueryLocationProviderUkprn:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationProviderUkprn), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationProviderUkprn),
+                        options
+                    );
                     return;
                 case DataSetQueryLocationSchoolLaEstab:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationSchoolLaEstab), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationSchoolLaEstab),
+                        options
+                    );
                     return;
                 case DataSetQueryLocationSchoolUrn:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationSchoolUrn), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationSchoolUrn),
+                        options
+                    );
                     return;
                 case DataSetQueryLocationCode:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationCode), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationCode),
+                        options
+                    );
                     return;
                 case DataSetQueryLocationId:
-                    JsonSerializer.Serialize(writer, value, typeof(DataSetQueryLocationId), options);
+                    JsonSerializer.Serialize(
+                        writer,
+                        value,
+                        typeof(DataSetQueryLocationId),
+                        options
+                    );
                     return;
             }
         }

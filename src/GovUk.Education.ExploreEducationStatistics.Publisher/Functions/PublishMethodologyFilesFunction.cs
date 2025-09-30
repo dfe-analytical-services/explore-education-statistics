@@ -8,17 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
 public class PublishMethodologyFilesFunction(
     ILogger<PublishMethodologyFilesFunction> logger,
-    IPublishingService publishingService)
+    IPublishingService publishingService
+)
 {
     [Function("PublishMethodologyFiles")]
     public async Task PublishMethodologyFiles(
-        [QueueTrigger(PublishMethodologyFilesQueue)]
-        PublishMethodologyFilesMessage message,
-        FunctionContext context)
+        [QueueTrigger(PublishMethodologyFilesQueue)] PublishMethodologyFilesMessage message,
+        FunctionContext context
+    )
     {
-        logger.LogInformation("{FunctionName} triggered: {Message}",
+        logger.LogInformation(
+            "{FunctionName} triggered: {Message}",
             context.FunctionDefinition.Name,
-            message);
+            message
+        );
 
         await publishingService.PublishMethodologyFiles(message.MethodologyId);
 

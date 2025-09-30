@@ -11,12 +11,10 @@ public class DataSetQueryCriteriaOrValidatorTests
     [Fact]
     public void Empty_Failure()
     {
-        var query = new DataSetQueryCriteriaOr
-        {
-            Or = [],
-        };
+        var query = new DataSetQueryCriteriaOr { Or = [] };
 
-        _validator.TestValidate(query)
+        _validator
+            .TestValidate(query)
             .ShouldHaveValidationErrorFor(q => q.Or)
             .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
             .Only();
@@ -25,16 +23,10 @@ public class DataSetQueryCriteriaOrValidatorTests
     [Fact]
     public void Nulls_Failure()
     {
-        var query = new DataSetQueryCriteriaOr
-        {
-            Or =
-            [
-                null!,
-                new DataSetQueryCriteriaFacets()
-            ],
-        };
+        var query = new DataSetQueryCriteriaOr { Or = [null!, new DataSetQueryCriteriaFacets()] };
 
-        _validator.TestValidate(query)
+        _validator
+            .TestValidate(query)
             .ShouldHaveValidationErrorFor("Or[0]")
             .WithErrorCode(FluentValidationKeys.NotNullValidator)
             .Only();
@@ -49,10 +41,7 @@ public class DataSetQueryCriteriaOrValidatorTests
             [
                 new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetQueryCriteriaFilters
-                    {
-                        Eq = "12345"
-                    },
+                    Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                 },
             ],
         };
@@ -69,17 +58,12 @@ public class DataSetQueryCriteriaOrValidatorTests
             [
                 new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetQueryCriteriaFilters
-                    {
-                        Eq = ""
-                    },
+                    Filters = new DataSetQueryCriteriaFilters { Eq = "" },
                 },
             ],
         };
 
-        _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("Or[0].Filters.Eq")
-            .Only();
+        _validator.TestValidate(query).ShouldHaveValidationErrorFor("Or[0].Filters.Eq").Only();
     }
 
     [Fact]
@@ -91,16 +75,13 @@ public class DataSetQueryCriteriaOrValidatorTests
             [
                 new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetQueryCriteriaFilters
-                    {
-                        Eq = "12345"
-                    }
+                    Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                 },
                 new DataSetQueryCriteriaFacets
                 {
                     TimePeriods = new DataSetQueryCriteriaTimePeriods
                     {
-                        NotEq = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" }
+                        NotEq = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" },
                     },
                 },
             ],
@@ -108,7 +89,6 @@ public class DataSetQueryCriteriaOrValidatorTests
 
         _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
     }
-
 
     [Fact]
     public void MultipleFacets_Failure()
@@ -119,16 +99,13 @@ public class DataSetQueryCriteriaOrValidatorTests
             [
                 new DataSetQueryCriteriaFacets
                 {
-                    Filters = new DataSetQueryCriteriaFilters
-                    {
-                        Eq = ""
-                    },
+                    Filters = new DataSetQueryCriteriaFilters { Eq = "" },
                 },
                 new DataSetQueryCriteriaFacets
                 {
                     TimePeriods = new DataSetQueryCriteriaTimePeriods
                     {
-                        Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "Invalid" }
+                        Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "Invalid" },
                     },
                 },
             ],
@@ -145,20 +122,9 @@ public class DataSetQueryCriteriaOrValidatorTests
     [Fact]
     public void SingleCondition_Empty_Failure()
     {
-        var query = new DataSetQueryCriteriaOr
-        {
-            Or =
-            [
-                new DataSetQueryCriteriaOr
-                {
-                    Or = [],
-                },
-            ],
-        };
+        var query = new DataSetQueryCriteriaOr { Or = [new DataSetQueryCriteriaOr { Or = [] }] };
 
-        _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("Or[0].Or")
-            .Only();
+        _validator.TestValidate(query).ShouldHaveValidationErrorFor("Or[0].Or").Only();
     }
 
     [Fact]
@@ -174,10 +140,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = "12345"
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                         },
                     ],
                 },
@@ -200,17 +163,15 @@ public class DataSetQueryCriteriaOrValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = new string('x', 11)
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                         },
                     ],
                 },
             ],
         };
 
-        _validator.TestValidate(query)
+        _validator
+            .TestValidate(query)
             .ShouldHaveValidationErrorFor("Or[0].Or[0].Filters.Eq")
             .Only();
     }
@@ -228,10 +189,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = "12345"
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                         },
                     ],
                 },
@@ -243,7 +201,11 @@ public class DataSetQueryCriteriaOrValidatorTests
                         {
                             TimePeriods = new DataSetQueryCriteriaTimePeriods
                             {
-                                Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" }
+                                Gte = new DataSetQueryTimePeriod
+                                {
+                                    Period = "2020/2021",
+                                    Code = "AY",
+                                },
                             },
                         },
                     ],
@@ -277,10 +239,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = new string('x', 11)
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                         },
                     ],
                 },
@@ -292,7 +251,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                         {
                             TimePeriods = new DataSetQueryCriteriaTimePeriods
                             {
-                                Gte = new DataSetQueryTimePeriod { Period = "", Code = "AY" }
+                                Gte = new DataSetQueryTimePeriod { Period = "", Code = "AY" },
                             },
                         },
                     ],
@@ -332,10 +291,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = "12345"
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = "12345" },
                         },
                     ],
                 },
@@ -343,7 +299,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                 {
                     TimePeriods = new DataSetQueryCriteriaTimePeriods
                     {
-                        Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" }
+                        Gte = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" },
                     },
                 },
             ],
@@ -365,10 +321,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                     [
                         new DataSetQueryCriteriaFacets
                         {
-                            Filters = new DataSetQueryCriteriaFilters
-                            {
-                                Eq = new string('x', 11)
-                            },
+                            Filters = new DataSetQueryCriteriaFilters { Eq = new string('x', 11) },
                         },
                     ],
                 },
@@ -376,7 +329,7 @@ public class DataSetQueryCriteriaOrValidatorTests
                 {
                     TimePeriods = new DataSetQueryCriteriaTimePeriods
                     {
-                        Gte = new DataSetQueryTimePeriod { Period = "", Code = "AY" }
+                        Gte = new DataSetQueryTimePeriod { Period = "", Code = "AY" },
                     },
                 },
             ],

@@ -66,10 +66,12 @@ public class Startup
     {
         services.AddHealthChecks();
 
-        services.AddApplicationInsightsTelemetry()
+        services
+            .AddApplicationInsightsTelemetry()
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
-        services.AddMvc(options =>
+        services
+            .AddMvc(options =>
             {
                 options.Filters.Add(new OperationCancelledExceptionFilter());
                 options.Filters.Add(new ProblemDetailsResultFilter());
@@ -94,10 +96,13 @@ public class Startup
 
         services.AddDbContext<StatisticsDbContext>(options =>
             options
-                .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                .UseSqlServer(
+                    Configuration.GetConnectionString("StatisticsDb"),
                     providerOptions =>
                         providerOptions
-                            .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                            .MigrationsAssembly(
+                                "GovUk.Education.ExploreEducationStatistics.Data.Model"
+                            )
                             .AddBulkOperationSupport()
                             .EnableCustomRetryOnFailure()
                 )
@@ -106,7 +111,8 @@ public class Startup
 
         services.AddDbContext<ContentDbContext>(options =>
             options
-                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                .UseSqlServer(
+                    Configuration.GetConnectionString("ContentDb"),
                     providerOptions =>
                         providerOptions
                             .MigrationsAssembly(typeof(Startup).Assembly.FullName)
@@ -124,7 +130,14 @@ public class Startup
         // Register the Swagger generator, defining 1 or more Swagger documents
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Data API", Version = "v1" });
+            c.SwaggerDoc(
+                "v1",
+                new OpenApiInfo
+                {
+                    Title = "Explore education statistics - Data API",
+                    Version = "v1",
+                }
+            );
             c.SchemaFilter<EnumSchemaFilter>();
             c.SchemaFilter<TimeIdentifierSchemaFilter>();
         });
@@ -134,14 +147,18 @@ public class Startup
         //
 
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
-        services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
+        services.Configure<TableBuilderOptions>(
+            Configuration.GetSection(TableBuilderOptions.Section)
+        );
 
         services.AddSingleton<IBlobSasService, BlobSasService>();
-        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(
+        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(
+            provider => new PublicBlobStorageService(
                 connectionString: Configuration.GetValue<string>("PublicStorage")!,
                 logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                sasService: provider.GetRequiredService<IBlobSasService>()));
+                sasService: provider.GetRequiredService<IBlobSasService>()
+            )
+        );
         services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<BlobCacheService>>()
@@ -173,53 +190,72 @@ public class Startup
         services.AddTransient<IPermalinkService, PermalinkService>();
         services.AddTransient<IPermalinkCsvMetaService, PermalinkCsvMetaService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
-        services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
-        services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
+        services.AddSingleton<
+            DataServiceMemoryCache<BoundaryLevel>,
+            DataServiceMemoryCache<BoundaryLevel>
+        >();
+        services.AddSingleton<
+            DataServiceMemoryCache<BoundaryData>,
+            DataServiceMemoryCache<BoundaryData>
+        >();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
         services.AddTransient<ILocationService, LocationService>();
         services.AddSingleton<DateTimeProvider>();
         services.AddAnalytics(Configuration);
-        
-        services
-            .AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = "defaultScheme";
-                options.DefaultForbidScheme = "defaultScheme";
-                options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
-            });
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = "defaultScheme";
+            options.DefaultForbidScheme = "defaultScheme";
+            options.AddScheme<DefaultAuthenticationHandler>("defaultScheme", "Default Scheme");
+        });
 
         services.AddAuthorization(options =>
         {
             // does this use have permission to view a specific Release?
-            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
-                policy.Requirements.Add(new ViewReleaseRequirement()));
+            options.AddPolicy(
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(),
+                policy => policy.Requirements.Add(new ViewReleaseRequirement())
+            );
 
             // does this user have permission to view the subject data of a specific Release?
-            options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
-                policy.Requirements.Add(new ViewSubjectDataRequirement()));
+            options.AddPolicy(
+                DataSecurityPolicies.CanViewSubjectData.ToString(),
+                policy => policy.Requirements.Add(new ViewSubjectDataRequirement())
+            );
         });
 
-        services.AddHttpClient("PublicApp", httpClient =>
-        {
-            var publicAppOptions = new PublicAppOptions();
-            Configuration.GetSection("PublicApp").Bind(publicAppOptions);
-
-            httpClient.BaseAddress = new Uri(publicAppOptions.Url);
-
-            if (publicAppOptions.BasicAuth)
+        services.AddHttpClient(
+            "PublicApp",
+            httpClient =>
             {
-                httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Basic",
-                        Convert.ToBase64String(Encoding.UTF8.GetBytes(
-                            $"{publicAppOptions.BasicAuthUsername}:{publicAppOptions.BasicAuthPassword}")));
-            }
+                var publicAppOptions = new PublicAppOptions();
+                Configuration.GetSection("PublicApp").Bind(publicAppOptions);
 
-            httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
-        });
+                httpClient.BaseAddress = new Uri(publicAppOptions.Url);
+
+                if (publicAppOptions.BasicAuth)
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                        "Basic",
+                        Convert.ToBase64String(
+                            Encoding.UTF8.GetBytes(
+                                $"{publicAppOptions.BasicAuthUsername}:{publicAppOptions.BasicAuthPassword}"
+                            )
+                        )
+                    );
+                }
+
+                httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
+            }
+        );
 
         services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
+        services.AddTransient<
+            IAuthorizationHandler,
+            ViewSubjectDataForPublishedReleasesAuthorizationHandler
+        >();
 
         services.AddCors();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -233,10 +269,15 @@ public class Startup
     {
         // Enable caching and register any caching services.
         CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+        BlobCacheAttribute.AddService(
+            "default",
+            app.ApplicationServices.GetRequiredService<IBlobCacheService>()
+        );
         // Enable cancellation aspects and register request timeout configuration.
         CancellationTokenTimeoutAspect.Enabled = true;
-        CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
+        CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(
+            Configuration.GetSection("RequestTimeouts")
+        );
 
         if (env.IsDevelopment())
         {
@@ -248,8 +289,7 @@ public class Startup
             app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
         }
 
-        var rewriteOptions = new RewriteOptions()
-            .Add(new LowercasePathRule());
+        var rewriteOptions = new RewriteOptions().Add(new LowercasePathRule());
 
         if (Configuration.GetValue<bool>("enableSwagger"))
         {
@@ -269,21 +309,25 @@ public class Startup
         // Adds Brotli and Gzip compressing
         app.UseResponseCompression();
 
-        app.UseCors(options => options
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "https://localhost:3000",
-                "https://localhost:3001")
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+        app.UseCors(options =>
+            options
+                .WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "https://localhost:3000",
+                    "https://localhost:3001"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+        );
 
         app.UseMvc();
         app.UseHealthChecks("/api/health");
 
         app.ServerFeatures.Get<IServerAddressesFeature>()
-            ?.Addresses
-            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+            ?.Addresses.ForEach(address =>
+                Console.WriteLine($"Server listening on address: {address}")
+            );
     }
 
     private record PublicAppOptions

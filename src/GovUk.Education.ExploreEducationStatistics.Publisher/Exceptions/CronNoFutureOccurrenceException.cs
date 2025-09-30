@@ -9,5 +9,8 @@
 public class CronNoFutureOccurrenceException(
     string cronExpression,
     DateTimeOffset from,
-    TimeZoneInfo timeZone) : Exception(
-    $"No next occurrence for Cron expression: '{cronExpression}' from: '{from}' evaluated in time zone: '${timeZone.Id}'");
+    TimeZoneInfo timeZone
+)
+    : Exception(
+        $"No next occurrence for Cron expression: '{cronExpression}' from: '{from}' evaluated in time zone: '${timeZone.Id}'"
+    );

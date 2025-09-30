@@ -30,9 +30,7 @@ public abstract class PublicationServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
             await SeedDatabase(publication, _contentDbContextId);
 
@@ -44,8 +42,10 @@ public abstract class PublicationServiceTests
             Assert.Equal(publication.Title, publicationViewModel.Title);
             Assert.Equal(publication.Slug, publicationViewModel.Slug);
             Assert.Equal(publication.Summary, publicationViewModel.Summary);
-            Assert.Equal(publication.LatestPublishedReleaseVersion!.Published!.Value,
-                publicationViewModel.Published);
+            Assert.Equal(
+                publication.LatestPublishedReleaseVersion!.Published!.Value,
+                publicationViewModel.Published
+            );
         }
 
         [Fact]
@@ -53,9 +53,11 @@ public abstract class PublicationServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
+                );
 
             await SeedDatabase(publication, _contentDbContextId);
 
@@ -85,9 +87,9 @@ public abstract class PublicationServiceTests
             }
         }
 
-        private static async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(
-            Guid publicationId,
-            string contentDbContextId)
+        private static async Task<
+            Either<ActionResult, PublishedPublicationSummaryViewModel>
+        > GetSummary(Guid publicationId, string contentDbContextId)
         {
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -105,7 +107,7 @@ public abstract class PublicationServiceTests
             TeamName = "Team name",
             TeamEmail = "team@email.com",
             ContactName = "Contact name",
-            ContactTelNo = "1234"
+            ContactTelNo = "1234",
         };
 
         private readonly ExternalMethodology _externalMethodology = new()
@@ -121,14 +123,21 @@ public abstract class PublicationServiceTests
 
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases([
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
-                ])
+                .WithReleases(
+                    [
+                        _dataFixture.DefaultRelease(
+                            publishedVersions: 2,
+                            draftVersion: true,
+                            year: 2022
+                        ),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                        _dataFixture.DefaultRelease(
+                            publishedVersions: 0,
+                            draftVersion: true,
+                            year: 2021
+                        ),
+                    ]
+                )
                 .WithContact(_contact)
                 .WithExternalMethodology(_externalMethodology)
                 .WithLegacyLinks([legacyLink])
@@ -142,7 +151,10 @@ public abstract class PublicationServiceTests
 
                     // Apply a different release series order rather than using the default
                     p.ReleaseSeries =
-                        [.. GenerateReleaseSeries(p.Releases, 2021, 2020, 2022), legacyLink];
+                    [
+                        .. GenerateReleaseSeries(p.Releases, 2021, 2020, 2022),
+                        legacyLink,
+                    ];
                 });
 
             var release2020 = publication.Releases.Single(r => r.Year == 2020);
@@ -217,8 +229,14 @@ public abstract class PublicationServiceTests
                 Assert.Equal(_contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
 
                 Assert.NotNull(publicationViewModel.ExternalMethodology);
-                Assert.Equal(_externalMethodology.Title, publicationViewModel.ExternalMethodology!.Title);
-                Assert.Equal(_externalMethodology.Url, publicationViewModel.ExternalMethodology.Url);
+                Assert.Equal(
+                    _externalMethodology.Title,
+                    publicationViewModel.ExternalMethodology!.Title
+                );
+                Assert.Equal(
+                    _externalMethodology.Url,
+                    publicationViewModel.ExternalMethodology.Url
+                );
             }
         }
 
@@ -227,15 +245,12 @@ public abstract class PublicationServiceTests
         {
             Publication supersedingPublication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithSupersededBy(supersedingPublication)
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1))
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1))
                 .WithContact(_contact)
                 .WithExternalMethodology(_externalMethodology)
                 .WithTheme(_dataFixture.DefaultTheme());
@@ -270,15 +285,16 @@ public abstract class PublicationServiceTests
         {
             Publication supersedingPublication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
+                );
 
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithSupersededBy(supersedingPublication)
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1))
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1))
                 .WithContact(_contact)
                 .WithExternalMethodology(_externalMethodology)
                 .WithTheme(_dataFixture.DefaultTheme());
@@ -309,9 +325,11 @@ public abstract class PublicationServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1))
+                .WithReleases(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        .Generate(1)
+                )
                 .WithContact(_contact)
                 .WithExternalMethodology(_externalMethodology)
                 .WithTheme(_dataFixture.DefaultTheme());
@@ -362,14 +380,15 @@ public abstract class PublicationServiceTests
         {
             var (publication1, publication2, publication3) = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1))
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1))
                 .GenerateTuple3();
 
             var (theme1, theme2) = _dataFixture
                 .DefaultTheme()
-                .ForIndex(0, themeSetter => themeSetter.SetPublications([publication1, publication2]))
+                .ForIndex(
+                    0,
+                    themeSetter => themeSetter.SetPublications([publication1, publication2])
+                )
                 .ForIndex(1, themeSetter => themeSetter.SetPublications([publication3]))
                 .GenerateTuple2();
 
@@ -420,12 +439,18 @@ public abstract class PublicationServiceTests
                 .DefaultTheme()
                 // Index 0 has no publications,
                 // Index 1 one publication
-                .ForIndex(1, s => s.SetPublications(_dataFixture
-                    .DefaultPublication()
-                        .WithReleases(_dataFixture
-                            .DefaultRelease(publishedVersions: 1)
-                            .Generate(1))
-                    .Generate(1)))
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetPublications(
+                            _dataFixture
+                                .DefaultPublication()
+                                .WithReleases(
+                                    _dataFixture.DefaultRelease(publishedVersions: 1).Generate(1)
+                                )
+                                .Generate(1)
+                        )
+                )
                 .Generate(2)
                 .ToTuple2();
 
@@ -461,28 +486,51 @@ public abstract class PublicationServiceTests
                 // Index 1 has a publication with a published and unpublished release
                 // Index 2 has a publication with no releases
                 // Index 3 has a publication with an unpublished release
-                .ForIndex(0, s => s.SetPublications(_dataFixture
-                    .DefaultPublication()
-                        .WithReleases(_dataFixture
-                            .DefaultRelease(publishedVersions: 1)
-                            .Generate(1))
-                    .Generate(1)))
-                .ForIndex(1, s => s.SetPublications(_dataFixture
-                    .DefaultPublication()
-                        .WithReleases(ListOf<Release>(
-                            _dataFixture.DefaultRelease(publishedVersions: 1),
-                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                        ))
-                    .Generate(1)))
-                .ForIndex(2, s => s.SetPublications(_dataFixture
-                    .DefaultPublication()
-                        .Generate(1)))
-                .ForIndex(3, s => s.SetPublications(_dataFixture
-                    .DefaultPublication()
-                        .WithReleases(_dataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                            .Generate(1))
-                        .Generate(1)))
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetPublications(
+                            _dataFixture
+                                .DefaultPublication()
+                                .WithReleases(
+                                    _dataFixture.DefaultRelease(publishedVersions: 1).Generate(1)
+                                )
+                                .Generate(1)
+                        )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetPublications(
+                            _dataFixture
+                                .DefaultPublication()
+                                .WithReleases(
+                                    ListOf<Release>(
+                                        _dataFixture.DefaultRelease(publishedVersions: 1),
+                                        _dataFixture.DefaultRelease(
+                                            publishedVersions: 0,
+                                            draftVersion: true
+                                        )
+                                    )
+                                )
+                                .Generate(1)
+                        )
+                )
+                .ForIndex(2, s => s.SetPublications(_dataFixture.DefaultPublication().Generate(1)))
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetPublications(
+                            _dataFixture
+                                .DefaultPublication()
+                                .WithReleases(
+                                    _dataFixture
+                                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                                        .Generate(1)
+                                )
+                                .Generate(1)
+                        )
+                )
                 .GenerateList(4);
 
             var contextId = Guid.NewGuid().ToString();
@@ -505,16 +553,28 @@ public abstract class PublicationServiceTests
                 Assert.Equal(themes[1].Title, publicationTree[1].Title);
 
                 Assert.Single(publicationTree[0].Publications);
-                Assert.Equal(themes[0].Publications[0].Title, publicationTree[0].Publications[0].Title);
+                Assert.Equal(
+                    themes[0].Publications[0].Title,
+                    publicationTree[0].Publications[0].Title
+                );
 
                 Assert.Single(publicationTree[0].Publications);
-                Assert.Equal(themes[0].Publications[0].Title, publicationTree[0].Publications[0].Title);
+                Assert.Equal(
+                    themes[0].Publications[0].Title,
+                    publicationTree[0].Publications[0].Title
+                );
 
                 Assert.Single(publicationTree[1].Publications);
-                Assert.Equal(themes[1].Publications[0].Title, publicationTree[1].Publications[0].Title);
+                Assert.Equal(
+                    themes[1].Publications[0].Title,
+                    publicationTree[1].Publications[0].Title
+                );
 
                 Assert.Single(publicationTree[1].Publications);
-                Assert.Equal(themes[1].Publications[0].Title, publicationTree[1].Publications[0].Title);
+                Assert.Equal(
+                    themes[1].Publications[0].Title,
+                    publicationTree[1].Publications[0].Title
+                );
             }
         }
 
@@ -523,14 +583,20 @@ public abstract class PublicationServiceTests
         {
             var theme = _dataFixture
                 .DefaultTheme()
-                .WithPublications(_dataFixture
-                    .DefaultPublication()
-                    // Index 0 has a published release
-                    // Index 1 has no releases
-                    .ForIndex(0, s => s.SetReleases(_dataFixture
-                        .DefaultRelease(publishedVersions: 1)
-                        .Generate(1)))
-                    .Generate(2))
+                .WithPublications(
+                    _dataFixture
+                        .DefaultPublication()
+                        // Index 0 has a published release
+                        // Index 1 has no releases
+                        .ForIndex(
+                            0,
+                            s =>
+                                s.SetReleases(
+                                    _dataFixture.DefaultRelease(publishedVersions: 1).Generate(1)
+                                )
+                        )
+                        .Generate(2)
+                )
                 .Generate();
 
             var contextId = Guid.NewGuid().ToString();
@@ -558,9 +624,7 @@ public abstract class PublicationServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(2));
 
             var theme = _dataFixture
                 .DefaultTheme()
@@ -573,20 +637,14 @@ public abstract class PublicationServiceTests
                 new()
                 {
                     ReleaseVersion = publication.ReleaseVersions[1],
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
+                    File = new File { Type = FileType.Data },
                 },
                 // Older release has no data
                 new()
                 {
                     ReleaseVersion = publication.ReleaseVersions[0],
-                    File = new File
-                    {
-                        Type = FileType.Ancillary
-                    }
-                }
+                    File = new File { Type = FileType.Ancillary },
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -620,9 +678,7 @@ public abstract class PublicationServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(2));
 
             var theme = _dataFixture
                 .DefaultTheme()
@@ -635,19 +691,13 @@ public abstract class PublicationServiceTests
                 new()
                 {
                     ReleaseVersion = publication.ReleaseVersions[1],
-                    File = new File
-                    {
-                        Type = FileType.Ancillary
-                    }
+                    File = new File { Type = FileType.Ancillary },
                 },
                 // Older release has data, so the publication is visible
                 new()
                 {
                     ReleaseVersion = publication.ReleaseVersions[0],
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
+                    File = new File { Type = FileType.Data },
                 },
             };
 
@@ -682,9 +732,12 @@ public abstract class PublicationServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true),
-                    _dataFixture.DefaultRelease(publishedVersions: 1)));
+                .WithReleases(
+                    ListOf<Release>(
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true),
+                        _dataFixture.DefaultRelease(publishedVersions: 1)
+                    )
+                );
 
             var theme = _dataFixture
                 .DefaultTheme()
@@ -697,19 +750,13 @@ public abstract class PublicationServiceTests
                 new()
                 {
                     ReleaseVersion = publication.ReleaseVersions[1],
-                    File = new File
-                    {
-                        Type = FileType.Ancillary
-                    }
+                    File = new File { Type = FileType.Ancillary },
                 },
                 // Unpublished release has data but this shouldn't alter anything
                 new()
                 {
                     ReleaseVersion = publication.ReleaseVersions[0],
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
+                    File = new File { Type = FileType.Data },
                 },
             };
 
@@ -743,16 +790,13 @@ public abstract class PublicationServiceTests
         {
             Publication supersedingPublication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
             var (publication1, publication2) = _dataFixture
                 .DefaultPublication()
                 // Both publications have published releases
                 // Index 1 is superseded
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1))
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1))
                 .ForIndex(1, s => s.SetSupersededBy(supersedingPublication))
                 .GenerateTuple2();
 
@@ -802,51 +846,48 @@ public abstract class PublicationServiceTests
         public async Task GivenPublishedPublications_WhenListPublicationInfos_ThenReturnsPublicationInfos()
         {
             // Arrange
-            var publishedPublications = 
-                    Enumerable
-                    .Range(1, 3)
-                    .Select(_ => GeneratePublishedPublication())
-                    .ToArray();
+            var publishedPublications = Enumerable
+                .Range(1, 3)
+                .Select(_ => GeneratePublishedPublication())
+                .ToArray();
 
             var themes = new List<Theme>
             {
                 GenerateTheme(publishedPublications.Take(2)),
-                GenerateTheme(publishedPublications.Skip(2))
+                GenerateTheme(publishedPublications.Skip(2)),
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
             // Assert
             AssertPublicationInfosAsExpected(publishedPublications, results);
         }
-        
+
         [Fact]
         public async Task GivenPublishedAndUnpublishedPublications_WhenListPublicationInfos_ThenReturnsOnlyPublishedPublicationInfos()
         {
             // Arrange
-            var publishedPublications = 
-                    Enumerable
-                    .Range(1, 3)
-                    .Select(_ => GeneratePublishedPublication())
-                    .ToArray();
-            
-            var unpublishedPublications = 
-                    Enumerable
-                    .Range(1, 3)
-                    .Select(_ => GenerateUnpublishedPublication())
-                    .ToArray();
+            var publishedPublications = Enumerable
+                .Range(1, 3)
+                .Select(_ => GeneratePublishedPublication())
+                .ToArray();
+
+            var unpublishedPublications = Enumerable
+                .Range(1, 3)
+                .Select(_ => GenerateUnpublishedPublication())
+                .ToArray();
 
             var themes = new List<Theme>
             {
                 GenerateTheme(publishedPublications.Take(2), unpublishedPublications.Take(1)),
-                GenerateTheme(publishedPublications.Skip(2), unpublishedPublications.Skip(1))
+                GenerateTheme(publishedPublications.Skip(2), unpublishedPublications.Skip(1)),
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
@@ -858,32 +899,37 @@ public abstract class PublicationServiceTests
         public async Task GivenPublishedPublicationsSomeOfWhichAreSuperseded_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfos()
         {
             // Arrange
-            var publishedPublications = 
-                    Enumerable
-                    .Range(1, 3)
-                    .Select(_ => GeneratePublishedPublication())
-                    .ToArray();
-            
-            var publishedPublicationsWithUnpublishedSuperseded = 
-                    Enumerable
-                    .Range(1, 4)
-                    .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
-                    .ToArray();
-            
-            var supersededPublications = 
-                    Enumerable
-                    .Range(1, 5)
-                    .Select(_ => GeneratePublicationWithPublishedSuperseded())
-                    .ToArray();
+            var publishedPublications = Enumerable
+                .Range(1, 3)
+                .Select(_ => GeneratePublishedPublication())
+                .ToArray();
+
+            var publishedPublicationsWithUnpublishedSuperseded = Enumerable
+                .Range(1, 4)
+                .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
+                .ToArray();
+
+            var supersededPublications = Enumerable
+                .Range(1, 5)
+                .Select(_ => GeneratePublicationWithPublishedSuperseded())
+                .ToArray();
 
             var themes = new List<Theme>
             {
-                GenerateTheme(publishedPublications.Take(1), supersededPublications.Take(1), publishedPublicationsWithUnpublishedSuperseded.Take(2)),
-                GenerateTheme(publishedPublications.Skip(1), supersededPublications.Skip(1), publishedPublicationsWithUnpublishedSuperseded.Skip(2))
+                GenerateTheme(
+                    publishedPublications.Take(1),
+                    supersededPublications.Take(1),
+                    publishedPublicationsWithUnpublishedSuperseded.Take(2)
+                ),
+                GenerateTheme(
+                    publishedPublications.Skip(1),
+                    supersededPublications.Skip(1),
+                    publishedPublicationsWithUnpublishedSuperseded.Skip(2)
+                ),
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
@@ -892,7 +938,7 @@ public abstract class PublicationServiceTests
                 .Concat(publishedPublicationsWithUnpublishedSuperseded)
                 .Concat(supersededPublications.Select(p => p.SupersededBy).OfType<Publication>())
                 .ToArray();
-            
+
             AssertPublicationInfosAsExpected(expectedPublications, results);
         }
 
@@ -900,26 +946,26 @@ public abstract class PublicationServiceTests
         public async Task GivenPublishedPublicationsSomeOfWhichAreSupersededByEachOther_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfosOnce()
         {
             // Arrange
-            var publishedPublications = 
-                    Enumerable
-                    .Range(1, 3)
-                    .Select(_ => GeneratePublishedPublication())
-                    .ToArray();
-            
-            var supersededPublications = 
-                    Enumerable
-                    .Range(1, 3)
-                    .Select(i => GeneratePublicationWithPublishedSuperseded(publishedPublications[i - 1]))
-                    .ToArray();
+            var publishedPublications = Enumerable
+                .Range(1, 3)
+                .Select(_ => GeneratePublishedPublication())
+                .ToArray();
+
+            var supersededPublications = Enumerable
+                .Range(1, 3)
+                .Select(i =>
+                    GeneratePublicationWithPublishedSuperseded(publishedPublications[i - 1])
+                )
+                .ToArray();
 
             var themes = new List<Theme>
             {
                 GenerateTheme(publishedPublications.Take(1), supersededPublications.Take(1)),
-                GenerateTheme(publishedPublications.Skip(1), supersededPublications.Skip(1))
+                GenerateTheme(publishedPublications.Skip(1), supersededPublications.Skip(1)),
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
@@ -932,29 +978,25 @@ public abstract class PublicationServiceTests
         public async Task GivenAVarietyOfPublications_WhenListPublicationInfosByThemeIdIsCalled_ThenReturnsPublishedPublicationInfosInTheme()
         {
             // Arrange
-            var publishedPublications = 
-                Enumerable
-                    .Range(1, 6)
-                    .Select(_ => GeneratePublishedPublication())
-                    .ToArray();
-            
-            var unpublishedPublications = 
-                Enumerable
-                    .Range(1, 6)
-                    .Select(_ => GenerateUnpublishedPublication())
-                    .ToArray();
-            
-            var publishedPublicationsWithUnpublishedSuperseded = 
-                Enumerable
-                    .Range(1, 6)
-                    .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
-                    .ToArray();
-            
-            var supersededPublications = 
-                Enumerable
-                    .Range(1, 6)
-                    .Select(_ => GeneratePublicationWithPublishedSuperseded())
-                    .ToArray();
+            var publishedPublications = Enumerable
+                .Range(1, 6)
+                .Select(_ => GeneratePublishedPublication())
+                .ToArray();
+
+            var unpublishedPublications = Enumerable
+                .Range(1, 6)
+                .Select(_ => GenerateUnpublishedPublication())
+                .ToArray();
+
+            var publishedPublicationsWithUnpublishedSuperseded = Enumerable
+                .Range(1, 6)
+                .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
+                .ToArray();
+
+            var supersededPublications = Enumerable
+                .Range(1, 6)
+                .Select(_ => GeneratePublicationWithPublishedSuperseded())
+                .ToArray();
 
             var allPublicationsSplitInto3Groups = publishedPublications
                 .Concat(unpublishedPublications)
@@ -968,17 +1010,17 @@ public abstract class PublicationServiceTests
             {
                 GenerateTheme(allPublicationsSplitInto3Groups[0].Shuffle()),
                 GenerateTheme(allPublicationsSplitInto3Groups[1].Shuffle()),
-                GenerateTheme(allPublicationsSplitInto3Groups[2].Shuffle())
+                GenerateTheme(allPublicationsSplitInto3Groups[2].Shuffle()),
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             IList<PublicationInfoViewModel>[] resultsByTheme =
             [
                 await ListPublicationInfos(themes[0].Id),
                 await ListPublicationInfos(themes[1].Id),
-                await ListPublicationInfos(themes[2].Id)
+                await ListPublicationInfos(themes[2].Id),
             ];
 
             // Assert
@@ -986,37 +1028,55 @@ public abstract class PublicationServiceTests
                 .Concat(publishedPublicationsWithUnpublishedSuperseded)
                 .Concat(supersededPublications.Select(p => p.SupersededBy).OfType<Publication>())
                 .ToArray();
-            
+
             IList<Publication>[] expectedPublicationsByTheme =
             [
                 expectedPublications.Intersect(allPublicationsSplitInto3Groups[0]).ToList(),
                 expectedPublications.Intersect(allPublicationsSplitInto3Groups[1]).ToList(),
-                expectedPublications.Intersect(allPublicationsSplitInto3Groups[2]).ToList()
+                expectedPublications.Intersect(allPublicationsSplitInto3Groups[2]).ToList(),
             ];
-            
-            Assert.All([0,1,2],
+
+            Assert.All(
+                [0, 1, 2],
                 i =>
                 {
-                    AssertPublicationInfosAsExpected(expectedPublicationsByTheme[i], resultsByTheme[i]);
-                });
+                    AssertPublicationInfosAsExpected(
+                        expectedPublicationsByTheme[i],
+                        resultsByTheme[i]
+                    );
+                }
+            );
         }
-        
-        private void AssertPublicationInfosAsExpected(IList<Publication> expectedPublications, IList<PublicationInfoViewModel> actualPublicationInfoViewModels)
+
+        private void AssertPublicationInfosAsExpected(
+            IList<Publication> expectedPublications,
+            IList<PublicationInfoViewModel> actualPublicationInfoViewModels
+        )
         {
             Assert.Equal(expectedPublications.Count, actualPublicationInfoViewModels.Count);
-            Assert.All(expectedPublications.OrderBy(p => p.Id).Zip(actualPublicationInfoViewModels.OrderBy(p => p.PublicationId)),
+            Assert.All(
+                expectedPublications
+                    .OrderBy(p => p.Id)
+                    .Zip(actualPublicationInfoViewModels.OrderBy(p => p.PublicationId)),
                 x =>
                 {
                     var (expected, actual) = x;
                     Assert.Equal(expected.Id, actual.PublicationId);
                     Assert.Equal(expected.Slug, actual.PublicationSlug);
                     Assert.NotNull(actual.LatestPublishedRelease);
-                    Assert.Equal(expected.LatestPublishedReleaseVersion?.Release.Slug, actual.LatestPublishedRelease.ReleaseSlug);
-                    Assert.Equal(expected.LatestPublishedReleaseVersion?.Release.Id, actual.LatestPublishedRelease.ReleaseId);
-                });
+                    Assert.Equal(
+                        expected.LatestPublishedReleaseVersion?.Release.Slug,
+                        actual.LatestPublishedRelease.ReleaseSlug
+                    );
+                    Assert.Equal(
+                        expected.LatestPublishedReleaseVersion?.Release.Id,
+                        actual.LatestPublishedRelease.ReleaseId
+                    );
+                }
+            );
         }
 
-        private Theme GenerateTheme(params IEnumerable<Publication>[] publications) => 
+        private Theme GenerateTheme(params IEnumerable<Publication>[] publications) =>
             _dataFixture
                 .DefaultTheme()
                 .WithPublications(publications.SelectMany(p => p))
@@ -1026,40 +1086,31 @@ public abstract class PublicationServiceTests
             _dataFixture
                 .DefaultPublication()
                 .WithLatestPublishedReleaseVersion(
-                    _dataFixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(
-                            _dataFixture
-                                .DefaultRelease()))
-                .Generate();
-    
-        private Publication GenerateUnpublishedPublication() =>
-            _dataFixture
-                .DefaultPublication()
+                    _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease())
+                )
                 .Generate();
 
-        private Publication GeneratePublicationWithPublishedSuperseded(Publication? supersededBy = null) =>
+        private Publication GenerateUnpublishedPublication() =>
+            _dataFixture.DefaultPublication().Generate();
+
+        private Publication GeneratePublicationWithPublishedSuperseded(
+            Publication? supersededBy = null
+        ) =>
             _dataFixture
                 .DefaultPublication()
                 .WithSupersededBy(supersededBy ?? GeneratePublishedPublication())
                 .WithLatestPublishedReleaseVersion(
-                    _dataFixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(
-                            _dataFixture
-                                .DefaultRelease()))
+                    _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease())
+                )
                 .Generate();
-    
+
         private Publication GeneratePublicationWithUnpublishedSuperseded() =>
             _dataFixture
                 .DefaultPublication()
                 .WithSupersededBy(GenerateUnpublishedPublication())
                 .WithLatestPublishedReleaseVersion(
-                    _dataFixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(
-                            _dataFixture
-                                .DefaultRelease()))
+                    _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease())
+                )
                 .Generate();
 
         private async Task AddToDatabase(IEnumerable<Theme> themes)
@@ -1069,7 +1120,9 @@ public abstract class PublicationServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        private async Task<IList<PublicationInfoViewModel>> ListPublicationInfos(Guid? themeId = null)
+        private async Task<IList<PublicationInfoViewModel>> ListPublicationInfos(
+            Guid? themeId = null
+        )
         {
             await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
             var service = SetupPublicationService(contentDbContext);
@@ -1077,20 +1130,26 @@ public abstract class PublicationServiceTests
         }
     }
 
-    private List<ReleaseSeriesItem> GenerateReleaseSeries(IReadOnlyList<Release> releases, params int[] years)
+    private List<ReleaseSeriesItem> GenerateReleaseSeries(
+        IReadOnlyList<Release> releases,
+        params int[] years
+    )
     {
-        return years.Select(year =>
-        {
-            var release = releases.Single(r => r.Year == year);
-            return _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(release.Id).Generate();
-        }).ToList();
+        return years
+            .Select(year =>
+            {
+                var release = releases.Single(r => r.Year == year);
+                return _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(release.Id).Generate();
+            })
+            .ToList();
     }
 
     private static PublicationService SetupPublicationService(
         ContentDbContext? contentDbContext = null,
         IPublicationRepository? publicationRepository = null,
         IReleaseRepository? releaseRepository = null,
-        IReleaseVersionRepository? releaseVersionRepository = null)
+        IReleaseVersionRepository? releaseVersionRepository = null
+    )
     {
         contentDbContext ??= InMemoryContentDbContext();
 

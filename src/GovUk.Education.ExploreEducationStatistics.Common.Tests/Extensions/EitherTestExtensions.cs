@@ -29,34 +29,51 @@ public static class EitherTestExtensions
         result.AssertStatusCodeResult(HttpStatusCode.InternalServerError);
     }
 
-    public static void AssertStatusCodeResult<T>(this Either<ActionResult, T> result, HttpStatusCode statusCode)
+    public static void AssertStatusCodeResult<T>(
+        this Either<ActionResult, T> result,
+        HttpStatusCode statusCode
+    )
     {
         var statusCodeResult = result.AssertActionResultOfType<StatusCodeResult, T>();
-        Assert.Equal((int) statusCode, statusCodeResult.StatusCode);
+        Assert.Equal((int)statusCode, statusCodeResult.StatusCode);
     }
 
-    public static TRight AssertRight<TLeft, TRight>(this Either<TLeft, TRight> either, string message = null)
+    public static TRight AssertRight<TLeft, TRight>(
+        this Either<TLeft, TRight> either,
+        string message = null
+    )
     {
         if (either.IsLeft)
         {
-            AssertFail(message ?? $"Expected Either to be Right, but was Left with value {either.Left}");
+            AssertFail(
+                message ?? $"Expected Either to be Right, but was Left with value {either.Left}"
+            );
         }
 
         return either.Right;
     }
 
-    public static TRight AssertRight<TLeft, TRight>(this Either<TLeft, TRight> either, TRight expected, string message = null)
+    public static TRight AssertRight<TLeft, TRight>(
+        this Either<TLeft, TRight> either,
+        TRight expected,
+        string message = null
+    )
     {
         var value = either.AssertRight(message);
         Assert.Equal(expected, value);
         return value;
     }
 
-    public static TLeft AssertLeft<TLeft, TRight>(this Either<TLeft, TRight> either, string message = null)
+    public static TLeft AssertLeft<TLeft, TRight>(
+        this Either<TLeft, TRight> either,
+        string message = null
+    )
     {
         if (either.IsRight)
         {
-            AssertFail(message ?? $"Expected Either to be Left, but was Right with value {either.Right}");
+            AssertFail(
+                message ?? $"Expected Either to be Left, but was Right with value {either.Right}"
+            );
         }
 
         return either.Left;
@@ -65,40 +82,51 @@ public static class EitherTestExtensions
     public static TLeft AssertLeft<TLeft, TRight>(
         this Either<TLeft, TRight> either,
         TLeft expectedValue,
-        string message = null)
+        string message = null
+    )
     {
         var value = either.AssertLeft(message);
         Assert.Equal(expectedValue, value);
         return either.Left;
     }
 
-    public static ActionResult AssertBadRequest<TRight>(this Either<ActionResult, TRight> either,
-        params Enum[] expectedValidationErrors)
+    public static ActionResult AssertBadRequest<TRight>(
+        this Either<ActionResult, TRight> either,
+        params Enum[] expectedValidationErrors
+    )
     {
         var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
         badRequest.AssertValidationProblem(expectedValidationErrors);
         return either.Left;
     }
-    
-    public static ActionResult AssertBadRequestWithErrorViewModels<TRight>(this Either<ActionResult, TRight> either,
-        List<ErrorViewModel> expectedErrorViewModels)
+
+    public static ActionResult AssertBadRequestWithErrorViewModels<TRight>(
+        this Either<ActionResult, TRight> either,
+        List<ErrorViewModel> expectedErrorViewModels
+    )
     {
         var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
         badRequest.AssertBadRequestWithValidationErrors(expectedErrorViewModels);
         return either.Left;
     }
 
-    public static ValidationProblemViewModel AssertBadRequestWithValidationProblem<TRight>(this Either<ActionResult, TRight> either)
+    public static ValidationProblemViewModel AssertBadRequestWithValidationProblem<TRight>(
+        this Either<ActionResult, TRight> either
+    )
     {
-        var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>(); 
+        var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
         return Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
     }
 
-    private static TActionResult AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)
+    private static TActionResult AssertActionResultOfType<TActionResult, TRight>(
+        this Either<ActionResult, TRight> result
+    )
         where TActionResult : ActionResult
     {
-        var actionResult = result.AssertLeft($"Expecting result to be Left when asserting result of " +
-                                             $"type {typeof(TActionResult)}");
+        var actionResult = result.AssertLeft(
+            $"Expecting result to be Left when asserting result of "
+                + $"type {typeof(TActionResult)}"
+        );
         Assert.IsType<TActionResult>(actionResult);
         return actionResult as TActionResult;
     }

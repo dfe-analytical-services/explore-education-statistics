@@ -17,7 +17,8 @@ public class ValidationService : IValidationService
     public ValidationService(
         ContentDbContext context,
         IReleasePublishingStatusService releasePublishingStatusService,
-        ILogger<ValidationService> logger)
+        ILogger<ValidationService> logger
+    )
     {
         _context = context;
         _releasePublishingStatusService = releasePublishingStatusService;
@@ -25,12 +26,13 @@ public class ValidationService : IValidationService
     }
 
     public async Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(
-        Guid releaseVersionId)
+        Guid releaseVersionId
+    )
     {
         _logger.LogTrace("Validating release version: {0}", releaseVersionId);
 
-        var releaseVersion = await _context.ReleaseVersions
-            .AsNoTracking()
+        var releaseVersion = await _context
+            .ReleaseVersions.AsNoTracking()
             .Include(releaseVersion => releaseVersion.Publication)
             .SingleAsync(releaseVersion => releaseVersion.Id == releaseVersionId);
 
@@ -48,18 +50,21 @@ public class ValidationService : IValidationService
 
     public async Task<bool> ValidatePublishingState(Guid releaseVersionId)
     {
-        _logger.LogTrace("Validating publishing state for release version {ReleaseVersionId}", releaseVersionId);
+        _logger.LogTrace(
+            "Validating publishing state for release version {ReleaseVersionId}",
+            releaseVersionId
+        );
 
         // Before creating a new release status entry for this release version,
         // check there are no existing entries that are scheduled or started.
-        var scheduledOrStarted =
-            await _releasePublishingStatusService.GetReleasesWithOverallStages(
-                releaseVersionId,
-                overallStages:
-                [
-                    ReleasePublishingStatusOverallStage.Scheduled,
-                    ReleasePublishingStatusOverallStage.Started
-                ]);
+        var scheduledOrStarted = await _releasePublishingStatusService.GetReleasesWithOverallStages(
+            releaseVersionId,
+            overallStages:
+            [
+                ReleasePublishingStatusOverallStage.Scheduled,
+                ReleasePublishingStatusOverallStage.Started,
+            ]
+        );
 
         if (scheduledOrStarted.Any())
         {
@@ -69,7 +74,8 @@ public class ValidationService : IValidationService
             _logger.LogError(
                 "Validating {ValidationStage} failed. Publishing is already scheduled or started. ReleaseVersionId: {ReleaseVersionId}",
                 ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString(),
-                scheduledOrStarted[0].ReleaseVersionId);
+                scheduledOrStarted[0].ReleaseVersionId
+            );
 
             return false;
         }
@@ -78,43 +84,54 @@ public class ValidationService : IValidationService
     }
 
     private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateApproval(
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         return releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved
             ? Unit.Instance
-            : Failure(ValidationStage.ReleaseMustBeApproved,
-                $"Release approval status is {releaseVersion.ApprovalStatus}");
+            : Failure(
+                ValidationStage.ReleaseMustBeApproved,
+                $"Release approval status is {releaseVersion.ApprovalStatus}"
+            );
     }
 
-    private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateScheduledPublishDate(
-        ReleaseVersion releaseVersion)
+    private static Either<
+        IEnumerable<ReleasePublishingStatusLogMessage>,
+        Unit
+    > ValidateScheduledPublishDate(ReleaseVersion releaseVersion)
     {
         return releaseVersion.PublishScheduled.HasValue
             ? Unit.Instance
-            : Failure(ValidationStage.ReleaseMustHavePublishScheduledDate, "Scheduled publish date is not set");
+            : Failure(
+                ValidationStage.ReleaseMustHavePublishScheduledDate,
+                "Scheduled publish date is not set"
+            );
     }
 
     private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> Failure(
         ValidationStage stage,
-        string message)
+        string message
+    )
     {
         return new List<ReleasePublishingStatusLogMessage>
         {
-            new($"Validating {stage}: {message}")
+            new($"Validating {stage}: {message}"),
         };
     }
 
     private static IEnumerable<ReleasePublishingStatusLogMessage> CollateMessages(
-        params Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>[] results)
+        params Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>[] results
+    )
     {
         return results.SelectMany(either =>
-            either.IsLeft ? either.Left : new ReleasePublishingStatusLogMessage[] { });
+            either.IsLeft ? either.Left : new ReleasePublishingStatusLogMessage[] { }
+        );
     }
 
     private enum ValidationStage
     {
         ReleaseMustBeApproved,
         ReleaseMustHavePublishScheduledDate,
-        ReleasePublishingStateNotScheduledOrStarted
+        ReleasePublishingStateNotScheduledOrStarted,
     }
 }

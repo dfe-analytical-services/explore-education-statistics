@@ -36,8 +36,9 @@ internal class DefaultValuesOperationFilter : IOperationFilter
 
         foreach (var parameter in operation.Parameters)
         {
-            var description = apiDescription.ParameterDescriptions
-                .First(p => p.Name.Equals(parameter.Name, StringComparison.CurrentCultureIgnoreCase));
+            var description = apiDescription.ParameterDescriptions.First(p =>
+                p.Name.Equals(parameter.Name, StringComparison.CurrentCultureIgnoreCase)
+            );
 
             parameter.Description ??= description.ModelMetadata?.Description;
 

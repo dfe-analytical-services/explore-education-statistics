@@ -17,7 +17,10 @@ public partial class EES3661_AddPublicationsFreeTextTableFunction : Migration
     {
         // Add a database table-valued function wrapping the SQL Server built-in function freetexttable.
         // This can be mapped to a queryable function in EF Core
-        migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_Routine_PublicationsFreeTextTable.sql");
+        migrationBuilder.SqlFromFile(
+            ContentMigrationsPath,
+            $"{MigrationId}_Routine_PublicationsFreeTextTable.sql"
+        );
         migrationBuilder.Sql("GRANT SELECT ON dbo.PublicationsFreeTextTable TO [content]");
     }
 

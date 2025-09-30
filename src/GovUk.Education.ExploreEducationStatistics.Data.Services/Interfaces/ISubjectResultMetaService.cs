@@ -12,5 +12,6 @@ public interface ISubjectResultMetaService
     Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
         Guid releaseVersionId,
         FullTableQuery query,
-        IList<Observation> observations);
+        IList<Observation> observations
+    );
 }

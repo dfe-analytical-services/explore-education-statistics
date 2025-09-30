@@ -9,12 +9,14 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ReleasePublishingStatusRepository(IPublisherTableStorageService publisherTableStorageService)
-    : IReleasePublishingStatusRepository
+public class ReleasePublishingStatusRepository(
+    IPublisherTableStorageService publisherTableStorageService
+) : IReleasePublishingStatusRepository
 {
     public async Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
         Guid releaseVersionId,
-        params ReleasePublishingStatusOverallStage[] overallStages)
+        params ReleasePublishingStatusOverallStage[] overallStages
+    )
     {
         if (overallStages.Length == 0)
         {
@@ -23,12 +25,16 @@ public class ReleasePublishingStatusRepository(IPublisherTableStorageService pub
 
         var result = await publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
             PublisherReleaseStatusTableName,
-            status => status.PartitionKey == releaseVersionId.ToString());
+            status => status.PartitionKey == releaseVersionId.ToString()
+        );
         var allStatusesForReleaseVersion = await result.ToListAsync();
 
         var statusesForStages = allStatusesForReleaseVersion
-            .Where(status => overallStages.Contains(
-                Enum.Parse<ReleasePublishingStatusOverallStage>(status.OverallStage)))
+            .Where(status =>
+                overallStages.Contains(
+                    Enum.Parse<ReleasePublishingStatusOverallStage>(status.OverallStage)
+                )
+            )
             .ToList();
 
         return statusesForStages;
@@ -45,22 +51,22 @@ public class ReleasePublishingStatusRepository(IPublisherTableStorageService pub
         foreach (var releaseVersionId in releaseVersionIds)
         {
             var filterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
-                status.PartitionKey == releaseVersionId.ToString());
+                status.PartitionKey == releaseVersionId.ToString()
+            );
 
-            filter = filter == ""
-                ? filterCondition
-                : $"({filter}) or ({filterCondition})";
+            filter = filter == "" ? filterCondition : $"({filter}) or ({filterCondition})";
         }
 
-        var results = await publisherTableStorageService
-            .QueryEntities<ReleasePublishingStatus>(
-                PublisherReleaseStatusTableName,
-                filter);
+        var results = await publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
+            PublisherReleaseStatusTableName,
+            filter
+        );
         var statusesToRemove = await results.ToListAsync();
 
         await publisherTableStorageService.BatchManipulateEntities(
             PublisherReleaseStatusTableName,
             statusesToRemove,
-            TableTransactionActionType.Delete);
+            TableTransactionActionType.Delete
+        );
     }
 }

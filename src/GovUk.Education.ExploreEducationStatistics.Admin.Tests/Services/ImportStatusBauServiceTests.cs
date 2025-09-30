@@ -22,7 +22,9 @@ public class ImportStatusBauServiceTests
     {
         await using (var contentDbContext = InMemoryApplicationDbContext())
         {
-            var importStatusBauService = BuildImportStatusBauService(contentDbContext: contentDbContext);
+            var importStatusBauService = BuildImportStatusBauService(
+                contentDbContext: contentDbContext
+            );
 
             var result = await importStatusBauService.GetAllIncompleteImports();
             Assert.True(result.IsRight);
@@ -33,12 +35,14 @@ public class ImportStatusBauServiceTests
     [Fact]
     public async Task GetIncompleteImports()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        var (releaseFile1, releaseFile2, releaseFile3) = _dataFixture.DefaultReleaseFile()
+        var (releaseFile1, releaseFile2, releaseFile3) = _dataFixture
+            .DefaultReleaseFile()
             .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
             .WithReleaseVersion(releaseVersion)
             .GenerateTuple3();
@@ -50,7 +54,7 @@ public class ImportStatusBauServiceTests
             StagePercentageComplete = 99,
             Status = FAILED,
             SubjectId = Guid.NewGuid(),
-            Created = DateTime.UtcNow.AddHours(-1)
+            Created = DateTime.UtcNow.AddHours(-1),
         };
 
         var import2 = new DataImport
@@ -60,7 +64,7 @@ public class ImportStatusBauServiceTests
             StagePercentageComplete = 54,
             Status = STAGE_1,
             SubjectId = Guid.NewGuid(),
-            Created = DateTime.UtcNow
+            Created = DateTime.UtcNow,
         };
 
         var import3 = new DataImport
@@ -70,7 +74,7 @@ public class ImportStatusBauServiceTests
             StagePercentageComplete = 76,
             Status = STAGE_3,
             SubjectId = Guid.NewGuid(),
-            Created = DateTime.UtcNow.AddDays(-1)
+            Created = DateTime.UtcNow.AddDays(-1),
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -84,7 +88,9 @@ public class ImportStatusBauServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var importStatusBauService = BuildImportStatusBauService(contentDbContext: contentDbContext);
+            var importStatusBauService = BuildImportStatusBauService(
+                contentDbContext: contentDbContext
+            );
 
             var result = await importStatusBauService.GetAllIncompleteImports();
 
@@ -137,7 +143,8 @@ public class ImportStatusBauServiceTests
 
     internal static ImportStatusBauService BuildImportStatusBauService(
         IUserService? userService = null,
-        ContentDbContext? contentDbContext = null)
+        ContentDbContext? contentDbContext = null
+    )
     {
         return new ImportStatusBauService(
             userService ?? MockUtils.AlwaysTrueUserService().Object,

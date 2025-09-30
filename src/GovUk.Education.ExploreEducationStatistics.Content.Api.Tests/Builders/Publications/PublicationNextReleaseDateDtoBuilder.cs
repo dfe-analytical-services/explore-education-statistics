@@ -8,12 +8,13 @@ public class PublicationNextReleaseDateDtoBuilder
     private int? _month = 9;
     private int? _day = 5;
 
-    public PublicationNextReleaseDateDto Build() => new()
-    {
-        Year = _year,
-        Month = _month,
-        Day = _day
-    };
+    public PublicationNextReleaseDateDto Build() =>
+        new()
+        {
+            Year = _year,
+            Month = _month,
+            Day = _day,
+        };
 
     public PublicationNextReleaseDateDtoBuilder WithYear(int year)
     {

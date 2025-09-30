@@ -1,4 +1,3 @@
-
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common;

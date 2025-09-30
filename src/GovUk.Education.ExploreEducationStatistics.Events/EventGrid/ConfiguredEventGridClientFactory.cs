@@ -12,8 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 public class ConfiguredEventGridClientFactory(
     IEventGridClientFactory eventGridClientFactory,
     IOptions<EventGridOptions> eventGridOptions,
-    ILogger<ConfiguredEventGridClientFactory> logger)
-    : IConfiguredEventGridClientFactory
+    ILogger<ConfiguredEventGridClientFactory> logger
+) : IConfiguredEventGridClientFactory
 {
     /// <summary>
     /// Attempt to create an Event Grid Publisher using the configuration key specified.
@@ -22,31 +22,38 @@ public class ConfiguredEventGridClientFactory(
     /// <param name="configKey">The configuration section loaded into <see cref="EventGridOptions"/> has a collection of EventTopics configurations. This key specifies which one to use.</param>
     /// <param name="client">If the configuration for the specified key is found then a configured client will be returned.</param>
     /// <returns>True if the configuration was found and a client was successfully created.</returns>
-    public bool TryCreateClient(string configKey, [NotNullWhen(true)]out IEventGridClient? client)
+    public bool TryCreateClient(string configKey, [NotNullWhen(true)] out IEventGridClient? client)
     {
-        var options = eventGridOptions.Value.EventTopics.SingleOrDefault(opt => opt.Key == configKey);
+        var options = eventGridOptions.Value.EventTopics.SingleOrDefault(opt =>
+            opt.Key == configKey
+        );
         if (options is null || string.IsNullOrEmpty(options.TopicEndpoint))
         {
             logger.LogWarning(
-                "No Event Topic is configured for key {EventTopicOptionsKey}. No events will be published.", 
-                configKey);
-            
+                "No Event Topic is configured for key {EventTopicOptionsKey}. No events will be published.",
+                configKey
+            );
+
             client = null;
             return false;
         }
 
         try
         {
-            client = eventGridClientFactory.CreateClient(options.TopicEndpoint, options.TopicAccessKey);
+            client = eventGridClientFactory.CreateClient(
+                options.TopicEndpoint,
+                options.TopicAccessKey
+            );
         }
         catch (Exception ex)
         {
             logger.LogError(
                 ex,
-                "An error occurred whilst trying to create Event Grid Client with topic endpoint {TopicEndpoint}. Please check configuration for Topic Options Key {EventTopicOptionsKey}", 
+                "An error occurred whilst trying to create Event Grid Client with topic endpoint {TopicEndpoint}. Please check configuration for Topic Options Key {EventTopicOptionsKey}",
                 options.TopicEndpoint,
-                configKey);
-            
+                configKey
+            );
+
             client = null;
             return false;
         }

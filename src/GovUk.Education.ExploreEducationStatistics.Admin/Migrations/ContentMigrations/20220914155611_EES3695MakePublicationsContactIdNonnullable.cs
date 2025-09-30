@@ -10,7 +10,8 @@ public partial class EES3695MakePublicationsContactIdNonnullable : Migration
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Publications_Contacts_ContactId",
-            table: "Publications");
+            table: "Publications"
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "ContactId",
@@ -20,7 +21,8 @@ public partial class EES3695MakePublicationsContactIdNonnullable : Migration
             defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Publications_Contacts_ContactId",
@@ -28,14 +30,16 @@ public partial class EES3695MakePublicationsContactIdNonnullable : Migration
             column: "ContactId",
             principalTable: "Contacts",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Publications_Contacts_ContactId",
-            table: "Publications");
+            table: "Publications"
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "ContactId",
@@ -43,13 +47,15 @@ public partial class EES3695MakePublicationsContactIdNonnullable : Migration
             type: "uniqueidentifier",
             nullable: true,
             oldClrType: typeof(Guid),
-            oldType: "uniqueidentifier");
+            oldType: "uniqueidentifier"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Publications_Contacts_ContactId",
             table: "Publications",
             column: "ContactId",
             principalTable: "Contacts",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 }

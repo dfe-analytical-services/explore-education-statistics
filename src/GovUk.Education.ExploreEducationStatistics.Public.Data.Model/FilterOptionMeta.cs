@@ -17,8 +17,7 @@ public class FilterOptionMeta
     {
         public void Configure(EntityTypeBuilder<FilterOptionMeta> builder)
         {
-            builder.Property(m => m.Label)
-                .HasMaxLength(120);
+            builder.Property(m => m.Label).HasMaxLength(120);
         }
     }
 }

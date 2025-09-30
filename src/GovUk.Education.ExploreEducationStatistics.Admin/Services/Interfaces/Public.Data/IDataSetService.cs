@@ -12,17 +12,21 @@ public interface IDataSetService
         int page,
         int pageSize,
         Guid publicationId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetViewModel>> CreateDataSet(
         Guid releaseFileId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, bool>> HasDraftVersion(
         Guid dataSetId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

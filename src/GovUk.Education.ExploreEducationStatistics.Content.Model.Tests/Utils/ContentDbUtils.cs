@@ -5,11 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 
 public static class ContentDbUtils
 {
-    public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions(string databaseName)
+    public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions(
+        string databaseName
+    )
     {
-        var builder = new DbContextOptionsBuilder<ContentDbContext>()
-            .UseInMemoryDatabase(databaseName,
-                b => b.EnableNullChecks(false));
+        var builder = new DbContextOptionsBuilder<ContentDbContext>().UseInMemoryDatabase(
+            databaseName,
+            b => b.EnableNullChecks(false)
+        );
 
         return builder.Options;
     }
@@ -19,9 +22,15 @@ public static class ContentDbUtils
         return InMemoryContentDbContextOptions(Guid.NewGuid().ToString());
     }
 
-    public static ContentDbContext InMemoryContentDbContext(string databaseName, bool updateTimestamps = true)
+    public static ContentDbContext InMemoryContentDbContext(
+        string databaseName,
+        bool updateTimestamps = true
+    )
     {
-        return new ContentDbContext(InMemoryContentDbContextOptions(databaseName), updateTimestamps);
+        return new ContentDbContext(
+            InMemoryContentDbContextOptions(databaseName),
+            updateTimestamps
+        );
     }
 
     public static ContentDbContext InMemoryContentDbContext(bool updateTimestamps = true)

@@ -20,7 +20,9 @@ public class BauReleaseController(IPublishingService publishingService) : Contro
     /// <returns></returns>
     [HttpPut("bau/release/{releaseVersionId:guid}/publish/content")]
     public async Task<ActionResult<Unit>> RetryReleasePublishing(
-        Guid releaseVersionId, CancellationToken cancellationToken)
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    )
     {
         return await publishingService
             .RetryReleasePublishing(releaseVersionId, cancellationToken)

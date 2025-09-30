@@ -20,7 +20,10 @@ public class PreReleaseService : IPreReleaseService
     {
         if (!releaseVersion.PublishScheduled.HasValue)
         {
-            throw new ArgumentException("Release version has no PublishScheduled value", nameof(releaseVersion));
+            throw new ArgumentException(
+                "Release version has no PublishScheduled value",
+                nameof(releaseVersion)
+            );
         }
 
         var publishScheduled = releaseVersion.PublishScheduled.Value;
@@ -28,26 +31,23 @@ public class PreReleaseService : IPreReleaseService
         return new PreReleaseWindow
         {
             Start = GetStartTime(publishScheduled),
-            ScheduledPublishDate = publishScheduled
+            ScheduledPublishDate = publishScheduled,
         };
     }
 
-    public PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTime referenceTime)
+    public PreReleaseWindowStatus GetPreReleaseWindowStatus(
+        ReleaseVersion releaseVersion,
+        DateTime referenceTime
+    )
     {
         if (releaseVersion.Live)
         {
-            return new PreReleaseWindowStatus
-            {
-                Access = PreReleaseAccess.After
-            };
+            return new PreReleaseWindowStatus { Access = PreReleaseAccess.After };
         }
 
         if (!releaseVersion.PublishScheduled.HasValue)
         {
-            return new PreReleaseWindowStatus
-            {
-                Access = PreReleaseAccess.NoneSet
-            };
+            return new PreReleaseWindowStatus { Access = PreReleaseAccess.NoneSet };
         }
 
         var publishScheduled = releaseVersion.PublishScheduled.Value;
@@ -57,7 +57,7 @@ public class PreReleaseService : IPreReleaseService
         {
             Start = GetStartTime(publishScheduled),
             ScheduledPublishDate = publishScheduled,
-            Access = GetAccess(releaseVersion, startTime, referenceTime)
+            Access = GetAccess(releaseVersion, startTime, referenceTime),
         };
     }
 
@@ -69,10 +69,13 @@ public class PreReleaseService : IPreReleaseService
     private static PreReleaseAccess GetAccess(
         ReleaseVersion releaseVersion,
         DateTime startTime,
-        DateTime referenceTime)
+        DateTime referenceTime
+    )
     {
-        if (!releaseVersion.PublishScheduled.HasValue ||
-            releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
+        if (
+            !releaseVersion.PublishScheduled.HasValue
+            || releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved
+        )
         {
             return PreReleaseAccess.NoneSet;
         }

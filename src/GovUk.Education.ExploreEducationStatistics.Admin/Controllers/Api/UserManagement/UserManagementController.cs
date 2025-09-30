@@ -18,8 +18,10 @@ public class UserManagementController : ControllerBase
     private readonly IUserManagementService _userManagementService;
     private readonly IUserRoleService _userRoleService;
 
-    public UserManagementController(IUserManagementService userManagementService,
-        IUserRoleService userRoleService)
+    public UserManagementController(
+        IUserManagementService userManagementService,
+        IUserRoleService userRoleService
+    )
     {
         _userManagementService = userManagementService;
         _userRoleService = userRoleService;
@@ -29,18 +31,14 @@ public class UserManagementController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<List<UserViewModel>>> GetUserList()
     {
-        return await _userManagementService
-            .ListAllUsers()
-            .HandleFailuresOrOk();
+        return await _userManagementService.ListAllUsers().HandleFailuresOrOk();
     }
 
     [HttpGet("users/{id:guid}")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<UserViewModel>> GetUser(Guid id)
     {
-        return await _userManagementService
-            .GetUser(id)
-            .HandleFailuresOrOk();
+        return await _userManagementService.GetUser(id).HandleFailuresOrOk();
     }
 
     [HttpPut("users/{userId:guid}")]
@@ -53,7 +51,10 @@ public class UserManagementController : ControllerBase
 
     [HttpPost("users/{userId:guid}/publication-role")]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, UserPublicationRoleCreateRequest request)
+    public async Task<ActionResult<Unit>> AddPublicationRole(
+        Guid userId,
+        UserPublicationRoleCreateRequest request
+    )
     {
         return await _userRoleService
             .AddPublicationRole(userId, request.PublicationId, request.PublicationRole)
@@ -62,7 +63,10 @@ public class UserManagementController : ControllerBase
 
     [HttpPost("users/{userId:guid}/release-role")]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, UserReleaseRoleCreateRequest request)
+    public async Task<ActionResult<Unit>> AddReleaseRole(
+        Guid userId,
+        UserReleaseRoleCreateRequest request
+    )
     {
         return await _userRoleService
             .AddReleaseRole(userId: userId, releaseId: request.ReleaseId, request.ReleaseRole)
@@ -73,18 +77,14 @@ public class UserManagementController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> DeleteUserPublicationRole(Guid id)
     {
-        return await _userRoleService
-            .RemoveUserPublicationRole(id)
-            .HandleFailuresOrOk();
+        return await _userRoleService.RemoveUserPublicationRole(id).HandleFailuresOrOk();
     }
 
     [HttpDelete("users/release-role/{id:guid}")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> DeleteUserReleaseRole(Guid id)
     {
-        return await _userRoleService
-            .RemoveUserReleaseRole(id)
-            .HandleFailuresOrOk();
+        return await _userRoleService.RemoveUserReleaseRole(id).HandleFailuresOrOk();
     }
 
     /// <summary>
@@ -92,7 +92,8 @@ public class UserManagementController : ControllerBase
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    [HttpDelete("user/{userId:guid}/resource-roles/all")] [ProducesResponseType(204)]
+    [HttpDelete("user/{userId:guid}/resource-roles/all")]
+    [ProducesResponseType(204)]
     public async Task<ActionResult<Unit>> DeleteAllUserResourceRoles(Guid userId)
     {
         return await _userRoleService
@@ -108,9 +109,7 @@ public class UserManagementController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<List<IdTitleViewModel>>> GetReleases()
     {
-        return await _userManagementService
-            .ListReleases()
-            .HandleFailuresOrOk();
+        return await _userManagementService.ListReleases().HandleFailuresOrOk();
     }
 
     /// <summary>
@@ -121,9 +120,7 @@ public class UserManagementController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<List<RoleViewModel>>> GetGlobalRoles()
     {
-        return await _userRoleService
-            .GetAllGlobalRoles()
-            .HandleFailuresOrOk();
+        return await _userRoleService.GetAllGlobalRoles().HandleFailuresOrOk();
     }
 
     /// <summary>
@@ -134,9 +131,7 @@ public class UserManagementController : ControllerBase
     [ProducesResponseType(200)]
     public Task<ActionResult<Dictionary<string, List<string>>>> GetResourceRoles()
     {
-        return _userRoleService
-            .GetAllResourceRoles()
-            .HandleFailuresOrOk();
+        return _userRoleService.GetAllResourceRoles().HandleFailuresOrOk();
     }
 
     /// <summary>
@@ -147,8 +142,6 @@ public class UserManagementController : ControllerBase
     [Authorize(Roles = GlobalRoles.RoleNames.BauUser)]
     public async Task<ActionResult> DeleteUser(string email)
     {
-        return await _userManagementService
-            .DeleteUser(email)
-            .HandleFailuresOrNoContent();
+        return await _userManagementService.DeleteUser(email).HandleFailuresOrNoContent();
     }
 }

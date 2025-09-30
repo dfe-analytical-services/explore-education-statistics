@@ -25,10 +25,12 @@ public class DataGuidanceService : IDataGuidanceService
     private readonly IUserService _userService;
     private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
-    public DataGuidanceService(ContentDbContext contentDbContext,
+    public DataGuidanceService(
+        ContentDbContext contentDbContext,
         IDataGuidanceDataSetService dataGuidanceDataSetService,
         IUserService userService,
-        IReleaseDataFileRepository releaseDataFileRepository)
+        IReleaseDataFileRepository releaseDataFileRepository
+    )
     {
         _contentDbContext = contentDbContext;
         _dataGuidanceDataSetService = dataGuidanceDataSetService;
@@ -36,42 +38,69 @@ public class DataGuidanceService : IDataGuidanceService
         _releaseDataFileRepository = releaseDataFileRepository;
     }
 
-    public async Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _contentDbContext.ReleaseVersions
-            .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+        return await _contentDbContext
+            .ReleaseVersions.FirstOrNotFoundAsync(
+                releaseVersion => releaseVersion.Id == releaseVersionId,
+                cancellationToken
+            )
             .OnSuccess(releaseVersion => _userService.CheckCanViewReleaseVersion(releaseVersion))
             .OnSuccessCombineWith(_ =>
-                _dataGuidanceDataSetService.ListDataSets(releaseVersionId, cancellationToken: cancellationToken))
+                _dataGuidanceDataSetService.ListDataSets(
+                    releaseVersionId,
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(releaseVersionAndDataSets =>
-                BuildViewModel(releaseVersionAndDataSets.Item1, releaseVersionAndDataSets.Item2));
+                BuildViewModel(releaseVersionAndDataSets.Item1, releaseVersionAndDataSets.Item2)
+            );
     }
 
-    public async Task<Either<ActionResult, DataGuidanceViewModel>> UpdateDataGuidance(Guid releaseVersionId,
+    public async Task<Either<ActionResult, DataGuidanceViewModel>> UpdateDataGuidance(
+        Guid releaseVersionId,
         DataGuidanceUpdateRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _contentDbContext.ReleaseVersions
-            .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+        return await _contentDbContext
+            .ReleaseVersions.FirstOrNotFoundAsync(
+                releaseVersion => releaseVersion.Id == releaseVersionId,
+                cancellationToken
+            )
             .OnSuccess(releaseVersion => _userService.CheckCanUpdateReleaseVersion(releaseVersion))
-            .OnSuccessDo(releaseVersion => UpdateDataGuidance(releaseVersion, request, cancellationToken))
+            .OnSuccessDo(releaseVersion =>
+                UpdateDataGuidance(releaseVersion, request, cancellationToken)
+            )
             .OnSuccessCombineWith(_ =>
-                _dataGuidanceDataSetService.ListDataSets(releaseVersionId, cancellationToken: cancellationToken))
+                _dataGuidanceDataSetService.ListDataSets(
+                    releaseVersionId,
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(releaseVersionAndDataSets =>
-                BuildViewModel(releaseVersionAndDataSets.Item1, releaseVersionAndDataSets.Item2));
+                BuildViewModel(releaseVersionAndDataSets.Item1, releaseVersionAndDataSets.Item2)
+            );
     }
 
-    public async Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+    public async Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _contentDbContext.ReleaseVersions
-            .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+        return await _contentDbContext
+            .ReleaseVersions.FirstOrNotFoundAsync(
+                releaseVersion => releaseVersion.Id == releaseVersionId,
+                cancellationToken
+            )
             .OnSuccess<ActionResult, ReleaseVersion, Unit>(async releaseVersion =>
             {
-                var releaseFilesQueryable = _contentDbContext.ReleaseFiles
-                    .Where(rf => rf.ReleaseVersionId == releaseVersionId
-                                 && rf.File.Type == FileType.Data);
+                var releaseFilesQueryable = _contentDbContext.ReleaseFiles.Where(rf =>
+                    rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data
+                );
 
                 if (await releaseFilesQueryable.AnyAsync(cancellationToken))
                 {
@@ -80,8 +109,12 @@ public class DataGuidanceService : IDataGuidanceService
                         return ValidationResult(PublicDataGuidanceRequired);
                     }
 
-                    if (await releaseFilesQueryable.AnyAsync(rf =>
-                            string.IsNullOrWhiteSpace(rf.Summary), cancellationToken))
+                    if (
+                        await releaseFilesQueryable.AnyAsync(
+                            rf => string.IsNullOrWhiteSpace(rf.Summary),
+                            cancellationToken
+                        )
+                    )
                     {
                         return ValidationResult(PublicDataGuidanceRequired);
                     }
@@ -94,13 +127,15 @@ public class DataGuidanceService : IDataGuidanceService
     private async Task<Either<ActionResult, Unit>> UpdateDataGuidance(
         ReleaseVersion releaseVersion,
         DataGuidanceUpdateRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         _contentDbContext.Update(releaseVersion);
         releaseVersion.DataGuidance = request.Content;
 
-        var allDataFileIds = (await _releaseDataFileRepository.ListDataFiles(releaseVersion.Id))
-            .Select(file => file.Id);
+        var allDataFileIds = (
+            await _releaseDataFileRepository.ListDataFiles(releaseVersion.Id)
+        ).Select(file => file.Id);
 
         var updateRequestsByFileId = request.DataSets.ToDictionary(dataSet => dataSet.FileId);
         var dataFileIds = updateRequestsByFileId.Keys.ToList();
@@ -111,10 +146,11 @@ public class DataGuidanceService : IDataGuidanceService
         }
 
         var releaseFiles = await _contentDbContext
-            .ReleaseFiles
-            .Include(releaseFile => releaseFile.File)
-            .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id
-                                  && dataFileIds.Contains(releaseFile.FileId))
+            .ReleaseFiles.Include(releaseFile => releaseFile.File)
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId == releaseVersion.Id
+                && dataFileIds.Contains(releaseFile.FileId)
+            )
             .ToListAsync(cancellationToken);
 
         releaseFiles.ForEach(releaseFile =>
@@ -136,14 +172,16 @@ public class DataGuidanceService : IDataGuidanceService
         return Unit.Instance;
     }
 
-    private static DataGuidanceViewModel BuildViewModel(ReleaseVersion releaseVersion,
-        List<DataGuidanceDataSetViewModel> dataSets)
+    private static DataGuidanceViewModel BuildViewModel(
+        ReleaseVersion releaseVersion,
+        List<DataGuidanceDataSetViewModel> dataSets
+    )
     {
         return new DataGuidanceViewModel
         {
             Id = releaseVersion.Id,
             Content = releaseVersion.DataGuidance ?? "",
-            DataSets = dataSets
+            DataSets = dataSets,
         };
     }
 }

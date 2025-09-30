@@ -18,7 +18,9 @@ public class TrimStringModelBinderProvider : IModelBinderProvider
         if (!context.Metadata.IsComplexType && context.Metadata.ModelType == typeof(string))
         {
             var loggerFactory = context.Services.GetRequiredService<ILoggerFactory>();
-            return new TrimStringModelBinder(new SimpleTypeModelBinder(context.Metadata.ModelType, loggerFactory));
+            return new TrimStringModelBinder(
+                new SimpleTypeModelBinder(context.Metadata.ModelType, loggerFactory)
+            );
         }
 
         return null;

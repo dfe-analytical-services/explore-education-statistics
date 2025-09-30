@@ -7,9 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseImageService
 {
-    Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId,
-        Guid fileId);
+    Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId, Guid fileId);
 
-    Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid releaseVersionId,
-        IFormFile formFile);
+    Task<Either<ActionResult, ImageFileViewModel>> Upload(
+        Guid releaseVersionId,
+        IFormFile formFile
+    );
 }

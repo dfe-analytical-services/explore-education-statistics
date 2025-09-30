@@ -23,24 +23,29 @@ public class MethodologyContentService : IMethodologyContentService
     public enum ContentListType
     {
         Content,
-        Annexes
+        Annexes,
     }
 
-    private static readonly Dictionary<ContentListType, Func<MethodologyVersionContent, List<ContentSection>>> ContentListSelector
-        = new()
-        {
-            {ContentListType.Content, methodologyContent => methodologyContent.Content},
-            {ContentListType.Annexes, methodologyContent => methodologyContent.Annexes},
-        };
+    private static readonly Dictionary<
+        ContentListType,
+        Func<MethodologyVersionContent, List<ContentSection>>
+    > ContentListSelector = new()
+    {
+        { ContentListType.Content, methodologyContent => methodologyContent.Content },
+        { ContentListType.Annexes, methodologyContent => methodologyContent.Annexes },
+    };
 
     private readonly ContentDbContext _context;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
-    public MethodologyContentService(ContentDbContext context,
+    public MethodologyContentService(
+        ContentDbContext context,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IUserService userService, IMapper mapper)
+        IUserService userService,
+        IMapper mapper
+    )
     {
         _context = context;
         _persistenceHelper = persistenceHelper;
@@ -48,66 +53,77 @@ public class MethodologyContentService : IMethodologyContentService
         _mapper = mapper;
     }
 
-    public Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(Guid methodologyVersionId)
+    public Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(
+        Guid methodologyVersionId
+    )
     {
         return _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q => q
-                .Include(version => version.Notes)
-                .Include(version => version.MethodologyContent)
-                // Load the Methodology so that Slug can be provided
-                .Include(m => m.Methodology))
+            .CheckEntityExists<MethodologyVersion>(
+                methodologyVersionId,
+                q =>
+                    q.Include(version => version.Notes)
+                        .Include(version => version.MethodologyContent)
+                        // Load the Methodology so that Slug can be provided
+                        .Include(m => m.Methodology)
+            )
             .OnSuccess(CheckCanViewMethodology)
             .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
     }
 
-    public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyVersionId) where T : ContentBlock
+    public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyVersionId)
+        where T : ContentBlock
     {
         return _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q =>
-                q.Include(version => version.MethodologyContent))
+            .CheckEntityExists<MethodologyVersion>(
+                methodologyVersionId,
+                q => q.Include(version => version.MethodologyContent)
+            )
             .OnSuccess(CheckCanViewMethodology)
             .OnSuccess(methodology =>
             {
-                var sections =
-                    methodology.MethodologyContent.Annexes
-                        .Concat(methodology.MethodologyContent.Content);
+                var sections = methodology.MethodologyContent.Annexes.Concat(
+                    methodology.MethodologyContent.Content
+                );
 
-                return sections
-                    .SelectMany(section => section.Content)
-                    .OfType<T>()
-                    .ToList();
+                return sections.SelectMany(section => section.Content).OfType<T>().ToList();
             });
     }
 
     public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(
         Guid methodologyVersionId,
-        Guid contentSectionId)
+        Guid contentSectionId
+    )
     {
-        return
-            CheckContentSectionExists(methodologyVersionId, contentSectionId)
-                .OnSuccess(CheckCanViewMethodology)
-                .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
+        return CheckContentSectionExists(methodologyVersionId, contentSectionId)
+            .OnSuccess(CheckCanViewMethodology)
+            .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
     }
 
     public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
         Guid methodologyVersionId,
-        Dictionary<Guid, int> newSectionOrder)
+        Dictionary<Guid, int> newSectionOrder
+    )
     {
         return _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q =>
-                q.Include(version => version.MethodologyContent))
+            .CheckEntityExists<MethodologyVersion>(
+                methodologyVersionId,
+                q => q.Include(version => version.MethodologyContent)
+            )
             .OnSuccess(CheckCanUpdateMethodologyContent)
-            .OnSuccess(methodology => FindContentListWithAllSectionIds(methodology, newSectionOrder.Keys.ToList()))
+            .OnSuccess(methodology =>
+                FindContentListWithAllSectionIds(methodology, newSectionOrder.Keys.ToList())
+            )
             .OnSuccess(async tuple =>
             {
                 var (methodologyContent, contentSections) = tuple;
 
-                newSectionOrder.ToList().ForEach(kvp =>
-                {
-                    var (sectionId, newOrder) = kvp;
-                    contentSections.Single(section => section.Id == sectionId)
-                        .Order = newOrder;
-                });
+                newSectionOrder
+                    .ToList()
+                    .ForEach(kvp =>
+                    {
+                        var (sectionId, newOrder) = kvp;
+                        contentSections.Single(section => section.Id == sectionId).Order = newOrder;
+                    });
 
                 _context.MethodologyContent.Update(methodologyContent);
                 await _context.SaveChangesAsync();
@@ -118,18 +134,21 @@ public class MethodologyContentService : IMethodologyContentService
     public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSection(
         Guid methodologyVersionId,
         ContentSectionAddRequest request,
-        ContentListType contentType)
+        ContentListType contentType
+    )
     {
         return _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q =>
-                q.Include(version => version.MethodologyContent))
+            .CheckEntityExists<MethodologyVersion>(
+                methodologyVersionId,
+                q => q.Include(version => version.MethodologyContent)
+            )
             .OnSuccess(CheckCanUpdateMethodologyContent)
             .OnSuccess(async methodologyContent =>
             {
                 var content = ContentListSelector[contentType](methodologyContent);
 
-                var orderForNewSection = request?.Order ??
-                                         content.Max(contentSection => contentSection.Order) + 1;
+                var orderForNewSection =
+                    request?.Order ?? content.Max(contentSection => contentSection.Order) + 1;
 
                 content
                     .FindAll(contentSection => contentSection.Order >= orderForNewSection)
@@ -139,7 +158,7 @@ public class MethodologyContentService : IMethodologyContentService
                 {
                     Id = Guid.NewGuid(),
                     Heading = "New section",
-                    Order = orderForNewSection
+                    Order = orderForNewSection,
                 };
 
                 content.Add(newContentSection);
@@ -153,26 +172,27 @@ public class MethodologyContentService : IMethodologyContentService
     public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
         Guid methodologyVersionId,
         Guid contentSectionId,
-        string newHeading)
+        string newHeading
+    )
     {
-        return
-            CheckContentSectionExists(methodologyVersionId, contentSectionId)
-                .OnSuccess(CheckCanUpdateMethodologyContent)
-                .OnSuccess(async tuple =>
-                {
-                    var (methodologyContent, sectionToUpdate) = tuple;
+        return CheckContentSectionExists(methodologyVersionId, contentSectionId)
+            .OnSuccess(CheckCanUpdateMethodologyContent)
+            .OnSuccess(async tuple =>
+            {
+                var (methodologyContent, sectionToUpdate) = tuple;
 
-                    sectionToUpdate.Heading = newHeading;
+                sectionToUpdate.Heading = newHeading;
 
-                    _context.MethodologyContent.Update(methodologyContent);
-                    await _context.SaveChangesAsync();
-                    return _mapper.Map<ContentSectionViewModel>(sectionToUpdate);
-                });
+                _context.MethodologyContent.Update(methodologyContent);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<ContentSectionViewModel>(sectionToUpdate);
+            });
     }
 
     public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
         Guid methodologyVersionId,
-        Guid contentSectionId)
+        Guid contentSectionId
+    )
     {
         return CheckContentSectionExists(methodologyVersionId, contentSectionId)
             .OnSuccess(CheckCanUpdateMethodologyContent)
@@ -180,7 +200,9 @@ public class MethodologyContentService : IMethodologyContentService
             .OnSuccess(async tuple =>
             {
                 var (methodologyContent, contentSections) = tuple;
-                var sectionToRemove = contentSections.Single(section => section.Id == contentSectionId); 
+                var sectionToRemove = contentSections.Single(section =>
+                    section.Id == contentSectionId
+                );
 
                 contentSections.Remove(sectionToRemove);
 
@@ -199,32 +221,35 @@ public class MethodologyContentService : IMethodologyContentService
     public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
         Guid methodologyVersionId,
         Guid contentSectionId,
-        Dictionary<Guid, int> newBlocksOrder)
+        Dictionary<Guid, int> newBlocksOrder
+    )
     {
-        return
-            CheckContentSectionExists(methodologyVersionId, contentSectionId)
-                .OnSuccess(CheckCanUpdateMethodologyContent)
-                .OnSuccess(EnsureContentBlockListNotNull)
-                .OnSuccess(async tuple =>
-                {
-                    var (methodologyContent, section) = tuple;
+        return CheckContentSectionExists(methodologyVersionId, contentSectionId)
+            .OnSuccess(CheckCanUpdateMethodologyContent)
+            .OnSuccess(EnsureContentBlockListNotNull)
+            .OnSuccess(async tuple =>
+            {
+                var (methodologyContent, section) = tuple;
 
-                    newBlocksOrder.ToList().ForEach(kvp =>
+                newBlocksOrder
+                    .ToList()
+                    .ForEach(kvp =>
                     {
                         var (blockId, newOrder) = kvp;
                         section.Content.Single(block => block.Id == blockId).Order = newOrder;
                     });
 
-                    _context.MethodologyContent.Update(methodologyContent);
-                    await _context.SaveChangesAsync();
-                    return OrderedContentBlocks(section);
-                });
+                _context.MethodologyContent.Update(methodologyContent);
+                await _context.SaveChangesAsync();
+                return OrderedContentBlocks(section);
+            });
     }
 
     public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(
         Guid methodologyVersionId,
         Guid contentSectionId,
-        ContentBlockAddRequest request)
+        ContentBlockAddRequest request
+    )
     {
         return CheckContentSectionExists(methodologyVersionId, contentSectionId)
             .OnSuccess(CheckCanUpdateMethodologyContent)
@@ -234,14 +259,19 @@ public class MethodologyContentService : IMethodologyContentService
                 var (methodologyContent, section) = tuple;
                 var newContentBlock = CreateContentBlockForType(request.Type);
                 return await AddContentBlockToContentSectionAndSave(
-                    request.Order, section, newContentBlock, methodologyContent);
+                    request.Order,
+                    section,
+                    newContentBlock,
+                    methodologyContent
+                );
             });
     }
 
     public Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
         Guid methodologyVersionId,
         Guid contentSectionId,
-        Guid contentBlockId)
+        Guid contentBlockId
+    )
     {
         return CheckContentSectionExists(methodologyVersionId, contentSectionId)
             .OnSuccess(CheckCanUpdateMethodologyContent)
@@ -269,7 +299,8 @@ public class MethodologyContentService : IMethodologyContentService
         Guid methodologyVersionId,
         Guid contentSectionId,
         Guid contentBlockId,
-        ContentBlockUpdateRequest request)
+        ContentBlockUpdateRequest request
+    )
     {
         return CheckContentSectionExists(methodologyVersionId, contentSectionId)
             .OnSuccess(CheckCanUpdateMethodologyContent)
@@ -287,22 +318,29 @@ public class MethodologyContentService : IMethodologyContentService
 
                 return blockToUpdate switch
                 {
-                    HtmlBlock htmlBlock => await UpdateHtmlBlock(htmlBlock, request.Body, methodology),
-                    _ => throw new ArgumentOutOfRangeException()
+                    HtmlBlock htmlBlock => await UpdateHtmlBlock(
+                        htmlBlock,
+                        request.Body,
+                        methodology
+                    ),
+                    _ => throw new ArgumentOutOfRangeException(),
                 };
             });
     }
 
-    private async Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockToContentSectionAndSave(
+    private async Task<
+        Either<ActionResult, IContentBlockViewModel>
+    > AddContentBlockToContentSectionAndSave(
         int? order,
         ContentSection section,
         ContentBlock newContentBlock,
-        MethodologyVersionContent methodologyContent)
+        MethodologyVersionContent methodologyContent
+    )
     {
         var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
 
-        section.Content
-            .FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
+        section
+            .Content.FindAll(contentBlock => contentBlock.Order >= orderForNewBlock)
             .ForEach(contentBlock => contentBlock.Order++);
 
         newContentBlock.Order = orderForNewBlock;
@@ -310,14 +348,16 @@ public class MethodologyContentService : IMethodologyContentService
 
         _context.MethodologyContent.Update(methodologyContent);
         await _context.SaveChangesAsync();
-        return new Either<ActionResult, IContentBlockViewModel>(_mapper.Map<IContentBlockViewModel>(newContentBlock));
+        return new Either<ActionResult, IContentBlockViewModel>(
+            _mapper.Map<IContentBlockViewModel>(newContentBlock)
+        );
     }
 
     private static int OrderValueForNewlyAddedContentBlock(int? order, ContentSection section)
     {
         if (order.HasValue)
         {
-            return (int) order;
+            return (int)order;
         }
 
         if (!section.Content.IsNullOrEmpty())
@@ -330,19 +370,23 @@ public class MethodologyContentService : IMethodologyContentService
 
     private void RemoveContentBlockFromContentSection(
         ContentSection section,
-        ContentBlock blockToRemove)
+        ContentBlock blockToRemove
+    )
     {
         section.Content.Remove(blockToRemove);
 
         var removedBlockOrder = blockToRemove.Order;
 
-        section.Content
-            .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
+        section
+            .Content.FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
             .ForEach(contentBlock => contentBlock.Order--);
     }
 
-    private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateHtmlBlock(HtmlBlock blockToUpdate,
-        string body, MethodologyVersionContent content)
+    private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateHtmlBlock(
+        HtmlBlock blockToUpdate,
+        string body,
+        MethodologyVersionContent content
+    )
     {
         blockToUpdate.Body = body;
         _context.MethodologyContent.Update(content);
@@ -353,8 +397,12 @@ public class MethodologyContentService : IMethodologyContentService
     private static ContentBlock CreateContentBlockForType(ContentBlockType type)
     {
         var classType = GetContentBlockClassTypeFromEnumValue(type);
-        var newContentBlock = (ContentBlock) (Activator.CreateInstance(classType) 
-                                              ?? throw new ArgumentException($"Could not create content block for {type} with class type {classType}"));
+        var newContentBlock = (ContentBlock)(
+            Activator.CreateInstance(classType)
+            ?? throw new ArgumentException(
+                $"Could not create content block for {type} with class type {classType}"
+            )
+        );
         newContentBlock.Id = Guid.NewGuid();
         newContentBlock.Created = DateTime.UtcNow;
         return newContentBlock;
@@ -362,34 +410,41 @@ public class MethodologyContentService : IMethodologyContentService
 
     private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)
     {
-        return _mapper.Map<List<IContentBlockViewModel>>(section
-            .Content
-            .OrderBy(block => block.Order)
-            .ToList());
+        return _mapper.Map<List<IContentBlockViewModel>>(
+            section.Content.OrderBy(block => block.Order).ToList()
+        );
     }
 
     private List<ContentSectionViewModel> OrderedContentSections(List<ContentSection> sectionsList)
     {
-        return _mapper.Map<List<ContentSectionViewModel>>(sectionsList)
+        return _mapper
+            .Map<List<ContentSectionViewModel>>(sectionsList)
             .OrderBy(c => c.Order)
             .ToList();
     }
 
-    private Task<Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>> CheckContentSectionExists(
-        Guid methodologyId, Guid contentSectionId)
+    private Task<
+        Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>
+    > CheckContentSectionExists(Guid methodologyId, Guid contentSectionId)
     {
         return _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyId, q =>
-                q.Include(version => version.MethodologyContent))
+            .CheckEntityExists<MethodologyVersion>(
+                methodologyId,
+                q => q.Include(version => version.MethodologyContent)
+            )
             .OnSuccess(methodology =>
             {
-                return FindContentListWithSectionId(methodology.MethodologyContent, contentSectionId)
+                return FindContentListWithSectionId(
+                        methodology.MethodologyContent,
+                        contentSectionId
+                    )
                     .OnSuccess(tuple =>
                     {
                         var (_, contentSections) = tuple;
 
-                        var section = contentSections
-                            .Find(contentSection => contentSection.Id == contentSectionId);
+                        var section = contentSections.Find(contentSection =>
+                            contentSection.Id == contentSectionId
+                        );
 
                         if (section == null)
                         {
@@ -397,27 +452,29 @@ public class MethodologyContentService : IMethodologyContentService
                         }
 
                         return new Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>(
-                            TupleOf(methodology, section));
+                            TupleOf(methodology, section)
+                        );
                     });
             });
     }
 
     private Task<Either<ActionResult, MethodologyVersion>> CheckCanViewMethodology(
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         return _userService.CheckCanViewMethodology(methodologyVersion);
     }
 
-    private Task<Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>> CheckCanViewMethodology(
-        Tuple<MethodologyVersion, ContentSection> tuple)
+    private Task<
+        Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>
+    > CheckCanViewMethodology(Tuple<MethodologyVersion, ContentSection> tuple)
     {
-        return _userService
-            .CheckCanViewMethodology(tuple.Item1)
-            .OnSuccess(_ => tuple);
+        return _userService.CheckCanViewMethodology(tuple.Item1).OnSuccess(_ => tuple);
     }
 
-    private async Task<Either<ActionResult, MethodologyVersionContent>> CheckCanUpdateMethodologyContent(
-        MethodologyVersion methodologyVersion)
+    private async Task<
+        Either<ActionResult, MethodologyVersionContent>
+    > CheckCanUpdateMethodologyContent(MethodologyVersion methodologyVersion)
     {
         if (methodologyVersion.Status == MethodologyApprovalStatus.Approved)
         {
@@ -434,8 +491,9 @@ public class MethodologyContentService : IMethodologyContentService
             .OnSuccess(_ => methodologyVersion.MethodologyContent);
     }
 
-    private async Task<Either<ActionResult, Tuple<MethodologyVersionContent, ContentSection>>> CheckCanUpdateMethodologyContent(
-        Tuple<MethodologyVersion, ContentSection> tuple)
+    private async Task<
+        Either<ActionResult, Tuple<MethodologyVersionContent, ContentSection>>
+    > CheckCanUpdateMethodologyContent(Tuple<MethodologyVersion, ContentSection> tuple)
     {
         if (tuple.Item1.Status == MethodologyApprovalStatus.Approved)
         {
@@ -444,11 +502,16 @@ public class MethodologyContentService : IMethodologyContentService
 
         return await _userService
             .CheckCanUpdateMethodologyVersion(tuple.Item1)
-            .OnSuccess(_ => new Tuple<MethodologyVersionContent, ContentSection>(tuple.Item1.MethodologyContent, tuple.Item2));
+            .OnSuccess(_ => new Tuple<MethodologyVersionContent, ContentSection>(
+                tuple.Item1.MethodologyContent,
+                tuple.Item2
+            ));
     }
 
-    private Either<ActionResult, Tuple<MethodologyVersionContent, ContentSection>> EnsureContentBlockListNotNull(
-        Tuple<MethodologyVersionContent, ContentSection> tuple)
+    private Either<
+        ActionResult,
+        Tuple<MethodologyVersionContent, ContentSection>
+    > EnsureContentBlockListNotNull(Tuple<MethodologyVersionContent, ContentSection> tuple)
     {
         if (tuple.Item2.Content == null)
         {
@@ -458,9 +521,10 @@ public class MethodologyContentService : IMethodologyContentService
         return tuple;
     }
 
-    private static Either<ActionResult, Tuple<MethodologyVersionContent, List<ContentSection>>>
-        FindContentListWithSectionId(MethodologyVersionContent content,
-            Guid contentSectionId)
+    private static Either<
+        ActionResult,
+        Tuple<MethodologyVersionContent, List<ContentSection>>
+    > FindContentListWithSectionId(MethodologyVersionContent content, Guid contentSectionId)
     {
         if (content.Content.Any(section => section.Id == contentSectionId))
         {
@@ -475,20 +539,30 @@ public class MethodologyContentService : IMethodologyContentService
         return new NotFoundResult();
     }
 
-    private static Either<ActionResult, Tuple<MethodologyVersionContent, List<ContentSection>>>
-        FindContentListWithAllSectionIds(MethodologyVersionContent content,
-            List<Guid> contentSectionIds)
+    private static Either<
+        ActionResult,
+        Tuple<MethodologyVersionContent, List<ContentSection>>
+    > FindContentListWithAllSectionIds(
+        MethodologyVersionContent content,
+        List<Guid> contentSectionIds
+    )
     {
-        if (ComparerUtils.SequencesAreEqualIgnoringOrder(
+        if (
+            ComparerUtils.SequencesAreEqualIgnoringOrder(
                 content.Content.Select(section => section.Id),
-                contentSectionIds))
-            {
-                return TupleOf(content, content.Content);
-            }
+                contentSectionIds
+            )
+        )
+        {
+            return TupleOf(content, content.Content);
+        }
 
-        if (ComparerUtils.SequencesAreEqualIgnoringOrder(
-            content.Annexes.Select(section => section.Id),
-            contentSectionIds))
+        if (
+            ComparerUtils.SequencesAreEqualIgnoringOrder(
+                content.Annexes.Select(section => section.Id),
+                contentSectionIds
+            )
+        )
         {
             return TupleOf(content, content.Annexes);
         }

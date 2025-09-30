@@ -17,14 +17,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReplacementBatchService(
     ContentDbContext contentDbContext,
     IUserService userService,
-    IReplacementService replacementService) : IReplacementBatchService
+    IReplacementService replacementService
+) : IReplacementBatchService
 {
-    public async Task<Either<ActionResult, Unit>> Replace(Guid releaseVersionId,
+    public async Task<Either<ActionResult, Unit>> Replace(
+        Guid releaseVersionId,
         IEnumerable<Guid> originalFileIds,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await contentDbContext.ReleaseVersions
-            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+        return await contentDbContext
+            .ReleaseVersions.FirstOrNotFoundAsync(
+                rv => rv.Id == releaseVersionId,
+                cancellationToken: cancellationToken
+            )
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -35,7 +41,8 @@ public class ReplacementBatchService(
                     var replacementResult = await replacementService.Replace(
                         releaseVersionId: releaseVersionId,
                         originalFileId: originalFileId,
-                        cancellationToken);
+                        cancellationToken
+                    );
 
                     if (replacementResult.IsLeft)
                     {

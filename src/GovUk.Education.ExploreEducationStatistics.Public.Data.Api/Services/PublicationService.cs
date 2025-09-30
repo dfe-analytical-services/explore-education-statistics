@@ -14,30 +14,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 internal class PublicationService(
     PublicDataDbContext publicDataDbContext,
     IContentApiClient contentApiClient,
-    IAnalyticsService analyticsService)
-    : IPublicationService
+    IAnalyticsService analyticsService
+) : IPublicationService
 {
     public async Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
         int pageSize,
         string? search = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await
-            GetPublishedDataSetPublicationIds(cancellationToken)
+        return await GetPublishedDataSetPublicationIds(cancellationToken)
             .OnSuccess(async publicationIds =>
                 await contentApiClient.ListPublications(
-                    page: page, 
-                    pageSize: pageSize, 
-                    search:search, 
+                    page: page,
+                    pageSize: pageSize,
+                    search: search,
                     publicationIds: publicationIds,
-                    cancellationToken: cancellationToken))
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(paginatedPublications =>
             {
-                var results = paginatedPublications
-                    .Results
-                    .Select(MapPublication)
-                    .ToList();
+                var results = paginatedPublications.Results.Select(MapPublication).ToList();
 
                 return new PublicationPaginatedListViewModel
                 {
@@ -45,50 +44,61 @@ internal class PublicationService(
                     Paging = new PagingViewModel(
                         totalResults: paginatedPublications.Paging.TotalResults,
                         page: paginatedPublications.Paging.Page,
-                        pageSize: paginatedPublications.Paging.PageSize),
+                        pageSize: paginatedPublications.Paging.PageSize
+                    ),
                 };
             })
-            .OnSuccessDo(() => analyticsService.CaptureTopLevelCall(
-                type: TopLevelCallType.GetPublications,
-                parameters: new PaginationParameters(Page: page, PageSize: pageSize),
-                cancellationToken: cancellationToken)
+            .OnSuccessDo(() =>
+                analyticsService.CaptureTopLevelCall(
+                    type: TopLevelCallType.GetPublications,
+                    parameters: new PaginationParameters(Page: page, PageSize: pageSize),
+                    cancellationToken: cancellationToken
+                )
             );
     }
 
     public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await CheckPublicationIsPublished(publicationId, cancellationToken)
-            .OnSuccess(async _ => await contentApiClient.GetPublication(publicationId, cancellationToken))
+            .OnSuccess(async _ =>
+                await contentApiClient.GetPublication(publicationId, cancellationToken)
+            )
             .OnSuccess(publication => new PublicationSummaryViewModel
             {
-                Id  = publication.Id,
+                Id = publication.Id,
                 Title = publication.Title,
                 Slug = publication.Slug,
                 Summary = publication.Summary,
-                LastPublished = publication.Published
+                LastPublished = publication.Published,
             })
-            .OnSuccessDo(viewModel => analyticsService.CapturePublicationCall(
-                publicationId: viewModel.Id,
-                publicationTitle: viewModel.Title,
-                type: PublicationCallType.GetSummary,
-                cancellationToken: cancellationToken)
+            .OnSuccessDo(viewModel =>
+                analyticsService.CapturePublicationCall(
+                    publicationId: viewModel.Id,
+                    publicationTitle: viewModel.Title,
+                    type: PublicationCallType.GetSummary,
+                    cancellationToken: cancellationToken
+                )
             );
     }
 
     private async Task<Either<ActionResult, HashSet<Guid>>> GetPublishedDataSetPublicationIds(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return (await publicDataDbContext.DataSets
-                .Where(ds => ds.Status == DataSetStatus.Published)
+        return (
+            await publicDataDbContext
+                .DataSets.Where(ds => ds.Status == DataSetStatus.Published)
                 .Select(ds => ds.PublicationId)
                 .ToListAsync(cancellationToken: cancellationToken)
-            )
-            .ToHashSet();
+        ).ToHashSet();
     }
 
-    private static PublicationSummaryViewModel MapPublication(PublicationSearchResultViewModel publication)
+    private static PublicationSummaryViewModel MapPublication(
+        PublicationSearchResultViewModel publication
+    )
     {
         return new PublicationSummaryViewModel
         {
@@ -96,17 +106,21 @@ internal class PublicationService(
             Title = publication.Title,
             Slug = publication.Slug,
             Summary = publication.Summary,
-            LastPublished = publication.Published
+            LastPublished = publication.Published,
         };
     }
 
     private async Task<Either<ActionResult, Unit>> CheckPublicationIsPublished(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var publicationIsPublished = await publicDataDbContext.DataSets
-            .Where(ds => ds.PublicationId == publicationId)
-            .AnyAsync(ds => ds.Status == DataSetStatus.Published, cancellationToken: cancellationToken);
+        var publicationIsPublished = await publicDataDbContext
+            .DataSets.Where(ds => ds.PublicationId == publicationId)
+            .AnyAsync(
+                ds => ds.Status == DataSetStatus.Published,
+                cancellationToken: cancellationToken
+            );
 
         if (publicationIsPublished)
         {

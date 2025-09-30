@@ -18,5 +18,9 @@ public class EventGridClientFactory(Func<ILogger<SafeEventGridClient>> clientLog
             clientLoggerFactory(),
             topicAccessKey is null
                 ? new EventGridPublisherClient(new Uri(topicEndpoint), new DefaultAzureCredential())
-                : new EventGridPublisherClient(new Uri(topicEndpoint), new AzureKeyCredential(topicAccessKey)));
+                : new EventGridPublisherClient(
+                    new Uri(topicEndpoint),
+                    new AzureKeyCredential(topicAccessKey)
+                )
+        );
 }

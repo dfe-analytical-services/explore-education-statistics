@@ -24,7 +24,8 @@ public partial class File : ICreatedTimestamp<DateTime?>
     public int? DataSetFileVersion { get; set; }
 
     [UnorderedEquality]
-    public List<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; } = [];
+    public List<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; } =
+    [];
 
     public DataSetFileMeta? DataSetFileMeta { get; set; }
 

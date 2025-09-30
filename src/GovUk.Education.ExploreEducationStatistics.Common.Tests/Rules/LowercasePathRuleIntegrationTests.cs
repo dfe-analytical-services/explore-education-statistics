@@ -11,9 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Rules;
 
 public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
 {
-    public LowercasePathRuleIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-    {
-    }
+    public LowercasePathRuleIntegrationTests(TestApplicationFactory<TestStartup> testApp)
+        : base(testApp) { }
 
     [Fact]
     public async Task PathIsLowercased_Get()
@@ -32,8 +31,10 @@ public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
     {
         var client = SetupApp().CreateClient();
 
-        var response = await client.PostAsync("api/test/Path?query=Query",
-            content: new JsonNetContent("Body"));
+        var response = await client.PostAsync(
+            "api/test/Path?query=Query",
+            content: new JsonNetContent("Body")
+        );
 
         // Client should follow 308 permanent redirect without changing method from POST to GET
         response.AssertOk(new TestResponse(Path: "path", Query: "Query", Body: "Body"));
@@ -42,8 +43,9 @@ public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
 
     private WebApplicationFactory<TestStartup> SetupApp()
     {
-        return TestApp.WithWebHostBuilder(builder => builder
-            .WithAdditionalControllers(typeof(TestController)));
+        return TestApp.WithWebHostBuilder(builder =>
+            builder.WithAdditionalControllers(typeof(TestController))
+        );
     }
 
     [ApiController]
@@ -51,9 +53,7 @@ public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
     private class TestController : ControllerBase
     {
         [HttpGet("")]
-        public ActionResult<TestResponse> Get(
-            string path,
-            [FromQuery] string query)
+        public ActionResult<TestResponse> Get(string path, [FromQuery] string query)
         {
             return new TestResponse(path, query);
         }
@@ -62,7 +62,8 @@ public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
         public ActionResult<TestResponse> Post(
             string path,
             [FromQuery] string query,
-            [FromBody, Required] string body)
+            [FromBody, Required] string body
+        )
         {
             return new TestResponse(path, query, body);
         }

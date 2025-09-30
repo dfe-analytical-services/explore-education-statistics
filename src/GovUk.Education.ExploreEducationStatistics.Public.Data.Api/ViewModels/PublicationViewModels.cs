@@ -39,4 +39,5 @@ public record PublicationSummaryViewModel
 /// <summary>
 /// A paginated list of publication summaries.
 /// </summary>
-public record PublicationPaginatedListViewModel : PaginatedListViewModel<PublicationSummaryViewModel>;
+public record PublicationPaginatedListViewModel
+    : PaginatedListViewModel<PublicationSummaryViewModel>;

@@ -20,10 +20,15 @@ public static class CronExpressionUtil
     public static DateTimeOffset? GetNextOccurrence(
         string cronExpression,
         DateTimeOffset from,
-        TimeZoneInfo timeZone)
+        TimeZoneInfo timeZone
+    )
     {
-        var expression = CronExpression.Parse(cronExpression,
-            CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
+        var expression = CronExpression.Parse(
+            cronExpression,
+            CronExpressionHasSecondPrecision(cronExpression)
+                ? CronFormat.IncludeSeconds
+                : CronFormat.Standard
+        );
 
         return expression.GetNextOccurrence(from, timeZone);
     }

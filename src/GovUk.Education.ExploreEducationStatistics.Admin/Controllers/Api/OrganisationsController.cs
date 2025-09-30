@@ -12,8 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 public class OrganisationsController(IOrganisationService organisationService) : ControllerBase
 {
     [HttpGet("organisations")]
-    public async Task<OrganisationViewModel[]> GetAllOrganisations(CancellationToken cancellationToken = default) =>
+    public async Task<OrganisationViewModel[]> GetAllOrganisations(
+        CancellationToken cancellationToken = default
+    ) =>
         (await organisationService.GetAllOrganisations(cancellationToken))
-        .Select(OrganisationViewModel.FromOrganisation)
-        .ToArray();
+            .Select(OrganisationViewModel.FromOrganisation)
+            .ToArray();
 }

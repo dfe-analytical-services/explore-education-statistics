@@ -59,7 +59,9 @@ public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup>
     public async Task ValidationProblemWithModelState_Returns400ValidationProblem()
     {
         var client = BuildApp().CreateClient();
-        var response = await client.GetAsync(nameof(TestController.TestValidationProblemWithModelState));
+        var response = await client.GetAsync(
+            nameof(TestController.TestValidationProblemWithModelState)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -83,7 +85,9 @@ public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup>
     {
         var client = BuildApp().CreateClient();
         var response = await client.PostAsJsonAsync(
-            nameof(TestController.TestValidationProblemWithAttributes), new TestClass());
+            nameof(TestController.TestValidationProblemWithAttributes),
+            new TestClass()
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -158,10 +162,9 @@ public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup>
         [HttpGet(nameof(TestValidationResult))]
         public ActionResult TestValidationResult()
         {
-            return ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Message = "A global error"
-            });
+            return ValidationUtils.ValidationResult(
+                new ErrorViewModel { Message = "A global error" }
+            );
         }
     }
 
@@ -174,9 +177,9 @@ public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup>
 
     private WebApplicationFactory<TestStartup> BuildApp()
     {
-        return TestApp
-            .WithWebHostBuilder(
-                builder => { builder.WithAdditionalControllers(typeof(TestController)); }
-            );
+        return TestApp.WithWebHostBuilder(builder =>
+        {
+            builder.WithAdditionalControllers(typeof(TestController));
+        });
     }
 }

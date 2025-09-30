@@ -16,7 +16,9 @@ public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
 
     public string GenerateToken(string email, DateTime expiryDateTime)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appOptions.TokenSecretKey));
+        var securityKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_appOptions.TokenSecretKey)
+        );
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var secToken = new JwtSecurityToken(
@@ -24,7 +26,8 @@ public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
             issuer: "Sample",
             audience: "Sample",
             claims: new[] { new Claim(JwtRegisteredClaimNames.Email, email) },
-            expires: expiryDateTime);
+            expires: expiryDateTime
+        );
 
         var handler = new JwtSecurityTokenHandler();
         return handler.WriteToken(secToken);
@@ -38,7 +41,11 @@ public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
 
         try
         {
-            var principal = tokenHandler.ValidateToken(authToken, validationParameters, out var validatedToken);
+            var principal = tokenHandler.ValidateToken(
+                authToken,
+                validationParameters,
+                out var validatedToken
+            );
             if (principal != null)
             {
                 email = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -61,8 +68,7 @@ public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
             ValidateIssuer = false, // Because there is no issuer in the generated token
             ValidIssuer = "Sample",
             ValidAudience = "Sample",
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(secretKey)) // The same key as the one that generate the token
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)), // The same key as the one that generate the token
         };
     }
 }

@@ -9,13 +9,12 @@ public partial class EES2328CreateDataImportGeographicLevelsColumn : Migration
         migrationBuilder.AddColumn<string>(
             name: "GeographicLevels",
             table: "DataImports",
-            nullable: true);
+            nullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "GeographicLevels",
-            table: "DataImports");
+        migrationBuilder.DropColumn(name: "GeographicLevels", table: "DataImports");
     }
 }

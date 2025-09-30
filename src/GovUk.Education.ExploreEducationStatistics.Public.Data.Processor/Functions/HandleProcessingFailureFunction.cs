@@ -4,15 +4,16 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class HandleProcessingFailureFunction(
-    PublicDataDbContext publicDataDbContext) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+public class HandleProcessingFailureFunction(PublicDataDbContext publicDataDbContext)
+    : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     private readonly PublicDataDbContext _publicDataDbContext = publicDataDbContext;
 
     [Function(ActivityNames.HandleProcessingFailure)]
     public async Task HandleProcessingFailure(
         [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         var dataSetVersion = dataSetVersionImport.DataSetVersion;

@@ -35,7 +35,7 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
             StartYear = 2021,
             StartCode = CalendarYear,
             EndYear = 2022,
-            EndCode = CalendarYear
+            EndCode = CalendarYear,
         },
         FilterHierarchiesOptions = null,
     };
@@ -50,13 +50,13 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
             TimePeriodRange =
             [
                 new TimePeriodMetaViewModel(2020, AcademicYear),
-                new TimePeriodMetaViewModel(2021, AcademicYear)
-            ]
+                new TimePeriodMetaViewModel(2021, AcademicYear),
+            ],
         },
         Results = new List<ObservationViewModel>
         {
             new() { TimePeriod = "2020_AY" },
-            new() { TimePeriod = "2021_AY" }
+            new() { TimePeriod = "2021_AY" },
         },
     };
 
@@ -65,20 +65,23 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
     {
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
         tableBuilderService
-            .Setup(s => s.Query(
-                ReleaseVersionId,
-                ItIs.DeepEqualTo(FullTableQuery),
-                It.IsAny<CancellationToken>()))
+            .Setup(s =>
+                s.Query(
+                    ReleaseVersionId,
+                    ItIs.DeepEqualTo(FullTableQuery),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(
-                tableBuilderService: tableBuilderService.Object)
+        var client = SetupApp(tableBuilderService: tableBuilderService.Object)
             .SetUser(DataFixture.AuthenticatedUser())
             .CreateClient();
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-            new JsonNetContent(FullTableQueryRequest));
+            new JsonNetContent(FullTableQueryRequest)
+        );
 
         VerifyAllMocks(tableBuilderService);
 
@@ -90,14 +93,21 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
     {
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
         tableBuilderService
-            .Setup(s => s.QueryToCsvStream(
-                ReleaseVersionId,
-                ItIs.DeepEqualTo(FullTableQuery),
-                It.IsAny<Stream>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(s =>
+                s.QueryToCsvStream(
+                    ReleaseVersionId,
+                    ItIs.DeepEqualTo(FullTableQuery),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(Unit.Instance)
             .Callback<Guid, FullTableQuery, Stream, CancellationToken>(
-                (_, _, stream, _) => { stream.WriteText("Test csv"); });
+                (_, _, stream, _) =>
+                {
+                    stream.WriteText("Test csv");
+                }
+            );
 
         var client = SetupApp(tableBuilderService: tableBuilderService.Object)
             .SetUser(DataFixture.AuthenticatedUser())
@@ -106,7 +116,8 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
             content: new JsonNetContent(FullTableQueryRequest),
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } });
+            headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
+        );
 
         VerifyAllMocks(tableBuilderService);
 
@@ -114,9 +125,11 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
     }
 
     private WebApplicationFactory<TestStartup> SetupApp(
-        ITableBuilderService? tableBuilderService = null)
+        ITableBuilderService? tableBuilderService = null
+    )
     {
         return TestApp.ConfigureServices(services =>
-            services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
+            services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict))
+        );
     }
 }

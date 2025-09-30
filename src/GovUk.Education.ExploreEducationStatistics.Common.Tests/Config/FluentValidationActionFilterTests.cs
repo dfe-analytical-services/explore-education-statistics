@@ -18,15 +18,13 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
     private const string NotEmptyCode = "NotEmpty";
     private const string NotEmptyMessage = "Must not be empty.";
 
-    private FluentValidationActionFilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-    {
-    }
+    private FluentValidationActionFilterTests(TestApplicationFactory<TestStartup> testApp)
+        : base(testApp) { }
 
     public class TestClassTests : FluentValidationActionFilterTests
     {
-        public TestClassTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
+        public TestClassTests(TestApplicationFactory<TestStartup> testApp)
+            : base(testApp) { }
 
         [Fact]
         public async Task Body_Valid()
@@ -69,13 +67,7 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestClass
             {
                 Name = "Test name",
-                TestAddresses = new List<TestAddress>
-                {
-                    new()
-                    {
-                        Line1 = "Test line 1"
-                    }
-                }
+                TestAddresses = new List<TestAddress> { new() { Line1 = "Test line 1" } },
             };
 
             var client = BuildApp().CreateClient();
@@ -90,13 +82,7 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestClass
             {
                 Name = "",
-                TestAddresses = new List<TestAddress>
-                {
-                    new()
-                    {
-                        Line1 = ""
-                    }
-                }
+                TestAddresses = new List<TestAddress> { new() { Line1 = "" } },
             };
 
             var client = BuildApp().CreateClient();
@@ -134,10 +120,7 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
         public async Task Form_Valid()
         {
             var form = new FormUrlEncodedContent(
-                new Dictionary<string, string>
-                {
-                    { "name", "Test name" },
-                }
+                new Dictionary<string, string> { { "name", "Test name" } }
             );
 
             var client = BuildApp().CreateClient();
@@ -149,12 +132,7 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
         [Fact]
         public async Task Form_Invalid()
         {
-            var form = new FormUrlEncodedContent(
-                new Dictionary<string, string>
-                {
-                    { "name", "" },
-                }
-            );
+            var form = new FormUrlEncodedContent(new Dictionary<string, string> { { "name", "" } });
 
             var client = BuildApp().CreateClient();
             var response = await client.PostAsync(nameof(TestController.TestClassForm), form);
@@ -178,14 +156,12 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
         [Fact]
         public async Task Query_Valid()
         {
-            var query = new Dictionary<string, string?>
-            {
-                { "name", "Test name" },
-            };
+            var query = new Dictionary<string, string?> { { "name", "Test name" } };
 
             var client = BuildApp().CreateClient();
             var response = await client.GetAsync(
-                QueryHelpers.AddQueryString(nameof(TestController.TestClassQuery), query));
+                QueryHelpers.AddQueryString(nameof(TestController.TestClassQuery), query)
+            );
 
             response.AssertOk();
         }
@@ -193,14 +169,12 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
         [Fact]
         public async Task Query_Invalid()
         {
-            var query = new Dictionary<string, string?>
-            {
-                { "name", "" },
-            };
+            var query = new Dictionary<string, string?> { { "name", "" } };
 
             var client = BuildApp().CreateClient();
             var response = await client.GetAsync(
-                QueryHelpers.AddQueryString(nameof(TestController.TestClassQuery), query));
+                QueryHelpers.AddQueryString(nameof(TestController.TestClassQuery), query)
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -224,7 +198,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestClass { Name = "Test name" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestClassNoAttribute), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestClassNoAttribute),
+                body
+            );
 
             response.AssertOk();
         }
@@ -235,7 +212,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestClass { Name = "" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestClassNoAttribute), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestClassNoAttribute),
+                body
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -256,9 +236,8 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
 
     public class TestRecordTests : FluentValidationActionFilterTests
     {
-        public TestRecordTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
+        public TestRecordTests(TestApplicationFactory<TestStartup> testApp)
+            : base(testApp) { }
 
         [Fact]
         public async Task Valid()
@@ -266,7 +245,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestRecord { Name = "Test name" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestRecordBody),
+                body
+            );
 
             response.AssertOk();
         }
@@ -277,7 +259,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestRecord { Name = "" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestRecordBody),
+                body
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -301,7 +286,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestRecord { Name = "Test", Person = "" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestRecordBody),
+                body
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -326,7 +314,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestRecord { Name = "Test", Role = "" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestRecordBody),
+                body
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -351,7 +342,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestRecord { Name = "Test", Location = "" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestRecordBody),
+                body
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -379,7 +373,10 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             var body = new TestRecord { Name = "Test", Vehicle = "" };
 
             var client = BuildApp().CreateClient();
-            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+            var response = await client.PostAsJsonAsync(
+                nameof(TestController.TestRecordBody),
+                body
+            );
 
             var details = response.AssertValidationProblem();
 
@@ -459,8 +456,7 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
                 When(
                     c => c.TestAddresses is not null,
                     () =>
-                        RuleForEach(c => c.TestAddresses)
-                            .SetValidator(new TestAddress.Validator())
+                        RuleForEach(c => c.TestAddresses).SetValidator(new TestAddress.Validator())
                 );
             }
         }
@@ -498,38 +494,29 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
                 RuleFor(c => c.Name).NotEmpty();
                 When(
                     c => c.Role is not null,
-                    () => RuleFor(c => c.Role)
-                        .NotEmpty()
-                        .WithState(_ => new
-                        {
-                            Allowed = "Some allowed value"
-                        })
+                    () =>
+                        RuleFor(c => c.Role)
+                            .NotEmpty()
+                            .WithState(_ => new { Allowed = "Some allowed value" })
                 );
                 When(
                     c => c.Location is not null,
-                    () => RuleFor(c => c.Location)
-                        .MinimumLength(2)
-                        .WithState(_ => new
-                        {
-                            Reason = "Some reason"
-                        })
+                    () =>
+                        RuleFor(c => c.Location)
+                            .MinimumLength(2)
+                            .WithState(_ => new { Reason = "Some reason" })
                 );
                 When(
                     c => c.Person is not null,
-                    () => RuleFor(c => c.Person)
-                        .NotEmpty()
-                        .WithState(_ => 1234)
+                    () => RuleFor(c => c.Person).NotEmpty().WithState(_ => 1234)
                 );
 
                 When(
                     c => c.Vehicle is not null,
-                    () => RuleFor(c => c.Vehicle)
-                        .MinimumLength(2)
-                        .WithState(_ => new
-                        {
-                            MinLength = 20,
-                            MaxLength = 100
-                        })
+                    () =>
+                        RuleFor(c => c.Vehicle)
+                            .MinimumLength(2)
+                            .WithState(_ => new { MinLength = 20, MaxLength = 100 })
                 );
             }
         }
@@ -538,11 +525,13 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
     private WebApplicationFactory<TestStartup> BuildApp()
     {
         return TestApp
-            .WithWebHostBuilder(
-                builder => { builder.WithAdditionalControllers(typeof(TestController)); }
-            )
-            .ConfigureServices(
-                services => { services.AddFluentValidation(); }
-            );
+            .WithWebHostBuilder(builder =>
+            {
+                builder.WithAdditionalControllers(typeof(TestController));
+            })
+            .ConfigureServices(services =>
+            {
+                services.AddFluentValidation();
+            });
     }
 }

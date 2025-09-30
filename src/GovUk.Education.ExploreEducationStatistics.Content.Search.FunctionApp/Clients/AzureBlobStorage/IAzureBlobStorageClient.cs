@@ -11,7 +11,11 @@ public interface IAzureBlobStorageClient
     /// <returns>
     /// A a boolean indicating whether the blob was successfully deleted or did not exist.
     /// </returns>
-    Task<bool> DeleteBlobIfExists(string containerName, string blobName, CancellationToken cancellationToken = default);
+    Task<bool> DeleteBlobIfExists(
+        string containerName,
+        string blobName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Upload a Blob to our configured Azure Blob storage account
@@ -28,7 +32,8 @@ public interface IAzureBlobStorageClient
         Blob blob,
         string contentType,
         string? contentEncoding = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Check for the existence of a container in our configured Azure Blob Storage account
@@ -43,7 +48,10 @@ public interface IAzureBlobStorageClient
     /// </summary>
     /// <param name="containerName">The name of the storage account container</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default);
+    Task DeleteAllBlobsFromContainer(
+        string containerName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Get a list of all blobs in a container
@@ -51,5 +59,8 @@ public interface IAzureBlobStorageClient
     /// <param name="containerName">The name of the storage account container</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>An array of blob names</returns>
-    Task<IList<string>> ListBlobsInContainer(string containerName, CancellationToken cancellationToken = default);
+    Task<IList<string>> ListBlobsInContainer(
+        string containerName,
+        CancellationToken cancellationToken = default
+    );
 }

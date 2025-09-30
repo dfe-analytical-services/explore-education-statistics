@@ -13,7 +13,8 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
         Guid latestPublishedReleaseVersionId,
         Guid previousReleaseId,
         Guid previousReleaseVersionId,
-        bool isPublicationArchived)
+        bool isPublicationArchived
+    )
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
@@ -24,13 +25,14 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
             LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId,
             PreviousReleaseId = previousReleaseId,
             PreviousReleaseVersionId = previousReleaseVersionId,
-            IsPublicationArchived = isPublicationArchived
+            IsPublicationArchived = isPublicationArchived,
         };
     }
 
     // Changes to this event should also increment the version accordingly.
     private const string DataVersion = "1.0";
-    private const string EventType = PublicationChangedEventTypes.PublicationLatestPublishedReleaseReordered;
+    private const string EventType =
+        PublicationChangedEventTypes.PublicationLatestPublishedReleaseReordered;
 
     // Which Topic endpoint to use from the appsettings
     public static string EventTopicOptionsKey => EventTopicOptionsKeys.PublicationChanged;

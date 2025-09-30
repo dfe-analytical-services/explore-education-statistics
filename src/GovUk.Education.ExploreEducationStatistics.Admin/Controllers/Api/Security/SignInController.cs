@@ -24,7 +24,8 @@ public class SignInController : ControllerBase
         ILogger<SignInController> logger,
         IHttpContextAccessor httpContextAccessor,
         ISignInService signInService,
-        IUserService userService)
+        IUserService userService
+    )
     {
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
@@ -39,31 +40,41 @@ public class SignInController : ControllerBase
         // Manually check that the user has the correct "access-admin-api" scope as provided by the Identity Provider
         // prior to accessing this endpoint.  It is not possible to do this via the Authorize attribute as the other
         // default policies still check to see if the user has been allocated a valid role at this point.
-        var authorizedByIdP = await _userService.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider);
+        var authorizedByIdP = await _userService.MatchesPolicy(
+            SecurityPolicies.AuthenticatedByIdentityProvider
+        );
         if (!authorizedByIdP)
         {
             return new ForbidResult();
         }
 
-        var remoteUserId = _httpContextAccessor
-            .HttpContext!
-            .User
-            .FindFirstValue(ClaimConstants.NameIdentifierId);
+        var remoteUserId = _httpContextAccessor.HttpContext!.User.FindFirstValue(
+            ClaimConstants.NameIdentifierId
+        );
 
         return await _signInService
             .RegisterOrSignIn()
             .OnFailureDo(_ =>
-                _logger.LogWarning("User with remote Id \"{UserId}\" " +
-                                   "failed to sign in or register", remoteUserId))
+                _logger.LogWarning(
+                    "User with remote Id \"{UserId}\" " + "failed to sign in or register",
+                    remoteUserId
+                )
+            )
             .HandleFailuresOr(signInResponse =>
             {
                 switch (signInResponse.LoginResult)
                 {
                     case LoginResult.NoInvite:
-                        _logger.LogWarning("User with remote Id \"{UserId}\" had no invite to accept", remoteUserId);
+                        _logger.LogWarning(
+                            "User with remote Id \"{UserId}\" had no invite to accept",
+                            remoteUserId
+                        );
                         break;
                     case LoginResult.ExpiredInvite:
-                        _logger.LogWarning("User with remote Id \"{UserId}\" had an expired invite", remoteUserId);
+                        _logger.LogWarning(
+                            "User with remote Id \"{UserId}\" had an expired invite",
+                            remoteUserId
+                        );
                         break;
                 }
 

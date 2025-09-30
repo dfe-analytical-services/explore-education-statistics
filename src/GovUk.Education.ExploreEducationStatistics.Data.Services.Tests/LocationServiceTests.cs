@@ -36,7 +36,7 @@ public class LocationServiceTests
     {
         Id = 1,
         Label = "Countries November 2021",
-        Level = GeographicLevel.Country
+        Level = GeographicLevel.Country,
     };
 
     private static readonly Dictionary<string, object> _properties = new()
@@ -57,15 +57,24 @@ public class LocationServiceTests
         BoundaryLevel = _countriesBoundaryLevel,
         Code = "E92000001",
         Name = "England",
-        GeoJson = new(new MultiPolygon([[[
-                    [-71.17351189255714, 42.350224666504324],
-                    [-71.1677360907197, 42.34671571695422],
-                    [-71.16970919072628, 42.35326835618748],
-                    [-71.14341516047716, 42.36174674733808],
-                    [-71.17559093981981, 42.368232175909064],
-                    [-71.17351189255714, 42.350224666504324]]]]),
-                    _properties, "1"
-                ),
+        GeoJson = new(
+            new MultiPolygon(
+                [
+                    [
+                        [
+                            [-71.17351189255714, 42.350224666504324],
+                            [-71.1677360907197, 42.34671571695422],
+                            [-71.16970919072628, 42.35326835618748],
+                            [-71.14341516047716, 42.36174674733808],
+                            [-71.17559093981981, 42.368232175909064],
+                            [-71.17351189255714, 42.350224666504324],
+                        ],
+                    ],
+                ]
+            ),
+            _properties,
+            "1"
+        ),
     };
 
     [Fact]
@@ -77,7 +86,7 @@ public class LocationServiceTests
         {
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Country,
-            Country = _england
+            Country = _england,
         };
 
         var location2 = new Location
@@ -85,7 +94,7 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Region,
             Country = _england,
-            Region = _northEast
+            Region = _northEast,
         };
 
         var location3 = new Location
@@ -93,7 +102,7 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Region,
             Country = _england,
-            Region = _northWest
+            Region = _northWest,
         };
 
         var location4 = new Location
@@ -101,7 +110,7 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Region,
             Country = _england,
-            Region = _eastMidlands
+            Region = _eastMidlands,
         };
 
         var location5 = new Location
@@ -110,7 +119,7 @@ public class LocationServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             Country = _england,
             Region = _eastMidlands,
-            LocalAuthority = _derby
+            LocalAuthority = _derby,
         };
 
         var location6 = new Location
@@ -119,32 +128,29 @@ public class LocationServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             Country = _england,
             Region = _eastMidlands,
-            LocalAuthority = _nottingham
+            LocalAuthority = _nottingham,
         };
 
         var locations = new List<Location>
         {
-            location1, location2, location3, location4, location5, location6
+            location1,
+            location2,
+            location3,
+            location4,
+            location5,
+            location6,
         };
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {
-                GeographicLevel.LocalAuthority,
-                [
-                    "Country",
-                    "Region"
-                ]
-            }
+            { GeographicLevel.LocalAuthority, ["Country", "Region"] },
         };
 
         _context.BoundaryLevel.Add(_countriesBoundaryLevel);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _sut.GetLocationViewModels(
-            locations,
-            hierarchies);
+        var result = await _sut.GetLocationViewModels(locations, hierarchies);
 
         // Assert
         // Result has Country, Region and Local Authority levels
@@ -234,13 +240,12 @@ public class LocationServiceTests
     [Fact]
     public async Task GetLocationViewModels_WithBoundaryLevel_ReturnsViewModelsWithGeoJson()
     {
-
         var location1 = new Location
         {
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Region,
             Country = _england,
-            Region = _northEast
+            Region = _northEast,
         };
 
         var location2 = new Location
@@ -248,7 +253,7 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Region,
             Country = _england,
-            Region = _northWest
+            Region = _northWest,
         };
 
         var location3 = new Location
@@ -256,49 +261,44 @@ public class LocationServiceTests
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Region,
             Country = _england,
-            Region = _eastMidlands
+            Region = _eastMidlands,
         };
 
-        var locations = new List<Location>
-        {
-            location1, location2, location3
-        };
+        var locations = new List<Location> { location1, location2, location3 };
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {
-                GeographicLevel.Region, ["Country"]
-            }
+            { GeographicLevel.Region, ["Country"] },
         };
 
-        _context.BoundaryLevel.Add(new() { Id = 123, Label = "Boundary Level 1", Level = GeographicLevel.Region });
+        _context.BoundaryLevel.Add(
+            new()
+            {
+                Id = 123,
+                Label = "Boundary Level 1",
+                Level = GeographicLevel.Region,
+            }
+        );
         await _context.SaveChangesAsync();
 
         _boundaryDataRepository
-            .Setup(s => s.FindByBoundaryLevelAndCodes(
-                It.IsAny<long>(),
-                new List<string> { _northEast.Code!, _northWest.Code!, _eastMidlands.Code! }))
-            .Returns(new Dictionary<string, BoundaryData>
+            .Setup(s =>
+                s.FindByBoundaryLevelAndCodes(
+                    It.IsAny<long>(),
+                    new List<string> { _northEast.Code!, _northWest.Code!, _eastMidlands.Code! }
+                )
+            )
+            .Returns(
+                new Dictionary<string, BoundaryData>
                 {
-                    {
-                        _northEast.Code!,
-                        _boundaryData
-                    },
-                    {
-                        _northWest.Code!,
-                        _boundaryData
-                    },
-                    {
-                        _eastMidlands.Code!,
-                        _boundaryData
-                    }
-                });
+                    { _northEast.Code!, _boundaryData },
+                    { _northWest.Code!, _boundaryData },
+                    { _eastMidlands.Code!, _boundaryData },
+                }
+            );
 
         // Act
-        var result = await _sut.GetLocationViewModels(
-            locations,
-            hierarchies,
-            boundaryLevelId: 123);
+        var result = await _sut.GetLocationViewModels(locations, hierarchies, boundaryLevelId: 123);
 
         // Assert
         VerifyAllMocks(_boundaryDataRepository);

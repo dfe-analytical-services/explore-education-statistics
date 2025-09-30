@@ -9,7 +9,8 @@ public partial class EES2686RenameReleaseSubjectMetaGuidanceToDataGuidance : Mig
         migrationBuilder.RenameColumn(
             name: "MetaGuidance",
             newName: "DataGuidance",
-            table: "ReleaseSubject");
+            table: "ReleaseSubject"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -17,6 +18,7 @@ public partial class EES2686RenameReleaseSubjectMetaGuidanceToDataGuidance : Mig
         migrationBuilder.RenameColumn(
             name: "DataGuidance",
             newName: "MetaGuidance",
-            table: "ReleaseSubject");
+            table: "ReleaseSubject"
+        );
     }
 }

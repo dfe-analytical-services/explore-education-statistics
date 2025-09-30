@@ -9,11 +9,7 @@ public class StatusCheckFunction
 {
     private static readonly OrchestrationQuery ActiveOrchestrationsQuery = new()
     {
-        Statuses =
-        [
-            OrchestrationRuntimeStatus.Pending,
-            OrchestrationRuntimeStatus.Running
-        ]
+        Statuses = [OrchestrationRuntimeStatus.Pending, OrchestrationRuntimeStatus.Running],
     };
 
     [Function(nameof(StatusCheck))]
@@ -23,12 +19,13 @@ public class StatusCheckFunction
 #pragma warning disable IDE0060
         HttpRequest request,
 #pragma warning restore IDE0060
-        [DurableClient] DurableTaskClient client)
+        [DurableClient] DurableTaskClient client
+    )
     {
         var activeOrchestrations = await client
             .GetAllInstancesAsync(filter: ActiveOrchestrationsQuery)
             .CountAsync();
-        
+
         return new OkObjectResult(new { ActiveOrchestrations = activeOrchestrations });
     }
 }

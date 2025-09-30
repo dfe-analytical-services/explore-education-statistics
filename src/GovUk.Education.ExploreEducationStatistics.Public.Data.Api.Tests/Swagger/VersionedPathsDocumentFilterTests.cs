@@ -15,9 +15,9 @@ public class VersionedPathsDocumentFilterTests
             Info = new OpenApiInfo { Version = "1" },
             Paths = new OpenApiPaths
             {
-                {"/v{version}/endpoint-1", new OpenApiPathItem()},
-                {"/v{version}/endpoint-2/{id}", new OpenApiPathItem()}
-            }
+                { "/v{version}/endpoint-1", new OpenApiPathItem() },
+                { "/v{version}/endpoint-2/{id}", new OpenApiPathItem() },
+            },
         };
 
         var filter = new VersionedPathsDocumentFilter();
@@ -42,24 +42,17 @@ public class VersionedPathsDocumentFilterTests
                     "/v{version}/endpoint-1",
                     new OpenApiPathItem
                     {
-                        Parameters =
-                        [
-                            new OpenApiParameter { Name = "version" }
-                        ],
+                        Parameters = [new OpenApiParameter { Name = "version" }],
                         Operations =
                         {
                             {
                                 OperationType.Get,
                                 new OpenApiOperation
                                 {
-                                    Parameters =
-                                    [
-                                        new OpenApiParameter { Name = "version" }
-                                    ]
+                                    Parameters = [new OpenApiParameter { Name = "version" }],
                                 }
-                            }
-
-                        }
+                            },
+                        },
                     }
                 },
                 {
@@ -69,7 +62,7 @@ public class VersionedPathsDocumentFilterTests
                         Parameters =
                         [
                             new OpenApiParameter { Name = "version" },
-                            new OpenApiParameter { Name = "id" }
+                            new OpenApiParameter { Name = "id" },
                         ],
                         Operations =
                         {
@@ -80,15 +73,14 @@ public class VersionedPathsDocumentFilterTests
                                     Parameters =
                                     [
                                         new OpenApiParameter { Name = "version" },
-                                        new OpenApiParameter { Name = "id" }
-                                    ]
+                                        new OpenApiParameter { Name = "id" },
+                                    ],
                                 }
-                            }
-
-                        }
+                            },
+                        },
                     }
-                }
-            }
+                },
+            },
         };
 
         var filter = new VersionedPathsDocumentFilter();
@@ -117,10 +109,7 @@ public class VersionedPathsDocumentFilterTests
         var schemaGenerator = new SchemaGenerator(
             new SchemaGeneratorOptions(),
             new JsonSerializerDataContractResolver(
-                new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                }
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
             )
         );
         var schemaRepository = new SchemaRepository();

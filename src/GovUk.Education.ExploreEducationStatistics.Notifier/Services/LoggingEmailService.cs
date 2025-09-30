@@ -6,10 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
 public class LoggingEmailService(ILogger<IEmailService> logger) : IEmailService
 {
-    public void SendEmail(
-        string email,
-        string templateId,
-        Dictionary<string, dynamic> values)
+    public void SendEmail(string email, string templateId, Dictionary<string, dynamic> values)
     {
         logger.LogInformation(
             """
@@ -19,6 +16,7 @@ public class LoggingEmailService(ILogger<IEmailService> logger) : IEmailService
             {TemplateValues}
             """,
             templateId,
-            values);
+            values
+        );
     }
 }

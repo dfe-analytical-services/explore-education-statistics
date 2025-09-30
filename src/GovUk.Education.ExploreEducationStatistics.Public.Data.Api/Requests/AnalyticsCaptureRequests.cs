@@ -37,7 +37,8 @@ public record CaptureDataSetVersionQueryRequest(
     int TotalRowsCount,
     DateTime StartTime,
     DateTime EndTime,
-    DataSetQueryRequest Query) : IAnalyticsCaptureRequest;
+    DataSetQueryRequest Query
+) : IAnalyticsCaptureRequest;
 
 public record CaptureDataSetVersionCallRequest(
     Guid DataSetId,
@@ -53,19 +54,19 @@ public record CaptureDataSetVersionCallRequest(
 
 public enum TopLevelCallType
 {
-    GetPublications
+    GetPublications,
 }
 
 public enum PublicationCallType
 {
     GetSummary,
-    GetDataSets
+    GetDataSets,
 }
 
 public enum DataSetCallType
 {
     GetSummary,
-    GetVersions
+    GetVersions,
 }
 
 public enum DataSetVersionCallType
@@ -73,18 +74,16 @@ public enum DataSetVersionCallType
     GetMetadata,
     GetSummary,
     DownloadCsv,
-    GetChanges
+    GetChanges,
 }
 
-public record GetMetadataAnalyticsParameters(
-    IEnumerable<DataSetMetaType> Types);
+public record GetMetadataAnalyticsParameters(IEnumerable<DataSetMetaType> Types);
 
 public record PreviewTokenRequest(
     string Label,
     Guid DataSetVersionId,
     DateTimeOffset Created,
-    DateTimeOffset Expiry);
+    DateTimeOffset Expiry
+);
 
-public record PaginationParameters(
-    int Page,
-    int PageSize);
+public record PaginationParameters(int Page, int PageSize);

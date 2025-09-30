@@ -7,15 +7,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class ImportDataFunction(
     PublicDataDbContext publicDataDbContext,
-    IDataDuckDbRepository dataDuckDbRepository) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataDuckDbRepository dataDuckDbRepository
+) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(ActivityNames.ImportData)]
     public async Task ImportData(
         [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.ImportingData, cancellationToken);
-        await dataDuckDbRepository.CreateDataTable(dataSetVersionImport.DataSetVersionId, cancellationToken);
+        await UpdateImportStage(
+            dataSetVersionImport,
+            DataSetVersionImportStage.ImportingData,
+            cancellationToken
+        );
+        await dataDuckDbRepository.CreateDataTable(
+            dataSetVersionImport.DataSetVersionId,
+            cancellationToken
+        );
     }
 }

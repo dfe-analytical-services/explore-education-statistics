@@ -17,9 +17,9 @@ using Testcontainers.PostgreSql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
-public abstract class ProcessorFunctionsIntegrationTest(
-    FunctionsIntegrationTestFixture fixture)
-    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
+public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture)
+    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>(fixture),
+        IAsyncLifetime
 {
     public async Task InitializeAsync()
     {
@@ -42,7 +42,8 @@ public abstract class ProcessorFunctionsIntegrationTest(
 
     protected void SetupCsvDataFilesForDataSetVersion(
         ProcessorTestData processorTestData,
-        DataSetVersion dataSetVersion)
+        DataSetVersion dataSetVersion
+    )
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
@@ -53,45 +54,56 @@ public abstract class ProcessorFunctionsIntegrationTest(
         }
 
         // Prepare the data set version directory with data and metadata CSV files
-        File.Copy(sourceFileName: processorTestData.CsvDataGzipFilePath,
-            destFileName: dataSetVersionPathResolver.CsvDataPath(dataSetVersion));
-        File.Copy(sourceFileName: processorTestData.CsvMetadataFilePath,
-            destFileName: dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion));
+        File.Copy(
+            sourceFileName: processorTestData.CsvDataGzipFilePath,
+            destFileName: dataSetVersionPathResolver.CsvDataPath(dataSetVersion)
+        );
+        File.Copy(
+            sourceFileName: processorTestData.CsvMetadataFilePath,
+            destFileName: dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion)
+        );
     }
 
-    protected async Task<(DataSetVersion initialVersion, DataSetVersion nextVersion, Guid instanceId)>
-        CreateDataSetInitialAndNextVersion(
-            DataSetVersionStatus nextVersionStatus,
-            DataSetVersionImportStage nextVersionImportStage,
-            DataSetVersionMeta? initialVersionMeta = null,
-            DataSetVersionMeta? nextVersionMeta = null)
+    protected async Task<(
+        DataSetVersion initialVersion,
+        DataSetVersion nextVersion,
+        Guid instanceId
+    )> CreateDataSetInitialAndNextVersion(
+        DataSetVersionStatus nextVersionStatus,
+        DataSetVersionImportStage nextVersionImportStage,
+        DataSetVersionMeta? initialVersionMeta = null,
+        DataSetVersionMeta? nextVersionMeta = null
+    )
     {
         var (initialVersion, _) = await CreateDataSetInitialVersion(
             dataSetStatus: DataSetStatus.Published,
             dataSetVersionStatus: DataSetVersionStatus.Published,
             importStage: DataSetVersionImportStage.Completing,
-            meta: initialVersionMeta);
+            meta: initialVersionMeta
+        );
 
         var (nextVersion, instanceId) = await CreateDataSetNextVersion(
             initialVersion: initialVersion,
             status: nextVersionStatus,
             importStage: nextVersionImportStage,
-            meta: nextVersionMeta);
+            meta: nextVersionMeta
+        );
 
         return (initialVersion, nextVersion, instanceId);
     }
 
-    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)>
-        CreateDataSetInitialVersion(
-            DataSetVersionImportStage importStage,
-            DataSetStatus dataSetStatus = DataSetStatus.Draft,
-            DataSetVersionStatus dataSetVersionStatus = DataSetVersionStatus.Processing,
-            Guid? releaseFileId = null,
-            DataSetVersionMeta? meta = null)
+    protected async Task<(
+        DataSetVersion dataSetVersion,
+        Guid instanceId
+    )> CreateDataSetInitialVersion(
+        DataSetVersionImportStage importStage,
+        DataSetStatus dataSetStatus = DataSetStatus.Draft,
+        DataSetVersionStatus dataSetVersionStatus = DataSetVersionStatus.Processing,
+        Guid? releaseFileId = null,
+        DataSetVersionMeta? meta = null
+    )
     {
-        DataSet dataSet = DataFixture
-            .DefaultDataSet()
-            .WithStatus(dataSetStatus);
+        DataSet dataSet = DataFixture.DefaultDataSet().WithStatus(dataSetStatus);
 
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -100,15 +112,16 @@ public abstract class ProcessorFunctionsIntegrationTest(
             importStage: importStage,
             status: dataSetVersionStatus,
             releaseFileId: releaseFileId,
-            meta: meta);
+            meta: meta
+        );
     }
 
-    protected async Task<(DataSetVersion nextVersion, Guid instanceId)>
-        CreateDataSetNextVersion(
-            DataSetVersion initialVersion,
-            DataSetVersionStatus status,
-            DataSetVersionImportStage importStage,
-            DataSetVersionMeta? meta = null)
+    protected async Task<(DataSetVersion nextVersion, Guid instanceId)> CreateDataSetNextVersion(
+        DataSetVersion initialVersion,
+        DataSetVersionStatus status,
+        DataSetVersionImportStage importStage,
+        DataSetVersionMeta? meta = null
+    )
     {
         var defaultNextVersion = initialVersion.DefaultNextVersion();
 
@@ -118,7 +131,8 @@ public abstract class ProcessorFunctionsIntegrationTest(
             importStage: importStage,
             versionMajor: defaultNextVersion.Major,
             versionMinor: defaultNextVersion.Minor,
-            meta: meta);
+            meta: meta
+        );
     }
 
     private async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
@@ -128,13 +142,12 @@ public abstract class ProcessorFunctionsIntegrationTest(
         Guid? releaseFileId = null,
         int versionMajor = 1,
         int versionMinor = 0,
-        DataSetVersionMeta? meta = null)
+        DataSetVersionMeta? meta = null
+    )
     {
         await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-        var dataSet = await publicDataDbContext
-            .DataSets
-            .SingleAsync(ds => ds.Id == dataSetId);
+        var dataSet = await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == dataSetId);
 
         DataSetVersionImport dataSetVersionImport = DataFixture
             .DefaultDataSetVersionImport()
@@ -165,32 +178,37 @@ public abstract class ProcessorFunctionsIntegrationTest(
 
         if (meta?.FilterMetas is not null)
         {
-            dataSetVersionGenerator = dataSetVersionGenerator
-                .WithFilterMetas(() => meta.FilterMetas);
+            dataSetVersionGenerator = dataSetVersionGenerator.WithFilterMetas(() =>
+                meta.FilterMetas
+            );
         }
 
         if (meta?.LocationMetas is not null)
         {
-            dataSetVersionGenerator = dataSetVersionGenerator
-                .WithLocationMetas(() => meta.LocationMetas);
+            dataSetVersionGenerator = dataSetVersionGenerator.WithLocationMetas(() =>
+                meta.LocationMetas
+            );
         }
 
         if (meta?.GeographicLevelMeta is not null)
         {
-            dataSetVersionGenerator = dataSetVersionGenerator
-                .WithGeographicLevelMeta(() => meta.GeographicLevelMeta);
+            dataSetVersionGenerator = dataSetVersionGenerator.WithGeographicLevelMeta(() =>
+                meta.GeographicLevelMeta
+            );
         }
 
         if (meta?.IndicatorMetas is not null)
         {
-            dataSetVersionGenerator = dataSetVersionGenerator
-                .WithIndicatorMetas(() => meta.IndicatorMetas);
+            dataSetVersionGenerator = dataSetVersionGenerator.WithIndicatorMetas(() =>
+                meta.IndicatorMetas
+            );
         }
 
         if (meta?.TimePeriodMetas is not null)
         {
-            dataSetVersionGenerator = dataSetVersionGenerator
-                .WithTimePeriodMetas(() => meta.TimePeriodMetas);
+            dataSetVersionGenerator = dataSetVersionGenerator.WithTimePeriodMetas(() =>
+                meta.TimePeriodMetas
+            );
         }
 
         var dataSetVersion = dataSetVersionGenerator.Generate();
@@ -207,15 +225,19 @@ public abstract class ProcessorFunctionsIntegrationTest(
     protected DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-        return DuckDbConnection.CreateFileConnectionReadOnly(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
+        return DuckDbConnection.CreateFileConnectionReadOnly(
+            dataSetVersionPathResolver.DuckDbPath(dataSetVersion)
+        );
     }
 
     protected void AssertDataSetVersionDirectoryContainsOnlyFiles(
         DataSetVersion dataSetVersion,
-        params string[] expectedFiles)
+        params string[] expectedFiles
+    )
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-        var actualFiles = Directory.GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
+        var actualFiles = Directory
+            .GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
             .Select(Path.GetFileName)
             .ToArray();
 
@@ -225,7 +247,9 @@ public abstract class ProcessorFunctionsIntegrationTest(
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
+public class ProcessorFunctionsIntegrationTestFixture
+    : FunctionsIntegrationTestFixture,
+        IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
@@ -249,36 +273,43 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
 
     public override IHostBuilder ConfigureTestHostBuilder()
     {
-        return base
-            .ConfigureTestHostBuilder()
+        return base.ConfigureTestHostBuilder()
             .ConfigureProcessorHostBuilder()
-            .ConfigureAppConfiguration((_, config) =>
-            {
-                config.AddInMemoryCollection(new Dictionary<string, string?>
+            .ConfigureAppConfiguration(
+                (_, config) =>
                 {
-                    {
-                        $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
-                        _azuriteContainer.GetConnectionString()
-                    }
-                });
-            })
+                    config.AddInMemoryCollection(
+                        new Dictionary<string, string?>
+                        {
+                            {
+                                $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
+                                _azuriteContainer.GetConnectionString()
+                            },
+                        }
+                    );
+                }
+            )
             .ConfigureServices(services =>
             {
-                services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
+                services.UseInMemoryDbContext<ContentDbContext>(
+                    databaseName: Guid.NewGuid().ToString()
+                );
 
-                services.AddDbContext<PublicDataDbContext>(
-                    options =>
-                    {
-                        options.UseNpgsql(
-                            _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure());
-                    });
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    options.UseNpgsql(
+                        _postgreSqlContainer.GetConnectionString(),
+                        psqlOptions => psqlOptions.EnableRetryOnFailure()
+                    );
+                });
 
-                using var serviceScope = services.BuildServiceProvider()
+                using var serviceScope = services
+                    .BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
                     .CreateScope();
 
-                using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
+                using var context =
+                    serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
                 context.Database.Migrate();
             });
     }

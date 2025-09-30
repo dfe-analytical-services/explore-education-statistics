@@ -11,11 +11,14 @@ public static class NamingUtils
     public static string CreateReleaseSlug(
         int year,
         TimeIdentifier timePeriodCoverage,
-        string? label = null)
+        string? label = null
+    )
     {
         var trimmedLowercaseLabel = label?.Trim().ToLower();
 
-        return SlugFromTitle($"{Format(year, timePeriodCoverage)}{(string.IsNullOrWhiteSpace(trimmedLowercaseLabel) ? "" : $"-{trimmedLowercaseLabel}")}");
+        return SlugFromTitle(
+            $"{Format(year, timePeriodCoverage)}{(string.IsNullOrWhiteSpace(trimmedLowercaseLabel) ? "" : $"-{trimmedLowercaseLabel}")}"
+        );
     }
 
     public static string SlugFromTitle(string title)
@@ -24,7 +27,9 @@ public static class NamingUtils
         var replaceNonAlphaNumericWithSpace = ReplaceNonAlphaNumericWithSpaceAndTrim(title);
         var toLower = new string(replaceNonAlphaNumericWithSpace.Select(ToLower).ToArray());
         var removeMultipleSpaces = Regex.Replace(toLower, @"\s+", " ");
-        var replaceSpaces = new string(removeMultipleSpaces.Select(c => IsWhiteSpace(c) ? '-' : c).ToArray());
+        var replaceSpaces = new string(
+            removeMultipleSpaces.Select(c => IsWhiteSpace(c) ? '-' : c).ToArray()
+        );
         return replaceSpaces;
     }
 

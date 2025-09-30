@@ -15,47 +15,30 @@ public partial class EES3755_RemoveTemporaryFieldsFromPermalink : Migration
         // to allow setting the LegacyHasSnapshot flag during the EES-4236 migration run.
         migrationBuilder.Sql("REVOKE UPDATE ON dbo.Permalinks FROM [data]");
 
-        migrationBuilder.DropColumn(
-            name: "CountFilterItems",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "CountFilterItems", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "CountFootnotes",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "CountFootnotes", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "CountIndicators",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "CountIndicators", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "CountLocations",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "CountLocations", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "CountObservations",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "CountObservations", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "CountTimePeriods",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "CountTimePeriods", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "LegacyContentLength",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "LegacyContentLength", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "LegacyHasConfigurationHeaders",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "LegacyHasConfigurationHeaders", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "LegacyHasSnapshot",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "LegacyHasSnapshot", table: "Permalinks");
 
         // Legacy column retained to facilitate fallback to legacy data for resolving migration related issues.
         migrationBuilder.RenameColumn(
             name: "Legacy",
             table: "Permalinks",
-            newName: "MigratedFromLegacy");
+            newName: "MigratedFromLegacy"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -65,66 +48,76 @@ public partial class EES3755_RemoveTemporaryFieldsFromPermalink : Migration
         migrationBuilder.RenameColumn(
             name: "MigratedFromLegacy",
             table: "Permalinks",
-            newName: "Legacy");
+            newName: "Legacy"
+        );
 
         migrationBuilder.AddColumn<int>(
             name: "CountFilterItems",
             table: "Permalinks",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
 
         migrationBuilder.AddColumn<int>(
             name: "CountFootnotes",
             table: "Permalinks",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
 
         migrationBuilder.AddColumn<int>(
             name: "CountIndicators",
             table: "Permalinks",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
 
         migrationBuilder.AddColumn<int>(
             name: "CountLocations",
             table: "Permalinks",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
 
         migrationBuilder.AddColumn<int>(
             name: "CountObservations",
             table: "Permalinks",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
 
         migrationBuilder.AddColumn<int>(
             name: "CountTimePeriods",
             table: "Permalinks",
             type: "int",
             nullable: false,
-            defaultValue: 0);
+            defaultValue: 0
+        );
 
         migrationBuilder.AddColumn<long>(
             name: "LegacyContentLength",
             table: "Permalinks",
             type: "bigint",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<bool>(
             name: "LegacyHasConfigurationHeaders",
             table: "Permalinks",
             type: "bit",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<bool>(
             name: "LegacyHasSnapshot",
             table: "Permalinks",
             type: "bit",
-            nullable: true);
+            nullable: true
+        );
     }
 }

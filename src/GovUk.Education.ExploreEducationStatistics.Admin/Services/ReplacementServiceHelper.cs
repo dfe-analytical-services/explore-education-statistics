@@ -13,7 +13,8 @@ public class ReplacementServiceHelper
     public static List<FilterSequenceEntry>? ReplaceFilterSequence(
         List<Filter> originalFilters,
         List<Filter> replacementFilters,
-        ReleaseFile originalReleaseFile)
+        ReleaseFile originalReleaseFile
+    )
     {
         // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
         if (originalReleaseFile.FilterSequence == null)
@@ -21,7 +22,10 @@ public class ReplacementServiceHelper
             return null;
         }
 
-        var originalFiltersLabelMap = originalFilters.ToDictionary(filter => filter.Name, filter => filter);
+        var originalFiltersLabelMap = originalFilters.ToDictionary(
+            filter => filter.Name,
+            filter => filter
+        );
 
         // Step 1: Create id to replacement-id maps and work out newly added filters, filter groups and filter items
 
@@ -37,46 +41,70 @@ public class ReplacementServiceHelper
             if (originalFiltersLabelMap.TryGetValue(replacementFilter.Name, out var originalFilter))
             {
                 filtersMap.Add(originalFilter.Id, replacementFilter.Id);
-                var originalFilterGroupsLabelMap = originalFilter.FilterGroups.ToDictionary(fg => fg.Label);
+                var originalFilterGroupsLabelMap = originalFilter.FilterGroups.ToDictionary(fg =>
+                    fg.Label
+                );
                 replacementFilter.FilterGroups.ForEach(replacementFilterGroup =>
                 {
-                    if (originalFilterGroupsLabelMap.TryGetValue(replacementFilterGroup.Label,
-                            out var originalFilterGroup))
+                    if (
+                        originalFilterGroupsLabelMap.TryGetValue(
+                            replacementFilterGroup.Label,
+                            out var originalFilterGroup
+                        )
+                    )
                     {
                         filterGroupsMap.Add(originalFilterGroup.Id, replacementFilterGroup.Id);
-                        var originalFilterItemsLabelMap = originalFilterGroup.FilterItems.ToDictionary(fi => fi.Label);
+                        var originalFilterItemsLabelMap =
+                            originalFilterGroup.FilterItems.ToDictionary(fi => fi.Label);
                         replacementFilterGroup.FilterItems.ForEach(replacementFilterItem =>
                         {
-                            if (originalFilterItemsLabelMap.TryGetValue(replacementFilterItem.Label,
-                                    out var originalFilterItem))
+                            if (
+                                originalFilterItemsLabelMap.TryGetValue(
+                                    replacementFilterItem.Label,
+                                    out var originalFilterItem
+                                )
+                            )
                             {
                                 filterItemsMap.Add(originalFilterItem.Id, replacementFilterItem.Id);
                             }
                             else
                             {
-                                if (newlyAddedFilterItems.TryGetValue(originalFilterGroup.Id,
-                                        out var newlyAddedFilterItemList))
+                                if (
+                                    newlyAddedFilterItems.TryGetValue(
+                                        originalFilterGroup.Id,
+                                        out var newlyAddedFilterItemList
+                                    )
+                                )
                                 {
                                     newlyAddedFilterItemList.Add(replacementFilterItem);
                                 }
                                 else
                                 {
-                                    newlyAddedFilterItems.Add(originalFilterGroup.Id,
-                                        ListOf(replacementFilterItem));
+                                    newlyAddedFilterItems.Add(
+                                        originalFilterGroup.Id,
+                                        ListOf(replacementFilterItem)
+                                    );
                                 }
                             }
                         });
                     }
                     else
                     {
-                        if (newlyAddedFilterGroups.TryGetValue(originalFilter.Id,
-                                out var newlyAddedFilterGroupList))
+                        if (
+                            newlyAddedFilterGroups.TryGetValue(
+                                originalFilter.Id,
+                                out var newlyAddedFilterGroupList
+                            )
+                        )
                         {
                             newlyAddedFilterGroupList.Add(replacementFilterGroup);
                         }
                         else
                         {
-                            newlyAddedFilterGroups.Add(originalFilter.Id, ListOf(replacementFilterGroup));
+                            newlyAddedFilterGroups.Add(
+                                originalFilter.Id,
+                                ListOf(replacementFilterGroup)
+                            );
                         }
                     }
                 });
@@ -92,62 +120,87 @@ public class ReplacementServiceHelper
         // - Swap the remaining id's with their replacements
         // - Append new entries that were added in the replacement
 
-        var filterSequence = originalReleaseFile.FilterSequence
-            .Where(filter => filtersMap.ContainsKey(filter.Id))
+        var filterSequence = originalReleaseFile
+            .FilterSequence.Where(filter => filtersMap.ContainsKey(filter.Id))
             .Select(filter =>
             {
                 var newFilterSequenceEntry = new FilterSequenceEntry(
                     filtersMap[filter.Id],
-                    filter.ChildSequence
-                        .Where(filterGroup => filterGroupsMap.ContainsKey(filterGroup.Id))
+                    filter
+                        .ChildSequence.Where(filterGroup =>
+                            filterGroupsMap.ContainsKey(filterGroup.Id)
+                        )
                         .Select(filterGroup =>
                         {
                             var newFilterGroupSequenceEntry = new FilterGroupSequenceEntry(
                                 filterGroupsMap[filterGroup.Id],
-                                filterGroup.ChildSequence
-                                    .Where(filterItem => filterItemsMap.ContainsKey(filterItem))
+                                filterGroup
+                                    .ChildSequence.Where(filterItem =>
+                                        filterItemsMap.ContainsKey(filterItem)
+                                    )
                                     .Select(filterItem => filterItemsMap[filterItem])
-                                    .ToList());
+                                    .ToList()
+                            );
 
-                            if (newlyAddedFilterItems.TryGetValue(filterGroup.Id, out var newlyAddedFilterItemList))
+                            if (
+                                newlyAddedFilterItems.TryGetValue(
+                                    filterGroup.Id,
+                                    out var newlyAddedFilterItemList
+                                )
+                            )
                             {
                                 newFilterGroupSequenceEntry.ChildSequence.AddRange(
                                     newlyAddedFilterItemList
                                         .OrderBy(fi => !IsTotal(fi.Label))
                                         .ThenBy(fi => fi.Label, LabelComparer)
-                                        .Select(fi => fi.Id));
+                                        .Select(fi => fi.Id)
+                                );
                             }
 
                             return newFilterGroupSequenceEntry;
-                        }).ToList());
+                        })
+                        .ToList()
+                );
 
-                if (newlyAddedFilterGroups.TryGetValue(filter.Id, out var newlyAddedFilterGroupList))
+                if (
+                    newlyAddedFilterGroups.TryGetValue(filter.Id, out var newlyAddedFilterGroupList)
+                )
                 {
-                    newFilterSequenceEntry.ChildSequence.AddRange(newlyAddedFilterGroupList
-                        .OrderBy(fg => !IsTotal(fg.Label))
-                        .ThenBy(fg => fg.Label, LabelComparer)
-                        .Select(fg => new FilterGroupSequenceEntry(fg.Id,
-                            fg.FilterItems
-                                .OrderBy(fi => !IsTotal(fi.Label))
-                                .ThenBy(fi => fi.Label, LabelComparer)
-                                .Select(fi => fi.Id).ToList()))
+                    newFilterSequenceEntry.ChildSequence.AddRange(
+                        newlyAddedFilterGroupList
+                            .OrderBy(fg => !IsTotal(fg.Label))
+                            .ThenBy(fg => fg.Label, LabelComparer)
+                            .Select(fg => new FilterGroupSequenceEntry(
+                                fg.Id,
+                                fg.FilterItems.OrderBy(fi => !IsTotal(fi.Label))
+                                    .ThenBy(fi => fi.Label, LabelComparer)
+                                    .Select(fi => fi.Id)
+                                    .ToList()
+                            ))
                     );
                 }
 
                 return newFilterSequenceEntry;
-            }).ToList();
+            })
+            .ToList();
 
-        filterSequence.AddRange(newlyAddedFilters
-            .OrderBy(f => f.Label, LabelComparer)
-            .Select(f => new FilterSequenceEntry(f.Id,
-                f.FilterGroups
-                    .OrderBy(fg => !IsTotal(fg.Label))
-                    .ThenBy(fg => fg.Label, LabelComparer)
-                    .Select(fg =>
-                        new FilterGroupSequenceEntry(fg.Id, fg.FilterItems
-                            .OrderBy(fi => !IsTotal(fi.Label))
-                            .ThenBy(fi => fi.Label, LabelComparer)
-                            .Select(fi => fi.Id).ToList())).ToList())));
+        filterSequence.AddRange(
+            newlyAddedFilters
+                .OrderBy(f => f.Label, LabelComparer)
+                .Select(f => new FilterSequenceEntry(
+                    f.Id,
+                    f.FilterGroups.OrderBy(fg => !IsTotal(fg.Label))
+                        .ThenBy(fg => fg.Label, LabelComparer)
+                        .Select(fg => new FilterGroupSequenceEntry(
+                            fg.Id,
+                            fg.FilterItems.OrderBy(fi => !IsTotal(fi.Label))
+                                .ThenBy(fi => fi.Label, LabelComparer)
+                                .Select(fi => fi.Id)
+                                .ToList()
+                        ))
+                        .ToList()
+                ))
+        );
 
         return filterSequence;
     }
@@ -155,7 +208,8 @@ public class ReplacementServiceHelper
     public static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
         List<IndicatorGroup> originalIndicatorGroups,
         List<IndicatorGroup> replacementIndicatorGroups,
-        ReleaseFile originalReleaseFile)
+        ReleaseFile originalReleaseFile
+    )
     {
         // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
         if (originalReleaseFile.IndicatorSequence == null)
@@ -163,8 +217,10 @@ public class ReplacementServiceHelper
             return null;
         }
 
-        var originalIndicatorGroupsLabelMap = originalIndicatorGroups
-            .ToDictionary(indicatorGroup => indicatorGroup.Label, indicatorGroup => indicatorGroup);
+        var originalIndicatorGroupsLabelMap = originalIndicatorGroups.ToDictionary(
+            indicatorGroup => indicatorGroup.Label,
+            indicatorGroup => indicatorGroup
+        );
 
         // Step 1: Create id to replacement-id maps and work out newly added indicator groups and indicators
 
@@ -175,27 +231,45 @@ public class ReplacementServiceHelper
 
         replacementIndicatorGroups.ForEach(replacementIndicatorGroup =>
         {
-            if (originalIndicatorGroupsLabelMap.TryGetValue(replacementIndicatorGroup.Label,
-                    out var originalIndicatorGroup))
+            if (
+                originalIndicatorGroupsLabelMap.TryGetValue(
+                    replacementIndicatorGroup.Label,
+                    out var originalIndicatorGroup
+                )
+            )
             {
                 indicatorGroupsMap.Add(originalIndicatorGroup.Id, replacementIndicatorGroup.Id);
-                var originalIndicatorsNameMap = originalIndicatorGroup.Indicators.ToDictionary(i => i.Name);
+                var originalIndicatorsNameMap = originalIndicatorGroup.Indicators.ToDictionary(i =>
+                    i.Name
+                );
                 replacementIndicatorGroup.Indicators.ForEach(replacementIndicator =>
                 {
-                    if (originalIndicatorsNameMap.TryGetValue(replacementIndicator.Name, out var originalIndicator))
+                    if (
+                        originalIndicatorsNameMap.TryGetValue(
+                            replacementIndicator.Name,
+                            out var originalIndicator
+                        )
+                    )
                     {
                         indicatorsMap.Add(originalIndicator.Id, replacementIndicator.Id);
                     }
                     else
                     {
-                        if (newlyAddedIndicators.TryGetValue(originalIndicatorGroup.Id,
-                                out var newlyAddedIndicatorList))
+                        if (
+                            newlyAddedIndicators.TryGetValue(
+                                originalIndicatorGroup.Id,
+                                out var newlyAddedIndicatorList
+                            )
+                        )
                         {
                             newlyAddedIndicatorList.Add(replacementIndicator);
                         }
                         else
                         {
-                            newlyAddedIndicators.Add(originalIndicatorGroup.Id, ListOf(replacementIndicator));
+                            newlyAddedIndicators.Add(
+                                originalIndicatorGroup.Id,
+                                ListOf(replacementIndicator)
+                            );
                         }
                     }
                 });
@@ -211,34 +285,46 @@ public class ReplacementServiceHelper
         // - Swap the remaining id's with their replacements
         // - Append new entries that were added in the replacement
 
-        var indicatorSequence = originalReleaseFile.IndicatorSequence
-            .Where(indicatorGroup => indicatorGroupsMap.ContainsKey(indicatorGroup.Id))
+        var indicatorSequence = originalReleaseFile
+            .IndicatorSequence.Where(indicatorGroup =>
+                indicatorGroupsMap.ContainsKey(indicatorGroup.Id)
+            )
             .Select(indicatorGroup =>
             {
                 var newIndicatorGroupSequenceEntry = new IndicatorGroupSequenceEntry(
                     indicatorGroupsMap[indicatorGroup.Id],
-                    indicatorGroup.ChildSequence
-                        .Where(indicator => indicatorsMap.ContainsKey(indicator))
+                    indicatorGroup
+                        .ChildSequence.Where(indicator => indicatorsMap.ContainsKey(indicator))
                         .Select(indicator => indicatorsMap[indicator])
-                        .ToList());
+                        .ToList()
+                );
 
-                if (newlyAddedIndicators.TryGetValue(indicatorGroup.Id, out var newlyAddedIndicatorList))
+                if (
+                    newlyAddedIndicators.TryGetValue(
+                        indicatorGroup.Id,
+                        out var newlyAddedIndicatorList
+                    )
+                )
                 {
                     newIndicatorGroupSequenceEntry.ChildSequence.AddRange(
                         newlyAddedIndicatorList
                             .OrderBy(i => i.Label, LabelComparer)
-                            .Select(i => i.Id));
+                            .Select(i => i.Id)
+                    );
                 }
 
                 return newIndicatorGroupSequenceEntry;
-            }).ToList();
+            })
+            .ToList();
 
-        indicatorSequence.AddRange(newlyAddedIndicatorGroups
-            .OrderBy(ig => ig.Label, LabelComparer)
-            .Select(ig => new IndicatorGroupSequenceEntry(ig.Id,
-                ig.Indicators
-                    .OrderBy(i => i.Label, LabelComparer)
-                    .Select(i => i.Id).ToList())));
+        indicatorSequence.AddRange(
+            newlyAddedIndicatorGroups
+                .OrderBy(ig => ig.Label, LabelComparer)
+                .Select(ig => new IndicatorGroupSequenceEntry(
+                    ig.Id,
+                    ig.Indicators.OrderBy(i => i.Label, LabelComparer).Select(i => i.Id).ToList()
+                ))
+        );
 
         return indicatorSequence;
     }

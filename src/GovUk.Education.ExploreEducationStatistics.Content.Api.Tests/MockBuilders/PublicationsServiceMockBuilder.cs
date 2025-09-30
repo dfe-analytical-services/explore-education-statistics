@@ -14,15 +14,15 @@ public class PublicationsServiceMockBuilder
 
     private PublicationDto? _publication;
 
-    private static readonly Expression<Func<IPublicationsService,
-        Task<Either<ActionResult, PublicationDto>>>> GetPublication =
-        m => m.GetPublication(
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IPublicationsService, Task<Either<ActionResult, PublicationDto>>>
+    > GetPublication = m => m.GetPublication(It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public PublicationsServiceMockBuilder()
     {
-        _mock.Setup(GetPublication).ReturnsAsync(() => _publication ?? new PublicationDtoBuilder().Build());
+        _mock
+            .Setup(GetPublication)
+            .ReturnsAsync(() => _publication ?? new PublicationDtoBuilder().Build());
     }
 
     public IPublicationsService Build() => _mock.Object;
@@ -35,9 +35,8 @@ public class PublicationsServiceMockBuilder
 
     public PublicationsServiceMockBuilder WhereGetPublicationReturnsNotFound(string publicationSlug)
     {
-        _mock.Setup(m => m.GetPublication(
-                publicationSlug,
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m => m.GetPublication(publicationSlug, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -49,10 +48,16 @@ public class PublicationsServiceMockBuilder
     {
         public void GetPublicationWasCalled(string? publicationSlug = null)
         {
-            mock.Verify(m => m.GetPublication(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetPublication(
+                        It.Is<string>(actual =>
+                            publicationSlug == null || actual == publicationSlug
+                        ),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

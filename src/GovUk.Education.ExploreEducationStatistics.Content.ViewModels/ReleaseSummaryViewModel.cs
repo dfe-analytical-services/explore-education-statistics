@@ -38,12 +38,13 @@ public record ReleaseSummaryViewModel
 
     // ReSharper disable once UnusedMember.Global
     // Used by JSON serialisation.
-    public ReleaseSummaryViewModel()
-    {
-    }
+    public ReleaseSummaryViewModel() { }
 
     [SetsRequiredMembers]
-    public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
+    public ReleaseSummaryViewModel(
+        ReleaseCacheViewModel release,
+        PublicationCacheViewModel publication
+    )
     {
         Id = release.Id;
         ReleaseId = release.ReleaseId;

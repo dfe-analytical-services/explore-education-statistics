@@ -16,18 +16,20 @@ public class UpdateSpecificCommentAuthorizationHandlerTests
     {
         var user = _fixture.AuthenticatedUser().Generate();
 
-        var comment = new Comment
-        {
-            Id = Guid.NewGuid(),
-            CreatedById = user.GetUserId()
-        };
+        var comment = new Comment { Id = Guid.NewGuid(), CreatedById = user.GetUserId() };
 
         var authContext = new AuthorizationHandlerContext(
-            new IAuthorizationRequirement[] { new UpdateSpecificCommentRequirement() }, user, comment);
+            new IAuthorizationRequirement[] { new UpdateSpecificCommentRequirement() },
+            user,
+            comment
+        );
 
         await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(authContext);
 
-        Assert.True(authContext.HasSucceeded, "Expected matching user to have caused the handler to fail");
+        Assert.True(
+            authContext.HasSucceeded,
+            "Expected matching user to have caused the handler to fail"
+        );
     }
 
     [Fact]
@@ -35,17 +37,19 @@ public class UpdateSpecificCommentAuthorizationHandlerTests
     {
         var user = _fixture.AuthenticatedUser();
 
-        var comment = new Comment
-        {
-            Id = Guid.NewGuid(),
-            CreatedById = Guid.NewGuid()
-        };
+        var comment = new Comment { Id = Guid.NewGuid(), CreatedById = Guid.NewGuid() };
 
         var authContext = new AuthorizationHandlerContext(
-            new IAuthorizationRequirement[] { new UpdateSpecificCommentRequirement() }, user, comment);
+            new IAuthorizationRequirement[] { new UpdateSpecificCommentRequirement() },
+            user,
+            comment
+        );
 
         await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(authContext);
 
-        Assert.False(authContext.HasSucceeded, "Expected different user to have caused the handler to fail");
+        Assert.False(
+            authContext.HasSucceeded,
+            "Expected different user to have caused the handler to fail"
+        );
     }
 }

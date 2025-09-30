@@ -9,25 +9,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class ProcessCompletionOfNextDataSetVersionFunctions(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IDataSetVersionChangeService dataSetVersionChangeService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionChangeService dataSetVersionChangeService
+) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(ActivityNames.CreateChanges)]
     public async Task CreateChanges(
         [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingChanges, cancellationToken);
-        await dataSetVersionChangeService.CreateChanges(dataSetVersionImport.DataSetVersionId, cancellationToken);
+        await UpdateImportStage(
+            dataSetVersionImport,
+            DataSetVersionImportStage.CreatingChanges,
+            cancellationToken
+        );
+        await dataSetVersionChangeService.CreateChanges(
+            dataSetVersionImport.DataSetVersionId,
+            cancellationToken
+        );
     }
 
     [Function(ActivityNames.CompleteNextDataSetVersionImportProcessing)]
     public async Task CompleteNextDataSetVersionImportProcessing(
         [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.Completing, cancellationToken);
+        await UpdateImportStage(
+            dataSetVersionImport,
+            DataSetVersionImportStage.Completing,
+            cancellationToken
+        );
 
         var dataSetVersion = dataSetVersionImport.DataSetVersion;
 

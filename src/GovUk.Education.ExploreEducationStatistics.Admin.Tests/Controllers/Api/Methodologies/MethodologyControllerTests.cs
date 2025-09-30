@@ -120,9 +120,7 @@ public class MethodologyControllerTests
     {
         var methodologyService = new Mock<IMethodologyService>(Strict);
 
-        methodologyService
-            .Setup(s => s.GetMethodology(_id))
-            .ReturnsAsync(new NotFoundResult());
+        methodologyService.Setup(s => s.GetMethodology(_id)).ReturnsAsync(new NotFoundResult());
 
         var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -216,8 +214,9 @@ public class MethodologyControllerTests
             .Setup(s => s.CreateMethodologyAmendment(_id))
             .ReturnsAsync(new MethodologyVersionViewModel());
 
-        var controller =
-            SetupMethodologyController(methodologyAmendmentService: methodologyAmendmentService.Object);
+        var controller = SetupMethodologyController(
+            methodologyAmendmentService: methodologyAmendmentService.Object
+        );
 
         var result = await controller.CreateMethodologyAmendment(_id);
 
@@ -247,11 +246,8 @@ public class MethodologyControllerTests
     [Fact]
     public async Task ListMethodologyVersionsForApproval()
     {
-        var methodologyVersions = ListOf(new MethodologyVersionViewModel
-        {
-            Id = Guid.NewGuid()
-        });
-        
+        var methodologyVersions = ListOf(new MethodologyVersionViewModel { Id = Guid.NewGuid() });
+
         var userService = new Mock<IUserService>(Strict);
         var methodologyService = new Mock<IMethodologyService>(Strict);
 
@@ -259,8 +255,7 @@ public class MethodologyControllerTests
             .Setup(s => s.ListUsersMethodologyVersionsForApproval())
             .ReturnsAsync(methodologyVersions);
 
-        var controller = SetupMethodologyController(
-            methodologyService.Object);
+        var controller = SetupMethodologyController(methodologyService.Object);
 
         var result = await controller.ListMethodologyVersionsForApproval();
         VerifyAllMocks(userService, methodologyService);
@@ -270,10 +265,12 @@ public class MethodologyControllerTests
 
     private static MethodologyController SetupMethodologyController(
         IMethodologyService? methodologyService = null,
-        IMethodologyAmendmentService? methodologyAmendmentService = null)
+        IMethodologyAmendmentService? methodologyAmendmentService = null
+    )
     {
         return new(
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-            methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict));
+            methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict)
+        );
     }
 }

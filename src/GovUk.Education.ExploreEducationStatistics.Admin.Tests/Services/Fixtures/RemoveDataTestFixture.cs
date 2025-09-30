@@ -41,6 +41,7 @@ public class RemoveDataSetTestFixture
     public ReleaseFile ReleaseFile { get; private set; } = null!;
     public DataSetVersion TestDataSetVersion { get; set; }
     public DataSet TestDataSet { get; set; }
+
     private RemoveDataSetTestFixture(
         Mock<IReleaseDataFileService>? releaseDataFileService = null,
         Mock<IDataImportService>? dataImportService = null,
@@ -48,15 +49,18 @@ public class RemoveDataSetTestFixture
         Mock<IFootnoteRepository>? footnoteRepository = null,
         Mock<IDataBlockService>? dataBlockService = null,
         Mock<IReleaseSubjectRepository>? releaseSubjectRepository = null,
-        Mock<IPrivateBlobCacheService>? privateBlobCacheService = null, 
-        Mock<ILogger<ReleaseVersionService>>? logger = null)
+        Mock<IPrivateBlobCacheService>? privateBlobCacheService = null,
+        Mock<ILogger<ReleaseVersionService>>? logger = null
+    )
     {
-        ReleaseDataFileService = releaseDataFileService ?? new Mock<IReleaseDataFileService>(Strict);
+        ReleaseDataFileService =
+            releaseDataFileService ?? new Mock<IReleaseDataFileService>(Strict);
         DataImportService = dataImportService ?? new Mock<IDataImportService>(Strict);
         DataSetVersionService = dataSetVersionService ?? new Mock<IDataSetVersionService>(Strict);
         FootnoteRepository = footnoteRepository ?? new Mock<IFootnoteRepository>(Strict);
         DataBlockService = dataBlockService ?? new Mock<IDataBlockService>(Strict);
-        ReleaseSubjectRepository = releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>(Strict);
+        ReleaseSubjectRepository =
+            releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>(Strict);
         PrivateCacheService = privateBlobCacheService ?? new Mock<IPrivateBlobCacheService>(Strict);
         Logger = logger ?? new Mock<ILogger<ReleaseVersionService>>(Strict);
     }
@@ -65,81 +69,99 @@ public class RemoveDataSetTestFixture
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
-        var instance = await InitializeApiLinkedData(dataFixture, 
-            dataSetVersionStatus, 
-            statisticsDbContext, 
-            contentDbContext);
-        
+        var instance = await InitializeApiLinkedData(
+            dataFixture,
+            dataSetVersionStatus,
+            statisticsDbContext,
+            contentDbContext
+        );
+
         instance.SetUpMocksForApiLinkedValidationErrors();
-        
+
         return instance;
     }
-    
+
     public static async Task<RemoveDataSetTestFixture> CreateApiLinkedThrows404VersionException(
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
-        var instance = await InitializeApiLinkedData(dataFixture, 
-            dataSetVersionStatus, 
-            statisticsDbContext, 
-            contentDbContext);
-        
+        var instance = await InitializeApiLinkedData(
+            dataFixture,
+            dataSetVersionStatus,
+            statisticsDbContext,
+            contentDbContext
+        );
+
         instance.SetUpMocksForApiLinkedExceptions();
-        
+
         return instance;
     }
-    
+
     public static async Task<RemoveDataSetTestFixture> CreateApiLinkedToRelease(
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
         StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
-        Guid? replacedById = null, 
+        Guid? replacedById = null,
         Guid? replacingId = null,
-        bool releaseVersionPublished = false)
+        bool releaseVersionPublished = false
+    )
     {
-        var instance = await InitializeApiLinkedData(dataFixture, 
-            dataSetVersionStatus, 
-            statisticsDbContext, 
-            contentDbContext);
-        
+        var instance = await InitializeApiLinkedData(
+            dataFixture,
+            dataSetVersionStatus,
+            statisticsDbContext,
+            contentDbContext
+        );
+
         instance.SetupApiLinkedDataFixtures(
             dataFixture,
             dataSetVersionStatus,
-            isPublished: releaseVersionPublished);
+            isPublished: releaseVersionPublished
+        );
         instance.SetupApiLinkedReplaceByIds(replacedById, replacingId);
         await instance.SetupStatsAndContentDbContext(statisticsDbContext, contentDbContext);
         instance.SetUpMocksForCheckApiLinkedServices();
         instance.SetUpMocksForApiLinkedValidationErrors();
-        
+
         return instance;
     }
 
     private void SetUpMocksForApiLinkedExceptions()
     {
         SetUpMocksForApiLinkedValidationErrors();
-        DataSetVersionService.Setup(service => service.GetDataSetVersion(
-                ReleaseFile.PublicApiDataSetId!.Value,
-                ReleaseFile.PublicApiDataSetVersion!,
-                It.IsAny<CancellationToken>()))
+        DataSetVersionService
+            .Setup(service =>
+                service.GetDataSetVersion(
+                    ReleaseFile.PublicApiDataSetId!.Value,
+                    ReleaseFile.PublicApiDataSetVersion!,
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new NotFoundResult());
         Logger
-            .Setup(x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()))
+            .Setup(x =>
+                x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                )
+            )
             .Verifiable(Times.Once);
     }
-    
+
     private void SetUpMocksForApiLinkedValidationErrors()
     {
-        DataImportService.Setup(service => service.GetImport(File.Id))
+        DataImportService
+            .Setup(service => service.GetImport(File.Id))
             .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
         ReleaseSubjectRepository
             .Setup(service => service.DeleteReleaseSubject(ReleaseVersion.Id, Subject.Id, true))
@@ -147,8 +169,12 @@ public class RemoveDataSetTestFixture
         ReleaseDataFileService
             .Setup(service => service.Delete(ReleaseVersion.Id, File.Id, false))
             .ReturnsAsync(Unit.Instance);
-        PrivateCacheService.Setup(service =>
-                service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(ReleaseVersion.Id, Subject.Id)))
+        PrivateCacheService
+            .Setup(service =>
+                service.DeleteItemAsync(
+                    new PrivateSubjectMetaCacheKey(ReleaseVersion.Id, Subject.Id)
+                )
+            )
             .Returns(Task.CompletedTask);
     }
 
@@ -156,7 +182,8 @@ public class RemoveDataSetTestFixture
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
         var instance = new RemoveDataSetTestFixture();
         instance.SetupApiLinkedDataFixtures(dataFixture, dataSetVersionStatus, isPublished: true);
@@ -169,31 +196,27 @@ public class RemoveDataSetTestFixture
         File.ReplacedById = replacedById;
         File.ReplacingId = replacingId;
     }
-    
+
     private void SetupApiLinkedDataFixtures(
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
-        bool isPublished = false)
+        bool isPublished = false
+    )
     {
-        TestDataSet = dataFixture
-            .DefaultDataSet().Generate();
+        TestDataSet = dataFixture.DefaultDataSet().Generate();
         TestDataSetVersion = dataFixture
             .DefaultDataSetVersion()
             .WithStatus(dataSetVersionStatus)
             .WithDataSet(TestDataSet)
             .Generate();
-        ReleaseVersion = dataFixture
-            .DefaultReleaseVersion()
-            .Generate();
+        ReleaseVersion = dataFixture.DefaultReleaseVersion().Generate();
 
         if (isPublished)
         {
             ReleaseVersion.Published = DateTime.Now.AddDays(-1);
         }
-        
-        Subject = dataFixture
-            .DefaultSubject()
-            .Generate();
+
+        Subject = dataFixture.DefaultSubject().Generate();
         File = dataFixture
             .DefaultFile()
             .WithSubjectId(Subject.Id)
@@ -210,12 +233,13 @@ public class RemoveDataSetTestFixture
 
     private async Task SetupStatsAndContentDbContext(
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
         contentDbContext.ReleaseVersions.Add(ReleaseVersion);
         contentDbContext.ReleaseFiles.Add(ReleaseFile);
         await contentDbContext.SaveChangesAsync();
-                
+
         statisticsDbContext.Subject.Add(Subject);
         await statisticsDbContext.SaveChangesAsync();
     }
@@ -224,29 +248,37 @@ public class RemoveDataSetTestFixture
     {
         var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
         var footnote = new Footnote { Id = Guid.NewGuid() };
-        DataSetVersionService.Setup(service => service.GetDataSetVersion(
-                ReleaseFile.PublicApiDataSetId!.Value,
-                ReleaseFile.PublicApiDataSetVersion!,
-                It.IsAny<CancellationToken>()))
+        DataSetVersionService
+            .Setup(service =>
+                service.GetDataSetVersion(
+                    ReleaseFile.PublicApiDataSetId!.Value,
+                    ReleaseFile.PublicApiDataSetVersion!,
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(TestDataSetVersion);
 
-        FootnoteRepository.Setup(service => service.GetFootnotes(ReleaseVersion.Id, Subject.Id))
+        FootnoteRepository
+            .Setup(service => service.GetFootnotes(ReleaseVersion.Id, Subject.Id))
             .ReturnsAsync([footnote]);
 
-        DataBlockService.Setup(service =>
-                service.GetDeletePlan(ReleaseVersion.Id, It.Is<Subject>(s => s.Id == Subject.Id)))
+        DataBlockService
+            .Setup(service =>
+                service.GetDeletePlan(ReleaseVersion.Id, It.Is<Subject>(s => s.Id == Subject.Id))
+            )
             .ReturnsAsync(deleteDataBlockPlan);
-               
-        DataBlockService.Setup(service =>
-                service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
+
+        DataBlockService
+            .Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
             .ReturnsAsync(Unit.Instance);
     }
 
     public void SetUpMocksForDeleteApiLinkedServices()
     {
-        DataSetVersionService.Setup(service => service.DeleteVersion(
-                It.IsAny<Guid>(),
-                It.IsAny<CancellationToken>()))
+        DataSetVersionService
+            .Setup(service =>
+                service.DeleteVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(Unit.Instance);
     }
 }

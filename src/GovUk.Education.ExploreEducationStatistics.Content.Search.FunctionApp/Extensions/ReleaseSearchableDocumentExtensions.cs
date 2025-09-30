@@ -23,13 +23,18 @@ public static class SearchableDocumentAzureBlobMetadataKeys
 
 public static class ReleaseSearchableDocumentExtensions
 {
-    public static IDictionary<string, string> BuildMetadata(this ReleaseSearchableDocument releaseSearchableDocument)
+    public static IDictionary<string, string> BuildMetadata(
+        this ReleaseSearchableDocument releaseSearchableDocument
+    )
     {
         // Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
         // Values are Base64 encoded if non-ASCII characters might be present.
         var metadata = new Dictionary<string, string>
         {
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseId, releaseSearchableDocument.ReleaseId.ToString() },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.ReleaseId,
+                releaseSearchableDocument.ReleaseId.ToString()
+            },
             {
                 SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug,
                 releaseSearchableDocument.ReleaseSlug.ToBase64String()
@@ -46,24 +51,36 @@ public static class ReleaseSearchableDocumentExtensions
                 SearchableDocumentAzureBlobMetadataKeys.PublicationSlug,
                 releaseSearchableDocument.PublicationSlug.ToBase64String()
             },
-            { SearchableDocumentAzureBlobMetadataKeys.ThemeId, releaseSearchableDocument.ThemeId.ToString() },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.ThemeId,
+                releaseSearchableDocument.ThemeId.ToString()
+            },
             {
                 SearchableDocumentAzureBlobMetadataKeys.ThemeTitle,
                 releaseSearchableDocument.ThemeTitle.TrimAndBase64Encode()
             },
             {
                 SearchableDocumentAzureBlobMetadataKeys.Published,
-                releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ")
+                releaseSearchableDocument
+                    .Published.ToUniversalTime()
+                    .ToString("yyyy-MM-ddThh:mm:ssZ")
             },
             {
-                SearchableDocumentAzureBlobMetadataKeys.Summary, releaseSearchableDocument.Summary.TrimAndBase64Encode()
+                SearchableDocumentAzureBlobMetadataKeys.Summary,
+                releaseSearchableDocument.Summary.TrimAndBase64Encode()
             },
             {
                 SearchableDocumentAzureBlobMetadataKeys.Title,
                 releaseSearchableDocument.PublicationTitle.TrimAndBase64Encode()
             },
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseType, releaseSearchableDocument.ReleaseType },
-            { SearchableDocumentAzureBlobMetadataKeys.TypeBoost, releaseSearchableDocument.TypeBoost.ToString() },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.ReleaseType,
+                releaseSearchableDocument.ReleaseType
+            },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.TypeBoost,
+                releaseSearchableDocument.TypeBoost.ToString()
+            },
         };
         return metadata;
     }

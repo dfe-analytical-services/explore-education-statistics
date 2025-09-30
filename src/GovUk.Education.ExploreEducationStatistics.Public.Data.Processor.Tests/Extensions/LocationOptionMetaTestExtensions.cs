@@ -6,7 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests
 
 public static class LocationOptionMetaTestExtensions
 {
-    public static void AssertEqual(this LocationOptionMeta expectedOption, ParquetLocationOption actualOption)
+    public static void AssertEqual(
+        this LocationOptionMeta expectedOption,
+        ParquetLocationOption actualOption
+    )
     {
         Assert.Equal(expectedOption.Label, actualOption.Label);
         Assert.Equal(SqidEncoder.Encode(expectedOption.Id), actualOption.PublicId);
@@ -51,7 +54,8 @@ public static class LocationOptionMetaTestExtensions
             default:
                 throw new ArgumentOutOfRangeException(
                     paramName: nameof(expectedOption),
-                    $"Unsupported {expectedOption.GetType().Name} type");
+                    $"Unsupported {expectedOption.GetType().Name} type"
+                );
         }
     }
 }

@@ -22,26 +22,35 @@ public abstract class SecureBlobDownloadControllerTests
                 ContainerName: "a-container",
                 Path: "a-path",
                 Filename: "a-filename.csv",
-                ContentType: MediaTypeNames.Text.Csv);
+                ContentType: MediaTypeNames.Text.Csv
+            );
 
-            var encodedToken = JsonSerializer
-                .Serialize(originalToken)
-                .ToBase64String();
+            var encodedToken = JsonSerializer.Serialize(originalToken).ToBase64String();
 
             var fileStreamResult = new FileStreamResult(
                 fileStream: "test text".ToStream(),
-                originalToken.ContentType) { FileDownloadName = originalToken.Filename };
+                originalToken.ContentType
+            )
+            {
+                FileDownloadName = originalToken.Filename,
+            };
 
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(
+                MockBehavior.Strict
+            );
 
             privateBlobStorageService
                 .Setup(s => s.StreamWithToken(originalToken, default))
                 .ReturnsAsync(fileStreamResult);
 
-            var controller = new SecureBlobDownloadController(blobService: privateBlobStorageService.Object);
+            var controller = new SecureBlobDownloadController(
+                blobService: privateBlobStorageService.Object
+            );
 
-            var result = await controller
-                .StreamWithToken(token: encodedToken, cancellationToken: default);
+            var result = await controller.StreamWithToken(
+                token: encodedToken,
+                cancellationToken: default
+            );
 
             result.AssertFileStreamResult(expectedResult: fileStreamResult);
         }

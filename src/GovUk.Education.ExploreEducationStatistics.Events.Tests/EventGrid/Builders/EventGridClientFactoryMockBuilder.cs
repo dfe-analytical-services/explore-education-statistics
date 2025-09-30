@@ -13,8 +13,8 @@ public class EventGridClientFactoryMockBuilder
         if (_creatingClientFails)
         {
             _mock
-            .Setup(m => m.CreateClient(It.IsAny<string>(), It.IsAny<string>()))
-            .Throws(new Exception("TEST EXCEPTION - Client could not be created."));
+                .Setup(m => m.CreateClient(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new Exception("TEST EXCEPTION - Client could not be created."));
         }
         else
         {
@@ -28,17 +28,26 @@ public class EventGridClientFactoryMockBuilder
     public EventGridClientMockBuilder Client { get; } = new();
 
     public Asserter Assert => new(_mock);
+
     public class Asserter(Mock<IEventGridClientFactory> mock)
     {
         public void ClientRequested(
             Func<string, bool>? whereTopicEndpoint = null,
-            Func<string, bool>? whereAccessKey = null)
+            Func<string, bool>? whereAccessKey = null
+        )
         {
-            mock
-                .Verify(m => m.CreateClient(
-                    It.Is<string>(actualEndpoint => whereTopicEndpoint == null || whereTopicEndpoint(actualEndpoint)), 
-                    It.Is<string>(actualAccessKey => whereAccessKey == null || whereAccessKey(actualAccessKey)) 
-                    ), Times.Once);
+            mock.Verify(
+                m =>
+                    m.CreateClient(
+                        It.Is<string>(actualEndpoint =>
+                            whereTopicEndpoint == null || whereTopicEndpoint(actualEndpoint)
+                        ),
+                        It.Is<string>(actualAccessKey =>
+                            whereAccessKey == null || whereAccessKey(actualAccessKey)
+                        )
+                    ),
+                Times.Once
+            );
         }
     }
 

@@ -38,23 +38,23 @@ public abstract class BlobStorageService(
     BlobServiceClient client,
     ILogger<IBlobStorageService> logger,
     IStorageInstanceCreationUtil storageInstanceCreationUtil,
-    IBlobSasService blobSasService)
-    : IBlobStorageService
+    IBlobSasService blobSasService
+) : IBlobStorageService
 {
     private static readonly TimeSpan DownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
 
     protected BlobStorageService(
         string connectionString,
         ILogger<IBlobStorageService> logger,
-        IBlobSasService blobSasService)
+        IBlobSasService blobSasService
+    )
         : this(
             connectionString,
             new BlobServiceClient(connectionString),
             logger,
             new StorageInstanceCreationUtil(),
-            blobSasService)
-    {
-    }
+            blobSasService
+        ) { }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
     {
@@ -77,7 +77,8 @@ public abstract class BlobStorageService(
     public async Task DeleteBlobs(
         IBlobContainer containerName,
         string? directoryPath = null,
-        IBlobStorageService.DeleteBlobsOptions? options = null)
+        IBlobStorageService.DeleteBlobsOptions? options = null
+    )
     {
         if (!directoryPath.IsNullOrEmpty())
         {
@@ -87,13 +88,18 @@ public abstract class BlobStorageService(
 
         var blobContainer = await GetBlobContainer(containerName);
 
-        logger.LogInformation("Deleting blobs from {containerName}/{path}", blobContainer.Name, directoryPath);
+        logger.LogInformation(
+            "Deleting blobs from {containerName}/{path}",
+            blobContainer.Name,
+            directoryPath
+        );
 
         string? continuationToken = null;
 
         do
         {
-            var blobPages = blobContainer.GetBlobsAsync(prefix: directoryPath)
+            var blobPages = blobContainer
+                .GetBlobsAsync(prefix: directoryPath)
                 .AsPages(continuationToken);
 
             var deleteTasks = new List<Task>();
@@ -112,11 +118,19 @@ public abstract class BlobStorageService(
 
                     if (excluded || !included)
                     {
-                        logger.LogInformation("Ignoring blob {containerName}/{path}", blobContainer.Name, blob.Name);
+                        logger.LogInformation(
+                            "Ignoring blob {containerName}/{path}",
+                            blobContainer.Name,
+                            blob.Name
+                        );
                         continue;
                     }
 
-                    logger.LogInformation("Deleting blob {containerName}/{path}", blobContainer.Name, blob.Name);
+                    logger.LogInformation(
+                        "Deleting blob {containerName}/{path}",
+                        blobContainer.Name,
+                        blob.Name
+                    );
 
                     deleteTasks.Add(blobContainer.DeleteBlobIfExistsAsync(blob.Name));
                 }
@@ -137,10 +151,7 @@ public abstract class BlobStorageService(
         await blob.DeleteIfExistsAsync();
     }
 
-    public async Task UploadFile(
-        IBlobContainer containerName,
-        string path,
-        IFormFile file)
+    public async Task UploadFile(IBlobContainer containerName, string path, IFormFile file)
     {
         var blob = await GetBlobClient(containerName, path);
 
@@ -150,10 +161,7 @@ public abstract class BlobStorageService(
 
         await blob.UploadAsync(
             path: tempFilePath,
-            httpHeaders: new BlobHttpHeaders
-            {
-                ContentType = file.ContentType
-            }
+            httpHeaders: new BlobHttpHeaders { ContentType = file.ContentType }
         );
     }
 
@@ -161,7 +169,8 @@ public abstract class BlobStorageService(
         IBlobContainer sourceContainer,
         string sourcePath,
         string destinationPath,
-        IBlobContainer? destinationContainer = null)
+        IBlobContainer? destinationContainer = null
+    )
     {
         var sourceContainerClient = await GetBlobContainer(sourceContainer);
         var destinationContainerClient = destinationContainer is not null
@@ -174,7 +183,8 @@ public abstract class BlobStorageService(
             logger.LogWarning(
                 "Source blob not found while moving blob. Source: '{Source}' Destination: '{Destination}'",
                 sourcePath,
-                destinationPath);
+                destinationPath
+            );
             return false;
         }
 
@@ -184,7 +194,8 @@ public abstract class BlobStorageService(
             logger.LogWarning(
                 "Destination already exists while moving blob. Source: '{Source}' Destination: '{Destination}'",
                 sourcePath,
-                destinationPath);
+                destinationPath
+            );
             return false;
         }
 
@@ -204,7 +215,10 @@ public abstract class BlobStorageService(
             while (destinationProperties.CopyStatus == CopyStatus.Pending)
             {
                 await Task.Delay(1000);
-                logger.LogInformation("Copy progress: {Progress}", destinationProperties.CopyProgress);
+                logger.LogInformation(
+                    "Copy progress: {Progress}",
+                    destinationProperties.CopyProgress
+                );
                 destinationProperties = await destinationBlob.GetPropertiesAsync();
             }
 
@@ -241,7 +255,8 @@ public abstract class BlobStorageService(
         Stream sourceStream,
         string contentType,
         string? contentEncoding = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var blob = await GetBlobClient(containerName, path);
 
@@ -252,22 +267,24 @@ public abstract class BlobStorageService(
         var httpHeaders = new BlobHttpHeaders
         {
             ContentEncoding = contentEncoding,
-            ContentType = contentType
+            ContentType = contentType,
         };
 
         var compress = contentEncoding != null;
-        
+
         if (compress)
         {
             await using var blobStream = await blob.OpenWriteAsync(
                 overwrite: true,
                 options: new BlobOpenWriteOptions { HttpHeaders = httpHeaders },
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             await using var compressionStream = CompressionUtils.GetCompressionStream(
                 targetStream: blobStream,
                 contentEncoding: contentEncoding!,
-                compressionMode: CompressionMode.Compress);
+                compressionMode: CompressionMode.Compress
+            );
 
             await sourceStream.CopyToAsync(compressionStream, cancellationToken);
         }
@@ -287,7 +304,8 @@ public abstract class BlobStorageService(
         T content,
         string? contentEncoding = null,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await using var stream = new MemoryStream();
         await using var jsonWriter = new JsonTextWriter(new StreamWriter(stream, leaveOpen: true));
@@ -300,7 +318,8 @@ public abstract class BlobStorageService(
             sourceStream: stream,
             contentEncoding: contentEncoding,
             contentType: MediaTypeNames.Application.Json,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task<Either<ActionResult, Stream>> DownloadToStream(
@@ -308,15 +327,17 @@ public abstract class BlobStorageService(
         string path,
         Stream targetStream,
         bool decompress = true,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await GetBlobClientOrNotFound(containerName, path)
             .OnSuccess(async blob =>
             {
                 if (decompress)
                 {
-                    BlobProperties blobProperties =
-                        await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+                    BlobProperties blobProperties = await blob.GetPropertiesAsync(
+                        cancellationToken: cancellationToken
+                    );
 
                     // Check the ContentEncoding property to determine if the blob
                     // is compressed and only decompress if necessary.
@@ -327,12 +348,15 @@ public abstract class BlobStorageService(
                     }
                     else
                     {
-                        var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+                        var blobStream = await blob.OpenReadAsync(
+                            cancellationToken: cancellationToken
+                        );
                         await CompressionUtils.DecompressToStream(
                             stream: blobStream,
                             targetStream: targetStream,
                             contentEncoding: blobProperties.ContentEncoding,
-                            cancellationToken: cancellationToken);
+                            cancellationToken: cancellationToken
+                        );
                     }
                 }
                 else
@@ -349,15 +373,17 @@ public abstract class BlobStorageService(
         IBlobContainer containerName,
         string path,
         bool decompress = true,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await GetBlobClientOrNotFound(containerName, path)
             .OnSuccess(async blob =>
             {
                 if (decompress)
                 {
-                    BlobProperties blobProperties =
-                        await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+                    BlobProperties blobProperties = await blob.GetPropertiesAsync(
+                        cancellationToken: cancellationToken
+                    );
 
                     // Check the ContentEncoding property to determine if the blob
                     // is compressed and only decompress if necessary.
@@ -370,7 +396,8 @@ public abstract class BlobStorageService(
                     return CompressionUtils.GetCompressionStream(
                         blobStream,
                         contentEncoding: blobProperties.ContentEncoding,
-                        CompressionMode.Decompress);
+                        CompressionMode.Decompress
+                    );
                 }
 
                 return await blob.OpenReadAsync(cancellationToken: cancellationToken);
@@ -380,12 +407,14 @@ public abstract class BlobStorageService(
     private async Task<Either<ActionResult, Stream>> GetDownloadStream(
         BlobClient blob,
         bool decompress = true,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (decompress)
         {
-            BlobProperties blobProperties =
-                await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+            BlobProperties blobProperties = await blob.GetPropertiesAsync(
+                cancellationToken: cancellationToken
+            );
 
             // Check the ContentEncoding property to determine if the blob
             // is compressed and only decompress if necessary.
@@ -398,7 +427,8 @@ public abstract class BlobStorageService(
             return CompressionUtils.GetCompressionStream(
                 blobStream,
                 contentEncoding: blobProperties.ContentEncoding,
-                CompressionMode.Decompress);
+                CompressionMode.Decompress
+            );
         }
 
         return await blob.OpenReadAsync(cancellationToken: cancellationToken);
@@ -406,36 +436,45 @@ public abstract class BlobStorageService(
 
     public Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
         BlobDownloadToken token,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return blobSasService
             .CreateSecureBlobClient(blobServiceClient: client, token: token)
-            .OnSuccess(blobClient => GetDownloadStream(blob: blobClient, decompress: true, cancellationToken))
+            .OnSuccess(blobClient =>
+                GetDownloadStream(blob: blobClient, decompress: true, cancellationToken)
+            )
             .OnSuccess(stream => new FileStreamResult(
                 fileStream: stream,
-                contentType: token.ContentType) { FileDownloadName = token.Filename });
+                contentType: token.ContentType
+            )
+            {
+                FileDownloadName = token.Filename,
+            });
     }
 
     public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
         IBlobContainer container,
         string filename,
         string path,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await blobSasService
-            .CreateBlobDownloadToken(
-                blobServiceClient: client,
-                container: container,
-                filename: filename,
-                path: path,
-                expiryDuration: DownloadTokenExpiryDuration,
-                cancellationToken: cancellationToken);
+        return await blobSasService.CreateBlobDownloadToken(
+            blobServiceClient: client,
+            container: container,
+            filename: filename,
+            path: path,
+            expiryDuration: DownloadTokenExpiryDuration,
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task<Either<ActionResult, string>> DownloadBlobText(
         IBlobContainer containerName,
         string path,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var blob = await GetBlobClient(containerName, path);
 
@@ -454,10 +493,10 @@ public abstract class BlobStorageService(
             return await CompressionUtils.DecompressToString(
                 bytes: response.Content.ToArray(),
                 contentEncoding: contentEncoding,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
         }
-        catch (RequestFailedException exception)
-            when (exception.Status == 404)
+        catch (RequestFailedException exception) when (exception.Status == 404)
         {
             return new NotFoundResult();
         }
@@ -468,7 +507,8 @@ public abstract class BlobStorageService(
         string path,
         Type type,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await DownloadBlobText(containerName, path, cancellationToken)
             .OnSuccess(text =>
@@ -476,14 +516,11 @@ public abstract class BlobStorageService(
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     throw new JsonException(
-                        $"Found empty file when trying to deserialize JSON for path: {path}");
+                        $"Found empty file when trying to deserialize JSON for path: {path}"
+                    );
                 }
 
-                return JsonConvert.DeserializeObject(
-                    value: text,
-                    type,
-                    settings
-                );
+                return JsonConvert.DeserializeObject(value: text, type, settings);
             });
     }
 
@@ -491,11 +528,13 @@ public abstract class BlobStorageService(
         IBlobContainer containerName,
         string path,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where T : class
     {
-        return (await GetDeserializedJson(containerName, path, typeof(T), settings, cancellationToken))
-            .OnSuccess(deserialized => deserialized as T);
+        return (
+            await GetDeserializedJson(containerName, path, typeof(T), settings, cancellationToken)
+        ).OnSuccess(deserialized => deserialized as T);
     }
 
     public async Task<List<BlobInfo>> CopyDirectory(
@@ -503,7 +542,8 @@ public abstract class BlobStorageService(
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
         string destinationDirectoryPath,
-        IBlobStorageService.CopyDirectoryOptions? options = null)
+        IBlobStorageService.CopyDirectoryOptions? options = null
+    )
     {
         logger.LogInformation(
             "Copying directory from {sourceContainer}/{sourcePath} to {destinationContainer}/{destinationPath}",
@@ -520,12 +560,11 @@ public abstract class BlobStorageService(
         );
 
         var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
-        var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
+        var destinationDirectory = destinationContainer.GetDirectoryReference(
+            destinationDirectoryPath
+        );
 
-        var copyDirectoryOptions = new CopyDirectoryOptions
-        {
-            Recursive = true
-        };
+        var copyDirectoryOptions = new CopyDirectoryOptions { Recursive = true };
 
         var filesTransferred = new List<BlobInfo>();
 
@@ -555,7 +594,8 @@ public abstract class BlobStorageService(
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
         string destinationDirectoryPath,
-        IBlobStorageService.MoveDirectoryOptions? options = null)
+        IBlobStorageService.MoveDirectoryOptions? options = null
+    )
     {
         await CopyDirectory(
             sourceContainerName: sourceContainerName,
@@ -573,9 +613,7 @@ public abstract class BlobStorageService(
         await DeleteBlobs(sourceContainerName, sourceDirectoryPath);
     }
 
-    private void FileTransferredCallback(
-        TransferEventArgs e,
-        ICollection<BlobInfo> allFilesStream)
+    private void FileTransferredCallback(TransferEventArgs e, ICollection<BlobInfo> allFilesStream)
     {
         var source = (CloudBlockBlob)e.Source;
         var destination = (CloudBlockBlob)e.Destination;
@@ -637,7 +675,8 @@ public abstract class BlobStorageService(
 
     private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
         IBlobContainer containerName,
-        string path)
+        string path
+    )
     {
         var blobClient = await GetBlobClient(containerName, path);
         if (await blobClient.ExistsAsync())
@@ -657,12 +696,15 @@ public abstract class BlobStorageService(
      */
     private async Task<CloudBlobContainer> GetCloudBlobContainer(
         IBlobContainer container,
-        string? connectionString = null)
+        string? connectionString = null
+    )
     {
         var storageAccount = CloudStorageAccount.Parse(connectionString ?? defaultConnectionString);
         var blobClient = storageAccount.CreateCloudBlobClient();
 
-        var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
+        var containerName = IsDevelopmentStorageAccount(blobClient)
+            ? container.EmulatedName
+            : container.Name;
 
         var containerClient = blobClient.GetContainerReference(containerName);
 
@@ -670,14 +712,17 @@ public abstract class BlobStorageService(
             defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
-            () => containerClient.CreateIfNotExistsAsync());
+            () => containerClient.CreateIfNotExistsAsync()
+        );
 
         return containerClient;
     }
 
     private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
     {
-        var containerName = IsDevelopmentStorageAccount(client) ? container.EmulatedName : container.Name;
+        var containerName = IsDevelopmentStorageAccount(client)
+            ? container.EmulatedName
+            : container.Name;
 
         var containerClient = client.GetBlobContainerClient(containerName);
 
@@ -685,7 +730,8 @@ public abstract class BlobStorageService(
             defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
-            () => containerClient.CreateIfNotExistsAsync());
+            () => containerClient.CreateIfNotExistsAsync()
+        );
 
         return containerClient;
     }

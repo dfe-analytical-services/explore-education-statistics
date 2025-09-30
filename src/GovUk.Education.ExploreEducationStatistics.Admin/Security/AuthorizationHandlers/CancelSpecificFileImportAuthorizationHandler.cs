@@ -7,9 +7,7 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class CancelSpecificFileImportRequirement : IAuthorizationRequirement
-{
-}
+public class CancelSpecificFileImportRequirement : IAuthorizationRequirement { }
 
 public class CancelSpecificFileImportAuthorizationHandler
     : AuthorizationHandler<CancelSpecificFileImportRequirement, File>
@@ -21,9 +19,11 @@ public class CancelSpecificFileImportAuthorizationHandler
         _dataImportRepository = dataImportRepository;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext ctx,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext ctx,
         CancelSpecificFileImportRequirement requirement,
-        File file)
+        File file
+    )
     {
         var status = await _dataImportRepository.GetStatusByFileId(file.Id);
 

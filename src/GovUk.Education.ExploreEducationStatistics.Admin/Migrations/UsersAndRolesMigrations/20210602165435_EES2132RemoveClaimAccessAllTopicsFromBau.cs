@@ -6,10 +6,7 @@ public partial class EES2132RemoveClaimAccessAllTopicsFromBau : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DeleteData(
-            table: "AspNetRoleClaims",
-            keyColumn: "Id",
-            keyValue: -4);
+        migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -4);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -17,6 +14,13 @@ public partial class EES2132RemoveClaimAccessAllTopicsFromBau : Migration
         migrationBuilder.InsertData(
             table: "AspNetRoleClaims",
             columns: new[] { "Id", "ClaimType", "ClaimValue", "RoleId" },
-            values: new object[] { -4, "AccessAllTopics", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" });
+            values: new object[]
+            {
+                -4,
+                "AccessAllTopics",
+                "",
+                "cf67b697-bddd-41bd-86e0-11b7e11d99b3",
+            }
+        );
     }
 }

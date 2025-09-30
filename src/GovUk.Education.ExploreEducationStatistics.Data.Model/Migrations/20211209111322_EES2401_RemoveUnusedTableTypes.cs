@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
 public partial class EES2401_RemoveUnusedTableTypes : Migration
 {
     private const string MigrationId = "20211209111322";
-    
+
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql("DROP TYPE dbo.PublicationType");

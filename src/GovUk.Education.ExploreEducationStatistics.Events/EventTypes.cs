@@ -8,7 +8,8 @@ public static class PublicationChangedEventTypes
     public const string PublicationArchived = "publication-archived";
     public const string PublicationChanged = "publication-changed";
     public const string PublicationDeleted = "publication-deleted";
-    public const string PublicationLatestPublishedReleaseReordered = "publication-latest-published-release-reordered";
+    public const string PublicationLatestPublishedReleaseReordered =
+        "publication-latest-published-release-reordered";
     public const string PublicationRestored = "publication-restored";
 }
 

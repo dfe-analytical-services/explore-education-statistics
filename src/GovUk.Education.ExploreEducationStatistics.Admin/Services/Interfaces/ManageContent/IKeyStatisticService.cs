@@ -10,26 +10,30 @@ public interface IKeyStatisticService
 {
     Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
         Guid releaseVersionId,
-        KeyStatisticDataBlockCreateRequest request);
+        KeyStatisticDataBlockCreateRequest request
+    );
 
     Task<Either<ActionResult, KeyStatisticTextViewModel>> CreateKeyStatisticText(
         Guid releaseVersionId,
-        KeyStatisticTextCreateRequest request);
+        KeyStatisticTextCreateRequest request
+    );
 
     Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
         Guid releaseVersionId,
         Guid keyStatisticId,
-        KeyStatisticDataBlockUpdateRequest request);
+        KeyStatisticDataBlockUpdateRequest request
+    );
 
     Task<Either<ActionResult, KeyStatisticTextViewModel>> UpdateKeyStatisticText(
         Guid releaseVersionId,
         Guid keyStatisticId,
-        KeyStatisticTextUpdateRequest request);
+        KeyStatisticTextUpdateRequest request
+    );
 
-    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
-        Guid keyStatisticId);
+    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid keyStatisticId);
 
     Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
         Guid releaseVersionId,
-        List<Guid> newOrder);
+        List<Guid> newOrder
+    );
 }

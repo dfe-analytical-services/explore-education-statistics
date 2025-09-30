@@ -10,7 +10,9 @@ public abstract class DataSetQueryLocationTests
 {
     public class ParseTests
     {
-        public static readonly TheoryData<string> LocationLevelCodes = new(EnumUtil.GetEnumValues<GeographicLevel>());
+        public static readonly TheoryData<string> LocationLevelCodes = new(
+            EnumUtil.GetEnumValues<GeographicLevel>()
+        );
 
         [Theory]
         [MemberData(nameof(LocationLevelCodes))]
@@ -33,7 +35,11 @@ public abstract class DataSetQueryLocationTests
         [InlineData("PROV", "ukprn", typeof(DataSetQueryLocationProviderUkprn))]
         [InlineData("SCH", "laEstab", typeof(DataSetQueryLocationSchoolLaEstab))]
         [InlineData("SCH", "urn", typeof(DataSetQueryLocationSchoolUrn))]
-        public void OtherProperty_ReturnsCorrectLocationType(string level, string property, Type expectedType)
+        public void OtherProperty_ReturnsCorrectLocationType(
+            string level,
+            string property,
+            Type expectedType
+        )
         {
             const string expectedValue = "12345";
 
@@ -41,9 +47,7 @@ public abstract class DataSetQueryLocationTests
 
             Assert.IsType(expectedType, location);
 
-            var value = location.GetType()
-                .GetProperty(property.ToUpperFirst())!
-                .GetValue(location);
+            var value = location.GetType().GetProperty(property.ToUpperFirst())!.GetValue(location);
 
             Assert.Equal(expectedValue, value);
         }
@@ -59,7 +63,8 @@ public abstract class DataSetQueryLocationTests
         public void InvalidLevel_Throws(string level)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
-                IDataSetQueryLocation.Parse($"{level}|id|12345"));
+                IDataSetQueryLocation.Parse($"{level}|id|12345")
+            );
         }
 
         [Theory]
@@ -84,7 +89,8 @@ public abstract class DataSetQueryLocationTests
         public void InvalidProperty_Throws(string level, string property)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
-                IDataSetQueryLocation.Parse($"{level}|{property}|12345"));
+                IDataSetQueryLocation.Parse($"{level}|{property}|12345")
+            );
         }
 
         public static readonly TheoryData<Type> LocationTypes = new(
@@ -118,11 +124,15 @@ public abstract class DataSetQueryLocationTests
             Assert.True(
                 parsedLocationTypes.Contains(locationType),
                 $"""
-                  The location type could not be parsed. Ensure that:
-                  
-                  - There is a branch for this type in '{nameof(IDataSetQueryLocation)}.{nameof(IDataSetQueryLocation.Parse)}'
-                  - There is a corresponding string for this in the '{nameof(locationStrings)}' variable
-                  """
+                The location type could not be parsed. Ensure that:
+
+                - There is a branch for this type in '{nameof(IDataSetQueryLocation)}.{nameof(
+                    IDataSetQueryLocation.Parse
+                )}'
+                - There is a corresponding string for this in the '{nameof(
+                    locationStrings
+                )}' variable
+                """
             );
         }
     }

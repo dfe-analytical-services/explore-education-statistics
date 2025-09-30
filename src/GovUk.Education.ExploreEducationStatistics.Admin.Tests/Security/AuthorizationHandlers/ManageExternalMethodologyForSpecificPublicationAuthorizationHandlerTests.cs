@@ -107,16 +107,21 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
         }
     }
 
-    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Publication publication)
+    private static AuthorizationHandlerContext CreateAuthContext(
+        ClaimsPrincipal user,
+        Publication publication
+    )
     {
-        return CreateAuthorizationHandlerContext<ManageExternalMethodologyForSpecificPublicationRequirement,
-                Publication>
-            (user, publication);
+        return CreateAuthorizationHandlerContext<
+            ManageExternalMethodologyForSpecificPublicationRequirement,
+            Publication
+        >(user, publication);
     }
 
-    private static (ManageExternalMethodologyForSpecificPublicationAuthorizationHandler,
-        Mock<IUserPublicationRoleRepository>)
-        CreateHandlerAndDependencies()
+    private static (
+        ManageExternalMethodologyForSpecificPublicationAuthorizationHandler,
+        Mock<IUserPublicationRoleRepository>
+    ) CreateHandlerAndDependencies()
     {
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
@@ -125,7 +130,9 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
 
         return (handler, userPublicationRoleRepository);
     }

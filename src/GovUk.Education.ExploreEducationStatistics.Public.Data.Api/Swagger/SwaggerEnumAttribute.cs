@@ -13,8 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
 public class SwaggerEnumAttribute(
     Type type,
-    SwaggerEnumSerializer serializer = SwaggerEnumSerializer.Ref)
-    : Attribute
+    SwaggerEnumSerializer serializer = SwaggerEnumSerializer.Ref
+) : Attribute
 {
     /// <summary>
     /// The enum type to use.
@@ -33,22 +33,27 @@ public enum SwaggerEnumSerializer
     /// Use `allOf` to reference the enum schema.
     /// </summary>
     Ref,
+
     /// <summary>
     /// Use enums defined by the enum schema.
     /// </summary>
     Schema,
+
     /// <summary>
     /// Use the enum's integer serialization.
     /// </summary>
     Int,
+
     /// <summary>
     /// Use the enum's string serialization.
     /// </summary>
     String,
+
     /// <summary>
     /// Use the enum's value serialization (using <see cref="EnumLabelValueAttribute"/>).
     /// </summary>
     Value,
+
     /// <summary>
     /// Use the enum's label serialization (using <see cref="EnumLabelValueAttribute"/>).
     /// </summary>

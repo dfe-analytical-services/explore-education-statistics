@@ -31,28 +31,63 @@ public class ReleaseSearchableDocumentExtensionsTests
 
         // ASSERT
         AssertAll(
-        [
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseId, "76640d46-3f02-4b08-a4d9-c1fbf1bdd502"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, "5cd3ae70-ff32-409b-aa6b-363b380eb4c8"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationId, "caf751b8-5f8c-4526-8b5f-7fd28199866b"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeId, "4625ca38-68aa-4d73-a1f9-2aab732aecc2"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Published, "2025-02-21T08:24:01Z"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseType, "Official Statistics"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.Summary, "This is a summary."),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeTitle, "Theme Title"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.Title, "Publication Title"),
-            () => Assert.Equal(12, actual.Keys.Count) // Ensure there aren't any extra items in the metadata
-        ]);
+            [
+                AssertMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.ReleaseId,
+                    "76640d46-3f02-4b08-a4d9-c1fbf1bdd502"
+                ),
+                AssertMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId,
+                    "5cd3ae70-ff32-409b-aa6b-363b380eb4c8"
+                ),
+                AssertMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.PublicationId,
+                    "caf751b8-5f8c-4526-8b5f-7fd28199866b"
+                ),
+                AssertMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.ThemeId,
+                    "4625ca38-68aa-4d73-a1f9-2aab732aecc2"
+                ),
+                AssertMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.Published,
+                    "2025-02-21T08:24:01Z"
+                ),
+                AssertMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.ReleaseType,
+                    "Official Statistics"
+                ),
+                AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
+                AssertEncodedMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.PublicationSlug,
+                    "publication-slug"
+                ),
+                AssertEncodedMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug,
+                    "release-slug"
+                ),
+                AssertEncodedMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.Summary,
+                    "This is a summary."
+                ),
+                AssertEncodedMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.ThemeTitle,
+                    "Theme Title"
+                ),
+                AssertEncodedMetadata(
+                    SearchableDocumentAzureBlobMetadataKeys.Title,
+                    "Publication Title"
+                ),
+                () => Assert.Equal(12, actual.Keys.Count), // Ensure there aren't any extra items in the metadata
+            ]
+        );
 
         Action AssertMetadata(string key, string value) => () => Assert.Equal(value, actual[key]);
-        Action AssertEncodedMetadata(string key, string value) => () => AssertEncodedMetadataValue(value, actual[key]);
+        Action AssertEncodedMetadata(string key, string value) =>
+            () => AssertEncodedMetadataValue(value, actual[key]);
     }
 
     /// <summary>
-    /// Azure metadata does not accept preceding or trailing spaces. Therefore, we need to trim them. 
+    /// Azure metadata does not accept preceding or trailing spaces. Therefore, we need to trim them.
     /// </summary>
     [Fact]
     public void GivenSummaryWithExtraSpaces_WhenBuildingMetadata_ThenSummaryIsTrimmed()
@@ -63,11 +98,14 @@ public class ReleaseSearchableDocumentExtensionsTests
 
         var actual = releaseSearchViewModel.BuildMetadata();
 
-        AssertEncodedMetadataValue("extra spaces either side", actual[SearchableDocumentAzureBlobMetadataKeys.Summary]);
+        AssertEncodedMetadataValue(
+            "extra spaces either side",
+            actual[SearchableDocumentAzureBlobMetadataKeys.Summary]
+        );
     }
 
     /// <summary>
-    /// Azure metadata does not accept preceding or trailing spaces. Therefore, we need to trim them. 
+    /// Azure metadata does not accept preceding or trailing spaces. Therefore, we need to trim them.
     /// </summary>
     [Fact]
     public void GivenThemeTitleWithExtraSpaces_WhenBuildingMetadata_ThenThemeTitleIsTrimmed()
@@ -78,12 +116,14 @@ public class ReleaseSearchableDocumentExtensionsTests
 
         var actual = releaseSearchViewModel.BuildMetadata();
 
-        AssertEncodedMetadataValue("extra spaces either side",
-            actual[SearchableDocumentAzureBlobMetadataKeys.ThemeTitle]);
+        AssertEncodedMetadataValue(
+            "extra spaces either side",
+            actual[SearchableDocumentAzureBlobMetadataKeys.ThemeTitle]
+        );
     }
 
     /// <summary>
-    /// Azure metadata does not accept preceding or trailing spaces. Therefore, we need to trim them. 
+    /// Azure metadata does not accept preceding or trailing spaces. Therefore, we need to trim them.
     /// </summary>
     [Fact]
     public void GivenTitleWithExtraSpaces_WhenBuildingMetadata_ThenTitleIsTrimmed()
@@ -94,12 +134,17 @@ public class ReleaseSearchableDocumentExtensionsTests
 
         var actual = releaseSearchViewModel.BuildMetadata();
 
-        AssertEncodedMetadataValue("extra spaces either side", actual[SearchableDocumentAzureBlobMetadataKeys.Title]);
+        AssertEncodedMetadataValue(
+            "extra spaces either side",
+            actual[SearchableDocumentAzureBlobMetadataKeys.Title]
+        );
     }
 
     private static void AssertAll(params IEnumerable<Action>[] assertions) =>
         Assert.All(assertions.SelectMany(a => a), assertion => assertion());
 
-    private static void AssertEncodedMetadataValue(string expectedDecodedValue, string actualEncodedValue) =>
-        Assert.Equal(expectedDecodedValue, actualEncodedValue.FromBase64String());
+    private static void AssertEncodedMetadataValue(
+        string expectedDecodedValue,
+        string actualEncodedValue
+    ) => Assert.Equal(expectedDecodedValue, actualEncodedValue.FromBase64String());
 }

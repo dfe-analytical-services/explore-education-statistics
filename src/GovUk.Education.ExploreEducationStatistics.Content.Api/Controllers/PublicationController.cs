@@ -21,7 +21,8 @@ public class PublicationController : ControllerBase
 
     public PublicationController(
         IPublicationCacheService publicationCacheService,
-        IPublicationService publicationService)
+        IPublicationService publicationService
+    )
     {
         _publicationCacheService = publicationCacheService;
         _publicationService = publicationService;
@@ -29,42 +30,37 @@ public class PublicationController : ControllerBase
 
     [HttpGet("publication-tree")]
     public async Task<ActionResult<IList<PublicationTreeThemeViewModel>>> GetPublicationTree(
-        [FromQuery(Name = "publicationFilter")]
-        PublicationTreeFilter? filter = null)
+        [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null
+    )
     {
         if (filter == null)
         {
             return new BadRequestResult();
         }
 
-        return await _publicationCacheService
-            .GetPublicationTree(filter.Value)
-            .HandleFailuresOrOk();
+        return await _publicationCacheService.GetPublicationTree(filter.Value).HandleFailuresOrOk();
     }
 
     [HttpGet("publications/{publicationId:guid}/summary")]
-    public async Task<ActionResult<PublishedPublicationSummaryViewModel>> GetPublicationSummary(Guid publicationId)
+    public async Task<ActionResult<PublishedPublicationSummaryViewModel>> GetPublicationSummary(
+        Guid publicationId
+    )
     {
-        return await _publicationService
-            .GetSummary(publicationId)
-            .HandleFailuresOrOk();
+        return await _publicationService.GetSummary(publicationId).HandleFailuresOrOk();
     }
 
     [HttpGet("publications/{slug}/title")]
     public async Task<ActionResult<PublicationTitleViewModel>> GetPublicationTitle(string slug)
     {
-        return await _publicationCacheService.GetPublication(slug)
-            .OnSuccess(p => new PublicationTitleViewModel
-            {
-                Id = p.Id,
-                Title = p.Title,
-            })
+        return await _publicationCacheService
+            .GetPublication(slug)
+            .OnSuccess(p => new PublicationTitleViewModel { Id = p.Id, Title = p.Title })
             .HandleFailuresOrOk();
     }
-    
+
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(
-        [FromQuery] GetPublicationInfosRequest request, 
-        CancellationToken cancellationToken = default) =>
-        Ok(await _publicationService.ListPublicationInfos(request.ThemeId, cancellationToken));
+        [FromQuery] GetPublicationInfosRequest request,
+        CancellationToken cancellationToken = default
+    ) => Ok(await _publicationService.ListPublicationInfos(request.ThemeId, cancellationToken));
 }

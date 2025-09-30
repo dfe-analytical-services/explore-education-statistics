@@ -24,10 +24,12 @@ public class FeaturedTableService : IFeaturedTableService
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
-    public FeaturedTableService(ContentDbContext contentDbContext,
+    public FeaturedTableService(
+        ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IUserService userService,
-        IMapper mapper)
+        IMapper mapper
+    )
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
@@ -35,20 +37,30 @@ public class FeaturedTableService : IFeaturedTableService
         _mapper = mapper;
     }
 
-    public async Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseVersionId,
-        Guid dataBlockId)
+    public async Task<Either<ActionResult, FeaturedTableViewModel>> Get(
+        Guid releaseVersionId,
+        Guid dataBlockId
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
-                    query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId)))
+                    query.Where(ft =>
+                        ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId
+                    )
+                )
+            )
             .OnSuccess(_mapper.Map<FeaturedTableViewModel>);
     }
 
-    public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(Guid releaseVersionId)
+    public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(
+        Guid releaseVersionId
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -57,21 +69,27 @@ public class FeaturedTableService : IFeaturedTableService
             });
     }
 
-    public async Task<Either<ActionResult, FeaturedTableViewModel>> Create(Guid releaseVersionId,
-        FeaturedTableCreateRequest request)
+    public async Task<Either<ActionResult, FeaturedTableViewModel>> Create(
+        Guid releaseVersionId,
+        FeaturedTableCreateRequest request
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
-                await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
+                await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId)
+            )
             .OnSuccessDo(async dataBlock =>
             {
-                var hasFeaturedTable = await _contentDbContext.FeaturedTables
-                    .AnyAsync(ft => ft.DataBlockId == dataBlock.Id);
+                var hasFeaturedTable = await _contentDbContext.FeaturedTables.AnyAsync(ft =>
+                    ft.DataBlockId == dataBlock.Id
+                );
                 if (hasFeaturedTable)
                 {
                     return new Either<ActionResult, Unit>(
-                        ValidationUtils.ValidationActionResult(DataBlockAlreadyHasFeaturedTable));
+                        ValidationUtils.ValidationActionResult(DataBlockAlreadyHasFeaturedTable)
+                    );
                 }
 
                 return Unit.Instance;
@@ -79,8 +97,9 @@ public class FeaturedTableService : IFeaturedTableService
             .OnSuccess(async _ =>
             {
                 var dataBlockParentId = _contentDbContext
-                    .DataBlockVersions
-                    .First(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId)
+                    .DataBlockVersions.First(dataBlockVersion =>
+                        dataBlockVersion.Id == request.DataBlockId
+                    )
                     .DataBlockParentId;
 
                 var featuredTable = _mapper.Map<FeaturedTable>(request);
@@ -106,13 +125,19 @@ public class FeaturedTableService : IFeaturedTableService
     public async Task<Either<ActionResult, FeaturedTableViewModel>> Update(
         Guid releaseVersionId,
         Guid dataBlockId,
-        FeaturedTableUpdateRequest request)
+        FeaturedTableUpdateRequest request
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
-                    query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId)))
+                    query.Where(ft =>
+                        ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId
+                    )
+                )
+            )
             .OnSuccess(async featuredTable =>
             {
                 _contentDbContext.FeaturedTables.Update(featuredTable);
@@ -126,14 +151,18 @@ public class FeaturedTableService : IFeaturedTableService
             });
     }
 
-    public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
-        Guid dataBlockId)
+    public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid dataBlockId)
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
-                    query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId)))
+                    query.Where(ft =>
+                        ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId
+                    )
+                )
+            )
             .OnSuccessVoid(async featuredTable =>
             {
                 _contentDbContext.FeaturedTables.Remove(featuredTable);
@@ -143,29 +172,41 @@ public class FeaturedTableService : IFeaturedTableService
 
     public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> Reorder(
         Guid releaseVersionId,
-        List<Guid> newOrder)
+        List<Guid> newOrder
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion => await ListFeaturedTables(releaseVersion.Id))
             .OnSuccess(async featuredTableList =>
             {
-                if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+                if (
+                    !ComparerUtils.SequencesAreEqualIgnoringOrder(
                         newOrder,
-                        featuredTableList.Select(ft => ft.Id)))
+                        featuredTableList.Select(ft => ft.Id)
+                    )
+                )
                 {
-                    return new Either<ActionResult, List<FeaturedTable>>(ValidationUtils.ValidationActionResult(
-                        ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds));
+                    return new Either<ActionResult, List<FeaturedTable>>(
+                        ValidationUtils.ValidationActionResult(
+                            ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds
+                        )
+                    );
                 }
 
                 var updatingUserId = _userService.GetUserId();
 
-                newOrder.ForEach((featuredTableId, order) =>
-                {
-                    var matchingFeaturedTable = featuredTableList.Single(ft => ft.Id == featuredTableId);
-                    matchingFeaturedTable.Order = order;
-                    matchingFeaturedTable.UpdatedById = updatingUserId;
-                });
+                newOrder.ForEach(
+                    (featuredTableId, order) =>
+                    {
+                        var matchingFeaturedTable = featuredTableList.Single(ft =>
+                            ft.Id == featuredTableId
+                        );
+                        matchingFeaturedTable.Order = order;
+                        matchingFeaturedTable.UpdatedById = updatingUserId;
+                    }
+                );
 
                 _contentDbContext.FeaturedTables.UpdateRange(featuredTableList);
                 await _contentDbContext.SaveChangesAsync();
@@ -173,21 +214,20 @@ public class FeaturedTableService : IFeaturedTableService
                 return featuredTableList;
             })
             .OnSuccess(featuredTables =>
-                _mapper.Map<List<FeaturedTableViewModel>>(
-                    featuredTables.OrderBy(ft => ft.Order)));
+                _mapper.Map<List<FeaturedTableViewModel>>(featuredTables.OrderBy(ft => ft.Order))
+            );
     }
 
     private async Task<List<FeaturedTable>> ListFeaturedTables(Guid releaseVersionId)
     {
         var releaseDataBlockIds = await _contentDbContext
-            .ContentBlocks
-            .Where(block => block.ReleaseVersionId == releaseVersionId)
+            .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
             .OfType<DataBlock>()
             .Select(dataBlock => dataBlock.Id)
             .ToListAsync();
 
-        return await _contentDbContext.FeaturedTables
-            .Where(ft => releaseDataBlockIds.Contains(ft.DataBlockId))
+        return await _contentDbContext
+            .FeaturedTables.Where(ft => releaseDataBlockIds.Contains(ft.DataBlockId))
             .OrderBy(ft => ft.Order)
             .ThenBy(ft => ft.Name)
             .ToListAsync();

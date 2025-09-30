@@ -26,15 +26,22 @@ public class AuthorizationHandlerServiceTests
 
             var user = _fixture.AuthenticatedUser();
 
-            var userPublicationRoleAndInviteManagerMock = new Mock<IUserPublicationRoleRepository>();
+            var userPublicationRoleAndInviteManagerMock =
+                new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleAndInviteManagerMock
-                .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .Setup(rvr =>
+                    rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>())
+                )
                 .ReturnsAsync([publicationRole]);
 
             var authorizationHandlerService = CreateService(
-                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object);
+                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object
+            );
 
-            var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, user);
+            var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(
+                releaseVersion,
+                user
+            );
 
             Assert.True(result);
         }
@@ -48,15 +55,22 @@ public class AuthorizationHandlerServiceTests
 
             var user = _fixture.AuthenticatedUser();
 
-            var userPublicationRoleAndInviteManagerMock = new Mock<IUserPublicationRoleRepository>();
+            var userPublicationRoleAndInviteManagerMock =
+                new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleAndInviteManagerMock
-                .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .Setup(rvr =>
+                    rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>())
+                )
                 .ReturnsAsync([publicationRole]);
 
             var authorizationHandlerService = CreateService(
-                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object);
+                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object
+            );
 
-            var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, user);
+            var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(
+                releaseVersion,
+                user
+            );
 
             Assert.False(result);
         }
@@ -66,16 +80,21 @@ public class AuthorizationHandlerServiceTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IPreReleaseService? preReleaseService = null)
+        IPreReleaseService? preReleaseService = null
+    )
     {
         var releaseVersionRepositoryMock = new Mock<IReleaseVersionRepository>();
         releaseVersionRepositoryMock
-            .Setup(rvr => rvr.IsLatestPublishedReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .Setup(rvr =>
+                rvr.IsLatestPublishedReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(false);
 
         var userReleaseRoleAndInviteManagerMock = new Mock<IUserReleaseRoleRepository>();
         userReleaseRoleAndInviteManagerMock
-            .Setup(rvr => rvr.GetAllRolesByUserAndReleaseVersion(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Setup(rvr =>
+                rvr.GetAllRolesByUserAndReleaseVersion(It.IsAny<Guid>(), It.IsAny<Guid>())
+            )
             .ReturnsAsync([]);
         userReleaseRoleAndInviteManagerMock
             .Setup(rvr => rvr.GetAllRolesByUserAndPublication(It.IsAny<Guid>(), It.IsAny<Guid>()))
@@ -88,16 +107,16 @@ public class AuthorizationHandlerServiceTests
 
         var preReleaseServiceMock = new Mock<IPreReleaseService>();
         preReleaseServiceMock
-            .Setup(rvr => rvr.GetPreReleaseWindowStatus(It.IsAny<ReleaseVersion>(), It.IsAny<DateTime>()))
-            .Returns(new PreReleaseWindowStatus
-            {
-                Access = PreReleaseAccess.NoneSet,
-            });
+            .Setup(rvr =>
+                rvr.GetPreReleaseWindowStatus(It.IsAny<ReleaseVersion>(), It.IsAny<DateTime>())
+            )
+            .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.NoneSet });
 
         return new AuthorizationHandlerService(
             releaseVersionRepository ?? releaseVersionRepositoryMock.Object,
             userReleaseRoleRepository ?? userReleaseRoleAndInviteManagerMock.Object,
             userPublicationRoleRepository ?? userPublicationRoleAndInviteManagerMock.Object,
-            preReleaseService ?? preReleaseServiceMock.Object);
+            preReleaseService ?? preReleaseServiceMock.Object
+        );
     }
 }

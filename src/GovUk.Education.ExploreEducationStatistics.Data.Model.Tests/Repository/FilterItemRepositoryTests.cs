@@ -24,20 +24,17 @@ public class FilterItemRepositoryTests
             {
                 new()
                 {
-                    FilterItems = new List<FilterItem>
-                    {
-                        filterItemCharacteristicSchoolYear1
-                    }
+                    FilterItems = new List<FilterItem> { filterItemCharacteristicSchoolYear1 },
                 },
                 new()
                 {
                     FilterItems = new List<FilterItem>
                     {
                         filterItemCharacteristicFsmEligible,
-                        filterItemCharacteristicFsmNotEligible
-                    }
-                }
-            }
+                        filterItemCharacteristicFsmNotEligible,
+                    },
+                },
+            },
         };
 
         var filterSchoolType = new Filter
@@ -49,10 +46,10 @@ public class FilterItemRepositoryTests
                     FilterItems = new List<FilterItem>
                     {
                         filterItemSchoolTypePrimary,
-                        filterItemSchoolTypeSecondary
-                    }
-                }
-            }
+                        filterItemSchoolTypeSecondary,
+                    },
+                },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -72,14 +69,14 @@ public class FilterItemRepositoryTests
                 filterItemCharacteristicFsmEligible.Id,
                 filterItemCharacteristicFsmNotEligible.Id,
                 filterItemSchoolTypePrimary.Id,
-                filterItemSchoolTypeSecondary.Id
+                filterItemSchoolTypeSecondary.Id,
             };
             var result = await repository.CountFilterItemsByFilter(filterItemIds);
 
             // Result should contain the counts of filter items in both filters
             Assert.Equal(2, result.Count);
 
-            // 3 of the filter items belong to the Characteristic filter 
+            // 3 of the filter items belong to the Characteristic filter
             Assert.Equal(3, result[filterCharacteristic.Id]);
 
             // 2 of the filter items belong to the School Type filter
@@ -94,14 +91,8 @@ public class FilterItemRepositoryTests
         {
             FilterGroups = new List<FilterGroup>
             {
-                new()
-                {
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                    }
-                }
-            }
+                new() { FilterItems = new List<FilterItem> { new() } },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -128,14 +119,8 @@ public class FilterItemRepositoryTests
         {
             FilterGroups = new List<FilterGroup>
             {
-                new()
-                {
-                    FilterItems = new List<FilterItem>
-                    {
-                        filterItem
-                    }
-                }
-            }
+                new() { FilterItems = new List<FilterItem> { filterItem } },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -156,19 +141,18 @@ public class FilterItemRepositoryTests
             var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
             {
                 await repository.CountFilterItemsByFilter(
-                    ListOf(
-                        filterItem.Id,
-                        filterItemNotFound1,
-                        filterItemNotFound2
-                    ));
+                    ListOf(filterItem.Id, filterItemNotFound1, filterItemNotFound2)
+                );
             });
 
-            Assert.Equal($"Could not find filter items: {filterItemNotFound1}, {filterItemNotFound2}", exception.Message);
+            Assert.Equal(
+                $"Could not find filter items: {filterItemNotFound1}, {filterItemNotFound2}",
+                exception.Message
+            );
         }
     }
 
-    private static FilterItemRepository BuildFilterItemRepository(
-        StatisticsDbContext context)
+    private static FilterItemRepository BuildFilterItemRepository(StatisticsDbContext context)
     {
         return new(context);
     }

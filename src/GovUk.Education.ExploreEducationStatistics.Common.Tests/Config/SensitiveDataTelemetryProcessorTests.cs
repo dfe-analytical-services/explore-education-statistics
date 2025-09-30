@@ -50,10 +50,7 @@ public class SensitiveDataTelemetryProcessorTests
     [Fact]
     public void Process_Request_NoQuery()
     {
-        var telemetry = new RequestTelemetry
-        {
-            Url = new Uri("https://test.com/"),
-        };
+        var telemetry = new RequestTelemetry { Url = new Uri("https://test.com/") };
 
         BuildProcessor().Process(telemetry);
 
@@ -73,10 +70,7 @@ public class SensitiveDataTelemetryProcessorTests
     [Fact]
     public void Process_Request_SingleQueryParam()
     {
-        var telemetry = new RequestTelemetry
-        {
-            Url = new Uri("https://test.com/?code=my-code")
-        };
+        var telemetry = new RequestTelemetry { Url = new Uri("https://test.com/?code=my-code") };
 
         BuildProcessor().Process(telemetry);
 
@@ -86,10 +80,7 @@ public class SensitiveDataTelemetryProcessorTests
     [Fact]
     public void Process_Request_SingleQueryParam_NotFiltered()
     {
-        var telemetry = new RequestTelemetry
-        {
-            Url = new Uri("https://test.com/?key=value")
-        };
+        var telemetry = new RequestTelemetry { Url = new Uri("https://test.com/?key=value") };
 
         BuildProcessor().Process(telemetry);
 
@@ -101,7 +92,7 @@ public class SensitiveDataTelemetryProcessorTests
     {
         var telemetry = new RequestTelemetry
         {
-            Url = new Uri("https://test.com/?encodeType=something")
+            Url = new Uri("https://test.com/?encodeType=something"),
         };
 
         BuildProcessor().Process(telemetry);
@@ -116,7 +107,7 @@ public class SensitiveDataTelemetryProcessorTests
     {
         var telemetry = new RequestTelemetry
         {
-            Url = new Uri($"https://test.com/?{key}=some-value")
+            Url = new Uri($"https://test.com/?{key}=some-value"),
         };
 
         var processor = BuildProcessor();
@@ -130,7 +121,9 @@ public class SensitiveDataTelemetryProcessorTests
     {
         var telemetry = new RequestTelemetry
         {
-            Url = new Uri("https://test.com/?password=my-password&code=my-code&token=my-token&email=my-email")
+            Url = new Uri(
+                "https://test.com/?password=my-password&code=my-code&token=my-token&email=my-email"
+            ),
         };
 
         BuildProcessor().Process(telemetry);
@@ -146,7 +139,9 @@ public class SensitiveDataTelemetryProcessorTests
     {
         var telemetry = new RequestTelemetry
         {
-            Url = new Uri("https://test.com/?test1=value1&code=my-code&test2=value2&email=my-email")
+            Url = new Uri(
+                "https://test.com/?test1=value1&code=my-code&test2=value2&email=my-email"
+            ),
         };
 
         BuildProcessor().Process(telemetry);
@@ -160,10 +155,7 @@ public class SensitiveDataTelemetryProcessorTests
     [Fact]
     public void Process_Request_CallsNext()
     {
-        var telemetry = new RequestTelemetry
-        {
-            Url = new Uri("https://test.com/")
-        };
+        var telemetry = new RequestTelemetry { Url = new Uri("https://test.com/") };
 
         var nextProcessor = new Mock<ITelemetryProcessor>();
 
@@ -182,10 +174,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri("https://test.com/"),
-            Properties =
-            {
-                { "refUri", "https://test.com/" }
-            }
+            Properties = { { "refUri", "https://test.com/" } },
         };
 
         BuildProcessor().Process(telemetry);
@@ -211,10 +200,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri("https://test.com/"),
-            Properties =
-            {
-                { "refUri", "Not a URI" }
-            }
+            Properties = { { "refUri", "Not a URI" } },
         };
 
         BuildProcessor().Process(telemetry);
@@ -229,10 +215,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri("https://test.com/?code=my-code"),
-            Properties =
-            {
-                { "refUri", "https://test.com/ref?code=my-code" }
-            }
+            Properties = { { "refUri", "https://test.com/ref?code=my-code" } },
         };
 
         BuildProcessor().Process(telemetry);
@@ -247,10 +230,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri("https://test.com/?key=value"),
-            Properties =
-            {
-                { "refUri", "https://test.com/ref?key=value" }
-            }
+            Properties = { { "refUri", "https://test.com/ref?key=value" } },
         };
 
         BuildProcessor().Process(telemetry);
@@ -265,10 +245,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri("https://test.com/?encodeType=something"),
-            Properties =
-            {
-                { "refUri", "https://test.com/ref?encodeType=something" }
-            }
+            Properties = { { "refUri", "https://test.com/ref?encodeType=something" } },
         };
 
         BuildProcessor().Process(telemetry);
@@ -285,10 +262,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri($"https://test.com/?{key}=some-value"),
-            Properties =
-            {
-                { "refUri", $"https://test.com/ref?{key}=some-value" }
-            }
+            Properties = { { "refUri", $"https://test.com/ref?{key}=some-value" } },
         };
 
         var processor = BuildProcessor();
@@ -303,11 +277,16 @@ public class SensitiveDataTelemetryProcessorTests
     {
         var telemetry = new PageViewTelemetry
         {
-            Url = new Uri("https://test.com/?password=my-password&code=my-code&token=my-token&email=my-email"),
+            Url = new Uri(
+                "https://test.com/?password=my-password&code=my-code&token=my-token&email=my-email"
+            ),
             Properties =
             {
-                { "refUri", "https://test.com/ref?password=my-password&code=my-code&token=my-token&email=my-email" }
-            }
+                {
+                    "refUri",
+                    "https://test.com/ref?password=my-password&code=my-code&token=my-token&email=my-email"
+                },
+            },
         };
 
         BuildProcessor().Process(telemetry);
@@ -327,11 +306,16 @@ public class SensitiveDataTelemetryProcessorTests
     {
         var telemetry = new PageViewTelemetry
         {
-            Url = new Uri("https://test.com/?test1=value1&code=my-code&test2=value2&email=my-email"),
+            Url = new Uri(
+                "https://test.com/?test1=value1&code=my-code&test2=value2&email=my-email"
+            ),
             Properties =
             {
-                { "refUri", "https://test.com/ref?test1=value1&code=my-code&test2=value2&email=my-email" }
-            }
+                {
+                    "refUri",
+                    "https://test.com/ref?test1=value1&code=my-code&test2=value2&email=my-email"
+                },
+            },
         };
 
         BuildProcessor().Process(telemetry);
@@ -352,10 +336,7 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new PageViewTelemetry
         {
             Url = new Uri("https://test.com/"),
-            Properties =
-            {
-                { "refUri", "https://test.com/ref" }
-            }
+            Properties = { { "refUri", "https://test.com/ref" } },
         };
 
         var nextProcessor = new Mock<ITelemetryProcessor>();
@@ -377,7 +358,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test",
             Data = "GET /test",
-            Type = "Http"
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -389,10 +370,7 @@ public class SensitiveDataTelemetryProcessorTests
     [Fact]
     public void Process_Dependency_NullUris()
     {
-        var telemetry = new DependencyTelemetry
-        {
-            Type = "Http"
-        };
+        var telemetry = new DependencyTelemetry { Type = "Http" };
 
         BuildProcessor().Process(telemetry);
 
@@ -407,7 +385,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "db | statistics",
             Data = "Test data",
-            Type = "SQL"
+            Type = "SQL",
         };
 
         BuildProcessor().Process(telemetry);
@@ -423,7 +401,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test?code=my-code",
             Data = "https://test.com/test?code=my-code",
-            Type = "Http"
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -439,7 +417,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test?code=my-code",
             Data = "Invalid URL",
-            Type = "Http"
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -457,7 +435,7 @@ public class SensitiveDataTelemetryProcessorTests
             Data = "https://test.com/test?code=my-code",
             // We don't filter this type as we consider it
             // outside of our application code's scope.
-            Type = "Azure Blob"
+            Type = "Azure Blob",
         };
 
         BuildProcessor().Process(telemetry);
@@ -473,7 +451,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test?key=value",
             Data = "https://test.com/test?key=value",
-            Type = "Http"
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -489,7 +467,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test?encodeType=something",
             Data = "https://test.com/test?encodeType=something",
-            Type = "Http"
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -507,7 +485,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = $"GET /test?{key}=some-value",
             Data = $"https://test.com/test?{key}=some-value",
-            Type = "Http"
+            Type = "Http",
         };
 
         var processor = BuildProcessor();
@@ -523,8 +501,9 @@ public class SensitiveDataTelemetryProcessorTests
         var telemetry = new DependencyTelemetry
         {
             Name = "GET /test?password=my-password&code=my-code&token=my-token&email=my-email",
-            Data = "https://test.com/test?password=my-password&code=my-code&token=my-token&email=my-email",
-            Type = "Http"
+            Data =
+                "https://test.com/test?password=my-password&code=my-code&token=my-token&email=my-email",
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -546,7 +525,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test?test1=value1&code=my-code&test2=value2&email=my-email",
             Data = "https://test.com/test?test1=value1&code=my-code&test2=value2&email=my-email",
-            Type = "Http"
+            Type = "Http",
         };
 
         BuildProcessor().Process(telemetry);
@@ -568,7 +547,7 @@ public class SensitiveDataTelemetryProcessorTests
         {
             Name = "GET /test",
             Data = "https://test.com/test",
-            Type = "Http"
+            Type = "Http",
         };
 
         var nextProcessor = new Mock<ITelemetryProcessor>();
@@ -583,10 +562,10 @@ public class SensitiveDataTelemetryProcessorTests
         MockUtils.VerifyAllMocks(nextProcessor);
     }
 
-    private SensitiveDataTelemetryProcessor BuildProcessor(ITelemetryProcessor? nextProcessor = null)
+    private SensitiveDataTelemetryProcessor BuildProcessor(
+        ITelemetryProcessor? nextProcessor = null
+    )
     {
-        return new SensitiveDataTelemetryProcessor(
-            nextProcessor ?? Mock.Of<ITelemetryProcessor>()
-        );
+        return new SensitiveDataTelemetryProcessor(nextProcessor ?? Mock.Of<ITelemetryProcessor>());
     }
 }

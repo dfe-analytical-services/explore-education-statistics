@@ -7,9 +7,15 @@ public static class HttpClientExtensions
         this HttpClient client,
         string uri,
         IDictionary<string, string> headers,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return client.SendAsync(HttpMethod.Get, uri, headers: headers, cancellationToken: cancellationToken);
+        return client.SendAsync(
+            HttpMethod.Get,
+            uri,
+            headers: headers,
+            cancellationToken: cancellationToken
+        );
     }
 
     public static Task<HttpResponseMessage> PostAsync(
@@ -17,7 +23,8 @@ public static class HttpClientExtensions
         string uri,
         HttpContent content,
         IDictionary<string, string> headers,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return client.SendAsync(HttpMethod.Post, uri, content, headers, cancellationToken);
     }
@@ -27,18 +34,19 @@ public static class HttpClientExtensions
         string uri,
         HttpContent content,
         IDictionary<string, string> headers,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return client.SendAsync(HttpMethod.Patch, uri, content, headers, cancellationToken);
     }
-
 
     public static Task<HttpResponseMessage> PutAsync(
         this HttpClient client,
         string uri,
         HttpContent content,
         IDictionary<string, string> headers,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return client.SendAsync(HttpMethod.Put, uri, content, headers, cancellationToken);
     }
@@ -48,7 +56,8 @@ public static class HttpClientExtensions
         string uri,
         HttpContent content,
         IDictionary<string, string> headers,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return client.SendAsync(HttpMethod.Delete, uri, content, headers, cancellationToken);
     }
@@ -59,7 +68,8 @@ public static class HttpClientExtensions
         string uri,
         HttpContent? content = null,
         IDictionary<string, string>? headers = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var message = new HttpRequestMessage
         {

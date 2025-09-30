@@ -34,7 +34,8 @@ public class MethodologyNoteRepositoryTests
                 methodologyVersionId: methodologyVersion.Id,
                 createdByUserId: createdById,
                 content: content,
-                displayDate: displayDate);
+                displayDate: displayDate
+            );
 
             Assert.NotNull(result);
         }
@@ -43,9 +44,9 @@ public class MethodologyNoteRepositoryTests
         {
             Assert.Single(contentDbContext.MethodologyNotes);
 
-            var addedNote =
-                await contentDbContext.MethodologyNotes.SingleAsync(n =>
-                    n.MethodologyVersionId == methodologyVersion.Id);
+            var addedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.NotEqual(Guid.Empty, addedNote.Id);
             Assert.Equal(content, addedNote.Content);
@@ -65,15 +66,9 @@ public class MethodologyNoteRepositoryTests
         {
             Notes = new List<MethodologyNote>
             {
-                new()
-                {
-                    Content = "Note 1"
-                },
-                new()
-                {
-                    Content = "Note 2"
-                }
-            }
+                new() { Content = "Note 1" },
+                new() { Content = "Note 2" },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -94,8 +89,12 @@ public class MethodologyNoteRepositoryTests
         {
             Assert.Single(contentDbContext.MethodologyNotes);
 
-            Assert.Null(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id));
-            Assert.NotNull(await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[1].Id));
+            Assert.Null(
+                await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[0].Id)
+            );
+            Assert.NotNull(
+                await contentDbContext.MethodologyNotes.FindAsync(methodologyVersion.Notes[1].Id)
+            );
         }
     }
 
@@ -108,7 +107,7 @@ public class MethodologyNoteRepositoryTests
             Created = DateTime.UtcNow,
             CreatedById = Guid.NewGuid(),
             DisplayDate = DateTime.Today.ToUniversalTime(),
-            MethodologyVersion = new MethodologyVersion()
+            MethodologyVersion = new MethodologyVersion(),
         };
 
         const string content = "Updating note";
@@ -131,7 +130,8 @@ public class MethodologyNoteRepositoryTests
                 methodologyNoteId: methodologyNote.Id,
                 updatedByUserId: updatedById,
                 content: content,
-                displayDate: displayDate);
+                displayDate: displayDate
+            );
 
             Assert.NotNull(result);
         }
@@ -140,7 +140,9 @@ public class MethodologyNoteRepositoryTests
         {
             Assert.Single(contentDbContext.MethodologyNotes);
 
-            var updatedNote = await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyNote.Id);
+            var updatedNote = await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                n.Id == methodologyNote.Id
+            );
 
             Assert.Equal(content, updatedNote.Content);
             Assert.Equal(methodologyNote.Created, updatedNote.Created);
@@ -152,7 +154,9 @@ public class MethodologyNoteRepositoryTests
         }
     }
 
-    private static MethodologyNoteRepository BuildMethodologyNoteRepository(ContentDbContext contentDbContext)
+    private static MethodologyNoteRepository BuildMethodologyNoteRepository(
+        ContentDbContext contentDbContext
+    )
     {
         return new(contentDbContext);
     }

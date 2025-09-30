@@ -42,8 +42,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         {
             Title = "Test chart",
             Height = 400,
-            Width = 500
-        }
+            Width = 500,
+        },
     ];
 
     private static readonly FullTableQuery FullTableQuery = new()
@@ -55,25 +55,58 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             StartYear = 2021,
             StartCode = CalendarYear,
             EndYear = 2022,
-            EndCode = CalendarYear
+            EndCode = CalendarYear,
         },
         Filters = new List<Guid>(),
         Indicators = new List<Guid> // use collection expression -> test failures
         {
-            Guid.NewGuid()
+            Guid.NewGuid(),
         },
         FilterHierarchiesOptions = new List<FilterHierarchyOptions>
         {
-            new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
-            new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()]] },
-            new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()]] },
-            new() { LeafFilterId = Guid.NewGuid(), Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]] },
-        }
+            new()
+            {
+                LeafFilterId = Guid.NewGuid(),
+                Options =
+                [
+                    [Guid.NewGuid(), Guid.NewGuid()],
+                    [Guid.NewGuid(), Guid.NewGuid()],
+                ],
+            },
+            new()
+            {
+                LeafFilterId = Guid.NewGuid(),
+                Options =
+                [
+                    [Guid.NewGuid(), Guid.NewGuid()],
+                ],
+            },
+            new()
+            {
+                LeafFilterId = Guid.NewGuid(),
+                Options =
+                [
+                    [Guid.NewGuid(), Guid.NewGuid()],
+                ],
+            },
+            new()
+            {
+                LeafFilterId = Guid.NewGuid(),
+                Options =
+                [
+                    [Guid.NewGuid(), Guid.NewGuid()],
+                    [Guid.NewGuid(), Guid.NewGuid()],
+                ],
+            },
+        },
     };
 
     private static readonly TableBuilderConfiguration TableConfiguration = new()
     {
-        TableHeaders = new TableHeaders { Rows = [new TableHeader("table header 1", TableHeaderType.Filter)] }
+        TableHeaders = new TableHeaders
+        {
+            Rows = [new TableHeader("table header 1", TableHeaderType.Filter)],
+        },
     };
 
     private readonly TableBuilderResultViewModel _tableBuilderResults = new()
@@ -83,13 +116,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             TimePeriodRange =
             [
                 new TimePeriodMetaViewModel(2020, AcademicYear),
-                new TimePeriodMetaViewModel(2021, AcademicYear)
-            ]
+                new TimePeriodMetaViewModel(2021, AcademicYear),
+            ],
         },
         Results = new List<ObservationViewModel>
         {
             new() { TimePeriod = "2020_AY" },
-            new() { TimePeriod = "2021_AY" }
+            new() { TimePeriod = "2021_AY" },
         },
     };
 
@@ -99,18 +132,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
         tableBuilderService
-            .Setup(
-                s => s.Query(
-                    ItIs.DeepEqualTo(FullTableQuery),
-                    It.IsAny<CancellationToken>()
-                )
-            )
+            .Setup(s => s.Query(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>()))
             .ReturnsAsync(_tableBuilderResults);
 
         var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
-        var response = await client
-            .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(FullTableQuery)));
+        var response = await client.PostAsync(
+            "/api/tablebuilder",
+            new JsonNetContent(ToRequest(FullTableQuery))
+        );
 
         VerifyAllMocks(tableBuilderService);
 
@@ -123,8 +153,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
         tableBuilderService
-            .Setup(
-                s => s.QueryToCsvStream(
+            .Setup(s =>
+                s.QueryToCsvStream(
                     ItIs.DeepEqualTo(FullTableQuery),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()
@@ -132,15 +162,16 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             )
             .ReturnsAsync(Unit.Instance)
             .Callback<FullTableQuery, Stream, CancellationToken>(
-                (_, stream, _) => stream.WriteText("Test csv"));
+                (_, stream, _) => stream.WriteText("Test csv")
+            );
 
         var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
-        var response = await client
-            .PostAsync("/api/tablebuilder",
-                content: new JsonNetContent(ToRequest(FullTableQuery)),
-                headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
-            );
+        var response = await client.PostAsync(
+            "/api/tablebuilder",
+            content: new JsonNetContent(ToRequest(FullTableQuery)),
+            headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
+        );
 
         VerifyAllMocks(tableBuilderService);
 
@@ -150,19 +181,21 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task Query_ReleaseVersionId()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
         await TestApp.AddTestData<ContentDbContext>(context =>
-            context.Publications.Add(publication));
+            context.Publications.Add(publication)
+        );
 
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
         tableBuilderService
-            .Setup(
-                s => s.Query(
+            .Setup(s =>
+                s.Query(
                     releaseVersion.Id,
                     ItIs.DeepEqualTo(FullTableQuery),
                     It.IsAny<CancellationToken>()
@@ -170,12 +203,12 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             )
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-            .CreateClient();
+        var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
-        var response = await client
-            .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}",
-                new JsonNetContent(ToRequest(FullTableQuery)));
+        var response = await client.PostAsync(
+            $"/api/tablebuilder/release/{releaseVersion.Id}",
+            new JsonNetContent(ToRequest(FullTableQuery))
+        );
 
         VerifyAllMocks(tableBuilderService);
 
@@ -185,20 +218,22 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task Query_ReleaseVersionId_Csv()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
         await TestApp.AddTestData<ContentDbContext>(context =>
-            context.Publications.Add(publication));
+            context.Publications.Add(publication)
+        );
 
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
         tableBuilderService
-            .Setup(
-                s => s.QueryToCsvStream(
+            .Setup(s =>
+                s.QueryToCsvStream(
                     releaseVersion.Id,
                     ItIs.DeepEqualTo(FullTableQuery),
                     It.IsAny<Stream>(),
@@ -207,27 +242,27 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             )
             .ReturnsAsync(Unit.Instance)
             .Callback<Guid, FullTableQuery, Stream, CancellationToken>(
-                (_, _, stream, _) => stream.WriteText("Test csv"));
-
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-            .CreateClient();
-
-        var response = await client
-            .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}",
-                content: new JsonNetContent(ToRequest(FullTableQuery)),
-                headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
+                (_, _, stream, _) => stream.WriteText("Test csv")
             );
+
+        var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
+
+        var response = await client.PostAsync(
+            $"/api/tablebuilder/release/{releaseVersion.Id}",
+            content: new JsonNetContent(ToRequest(FullTableQuery)),
+            headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
+        );
 
         VerifyAllMocks(tableBuilderService);
 
         response.AssertOk("Test csv");
     }
 
-
     [Fact]
     public async Task QueryForTableBuilderResult()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
@@ -235,13 +270,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
         DataBlockParent dataBlockParent = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(FullTableQuery)
-                .WithTable(TableConfiguration)
-                .WithCharts(Charts));
+            .WithLatestPublishedVersion(
+                _dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts)
+            );
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
@@ -254,7 +291,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
             releaseSlug: release.Slug,
-            dataBlockParent.Id);
+            dataBlockParent.Id
+        );
 
         BlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -270,12 +308,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object)
-            .CreateClient();
+        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
 
-        var response =
-            await client.GetAsync(
-                $"http://localhost/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}");
+        var response = await client.GetAsync(
+            $"http://localhost/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}"
+        );
 
         VerifyAllMocks(BlobCacheService, dataBlockService);
 
@@ -285,18 +322,22 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task QueryForTableBuilderResult_NotFound()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+        await TestApp.AddTestData<ContentDbContext>(context =>
+            context.Publications.Add(publication)
+        );
 
         var client = SetupApp().CreateClient();
 
-        var response =
-            await client.GetAsync($"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{Guid.NewGuid()}");
+        var response = await client.GetAsync(
+            $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{Guid.NewGuid()}"
+        );
 
         response.AssertNotFound();
     }
@@ -304,7 +345,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task QueryForTableBuilderResult_NotModified()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
@@ -312,13 +354,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
         DataBlockParent dataBlockParent = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(FullTableQuery)
-                .WithTable(TableConfiguration)
-                .WithCharts(Charts));
+            .WithLatestPublishedVersion(
+                _dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts)
+            );
 
         await TestApp.AddTestData<ContentDbContext>(context =>
         {
@@ -326,13 +370,9 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             context.DataBlockParents.Add(dataBlockParent);
         });
 
-        var client = SetupApp()
-            .CreateClient();
+        var client = SetupApp().CreateClient();
 
-        var publishedDate = dataBlockParent
-            .LatestPublishedVersion!
-            .Published!
-            .Value;
+        var publishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value;
 
         // This date is the date when the Controller call is happening. If it's after the Published date but not too
         // far, this will be considered Not Modified still.
@@ -342,8 +382,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
             new Dictionary<string, string>
             {
-                { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
-                { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" }
+                {
+                    HeaderNames.IfModifiedSince,
+                    ifModifiedSinceDate.ToUniversalTime().ToString("R")
+                },
+                { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" },
             }
         );
 
@@ -355,7 +398,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task QueryForTableBuilderResult_ETagChanged()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
@@ -363,13 +407,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
         DataBlockParent dataBlockParent = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(FullTableQuery)
-                .WithTable(TableConfiguration)
-                .WithCharts(Charts));
+            .WithLatestPublishedVersion(
+                _dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts)
+            );
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
@@ -382,7 +428,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
             releaseSlug: release.Slug,
-            dataBlockParent.Id);
+            dataBlockParent.Id
+        );
 
         BlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -398,13 +445,9 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object)
-            .CreateClient();
+        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
 
-        var publishedDate = dataBlockParent
-            .LatestPublishedVersion!
-            .Published!
-            .Value;
+        var publishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value;
 
         // This date is the date when the Controller call is happening. If it's after the Published date but not too
         // far, this will be considered Not Modified still. So it will not be considered "Modified" by this date alone.
@@ -415,8 +458,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
             new Dictionary<string, string>
             {
-                { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
-                { HeaderNames.IfNoneMatch, "\"not the same etag\"" }
+                {
+                    HeaderNames.IfModifiedSince,
+                    ifModifiedSinceDate.ToUniversalTime().ToString("R")
+                },
+                { HeaderNames.IfNoneMatch, "\"not the same etag\"" },
             }
         );
 
@@ -428,7 +474,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task QueryForTableBuilderResult_LastModifiedChanged()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
@@ -436,13 +483,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
         DataBlockParent dataBlockParent = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(FullTableQuery)
-                .WithTable(TableConfiguration)
-                .WithCharts(Charts));
+            .WithLatestPublishedVersion(
+                _dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts)
+            );
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
@@ -455,7 +504,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
             releaseSlug: release.Slug,
-            dataBlockParent.Id);
+            dataBlockParent.Id
+        );
 
         BlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -471,23 +521,22 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object)
-            .CreateClient();
+        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
 
         // The latest published DataBlockVersion has been published since the caller last requested it, so we
         // consider this "Modified" by the published date alone.
-        var yearBeforePublishedDate = dataBlockParent
-            .LatestPublishedVersion!
-            .Published!
-            .Value
-            .AddYears(-1);
+        var yearBeforePublishedDate =
+            dataBlockParent.LatestPublishedVersion!.Published!.Value.AddYears(-1);
 
         var response = await client.GetAsync(
             $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
             new Dictionary<string, string>
             {
-                { HeaderNames.IfModifiedSince, yearBeforePublishedDate.ToUniversalTime().ToString("R") },
-                { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" }
+                {
+                    HeaderNames.IfModifiedSince,
+                    yearBeforePublishedDate.ToUniversalTime().ToString("R")
+                },
+                { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" },
             }
         );
 
@@ -501,25 +550,27 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases([
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2020),
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2021)
-            ]);
+            .WithReleases(
+                [
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                ]
+            );
 
         var release = publication.Releases.Single(r => r.Year == 2021);
         var releaseVersion = release.Versions.Single();
 
         DataBlockParent dataBlockParent = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(FullTableQuery)
-                .WithTable(TableConfiguration)
-                .WithCharts(Charts));
+            .WithLatestPublishedVersion(
+                _dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts)
+            );
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
@@ -532,7 +583,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
             releaseSlug: release.Slug,
-            dataBlockParent.Id);
+            dataBlockParent.Id
+        );
 
         BlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -548,17 +600,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(
-                dataBlockService: dataBlockService.Object
-            )
-            .CreateClient();
+        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
 
         var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-        VerifyAllMocks(
-            BlobCacheService,
-            dataBlockService
-        );
+        VerifyAllMocks(BlobCacheService, dataBlockService);
 
         var viewModel = response.AssertOk<FastTrackViewModel>();
         Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
@@ -576,8 +622,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         Assert.Equal(publication.Id, queryViewModel.PublicationId);
         Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
         Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
-        Assert.Equal(FullTableQuery.GetNonHierarchicalFilterItemIds(), viewModel.Query.GetNonHierarchicalFilterItemIds());
-        viewModel.Query.FilterHierarchiesOptions.AssertDeepEqualTo(FullTableQuery.FilterHierarchiesOptions);
+        Assert.Equal(
+            FullTableQuery.GetNonHierarchicalFilterItemIds(),
+            viewModel.Query.GetNonHierarchicalFilterItemIds()
+        );
+        viewModel.Query.FilterHierarchiesOptions.AssertDeepEqualTo(
+            FullTableQuery.FilterHierarchiesOptions
+        );
         Assert.Equal(FullTableQuery.Indicators, viewModel.Query.Indicators);
         Assert.Equal(FullTableQuery.LocationIds, viewModel.Query.LocationIds);
     }
@@ -585,7 +636,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     [Fact]
     public async Task QueryForFastTrack_DataBlockNotYetPublished()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
@@ -593,9 +645,9 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
         DataBlockParent dataBlockParentWithNoPublishedVersion = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestDraftVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion));
+            .WithLatestDraftVersion(
+                _dataFixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion)
+            );
 
         await TestApp.AddTestData<ContentDbContext>(context =>
         {
@@ -603,11 +655,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             context.DataBlockParents.Add(dataBlockParentWithNoPublishedVersion);
         });
 
-        var client = SetupApp()
-            .CreateClient();
+        var client = SetupApp().CreateClient();
 
-        var response =
-            await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParentWithNoPublishedVersion.Id}");
+        var response = await client.GetAsync(
+            $"/api/tablebuilder/fast-track/{dataBlockParentWithNoPublishedVersion.Id}"
+        );
 
         VerifyAllMocks(BlobCacheService);
 
@@ -619,12 +671,12 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases([
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2020),
-                _dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2021)
-            ]);
+            .WithReleases(
+                [
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                ]
+            );
 
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
@@ -634,13 +686,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
         DataBlockParent dataBlockParent = _dataFixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_dataFixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(FullTableQuery)
-                .WithTable(TableConfiguration)
-                .WithCharts(Charts));
+            .WithLatestPublishedVersion(
+                _dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts)
+            );
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
@@ -653,7 +707,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
             releaseSlug: release2020.Slug,
-            dataBlockParent.Id);
+            dataBlockParent.Id
+        );
 
         BlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -669,17 +724,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(
-                dataBlockService: dataBlockService.Object
-            )
-            .CreateClient();
+        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
 
         var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-        VerifyAllMocks(
-            BlobCacheService,
-            dataBlockService
-        );
+        VerifyAllMocks(BlobCacheService, dataBlockService);
 
         var viewModel = response.AssertOk<FastTrackViewModel>();
         Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
@@ -693,18 +742,18 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
 
     private WebApplicationFactory<Startup> SetupApp(
         IDataBlockService? dataBlockService = null,
-        ITableBuilderService? tableBuilderService = null)
+        ITableBuilderService? tableBuilderService = null
+    )
     {
-        return TestApp
-            .ConfigureServices(
-                services =>
-                {
-                    services.ReplaceService(BlobCacheService);
+        return TestApp.ConfigureServices(services =>
+        {
+            services.ReplaceService(BlobCacheService);
 
-                    services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
-                    services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
-                }
+            services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
+            services.AddTransient(_ =>
+                tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)
             );
+        });
     }
 
     private FullTableQueryRequest ToRequest(FullTableQuery query)
@@ -716,8 +765,9 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp)
             TimePeriod = query.TimePeriod,
             Filters = query.GetNonHierarchicalFilterItemIds(),
             Indicators = query.Indicators,
-            FilterHierarchiesOptions =
-                FilterHierarchiesOptionsAsDictionary(query.FilterHierarchiesOptions),
+            FilterHierarchiesOptions = FilterHierarchiesOptionsAsDictionary(
+                query.FilterHierarchiesOptions
+            ),
         };
     }
 }

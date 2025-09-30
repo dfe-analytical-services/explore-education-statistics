@@ -24,7 +24,8 @@ public class PublicationController : ControllerBase
     public PublicationController(
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IReleaseService releaseService,
-        ICacheKeyService cacheKeyService)
+        ICacheKeyService cacheKeyService
+    )
     {
         _contentPersistenceHelper = contentPersistenceHelper;
         _releaseService = releaseService;
@@ -32,7 +33,9 @@ public class PublicationController : ControllerBase
     }
 
     [HttpGet("publications/{publicationId:guid}/subjects")]
-    public async Task<ActionResult<List<SubjectViewModel>>> ListLatestReleaseSubjects(Guid publicationId)
+    public async Task<ActionResult<List<SubjectViewModel>>> ListLatestReleaseSubjects(
+        Guid publicationId
+    )
     {
         return await GetLatestPublishedReleaseVersionId(publicationId)
             .OnSuccess(_cacheKeyService.CreateCacheKeyForReleaseSubjects)
@@ -42,7 +45,8 @@ public class PublicationController : ControllerBase
 
     [HttpGet("publications/{publicationId:guid}/featured-tables")]
     public async Task<ActionResult<List<FeaturedTableViewModel>>> ListLatestReleaseFeaturedTables(
-        Guid publicationId)
+        Guid publicationId
+    )
     {
         return await GetLatestPublishedReleaseVersionId(publicationId)
             .OnSuccess(_releaseService.ListFeaturedTables)
@@ -51,14 +55,18 @@ public class PublicationController : ControllerBase
 
     private Task<Either<ActionResult, Guid>> GetLatestPublishedReleaseVersionId(Guid publicationId)
     {
-        return _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId)
-            .OnSuccess(publication => publication.LatestPublishedReleaseVersionId ??
-                                      new Either<ActionResult, Guid>(new NotFoundResult()));
+        return _contentPersistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccess(publication =>
+                publication.LatestPublishedReleaseVersionId
+                ?? new Either<ActionResult, Guid>(new NotFoundResult())
+            );
     }
 
     [BlobCache(typeof(ReleaseSubjectsCacheKey))]
     private async Task<Either<ActionResult, List<SubjectViewModel>>> ListLatestReleaseSubjects(
-        ReleaseSubjectsCacheKey cacheKey)
+        ReleaseSubjectsCacheKey cacheKey
+    )
     {
         return await _releaseService.ListSubjects(cacheKey.ReleaseVersionId);
     }

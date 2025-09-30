@@ -37,7 +37,8 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public string DisplayName => $"{FirstName} {LastName}";
 
-    public bool ShouldExpire => !Active &&
-                                !SoftDeleted.HasValue &&
-                                Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
+    public bool ShouldExpire =>
+        !Active
+        && !SoftDeleted.HasValue
+        && Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
 }

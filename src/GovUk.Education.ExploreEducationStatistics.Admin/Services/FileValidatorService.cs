@@ -16,11 +16,15 @@ public class FileValidatorService(IFileTypeService fileTypeService) : IFileValid
 
     public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(
         IFormFile file,
-        FileType type)
+        FileType type
+    )
     {
         if (type is FileType.Data or Metadata)
         {
-            throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
+            throw new ArgumentException(
+                "Cannot use generic function to validate data file",
+                nameof(type)
+            );
         }
 
         if (file.Length == 0)

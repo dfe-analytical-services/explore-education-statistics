@@ -9,7 +9,9 @@ public static class WebApplicationFactoryExtensions
 {
     public static WebApplicationFactory<TEntrypoint> ConfigureServices<TEntrypoint>(
         this WebApplicationFactory<TEntrypoint> app,
-        Action<IServiceCollection> configureServices) where TEntrypoint : class
+        Action<IServiceCollection> configureServices
+    )
+        where TEntrypoint : class
     {
         return app.WithWebHostBuilder(builder => builder.ConfigureServices(configureServices));
     }
@@ -20,11 +22,12 @@ public static class WebApplicationFactoryExtensions
         where TDbContext : DbContext
         where TEntrypoint : class
     {
-        return app.WithWebHostBuilder(builder => builder
-            .ResetDbContext<TDbContext>());
+        return app.WithWebHostBuilder(builder => builder.ResetDbContext<TDbContext>());
     }
-    
-    public static TDbContext GetDbContext<TDbContext, TEntrypoint>(this WebApplicationFactory<TEntrypoint> app) 
+
+    public static TDbContext GetDbContext<TDbContext, TEntrypoint>(
+        this WebApplicationFactory<TEntrypoint> app
+    )
         where TDbContext : DbContext
         where TEntrypoint : class
     {
@@ -34,7 +37,7 @@ public static class WebApplicationFactoryExtensions
 
     /// <summary>
     /// This method registers all Controllers found in the <see cref="TStartup"/> class's assembly.
-    /// 
+    ///
     /// Typically, <see cref="TEntrypoint"/> will be the TestStartup type, and <see cref="TStartup"/> will be the
     /// production Startup type.
     /// </summary>

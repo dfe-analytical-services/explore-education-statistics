@@ -17,5 +17,6 @@ public interface IPublicationsSearchService
         int page = 1,
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

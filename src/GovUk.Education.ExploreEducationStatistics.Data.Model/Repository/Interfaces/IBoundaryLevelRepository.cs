@@ -11,7 +11,10 @@ public interface IBoundaryLevelRepository
         string label,
         DateTime published,
         FeatureCollection featureCollection,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels);
+    IEnumerable<BoundaryLevel> FindByGeographicLevels(
+        IEnumerable<GeographicLevel> geographicLevels
+    );
 }

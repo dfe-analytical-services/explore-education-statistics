@@ -10,14 +10,19 @@ public interface IDataSetVersionMappingService
     Task<Either<ActionResult, Unit>> CreateMappings(
         Guid nextDataSetVersionId,
         Guid? dataSetVersionToReplace,
-        CancellationToken cancellationToken = default);
-    
-    Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(
+        CancellationToken cancellationToken = default
+    );
+
+    Task<
+        Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>
+    > GetManualMappingVersionAndImport(
         NextDataSetVersionCompleteImportRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task ApplyAutoMappings(
         Guid nextDataSetVersionId,
         bool isReplacement = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

@@ -1,5 +1,6 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
+
 public static class BoundaryDataUtils
 {
     public static string GetCode(IDictionary<string, object> properties)
@@ -22,6 +23,9 @@ public static class BoundaryDataUtils
 
     private static string GetKeyBySuffix(
         IDictionary<string, object> properties,
-        string keySuffix)
-            => properties.Keys.SingleOrDefault(k => k.EndsWith(keySuffix, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
+        string keySuffix
+    ) =>
+        properties.Keys.SingleOrDefault(k =>
+            k.EndsWith(keySuffix, StringComparison.OrdinalIgnoreCase)
+        ) ?? string.Empty;
 }

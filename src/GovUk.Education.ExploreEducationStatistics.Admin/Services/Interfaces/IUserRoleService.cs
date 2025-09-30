@@ -10,14 +10,18 @@ public interface IUserRoleService
 {
     Task<Either<ActionResult, Unit>> SetGlobalRole(string userId, string roleId);
 
-    Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
-
-    Task<Either<ActionResult, Unit>> AddReleaseRole(
+    Task<Either<ActionResult, Unit>> AddPublicationRole(
         Guid userId,
-        Guid releaseId,
-        ReleaseRole role);
+        Guid publicationId,
+        PublicationRole role
+    );
 
-    Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId);
+    Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role);
+
+    Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(
+        string globalRoleNameToSet,
+        Guid userId
+    );
 
     string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role);
 
@@ -27,10 +31,13 @@ public interface IUserRoleService
 
     Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRoles(string userId);
 
-    Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId);
+    Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(
+        Guid userId
+    );
 
-    Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(
-        Guid publicationId);
+    Task<
+        Either<ActionResult, List<UserPublicationRoleViewModel>>
+    > GetPublicationRolesForPublication(Guid publicationId);
 
     Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId);
 

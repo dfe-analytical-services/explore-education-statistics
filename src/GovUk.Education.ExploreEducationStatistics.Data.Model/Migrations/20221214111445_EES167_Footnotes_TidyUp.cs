@@ -20,30 +20,36 @@ public partial class EES167_Footnotes_TidyUp : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         // Remove foreign keys with FootnoteId from FilterFootnote, FilterGroupFootnote, FilterItemFootnote
         // IndicatorFootnote, and SubjectFootnote tables
 
         migrationBuilder.DropForeignKey(
             name: "FK_FilterFootnote_Footnote_FootnoteId",
-            table: "FilterFootnote");
+            table: "FilterFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_FilterGroupFootnote_Footnote_FootnoteId",
-            table: "FilterGroupFootnote");
+            table: "FilterGroupFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_FilterItemFootnote_Footnote_FootnoteId",
-            table: "FilterItemFootnote");
+            table: "FilterItemFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_IndicatorFootnote_Footnote_FootnoteId",
-            table: "IndicatorFootnote");
+            table: "IndicatorFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_SubjectFootnote_Footnote_FootnoteId",
-            table: "SubjectFootnote");
+            table: "SubjectFootnote"
+        );
 
         // Recreate the same foreign keys but this time with a cascade delete action
 
@@ -53,7 +59,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FilterGroupFootnote_Footnote_FootnoteId",
@@ -61,7 +68,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FilterItemFootnote_Footnote_FootnoteId",
@@ -69,7 +77,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_IndicatorFootnote_Footnote_FootnoteId",
@@ -77,7 +86,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_SubjectFootnote_Footnote_FootnoteId",
@@ -85,7 +95,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -96,27 +107,33 @@ public partial class EES167_Footnotes_TidyUp : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_FilterFootnote_Footnote_FootnoteId",
-            table: "FilterFootnote");
+            table: "FilterFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_FilterGroupFootnote_Footnote_FootnoteId",
-            table: "FilterGroupFootnote");
+            table: "FilterGroupFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_FilterItemFootnote_Footnote_FootnoteId",
-            table: "FilterItemFootnote");
+            table: "FilterItemFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_IndicatorFootnote_Footnote_FootnoteId",
-            table: "IndicatorFootnote");
+            table: "IndicatorFootnote"
+        );
 
         migrationBuilder.DropForeignKey(
             name: "FK_SubjectFootnote_Footnote_FootnoteId",
-            table: "SubjectFootnote");
+            table: "SubjectFootnote"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FilterFootnote_Footnote_FootnoteId",
@@ -124,7 +141,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FilterGroupFootnote_Footnote_FootnoteId",
@@ -132,7 +150,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FilterItemFootnote_Footnote_FootnoteId",
@@ -140,7 +159,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_IndicatorFootnote_Footnote_FootnoteId",
@@ -148,7 +168,8 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_SubjectFootnote_Footnote_FootnoteId",
@@ -156,6 +177,7 @@ public partial class EES167_Footnotes_TidyUp : Migration
             column: "FootnoteId",
             principalTable: "Footnote",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
     }
 }

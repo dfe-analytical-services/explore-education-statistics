@@ -26,10 +26,10 @@ public abstract class PublicationsSitemapControllerTests
                         new PublicationSitemapReleaseDto
                         {
                             Slug = "test-release",
-                            LastModified = DateTime.Parse("2024-01-03T10:14:23.00Z")
-                        }
-                    ]
-                }
+                            LastModified = DateTime.Parse("2024-01-03T10:14:23.00Z"),
+                        },
+                    ],
+                },
             ];
             _publicationsSitemapService.WhereHasSitemapItems(sitemapItems);
 
@@ -44,5 +44,6 @@ public abstract class PublicationsSitemapControllerTests
         }
     }
 
-    private PublicationsSitemapController BuildController() => new(_publicationsSitemapService.Build());
+    private PublicationsSitemapController BuildController() =>
+        new(_publicationsSitemapService.Build());
 }

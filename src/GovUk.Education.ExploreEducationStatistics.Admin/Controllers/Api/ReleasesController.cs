@@ -14,23 +14,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 public class ReleasesController(IReleaseService releaseService) : ControllerBase
 {
     [HttpPost("releases")]
-    public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
+    public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(
+        ReleaseCreateRequest request
+    )
     {
-        return await releaseService
-            .CreateRelease(request)
-            .HandleFailuresOrOk();
+        return await releaseService.CreateRelease(request).HandleFailuresOrOk();
     }
 
     [HttpPatch("releases/{releaseId:guid}")]
-    public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateRequest request,
+    public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(
+        ReleaseUpdateRequest request,
         Guid releaseId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await releaseService
             .UpdateRelease(
-                releaseId: releaseId, 
+                releaseId: releaseId,
                 request: request,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 }

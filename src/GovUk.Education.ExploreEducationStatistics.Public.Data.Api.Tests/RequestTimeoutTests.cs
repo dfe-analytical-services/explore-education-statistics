@@ -63,7 +63,8 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
     }
 
     [ApiController]
-    private class TestController(IOptions<RequestTimeoutOptions> requestTimeoutOptions) : ControllerBase
+    private class TestController(IOptions<RequestTimeoutOptions> requestTimeoutOptions)
+        : ControllerBase
     {
         [HttpGet(nameof(TestGet))]
         public async Task<ActionResult> TestGet(CancellationToken _)
@@ -109,15 +110,24 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
             .WithWebHostBuilder(builder =>
             {
                 builder.WithAdditionalControllers(typeof(TestController));
-                builder.ConfigureAppConfiguration((_, config) =>
-                    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        { $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}", "100" }
-                    }));
+                builder.ConfigureAppConfiguration(
+                    (_, config) =>
+                        config.AddInMemoryCollection(
+                            new Dictionary<string, string?>
+                            {
+                                {
+                                    $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}",
+                                    "100"
+                                },
+                            }
+                        )
+                );
             })
             .ConfigureServices(s =>
             {
-                s.Configure<ApiVersioningOptions>(options => options.AssumeDefaultVersionWhenUnspecified = true);
+                s.Configure<ApiVersioningOptions>(options =>
+                    options.AssumeDefaultVersionWhenUnspecified = true
+                );
             });
     }
 }

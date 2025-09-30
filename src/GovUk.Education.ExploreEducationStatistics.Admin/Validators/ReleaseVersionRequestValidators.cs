@@ -10,7 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
 public static class ReleaseVersionUpdateRequestValidator
 {
-    public static Either<ActionResult, Unit> Validate(ReleaseVersionUpdateRequest releaseVersionUpdateRequest)
+    public static Either<ActionResult, Unit> Validate(
+        ReleaseVersionUpdateRequest releaseVersionUpdateRequest
+    )
     {
         if (releaseVersionUpdateRequest.Type == ReleaseType.ExperimentalStatistics)
         {

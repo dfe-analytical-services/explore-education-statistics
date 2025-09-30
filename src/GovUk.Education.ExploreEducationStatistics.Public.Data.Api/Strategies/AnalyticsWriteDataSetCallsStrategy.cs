@@ -7,20 +7,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 public class AnalyticsWriteDataSetCallsStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
     ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetCallRequest> workflow
-    ) : IAnalyticsWriteStrategy
+) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public-api", "data-sets"];
-    
-    private readonly IWorkflowActor<CaptureDataSetCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-        
+
+    private readonly IWorkflowActor<CaptureDataSetCallRequest> _workflowActor = new WorkflowActor(
+        analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths)
+    );
+
     public Type RequestType => typeof(CaptureDataSetCallRequest);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureDataSetCallRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type {nameof(CaptureDataSetCallRequest)}. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException(
+                $"Request must be of type {nameof(CaptureDataSetCallRequest)}. It is {request.GetType().FullName}",
+                nameof(request)
+            );
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }

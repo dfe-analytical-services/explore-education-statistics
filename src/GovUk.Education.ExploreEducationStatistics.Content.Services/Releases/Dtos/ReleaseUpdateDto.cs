@@ -9,9 +9,5 @@ public record ReleaseUpdateDto
     public required string Summary { get; init; }
 
     public static ReleaseUpdateDto FromUpdate(Update update) =>
-        new()
-        {
-            Date = update.On,
-            Summary = update.Reason
-        };
+        new() { Date = update.On, Summary = update.Reason };
 }

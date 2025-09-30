@@ -12,7 +12,8 @@ public class NotifyChangeFunction(
     IFileStorageService fileStorageService,
     IQueueService queueService,
     IReleasePublishingStatusService releasePublishingStatusService,
-    IValidationService validationService)
+    IValidationService validationService
+)
 {
     /// <summary>
     /// Azure function which validates that a release version is in a state to be published.
@@ -28,11 +29,14 @@ public class NotifyChangeFunction(
     [Function("NotifyChange")]
     public async Task NotifyChange(
         [QueueTrigger(NotifyChangeQueue)] NotifyChangeMessage message,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
-        logger.LogInformation("{FunctionName} triggered: {Message}",
+        logger.LogInformation(
+            "{FunctionName} triggered: {Message}",
             context.FunctionDefinition.Name,
-            message);
+            message
+        );
         var lease = await fileStorageService.AcquireLease(message.ReleaseVersionId.ToString());
         try
         {
@@ -45,20 +49,33 @@ public class NotifyChangeFunction(
                     {
                         if (message.Immediate)
                         {
-                            var releasePublishingKey = await CreateReleaseStatus(message,
-                                ReleasePublishingStatusStates.ImmediateReleaseStartedState);
-                            await queueService.QueuePublishReleaseFilesMessages(new[] { releasePublishingKey });
-                            await queueService.QueuePublishReleaseContentMessage(releasePublishingKey);
+                            var releasePublishingKey = await CreateReleaseStatus(
+                                message,
+                                ReleasePublishingStatusStates.ImmediateReleaseStartedState
+                            );
+                            await queueService.QueuePublishReleaseFilesMessages(
+                                new[] { releasePublishingKey }
+                            );
+                            await queueService.QueuePublishReleaseContentMessage(
+                                releasePublishingKey
+                            );
                         }
                         else
                         {
                             // Create a Release Status entry here for the midnight job to pick up.
-                            await CreateReleaseStatus(message, ReleasePublishingStatusStates.ScheduledState);
+                            await CreateReleaseStatus(
+                                message,
+                                ReleasePublishingStatusStates.ScheduledState
+                            );
                         }
                     })
-                    .OnFailureDo(async logMessages => await CreateReleaseStatus(message,
-                        ReleasePublishingStatusStates.InvalidState,
-                        logMessages));
+                    .OnFailureDo(async logMessages =>
+                        await CreateReleaseStatus(
+                            message,
+                            ReleasePublishingStatusStates.InvalidState,
+                            logMessages
+                        )
+                    );
             }
         }
         finally
@@ -72,17 +89,15 @@ public class NotifyChangeFunction(
     private async Task<ReleasePublishingKey> CreateReleaseStatus(
         NotifyChangeMessage message,
         ReleasePublishingStatusState state,
-        IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
+        IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null
+    )
     {
         var key = new ReleasePublishingKey(
             message.ReleasePublishingKey.ReleaseVersionId,
-            message.ReleasePublishingKey.ReleaseStatusId);
+            message.ReleasePublishingKey.ReleaseStatusId
+        );
 
-        await releasePublishingStatusService.Create(
-            key,
-            state,
-            message.Immediate,
-            logMessages);
+        await releasePublishingStatusService.Create(key, state, message.Immediate, logMessages);
 
         return key;
     }
@@ -93,12 +108,15 @@ public class NotifyChangeFunction(
         // If so, mark it as superseded
         var scheduled = await releasePublishingStatusService.GetReleasesWithOverallStages(
             message.ReleaseVersionId,
-            [ReleasePublishingStatusOverallStage.Scheduled]);
+            [ReleasePublishingStatusOverallStage.Scheduled]
+        );
 
         foreach (var status in scheduled)
         {
-            await releasePublishingStatusService.UpdateState(status,
-                ReleasePublishingStatusStates.SupersededState);
+            await releasePublishingStatusService.UpdateState(
+                status,
+                ReleasePublishingStatusStates.SupersededState
+            );
         }
     }
 }

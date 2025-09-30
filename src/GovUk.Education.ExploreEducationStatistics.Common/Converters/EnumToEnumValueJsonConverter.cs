@@ -5,7 +5,8 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 
-public class EnumToEnumValueJsonConverter<TEnum> : JsonConverter<TEnum> where TEnum : Enum
+public class EnumToEnumValueJsonConverter<TEnum> : JsonConverter<TEnum>
+    where TEnum : Enum
 {
     public override void WriteJson(JsonWriter writer, TEnum? value, JsonSerializer serializer)
     {
@@ -20,7 +21,8 @@ public class EnumToEnumValueJsonConverter<TEnum> : JsonConverter<TEnum> where TE
         Type objectType,
         TEnum? existingValue,
         bool hasExistingValue,
-        JsonSerializer serializer)
+        JsonSerializer serializer
+    )
     {
         return EnumUtil.GetFromEnumValue<TEnum>(reader.Value?.ToString() ?? string.Empty);
     }

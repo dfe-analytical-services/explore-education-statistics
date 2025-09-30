@@ -11,59 +11,67 @@ public class SearchableDocumentCreatorMockBuilder
     public ISearchableDocumentCreator Build()
     {
         _mock
-            .Setup(
-                m =>
-                    m.CreatePublicationLatestReleaseSearchableDocument(
-                        It.IsAny<CreatePublicationLatestReleaseSearchableDocumentRequest>(),
-                        It.IsAny<CancellationToken>()))
+            .Setup(m =>
+                m.CreatePublicationLatestReleaseSearchableDocument(
+                    It.IsAny<CreatePublicationLatestReleaseSearchableDocumentRequest>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(
-                (CreatePublicationLatestReleaseSearchableDocumentRequest req, CancellationToken _) =>
-                    _response ??
-                    new CreatePublicationLatestReleaseSearchableDocumentResponse
+                (
+                    CreatePublicationLatestReleaseSearchableDocumentRequest req,
+                    CancellationToken _
+                ) =>
+                    _response
+                    ?? new CreatePublicationLatestReleaseSearchableDocumentResponse
                     {
                         PublicationSlug = req.PublicationSlug,
                         ReleaseId = Guid.NewGuid(),
                         ReleaseSlug = "release-slug",
                         ReleaseVersionId = Guid.NewGuid(),
-                        BlobName = "blob name"
-                    });
+                        BlobName = "blob name",
+                    }
+            );
 
         return _mock.Object;
     }
 
     public SearchableDocumentCreatorMockBuilder WhereResponseIs(
-        CreatePublicationLatestReleaseSearchableDocumentResponse response)
+        CreatePublicationLatestReleaseSearchableDocumentResponse response
+    )
     {
         _response = response;
         return this;
     }
 
-public Asserter Assert => new(_mock);
+    public Asserter Assert => new(_mock);
 
     public class Asserter(Mock<ISearchableDocumentCreator> mock)
     {
         public void CreateSearchableDocumentCalledFor(string expectedPublicationSlug)
         {
-            mock
-                .Verify(
-                    m =>
-                        m.CreatePublicationLatestReleaseSearchableDocument(
-                            It.Is<CreatePublicationLatestReleaseSearchableDocumentRequest>(
-                                req => 
-                                    req.PublicationSlug == expectedPublicationSlug),
-                    It.IsAny<CancellationToken>()),
-                    Times.Once);
+            mock.Verify(
+                m =>
+                    m.CreatePublicationLatestReleaseSearchableDocument(
+                        It.Is<CreatePublicationLatestReleaseSearchableDocumentRequest>(req =>
+                            req.PublicationSlug == expectedPublicationSlug
+                        ),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
         public void CreateSearchableDocumentNotCalled()
         {
-            mock
-                .Verify(
-                    m =>
-                        m.CreatePublicationLatestReleaseSearchableDocument(
-                            It.IsAny<CreatePublicationLatestReleaseSearchableDocumentRequest>(),
-                            It.IsAny<CancellationToken>()),
-                    Times.Never);
+            mock.Verify(
+                m =>
+                    m.CreatePublicationLatestReleaseSearchableDocument(
+                        It.IsAny<CreatePublicationLatestReleaseSearchableDocumentRequest>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
         }
     }
 }

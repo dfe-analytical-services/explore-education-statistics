@@ -5,7 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class TableHeadersExtensions
 {
-    public static List<TableHeader> FilterByType(this IEnumerable<TableHeader> tableHeaders, TableHeaderType type)
+    public static List<TableHeader> FilterByType(
+        this IEnumerable<TableHeader> tableHeaders,
+        TableHeaderType type
+    )
     {
         return tableHeaders.Where(header => header.Type == type).ToList();
     }

@@ -61,7 +61,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     private readonly AppInsightsOptions _appInsightsOptions = configuration
         .GetSection(AppInsightsOptions.Section)
         .Get<AppInsightsOptions>()!;
-    
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -111,12 +111,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddRequestTimeouts(options =>
         {
-            options.DefaultPolicy =
-                new RequestTimeoutPolicy
-                {
-                    Timeout = TimeSpan.FromMilliseconds(_requestTimeoutOptions.TimeoutMilliseconds),
-                    TimeoutStatusCode = (int)HttpStatusCode.GatewayTimeout
-                };
+            options.DefaultPolicy = new RequestTimeoutPolicy
+            {
+                Timeout = TimeSpan.FromMilliseconds(_requestTimeoutOptions.TimeoutMilliseconds),
+                TimeoutStatusCode = (int)HttpStatusCode.GatewayTimeout,
+            };
         });
 
         services
@@ -134,7 +133,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 // Stop empty query string parameters being converted to null
                 options.ModelMetadataDetailsProviders.Add(new EmptyStringMetadataDetailsProvider());
                 // Adds correct camelCased paths for model errors
-                options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+                options.ModelMetadataDetailsProviders.Add(
+                    new SystemTextJsonValidationMetadataProvider()
+                );
             })
             .ConfigureApiBehaviorOptions(options =>
             {
@@ -143,8 +144,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             })
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
+                options.JsonSerializerOptions.DefaultIgnoreCondition =
+                    JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.UnmappedMemberHandling =
+                    JsonUnmappedMemberHandling.Disallow;
                 // This allows comments to be left in JSON bodies so users can annotate
                 // their data set queries for debugging - do not remove!
                 options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
@@ -190,9 +193,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Configure Dapper to match CSV columns with underscores
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-        services.AddScoped<IDuckDbConnection>(_ => _miniProfilerOptions.Enabled
-            ? new ProfiledDuckDbConnection()
-            : new DuckDbConnection()
+        services.AddScoped<IDuckDbConnection>(_ =>
+            _miniProfilerOptions.Enabled ? new ProfiledDuckDbConnection() : new DuckDbConnection()
         );
 
         // Caching and compression
@@ -205,30 +207,36 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Options - only need to add ones that will be used in services
 
-        services.AddOptions<AppOptions>()
+        services
+            .AddOptions<AppOptions>()
             .Bind(configuration.GetRequiredSection(AppOptions.Section));
-        services.AddOptions<ContentApiOptions>()
+        services
+            .AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
-        services.AddOptions<DataFilesOptions>()
+        services
+            .AddOptions<DataFilesOptions>()
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
-        services.AddOptions<RequestTimeoutOptions>()
+        services
+            .AddOptions<RequestTimeoutOptions>()
             .Bind(configuration.GetRequiredSection(RequestTimeoutOptions.Section));
-        services.AddOptions<AnalyticsOptions>()
+        services
+            .AddOptions<AnalyticsOptions>()
             .Bind(configuration.GetRequiredSection(AnalyticsOptions.Section));
 
         // Services
 
         services.AddFluentValidation();
-        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator)
-            .Assembly); // Adds *all* validators from Public.Data.Requests
+        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator).Assembly); // Adds *all* validators from Public.Data.Requests
         services.AddFluentValidationRulesToSwagger();
 
-        services.AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
-        {
-            var options = provider.GetRequiredService<IOptions<ContentApiOptions>>();
-            httpClient.BaseAddress = new Uri(options.Value.Url);
-            httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
-        });
+        services.AddHttpClient<IContentApiClient, ContentApiClient>(
+            (provider, httpClient) =>
+            {
+                var options = provider.GetRequiredService<IOptions<ContentApiOptions>>();
+                httpClient.BaseAddress = new Uri(options.Value.Url);
+                httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
+            }
+        );
 
         services.AddSecurity();
 
@@ -280,14 +288,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // CORS
 
-        app.UseCors(options => options
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "https://localhost:3000",
-                "https://localhost:3001")
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+        app.UseCors(options =>
+            options
+                .WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "https://localhost:3000",
+                    "https://localhost:3001"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+        );
 
         // Routing / endpoints
 
@@ -328,7 +339,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 {
                     options.SwaggerEndpoint(
                         url: $"{_appOptions.Url}/swagger/v{description.GroupName}/openapi.json",
-                        name: $"v{description.GroupName}");
+                        name: $"v{description.GroupName}"
+                    );
                 }
             });
         }
@@ -336,8 +348,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
     private static void UpdateDatabase(IApplicationBuilder app, IHostEnvironment env)
     {
-        using var serviceScope = app.ApplicationServices
-            .GetRequiredService<IServiceScopeFactory>()
+        using var serviceScope = app
+            .ApplicationServices.GetRequiredService<IServiceScopeFactory>()
             .CreateScope();
 
         using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
@@ -353,8 +365,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
     private static void ApplyCustomMigrations(IApplicationBuilder app)
     {
-        using var serviceScope = app.ApplicationServices
-            .GetRequiredService<IServiceScopeFactory>()
+        using var serviceScope = app
+            .ApplicationServices.GetRequiredService<IServiceScopeFactory>()
             .CreateScope();
 
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();

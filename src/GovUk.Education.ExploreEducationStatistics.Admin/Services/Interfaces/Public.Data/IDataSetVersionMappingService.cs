@@ -10,23 +10,32 @@ public interface IDataSetVersionMappingService
 {
     Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
         Guid nextDataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
+    Task<
+        Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>
+    > ApplyBatchLocationMappingUpdates(
         Guid nextDataSetVersionId,
         BatchLocationMappingUpdatesRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
         Guid nextDataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>> ApplyBatchFilterOptionMappingUpdates(
+    Task<
+        Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>
+    > ApplyBatchFilterOptionMappingUpdates(
         Guid nextDataSetVersionId,
         BatchFilterOptionMappingUpdatesRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<MappingStatusViewModel> GetMappingStatus(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

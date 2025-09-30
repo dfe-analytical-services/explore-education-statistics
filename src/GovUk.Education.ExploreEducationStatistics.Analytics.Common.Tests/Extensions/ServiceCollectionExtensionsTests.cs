@@ -20,10 +20,9 @@ public class ServiceCollectionExtensionsTests
         // Act
         serviceCollection = serviceCollection
             .AddAnalyticsCommon(configuration)
-                .WhenEnabled
-                    .AddWriteStrategy<TestAnalyticsWriter1>()
-                    .AddWriteStrategy<TestAnalyticsWriter2>()
-                    .Services;
+            .WhenEnabled.AddWriteStrategy<TestAnalyticsWriter1>()
+            .AddWriteStrategy<TestAnalyticsWriter2>()
+            .Services;
 
         // Assert
         var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -45,10 +44,9 @@ public class ServiceCollectionExtensionsTests
         // Act
         serviceCollection = serviceCollection
             .AddAnalyticsCommon(configuration)
-                .WhenEnabled
-                    .AddWriteStrategy<TestAnalyticsWriter1>()
-                    .AddWriteStrategy<TestAnalyticsWriter2>()
-                    .Services;
+            .WhenEnabled.AddWriteStrategy<TestAnalyticsWriter1>()
+            .AddWriteStrategy<TestAnalyticsWriter2>()
+            .Services;
 
         // Assert
         var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -59,9 +57,9 @@ public class ServiceCollectionExtensionsTests
 
     public static readonly TheoryData<string, bool> Configs = new()
     {
-        { AnalyticsEnabledConfig, true }, 
-        { AnalyticsDisabledConfig, false }, 
-        { BlankConfig, false }
+        { AnalyticsEnabledConfig, true },
+        { AnalyticsDisabledConfig, false },
+        { BlankConfig, false },
     };
 
     private IConfiguration BuildConfiguration(string json) =>
@@ -73,7 +71,8 @@ public class ServiceCollectionExtensionsTests
     [MemberData(nameof(Configs))]
     public void GivenConfig_WhenAddAnalyticsCalled_ThenRegistersAndBindsAnalyticsOptions(
         string json,
-        bool isAnalyticsEnabled)
+        bool isAnalyticsEnabled
+    )
     {
         // Arrange
         var configuration = BuildConfiguration(json);
@@ -82,9 +81,7 @@ public class ServiceCollectionExtensionsTests
         var serviceProvider = new ServiceCollection()
             .AddOptions()
             .AddAnalyticsCommon(configuration)
-            .WhenEnabled
-            .Services
-            .BuildServiceProvider();
+            .WhenEnabled.Services.BuildServiceProvider();
 
         // Assert
         var actual = serviceProvider.GetRequiredService<IOptions<AnalyticsOptions>>();
@@ -95,7 +92,8 @@ public class ServiceCollectionExtensionsTests
     [MemberData(nameof(Configs))]
     public void GivenConfig_WhenAddAnalyticsCalled_ThenAddsAnalyticsCommonSpecifyingWhetherAnalyticsIsEnabled(
         string json,
-        bool isAnalyticsEnabled)
+        bool isAnalyticsEnabled
+    )
     {
         // Arrange
         var configuration = BuildConfiguration(json);
@@ -104,15 +102,14 @@ public class ServiceCollectionExtensionsTests
         var serviceProvider = new ServiceCollection()
             .AddOptions()
             .AddAnalyticsCommon(configuration)
-            .WhenEnabled
-            .Services
-            .BuildServiceProvider();
-
+            .WhenEnabled.Services.BuildServiceProvider();
 
         // Assert
         // If Analytics is enabled, then AddAnalyticsCommon will have registered the real AnalyticsManager. Otherwise it registers the NoOp version.
         var actualAnalyticsManager = serviceProvider.GetRequiredService<IAnalyticsManager>();
-        var expectedAnalyticsManager = isAnalyticsEnabled ? typeof(AnalyticsManager) : typeof(NoOpAnalyticsManager);
+        var expectedAnalyticsManager = isAnalyticsEnabled
+            ? typeof(AnalyticsManager)
+            : typeof(NoOpAnalyticsManager);
         Assert.IsType(expectedAnalyticsManager, actualAnalyticsManager);
     }
 
@@ -133,26 +130,25 @@ public class ServiceCollectionExtensionsTests
     }
 
     private const string AnalyticsEnabledConfig = """
-                                                  {
-                                                      "Analytics":
-                                                      {
-                                                          "Enabled": "true"
-                                                      }
-                                                  }
-                                                  """;
+        {
+            "Analytics":
+            {
+                "Enabled": "true"
+            }
+        }
+        """;
 
     private const string AnalyticsDisabledConfig = """
-                                                   {
-                                                       "Analytics":
-                                                       {
-                                                           "Enabled": "false"
-                                                       }
-                                                   }
-                                                   """;
+        {
+            "Analytics":
+            {
+                "Enabled": "false"
+            }
+        }
+        """;
 
     private const string BlankConfig = """
-                                       {
-                                       }
-                                       """;
-
+        {
+        }
+        """;
 }

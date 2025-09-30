@@ -15,24 +15,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 
 public class ParquetDataRepository(
     IDuckDbConnection duckDbConnection,
-    IDataSetVersionPathResolver dataSetVersionPathResolver)
-    : IParquetDataRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : IParquetDataRepository
 {
     private const string DataIdsAlias = "data_ids";
 
     public async Task<long> CountRows(
         DataSetVersion dataSetVersion,
         IInterpolatedSql where,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        using var _ = MiniProfiler.Current
-            .Step($"{nameof(ParquetDataRepository)}.{nameof(CountRows)}");
+        using var _ = MiniProfiler.Current.Step(
+            $"{nameof(ParquetDataRepository)}.{nameof(CountRows)}"
+        );
 
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT count(*)
-             FROM '{dataSetVersionPathResolver.DataPath(dataSetVersion):raw}'
-             """
+            SELECT count(*)
+            FROM '{dataSetVersionPathResolver.DataPath(dataSetVersion):raw}'
+            """
         );
 
         command.AppendIf(!where.IsEmpty(), $"\nWHERE {where}");
@@ -47,15 +49,16 @@ public class ParquetDataRepository(
         IEnumerable<Sort>? sorts = null,
         int page = 1,
         int pageSize = 1000,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        using var _ = MiniProfiler.Current
-            .Step($"{nameof(ParquetDataRepository)}.{nameof(ListRows)}");
+        using var _ = MiniProfiler.Current.Step(
+            $"{nameof(ParquetDataRepository)}.{nameof(ListRows)}"
+        );
 
         var dataPath = dataSetVersionPathResolver.DataPath(dataSetVersion);
 
-        var whereFragment = new DuckDbSqlBuilder()
-            .AppendIf(!where.IsEmpty(), $"WHERE {where}");
+        var whereFragment = new DuckDbSqlBuilder().AppendIf(!where.IsEmpty(), $"WHERE {where}");
 
         var orderings = (sorts ?? [])
             .Select(s => $"{s.Field} {s.Direction.ToString().ToUpper()}")
@@ -76,19 +79,19 @@ public class ParquetDataRepository(
         // the performance penalty of using offset pagination having to scan through many rows.
         var command = duckDbConnection.SqlBuilder(
             $"""
-             WITH {DataIdsAlias:raw} AS (
-                SELECT {DataTable.Ref().Id:raw}
-                FROM '{dataPath:raw}' AS {DataTable.TableName:raw}
-                {whereFragment}
-                {orderByFragment}
-                LIMIT {pageSize}
-                OFFSET {pageOffset}
-             )
-             SELECT {columns.Select(DataTable.Ref().Col).JoinToString(",\n"):raw}
-             FROM '{dataPath:raw}' AS {DataTable.TableName:raw}
-             JOIN {DataIdsAlias:raw} ON {DataIdsAlias:raw}.id = {DataTable.Ref().Id:raw}
-             {orderByFragment}
-             """
+            WITH {DataIdsAlias:raw} AS (
+               SELECT {DataTable.Ref().Id:raw}
+               FROM '{dataPath:raw}' AS {DataTable.TableName:raw}
+               {whereFragment}
+               {orderByFragment}
+               LIMIT {pageSize}
+               OFFSET {pageOffset}
+            )
+            SELECT {columns.Select(DataTable.Ref().Col).JoinToString(",\n"):raw}
+            FROM '{dataPath:raw}' AS {DataTable.TableName:raw}
+            JOIN {DataIdsAlias:raw} ON {DataIdsAlias:raw}.id = {DataTable.Ref().Id:raw}
+            {orderByFragment}
+            """
         );
 
         return (await command.QueryAsync(cancellationToken: cancellationToken))
@@ -98,15 +101,15 @@ public class ParquetDataRepository(
 
     public async Task<ISet<string>> ListColumns(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var command = duckDbConnection.SqlBuilder(
-            $"DESCRIBE SELECT * FROM '{dataSetVersionPathResolver.DataPath(dataSetVersion):raw}' LIMIT 1");
+            $"DESCRIBE SELECT * FROM '{dataSetVersionPathResolver.DataPath(dataSetVersion):raw}' LIMIT 1"
+        );
 
         var columns = await command.QueryAsync<ParquetColumn>(cancellationToken: cancellationToken);
 
-        return columns
-            .Select(col => col.ColumnName)
-            .ToHashSet();
+        return columns.Select(col => col.ColumnName).ToHashSet();
     }
 }

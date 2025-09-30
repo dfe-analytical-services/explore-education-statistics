@@ -26,8 +26,7 @@ public class DataFixtureTests
         var generator = fixture.Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         Assert.Equal("Lenore", items[0].FirstName);
@@ -48,8 +47,7 @@ public class DataFixtureTests
         var generator = fixture.Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, "Test person"))
+            .ForInstance(s => s.Set(p => p.FirstName, "Test person"))
             .GenerateRandomList(10);
 
         Assert.Equal(7, items.Count);
@@ -69,8 +67,7 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         Assert.Equal("Lenore", items[0].FirstName);
@@ -80,8 +77,7 @@ public class DataFixtureTests
         fixture.SetSeed<Person>(100);
 
         items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         // Set the seed manually to some number. It should
@@ -98,8 +94,7 @@ public class DataFixtureTests
         var generator = fixture.Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.Index}"))
+            .ForInstance(s => s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.Index}"))
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -119,8 +114,7 @@ public class DataFixtureTests
         var generator = new Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.Index}"))
+            .ForInstance(s => s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.Index}"))
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -140,8 +134,9 @@ public class DataFixtureTests
         var generator = new Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -161,8 +156,9 @@ public class DataFixtureTests
         var generator = new Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -183,8 +179,7 @@ public class DataFixtureTests
         var generator = fixture.Generator<Person>();
 
         var items = generator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => $"Jane {faker.IndexFaker}"))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => $"Jane {faker.IndexFaker}"))
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -205,8 +200,7 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         Assert.Equal("Lenore", items[0].FirstName);
@@ -215,8 +209,7 @@ public class DataFixtureTests
 
         items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         // Multiple generator instances should produce
@@ -233,8 +226,7 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, "Test person 1"))
+            .ForInstance(s => s.Set(p => p.FirstName, "Test person 1"))
             .GenerateRandomList(10);
 
         Assert.Equal(7, items.Count);
@@ -242,8 +234,7 @@ public class DataFixtureTests
 
         items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, "Test person 2"))
+            .ForInstance(s => s.Set(p => p.FirstName, "Test person 2"))
             .GenerateRandomList(10);
 
         Assert.Equal(8, items.Count);
@@ -258,8 +249,7 @@ public class DataFixtureTests
         var peopleGenerator = fixture.Generator<Person>();
 
         var people = peopleGenerator
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         Assert.Equal("Lenore", people[0].FirstName);
@@ -269,8 +259,7 @@ public class DataFixtureTests
         var companyGenerator = fixture.Generator<Company>();
 
         var companies = companyGenerator
-            .ForInstance(s => s
-                .Set(p => p.Name, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.Name, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         // The companyGenerator's faker instance is providing a different set of deterministic names
@@ -289,8 +278,7 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         Assert.Equal("Lenore", items[0].FirstName);
@@ -300,8 +288,7 @@ public class DataFixtureTests
         items = fixture
             .SetSeed<Person>(100)
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .ForInstance(s => s.Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
         // Set the seed manually to some number. It should
@@ -318,9 +305,10 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => $"Jane {faker.IndexFaker}")
-                .Set(p => p.LastName, faker => $"Doe {faker.IndexFaker}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, faker => $"Jane {faker.IndexFaker}")
+                    .Set(p => p.LastName, faker => $"Doe {faker.IndexFaker}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -333,9 +321,10 @@ public class DataFixtureTests
 
         items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, faker => $"Jane {faker.IndexFaker}")
-                .Set(p => p.LastName, faker => $"Doe {faker.IndexFaker}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, faker => $"Jane {faker.IndexFaker}")
+                    .Set(p => p.LastName, faker => $"Doe {faker.IndexFaker}")
+            )
             .GenerateList(3);
 
         // IndexFaker does not increment when generators
@@ -356,9 +345,10 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
-                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
+                    .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", items[0].FirstName);
@@ -371,9 +361,10 @@ public class DataFixtureTests
 
         items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
-                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
+                    .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}")
+            )
             .GenerateList(3);
 
         // FixtureTypeIndex increments when generators
@@ -393,9 +384,10 @@ public class DataFixtureTests
         // Instantiate generators without a shared `DataFixture` instance,
         // meaning each generator gets its own default instance.
         var persons = new Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
-                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureTypeIndex}")
+                    .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureTypeIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", persons[0].FirstName);
@@ -407,8 +399,9 @@ public class DataFixtureTests
         Assert.Equal("Doe 2", persons[2].LastName);
 
         var companies = new Generator<Company>()
-            .ForInstance(s => s
-                .Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureTypeIndex}"))
+            .ForInstance(s =>
+                s.Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureTypeIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Acme 0", companies[0].Name);
@@ -423,9 +416,10 @@ public class DataFixtureTests
 
         var persons = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}")
-                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}")
+                    .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", persons[0].FirstName);
@@ -438,8 +432,7 @@ public class DataFixtureTests
 
         var companies = fixture
             .Generator<Company>()
-            .ForInstance(s => s
-                .Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureIndex}"))
+            .ForInstance(s => s.Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureIndex}"))
             .GenerateList(3);
 
         // FixtureIndex increments when generators
@@ -455,9 +448,10 @@ public class DataFixtureTests
         // Instantiate generators without a shared `DataFixture` instance,
         // meaning each generator gets its own default instance.
         var persons = new Generator<Person>()
-            .ForInstance(s => s
-                .Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}")
-                .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureIndex}"))
+            .ForInstance(s =>
+                s.Set(p => p.FirstName, (_, _, context) => $"Jane {context.FixtureIndex}")
+                    .Set(p => p.LastName, (_, _, context) => $"Doe {context.FixtureIndex}")
+            )
             .GenerateList(3);
 
         Assert.Equal("Jane 0", persons[0].FirstName);
@@ -469,8 +463,7 @@ public class DataFixtureTests
         Assert.Equal("Doe 2", persons[2].LastName);
 
         var companies = new Generator<Company>()
-            .ForInstance(s => s
-                .Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureIndex}"))
+            .ForInstance(s => s.Set(c => c.Name, (_, _, context) => $"Acme {context.FixtureIndex}"))
             .GenerateList(3);
 
         // FixtureIndex increments when generators
@@ -487,9 +480,7 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .SetDefault(p => p.FirstName)
-                .SetDefault(p => p.LastName))
+            .ForInstance(s => s.SetDefault(p => p.FirstName).SetDefault(p => p.LastName))
             .GenerateList(3);
 
         Assert.Equal("Person 0 :: FirstName", items[0].FirstName);
@@ -502,9 +493,7 @@ public class DataFixtureTests
 
         items = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .SetDefault(p => p.FirstName)
-                .SetDefault(p => p.LastName))
+            .ForInstance(s => s.SetDefault(p => p.FirstName).SetDefault(p => p.LastName))
             .GenerateList(3);
 
         // The default string increments when generators
@@ -525,9 +514,7 @@ public class DataFixtureTests
 
         var items = fixture
             .Generator<Person>()
-            .ForRange(..3, s => s
-                .SetDefault(p => p.FirstName)
-                .SetDefault(p => p.LastName))
+            .ForRange(..3, s => s.SetDefault(p => p.FirstName).SetDefault(p => p.LastName))
             .GenerateList(3);
 
         Assert.Equal("Person 0 :: FirstName", items[0].FirstName);
@@ -540,9 +527,7 @@ public class DataFixtureTests
 
         items = fixture
             .Generator<Person>()
-            .ForRange(..3, s => s
-                .SetDefault(p => p.FirstName)
-                .SetDefault(p => p.LastName))
+            .ForRange(..3, s => s.SetDefault(p => p.FirstName).SetDefault(p => p.LastName))
             .GenerateList(3);
 
         // The default string increments when generators
@@ -563,9 +548,7 @@ public class DataFixtureTests
 
         var persons = fixture
             .Generator<Person>()
-            .ForInstance(s => s
-                .SetDefault(p => p.FirstName)
-                .SetDefault(p => p.LastName))
+            .ForInstance(s => s.SetDefault(p => p.FirstName).SetDefault(p => p.LastName))
             .GenerateList(3);
 
         Assert.Equal("Person 0 :: FirstName", persons[0].FirstName);
@@ -578,8 +561,7 @@ public class DataFixtureTests
 
         var companies = fixture
             .Generator<Company>()
-            .ForInstance(s => s
-                .SetDefault(c => c.Name))
+            .ForInstance(s => s.SetDefault(c => c.Name))
             .GenerateList(3);
 
         // The default string does not increment when
@@ -589,7 +571,6 @@ public class DataFixtureTests
         Assert.Equal("Company 2 :: Name", companies[2].Name);
     }
 
-
     [Fact]
     public void Generate_Multiple_ForRange_SetDefaults_DoesNotIncrementForGeneratorsOfOtherTypes()
     {
@@ -597,9 +578,7 @@ public class DataFixtureTests
 
         var persons = fixture
             .Generator<Person>()
-            .ForRange(..3, s => s
-                .SetDefault(p => p.FirstName)
-                .SetDefault(p => p.LastName))
+            .ForRange(..3, s => s.SetDefault(p => p.FirstName).SetDefault(p => p.LastName))
             .GenerateList(3);
 
         Assert.Equal("Person 0 :: FirstName", persons[0].FirstName);
@@ -612,8 +591,7 @@ public class DataFixtureTests
 
         var companies = fixture
             .Generator<Company>()
-            .ForRange(..3, s => s
-                .SetDefault(c => c.Name))
+            .ForRange(..3, s => s.SetDefault(c => c.Name))
             .GenerateList(3);
 
         // The default string does not increment when

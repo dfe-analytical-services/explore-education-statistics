@@ -16,10 +16,9 @@ public class GeographicLevelSchemaFilterTests
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new GeographicLevelSchemaFilter()],
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");
@@ -33,11 +32,14 @@ public class GeographicLevelSchemaFilterTests
         Assert.Equal("string", schema.Type);
         Assert.Equal(geographicLevels.Count, schema.Enum.Count);
 
-        Assert.All(schema.Enum, e =>
-        {
-            var enumString = Assert.IsType<OpenApiString>(e);
-            Assert.Contains(enumString.Value, geographicLevels);
-        });
+        Assert.All(
+            schema.Enum,
+            e =>
+            {
+                var enumString = Assert.IsType<OpenApiString>(e);
+                Assert.Contains(enumString.Value, geographicLevels);
+            }
+        );
     }
 
     private OpenApiSchema GenerateSchema()

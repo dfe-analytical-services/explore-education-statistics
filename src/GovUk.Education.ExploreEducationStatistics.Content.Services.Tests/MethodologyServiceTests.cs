@@ -39,8 +39,8 @@ public class MethodologyServiceTests
                     Status = Approved,
                     AlternativeSlug = "alternative-title",
                     AlternativeTitle = "Alternative title",
-                }
-            }
+                },
+            },
         };
 
         var publication = new Publication
@@ -51,28 +51,24 @@ public class MethodologyServiceTests
             LatestPublishedReleaseVersion = new ReleaseVersion
             {
                 Release = new Release
-                { 
+                {
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug"
-                }
+                    Slug = "latest-release-slug",
+                },
             },
             Methodologies = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Methodology = methodology,
-                    Owner = true
-                }
+                new() { Methodology = methodology, Owner = true },
             },
             Contact = new Contact
             {
                 TeamEmail = "team-email",
                 TeamName = "team-name",
                 ContactName = "contact-name",
-                ContactTelNo = "contact-tel-no"
-            }
+                ContactTelNo = "contact-tel-no",
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -80,7 +76,7 @@ public class MethodologyServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             await contentDbContext.Publications.AddAsync(publication);
-            await contentDbContext.Methodologies.AddAsync(methodology);              
+            await contentDbContext.Methodologies.AddAsync(methodology);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -90,7 +86,9 @@ public class MethodologyServiceTests
 
             var service = SetupMethodologyService(contentDbContext);
 
-            var result = (await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)).AssertRight();
+            var result = (
+                await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)
+            ).AssertRight();
 
             Assert.Equal(methodology.Versions[0].Id, result.Id);
             Assert.Equal(methodology.Versions[0].Published, result.Published);
@@ -103,7 +101,10 @@ public class MethodologyServiceTests
             Assert.Single(result.Publications);
             Assert.Equal(publication.Id, result.Publications[0].Id);
             Assert.Equal(publication.Slug, result.Publications[0].Slug);
-            Assert.Equal(publication.LatestPublishedReleaseVersion!.Release.Slug, result.Publications[0].LatestReleaseSlug);
+            Assert.Equal(
+                publication.LatestPublishedReleaseVersion!.Release.Slug,
+                result.Publications[0].LatestReleaseSlug
+            );
             Assert.Equal(publication.Title, result.Publications[0].Title);
             Assert.True(result.Publications[0].Owner);
             Assert.NotNull(result.Publications[0].Contact);
@@ -126,9 +127,9 @@ public class MethodologyServiceTests
                     Id = methodologyVersionId,
                     PublishingStrategy = Immediately,
                     Published = DateTime.UtcNow,
-                    Status = Approved
-                }
-            }
+                    Status = Approved,
+                },
+            },
         };
 
         // Publication has a published release and is visible
@@ -143,25 +144,21 @@ public class MethodologyServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug"
-                }
+                    Slug = "latest-release-slug",
+                },
             },
             LatestPublishedReleaseVersionId = Guid.NewGuid(),
             Methodologies = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Methodology = methodology,
-                    Owner = true
-                }
+                new() { Methodology = methodology, Owner = true },
             },
             Contact = new Contact
             {
                 TeamEmail = "team-email",
                 TeamName = "team-name",
                 ContactName = "contact-name",
-                ContactTelNo = "contact-tel-no"
-            }
+                ContactTelNo = "contact-tel-no",
+            },
         };
 
         // Publication has no published releases and is not visible
@@ -176,18 +173,14 @@ public class MethodologyServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug"
-                }
+                    Slug = "latest-release-slug",
+                },
             },
             LatestPublishedReleaseVersionId = null,
             Methodologies = new List<PublicationMethodology>
             {
-                new()
-                {
-                    Methodology = methodology,
-                    Owner = false
-                }
-            }
+                new() { Methodology = methodology, Owner = false },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -206,13 +199,17 @@ public class MethodologyServiceTests
 
             var service = SetupMethodologyService(contentDbContext);
 
-
-            var result = (await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)).AssertRight();
+            var result = (
+                await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)
+            ).AssertRight();
 
             Assert.Single(result.Publications);
             Assert.Equal(publicationA.Id, result.Publications[0].Id);
             Assert.Equal(publicationA.Slug, result.Publications[0].Slug);
-            Assert.Equal(publicationA.LatestPublishedReleaseVersion!.Release.Slug, result.Publications[0].LatestReleaseSlug);
+            Assert.Equal(
+                publicationA.LatestPublishedReleaseVersion!.Release.Slug,
+                result.Publications[0].LatestReleaseSlug
+            );
             Assert.Equal(publicationA.Title, result.Publications[0].Title);
         }
     }
@@ -239,20 +236,20 @@ public class MethodologyServiceTests
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 2,
-                                Heading = "Annex 3 heading"
+                                Heading = "Annex 3 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 0,
-                                Heading = "Annex 1 heading"
+                                Heading = "Annex 1 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 1,
-                                Heading = "Annex 2 heading"
-                            }
+                                Heading = "Annex 2 heading",
+                            },
                         },
                         Content = new List<ContentSection>
                         {
@@ -260,28 +257,28 @@ public class MethodologyServiceTests
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 2,
-                                Heading = "Section 3 heading"
+                                Heading = "Section 3 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 0,
-                                Heading = "Section 1 heading"
+                                Heading = "Section 1 heading",
                             },
                             new()
                             {
                                 Id = Guid.NewGuid(),
                                 Order = 1,
-                                Heading = "Section 2 heading"
-                            }
+                                Heading = "Section 2 heading",
+                            },
                         },
                     },
                     PublishingStrategy = Immediately,
                     Status = Approved,
                     AlternativeTitle = "Alternative title",
                     AlternativeSlug = "alternative-title",
-                }
-            }
+                },
+            },
         };
         var methodologyVersion = methodology.Versions[0];
 
@@ -299,22 +296,36 @@ public class MethodologyServiceTests
 
             var service = SetupMethodologyService(contentDbContext);
 
-            var result = (await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)).AssertRight();
+            var result = (
+                await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)
+            ).AssertRight();
 
             Assert.Equal(3, result.Annexes.Count);
             Assert.Equal(3, result.Content.Count);
 
-            var expectedAnnex1 = methodologyVersion.MethodologyContent.Annexes.Single(section => section.Order == 0);
-            var expectedAnnex2 = methodologyVersion.MethodologyContent.Annexes.Single(section => section.Order == 1);
-            var expectedAnnex3 = methodologyVersion.MethodologyContent.Annexes.Single(section => section.Order == 2);
+            var expectedAnnex1 = methodologyVersion.MethodologyContent.Annexes.Single(section =>
+                section.Order == 0
+            );
+            var expectedAnnex2 = methodologyVersion.MethodologyContent.Annexes.Single(section =>
+                section.Order == 1
+            );
+            var expectedAnnex3 = methodologyVersion.MethodologyContent.Annexes.Single(section =>
+                section.Order == 2
+            );
 
             AssertContentSectionAndViewModelEqual(expectedAnnex1, result.Annexes[0]);
             AssertContentSectionAndViewModelEqual(expectedAnnex2, result.Annexes[1]);
             AssertContentSectionAndViewModelEqual(expectedAnnex3, result.Annexes[2]);
 
-            var expectedContent1 = methodologyVersion.MethodologyContent.Content.Single(section => section.Order == 0);
-            var expectedContent2 = methodologyVersion.MethodologyContent.Content.Single(section => section.Order == 1);
-            var expectedContent3 = methodologyVersion.MethodologyContent.Content.Single(section => section.Order == 2);
+            var expectedContent1 = methodologyVersion.MethodologyContent.Content.Single(section =>
+                section.Order == 0
+            );
+            var expectedContent2 = methodologyVersion.MethodologyContent.Content.Single(section =>
+                section.Order == 1
+            );
+            var expectedContent3 = methodologyVersion.MethodologyContent.Content.Single(section =>
+                section.Order == 2
+            );
 
             AssertContentSectionAndViewModelEqual(expectedContent1, result.Content[0]);
             AssertContentSectionAndViewModelEqual(expectedContent2, result.Content[1]);
@@ -324,7 +335,8 @@ public class MethodologyServiceTests
 
     private static void AssertContentSectionAndViewModelEqual(
         ContentSection expected,
-        ContentSectionViewModel actual)
+        ContentSectionViewModel actual
+    )
     {
         Assert.Equal(expected.Id, actual.Id);
         Assert.Equal(expected.Heading, actual.Heading);
@@ -347,9 +359,9 @@ public class MethodologyServiceTests
                     Id = methodologyVersionId,
                     PublishingStrategy = Immediately,
                     Status = Approved,
-                    AlternativeTitle = "Alternative title"
-                }
-            }
+                    AlternativeTitle = "Alternative title",
+                },
+            },
         };
         var methodologyVersion = methodology.Versions[0];
 
@@ -357,21 +369,21 @@ public class MethodologyServiceTests
         {
             DisplayDate = DateTime.Today.AddDays(-2).ToUniversalTime(),
             Content = "Other note",
-            MethodologyVersion = methodologyVersion
+            MethodologyVersion = methodologyVersion,
         };
 
         var earliestNote = new MethodologyNote
         {
             DisplayDate = DateTime.Today.AddDays(-3).ToUniversalTime(),
             Content = "Earliest note",
-            MethodologyVersion = methodologyVersion
+            MethodologyVersion = methodologyVersion,
         };
 
         var latestNote = new MethodologyNote
         {
             DisplayDate = DateTime.Today.AddDays(-1).ToUniversalTime(),
             Content = "Latest note",
-            MethodologyVersion = methodologyVersion
+            MethodologyVersion = methodologyVersion,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -379,7 +391,11 @@ public class MethodologyServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             await contentDbContext.Methodologies.AddAsync(methodology);
-            await contentDbContext.MethodologyNotes.AddRangeAsync(otherNote, earliestNote, latestNote);
+            await contentDbContext.MethodologyNotes.AddRangeAsync(
+                otherNote,
+                earliestNote,
+                latestNote
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -389,8 +405,9 @@ public class MethodologyServiceTests
 
             var service = SetupMethodologyService(contentDbContext);
 
-            var result = (await service.GetLatestMethodologyBySlug(
-                methodology.Versions[0].Slug)).AssertRight();
+            var result = (
+                await service.GetLatestMethodologyBySlug(methodology.Versions[0].Slug)
+            ).AssertRight();
 
             Assert.Equal(3, result.Notes.Count);
 
@@ -402,7 +419,8 @@ public class MethodologyServiceTests
 
     private static void AssertMethodologyNoteAndViewModelEqual(
         MethodologyNote expected,
-        MethodologyNoteViewModel actual)
+        MethodologyNoteViewModel actual
+    )
     {
         Assert.Equal(expected.Id, actual.Id);
         Assert.Equal(expected.Content, actual.Content);
@@ -415,7 +433,7 @@ public class MethodologyServiceTests
         var methodology = new Methodology
         {
             OwningPublicationSlug = "methodology-title",
-            OwningPublicationTitle = "Methodology title"
+            OwningPublicationTitle = "Methodology title",
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -430,8 +448,9 @@ public class MethodologyServiceTests
         {
             var service = SetupMethodologyService(contentDbContext);
 
-            var result = await service
-                .GetLatestMethodologyBySlug(methodology.OwningPublicationSlug);
+            var result = await service.GetLatestMethodologyBySlug(
+                methodology.OwningPublicationSlug
+            );
 
             result.AssertNotFound();
         }
@@ -441,10 +460,7 @@ public class MethodologyServiceTests
     public async Task GetLatestMethodologyBySlug_SlugNotFound()
     {
         // Set up a methodology with a different slug to make sure it's not returned
-        var methodology = new Methodology
-        {
-            OwningPublicationTitle = "Methodology title",
-        };
+        var methodology = new Methodology { OwningPublicationTitle = "Methodology title" };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -454,14 +470,18 @@ public class MethodologyServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
 
         // Expect no call to get the latest published version since no methodology will be found
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyService(contentDbContext,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+            var service = SetupMethodologyService(
+                contentDbContext,
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
             var result = await service.GetLatestMethodologyBySlug("methodology-slug");
 
@@ -474,16 +494,9 @@ public class MethodologyServiceTests
     [Fact]
     public async Task GetSummariesTree()
     {
-        var publication = new Publication
-        {
-            Title = "Publication title"
-        };
+        var publication = new Publication { Title = "Publication title" };
 
-        var theme = new Theme
-        {
-            Title = "Theme title",
-            Publications = [publication]
-        };
+        var theme = new Theme { Title = "Theme title", Publications = [publication] };
 
         var methodologyVersion1Id = Guid.NewGuid();
         var methodologyVersion2Id = Guid.NewGuid();
@@ -498,10 +511,7 @@ public class MethodologyServiceTests
                 AlternativeTitle = "Methodology 1 v0 title",
                 AlternativeSlug = "methodology-1-slug",
                 Version = 0,
-                Methodology = new Methodology
-                {
-                    LatestPublishedVersionId = methodologyVersion1Id,
-                }
+                Methodology = new Methodology { LatestPublishedVersionId = methodologyVersion1Id },
             },
             new MethodologyVersion
             {
@@ -513,11 +523,9 @@ public class MethodologyServiceTests
                 AlternativeTitle = "Methodology 2 v0 title",
                 AlternativeSlug = "methodology-2-slug",
                 Version = 0,
-                Methodology = new Methodology
-                {
-                    LatestPublishedVersionId = methodologyVersion2Id,
-                }
-            });
+                Methodology = new Methodology { LatestPublishedVersionId = methodologyVersion2Id },
+            }
+        );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -527,15 +535,20 @@ public class MethodologyServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
 
-        methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
+        methodologyVersionRepository
+            .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
             .ReturnsAsync(latestVersions);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyService(contentDbContext,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+            var service = SetupMethodologyService(
+                contentDbContext,
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
             var result = await service.GetSummariesTree();
             VerifyAllMocks(methodologyVersionRepository);
@@ -575,7 +588,7 @@ public class MethodologyServiceTests
             Title = "Theme title",
             Slug = "theme-slug",
             Summary = "Theme summary",
-            Publications = []
+            Publications = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -586,12 +599,16 @@ public class MethodologyServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyService(contentDbContext,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+            var service = SetupMethodologyService(
+                contentDbContext,
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
             var result = await service.GetSummariesTree();
 
@@ -617,7 +634,7 @@ public class MethodologyServiceTests
             Title = "Theme title",
             Slug = "theme-slug",
             Summary = "Theme summary",
-            Publications = ListOf(publication)
+            Publications = ListOf(publication),
         };
 
         // This test sets up returning an empty list of the latest publicly accessible methodologies for a publication.
@@ -636,15 +653,20 @@ public class MethodologyServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(
+            MockBehavior.Strict
+        );
 
-        methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
+        methodologyVersionRepository
+            .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
             .ReturnsAsync(latestMethodologies);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyService(contentDbContext,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+            var service = SetupMethodologyService(
+                contentDbContext,
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
             var result = await service.GetSummariesTree();
 
@@ -676,8 +698,8 @@ public class MethodologyServiceTests
                     Published = methodologyUpdatedDate,
                     Updated = methodologyUpdatedDate,
                     Status = Approved,
-                }
-            ]
+                },
+            ],
         };
 
         var publication = new Publication
@@ -687,7 +709,7 @@ public class MethodologyServiceTests
             LatestPublishedReleaseVersionId = Guid.NewGuid(),
             Methodologies =
             [
-                new PublicationMethodology { Methodology = methodology, Owner = true }
+                new PublicationMethodology { Methodology = methodology, Owner = true },
             ],
         };
 
@@ -733,8 +755,8 @@ public class MethodologyServiceTests
                     Status = Approved,
                     AlternativeSlug = "alternative-title",
                     AlternativeTitle = "Alternative title",
-                }
-            ]
+                },
+            ],
         };
 
         var publication = new Publication
@@ -744,7 +766,7 @@ public class MethodologyServiceTests
             LatestPublishedReleaseVersionId = Guid.NewGuid(),
             Methodologies =
             [
-                new PublicationMethodology { Methodology = methodology, Owner = true }
+                new PublicationMethodology { Methodology = methodology, Owner = true },
             ],
         };
 
@@ -771,13 +793,15 @@ public class MethodologyServiceTests
     private static MethodologyService SetupMethodologyService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-        IMethodologyVersionRepository? methodologyVersionRepository = null)
+        IMethodologyVersionRepository? methodologyVersionRepository = null
+    )
     {
         return new(
             contentDbContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             MapperUtils.ContentMapper(contentDbContext),
-            methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict)
+            methodologyVersionRepository
+                ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict)
         );
     }
 }

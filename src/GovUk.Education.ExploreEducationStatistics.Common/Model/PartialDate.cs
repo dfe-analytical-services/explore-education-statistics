@@ -45,7 +45,11 @@ public record PartialDate
             return false;
         }
 
-        if (!YearRegex.Match(Year).Success || !MonthRegex.Match(Month).Success || !DayRegex.Match(Day).Success)
+        if (
+            !YearRegex.Match(Year).Success
+            || !MonthRegex.Match(Month).Success
+            || !DayRegex.Match(Day).Success
+        )
         {
             return false; // Failed rudimentary number validation
         }

@@ -15,23 +15,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
 public class ReleaseServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task ListSubjects()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildReleaseMetaService(userService: userService.Object);
-                    return service.ListSubjects(_releaseVersion.Id);
-                }
-            );
+            .SetupResourceCheckToFail(
+                _releaseVersion,
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
+            )
+            .AssertForbidden(userService =>
+            {
+                var service = BuildReleaseMetaService(userService: userService.Object);
+                return service.ListSubjects(_releaseVersion.Id);
+            });
     }
 
     private ReleaseService BuildReleaseMetaService(
@@ -40,7 +38,8 @@ public class ReleaseServicePermissionTests
         StatisticsDbContext? statisticsDbContext = null,
         IUserService? userService = null,
         IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
-        ITimePeriodService? timePeriodService = null)
+        ITimePeriodService? timePeriodService = null
+    )
     {
         return new ReleaseService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

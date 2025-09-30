@@ -20,9 +20,12 @@ public class ManageMethodologyContentViewModel
 
     public DateTime? Published { get; set; }
 
-    public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
+    public List<ContentSectionViewModel> Content { get; set; } =
+        new List<ContentSectionViewModel>();
 
-    public List<ContentSectionViewModel> Annexes { get; set; } = new List<ContentSectionViewModel>();
+    public List<ContentSectionViewModel> Annexes { get; set; } =
+        new List<ContentSectionViewModel>();
 
-    public List<MethodologyNoteViewModel> Notes { get; set; } = new List<MethodologyNoteViewModel>();
+    public List<MethodologyNoteViewModel> Notes { get; set; } =
+        new List<MethodologyNoteViewModel>();
 }

@@ -15,13 +15,9 @@ public record FeaturedTableCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Name)
-                .NotEmpty()
-                .MaximumLength(120);
+            RuleFor(request => request.Name).NotEmpty().MaximumLength(120);
 
-            RuleFor(request => request.Description)
-                .NotEmpty()
-                .MaximumLength(200);
+            RuleFor(request => request.Description).NotEmpty().MaximumLength(200);
         }
     }
 }
@@ -36,13 +32,9 @@ public record FeaturedTableUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Name)
-                .NotEmpty()
-                .MaximumLength(120);
+            RuleFor(request => request.Name).NotEmpty().MaximumLength(120);
 
-            RuleFor(request => request.Description)
-                .NotEmpty()
-                .MaximumLength(200);
+            RuleFor(request => request.Description).NotEmpty().MaximumLength(200);
         }
     }
 }

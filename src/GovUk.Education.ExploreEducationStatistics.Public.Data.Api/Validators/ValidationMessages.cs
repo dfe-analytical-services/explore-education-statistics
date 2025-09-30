@@ -38,7 +38,7 @@ public static class ValidationMessages
         Code: "LocationAllowedProperty",
         Message: "Must be a location with an allowed identifying property."
     );
-    
+
     public static readonly LocalizableMessage LocationValueNotEmpty = new(
         Code: "LocationValueNotEmpty",
         Message: "Must be a location with '{Property}' that is not empty."

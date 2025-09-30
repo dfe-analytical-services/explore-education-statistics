@@ -6,15 +6,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class BlobNameListerMockBuilder
 {
     private readonly Mock<IBlobNameLister> _mock = new(MockBehavior.Strict);
-    
+
     private IList<string> _blobNames = new List<string>();
-    
+
     public IBlobNameLister Build()
     {
         _mock
             .Setup(m => m.ListBlobsInContainer(It.IsAny<CancellationToken>()))
             .ReturnsAsync(_blobNames);
-        
+
         return _mock.Object;
     }
 

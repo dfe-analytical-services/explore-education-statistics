@@ -10,9 +10,10 @@ public class AnalyticsWriteTopLevelCallsStrategy(
 ) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public-api", "top-level"];
-    
-    private readonly IWorkflowActor<CaptureTopLevelCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
+
+    private readonly IWorkflowActor<CaptureTopLevelCallRequest> _workflowActor = new WorkflowActor(
+        analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths)
+    );
 
     public Type RequestType => typeof(CaptureTopLevelCallRequest);
 
@@ -20,7 +21,10 @@ public class AnalyticsWriteTopLevelCallsStrategy(
     {
         if (request is not CaptureTopLevelCallRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type {nameof(CaptureTopLevelCallRequest)}. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException(
+                $"Request must be of type {nameof(CaptureTopLevelCallRequest)}. It is {request.GetType().FullName}",
+                nameof(request)
+            );
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }

@@ -7,12 +7,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class FullResetFunctionTests
 {
-    private readonly FullSearchableDocumentResetterMockBuilder _fullSearchableDocumentResetter = new();
-    
-    private FullResetFunction GetSut() => new(
-        _fullSearchableDocumentResetter.Build(), 
-        new TestableCommandHandler());
-    
+    private readonly FullSearchableDocumentResetterMockBuilder _fullSearchableDocumentResetter =
+        new();
+
+    private FullResetFunction GetSut() =>
+        new(_fullSearchableDocumentResetter.Build(), new TestableCommandHandler());
+
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
@@ -32,24 +32,27 @@ public class FullResetFunctionTests
         // Assert
         _fullSearchableDocumentResetter.Assert.PerformResetWasCalled();
     }
-    
+
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(10)]
     [InlineData(100)]
-    public async Task WhenFullSearchableDocumentsReset_ThenResetPublicationSearchableDocumentCommandsReturned(int numberOfPublications)
+    public async Task WhenFullSearchableDocumentsReset_ThenResetPublicationSearchableDocumentCommandsReturned(
+        int numberOfPublications
+    )
     {
         // Arrange
-        var publications = Enumerable.Range(0, numberOfPublications)
+        var publications = Enumerable
+            .Range(0, numberOfPublications)
             .Select(i => new PublicationInfo
             {
                 PublicationSlug = $"publication-slug-{i}",
-                LatestReleaseSlug = $"release-slug-{i}"
+                LatestReleaseSlug = $"release-slug-{i}",
             })
             .ToArray();
         _fullSearchableDocumentResetter.WherePublicationsReturnedAre(publications);
-            
+
         var sut = GetSut();
 
         // We know this is ignored so little point in creating a mock request

@@ -7,8 +7,8 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
 
@@ -22,7 +22,7 @@ public class MethodologyVersionRepositoryTests
         var publication = new Publication
         {
             Title = "The Publication Title",
-            Slug = "the-publication-slug"
+            Slug = "the-publication-slug",
         };
 
         var userId = Guid.NewGuid();
@@ -40,7 +40,10 @@ public class MethodologyVersionRepositoryTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
-            var methodologyVersion = await service.CreateMethodologyForPublication(publication.Id, userId);
+            var methodologyVersion = await service.CreateMethodologyForPublication(
+                publication.Id,
+                userId
+            );
             await contentDbContext.SaveChangesAsync();
             methodologyVersionId = methodologyVersion.Id;
         }
@@ -48,18 +51,22 @@ public class MethodologyVersionRepositoryTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var methodologyVersion = await contentDbContext
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .ThenInclude(p => p.Publications)
                 .ThenInclude(p => p.Publication)
                 .SingleAsync(m => m.Id == methodologyVersionId);
 
-            var savedPublication = await contentDbContext.Publications.SingleAsync(p => p.Id == publication.Id);
+            var savedPublication = await contentDbContext.Publications.SingleAsync(p =>
+                p.Id == publication.Id
+            );
 
             Assert.Equal(Immediately, methodologyVersion.PublishingStrategy);
             Assert.NotNull(methodologyVersion.Methodology);
             Assert.Single(methodologyVersion.Methodology.Publications);
-            Assert.Equal(savedPublication, methodologyVersion.Methodology.Publications[0].Publication);
+            Assert.Equal(
+                savedPublication,
+                methodologyVersion.Methodology.Publications[0].Publication
+            );
             Assert.Equal(savedPublication.Title, methodologyVersion.Title);
             Assert.Equal(savedPublication.Slug, methodologyVersion.Slug);
             methodologyVersion.Created.AssertUtcNow();
@@ -79,7 +86,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var version2 = new MethodologyVersion
@@ -89,7 +96,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 1
+            Version = 1,
         };
 
         var version3 = new MethodologyVersion
@@ -99,7 +106,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 2
+            Version = 2,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -137,7 +144,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology1,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var methodology1Version2 = new MethodologyVersion
@@ -147,7 +154,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology1,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 1
+            Version = 1,
         };
 
         var methodology2Version1 = new MethodologyVersion
@@ -157,7 +164,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology2,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var methodology2Version2 = new MethodologyVersion
@@ -167,7 +174,7 @@ public class MethodologyVersionRepositoryTests
             Methodology = methodology2,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 1
+            Version = 1,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -176,21 +183,26 @@ public class MethodologyVersionRepositoryTests
         {
             await contentDbContext.Publications.AddAsync(publication);
             await contentDbContext.Methodologies.AddRangeAsync(methodology1, methodology2);
-            await contentDbContext.MethodologyVersions.AddRangeAsync(methodology1Version1,
-                methodology1Version2, methodology2Version1, methodology2Version2);
+            await contentDbContext.MethodologyVersions.AddRangeAsync(
+                methodology1Version1,
+                methodology1Version2,
+                methodology2Version1,
+                methodology2Version2
+            );
             await contentDbContext.PublicationMethodologies.AddRangeAsync(
                 new PublicationMethodology
                 {
                     Publication = publication,
                     Methodology = methodology1,
-                    Owner = true
+                    Owner = true,
                 },
                 new PublicationMethodology
                 {
                     Publication = publication,
                     Methodology = methodology2,
-                    Owner = false
-                });
+                    Owner = false,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -200,10 +212,13 @@ public class MethodologyVersionRepositoryTests
         {
             contentDbContext.AttachRange(methodology1, methodology2);
 
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(ListOf(methodology1, methodology2));
 
             var result = await service.GetLatestVersionByPublication(publication.Id);
@@ -235,8 +250,9 @@ public class MethodologyVersionRepositoryTests
                 {
                     Publication = publication,
                     Methodology = methodology,
-                    Owner = true
-                });
+                    Owner = true,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -246,14 +262,18 @@ public class MethodologyVersionRepositoryTests
         {
             contentDbContext.Attach(methodology);
 
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(ListOf(methodology));
 
-            await Assert.ThrowsAsync<ArgumentException>(
-                () => service.GetLatestVersionByPublication(publication.Id));
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.GetLatestVersionByPublication(publication.Id)
+            );
         }
 
         VerifyAllMocks(methodologyRepository);
@@ -266,11 +286,14 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext())
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => service.GetLatestVersionByPublication(Guid.NewGuid()));
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.GetLatestVersionByPublication(Guid.NewGuid())
+            );
         }
 
         VerifyAllMocks(methodologyRepository);
@@ -293,10 +316,13 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(new List<Methodology>());
 
             var result = await service.GetLatestVersionByPublication(publication.Id);
@@ -330,8 +356,7 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(
-                contentDbContext: contentDbContext);
+            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext);
 
             var result = await service.GetLatestPublishedVersionBySlug(methodologyVersion.Slug);
 
@@ -350,7 +375,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestPublishedVersion = new MethodologyVersion
@@ -359,7 +384,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = previousVersion.Id,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 1
+            Version = 1,
         };
 
         var latestDraftVersion = new MethodologyVersion
@@ -368,13 +393,13 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = latestPublishedVersion.Id,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 2
+            Version = 2,
         };
 
         var methodology = new Methodology
         {
             LatestPublishedVersion = latestPublishedVersion,
-            Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion)
+            Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -387,10 +412,11 @@ public class MethodologyVersionRepositoryTests
                 {
                     Publication = new Publication
                     {
-                        LatestPublishedReleaseVersion = new ReleaseVersion()
+                        LatestPublishedReleaseVersion = new ReleaseVersion(),
                     },
-                    Methodology = methodology
-                });
+                    Methodology = methodology,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -398,8 +424,10 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
             var result = await service.GetLatestPublishedVersion(methodology.Id);
 
@@ -417,12 +445,8 @@ public class MethodologyVersionRepositoryTests
         {
             LatestPublishedVersionId = null,
             Versions = ListOf(
-                new MethodologyVersion
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                }
-            )
+                new MethodologyVersion { PublishingStrategy = Immediately, Status = Draft }
+            ),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -435,10 +459,11 @@ public class MethodologyVersionRepositoryTests
                 {
                     Publication = new Publication
                     {
-                        LatestPublishedReleaseVersion = new ReleaseVersion()
+                        LatestPublishedReleaseVersion = new ReleaseVersion(),
                     },
-                    Methodology = methodology
-                });
+                    Methodology = methodology,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -446,8 +471,10 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
             var result = await service.GetLatestPublishedVersion(methodology.Id);
 
@@ -463,7 +490,7 @@ public class MethodologyVersionRepositoryTests
         var methodology = new Methodology
         {
             LatestPublishedVersionId = null,
-            Versions = new List<MethodologyVersion>()
+            Versions = new List<MethodologyVersion>(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -476,10 +503,11 @@ public class MethodologyVersionRepositoryTests
                 {
                     Publication = new Publication
                     {
-                        LatestPublishedReleaseVersion = new ReleaseVersion()
+                        LatestPublishedReleaseVersion = new ReleaseVersion(),
                     },
-                    Methodology = methodology
-                });
+                    Methodology = methodology,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -487,8 +515,10 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
             var result = await service.GetLatestPublishedVersion(methodology.Id);
 
@@ -505,12 +535,8 @@ public class MethodologyVersionRepositoryTests
         {
             LatestPublishedVersionId = null,
             Versions = ListOf(
-                new MethodologyVersion
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                }
-            )
+                new MethodologyVersion { PublishingStrategy = Immediately, Status = Approved }
+            ),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -522,8 +548,9 @@ public class MethodologyVersionRepositoryTests
                 new PublicationMethodology
                 {
                     PublicationId = Guid.NewGuid(),
-                    Methodology = methodology
-                });
+                    Methodology = methodology,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -531,8 +558,10 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
             var result = await service.GetLatestPublishedVersion(methodology.Id);
 
@@ -551,11 +580,14 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                service.GetLatestPublishedVersion(Guid.NewGuid()));
+                service.GetLatestPublishedVersion(Guid.NewGuid())
+            );
         }
 
         VerifyAllMocks(methodologyRepository);
@@ -564,10 +596,7 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task GetLatestPublishedVersionByPublication()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseVersion = new ReleaseVersion()
-        };
+        var publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() };
 
         var methodology1 = new Methodology
         {
@@ -579,7 +608,7 @@ public class MethodologyVersionRepositoryTests
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
                     Status = Approved,
-                    Version = 0
+                    Version = 0,
                 },
                 new MethodologyVersion
                 {
@@ -587,7 +616,7 @@ public class MethodologyVersionRepositoryTests
                     PreviousVersionId = Guid.Parse("7a2179a3-16a2-4eff-9be4-5a281d901213"),
                     PublishingStrategy = Immediately,
                     Status = Approved,
-                    Version = 1
+                    Version = 1,
                 },
                 new MethodologyVersion
                 {
@@ -595,9 +624,9 @@ public class MethodologyVersionRepositoryTests
                     PreviousVersionId = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
                     PublishingStrategy = Immediately,
                     Status = Draft,
-                    Version = 2
+                    Version = 2,
                 }
-            )
+            ),
         };
 
         var methodology2 = new Methodology
@@ -610,7 +639,7 @@ public class MethodologyVersionRepositoryTests
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
                     Status = Approved,
-                    Version = 0
+                    Version = 0,
                 },
                 new MethodologyVersion
                 {
@@ -618,7 +647,7 @@ public class MethodologyVersionRepositoryTests
                     PreviousVersionId = Guid.Parse("4baee814-4c36-4850-9dc7-cfdae6026815"),
                     PublishingStrategy = Immediately,
                     Status = Approved,
-                    Version = 1
+                    Version = 1,
                 },
                 new MethodologyVersion
                 {
@@ -626,9 +655,9 @@ public class MethodologyVersionRepositoryTests
                     PreviousVersionId = Guid.Parse("2d6632b9-2480-4c34-b298-123064b6f04e"),
                     PublishingStrategy = Immediately,
                     Status = Draft,
-                    Version = 2
+                    Version = 2,
                 }
-            )
+            ),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -642,14 +671,15 @@ public class MethodologyVersionRepositoryTests
                 {
                     Publication = publication,
                     Methodology = methodology1,
-                    Owner = true
+                    Owner = true,
                 },
                 new PublicationMethodology
                 {
                     Publication = publication,
                     Methodology = methodology2,
-                    Owner = false
-                });
+                    Owner = false,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -659,10 +689,13 @@ public class MethodologyVersionRepositoryTests
         {
             contentDbContext.AttachRange(methodology1, methodology2);
 
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(ListOf(methodology1, methodology2));
 
             var result = await service.GetLatestPublishedVersionByPublication(publication.Id);
@@ -679,32 +712,21 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task GetLatestPublishedVersionByPublication_MethodologyHasNoPublishedVersions()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseVersion = new ReleaseVersion()
-        };
+        var publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() };
 
         var methodology1 = new Methodology
         {
             Versions = ListOf(
-                new MethodologyVersion
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                }
-            )
+                new MethodologyVersion { PublishingStrategy = Immediately, Status = Draft }
+            ),
         };
 
         var methodology2 = new Methodology
         {
             LatestPublishedVersionId = null,
             Versions = ListOf(
-                new MethodologyVersion
-                {
-                    PublishingStrategy = Immediately,
-                    Status = Draft
-                }
-            )
+                new MethodologyVersion { PublishingStrategy = Immediately, Status = Draft }
+            ),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -718,14 +740,15 @@ public class MethodologyVersionRepositoryTests
                 {
                     Publication = publication,
                     Methodology = methodology1,
-                    Owner = true
+                    Owner = true,
                 },
                 new PublicationMethodology
                 {
                     Publication = publication,
                     Methodology = methodology2,
-                    Owner = false
-                });
+                    Owner = false,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -735,10 +758,13 @@ public class MethodologyVersionRepositoryTests
         {
             contentDbContext.AttachRange(methodology1, methodology2);
 
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(ListOf(methodology1, methodology2));
 
             var result = await service.GetLatestPublishedVersionByPublication(publication.Id);
@@ -752,15 +778,12 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task GetLatestPublishedVersionByPublication_MethodologyHasNoVersions()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseVersion = new ReleaseVersion()
-        };
+        var publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() };
 
         var methodology = new Methodology
         {
             LatestPublishedVersionId = null,
-            Versions = new List<MethodologyVersion>()
+            Versions = new List<MethodologyVersion>(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -770,11 +793,8 @@ public class MethodologyVersionRepositoryTests
             await contentDbContext.Publications.AddAsync(publication);
             await contentDbContext.Methodologies.AddAsync(methodology);
             await contentDbContext.PublicationMethodologies.AddRangeAsync(
-                new PublicationMethodology
-                {
-                    Publication = publication,
-                    Methodology = methodology
-                });
+                new PublicationMethodology { Publication = publication, Methodology = methodology }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -784,10 +804,13 @@ public class MethodologyVersionRepositoryTests
         {
             contentDbContext.Attach(methodology);
 
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(ListOf(methodology));
 
             var result = await service.GetLatestPublishedVersionByPublication(publication.Id);
@@ -803,12 +826,15 @@ public class MethodologyVersionRepositoryTests
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
 
-        methodologyRepository.Setup(mock => mock.GetByPublication(It.IsAny<Guid>()))
+        methodologyRepository
+            .Setup(mock => mock.GetByPublication(It.IsAny<Guid>()))
             .ReturnsAsync(new List<Methodology>());
 
         await using var contentDbContext = InMemoryContentDbContext();
-        var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-            methodologyRepository: methodologyRepository.Object);
+        var service = BuildMethodologyVersionRepository(
+            contentDbContext: contentDbContext,
+            methodologyRepository: methodologyRepository.Object
+        );
 
         var result = await service.GetLatestPublishedVersionByPublication(Guid.NewGuid());
 
@@ -820,10 +846,7 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task GetLatestPublishedVersionByPublication_PublicationHasNoMethodologies()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseVersion = new ReleaseVersion()
-        };
+        var publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -837,10 +860,13 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                methodologyRepository: methodologyRepository.Object);
+            var service = BuildMethodologyVersionRepository(
+                contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object
+            );
 
-            methodologyRepository.Setup(mock => mock.GetByPublication(publication.Id))
+            methodologyRepository
+                .Setup(mock => mock.GetByPublication(publication.Id))
                 .ReturnsAsync(new List<Methodology>());
 
             var result = await service.GetLatestPublishedVersionByPublication(publication.Id);
@@ -887,11 +913,9 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(
-                contentDbContext: contentDbContext);
+            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext);
 
-            var result = await service
-                .GetLatestPublishedVersionBySlug("slug");
+            var result = await service.GetLatestPublishedVersionBySlug("slug");
 
             VerifyAllMocks(methodologyRepository);
 
@@ -937,11 +961,9 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(
-                contentDbContext: contentDbContext);
+            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext);
 
-            var result = await service
-                .GetLatestPublishedVersionBySlug("slug");
+            var result = await service.GetLatestPublishedVersionBySlug("slug");
 
             VerifyAllMocks(methodologyRepository);
 
@@ -961,11 +983,7 @@ public class MethodologyVersionRepositoryTests
             OwningPublicationSlug = "owning-publication-slug",
             Versions = new List<MethodologyVersion>
             {
-                new()
-                {
-                    AlternativeSlug = "alternative-slug",
-                    Version = 0,
-                },
+                new() { AlternativeSlug = "alternative-slug", Version = 0 },
             },
         };
 
@@ -980,11 +998,9 @@ public class MethodologyVersionRepositoryTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = BuildMethodologyVersionRepository(
-                contentDbContext: contentDbContext);
+            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext);
 
-            var result = await service
-                .GetLatestPublishedVersionBySlug("slug");
+            var result = await service.GetLatestPublishedVersionBySlug("slug");
 
             VerifyAllMocks(methodologyRepository);
 
@@ -998,19 +1014,13 @@ public class MethodologyVersionRepositoryTests
         var methodologyVersion = new MethodologyVersion
         {
             Status = Approved,
-            PublishingStrategy = Immediately
+            PublishingStrategy = Immediately,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1025,8 +1035,7 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(methodologyVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(methodologyVersion).ReloadAsync();
 
             Assert.True(await service.IsToBePublished(methodologyVersion));
         }
@@ -1038,26 +1047,20 @@ public class MethodologyVersionRepositoryTests
         var liveReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow
+            Published = DateTime.UtcNow,
         };
 
         var methodologyVersion = new MethodologyVersion
         {
             Status = Approved,
             PublishingStrategy = WithRelease,
-            ScheduledWithReleaseVersionId = liveReleaseVersion.Id
+            ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1073,8 +1076,7 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(methodologyVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(methodologyVersion).ReloadAsync();
 
             Assert.True(await service.IsToBePublished(methodologyVersion));
         }
@@ -1086,19 +1088,13 @@ public class MethodologyVersionRepositoryTests
         var methodologyVersion = new MethodologyVersion
         {
             Status = Draft,
-            PublishingStrategy = Immediately
+            PublishingStrategy = Immediately,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1123,26 +1119,20 @@ public class MethodologyVersionRepositoryTests
         var liveReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow
+            Published = DateTime.UtcNow,
         };
 
         var methodologyVersion = new MethodologyVersion
         {
             Status = Draft,
             PublishingStrategy = WithRelease,
-            ScheduledWithReleaseVersionId = liveReleaseVersion.Id
+            ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1165,28 +1155,19 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task IsToBePublished_ApprovedButScheduledWithNonLiveReleaseIsNotAccessible()
     {
-        var nonLiveReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var nonLiveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var methodologyVersion = new MethodologyVersion
         {
             Status = Approved,
             PublishingStrategy = WithRelease,
-            ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id
+            ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1202,8 +1183,7 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(methodologyVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(methodologyVersion).ReloadAsync();
 
             Assert.False(await service.IsToBePublished(methodologyVersion));
         }
@@ -1218,7 +1198,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestPublishedVersion = new MethodologyVersion
@@ -1227,7 +1207,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = previousVersion.Id,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 1
+            Version = 1,
         };
 
         var latestDraftVersion = new MethodologyVersion
@@ -1236,19 +1216,16 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = latestPublishedVersion.Id,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 2
+            Version = 2,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
             Methodology = new Methodology
             {
-                Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion)
-            }
+                Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1263,12 +1240,9 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(previousVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestPublishedVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestDraftVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(previousVersion).ReloadAsync();
+            await contentDbContext.Entry(latestPublishedVersion).ReloadAsync();
+            await contentDbContext.Entry(latestDraftVersion).ReloadAsync();
 
             Assert.False(await service.IsToBePublished(previousVersion));
             Assert.True(await service.IsToBePublished(latestPublishedVersion));
@@ -1277,13 +1251,9 @@ public class MethodologyVersionRepositoryTests
     }
 
     [Fact]
-    public async Task
-        IsToBePublished_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
+    public async Task IsToBePublished_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
     {
-        var nonLiveReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var nonLiveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var previousVersion = new MethodologyVersion
         {
@@ -1291,7 +1261,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestPublishedVersion = new MethodologyVersion
@@ -1300,7 +1270,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = previousVersion.Id,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 1
+            Version = 1,
         };
 
         var latestApprovedVersion = new MethodologyVersion
@@ -1310,19 +1280,16 @@ public class MethodologyVersionRepositoryTests
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id,
             Status = Approved,
-            Version = 2
+            Version = 2,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
             Methodology = new Methodology
             {
-                Versions = ListOf(previousVersion, latestPublishedVersion, latestApprovedVersion)
-            }
+                Versions = ListOf(previousVersion, latestPublishedVersion, latestApprovedVersion),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1338,12 +1305,9 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(previousVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestPublishedVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestApprovedVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(previousVersion).ReloadAsync();
+            await contentDbContext.Entry(latestPublishedVersion).ReloadAsync();
+            await contentDbContext.Entry(latestApprovedVersion).ReloadAsync();
 
             Assert.False(await service.IsToBePublished(previousVersion));
             Assert.True(await service.IsToBePublished(latestPublishedVersion));
@@ -1357,7 +1321,7 @@ public class MethodologyVersionRepositoryTests
         var liveReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow
+            Published = DateTime.UtcNow,
         };
 
         var previousVersion = new MethodologyVersion
@@ -1367,7 +1331,7 @@ public class MethodologyVersionRepositoryTests
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestPublishedVersion = new MethodologyVersion
@@ -1377,7 +1341,7 @@ public class MethodologyVersionRepositoryTests
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
             Status = Approved,
-            Version = 1
+            Version = 1,
         };
 
         var latestDraftVersion = new MethodologyVersion
@@ -1387,19 +1351,16 @@ public class MethodologyVersionRepositoryTests
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
             Status = Draft,
-            Version = 2
+            Version = 2,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
             Methodology = new Methodology
             {
-                Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion)
-            }
+                Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1415,12 +1376,9 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(previousVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestPublishedVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestDraftVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(previousVersion).ReloadAsync();
+            await contentDbContext.Entry(latestPublishedVersion).ReloadAsync();
+            await contentDbContext.Entry(latestDraftVersion).ReloadAsync();
 
             Assert.False(await service.IsToBePublished(previousVersion));
             Assert.True(await service.IsToBePublished(latestPublishedVersion));
@@ -1429,19 +1387,15 @@ public class MethodologyVersionRepositoryTests
     }
 
     [Fact]
-    public async Task
-        IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
+    public async Task IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
     {
         var liveReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow
+            Published = DateTime.UtcNow,
         };
 
-        var nonLiveReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var nonLiveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var previousVersion = new MethodologyVersion
         {
@@ -1449,7 +1403,7 @@ public class MethodologyVersionRepositoryTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestPublishedVersion = new MethodologyVersion
@@ -1459,7 +1413,7 @@ public class MethodologyVersionRepositoryTests
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
             Status = Approved,
-            Version = 1
+            Version = 1,
         };
 
         var latestApprovedVersion = new MethodologyVersion
@@ -1469,19 +1423,16 @@ public class MethodologyVersionRepositoryTests
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id,
             Status = Approved,
-            Version = 2
+            Version = 2,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
             Methodology = new Methodology
             {
-                Versions = ListOf(previousVersion, latestPublishedVersion, latestApprovedVersion)
-            }
+                Versions = ListOf(previousVersion, latestPublishedVersion, latestApprovedVersion),
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1497,12 +1448,9 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(previousVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestPublishedVersion)
-                .ReloadAsync();
-            await contentDbContext.Entry(latestApprovedVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(previousVersion).ReloadAsync();
+            await contentDbContext.Entry(latestPublishedVersion).ReloadAsync();
+            await contentDbContext.Entry(latestApprovedVersion).ReloadAsync();
 
             Assert.False(await service.IsToBePublished(previousVersion));
             Assert.True(await service.IsToBePublished(latestPublishedVersion));
@@ -1511,25 +1459,18 @@ public class MethodologyVersionRepositoryTests
     }
 
     [Fact]
-    public async Task
-        IsToBePublished_ApprovedAndPublishedImmediatelyButPublicationNotPublishedIsNotAccessible()
+    public async Task IsToBePublished_ApprovedAndPublishedImmediatelyButPublicationNotPublishedIsNotAccessible()
     {
         var methodologyVersion = new MethodologyVersion
         {
             Status = Approved,
-            PublishingStrategy = Immediately
+            PublishingStrategy = Immediately,
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = null
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = null },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1544,8 +1485,7 @@ public class MethodologyVersionRepositoryTests
         {
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
-            await contentDbContext.Entry(methodologyVersion)
-                .ReloadAsync();
+            await contentDbContext.Entry(methodologyVersion).ReloadAsync();
 
             Assert.False(await service.IsToBePublished(methodologyVersion));
         }
@@ -1558,19 +1498,13 @@ public class MethodologyVersionRepositoryTests
         {
             Status = Approved,
             PublishingStrategy = WithRelease,
-            ScheduledWithReleaseVersionId = Guid.NewGuid()
+            ScheduledWithReleaseVersionId = Guid.NewGuid(),
         };
 
         var publicationMethodology = new PublicationMethodology
         {
-            Publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion()
-            },
-            Methodology = new Methodology
-            {
-                Versions = ListOf(methodologyVersion)
-            }
+            Publication = new Publication { LatestPublishedReleaseVersion = new ReleaseVersion() },
+            Methodology = new Methodology { Versions = ListOf(methodologyVersion) },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1586,16 +1520,19 @@ public class MethodologyVersionRepositoryTests
             var service = BuildMethodologyVersionRepository(contentDbContext);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                service.IsToBePublished(methodologyVersion));
+                service.IsToBePublished(methodologyVersion)
+            );
         }
     }
 
     private static MethodologyVersionRepository BuildMethodologyVersionRepository(
         ContentDbContext contentDbContext,
-        IMethodologyRepository? methodologyRepository = null)
+        IMethodologyRepository? methodologyRepository = null
+    )
     {
         return new(
             contentDbContext,
-            methodologyRepository ?? Mock.Of<IMethodologyRepository>(Strict));
+            methodologyRepository ?? Mock.Of<IMethodologyRepository>(Strict)
+        );
     }
 }

@@ -8,23 +8,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IPreReleaseUserService
 {
-    Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
+    Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(
+        Guid releaseVersionId
+    );
 
     Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
-        List<string> emails);
+        List<string> emails
+    );
 
     Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
         Guid releaseVersionId,
-        List<string> emails);
+        List<string> emails
+    );
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId,
-        string email);
+    Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId, string email);
 
     Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
         Guid releaseVersionId,
         string email,
-        bool isNewUser);
+        bool isNewUser
+    );
 
     Task MarkInviteEmailAsSent(UserReleaseInvite invite);
 }

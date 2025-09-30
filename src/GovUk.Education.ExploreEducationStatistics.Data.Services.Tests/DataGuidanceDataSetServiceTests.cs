@@ -33,7 +33,7 @@ public class DataGuidanceDataSetServiceTests
             Subject = subject1,
             Name = "subject1_filter",
             Label = "Subject 1 Filter",
-            Hint = "Hint"
+            Hint = "Hint",
         };
 
         var subject2Filter = new Filter
@@ -41,7 +41,7 @@ public class DataGuidanceDataSetServiceTests
             Subject = subject2,
             Name = "subject2_filter",
             Label = "Subject 2 Filter",
-            Hint = null
+            Hint = null,
         };
 
         var subject1IndicatorGroup = new IndicatorGroup
@@ -49,12 +49,8 @@ public class DataGuidanceDataSetServiceTests
             Subject = subject1,
             Indicators = new List<Indicator>
             {
-                new()
-                {
-                    Name = "subject1_indicator",
-                    Label = "Subject 1 Indicator"
-                }
-            }
+                new() { Name = "subject1_indicator", Label = "Subject 1 Indicator" },
+            },
         };
 
         var subject2IndicatorGroup = new IndicatorGroup
@@ -62,172 +58,124 @@ public class DataGuidanceDataSetServiceTests
             Subject = subject2,
             Indicators = new List<Indicator>
             {
-                new()
-                {
-                    Name = "subject2_indicator",
-                    Label = "Subject 2 Indicator"
-                }
-            }
+                new() { Name = "subject2_indicator", Label = "Subject 2 Indicator" },
+            },
         };
 
         var releaseSubject1 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = subject1
+            Subject = subject1,
         };
 
         var releaseSubject2 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = subject2
+            Subject = subject2,
         };
 
         var subject1Observation1 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.Country },
             Subject = subject1,
             Year = 2020,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ3
+            TimeIdentifier = TimeIdentifier.AcademicYearQ3,
         };
 
         var subject1Observation2 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthority },
             Subject = subject1,
             Year = 2020,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ4
+            TimeIdentifier = TimeIdentifier.AcademicYearQ4,
         };
 
         var subject1Observation3 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
             Subject = subject1,
             Year = 2021,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ1
+            TimeIdentifier = TimeIdentifier.AcademicYearQ1,
         };
 
         var subject2Observation1 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.Country },
             Subject = subject2,
             Year = 2020,
-            TimeIdentifier = TimeIdentifier.SummerTerm
+            TimeIdentifier = TimeIdentifier.SummerTerm,
         };
 
         var subject2Observation2 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Region
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.Region },
             Subject = subject2,
             Year = 2021,
-            TimeIdentifier = TimeIdentifier.AutumnTerm
+            TimeIdentifier = TimeIdentifier.AutumnTerm,
         };
 
         var subject2Observation3 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Region
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.Region },
             Subject = subject2,
             Year = 2021,
-            TimeIdentifier = TimeIdentifier.SpringTerm
+            TimeIdentifier = TimeIdentifier.SpringTerm,
         };
 
         var subject1Footnote1 = new SubjectFootnote
         {
             Subject = subject1,
-            Footnote = new Footnote
-            {
-                Content = "Subject 1 Footnote 1",
-                Order = 0
-            }
+            Footnote = new Footnote { Content = "Subject 1 Footnote 1", Order = 0 },
         };
         var subject1Footnote2 = new FilterFootnote
         {
             Filter = subject1Filter,
-            Footnote = new Footnote
-            {
-                Content = "Subject 1 Footnote 2",
-                Order = 1
-            }
+            Footnote = new Footnote { Content = "Subject 1 Footnote 2", Order = 1 },
         };
         var subject1Footnote3 = new FilterGroupFootnote
         {
-            FilterGroup = new FilterGroup
-            {
-                Filter = subject1Filter
-            },
-            Footnote = new Footnote
-            {
-                Content = "Subject 1 Footnote 3",
-                Order = 2
-            }
+            FilterGroup = new FilterGroup { Filter = subject1Filter },
+            Footnote = new Footnote { Content = "Subject 1 Footnote 3", Order = 2 },
         };
 
         var subject2Footnote1 = new FilterItemFootnote
         {
             FilterItem = new FilterItem
             {
-                FilterGroup = new FilterGroup
-                {
-                    Filter = subject2Filter
-                }
+                FilterGroup = new FilterGroup { Filter = subject2Filter },
             },
-            Footnote = new Footnote
-            {
-                Content = "Subject 2 Footnote 1",
-                Order = 0
-            }
+            Footnote = new Footnote { Content = "Subject 2 Footnote 1", Order = 0 },
         };
         var subject2Footnote2 = new IndicatorFootnote
         {
             Indicator = subject2IndicatorGroup.Indicators[0],
-            Footnote = new Footnote
-            {
-                Content = "Subject 2 Footnote 2",
-                Order = 1
-            }
+            Footnote = new Footnote { Content = "Subject 2 Footnote 2", Order = 1 },
         };
 
         var releaseFootnote1 = new ReleaseFootnote
         {
             Footnote = subject1Footnote1.Footnote,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var releaseFootnote2 = new ReleaseFootnote
         {
             Footnote = subject1Footnote2.Footnote,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var releaseFootnote3 = new ReleaseFootnote
         {
             Footnote = subject1Footnote3.Footnote,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var releaseFootnote4 = new ReleaseFootnote
         {
             Footnote = subject2Footnote1.Footnote,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var releaseFootnote5 = new ReleaseFootnote
         {
             Footnote = subject2Footnote2.Footnote,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -238,7 +186,10 @@ public class DataGuidanceDataSetServiceTests
             statisticsDbContext.Subject.AddRange(subject1, subject2);
             statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
             statisticsDbContext.Filter.AddRange(subject1Filter, subject2Filter);
-            statisticsDbContext.IndicatorGroup.AddRange(subject1IndicatorGroup, subject2IndicatorGroup);
+            statisticsDbContext.IndicatorGroup.AddRange(
+                subject1IndicatorGroup,
+                subject2IndicatorGroup
+            );
             statisticsDbContext.Observation.AddRange(
                 subject1Observation1,
                 subject1Observation2,
@@ -262,10 +213,7 @@ public class DataGuidanceDataSetServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion
-        {
-            Id = releaseVersion.Id
-        };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -277,7 +225,7 @@ public class DataGuidanceDataSetServiceTests
                 Filename = "file1.csv",
                 Type = FileType.Data,
             },
-            Summary = "Data set 1 guidance"
+            Summary = "Data set 1 guidance",
         };
 
         var releaseFile2 = new ReleaseFile
@@ -290,7 +238,7 @@ public class DataGuidanceDataSetServiceTests
                 Filename = "file2.csv",
                 Type = FileType.Data,
             },
-            Summary = "Data set 2 guidance"
+            Summary = "Data set 2 guidance",
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -306,7 +254,8 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext);
+                contentDbContext: contentDbContext
+            );
 
             var result = (await service.ListDataSets(releaseVersion.Id)).AssertRight();
 
@@ -321,12 +270,10 @@ public class DataGuidanceDataSetServiceTests
 
             Assert.Equal("2020/21 Q3", result[0].TimePeriods.From);
             Assert.Equal("2021/22 Q1", result[0].TimePeriods.To);
-            Assert.Equal(new List<string>
-            {
-                "National",
-                "Local authority",
-                "Local authority district"
-            }, result[0].GeographicLevels);
+            Assert.Equal(
+                new List<string> { "National", "Local authority", "Local authority district" },
+                result[0].GeographicLevels
+            );
 
             Assert.Equal(2, result[0].Variables.Count);
             Assert.Equal("Subject 1 Filter - Hint", result[0].Variables[0].Label);
@@ -349,11 +296,7 @@ public class DataGuidanceDataSetServiceTests
 
             Assert.Equal("2020/21 Summer term", result[1].TimePeriods.From);
             Assert.Equal("2021/22 Spring term", result[1].TimePeriods.To);
-            Assert.Equal(new List<string>
-            {
-                "National",
-                "Regional"
-            }, result[1].GeographicLevels);
+            Assert.Equal(new List<string> { "National", "Regional" }, result[1].GeographicLevels);
 
             Assert.Equal(2, result[1].Variables.Count);
             Assert.Equal("Subject 2 Filter", result[1].Variables[0].Label);
@@ -377,33 +320,32 @@ public class DataGuidanceDataSetServiceTests
         var releaseSubject1 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
         var releaseSubject2 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
         var releaseSubject3 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1,
+            statisticsDbContext.ReleaseSubject.AddRange(
+                releaseSubject1,
                 releaseSubject2,
-                releaseSubject3);
+                releaseSubject3
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion
-        {
-            Id = releaseVersion.Id,
-        };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -447,7 +389,8 @@ public class DataGuidanceDataSetServiceTests
                 // Saved in random order
                 releaseFile3,
                 releaseFile1,
-                releaseFile2);
+                releaseFile2
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -456,7 +399,8 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext);
+                contentDbContext: contentDbContext
+            );
 
             var result = await service.ListDataSets(releaseVersion.Id);
 
@@ -478,19 +422,19 @@ public class DataGuidanceDataSetServiceTests
         var releaseSubject1 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
 
         var releaseSubject2 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
 
         var releaseSubject3 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -498,16 +442,15 @@ public class DataGuidanceDataSetServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1,
+            statisticsDbContext.ReleaseSubject.AddRange(
+                releaseSubject1,
                 releaseSubject2,
-                releaseSubject3);
+                releaseSubject3
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion
-        {
-            Id = releaseVersion.Id,
-        };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -518,7 +461,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject1.SubjectId,
                 Filename = "file1.csv",
                 Type = FileType.Data,
-            }
+            },
         };
 
         var releaseFile2 = new ReleaseFile
@@ -530,7 +473,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject2.SubjectId,
                 Filename = "file2.csv",
                 Type = FileType.Data,
-            }
+            },
         };
 
         var releaseFile3 = new ReleaseFile
@@ -542,14 +485,17 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject3.SubjectId,
                 Filename = "file3.csv",
                 Type = FileType.Data,
-            }
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             await contentDbContext.ReleaseFiles.AddRangeAsync(
-                releaseFile1, releaseFile2, releaseFile3);
+                releaseFile1,
+                releaseFile2,
+                releaseFile3
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -558,12 +504,13 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext);
+                contentDbContext: contentDbContext
+            );
 
-            var result = await service.ListDataSets(releaseVersion.Id, new List<Guid>
-            {
-                releaseFile1.FileId, releaseFile3.FileId
-            });
+            var result = await service.ListDataSets(
+                releaseVersion.Id,
+                new List<Guid> { releaseFile1.FileId, releaseFile3.FileId }
+            );
 
             // Assert only the specified data sets are returned
             var viewModels = result.AssertRight();
@@ -583,28 +530,24 @@ public class DataGuidanceDataSetServiceTests
         var originalSubject = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
 
         var replacementSubject = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = new Subject()
+            Subject = new Subject(),
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(originalSubject,
-                replacementSubject);
+            statisticsDbContext.ReleaseSubject.AddRange(originalSubject, replacementSubject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion
-        {
-            Id = releaseVersion.Id
-        };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
 
         var originalFile = new ReleaseFile
         {
@@ -613,8 +556,8 @@ public class DataGuidanceDataSetServiceTests
             {
                 Filename = "file1.csv",
                 Type = FileType.Data,
-                SubjectId = originalSubject.SubjectId
-            }
+                SubjectId = originalSubject.SubjectId,
+            },
         };
 
         var replacementFile = new ReleaseFile
@@ -625,8 +568,8 @@ public class DataGuidanceDataSetServiceTests
                 Filename = "file1.csv",
                 Type = FileType.Data,
                 SubjectId = replacementSubject.SubjectId,
-                Replacing = originalFile.File
-            }
+                Replacing = originalFile.File,
+            },
         };
 
         originalFile.File.ReplacedBy = replacementFile.File;
@@ -642,8 +585,10 @@ public class DataGuidanceDataSetServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = SetupService(contentDbContext: contentDbContext,
-                statisticsDbContext: statisticsDbContext);
+            var service = SetupService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext
+            );
 
             var result = await service.ListDataSets(contentReleaseVersion.Id);
 
@@ -692,15 +637,9 @@ public class DataGuidanceDataSetServiceTests
     [Fact]
     public async Task ListDataSets_AmendedRelease()
     {
-        var releaseVersion1 = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var releaseVersion1 = new ReleaseVersion { Id = Guid.NewGuid() };
 
-        var releaseVersion2 = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var releaseVersion2 = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var subject1 = new Subject();
         var subject2 = new Subject();
@@ -710,19 +649,19 @@ public class DataGuidanceDataSetServiceTests
         var releaseVersion1Subject1 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion1,
-            Subject = subject1
+            Subject = subject1,
         };
 
         var releaseVersion2Subject1 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion2,
-            Subject = subject1
+            Subject = subject1,
         };
 
         var releaseVersion2Subject2 = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion2,
-            Subject = subject2
+            Subject = subject2,
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -731,8 +670,11 @@ public class DataGuidanceDataSetServiceTests
         {
             statisticsDbContext.ReleaseVersion.AddRange(releaseVersion1, releaseVersion2);
             statisticsDbContext.Subject.AddRange(subject1, subject2);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseVersion1Subject1, releaseVersion2Subject1,
-                releaseVersion2Subject2);
+            statisticsDbContext.ReleaseSubject.AddRange(
+                releaseVersion1Subject1,
+                releaseVersion2Subject1,
+                releaseVersion2Subject2
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -767,7 +709,7 @@ public class DataGuidanceDataSetServiceTests
             ReleaseVersion = contentReleaseVersion1,
             File = file1,
             Name = "Version 1 data set 1",
-            Summary = "Version 1 data set 1 guidance"
+            Summary = "Version 1 data set 1 guidance",
         };
 
         var releaseVersion2File1 = new ReleaseFile
@@ -775,7 +717,7 @@ public class DataGuidanceDataSetServiceTests
             ReleaseVersion = contentReleaseVersion2,
             File = file1,
             Name = "Version 2 data set 1",
-            Summary = "Version 2 data set 1 guidance"
+            Summary = "Version 2 data set 1 guidance",
         };
 
         var releaseVersion2File2 = new ReleaseFile
@@ -783,7 +725,7 @@ public class DataGuidanceDataSetServiceTests
             ReleaseVersion = contentReleaseVersion2,
             File = file2,
             Name = "Version 2 data set 2",
-            Summary = "Version 2 data set 2 guidance"
+            Summary = "Version 2 data set 2 guidance",
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -791,11 +733,13 @@ public class DataGuidanceDataSetServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(
                 contentReleaseVersion1,
-                contentReleaseVersion2);
+                contentReleaseVersion2
+            );
             contentDbContext.ReleaseFiles.AddRange(
                 releaseVersion1File1,
                 releaseVersion2File1,
-                releaseVersion2File2);
+                releaseVersion2File2
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -804,7 +748,8 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext);
+                contentDbContext: contentDbContext
+            );
 
             var version1Result = await service.ListDataSets(releaseVersion1.Id);
             var version1ViewModels = version1Result.AssertRight();
@@ -857,40 +802,31 @@ public class DataGuidanceDataSetServiceTests
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = subject
+            Subject = subject,
         };
 
         var subjectObservation1 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.Country },
             Subject = subject,
             Year = 2020,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ3
+            TimeIdentifier = TimeIdentifier.AcademicYearQ3,
         };
 
         var subjectObservation2 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthority },
             Subject = subject,
             Year = 2020,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ4
+            TimeIdentifier = TimeIdentifier.AcademicYearQ4,
         };
 
         var subjectObservation3 = new Observation
         {
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict
-            },
+            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
             Subject = subject,
             Year = 2021,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ1
+            TimeIdentifier = TimeIdentifier.AcademicYearQ1,
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -903,7 +839,8 @@ public class DataGuidanceDataSetServiceTests
             statisticsDbContext.Observation.AddRange(
                 subjectObservation1,
                 subjectObservation2,
-                subjectObservation3);
+                subjectObservation3
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -930,7 +867,7 @@ public class DataGuidanceDataSetServiceTests
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = releaseVersion,
-            Subject = subject
+            Subject = subject,
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -958,7 +895,8 @@ public class DataGuidanceDataSetServiceTests
         ContentDbContext? contentDbContext = null,
         IIndicatorRepository? indicatorRepository = null,
         IFootnoteRepository? footnoteRepository = null,
-        ITimePeriodService? timePeriodService = null)
+        ITimePeriodService? timePeriodService = null
+    )
     {
         statisticsDbContext ??= InMemoryStatisticsDbContext();
         contentDbContext ??= InMemoryContentDbContext();

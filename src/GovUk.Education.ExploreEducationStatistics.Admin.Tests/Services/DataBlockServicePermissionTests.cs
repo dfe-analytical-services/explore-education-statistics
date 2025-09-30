@@ -21,28 +21,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class DataBlockServicePermissionTests
 {
-    private static readonly ReleaseVersion ReleaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly ReleaseVersion ReleaseVersion = new() { Id = Guid.NewGuid() };
 
     private static readonly DataBlockVersion DataBlockVersion = new()
     {
         Id = Guid.NewGuid(),
-        ReleaseVersion = ReleaseVersion
+        ReleaseVersion = ReleaseVersion,
     };
 
     [Fact]
     public async Task Get()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildDataBlockService(userService: userService.Object);
-                    return service.Get(DataBlockVersion.Id);
-                });
+            .SetupResourceCheckToFail(
+                ReleaseVersion,
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
+            )
+            .AssertForbidden(userService =>
+            {
+                var service = BuildDataBlockService(userService: userService.Object);
+                return service.Get(DataBlockVersion.Id);
+            });
     }
 
     [Fact]
@@ -50,12 +49,11 @@ public class DataBlockServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildDataBlockService(userService: userService.Object);
-                    return service.GetDeletePlan(ReleaseVersion.Id, DataBlockVersion.Id);
-                });
+            .AssertForbidden(userService =>
+            {
+                var service = BuildDataBlockService(userService: userService.Object);
+                return service.GetDeletePlan(ReleaseVersion.Id, DataBlockVersion.Id);
+            });
     }
 
     [Fact]
@@ -63,16 +61,14 @@ public class DataBlockServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildDataBlockService(userService: userService.Object);
-                    return service.Create(ReleaseVersion.Id, new DataBlockCreateRequest
-                    {
-                        Heading = "Heading 1",
-                        Name = "Name 1",
-                    });
-                });
+            .AssertForbidden(userService =>
+            {
+                var service = BuildDataBlockService(userService: userService.Object);
+                return service.Create(
+                    ReleaseVersion.Id,
+                    new DataBlockCreateRequest { Heading = "Heading 1", Name = "Name 1" }
+                );
+            });
     }
 
     [Fact]
@@ -80,16 +76,14 @@ public class DataBlockServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildDataBlockService(userService: userService.Object);
-                    return service.Update(DataBlockVersion.Id, new DataBlockUpdateRequest
-                    {
-                        Heading = "Heading 1",
-                        Name = "Name 1",
-                    });
-                });
+            .AssertForbidden(userService =>
+            {
+                var service = BuildDataBlockService(userService: userService.Object);
+                return service.Update(
+                    DataBlockVersion.Id,
+                    new DataBlockUpdateRequest { Heading = "Heading 1", Name = "Name 1" }
+                );
+            });
     }
 
     [Fact]
@@ -97,26 +91,26 @@ public class DataBlockServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildDataBlockService(userService: userService.Object);
-                    return service.Delete(ReleaseVersion.Id, DataBlockVersion.Id);
-                });
+            .AssertForbidden(userService =>
+            {
+                var service = BuildDataBlockService(userService: userService.Object);
+                return service.Delete(ReleaseVersion.Id, DataBlockVersion.Id);
+            });
     }
 
     [Fact]
     public async Task GetUnattachedDataBlocks()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = BuildDataBlockService(userService: userService.Object);
-                    return service.GetUnattachedDataBlocks(ReleaseVersion.Id);
-                }
-            );
+            .SetupResourceCheckToFail(
+                ReleaseVersion,
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
+            )
+            .AssertForbidden(userService =>
+            {
+                var service = BuildDataBlockService(userService: userService.Object);
+                return service.GetUnattachedDataBlocks(ReleaseVersion.Id);
+            });
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelperMock()
@@ -133,7 +127,8 @@ public class DataBlockServicePermissionTests
         IReleaseFileService? releaseFileService = null,
         IUserService? userService = null,
         IPrivateBlobCacheService? privateCacheService = null,
-        ICacheKeyService? cacheKeyService = null)
+        ICacheKeyService? cacheKeyService = null
+    )
     {
         var service = new DataBlockService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

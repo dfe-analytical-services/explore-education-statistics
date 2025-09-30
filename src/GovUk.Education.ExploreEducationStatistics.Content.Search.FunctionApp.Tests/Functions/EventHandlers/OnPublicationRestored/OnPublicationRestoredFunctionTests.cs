@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnPublicationRestoredFunctionTests
 {
-    private OnPublicationRestoredFunction GetSut() => new(
-        new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+    private OnPublicationRestoredFunction GetSut() =>
+        new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
@@ -21,9 +21,13 @@ public class OnPublicationRestoredFunctionTests
     {
         var payload = new PublicationRestoredEventDto { PublicationSlug = "publication-slug" };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
-        var expected = new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug };
+        var expected = new RefreshSearchableDocumentMessageDto
+        {
+            PublicationSlug = payload.PublicationSlug,
+        };
 
-        var response = await GetSut().OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
+        var response = await GetSut()
+            .OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         var actual = Assert.Single(response);
         Assert.Equal(expected, actual);
@@ -31,12 +35,15 @@ public class OnPublicationRestoredFunctionTests
 
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
+    public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(
+        string? blankSlug
+    )
     {
         var payload = new PublicationRestoredEventDto { PublicationSlug = blankSlug };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
-        var response = await GetSut().OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
+        var response = await GetSut()
+            .OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         Assert.Empty(response);
     }

@@ -15,12 +15,9 @@ public record PublicationExternalMethodologyDto
 
     public required string Url { get; init; }
 
-    public static PublicationExternalMethodologyDto? FromExternalMethodology(ExternalMethodology externalMethodology) =>
-        new()
-        {
-            Title = externalMethodology.Title,
-            Url = externalMethodology.Url
-        };
+    public static PublicationExternalMethodologyDto? FromExternalMethodology(
+        ExternalMethodology externalMethodology
+    ) => new() { Title = externalMethodology.Title, Url = externalMethodology.Url };
 }
 
 public record PublicationMethodologyDto
@@ -37,7 +34,7 @@ public record PublicationMethodologyDto
             {
                 MethodologyId = methodology.Id,
                 Title = methodology.LatestPublishedVersion.Title,
-                Slug = methodology.LatestPublishedVersion.Slug
+                Slug = methodology.LatestPublishedVersion.Slug,
             }
             : throw new InvalidOperationException("Methodology must have a published version");
 }

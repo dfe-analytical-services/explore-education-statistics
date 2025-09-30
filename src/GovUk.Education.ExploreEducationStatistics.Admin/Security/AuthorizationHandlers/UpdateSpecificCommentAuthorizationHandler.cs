@@ -8,9 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class UpdateSpecificCommentRequirement : IAuthorizationRequirement
-{
-}
+public class UpdateSpecificCommentRequirement : IAuthorizationRequirement { }
 
 public class UpdateSpecificCommentAuthorizationHandler
     : AuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
@@ -18,34 +16,42 @@ public class UpdateSpecificCommentAuthorizationHandler
     private readonly ContentDbContext _contentDbContext;
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
-        AuthorizationHandlerService authorizationHandlerService)
+    public UpdateSpecificCommentAuthorizationHandler(
+        ContentDbContext contentDbContext,
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _contentDbContext = contentDbContext;
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         UpdateSpecificCommentRequirement requirement,
-        Comment resource)
+        Comment resource
+    )
     {
         var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
         var updateSpecificReleaseVersionContext = new AuthorizationHandlerContext(
             requirements: [new UpdateSpecificReleaseVersionRequirement()],
-            user:
-            context.User,
-            resource: releaseVersion);
+            user: context.User,
+            resource: releaseVersion
+        );
 
-        await new UpdateSpecificReleaseVersionAuthorizationHandler(_authorizationHandlerService)
-            .HandleAsync(updateSpecificReleaseVersionContext);
+        await new UpdateSpecificReleaseVersionAuthorizationHandler(
+            _authorizationHandlerService
+        ).HandleAsync(updateSpecificReleaseVersionContext);
 
         if (!updateSpecificReleaseVersionContext.HasSucceeded)
         {
             return;
         }
 
-        var canUpdateOwnCommentContext =
-            new AuthorizationHandlerContext(new[] {requirement}, context.User, resource);
+        var canUpdateOwnCommentContext = new AuthorizationHandlerContext(
+            new[] { requirement },
+            context.User,
+            resource
+        );
 
         await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(canUpdateOwnCommentContext);
 
@@ -58,8 +64,7 @@ public class UpdateSpecificCommentAuthorizationHandler
     private static ReleaseVersion? GetReleaseVersion(ContentDbContext context, Comment comment)
     {
         var contentBlock = context
-            .ContentBlocks
-            .Include(block => block.ContentSection)
+            .ContentBlocks.Include(block => block.ContentSection)
             .ThenInclude(contentSection => contentSection!.ReleaseVersion)
             .First(block => block.Id == comment.ContentBlockId);
 
@@ -67,11 +72,9 @@ public class UpdateSpecificCommentAuthorizationHandler
     }
 }
 
-public class CanUpdateOwnCommentAuthorizationHandler :
-    EntityAuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
+public class CanUpdateOwnCommentAuthorizationHandler
+    : EntityAuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
 {
-    public CanUpdateOwnCommentAuthorizationHandler() : base(
-        context => context.User.GetUserId() == context.Entity.CreatedById)
-    {
-    }
+    public CanUpdateOwnCommentAuthorizationHandler()
+        : base(context => context.User.GetUserId() == context.Entity.CreatedById) { }
 }

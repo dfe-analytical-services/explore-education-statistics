@@ -3,7 +3,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IMethodologyVersionRepository
 {
-    Task<MethodologyVersion> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId);
+    Task<MethodologyVersion> CreateMethodologyForPublication(
+        Guid publicationId,
+        Guid createdByUserId
+    );
 
     Task<MethodologyVersion> GetLatestVersion(Guid methodologyId);
 

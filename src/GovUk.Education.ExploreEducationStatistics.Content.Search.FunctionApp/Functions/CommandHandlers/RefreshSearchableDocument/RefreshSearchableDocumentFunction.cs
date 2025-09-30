@@ -7,22 +7,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class RefreshSearchableDocumentFunction(
     ISearchableDocumentCreator searchableDocumentCreator,
-    ICommandHandler commandHandler)
+    ICommandHandler commandHandler
+)
 {
     [Function(nameof(RefreshSearchableDocument))]
     [QueueOutput("%SearchableDocumentCreatedQueueName%")]
     public async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
         [QueueTrigger("%RefreshSearchableDocumentQueueName%")]
-        RefreshSearchableDocumentMessageDto message,
-        FunctionContext context) =>
-        await commandHandler.Handle(
-            RefreshSearchableDocument,
-            message,
-            context.CancellationToken);
+            RefreshSearchableDocumentMessageDto message,
+        FunctionContext context
+    ) => await commandHandler.Handle(RefreshSearchableDocument, message, context.CancellationToken);
 
     private async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
-        RefreshSearchableDocumentMessageDto message, 
-        CancellationToken cancellationToken)
+        RefreshSearchableDocumentMessageDto message,
+        CancellationToken cancellationToken
+    )
     {
         if (string.IsNullOrEmpty(message.PublicationSlug))
         {
@@ -32,13 +31,14 @@ public class RefreshSearchableDocumentFunction(
         // Create Searchable Document
         var request = new CreatePublicationLatestReleaseSearchableDocumentRequest
         {
-            PublicationSlug = message.PublicationSlug
+            PublicationSlug = message.PublicationSlug,
         };
 
         var response =
             await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(
                 request,
-                cancellationToken);
+                cancellationToken
+            );
 
         return
         [
@@ -49,7 +49,7 @@ public class RefreshSearchableDocumentFunction(
                 ReleaseSlug = response.ReleaseSlug,
                 ReleaseVersionId = response.ReleaseVersionId,
                 BlobName = response.BlobName,
-            }
+            },
         ];
     }
 }

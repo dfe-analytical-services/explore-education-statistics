@@ -13,10 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 public class BlobSasService(
     DateTimeProvider dateTimeProvider,
     ILogger<BlobSasService> logger,
-    BlobSasService.ISecureBlobClientCreator? secureBlobClientCreator = null) : IBlobSasService
+    BlobSasService.ISecureBlobClientCreator? secureBlobClientCreator = null
+) : IBlobSasService
 {
-    private readonly ISecureBlobClientCreator _secureBlobClientCreator
-        = secureBlobClientCreator ?? new SecureBlobClientCreator();
+    private readonly ISecureBlobClientCreator _secureBlobClientCreator =
+        secureBlobClientCreator ?? new SecureBlobClientCreator();
 
     public Task<Either<ActionResult, BlobDownloadToken>> CreateBlobDownloadToken(
         BlobServiceClient blobServiceClient,
@@ -24,23 +25,27 @@ public class BlobSasService(
         string filename,
         string path,
         TimeSpan expiryDuration,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var containerName = GetContainerName(blobServiceClient, container);
 
         return GetBlobClientOrNotFound(
                 blobServiceClient: blobServiceClient,
                 containerName: containerName,
-                path: path)
+                path: path
+            )
             .OnSuccess(async blobClient =>
             {
-                BlobProperties blobProperties =
-                    await blobClient.GetPropertiesAsync(cancellationToken: cancellationToken);
+                BlobProperties blobProperties = await blobClient.GetPropertiesAsync(
+                    cancellationToken: cancellationToken
+                );
 
                 var uri = CreateSasUrl(
                     client: blobClient,
                     containerName: containerName,
-                    expiryDuration: expiryDuration);
+                    expiryDuration: expiryDuration
+                );
 
                 var requestParameters = uri.Query[1..];
 
@@ -49,28 +54,30 @@ public class BlobSasService(
                     ContainerName: containerName,
                     Path: path,
                     Filename: filename,
-                    ContentType: blobProperties.ContentType);
+                    ContentType: blobProperties.ContentType
+                );
             });
     }
 
     public async Task<Either<ActionResult, BlobClient>> CreateSecureBlobClient(
         BlobServiceClient blobServiceClient,
-        BlobDownloadToken token)
+        BlobDownloadToken token
+    )
     {
         return await GetBlobClientOrNotFound(
                 blobServiceClient: blobServiceClient,
                 containerName: token.ContainerName,
-                path: token.Path)
-            .OnSuccess(originalBlobClient => _secureBlobClientCreator
-                .CreateSecureBlobClient(
+                path: token.Path
+            )
+            .OnSuccess(originalBlobClient =>
+                _secureBlobClientCreator.CreateSecureBlobClient(
                     blobClientUri: originalBlobClient.Uri,
-                    sasToken: token.Token));
+                    sasToken: token.Token
+                )
+            );
     }
 
-    private Uri CreateSasUrl(
-        BlobClient client,
-        string containerName,
-        TimeSpan expiryDuration)
+    private Uri CreateSasUrl(BlobClient client, string containerName, TimeSpan expiryDuration)
     {
         // Check if BlobContainerClient object has been authorized with Shared Key
         if (client.CanGenerateSasUri)
@@ -80,7 +87,7 @@ public class BlobSasService(
             {
                 BlobContainerName = containerName,
                 Resource = "c",
-                ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration)
+                ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration),
             };
 
             sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
@@ -94,7 +101,8 @@ public class BlobSasService(
     private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
         BlobServiceClient blobServiceClient,
         string containerName,
-        string path)
+        string path
+    )
     {
         var blobContainer = blobServiceClient.GetBlobContainerClient(containerName);
         var client = blobContainer.GetBlobClient(path);
@@ -119,9 +127,7 @@ public class BlobSasService(
 
     public interface ISecureBlobClientCreator
     {
-        BlobClient CreateSecureBlobClient(
-            Uri blobClientUri,
-            string sasToken);
+        BlobClient CreateSecureBlobClient(Uri blobClientUri, string sasToken);
     }
 
     private class SecureBlobClientCreator : ISecureBlobClientCreator
@@ -130,7 +136,8 @@ public class BlobSasService(
         {
             return new BlobClient(
                 blobUri: blobClientUri,
-                credential: new AzureSasCredential(sasToken));
+                credential: new AzureSasCredential(sasToken)
+            );
         }
     }
 }

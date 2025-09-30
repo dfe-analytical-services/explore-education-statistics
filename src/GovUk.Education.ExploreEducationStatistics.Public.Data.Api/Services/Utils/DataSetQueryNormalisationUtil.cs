@@ -10,12 +10,9 @@ public static class DataSetQueryNormalisationUtil
     {
         return original with
         {
-            Indicators = original
-                .Indicators?
-                .Order()
-                .ToList(),
-            
-            Criteria = original.Criteria != null ? NormaliseCriteria(original.Criteria) : null
+            Indicators = original.Indicators?.Order().ToList(),
+
+            Criteria = original.Criteria != null ? NormaliseCriteria(original.Criteria) : null,
         };
     }
 
@@ -31,8 +28,10 @@ public static class DataSetQueryNormalisationUtil
                 return NormaliseOr(or);
             case DataSetQueryCriteriaNot not:
                 return NormaliseNot(not);
-            default: 
-                throw new ArgumentException($"Unknown data set query criteria type {original.GetType()}");
+            default:
+                throw new ArgumentException(
+                    $"Unknown data set query criteria type {original.GetType()}"
+                );
         }
     }
 
@@ -48,100 +47,108 @@ public static class DataSetQueryNormalisationUtil
             Filters = NormaliseFilters(original.Filters),
             Locations = NormaliseLocations(original.Locations),
             GeographicLevels = NormaliseGeographicLevels(original.GeographicLevels),
-            TimePeriods = NormaliseTimePeriods(original.TimePeriods)
+            TimePeriods = NormaliseTimePeriods(original.TimePeriods),
         };
     }
-    
+
     private static DataSetQueryCriteriaAnd NormaliseAnd(DataSetQueryCriteriaAnd original)
     {
         return new DataSetQueryCriteriaAnd
         {
             And = original
-                .And
-                .Select(NormaliseCriteria)
-                .OrderBy(criteria => JsonSerializationUtils.Serialize(
-                    obj: criteria,
-                    formatting: Formatting.None,
-                    camelCase: true,
-                    orderedProperties: true
-                    ))
-                .ToList()
+                .And.Select(NormaliseCriteria)
+                .OrderBy(criteria =>
+                    JsonSerializationUtils.Serialize(
+                        obj: criteria,
+                        formatting: Formatting.None,
+                        camelCase: true,
+                        orderedProperties: true
+                    )
+                )
+                .ToList(),
         };
     }
-    
+
     private static DataSetQueryCriteriaOr NormaliseOr(DataSetQueryCriteriaOr original)
     {
         return new DataSetQueryCriteriaOr
         {
             Or = original
-                .Or
-                .Select(NormaliseCriteria)
-                .OrderBy(criteria => JsonSerializationUtils.Serialize(
-                    obj: criteria,
-                    formatting: Formatting.None,
-                    camelCase: true,
-                    orderedProperties: true))
-                .ToList()
-        };
-    }
-    
-    private static DataSetQueryCriteriaNot NormaliseNot(DataSetQueryCriteriaNot original)
-    {
-        return new DataSetQueryCriteriaNot
-        {
-            Not = NormaliseCriteria(original.Not)
+                .Or.Select(NormaliseCriteria)
+                .OrderBy(criteria =>
+                    JsonSerializationUtils.Serialize(
+                        obj: criteria,
+                        formatting: Formatting.None,
+                        camelCase: true,
+                        orderedProperties: true
+                    )
+                )
+                .ToList(),
         };
     }
 
-    private static DataSetQueryCriteriaFilters? NormaliseFilters(DataSetQueryCriteriaFilters? original)
+    private static DataSetQueryCriteriaNot NormaliseNot(DataSetQueryCriteriaNot original)
+    {
+        return new DataSetQueryCriteriaNot { Not = NormaliseCriteria(original.Not) };
+    }
+
+    private static DataSetQueryCriteriaFilters? NormaliseFilters(
+        DataSetQueryCriteriaFilters? original
+    )
     {
         return original == null
             ? null
-            : original with { In = original.In?.Order().ToList(), NotIn = original.NotIn?.Order().ToList() };
+            : original with
+            {
+                In = original.In?.Order().ToList(),
+                NotIn = original.NotIn?.Order().ToList(),
+            };
     }
 
-    private static DataSetQueryCriteriaLocations? NormaliseLocations(DataSetQueryCriteriaLocations? original)
+    private static DataSetQueryCriteriaLocations? NormaliseLocations(
+        DataSetQueryCriteriaLocations? original
+    )
+    {
+        return original == null
+            ? null
+            : original with
+            {
+                In = original.In?.OrderBy(location => location.ToLocationString()).ToList(),
+
+                NotIn = original.NotIn?.OrderBy(location => location.ToLocationString()).ToList(),
+            };
+    }
+
+    private static DataSetQueryCriteriaGeographicLevels? NormaliseGeographicLevels(
+        DataSetQueryCriteriaGeographicLevels? original
+    )
+    {
+        return original == null
+            ? null
+            : original with
+            {
+                In = original.In?.Order().ToList(),
+                NotIn = original.NotIn?.Order().ToList(),
+            };
+    }
+
+    private static DataSetQueryCriteriaTimePeriods? NormaliseTimePeriods(
+        DataSetQueryCriteriaTimePeriods? original
+    )
     {
         return original == null
             ? null
             : original with
             {
                 In = original
-                    .In?
-                    .OrderBy(location => location.ToLocationString())
-                    .ToList(),
-                
-                NotIn = original
-                    .NotIn?
-                    .OrderBy(location => location.ToLocationString())
-                    .ToList()
-            };
-    }
-
-    private static DataSetQueryCriteriaGeographicLevels? NormaliseGeographicLevels(DataSetQueryCriteriaGeographicLevels? original)
-    {
-        return original == null
-            ? null
-            : original with { In = original.In?.Order().ToList(), NotIn = original.NotIn?.Order().ToList() };
-    }
-
-    private static DataSetQueryCriteriaTimePeriods? NormaliseTimePeriods(DataSetQueryCriteriaTimePeriods? original)
-    {
-        return original == null
-            ? null
-            : original with {
-                
-                In = original
-                    .In?
-                    .OrderBy(timePeriod => timePeriod.Code)
+                    .In?.OrderBy(timePeriod => timePeriod.Code)
                     .ThenBy(timePeriod => timePeriod.Period)
                     .ToList(),
-                
+
                 NotIn = original
-                    .NotIn?
-                    .OrderBy(timePeriod => timePeriod.Code)
+                    .NotIn?.OrderBy(timePeriod => timePeriod.Code)
                     .ThenBy(timePeriod => timePeriod.Period)
-                    .ToList()
+                    .ToList(),
             };
     }
 }

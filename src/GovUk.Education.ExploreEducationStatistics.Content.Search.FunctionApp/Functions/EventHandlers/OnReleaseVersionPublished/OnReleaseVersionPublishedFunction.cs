@@ -11,44 +11,62 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
 {
     [Function(nameof(OnReleaseVersionPublished))]
     public async Task<OnReleaseVersionPublishedOutput> OnReleaseVersionPublished(
-        [QueueTrigger("%ReleaseVersionPublishedQueueName%")]
-        EventGridEvent eventDto,
-        FunctionContext context) =>
-        await eventGridEventHandler.Handle<ReleaseVersionPublishedEventDto, OnReleaseVersionPublishedOutput>(
+        [QueueTrigger("%ReleaseVersionPublishedQueueName%")] EventGridEvent eventDto,
+        FunctionContext context
+    ) =>
+        await eventGridEventHandler.Handle<
+            ReleaseVersionPublishedEventDto,
+            OnReleaseVersionPublishedOutput
+        >(
             context,
             eventDto,
             (payload, _) =>
                 Task.FromResult(
-                    string.IsNullOrEmpty(payload.PublicationSlug) 
-                    || !payload.NewlyPublishedReleaseVersionIsLatest 
+                    string.IsNullOrEmpty(payload.PublicationSlug)
+                    || !payload.NewlyPublishedReleaseVersionIsLatest
                     || payload.IsPublicationArchived == true
                         ? OnReleaseVersionPublishedOutput.Empty
                         : new OnReleaseVersionPublishedOutput
                         {
-                            RefreshSearchableDocumentMessages = BuildRefreshSearchableDocumentMessages(payload),
-                            RemoveSearchableDocuments = BuildRemoveSearchableDocumentsCommands(payload)
-                        }));
+                            RefreshSearchableDocumentMessages =
+                                BuildRefreshSearchableDocumentMessages(payload),
+                            RemoveSearchableDocuments = BuildRemoveSearchableDocumentsCommands(
+                                payload
+                            ),
+                        }
+                )
+        );
 
-    private static RefreshSearchableDocumentMessageDto[] BuildRefreshSearchableDocumentMessages(ReleaseVersionPublishedEventDto payload) => 
-        [ new() { PublicationSlug = payload.PublicationSlug } ];
+    private static RefreshSearchableDocumentMessageDto[] BuildRefreshSearchableDocumentMessages(
+        ReleaseVersionPublishedEventDto payload
+    ) => [new() { PublicationSlug = payload.PublicationSlug }];
 
-    private static RemoveSearchableDocumentDto[] BuildRemoveSearchableDocumentsCommands(ReleaseVersionPublishedEventDto payload) =>
-        payload is
-        {
-            NewlyPublishedReleaseVersionIsForDifferentRelease: true, 
-            PreviousLatestPublishedReleaseId: not null
-        }
-            ? [ new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId } ]
+    private static RemoveSearchableDocumentDto[] BuildRemoveSearchableDocumentsCommands(
+        ReleaseVersionPublishedEventDto payload
+    ) =>
+        payload
+            is {
+                NewlyPublishedReleaseVersionIsForDifferentRelease: true,
+                PreviousLatestPublishedReleaseId: not null
+            }
+            ?
+            [
+                new RemoveSearchableDocumentDto
+                {
+                    ReleaseId = payload.PreviousLatestPublishedReleaseId,
+                },
+            ]
             : [];
 }
 
 public record OnReleaseVersionPublishedOutput
 {
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
-    public RefreshSearchableDocumentMessageDto[] RefreshSearchableDocumentMessages { get; init; } = [];
-    
+    public RefreshSearchableDocumentMessageDto[] RefreshSearchableDocumentMessages { get; init; } =
+    [];
+
     [QueueOutput("%RemoveSearchableDocumentQueueName%")]
     public RemoveSearchableDocumentDto[] RemoveSearchableDocuments { get; init; } = [];
-    
+
     public static OnReleaseVersionPublishedOutput Empty => new();
 }

@@ -9,11 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 public class RetryReleasePublishingFunction(
     ILogger<RetryReleasePublishingFunction> logger,
     IQueueService queueService,
-    IReleasePublishingStatusService releasePublishingStatusService)
+    IReleasePublishingStatusService releasePublishingStatusService
+)
 {
     private static readonly ReleasePublishingStatusOverallStage[] ValidStates =
     [
-        ReleasePublishingStatusOverallStage.Complete, ReleasePublishingStatusOverallStage.Failed
+        ReleasePublishingStatusOverallStage.Complete,
+        ReleasePublishingStatusOverallStage.Failed,
     ];
 
     /// <summary>
@@ -26,27 +28,33 @@ public class RetryReleasePublishingFunction(
     [Function("RetryReleasePublishing")]
     public async Task RetryReleasePublishing(
         [QueueTrigger(RetryReleasePublishingQueue)] RetryReleasePublishingMessage message,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var releaseStatus = await releasePublishingStatusService.GetLatest(message.ReleaseVersionId);
+        var releaseStatus = await releasePublishingStatusService.GetLatest(
+            message.ReleaseVersionId
+        );
 
         if (releaseStatus == null)
         {
             logger.LogError(
                 "Latest status not found for ReleaseVersion: {ReleaseVersionId} while attempting to retry",
-                message.ReleaseVersionId);
+                message.ReleaseVersionId
+            );
         }
         else
         {
             if (!ValidStates.Contains(releaseStatus.State.Overall))
             {
-                logger.LogError("Can only attempt a retry of ReleaseVersion: {ReleaseVersionId} if the latest " +
-                                "status is in [{ValidStates}]. Found: {OverallState}",
+                logger.LogError(
+                    "Can only attempt a retry of ReleaseVersion: {ReleaseVersionId} if the latest "
+                        + "status is in [{ValidStates}]. Found: {OverallState}",
                     message.ReleaseVersionId,
                     string.Join(", ", ValidStates),
-                    releaseStatus.State.Overall);
+                    releaseStatus.State.Overall
+                );
             }
             else
             {

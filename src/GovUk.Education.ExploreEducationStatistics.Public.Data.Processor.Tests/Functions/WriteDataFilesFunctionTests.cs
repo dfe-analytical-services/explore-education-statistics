@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class WriteDataFilesFunctionTests(
-    ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class WriteDataFilesFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private static readonly string[] AllDataSetVersionFiles =
@@ -21,7 +20,7 @@ public abstract class WriteDataFilesFunctionTests(
         FilterOptionsTable.ParquetFile,
         IndicatorsTable.ParquetFile,
         LocationOptionsTable.ParquetFile,
-        TimePeriodsTable.ParquetFile
+        TimePeriodsTable.ParquetFile,
     ];
 
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.WritingDataFiles;
@@ -31,22 +30,25 @@ public abstract class WriteDataFilesFunctionTests(
         ProcessorTestData.AbsenceSchool,
     };
 
-    public class WriteDataTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
+    public class WriteDataTests(ProcessorFunctionsIntegrationTestFixture fixture)
         : WriteDataFilesFunctionTests(fixture)
     {
         [Theory]
         [MemberData(nameof(Data))]
         public async Task Success(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(
+                Stage.PreviousStage()
+            );
 
             await WriteData(testData, dataSetVersion, instanceId);
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
+            var savedImport = await publicDataDbContext
+                .DataSetVersionImports.Include(dataSetVersionImport =>
+                    dataSetVersionImport.DataSetVersion
+                )
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
@@ -58,7 +60,8 @@ public abstract class WriteDataFilesFunctionTests(
         private async Task WriteData(
             ProcessorTestData testData,
             DataSetVersion dataSetVersion,
-            Guid instanceId)
+            Guid instanceId
+        )
         {
             SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
 

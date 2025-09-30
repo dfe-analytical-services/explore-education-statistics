@@ -9,18 +9,20 @@ public enum MethodologyApprovalStatus
 {
     Draft,
     HigherLevelReview,
-    Approved
+    Approved,
 }
 
 public enum MethodologyPublishingStrategy
 {
     Immediately,
-    WithRelease
+    WithRelease,
 }
 
 public class MethodologyVersion : ICreatedTimestamp<DateTime?>
 {
-    [Key] [Required] public Guid Id { get; set; }
+    [Key]
+    [Required]
+    public Guid Id { get; set; }
 
     public string Title => AlternativeTitle ?? Methodology.OwningPublicationTitle;
 
@@ -84,7 +86,9 @@ public class MethodologyVersion : ICreatedTimestamp<DateTime?>
 
             if (ScheduledWithReleaseVersionId == null || ScheduledWithReleaseVersion == null)
             {
-                throw new InvalidOperationException("ScheduledWithRelease field not included in MethodologyVersion");
+                throw new InvalidOperationException(
+                    "ScheduledWithRelease field not included in MethodologyVersion"
+                );
             }
 
             return ScheduledWithReleaseVersion.Live;

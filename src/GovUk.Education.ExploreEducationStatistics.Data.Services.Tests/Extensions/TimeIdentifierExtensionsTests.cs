@@ -7,8 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
 
 public class TimeIdentifierExtensionsTests
 {
-    private readonly IEnumerable<TimeIdentifier> _allTimeIdentifiers =
-        Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>().ToList();
+    private readonly IEnumerable<TimeIdentifier> _allTimeIdentifiers = Enum.GetValues(
+            typeof(TimeIdentifier)
+        )
+        .Cast<TimeIdentifier>()
+        .ToList();
 
     [Fact]
     public void TimeIdentifiersAreAlikeWhenTheyAreEqual()
@@ -79,71 +82,91 @@ public class TimeIdentifierExtensionsTests
     [Fact]
     public void TimeIdentifiersAreAcademicQuarters()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsAcademicQuarter(),
-            TimeIdentifierUtil.GetAcademicQuarters());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsAcademicQuarter(),
+            TimeIdentifierUtil.GetAcademicQuarters()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreCalendarQuarters()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsCalendarQuarter(),
-            TimeIdentifierUtil.GetCalendarQuarters());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsCalendarQuarter(),
+            TimeIdentifierUtil.GetCalendarQuarters()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreFinancialQuarters()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsFinancialQuarter(),
-            TimeIdentifierUtil.GetFinancialQuarters());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsFinancialQuarter(),
+            TimeIdentifierUtil.GetFinancialQuarters()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreTaxQuarters()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsTaxQuarter(),
-            TimeIdentifierUtil.GetTaxQuarters());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsTaxQuarter(),
+            TimeIdentifierUtil.GetTaxQuarters()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreYears()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsYear(),
-            TimeIdentifierUtil.GetYears());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsYear(),
+            TimeIdentifierUtil.GetYears()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreMonths()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(),
-            TimeIdentifierUtil.GetMonths());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsMonth(),
+            TimeIdentifierUtil.GetMonths()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreWeeks()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsWeek(),
-            TimeIdentifierUtil.GetWeeks());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsWeek(),
+            TimeIdentifierUtil.GetWeeks()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreTerms()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsTerm(),
-            TimeIdentifierUtil.GetTerms());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsTerm(),
+            TimeIdentifierUtil.GetTerms()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersAreFinancialYearParts()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.IsFinancialYearPart(),
-            TimeIdentifierUtil.GetFinancialYearParts());
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.IsFinancialYearPart(),
+            TimeIdentifierUtil.GetFinancialYearParts()
+        );
     }
 
     [Fact]
     public void TimeIdentifiersHaveAssociatedRanges()
     {
-        AssertTimeIdentifiersMeetCondition(identifier => identifier.HasAssociatedRange(),
-            _allTimeIdentifiers.Except(TimeIdentifierUtil.GetYears()));
+        AssertTimeIdentifiersMeetCondition(
+            identifier => identifier.HasAssociatedRange(),
+            _allTimeIdentifiers.Except(TimeIdentifierUtil.GetYears())
+        );
     }
 
     [Fact]
@@ -170,7 +193,10 @@ public class TimeIdentifierExtensionsTests
     [Fact]
     public void GetAssociatedRangeForFinancialQuarterReturnsAssociatedRange()
     {
-        Assert.Equal(TimeIdentifierUtil.GetFinancialQuarters(), FinancialYearQ1.GetAssociatedRange());
+        Assert.Equal(
+            TimeIdentifierUtil.GetFinancialQuarters(),
+            FinancialYearQ1.GetAssociatedRange()
+        );
     }
 
     [Fact]
@@ -200,11 +226,16 @@ public class TimeIdentifierExtensionsTests
     [Fact]
     public void GetAssociatedRangeForFinancialYearPartsReturnsAssociatedRange()
     {
-        Assert.Equal(TimeIdentifierUtil.GetFinancialYearParts(), FinancialYearPart1.GetAssociatedRange());
+        Assert.Equal(
+            TimeIdentifierUtil.GetFinancialYearParts(),
+            FinancialYearPart1.GetAssociatedRange()
+        );
     }
 
-    private void AssertTimeIdentifiersMeetCondition(Func<TimeIdentifier, bool> condition,
-        IEnumerable<TimeIdentifier> expectedTrue)
+    private void AssertTimeIdentifiersMeetCondition(
+        Func<TimeIdentifier, bool> condition,
+        IEnumerable<TimeIdentifier> expectedTrue
+    )
     {
         foreach (var identifier in expectedTrue)
         {

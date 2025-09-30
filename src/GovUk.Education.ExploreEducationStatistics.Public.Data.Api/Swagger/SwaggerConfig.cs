@@ -9,9 +9,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
-public class SwaggerConfig(
-    IApiVersionDescriptionProvider provider,
-    IOptions<AppOptions> appOptions)
+public class SwaggerConfig(IApiVersionDescriptionProvider provider, IOptions<AppOptions> appOptions)
     : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)
@@ -32,26 +30,28 @@ public class SwaggerConfig(
         options.SchemaFilter<TimeIdentifierSchemaFilter>();
 
         Directory
-            .GetFiles(AppContext.BaseDirectory,"*.xml", SearchOption.TopDirectoryOnly)
+            .GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly)
             .ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
 
-        options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
+        options.EnableAnnotations(
+            enableAnnotationsForInheritance: true,
+            enableAnnotationsForPolymorphism: true
+        );
         options.DescribeAllParametersInCamelCase();
         options.UseAllOfToExtendReferenceSchemas();
         options.SupportNonNullableReferenceTypes();
 
         options.CustomOperationIds(apiDesc =>
-            {
-                var actionDescriptor = apiDesc.ActionDescriptor;
+        {
+            var actionDescriptor = apiDesc.ActionDescriptor;
 
-                return actionDescriptor.AttributeRouteInfo?.Name
-                       ?? actionDescriptor.EndpointMetadata
-                               .OfType<IEndpointNameMetadata>()
-                               .LastOrDefault()
-                               ?.EndpointName
-                       ?? (apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
-            }
-        );
+            return actionDescriptor.AttributeRouteInfo?.Name
+                ?? actionDescriptor
+                    .EndpointMetadata.OfType<IEndpointNameMetadata>()
+                    .LastOrDefault()
+                    ?.EndpointName
+                ?? (apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
+        });
 
         options.CustomSchemaIds(SchemaIdSelector);
 
@@ -67,17 +67,15 @@ public class SwaggerConfig(
                     {
                         Name = "Explore education statistics",
                         Email = "explore.statistics@education.gov.uk",
-                        Url = new Uri("https://explore-education-statistics.service.gov.uk")
+                        Url = new Uri("https://explore-education-statistics.service.gov.uk"),
                     },
                 }
             );
         }
 
-        options.AddServer(new OpenApiServer
-        {
-            Description = "API server",
-            Url = appOptions.Value.Url
-        });
+        options.AddServer(
+            new OpenApiServer { Description = "API server", Url = appOptions.Value.Url }
+        );
     }
 
     private static string SchemaIdSelector(Type type)

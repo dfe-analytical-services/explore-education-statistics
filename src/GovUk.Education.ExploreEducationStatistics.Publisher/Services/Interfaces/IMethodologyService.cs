@@ -14,6 +14,8 @@ public interface IMethodologyService
 
     Task Publish(MethodologyVersion methodologyVersion);
 
-    Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion,
-        ReleaseVersion releaseVersion);
+    Task<bool> IsBeingPublishedAlongsideRelease(
+        MethodologyVersion methodologyVersion,
+        ReleaseVersion releaseVersion
+    );
 }

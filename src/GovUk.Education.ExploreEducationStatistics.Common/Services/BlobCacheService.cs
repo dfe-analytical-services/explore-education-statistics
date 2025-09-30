@@ -12,8 +12,10 @@ public class BlobCacheService : IBlobCacheService
     private readonly IBlobStorageService _blobStorageService;
     private readonly ILogger<BlobCacheService> _logger;
 
-    public BlobCacheService(IBlobStorageService blobStorageService,
-        ILogger<BlobCacheService> logger)
+    public BlobCacheService(
+        IBlobStorageService blobStorageService,
+        ILogger<BlobCacheService> logger
+    )
     {
         _blobStorageService = blobStorageService;
         _logger = logger;
@@ -32,11 +34,15 @@ public class BlobCacheService : IBlobCacheService
         // Attempt to read blob from the storage container
         try
         {
-            var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType)
-                .OrElse(() => (object?) null);
+            var result = await _blobStorageService
+                .GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType)
+                .OrElse(() => (object?)null);
 
-            _logger.LogDebug("Blob cache {HitOrMiss} - for key {CacheKey}",
-                result != null ? "hit" : "miss", key);
+            _logger.LogDebug(
+                "Blob cache {HitOrMiss} - for key {CacheKey}",
+                result != null ? "hit" : "miss",
+                key
+            );
 
             return result;
         }
@@ -44,28 +50,32 @@ public class BlobCacheService : IBlobCacheService
         {
             // If there's an error deserializing the blob, we should
             // assume it's not salvageable and delete it so that it's re-built.
-            _logger.LogWarning(e, $"Error deserializing JSON for blobContainer {blobContainer} and cache " +
-                                  $"key {key} - deleting cached JSON");
+            _logger.LogWarning(
+                e,
+                $"Error deserializing JSON for blobContainer {blobContainer} and cache "
+                    + $"key {key} - deleting cached JSON"
+            );
             await _blobStorageService.DeleteBlob(blobContainer, key);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Caught error fetching cache entry from: {BlobContainer}/{Key}", blobContainer, key);
+            _logger.LogError(
+                e,
+                "Caught error fetching cache entry from: {BlobContainer}/{Key}",
+                blobContainer,
+                key
+            );
         }
 
         return default;
     }
 
-    public void SetItem<TItem>(
-        IBlobCacheKey cacheKey,
-        TItem item)
+    public void SetItem<TItem>(IBlobCacheKey cacheKey, TItem item)
     {
         throw new NotImplementedException();
     }
 
-    public async Task SetItemAsync<TItem>(
-        IBlobCacheKey cacheKey,
-        TItem item)
+    public async Task SetItemAsync<TItem>(IBlobCacheKey cacheKey, TItem item)
     {
         // Write result to cache as a json blob before returning
         await _blobStorageService.UploadAsJson(cacheKey.Container, cacheKey.Key, item);

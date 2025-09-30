@@ -22,7 +22,8 @@ public class FluentValidationActionFilter : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(
         ActionExecutingContext context,
-        ActionExecutionDelegate next)
+        ActionExecutionDelegate next
+    )
     {
         if (context.Controller is not ControllerBase controllerBase)
         {
@@ -45,7 +46,10 @@ public class FluentValidationActionFilter : IAsyncActionFilter
                 continue;
             }
 
-            if (GetValidator(context.HttpContext.RequestServices, parameter) is not IValidator validator)
+            if (
+                GetValidator(context.HttpContext.RequestServices, parameter)
+                is not IValidator validator
+            )
             {
                 continue;
             }
@@ -72,7 +76,9 @@ public class FluentValidationActionFilter : IAsyncActionFilter
                 new ModelStateDictionary()
             );
 
-            context.Result = new BadRequestObjectResult(ValidationProblemViewModel.Create(details, errors));
+            context.Result = new BadRequestObjectResult(
+                ValidationProblemViewModel.Create(details, errors)
+            );
 
             return;
         }
@@ -80,9 +86,14 @@ public class FluentValidationActionFilter : IAsyncActionFilter
         await next();
     }
 
-    private static object? GetValidator(IServiceProvider serviceProvider, ParameterDescriptor parameter)
+    private static object? GetValidator(
+        IServiceProvider serviceProvider,
+        ParameterDescriptor parameter
+    )
     {
-        return serviceProvider.GetService(typeof(IValidator<>).MakeGenericType(parameter.ParameterType));
+        return serviceProvider.GetService(
+            typeof(IValidator<>).MakeGenericType(parameter.ParameterType)
+        );
     }
 
     private static bool IsValidParameter(ParameterDescriptor parameter)
@@ -91,13 +102,13 @@ public class FluentValidationActionFilter : IAsyncActionFilter
         var bindingSource = parameter.BindingInfo?.BindingSource;
 
         return type is { IsClass: true, IsPrimitive: false, IsEnum: false, IsValueType: false }
-               && HasValidBindingSource(bindingSource);
+            && HasValidBindingSource(bindingSource);
     }
 
     private static bool HasValidBindingSource(BindingSource? bindingSource)
     {
-        return bindingSource == BindingSource.Body ||
-               bindingSource == BindingSource.Form ||
-               bindingSource == BindingSource.Query;
+        return bindingSource == BindingSource.Body
+            || bindingSource == BindingSource.Form
+            || bindingSource == BindingSource.Query;
     }
 }

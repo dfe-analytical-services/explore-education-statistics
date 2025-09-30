@@ -8,5 +8,6 @@ public interface IReleaseFileBlobService
 {
     Task<Either<ActionResult, Stream>> GetDownloadStream(
         ReleaseFile releaseFile,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

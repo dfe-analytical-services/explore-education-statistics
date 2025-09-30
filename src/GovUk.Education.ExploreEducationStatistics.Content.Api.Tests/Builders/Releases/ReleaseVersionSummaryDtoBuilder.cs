@@ -11,7 +11,10 @@ public class ReleaseVersionSummaryDtoBuilder
     private string? _label = "Label";
     private DateTime _lastUpdated = new(2025, 9, 1, 8, 30, 0, DateTimeKind.Utc);
     private DateTime _published = new(2025, 8, 1, 8, 30, 0, DateTimeKind.Utc);
-    private PublishingOrganisationDto[] _publishingOrganisations = [new PublishingOrganisationDtoBuilder().Build()];
+    private PublishingOrganisationDto[] _publishingOrganisations =
+    [
+        new PublishingOrganisationDtoBuilder().Build(),
+    ];
     private string _slug = "Slug";
     private string _title = "Title";
     private string _coverageTitle = "Calendar year";
@@ -19,22 +22,23 @@ public class ReleaseVersionSummaryDtoBuilder
     private ReleaseType _type = ReleaseType.OfficialStatistics;
     private int _updateCount = 1;
 
-    public ReleaseVersionSummaryDto Build() => new()
-    {
-        Id = _id,
-        ReleaseId = _releaseId,
-        IsLatestRelease = _isLatestRelease,
-        Label = _label,
-        LastUpdated = _lastUpdated,
-        Published = _published,
-        PublishingOrganisations = _publishingOrganisations,
-        Slug = _slug,
-        Title = _title,
-        CoverageTitle = _coverageTitle,
-        YearTitle = _yearTitle,
-        Type = _type,
-        UpdateCount = _updateCount
-    };
+    public ReleaseVersionSummaryDto Build() =>
+        new()
+        {
+            Id = _id,
+            ReleaseId = _releaseId,
+            IsLatestRelease = _isLatestRelease,
+            Label = _label,
+            LastUpdated = _lastUpdated,
+            Published = _published,
+            PublishingOrganisations = _publishingOrganisations,
+            Slug = _slug,
+            Title = _title,
+            CoverageTitle = _coverageTitle,
+            YearTitle = _yearTitle,
+            Type = _type,
+            UpdateCount = _updateCount,
+        };
 
     public ReleaseVersionSummaryDtoBuilder WithId(Guid id)
     {
@@ -73,7 +77,8 @@ public class ReleaseVersionSummaryDtoBuilder
     }
 
     public ReleaseVersionSummaryDtoBuilder WithPublishingOrganisations(
-        PublishingOrganisationDto[] publishingOrganisations)
+        PublishingOrganisationDto[] publishingOrganisations
+    )
     {
         _publishingOrganisations = publishingOrganisations;
         return this;
@@ -122,12 +127,13 @@ public class PublishingOrganisationDtoBuilder
     private string _title = "Title";
     private string _url = "Url";
 
-    public PublishingOrganisationDto Build() => new()
-    {
-        Id = _id,
-        Title = _title,
-        Url = _url
-    };
+    public PublishingOrganisationDto Build() =>
+        new()
+        {
+            Id = _id,
+            Title = _title,
+            Url = _url,
+        };
 
     public PublishingOrganisationDtoBuilder WithId(Guid id)
     {

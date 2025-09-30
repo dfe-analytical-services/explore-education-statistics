@@ -6,10 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid;
 
 public class EventRaiserTests
 {
-    private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClientFactoryMockBuilder = new();
+    private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClientFactoryMockBuilder =
+        new();
 
-    private IEventRaiser GetSut() => 
-        new EventRaiser(_eventGridClientFactoryMockBuilder.Build());
+    private IEventRaiser GetSut() => new EventRaiser(_eventGridClientFactoryMockBuilder.Build());
 
     private class TestEvent : IEvent
     {
@@ -18,9 +18,10 @@ public class EventRaiserTests
         public string DataVersion => "version";
         public object Payload => "payload";
         public static string EventTopicOptionsKey => "TestEventTopicOptionsKey";
+
         public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
     }
-    
+
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
 
@@ -30,35 +31,32 @@ public class EventRaiserTests
         // ARRANGE
         _eventGridClientFactoryMockBuilder.WhereNoTopicConfigFound();
         var sut = GetSut();
-        
+
         // ACT
         await sut.RaiseEvent(new TestEvent());
-        
+
         // ASSERT
-        _eventGridClientFactoryMockBuilder
-            .Client
-            .Assert.NoEventsWerePublished();
+        _eventGridClientFactoryMockBuilder.Client.Assert.NoEventsWerePublished();
     }
-    
+
     [Fact]
     public async Task GivenTopicConfigured_WhenTestEventRaised_ThenEventPublished()
     {
         // ARRANGE
         var sut = GetSut();
-        
+
         // ACT
         var testEvent = new TestEvent();
         await sut.RaiseEvent(testEvent);
-        
+
         // ASSERT
         var actualEvent = Assert.Single(
-            _eventGridClientFactoryMockBuilder
-                .Client
-                .Assert.EventsPublished);
+            _eventGridClientFactoryMockBuilder.Client.Assert.EventsPublished
+        );
 
         var expectedEvent = testEvent;
         var expectedPayload = testEvent.Payload;
-        
+
         Assert.Equal(expectedEvent.Subject, actualEvent.Subject);
         Assert.Equal(expectedEvent.EventType, actualEvent.EventType);
         Assert.Equal(expectedEvent.DataVersion, actualEvent.DataVersion);

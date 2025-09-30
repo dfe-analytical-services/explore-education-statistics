@@ -36,8 +36,8 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
             return next();
         }
 
-        var invalidModelState = context.ModelState
-            .Where(kv => kv.Value?.ValidationState is ModelValidationState.Invalid)
+        var invalidModelState = context
+            .ModelState.Where(kv => kv.Value?.ValidationState is ModelValidationState.Invalid)
             .Cast<KeyValuePair<string, ModelStateEntry>>()
             .ToDictionary();
 
@@ -53,18 +53,14 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 
         // There can be error entries for the controller method's parameters
         // which need to be filtered out first (which otherwise leak internals).
-        var invalidErrorKeys = context.ActionDescriptor
-            .Parameters
-            .Where(param => param.ParameterType.IsComplex())
+        var invalidErrorKeys = context
+            .ActionDescriptor.Parameters.Where(param => param.ParameterType.IsComplex())
             .Select(param => param.Name)
             .ToHashSet();
 
         invalidModelState = invalidModelState
             .Where(entry => !invalidErrorKeys.Contains(entry.Key))
-            .ToDictionary(
-                kv => FormatErrorKey(kv.Key),
-                kv => kv.Value
-            );
+            .ToDictionary(kv => FormatErrorKey(kv.Key), kv => kv.Value);
 
         if (TryGetRequiredValueError(invalidModelState, out var requiredFieldError))
         {
@@ -81,36 +77,40 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
             return next();
         }
 
-        var problemDetailsFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+        var problemDetailsFactory =
+            context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
 
         var problemDetails = problemDetailsFactory.CreateValidationProblemDetails(
             context.HttpContext,
             new ModelStateDictionary()
         );
 
-        context.Result = new BadRequestObjectResult(ValidationProblemViewModel.Create(problemDetails, errors));
+        context.Result = new BadRequestObjectResult(
+            ValidationProblemViewModel.Create(problemDetails, errors)
+        );
 
         return Task.CompletedTask;
     }
 
     private static List<ErrorViewModel> GetUnknownQueryParameterErrors(
-        ActionExecutingContext context)
+        ActionExecutingContext context
+    )
     {
-        return context.HttpContext.Request
-            .Query
-            .Where(param => !context.ModelState.ContainsKey(param.Key))
+        return context
+            .HttpContext.Request.Query.Where(param => !context.ModelState.ContainsKey(param.Key))
             .Select(param => new ErrorViewModel
             {
                 Code = ValidationMessages.UnknownField.Code,
                 Message = ValidationMessages.UnknownField.Message,
-                Path = param.Key
+                Path = param.Key,
             })
             .ToList();
     }
 
     private static bool TryGetJsonError(
         IDictionary<string, ModelStateEntry> errorEntries,
-        [NotNullWhen(true)] out ErrorViewModel? error)
+        [NotNullWhen(true)] out ErrorViewModel? error
+    )
     {
         var modelError = errorEntries
             .SelectMany(entry => entry.Value.Errors)
@@ -153,28 +153,35 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 
         // Not ideal, but there isn't any better way of figuring out if we have this type
         // of JsonException as they don't provide any error codes or other identifier.
-        var message = currentException is not null
-                      && currentException.Message.StartsWith("The JSON property")
-                      && currentException.Message.Contains(
-                          "could not be mapped to any .NET member contained in type"
-                      )
-            ? ValidationMessages.UnknownField
-            : ValidationMessages.InvalidValue;
+        var message =
+            currentException is not null
+            && currentException.Message.StartsWith("The JSON property")
+            && currentException.Message.Contains(
+                "could not be mapped to any .NET member contained in type"
+            )
+                ? ValidationMessages.UnknownField
+                : ValidationMessages.InvalidValue;
 
         return new ErrorViewModel
         {
             Code = message.Code,
             Message = message.Message,
-            Path = JsonPathUtils.Concat(paths)
+            Path = JsonPathUtils.Concat(paths),
         };
     }
 
     private static bool TryGetEmptyBodyError(
         IDictionary<string, ModelStateEntry> modelState,
-        [NotNullWhen(true)] out ErrorViewModel? error)
+        [NotNullWhen(true)] out ErrorViewModel? error
+    )
     {
-        if (!modelState.Any(entry => entry.Value.Errors
-                .Any(e => e.ErrorMessage == ValidationMessages.NotEmptyBody.Message)))
+        if (
+            !modelState.Any(entry =>
+                entry.Value.Errors.Any(e =>
+                    e.ErrorMessage == ValidationMessages.NotEmptyBody.Message
+                )
+            )
+        )
         {
             error = null;
             return false;
@@ -191,7 +198,8 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 
     private static bool TryGetRequiredValueError(
         IDictionary<string, ModelStateEntry> modelState,
-        [NotNullWhen(true)] out ErrorViewModel? error)
+        [NotNullWhen(true)] out ErrorViewModel? error
+    )
     {
         var requiredFieldErrorKey = modelState
             // This isn't the ideal way of determining if we have a required field error.
@@ -199,8 +207,12 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
             // seem to be an easy way to change the default error message for `RequiredAttribute`.
             // In the interest of time, this approach will have to do.
             // TODO: Work out better way to modify default data annotation error messages
-            .FirstOrDefault(entry => entry.Value.Errors
-                .Any(e => e.ErrorMessage.StartsWith("The") && e.ErrorMessage.EndsWith("field is required.")))
+            .FirstOrDefault(entry =>
+                entry.Value.Errors.Any(e =>
+                    e.ErrorMessage.StartsWith("The")
+                    && e.ErrorMessage.EndsWith("field is required.")
+                )
+            )
             .Key;
 
         if (requiredFieldErrorKey.IsNullOrEmpty())
@@ -213,7 +225,7 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
         {
             Code = ValidationMessages.RequiredValue.Code,
             Message = ValidationMessages.RequiredValue.Message,
-            Path = requiredFieldErrorKey
+            Path = requiredFieldErrorKey,
         };
 
         return true;
@@ -221,11 +233,15 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
 
     private static bool TryGetInvalidValueError(
         IDictionary<string, ModelStateEntry> modelState,
-        [NotNullWhen(true)] out ErrorViewModel? error)
+        [NotNullWhen(true)] out ErrorViewModel? error
+    )
     {
         var invalidValueErrorKey = modelState
-            .FirstOrDefault(entry => entry.Value.Errors
-                .Any(e => e.ErrorMessage == ValidationMessages.InvalidValue.Message))
+            .FirstOrDefault(entry =>
+                entry.Value.Errors.Any(e =>
+                    e.ErrorMessage == ValidationMessages.InvalidValue.Message
+                )
+            )
             .Key;
 
         if (invalidValueErrorKey.IsNullOrEmpty())
@@ -238,7 +254,7 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
         {
             Code = ValidationMessages.InvalidValue.Code,
             Message = ValidationMessages.InvalidValue.Message,
-            Path = invalidValueErrorKey
+            Path = invalidValueErrorKey,
         };
 
         return true;
@@ -260,8 +276,6 @@ public class InvalidRequestInputFilter : IAsyncActionFilter
         // The error key is PascalCased, so we have to camelCase it
         var parts = errorKey.Split('.');
 
-        return parts
-            .Select(part => part.ToLowerFirst())
-            .JoinToString('.');
+        return parts.Select(part => part.ToLowerFirst()).JoinToString('.');
     }
 }

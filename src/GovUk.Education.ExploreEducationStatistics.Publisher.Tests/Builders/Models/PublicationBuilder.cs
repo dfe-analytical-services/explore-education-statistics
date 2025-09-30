@@ -16,7 +16,7 @@ public class PublicationBuilder(Guid publicationId, string publicationSlug)
             Slug = publicationSlug,
             LatestPublishedReleaseVersionId = _hasPublishedReleaseVersion ? Guid.NewGuid() : null,
             SupersededById = _supersededByPublicationId,
-            SupersededBy = _supersededByPublication
+            SupersededBy = _supersededByPublication,
         };
         return publication;
     }
@@ -26,13 +26,13 @@ public class PublicationBuilder(Guid publicationId, string publicationSlug)
         _hasPublishedReleaseVersion = true;
         return this;
     }
-    
+
     public PublicationBuilder SupersededBy(Guid supersededByPublicationId)
     {
         _supersededByPublicationId = supersededByPublicationId;
         return this;
     }
-    
+
     public PublicationBuilder SupersededBy(Publication supersededByPublication)
     {
         _supersededByPublication = supersededByPublication;

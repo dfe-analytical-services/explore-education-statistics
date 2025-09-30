@@ -19,10 +19,22 @@ public partial class EES4976_Update_Multiple_Boundaries_Geometry_Data : Migratio
 
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Countries_GeometryData.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Regions_GeometryData.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_LocalAuthorities_GeometryData.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_LocalAuthorityDistricts_GeometryData.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_LocalEnterprisePartnerships_GeometryData.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_ParliamentaryConstituencies_GeometryData.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_LocalAuthorities_GeometryData.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_LocalAuthorityDistricts_GeometryData.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_LocalEnterprisePartnerships_GeometryData.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_ParliamentaryConstituencies_GeometryData.sql"
+        );
         migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Wards_GeometryData.sql");
     }
 

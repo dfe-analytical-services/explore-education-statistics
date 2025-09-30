@@ -13,8 +13,10 @@ public class GlossaryController : ControllerBase
     private readonly IGlossaryCacheService _glossaryCacheService;
     private readonly IGlossaryService _glossaryService;
 
-    public GlossaryController(IGlossaryCacheService glossaryCacheService,
-        IGlossaryService glossaryService)
+    public GlossaryController(
+        IGlossaryCacheService glossaryCacheService,
+        IGlossaryService glossaryService
+    )
     {
         _glossaryCacheService = glossaryCacheService;
         _glossaryService = glossaryService;
@@ -29,7 +31,6 @@ public class GlossaryController : ControllerBase
     [HttpGet("glossary-entries/{slug}")]
     public async Task<ActionResult<GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
     {
-        return await _glossaryService.GetGlossaryEntry(slug)
-            .HandleFailuresOrOk();
+        return await _glossaryService.GetGlossaryEntry(slug).HandleFailuresOrOk();
     }
 }

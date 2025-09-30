@@ -31,7 +31,8 @@ public class ReleaseContentHub : Hub<IReleaseContentHubClient>
     }
 
     public async Task<HubResult<ContentBlockLockViewModel>> LockContentBlock(
-        ContentBlockLockMessage lockMessage)
+        ContentBlockLockMessage lockMessage
+    )
     {
         return await _contentBlockLockService
             .LockContentBlock(lockMessage.Id, lockMessage.Force)

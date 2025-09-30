@@ -20,7 +20,9 @@ public class CompressionUtilsTests
             await CompressionUtils.CompressToStream(
                 stream: Content.ToStream(),
                 targetStream: new MemoryStream(),
-                contentEncoding: "other"));
+                contentEncoding: "other"
+            )
+        );
     }
 
     [Fact]
@@ -31,7 +33,8 @@ public class CompressionUtilsTests
         await CompressionUtils.CompressToStream(
             stream: Content.ToStream(),
             targetStream: compressedStream,
-            contentEncoding: ContentEncodings.Gzip);
+            contentEncoding: ContentEncodings.Gzip
+        );
 
         Assert.Equal(0, compressedStream.Position);
         Assert.True(compressedStream.Length > 0);
@@ -39,7 +42,9 @@ public class CompressionUtilsTests
 
         // Decompress the stream using the compression class directly and assert it contains the original content
         await using var decompressedStream = new MemoryStream();
-        await using (var decompressor = new GZipStream(compressedStream, CompressionMode.Decompress))
+        await using (
+            var decompressor = new GZipStream(compressedStream, CompressionMode.Decompress)
+        )
         {
             await decompressor.CopyToAsync(decompressedStream);
         }
@@ -56,7 +61,8 @@ public class CompressionUtilsTests
         await CompressionUtils.CompressToStream(
             stream: Content.ToStream(),
             targetStream: compressedStream,
-            contentEncoding: ContentEncodings.Zstd);
+            contentEncoding: ContentEncodings.Zstd
+        );
 
         Assert.Equal(0, compressedStream.Position);
         Assert.True(compressedStream.Length > 0);
@@ -80,7 +86,9 @@ public class CompressionUtilsTests
             await CompressionUtils.DecompressToStream(
                 stream: Content.ToStream(),
                 targetStream: new MemoryStream(),
-                contentEncoding: "other"));
+                contentEncoding: "other"
+            )
+        );
     }
 
     [Fact]
@@ -88,7 +96,13 @@ public class CompressionUtilsTests
     {
         // Compress some content to a stream using the compression class directly
         await using var compressedStream = new MemoryStream();
-        await using (var compressor = new GZipStream(compressedStream, CompressionMode.Compress, leaveOpen: true))
+        await using (
+            var compressor = new GZipStream(
+                compressedStream,
+                CompressionMode.Compress,
+                leaveOpen: true
+            )
+        )
         {
             compressor.WriteText(Content);
         }
@@ -98,7 +112,8 @@ public class CompressionUtilsTests
         await CompressionUtils.DecompressToStream(
             stream: compressedStream,
             targetStream: decompressedStream,
-            contentEncoding: ContentEncodings.Gzip);
+            contentEncoding: ContentEncodings.Gzip
+        );
 
         Assert.Equal(0, decompressedStream.Position);
         Assert.Equal(Content, decompressedStream.ReadToEnd());
@@ -109,7 +124,9 @@ public class CompressionUtilsTests
     {
         // Compress some content to a stream using the compression class directly
         await using var compressedStream = new MemoryStream();
-        await using (var compressor = new CompressionStream(compressedStream, level: 11, leaveOpen: true))
+        await using (
+            var compressor = new CompressionStream(compressedStream, level: 11, leaveOpen: true)
+        )
         {
             compressor.WriteText(Content);
         }
@@ -119,7 +136,8 @@ public class CompressionUtilsTests
         await CompressionUtils.DecompressToStream(
             stream: compressedStream,
             targetStream: decompressedStream,
-            contentEncoding: ContentEncodings.Zstd);
+            contentEncoding: ContentEncodings.Zstd
+        );
 
         Assert.Equal(0, decompressedStream.Position);
         Assert.Equal(Content, decompressedStream.ReadToEnd());
@@ -131,7 +149,9 @@ public class CompressionUtilsTests
         await Assert.ThrowsAsync<NotSupportedException>(async () =>
             await CompressionUtils.DecompressToString(
                 bytes: Encoding.UTF8.GetBytes(Content),
-                contentEncoding: "other"));
+                contentEncoding: "other"
+            )
+        );
     }
 
     [Fact]
@@ -139,7 +159,13 @@ public class CompressionUtilsTests
     {
         // Compress some content to a byte array using the compression class directly
         await using var compressedStream = new MemoryStream();
-        await using (var compressor = new GZipStream(compressedStream, CompressionMode.Compress, leaveOpen: true))
+        await using (
+            var compressor = new GZipStream(
+                compressedStream,
+                CompressionMode.Compress,
+                leaveOpen: true
+            )
+        )
         {
             compressor.WriteText(Content);
         }
@@ -147,7 +173,8 @@ public class CompressionUtilsTests
         // Decompress the byte array using the method under test
         var result = await CompressionUtils.DecompressToString(
             bytes: compressedStream.ToArray(),
-            contentEncoding: ContentEncodings.Gzip);
+            contentEncoding: ContentEncodings.Gzip
+        );
 
         Assert.Equal(Content, result);
     }
@@ -157,7 +184,9 @@ public class CompressionUtilsTests
     {
         // Compress some content to a byte array using the compression class directly
         await using var compressedStream = new MemoryStream();
-        await using (var compressor = new CompressionStream(compressedStream, level: 11, leaveOpen: true))
+        await using (
+            var compressor = new CompressionStream(compressedStream, level: 11, leaveOpen: true)
+        )
         {
             compressor.WriteText(Content);
         }
@@ -165,7 +194,8 @@ public class CompressionUtilsTests
         // Decompress the byte array using the method under test
         var result = await CompressionUtils.DecompressToString(
             bytes: compressedStream.ToArray(),
-            contentEncoding: ContentEncodings.Zstd);
+            contentEncoding: ContentEncodings.Zstd
+        );
 
         Assert.Equal(Content, result);
     }

@@ -10,19 +10,27 @@ public partial class EES3004_UpdateSelectObservationsRoutinesOptimiseFilterItemI
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationsPath, 
-            $"{MigrationId}_Routine_SelectObservations.sql");
-        
-        migrationBuilder.SqlFromFile(MigrationsPath, 
-            $"{MigrationId}_Routine_SelectObservationsByLocationCodes.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_SelectObservations.sql"
+        );
+
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{MigrationId}_Routine_SelectObservationsByLocationCodes.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationsPath, 
-            $"{EES2778_QueryObservationsByLocationId.MigrationId}_Routine_SelectObservations.sql");
-        
-        migrationBuilder.SqlFromFile(MigrationsPath, 
-            $"{EES2778_QueryObservationsByLocationId.MigrationId}_Routine_SelectObservationsByLocationCodes.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{EES2778_QueryObservationsByLocationId.MigrationId}_Routine_SelectObservations.sql"
+        );
+
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{EES2778_QueryObservationsByLocationId.MigrationId}_Routine_SelectObservationsByLocationCodes.sql"
+        );
     }
 }

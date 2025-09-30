@@ -9,5 +9,7 @@ public interface IReleaseService
 {
     Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseVersionId);
 
-    Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseVersionId);
+    Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(
+        Guid releaseVersionId
+    );
 }

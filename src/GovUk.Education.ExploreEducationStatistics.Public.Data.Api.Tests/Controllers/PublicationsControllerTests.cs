@@ -25,15 +25,18 @@ using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.P
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class PublicationsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class PublicationsControllerTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "v1/publications";
 
     private readonly TestAnalyticsPathResolver _analyticsPathResolver = new();
 
-    public abstract class ListPublicationsTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
+    public abstract class ListPublicationsTests(TestApplicationFactory testApp)
+        : PublicationsControllerTests(testApp)
     {
-        public class PublishedPublicationsTests(TestApplicationFactory testApp) : ListPublicationsTests(testApp)
+        public class PublishedPublicationsTests(TestApplicationFactory testApp)
+            : ListPublicationsTests(testApp)
         {
             [Fact]
             public async Task PublishedDataSets_Returns200_FiltersPublicationsWithoutPublishedDataSets()
@@ -55,55 +58,66 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
                 var allDataSets = publishedDataSets.Concat(unpublishedDataSets).ToArray();
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.AddRange(allDataSets)
+                );
 
                 var publishedDataSetPublicationIds = publishedDataSets
                     .Select(p => p.PublicationId)
                     .ToList();
 
-                var expectedPublicationIds = publishedDataSetPublicationIds
-                    .Take(2)
-                    .ToList();
+                var expectedPublicationIds = publishedDataSetPublicationIds.Take(2).ToList();
 
                 var expectedPublications = expectedPublicationIds
                     .Select(id =>
                         DataFixture
-                        .Generator<PublicationSearchResultViewModel>()
-                        .ForInstance(s => s
-                            .SetDefault(p => p.Title)
-                            .SetDefault(p => p.Slug)
-                            .SetDefault(p => p.Summary)
-                            .SetDefault(p => p.Theme)
-                            .Set(p => p.Published, p => p.Date.Past())
-                            .Set(p => p.Type, ReleaseType.OfficialStatistics)
-                            .Set(p => p.Id, id))
-                        .Generate()
+                            .Generator<PublicationSearchResultViewModel>()
+                            .ForInstance(s =>
+                                s.SetDefault(p => p.Title)
+                                    .SetDefault(p => p.Slug)
+                                    .SetDefault(p => p.Summary)
+                                    .SetDefault(p => p.Theme)
+                                    .Set(p => p.Published, p => p.Date.Past())
+                                    .Set(p => p.Type, ReleaseType.OfficialStatistics)
+                                    .Set(p => p.Id, id)
+                            )
+                            .Generate()
                     )
                     .ToList();
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
-                    .Setup(c => c.ListPublications(
-                        page,
-                        pageSize,
-                        null,
-                        It.Is<IEnumerable<Guid>>(ids =>
-                            ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order())),
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                        results: expectedPublications,
-                        totalResults: numberOfPublishedDataSets,
-                        page: page,
-                        pageSize: pageSize));
+                    .Setup(c =>
+                        c.ListPublications(
+                            page,
+                            pageSize,
+                            null,
+                            It.Is<IEnumerable<Guid>>(ids =>
+                                ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order())
+                            ),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                            results: expectedPublications,
+                            totalResults: numberOfPublishedDataSets,
+                            page: page,
+                            pageSize: pageSize
+                        )
+                    );
 
                 var client = BuildApp(contentApiClient.Object).CreateClient();
 
                 var response = await ListPublications(
                     client: client,
                     page: page,
-                    pageSize: pageSize);
+                    pageSize: pageSize
+                );
 
-                var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
+                var content = response.AssertOk<PublicationPaginatedListViewModel>(
+                    useSystemJson: true
+                );
 
                 Assert.NotNull(content);
                 Assert.Equal(page, content.Paging.Page);
@@ -111,7 +125,10 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
                 Assert.Equal(expectedPublicationIds.Count, content.Results.Count);
 
-                Assert.All(content.Results, r => Assert.Contains(expectedPublicationIds, id => id == r.Id));
+                Assert.All(
+                    content.Results,
+                    r => Assert.Contains(expectedPublicationIds, id => id == r.Id)
+                );
             }
 
             [Fact]
@@ -124,41 +141,49 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithStatusPublished()
                     .WithPublicationId(publicationId);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(dataSet)
+                );
 
                 PublicationSearchResultViewModel publication = DataFixture
                     .Generator<PublicationSearchResultViewModel>()
-                    .ForInstance(s => s
-                        .SetDefault(p => p.Title)
-                        .SetDefault(p => p.Slug)
-                        .SetDefault(p => p.Summary)
-                        .SetDefault(p => p.Theme)
-                        .Set(p => p.Published, p => p.Date.Past())
-                        .Set(p => p.Type, ReleaseType.OfficialStatistics)
-                        .Set(p => p.Id, publicationId));
+                    .ForInstance(s =>
+                        s.SetDefault(p => p.Title)
+                            .SetDefault(p => p.Slug)
+                            .SetDefault(p => p.Summary)
+                            .SetDefault(p => p.Theme)
+                            .Set(p => p.Published, p => p.Date.Past())
+                            .Set(p => p.Type, ReleaseType.OfficialStatistics)
+                            .Set(p => p.Id, publicationId)
+                    );
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
-                    .Setup(c => c.ListPublications(
-                        1,
-                        1,
-                        null,
-                        new List<Guid>() { publicationId },
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                        results: [publication],
-                        totalResults: 1,
-                        page: 1,
-                        pageSize: 1));
+                    .Setup(c =>
+                        c.ListPublications(
+                            1,
+                            1,
+                            null,
+                            new List<Guid>() { publicationId },
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                            results: [publication],
+                            totalResults: 1,
+                            page: 1,
+                            pageSize: 1
+                        )
+                    );
 
                 var client = BuildApp(contentApiClient.Object).CreateClient();
 
-                var response = await ListPublications(
-                    client: client,
-                    page: 1,
-                    pageSize: 1);
+                var response = await ListPublications(client: client, page: 1, pageSize: 1);
 
-                var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
+                var content = response.AssertOk<PublicationPaginatedListViewModel>(
+                    useSystemJson: true
+                );
 
                 Assert.NotNull(content);
                 Assert.Equal(1, content.Paging.Page);
@@ -179,26 +204,31 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             {
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
-                    .Setup(c => c.ListPublications(
-                        1,
-                        1,
-                        null,
-                        Enumerable.Empty<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                        results: [],
-                        totalResults: 0,
-                        page: 1,
-                        pageSize: 1));
+                    .Setup(c =>
+                        c.ListPublications(
+                            1,
+                            1,
+                            null,
+                            Enumerable.Empty<Guid>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                            results: [],
+                            totalResults: 0,
+                            page: 1,
+                            pageSize: 1
+                        )
+                    );
 
                 var client = BuildApp(contentApiClient.Object).CreateClient();
 
-                var response = await ListPublications(
-                    client: client,
-                    page: 1,
-                    pageSize: 1);
+                var response = await ListPublications(client: client, page: 1, pageSize: 1);
 
-                var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
+                var content = response.AssertOk<PublicationPaginatedListViewModel>(
+                    useSystemJson: true
+                );
 
                 Assert.NotNull(content);
                 Assert.Equal(1, content.Paging.Page);
@@ -214,10 +244,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             {
                 var client = BuildApp().CreateClient();
 
-                var response = await ListPublications(
-                    client: client,
-                    page: page,
-                    pageSize: 1);
+                var response = await ListPublications(client: client, page: page, pageSize: 1);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -234,10 +261,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             {
                 var client = BuildApp().CreateClient();
 
-                var response = await ListPublications(
-                    client: client,
-                    page: 1,
-                    pageSize: pageSize);
+                var response = await ListPublications(client: client, page: 1, pageSize: pageSize);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -257,19 +281,21 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     page: null,
                     pageSize: null,
-                    search: searchTerm);
+                    search: searchTerm
+                );
 
                 var validationProblem = response.AssertValidationProblem();
 
                 Assert.Single(validationProblem.Errors);
 
                 validationProblem.AssertHasMinimumLengthError("search", minLength: 3);
-            }            
+            }
         }
-        
+
         public class AnalyticsEnabledTests : ListPublicationsTests, IDisposable
         {
-            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            public AnalyticsEnabledTests(TestApplicationFactory testApp)
+                : base(testApp)
             {
                 testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
             }
@@ -284,63 +310,75 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             {
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
-                    .Setup(c => c.ListPublications(
-                        1,
-                        10,
-                        null,
-                        Enumerable.Empty<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                        results: [],
-                        totalResults: 0,
-                        page: 1,
-                        pageSize: 10));
+                    .Setup(c =>
+                        c.ListPublications(
+                            1,
+                            10,
+                            null,
+                            Enumerable.Empty<Guid>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                            results: [],
+                            totalResults: 0,
+                            page: 1,
+                            pageSize: 10
+                        )
+                    );
 
                 var client = BuildApp(contentApiClient.Object).CreateClient();
-                
-                var response = await ListPublications(
-                    client: client,
-                    page: 1,
-                    pageSize: 10);
+
+                var response = await ListPublications(client: client, page: 1, pageSize: 10);
 
                 response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
-                
+
                 await AnalyticsTestAssertions.AssertTopLevelAnalyticsCallCaptured(
                     expectedType: TopLevelCallType.GetPublications,
-                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths),
-                    expectedParameters: new PaginationParameters(Page: 1, PageSize: 10));
+                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths
+                    ),
+                    expectedParameters: new PaginationParameters(Page: 1, PageSize: 10)
+                );
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
-                    .Setup(c => c.ListPublications(
-                        1,
-                        10,
-                        null,
-                        Enumerable.Empty<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                        results: [],
-                        totalResults: 0,
-                        page: 1,
-                        pageSize: 10));
+                    .Setup(c =>
+                        c.ListPublications(
+                            1,
+                            10,
+                            null,
+                            Enumerable.Empty<Guid>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                            results: [],
+                            totalResults: 0,
+                            page: 1,
+                            pageSize: 10
+                        )
+                    );
 
                 var client = BuildApp(contentApiClient.Object)
                     .CreateClient()
                     .WithRequestSourceHeader("EES");
-                
-                var response = await ListPublications(
-                    client: client,
-                    page: 1,
-                    pageSize: 10);
+
+                var response = await ListPublications(client: client, page: 1, pageSize: 10);
 
                 response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths));
+                    _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths
+                    )
+                );
             }
         }
 
@@ -348,7 +386,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             HttpClient client,
             int? page = null,
             int? pageSize = null,
-            string? search = null)
+            string? search = null
+        )
         {
             var query = new Dictionary<string, string?>
             {
@@ -363,21 +402,24 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
         }
     }
 
-    public abstract class GetPublicationTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
+    public abstract class GetPublicationTests(TestApplicationFactory testApp)
+        : PublicationsControllerTests(testApp)
     {
-        public class PublishedPublicationsTests(TestApplicationFactory testApp) : GetPublicationTests(testApp)
+        public class PublishedPublicationsTests(TestApplicationFactory testApp)
+            : GetPublicationTests(testApp)
         {
             [Fact]
             public async Task PublicationExists_Returns200()
             {
                 PublishedPublicationSummaryViewModel publication = DataFixture
                     .Generator<PublishedPublicationSummaryViewModel>()
-                    .ForInstance(s => s
-                        .SetDefault(f => f.Id)
-                        .SetDefault(f => f.Title)
-                        .SetDefault(f => f.Slug)
-                        .SetDefault(f => f.Summary)
-                        .Set(f => f.Published, f => f.Date.Past()));
+                    .ForInstance(s =>
+                        s.SetDefault(f => f.Id)
+                            .SetDefault(f => f.Title)
+                            .SetDefault(f => f.Slug)
+                            .SetDefault(f => f.Summary)
+                            .Set(f => f.Published, f => f.Date.Past())
+                    );
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
@@ -387,7 +429,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 var client = BuildApp(contentApiClient.Object).CreateClient();
 
                 var publishedDataSet = GeneratePublishedDataSet(publication.Id);
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(publishedDataSet)
+                );
 
                 var response = await GetPublication(client, publication.Id);
 
@@ -407,7 +451,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 var publicationId = Guid.NewGuid();
 
                 var publishedDataSet = GeneratePublishedDataSet(publicationId);
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(publishedDataSet)
+                );
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
@@ -442,7 +488,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithPublicationId(publicationId)
                     .GenerateList(3);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(unpublishedDataSets));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.AddRange(unpublishedDataSets)
+                );
 
                 var client = BuildApp().CreateClient();
 
@@ -457,7 +505,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 var publicationId = Guid.NewGuid();
 
                 var publishedDataSet = GeneratePublishedDataSet(publicationId);
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(publishedDataSet)
+                );
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
@@ -471,10 +521,11 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 Assert.Contains("something went wrong", await response.Content.ReadAsStringAsync());
             }
         }
-        
+
         public class AnalyticsEnabledTests : GetPublicationTests, IDisposable
         {
-            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            public AnalyticsEnabledTests(TestApplicationFactory testApp)
+                : base(testApp)
             {
                 testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
             }
@@ -489,8 +540,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             {
                 PublishedPublicationSummaryViewModel publication = DataFixture
                     .Generator<PublishedPublicationSummaryViewModel>()
-                    .ForInstance(s => s
-                        .Set(f => f.Published, f => f.Date.Past()));
+                    .ForInstance(s => s.Set(f => f.Published, f => f.Date.Past()));
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
@@ -498,7 +548,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .ReturnsAsync(publication);
 
                 var publishedDataSet = GeneratePublishedDataSet(publication.Id);
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(publishedDataSet)
+                );
 
                 var client = BuildApp(contentApiClient.Object).CreateClient();
 
@@ -510,20 +562,24 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     publicationId: publication.Id,
                     publicationTitle: publication.Title,
                     expectedType: PublicationCallType.GetSummary,
-                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths),
-                    expectedParameters: null);
+                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWritePublicationCallsStrategy.OutputSubPaths
+                    ),
+                    expectedParameters: null
+                );
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
                 PublishedPublicationSummaryViewModel publication = DataFixture
                     .Generator<PublishedPublicationSummaryViewModel>()
-                    .ForInstance(s => s
-                        .Set(f => f.Published, f => f.Date.Past()));
+                    .ForInstance(s => s.Set(f => f.Published, f => f.Date.Past()));
 
                 var publishedDataSet = GeneratePublishedDataSet(publication.Id);
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(publishedDataSet)
+                );
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
@@ -539,11 +595,17 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 response.AssertOk<PublicationSummaryViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
+                    _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWritePublicationCallsStrategy.OutputSubPaths
+                    )
+                );
             }
         }
 
-        private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
+        private static async Task<HttpResponseMessage> GetPublication(
+            HttpClient client,
+            Guid publicationId
+        )
         {
             var uri = new Uri($"{BaseUrl}/{publicationId}", UriKind.Relative);
 
@@ -562,7 +624,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
     public abstract class ListPublicationDataSetsTests(TestApplicationFactory testApp)
         : PublicationsControllerTests(testApp)
     {
-        public class ControllerTests(TestApplicationFactory testApp) : ListPublicationDataSetsTests(testApp)
+        public class ControllerTests(TestApplicationFactory testApp)
+            : ListPublicationDataSetsTests(testApp)
         {
             [Theory]
             [InlineData(1, 2, 1)]
@@ -573,7 +636,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             public async Task MultipleDataSetsAvailableForRequestedPublication_Returns200(
                 int page,
                 int pageSize,
-                int numberOfAvailableDataSets)
+                int numberOfAvailableDataSets
+            )
             {
                 var publicationId = Guid.NewGuid();
 
@@ -583,7 +647,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithPublicationId(publicationId)
                     .GenerateList(numberOfAvailableDataSets);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.AddRange(dataSets)
+                );
 
                 var dataSetVersions = dataSets
                     .Select(ds =>
@@ -592,11 +658,13 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                                 filters: 1,
                                 indicators: 1,
                                 locations: 1,
-                                timePeriods: 3)
+                                timePeriods: 3
+                            )
                             .WithStatusPublished()
                             .WithDataSet(ds)
                             .FinishWith(dsv => ds.LatestLiveVersion = dsv)
-                            .Generate())
+                            .Generate()
+                    )
                     .ToList();
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -620,7 +688,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: publicationId,
                     page: page,
-                    pageSize: pageSize);
+                    pageSize: pageSize
+                );
 
                 var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
@@ -630,13 +699,20 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 Assert.Equal(numberOfAvailableDataSets, content.Paging.TotalResults);
                 Assert.Equal(expectedDataSetIds.Count, content.Results.Count);
 
-                Assert.All(content.Results, r => Assert.Contains(expectedDataSetIds, id => id == r.Id));
+                Assert.All(
+                    content.Results,
+                    r => Assert.Contains(expectedDataSetIds, id => id == r.Id)
+                );
             }
 
             [Theory]
-            [MemberData(nameof(DataSetStatusTheoryData.AvailableStatuses),
-                MemberType = typeof(DataSetStatusTheoryData))]
-            public async Task DataSetIsAvailable_Returns200_CorrectViewModel(DataSetStatus dataSetStatus)
+            [MemberData(
+                nameof(DataSetStatusTheoryData.AvailableStatuses),
+                MemberType = typeof(DataSetStatusTheoryData)
+            )]
+            public async Task DataSetIsAvailable_Returns200_CorrectViewModel(
+                DataSetStatus dataSetStatus
+            )
             {
                 var publicationId = Guid.NewGuid();
 
@@ -645,14 +721,12 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithStatus(dataSetStatus)
                     .WithPublicationId(publicationId);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(dataSet)
+                );
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(dataSet)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -669,7 +743,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: publicationId,
                     page: 1,
-                    pageSize: 1);
+                    pageSize: 1
+                );
 
                 var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
@@ -696,16 +771,26 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 Assert.Equal(
                     TimePeriodFormatter.FormatLabel(
                         dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
-                        dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
-                    result.LatestVersion.TimePeriods.Start);
+                        dataSetVersion.MetaSummary.TimePeriodRange.Start.Code
+                    ),
+                    result.LatestVersion.TimePeriods.Start
+                );
                 Assert.Equal(
                     TimePeriodFormatter.FormatLabel(
                         dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
-                        dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
-                    result.LatestVersion.TimePeriods.End);
-                Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.LatestVersion.GeographicLevels);
+                        dataSetVersion.MetaSummary.TimePeriodRange.End.Code
+                    ),
+                    result.LatestVersion.TimePeriods.End
+                );
+                Assert.Equal(
+                    dataSetVersion.MetaSummary.GeographicLevels,
+                    result.LatestVersion.GeographicLevels
+                );
                 Assert.Equal(dataSetVersion.MetaSummary.Filters, result.LatestVersion.Filters);
-                Assert.Equal(dataSetVersion.MetaSummary.Indicators, result.LatestVersion.Indicators);
+                Assert.Equal(
+                    dataSetVersion.MetaSummary.Indicators,
+                    result.LatestVersion.Indicators
+                );
             }
 
             [Fact]
@@ -725,31 +810,27 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithPublicationId(publicationId2);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
-                    context.DataSets.AddRange(publication1DataSet, publication2DataSet));
+                    context.DataSets.AddRange(publication1DataSet, publication2DataSet)
+                );
 
                 DataSetVersion publication1DataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(publication1DataSet)
                     .FinishWith(dsv => publication1DataSet.LatestLiveVersion = dsv);
 
                 DataSetVersion publication2DataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(publication2DataSet)
                     .FinishWith(dsv => publication2DataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
-                    context.DataSetVersions.AddRange(publication1DataSetVersion, publication2DataSetVersion);
+                    context.DataSetVersions.AddRange(
+                        publication1DataSetVersion,
+                        publication2DataSetVersion
+                    );
                     context.DataSets.UpdateRange(publication1DataSet, publication2DataSet);
                 });
 
@@ -759,7 +840,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: publicationId1,
                     page: 1,
-                    pageSize: 1);
+                    pageSize: 1
+                );
 
                 var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
@@ -772,8 +854,10 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             }
 
             [Theory]
-            [MemberData(nameof(DataSetStatusTheoryData.UnavailableStatuses),
-                MemberType = typeof(DataSetStatusTheoryData))]
+            [MemberData(
+                nameof(DataSetStatusTheoryData.UnavailableStatuses),
+                MemberType = typeof(DataSetStatusTheoryData)
+            )]
             public async Task DataSetUnavailable_Returns200_EmptyList(DataSetStatus dataSetStatus)
             {
                 var publicationId = Guid.NewGuid();
@@ -783,14 +867,12 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithStatus(dataSetStatus)
                     .WithPublicationId(publicationId);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(dataSet)
+                );
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(dataSet)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -807,7 +889,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: publicationId,
                     page: 1,
-                    pageSize: 1);
+                    pageSize: 1
+                );
 
                 var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
@@ -827,7 +910,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: Guid.NewGuid(),
                     page: 1,
-                    pageSize: 1);
+                    pageSize: 1
+                );
 
                 var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
@@ -853,7 +937,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithPublicationId(publicationId)
                     .GenerateList(numberOfPublishedDataSets);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.AddRange(dataSets)
+                );
 
                 var client = BuildApp().CreateClient();
 
@@ -861,7 +947,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: publicationId,
                     page: page,
-                    pageSize: pageSize);
+                    pageSize: pageSize
+                );
 
                 var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
@@ -883,7 +970,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: Guid.NewGuid(),
                     page: page,
-                    pageSize: 1);
+                    pageSize: 1
+                );
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -904,7 +992,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: Guid.NewGuid(),
                     page: 1,
-                    pageSize: pageSize);
+                    pageSize: pageSize
+                );
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -924,7 +1013,10 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     { "pageSize", "1" },
                 };
 
-                var uri = QueryHelpers.AddQueryString($"{BaseUrl}/not_a_valid_guid/data-sets", query);
+                var uri = QueryHelpers.AddQueryString(
+                    $"{BaseUrl}/not_a_valid_guid/data-sets",
+                    query
+                );
 
                 var response = await client.GetAsync(uri);
 
@@ -934,14 +1026,17 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
         public class AnalyticsEnabledTests : ListPublicationDataSetsTests, IDisposable
         {
-            public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
+            public AnalyticsEnabledTests(TestApplicationFactory testApp)
+                : base(testApp)
             {
                 testApp.AddAppSettings("appsettings.AnalyticsEnabled.json");
             }
 
             public void Dispose()
             {
-                var analyticsCapturePath = _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths);
+                var analyticsCapturePath = _analyticsPathResolver.BuildOutputDirectory(
+                    AnalyticsWritePublicationCallsStrategy.OutputSubPaths
+                );
                 if (Directory.Exists(analyticsCapturePath))
                 {
                     Directory.Delete(analyticsCapturePath, recursive: true);
@@ -954,14 +1049,12 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 var publication = new PublishedPublicationSummaryViewModel
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Publication 1"
+                    Title = "Publication 1",
                 };
 
                 var contentApiClient = new Mock<IContentApiClient>();
                 contentApiClient
-                    .Setup(c => c.GetPublication(
-                        publication.Id,
-                        It.IsAny<CancellationToken>()))
+                    .Setup(c => c.GetPublication(publication.Id, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(publication);
 
                 DataSet dataSet = DataFixture
@@ -969,14 +1062,12 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     .WithStatusPublished()
                     .WithPublicationId(publication.Id);
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(dataSet)
+                );
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(dataSet)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -993,19 +1084,24 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: publication.Id,
                     page: 1,
-                    pageSize: 10);
+                    pageSize: 10
+                );
 
                 response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
-                contentApiClient.Verify(c => c
-                    .GetPublication(publication.Id, It.IsAny<CancellationToken>()));
+                contentApiClient.Verify(c =>
+                    c.GetPublication(publication.Id, It.IsAny<CancellationToken>())
+                );
 
                 await AnalyticsTestAssertions.AssertPublicationAnalyticsCallCaptured(
                     publicationId: publication.Id,
                     publicationTitle: publication.Title,
                     expectedType: PublicationCallType.GetDataSets,
-                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths),
-                    expectedParameters: new PaginationParameters(Page: 1, PageSize: 10));
+                    expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWritePublicationCallsStrategy.OutputSubPaths
+                    ),
+                    expectedParameters: new PaginationParameters(Page: 1, PageSize: 10)
+                );
             }
 
             [Fact]
@@ -1013,18 +1109,14 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             {
                 var contentApiClient = new Mock<IContentApiClient>(MockBehavior.Strict);
 
-                DataSet dataSet = DataFixture
-                    .DefaultDataSet()
-                    .WithStatusPublished();
+                DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(dataSet)
+                );
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(dataSet)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -1043,37 +1135,37 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     client: client,
                     publicationId: dataSet.PublicationId,
                     page: 1,
-                    pageSize: 10);
+                    pageSize: 10
+                );
 
                 response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
+                    _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWritePublicationCallsStrategy.OutputSubPaths
+                    )
+                );
             }
 
             [Fact]
             public async Task ContentApiCallFailure_AnalyticsRequestNotCaptured()
             {
-                DataSet dataSet = DataFixture
-                    .DefaultDataSet()
-                    .WithStatusPublished();
+                DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
                 var contentApiClient = new Mock<IContentApiClient>(MockBehavior.Strict);
 
                 contentApiClient
-                    .Setup(c => c.GetPublication(
-                        dataSet.PublicationId,
-                        It.IsAny<CancellationToken>()))
+                    .Setup(c =>
+                        c.GetPublication(dataSet.PublicationId, It.IsAny<CancellationToken>())
+                    )
                     .ThrowsAsync(new ArgumentException("Error calling Content API"));
 
-                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSets.Add(dataSet)
+                );
 
                 DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(
-                        filters: 1,
-                        indicators: 1,
-                        locations: 1,
-                        timePeriods: 3)
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(dataSet)
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -1084,21 +1176,24 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     context.DataSets.Update(dataSet);
                 });
 
-                var client = BuildApp(contentApiClient: contentApiClient.Object)
-                    .CreateClient();
+                var client = BuildApp(contentApiClient: contentApiClient.Object).CreateClient();
 
                 var response = await ListPublicationDataSets(
                     client: client,
                     publicationId: dataSet.PublicationId,
                     page: 1,
-                    pageSize: 10);
+                    pageSize: 10
+                );
 
                 // The call should have completed successfully, despite the failure to
                 // call the Content API for analytics information.
                 response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
                 AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
-                    _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
+                    _analyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWritePublicationCallsStrategy.OutputSubPaths
+                    )
+                );
             }
         }
 
@@ -1106,7 +1201,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             HttpClient client,
             Guid publicationId,
             int? page = null,
-            int? pageSize = null)
+            int? pageSize = null
+        )
         {
             var query = new Dictionary<string, string?>
             {
@@ -1122,9 +1218,10 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
     private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
     {
-        return TestApp.ConfigureServices(
-            services => services
+        return TestApp.ConfigureServices(services =>
+            services
                 .ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>())
-                .ReplaceService<IAnalyticsPathResolver>(_analyticsPathResolver, optional: true));
+                .ReplaceService<IAnalyticsPathResolver>(_analyticsPathResolver, optional: true)
+        );
     }
 }

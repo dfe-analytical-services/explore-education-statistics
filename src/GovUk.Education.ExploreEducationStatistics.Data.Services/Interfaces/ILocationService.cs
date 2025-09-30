@@ -4,10 +4,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+
 public interface ILocationService
 {
     Task<Dictionary<string, List<LocationAttributeViewModel>>> GetLocationViewModels(
         List<Location> locations,
         Dictionary<GeographicLevel, List<string>>? hierarchies,
-        long? boundaryLevelId = null);
+        long? boundaryLevelId = null
+    );
 }

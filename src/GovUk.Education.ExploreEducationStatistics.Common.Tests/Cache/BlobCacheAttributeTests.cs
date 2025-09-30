@@ -70,8 +70,8 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
         {
             return new();
         }
-
     }
+
     // ReSharper enable UnusedParameter.Local
 
     [Fact]
@@ -89,9 +89,7 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
         Assert.IsType<TestValue>(result);
         Assert.Equal(expectedResult, result);
 
-        _blobCacheService.Verify(
-            s => s.GetItem(cacheKey, typeof(TestValue)),
-            Times.Once);
+        _blobCacheService.Verify(s => s.GetItem(cacheKey, typeof(TestValue)), Times.Once);
     }
 
     [Fact]
@@ -109,9 +107,7 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
         Assert.IsType<TestValue>(result);
         Assert.Equal(expectedResult, result);
 
-        _blobCacheService.Verify(
-            s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
-            Times.Once);
+        _blobCacheService.Verify(s => s.GetItemAsync(cacheKey, typeof(TestValue)), Times.Once);
     }
 
     [Fact]
@@ -119,27 +115,20 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
     {
         var cacheKey = new TestBlobCacheKey("test");
 
-        _blobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns((object?)null);
+        _blobCacheService.Setup(s => s.GetItem(cacheKey, typeof(TestValue))).Returns((object?)null);
 
         var args = new List<object>();
 
-        _blobCacheService
-            .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
+        _blobCacheService.Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
         var result = TestMethods.SingleParam("test");
 
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
-        _blobCacheService.Verify(
-            s => s.GetItem(cacheKey, typeof(TestValue)),
-            Times.Once);
+        _blobCacheService.Verify(s => s.GetItem(cacheKey, typeof(TestValue)), Times.Once);
 
-        _blobCacheService.Verify(
-            s => s.SetItem(cacheKey, Capture.In(args)),
-            Times.Once);
+        _blobCacheService.Verify(s => s.SetItem(cacheKey, Capture.In(args)), Times.Once);
     }
 
     [Fact]
@@ -162,13 +151,9 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
-        _blobCacheService.Verify(
-            s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
-            Times.Once);
+        _blobCacheService.Verify(s => s.GetItemAsync(cacheKey, typeof(TestValue)), Times.Once);
 
-        _blobCacheService.Verify(
-            s => s.SetItemAsync(cacheKey, Capture.In(args)), 
-            Times.Once);
+        _blobCacheService.Verify(s => s.SetItemAsync(cacheKey, Capture.In(args)), Times.Once);
     }
 
     [Fact]
@@ -221,7 +206,9 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
     [Fact]
     public async Task InvalidKeyType()
     {
-        var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.InvalidKeyTypeAsync);
+        var exception = await Assert.ThrowsAsync<ArgumentException>(
+            TestMethods.InvalidKeyTypeAsync
+        );
 
         Assert.Equal(
             $"Cache key type {typeof(object).FullName} must be assignable to {typeof(IBlobCacheKey).GetPrettyFullName()}",

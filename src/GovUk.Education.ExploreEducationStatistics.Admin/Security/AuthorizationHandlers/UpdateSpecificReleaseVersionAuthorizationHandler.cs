@@ -15,7 +15,8 @@ public class UpdateSpecificReleaseVersionAuthorizationHandler
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public UpdateSpecificReleaseVersionAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
@@ -23,7 +24,8 @@ public class UpdateSpecificReleaseVersionAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         UpdateSpecificReleaseVersionRequirement requirement,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         if (releaseVersion.ApprovalStatus == Approved)
         {
@@ -39,13 +41,15 @@ public class UpdateSpecificReleaseVersionAuthorizationHandler
         var allowedPublicationRoles = ListOf(PublicationRole.Owner, PublicationRole.Allower);
         var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublicationOrReleaseVersion(
-                    context.User.GetUserId(),
-                    releaseVersion.PublicationId,
-                    releaseVersion.Id,
-                    allowedPublicationRoles,
-                    allowedReleaseRoles))
+        if (
+            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+                context.User.GetUserId(),
+                releaseVersion.PublicationId,
+                releaseVersion.Id,
+                allowedPublicationRoles,
+                allowedReleaseRoles
+            )
+        )
         {
             context.Succeed(requirement);
         }

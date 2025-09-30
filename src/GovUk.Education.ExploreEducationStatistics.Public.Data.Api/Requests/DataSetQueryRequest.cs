@@ -15,7 +15,7 @@ public record DataSetQueryRequest
 
     /// <summary>
     /// The IDs of indicators to return values for.
-    /// 
+    ///
     /// Omitting this parameter will return values for all indicators.
     /// </summary>
     /// <example>["C2ySJ", "q4X3J"]</example>
@@ -53,9 +53,7 @@ public record DataSetQueryRequest
     {
         public Validator()
         {
-            RuleForEach(q => q.Indicators)
-                .NotEmpty()
-                .MaximumLength(40);
+            RuleForEach(q => q.Indicators).NotEmpty().MaximumLength(40);
 
             RuleFor(q => q.Criteria)
                 .SetInheritanceValidator(v =>
@@ -66,20 +64,20 @@ public record DataSetQueryRequest
                     v.Add(new DataSetQueryCriteriaFacets.Validator());
                 });
 
-            When(q => q.Sorts is not null, () =>
-            {
-                RuleFor(q => q.Sorts)
-                    .NotEmpty();
-                RuleForEach(q => q.Sorts)
-                    .NotNull()
-                    .SetValidator(new DataSetQuerySort.Validator());
-            });
+            When(
+                q => q.Sorts is not null,
+                () =>
+                {
+                    RuleFor(q => q.Sorts).NotEmpty();
+                    RuleForEach(q => q.Sorts)
+                        .NotNull()
+                        .SetValidator(new DataSetQuerySort.Validator());
+                }
+            );
 
-            RuleFor(request => request.Page)
-                .GreaterThanOrEqualTo(1);
-            
-            RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 10000);
+            RuleFor(request => request.Page).GreaterThanOrEqualTo(1);
+
+            RuleFor(request => request.PageSize).InclusiveBetween(1, 10000);
         }
     }
 }

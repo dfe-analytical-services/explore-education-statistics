@@ -50,7 +50,12 @@ public abstract class DataSetVersionTests
         [InlineData(1, 2, 3, "1.2.3")]
         [InlineData(4, 5, 0, "4.5")]
         [InlineData(1000, 2000, 3000, "1000.2000.3000")]
-        public void FormatsCorrectly(int majorVersion, int minorVersion, int patchVersion, string formattedVersion)
+        public void FormatsCorrectly(
+            int majorVersion,
+            int minorVersion,
+            int patchVersion,
+            string formattedVersion
+        )
         {
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -58,7 +63,7 @@ public abstract class DataSetVersionTests
 
             Assert.Equal(formattedVersion, dataSetVersion.PublicVersion);
         }
-        
+
         [Fact]
         public void DefaultNextVersion_IncrementsMinorDefaultsPatchToZero()
         {
@@ -70,7 +75,7 @@ public abstract class DataSetVersionTests
             Assert.Equal(2, semVersion.Minor);
             Assert.Equal(0, semVersion.Patch);
         }
-    
+
         [Fact]
         public void NextPatchVersion_IncrementsPatch()
         {
@@ -82,20 +87,26 @@ public abstract class DataSetVersionTests
             Assert.Equal(1, semVersion.Minor);
             Assert.Equal(1, semVersion.Patch);
         }
-    
+
         private static DataSetVersion CreateDataSetVersion(int major, int minor, int patch)
         {
             var version = new DataSetVersion
             {
                 Id = Guid.NewGuid(),
                 DataSetId = Guid.NewGuid(),
-                Release = new Release { Title = "test", Slug = "test", DataSetFileId = Guid.NewGuid(), ReleaseFileId = Guid.NewGuid() },
+                Release = new Release
+                {
+                    Title = "test",
+                    Slug = "test",
+                    DataSetFileId = Guid.NewGuid(),
+                    ReleaseFileId = Guid.NewGuid(),
+                },
                 Status = DataSetVersionStatus.Draft,
                 VersionMajor = major,
                 VersionMinor = minor,
                 VersionPatch = patch,
                 Notes = "",
-                Created = DateTimeOffset.UtcNow
+                Created = DateTimeOffset.UtcNow,
             };
             return version;
         }

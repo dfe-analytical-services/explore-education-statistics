@@ -12,24 +12,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
 
 public class ViewMethodologyVersionAuthorizationHandlerTests
 {
-    private readonly MethodologyVersion _methodologyVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly MethodologyVersion _methodologyVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task MethodologyVersionIsLatestPublishedVersion()
     {
-        var (
-            handler,
-            methodologyVersionRepository
-            ) = CreateHandlerAndDependencies();
+        var (handler, methodologyVersionRepository) = CreateHandlerAndDependencies();
 
-        methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(_methodologyVersion))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsLatestPublishedVersion(_methodologyVersion))
             .ReturnsAsync(true);
 
-        var authContext =
-            CreateAnonymousAuthContext<ViewMethodologyVersionRequirement, MethodologyVersion>(_methodologyVersion);
+        var authContext = CreateAnonymousAuthContext<
+            ViewMethodologyVersionRequirement,
+            MethodologyVersion
+        >(_methodologyVersion);
 
         await handler.HandleAsync(authContext);
 
@@ -41,16 +38,16 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
     [Fact]
     public async Task MethodologyVersionIsNotLatestPublishedVersion()
     {
-        var (
-            handler,
-            methodologyVersionRepository
-            ) = CreateHandlerAndDependencies();
+        var (handler, methodologyVersionRepository) = CreateHandlerAndDependencies();
 
-        methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(_methodologyVersion))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsLatestPublishedVersion(_methodologyVersion))
             .ReturnsAsync(false);
 
-        var authContext =
-            CreateAnonymousAuthContext<ViewMethodologyVersionRequirement, MethodologyVersion>(_methodologyVersion);
+        var authContext = CreateAnonymousAuthContext<
+            ViewMethodologyVersionRequirement,
+            MethodologyVersion
+        >(_methodologyVersion);
 
         await handler.HandleAsync(authContext);
 
@@ -59,11 +56,10 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
         Assert.False(authContext.HasSucceeded);
     }
 
-    private static
-        (ViewMethodologyVersionAuthorizationHandler,
+    private static (
+        ViewMethodologyVersionAuthorizationHandler,
         Mock<IMethodologyVersionRepository>
-        )
-        CreateHandlerAndDependencies()
+    ) CreateHandlerAndDependencies()
     {
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
@@ -71,9 +67,6 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
             methodologyVersionRepository.Object
         );
 
-        return (
-            handler,
-            methodologyVersionRepository
-        );
+        return (handler, methodologyVersionRepository);
     }
 }

@@ -28,14 +28,20 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     {
         public void Configure(EntityTypeBuilder<TimePeriodMeta> builder)
         {
-            builder.Property(m => m.Period)
-                .HasMaxLength(9);
-            
-            builder.Property(m => m.Code)
+            builder.Property(m => m.Period).HasMaxLength(9);
+
+            builder
+                .Property(m => m.Code)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(10);
 
-            builder.HasIndex(m => new { m.DataSetVersionId, m.Code, m.Period })
+            builder
+                .HasIndex(m => new
+                {
+                    m.DataSetVersionId,
+                    m.Code,
+                    m.Period,
+                })
                 .IsUnique();
         }
     }
@@ -53,5 +59,6 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
         }
     }
 
-    public static IEqualityComparer<TimePeriodMeta> CodePeriodComparer { get; } = new CodePeriodEqualityComparer();
+    public static IEqualityComparer<TimePeriodMeta> CodePeriodComparer { get; } =
+        new CodePeriodEqualityComparer();
 }

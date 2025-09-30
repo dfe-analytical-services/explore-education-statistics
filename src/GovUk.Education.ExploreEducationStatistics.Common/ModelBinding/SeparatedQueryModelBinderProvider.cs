@@ -22,7 +22,7 @@ public class SeparatedQueryModelBinderProvider : IModelBinderProvider
         typeof(uint),
         typeof(ulong),
         typeof(ushort),
-        typeof(Guid)
+        typeof(Guid),
     };
 
     public SeparatedQueryModelBinderProvider(string separator)
@@ -33,8 +33,9 @@ public class SeparatedQueryModelBinderProvider : IModelBinderProvider
     public IModelBinder? GetBinder(ModelBinderProviderContext context)
     {
         var separatorAttribute = context.Metadata is DefaultModelMetadata defaultMetadata
-            ? defaultMetadata.Attributes.Attributes.FirstOrDefault(
-                attribute => attribute is QuerySeparatorAttribute) as QuerySeparatorAttribute
+            ? defaultMetadata.Attributes.Attributes.FirstOrDefault(attribute =>
+                attribute is QuerySeparatorAttribute
+            ) as QuerySeparatorAttribute
             : null;
 
         if (!IsSupported(context, separatorAttribute))
@@ -53,8 +54,11 @@ public class SeparatedQueryModelBinderProvider : IModelBinderProvider
             provider = new CollectionModelBinderProvider();
         }
 
-        var binder = provider.GetBinder(context)
-                     ?? throw new NullReferenceException($"Could not get binder for {provider.GetType().Name}");
+        var binder =
+            provider.GetBinder(context)
+            ?? throw new NullReferenceException(
+                $"Could not get binder for {provider.GetType().Name}"
+            );
 
         return new SeparatedQueryModelBinder(binder, separatorAttribute?.Separator ?? _separator);
     }
@@ -67,7 +71,7 @@ public class SeparatedQueryModelBinderProvider : IModelBinderProvider
         }
 
         return context.BindingInfo.BindingSource == BindingSource.Query
-               && context.Metadata.IsEnumerableType
-               && SupportedElementTypes.Contains(context.Metadata.ElementType!);
+            && context.Metadata.IsEnumerableType
+            && SupportedElementTypes.Contains(context.Metadata.ElementType!);
     }
 }

@@ -16,8 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [Route("v{version:apiVersion}/data-sets")]
 public class DataSetsController(
     IDataSetService dataSetService,
-    IDataSetQueryService dataSetQueryService)
-    : ControllerBase
+    IDataSetQueryService dataSetQueryService
+) : ControllerBase
 {
     /// <summary>
     /// Get a data set's summary
@@ -32,12 +32,11 @@ public class DataSetsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
-            .GetDataSet(
-               dataSetId: dataSetId,
-               cancellationToken: cancellationToken)
+            .GetDataSet(dataSetId: dataSetId, cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -49,24 +48,36 @@ public class DataSetsController(
     /// </remarks>
     [HttpGet("{dataSetId:guid}/meta")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The requested data set version metadata.", type: typeof(DataSetMetaViewModel))]
+    [SwaggerResponse(
+        200,
+        "The requested data set version metadata.",
+        type: typeof(DataSetMetaViewModel)
+    )]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
         [FromQuery] DataSetMetaRequest request,
-        [FromQuery, SwaggerParameter("""
-                                     The data set version e.g. 1.0, 1.1, 2.0, etc.
-                                     Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                                     """)]string? dataSetVersion,
+        [
+            FromQuery,
+            SwaggerParameter(
+                """
+                    The data set version e.g. 1.0, 1.1, 2.0, etc.
+                    Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                    """
+            )
+        ]
+            string? dataSetVersion,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
             .GetMeta(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 types: request.ParsedTypes(),
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -92,7 +103,7 @@ public class DataSetsController(
     /// Each indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.
     ///
     /// Omitting the `indicators` parameter will return values for all indicators.
-    /// 
+    ///
     /// ## Filters
     ///
     /// The `filters` query parameter is used to filter by other filter options (not locations,
@@ -215,25 +226,35 @@ public class DataSetsController(
     /// </remarks>
     [HttpGet("{dataSetId:guid}/query")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of query results.", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [SwaggerResponse(
+        200,
+        "The paginated list of query results.",
+        type: typeof(DataSetQueryPaginatedResultsViewModel)
+    )]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetGet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("""
-                          The data set version e.g. 1.0, 1.1, 2.0, etc.
-                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                          """)][FromQuery] string? dataSetVersion,
+        [SwaggerParameter(
+            """
+                The data set version e.g. 1.0, 1.1, 2.0, etc.
+                Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                """
+        )]
+        [FromQuery]
+            string? dataSetVersion,
         [FromQuery] DataSetGetQueryRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetQueryService
             .Query(
                 dataSetId: dataSetId,
                 request: request,
                 dataSetVersion: dataSetVersion,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -258,25 +279,35 @@ public class DataSetsController(
     [HttpPost("{dataSetId:guid}/query")]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of query results.", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [SwaggerResponse(
+        200,
+        "The paginated list of query results.",
+        type: typeof(DataSetQueryPaginatedResultsViewModel)
+    )]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("""
-                          The data set version e.g. 1.0, 1.1, 2.0, etc.
-                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                          """)][FromQuery] string? dataSetVersion,
+        [SwaggerParameter(
+            """
+                The data set version e.g. 1.0, 1.1, 2.0, etc.
+                Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                """
+        )]
+        [FromQuery]
+            string? dataSetVersion,
         [FromBody] DataSetQueryRequest? request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetQueryService
             .Query(
                 dataSetId: dataSetId,
                 request: request ?? new DataSetQueryRequest(),
                 dataSetVersion: dataSetVersion,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -295,15 +326,28 @@ public class DataSetsController(
         type: typeof(string),
         contentTypes: MediaTypeNames.Text.Csv
     )]
-    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
-    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
+    [SwaggerResponse(
+        403,
+        type: typeof(ProblemDetailsViewModel),
+        contentTypes: MediaTypeNames.Application.Json
+    )]
+    [SwaggerResponse(
+        404,
+        type: typeof(ProblemDetailsViewModel),
+        contentTypes: MediaTypeNames.Application.Json
+    )]
     public async Task<ActionResult> DownloadDataSetCsv(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("""
-                          The data set version e.g. 1.0, 1.1, 2.0, etc.
-                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                          """)][FromQuery] string? dataSetVersion,
-        CancellationToken cancellationToken)
+        [SwaggerParameter(
+            """
+                The data set version e.g. 1.0, 1.1, 2.0, etc.
+                Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                """
+        )]
+        [FromQuery]
+            string? dataSetVersion,
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
             .DownloadDataSet(

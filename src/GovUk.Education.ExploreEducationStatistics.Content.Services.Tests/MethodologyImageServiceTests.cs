@@ -31,8 +31,8 @@ public class MethodologyImageServiceTests
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
                 ContentType = "image/png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var fileData = new byte[] { 0 };
@@ -48,13 +48,18 @@ public class MethodologyImageServiceTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        publicBlobStorageService
-            .SetupGetDownloadStream(PublicMethodologyFiles, methodologyFile.Path(), fileData);
+        publicBlobStorageService.SetupGetDownloadStream(
+            PublicMethodologyFiles,
+            methodologyFile.Path(),
+            fileData
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                publicBlobStorageService: publicBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object
+            );
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
@@ -76,8 +81,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -133,8 +138,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -148,12 +153,17 @@ public class MethodologyImageServiceTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        publicBlobStorageService.SetupGetDownloadStreamNotFound(PublicMethodologyFiles, methodologyFile.Path());
+        publicBlobStorageService.SetupGetDownloadStreamNotFound(
+            PublicMethodologyFiles,
+            methodologyFile.Path()
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                publicBlobStorageService: publicBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object
+            );
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
@@ -164,7 +174,8 @@ public class MethodologyImageServiceTests
     private static MethodologyImageService SetupMethodologyImageService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-        IPublicBlobStorageService? publicBlobStorageService = null)
+        IPublicBlobStorageService? publicBlobStorageService = null
+    )
     {
         return new MethodologyImageService(
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),

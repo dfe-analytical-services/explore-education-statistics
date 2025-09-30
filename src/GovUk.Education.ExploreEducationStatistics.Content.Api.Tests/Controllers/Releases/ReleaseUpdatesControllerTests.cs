@@ -24,18 +24,18 @@ public abstract class ReleaseUpdatesControllerTests
         public async Task WhenServiceReturnsReleaseUpdates_ReturnsOk()
         {
             // Arrange
-            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate([
-                    new ReleaseUpdateDtoBuilder().Build()
-                ],
+            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate(
+                [new ReleaseUpdateDtoBuilder().Build()],
                 page: Page,
-                pageSize: PageSize);
+                pageSize: PageSize
+            );
 
             var request = new GetReleaseUpdatesRequest
             {
                 PublicationSlug = PublicationSlug,
                 ReleaseSlug = ReleaseSlug,
                 Page = Page,
-                PageSize = PageSize
+                PageSize = PageSize,
             };
 
             _releaseUpdatesService.WhereHasReleaseUpdates(releaseUpdates);
@@ -50,7 +50,8 @@ public abstract class ReleaseUpdatesControllerTests
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: request.Page,
-                pageSize: request.PageSize);
+                pageSize: request.PageSize
+            );
             result.AssertOkResult(releaseUpdates);
         }
 
@@ -60,17 +61,17 @@ public abstract class ReleaseUpdatesControllerTests
             // Arrange
             const int defaultPage = 1;
             const int defaultPageSize = 10;
-            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate([
-                    new ReleaseUpdateDtoBuilder().Build()
-                ],
+            var releaseUpdates = PaginatedListViewModel<ReleaseUpdateDto>.Paginate(
+                [new ReleaseUpdateDtoBuilder().Build()],
                 page: defaultPage,
-                pageSize: defaultPageSize);
+                pageSize: defaultPageSize
+            );
 
             // No page or pageSize query parameters set on request
             var request = new GetReleaseUpdatesRequest
             {
                 PublicationSlug = PublicationSlug,
-                ReleaseSlug = ReleaseSlug
+                ReleaseSlug = ReleaseSlug,
             };
 
             _releaseUpdatesService.WhereHasReleaseUpdates(releaseUpdates);
@@ -85,7 +86,8 @@ public abstract class ReleaseUpdatesControllerTests
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: defaultPage,
-                pageSize: defaultPageSize);
+                pageSize: defaultPageSize
+            );
             result.AssertOkResult(releaseUpdates);
         }
 
@@ -96,7 +98,7 @@ public abstract class ReleaseUpdatesControllerTests
             var request = new GetReleaseUpdatesRequest
             {
                 PublicationSlug = PublicationSlug,
-                ReleaseSlug = ReleaseSlug
+                ReleaseSlug = ReleaseSlug,
             };
 
             _releaseUpdatesService.WhereGetReleaseUpdatesReturnsNotFound();
@@ -109,7 +111,8 @@ public abstract class ReleaseUpdatesControllerTests
             // Assert
             _releaseUpdatesService.Assert.GetReleaseUpdatesWasCalled(
                 publicationSlug: request.PublicationSlug,
-                releaseSlug: request.ReleaseSlug);
+                releaseSlug: request.ReleaseSlug
+            );
             result.AssertNotFoundResult();
         }
     }

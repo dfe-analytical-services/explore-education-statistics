@@ -6,22 +6,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public class NotificationsService(
-    ContentDbContext context,
-    INotifierClient notifierClient)
+public class NotificationsService(ContentDbContext context, INotifierClient notifierClient)
     : INotificationsService
 {
     public async Task NotifySubscribersIfApplicable(IReadOnlyList<Guid> releaseVersionIds)
     {
-        var releasesVersions = await context.ReleaseVersions
-            .Include(rv => rv.Release)
+        var releasesVersions = await context
+            .ReleaseVersions.Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.NotifySubscribers)
             .ToListAsync();
 
         var messages = await releasesVersions
             .ToAsyncEnumerable()
-            .SelectAwait(async releaseVersion => await BuildPublicationNotificationMessage(releaseVersion))
+            .SelectAwait(async releaseVersion =>
+                await BuildPublicationNotificationMessage(releaseVersion)
+            )
             .ToListAsync();
 
         if (messages.Count > 0)
@@ -35,8 +35,7 @@ public class NotificationsService(
     public async Task SendReleasePublishingFeedbackEmails(IReadOnlyList<Guid> releaseVersionIds)
     {
         var releasesVersions = await context
-            .ReleaseVersions
-            .Include(rv => rv.Release)
+            .ReleaseVersions.Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .Where(rv => releaseVersionIds.Contains(rv.Id))
             .ToListAsync();
@@ -46,8 +45,7 @@ public class NotificationsService(
             .SelectManyAwait(async releaseVersion =>
             {
                 var publicationRoles = await context
-                    .UserPublicationRoles
-                    .Include(upr => upr.User)
+                    .UserPublicationRoles.Include(upr => upr.User)
                     .Where(upr => upr.PublicationId == releaseVersion.Release.PublicationId)
                     .ToListAsync();
 
@@ -62,7 +60,7 @@ public class NotificationsService(
                             ReleaseTitle = releaseVersion.Release.Title,
                             PublicationTitle = releaseVersion.Release.Publication.Title,
                             UserPublicationRole = upr.Role,
-                            EmailToken = Guid.NewGuid().ToString()
+                            EmailToken = Guid.NewGuid().ToString(),
                         };
 
                         return (feedback, email: upr.User.Email);
@@ -70,16 +68,18 @@ public class NotificationsService(
             })
             .ToListAsync();
 
-        var feedbackEntries = feedbackEntriesAndEmails
-            .Select(feedbackEntry => feedbackEntry.feedback);
-        
+        var feedbackEntries = feedbackEntriesAndEmails.Select(feedbackEntry =>
+            feedbackEntry.feedback
+        );
+
         context.ReleasePublishingFeedback.AddRange(feedbackEntries);
         await context.SaveChangesAsync();
-        
+
         var messages = feedbackEntriesAndEmails
             .Select(feedbackAndEmail => new ReleasePublishingFeedbackMessage(
                 ReleasePublishingFeedbackId: feedbackAndEmail.feedback.Id,
-                EmailAddress: feedbackAndEmail.email))
+                EmailAddress: feedbackAndEmail.email
+            ))
             .ToList();
 
         if (messages.Count > 0)
@@ -89,18 +89,15 @@ public class NotificationsService(
     }
 
     private async Task<ReleaseNotificationMessage> BuildPublicationNotificationMessage(
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         var latestUpdateNoteReason = "No update note provided.";
         // NOTE: Only amendment email template displays an update note.
         if (releaseVersion.Version > 0)
         {
-            await context.Entry(releaseVersion)
-                .Collection(rv => rv.Updates)
-                .LoadAsync();
-            var latestUpdateNote = releaseVersion.Updates
-                .OrderBy(u => u.Created)
-                .Last();
+            await context.Entry(releaseVersion).Collection(rv => rv.Updates).LoadAsync();
+            var latestUpdateNote = releaseVersion.Updates.OrderBy(u => u.Created).Last();
             latestUpdateNoteReason = latestUpdateNote.Reason;
         }
 

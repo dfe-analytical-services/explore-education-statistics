@@ -12,5 +12,6 @@ public interface IFrontendService
     Task<Either<ActionResult, PermalinkTableViewModel>> CreateTable(
         TableBuilderResultViewModel tableResult,
         TableBuilderConfiguration tableConfiguration,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

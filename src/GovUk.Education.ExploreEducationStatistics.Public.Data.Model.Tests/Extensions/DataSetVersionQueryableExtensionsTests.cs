@@ -17,17 +17,21 @@ public abstract class DataSetVersionQueryableExtensionsTests
 
         [Theory]
         [MemberData(nameof(ValidVersions))]
-        public async Task TestValidDataSetVersions_ReturnsExpectedVersion(string versionString,
-                int expectedMajor,
-                int expectedMinor = default,
-                int expectedPatch = default)
+        public async Task TestValidDataSetVersions_ReturnsExpectedVersion(
+            string versionString,
+            int expectedMajor,
+            int expectedMinor = default,
+            int expectedPatch = default
+        )
         {
             // Arrange
             var dataSetId = Guid.NewGuid();
             var queryable = SetupDataSetVersions(out dataSetId);
 
-            // Act 
-            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSetId, versionString, CancellationToken.None);
+            // Act
+            var actualResult = await queryable
+                .WherePublishedStatus()
+                .FindByVersion(dataSetId, versionString, CancellationToken.None);
 
             // Assert
             Assert.True(actualResult.IsRight);
@@ -61,8 +65,10 @@ public abstract class DataSetVersionQueryableExtensionsTests
             Guid dataSetId;
             var queryable = SetupDataSetVersions(out dataSetId);
 
-            // Act 
-            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSetId, versionString, CancellationToken.None);
+            // Act
+            var actualResult = await queryable
+                .WherePublishedStatus()
+                .FindByVersion(dataSetId, versionString, CancellationToken.None);
 
             // Assert
             actualResult.AssertNotFound();
@@ -74,9 +80,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
         public async Task SpecifyWildCardThatIsNonPublished_Returns404NotFound(string versionString)
         {
             // Arrange
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
             var dataSetVersions = _dataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
@@ -85,39 +89,49 @@ public abstract class DataSetVersionQueryableExtensionsTests
                 .WithPreviewTokens(() => [_dataFixture.DefaultPreviewToken()])
                 .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
                 .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
-                .ForIndex(3, dsv =>
-                {
-                    dsv.SetStatusDraft();
-                    dsv.SetVersionNumber(2, 0);
-                })
-                .ForIndex(4, dsv =>
-                {
-                    dsv.SetStatusDraft();
-                    dsv.SetVersionNumber(2, 1);
-                })
+                .ForIndex(
+                    3,
+                    dsv =>
+                    {
+                        dsv.SetStatusDraft();
+                        dsv.SetVersionNumber(2, 0);
+                    }
+                )
+                .ForIndex(
+                    4,
+                    dsv =>
+                    {
+                        dsv.SetStatusDraft();
+                        dsv.SetVersionNumber(2, 1);
+                    }
+                )
                 .GenerateList();
 
             var publicDataDbContextMock = new Mock<PublicDataDbContext>();
-            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+            publicDataDbContextMock
+                .Setup(dbContext => dbContext.DataSetVersions)
+                .ReturnsDbSet(dataSetVersions);
 
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
 
-            // Act 
-            var actualResult = await queryable.WherePublishedStatus().FindByVersion(dataSet.Id, versionString, CancellationToken.None);
+            // Act
+            var actualResult = await queryable
+                .WherePublishedStatus()
+                .FindByVersion(dataSet.Id, versionString, CancellationToken.None);
 
             // Assert
             actualResult.AssertNotFound();
         }
-        
+
         [Theory]
         [MemberData(nameof(NonPublishedStatusWithVersionStringTheoryData))]
         public async Task SpecifyWildCard_SkipsNonPublishedVersionAndReturnsPublishedVersion(
-            DataSetVersionStatus nonPublishedStatus, string versionString)
+            DataSetVersionStatus nonPublishedStatus,
+            string versionString
+        )
         {
             // Arrange
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
             var dataSetVersions = _dataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
@@ -126,34 +140,49 @@ public abstract class DataSetVersionQueryableExtensionsTests
                 .WithPreviewTokens(() => [_dataFixture.DefaultPreviewToken()])
                 .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
                 .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
-                .ForIndex(3, dsv =>
-                {
-                    dsv.SetStatus(nonPublishedStatus); //The status is not published status and so these will not be returned
-                    dsv.SetVersionNumber(1, 3);
-                })
-                .ForIndex(4, dsv =>
-                {
-                    dsv.SetStatus(nonPublishedStatus);
-                    dsv.SetVersionNumber(2, 0);
-                })
-                .ForIndex(5, dsv =>
-                {
-                    dsv.SetStatus(nonPublishedStatus);
-                    dsv.SetVersionNumber(2, 1);
-                })                
+                .ForIndex(
+                    3,
+                    dsv =>
+                    {
+                        dsv.SetStatus(nonPublishedStatus); //The status is not published status and so these will not be returned
+                        dsv.SetVersionNumber(1, 3);
+                    }
+                )
+                .ForIndex(
+                    4,
+                    dsv =>
+                    {
+                        dsv.SetStatus(nonPublishedStatus);
+                        dsv.SetVersionNumber(2, 0);
+                    }
+                )
+                .ForIndex(
+                    5,
+                    dsv =>
+                    {
+                        dsv.SetStatus(nonPublishedStatus);
+                        dsv.SetVersionNumber(2, 1);
+                    }
+                )
                 .GenerateList();
 
             var publicDataDbContextMock = new Mock<PublicDataDbContext>();
-            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+            publicDataDbContextMock
+                .Setup(dbContext => dbContext.DataSetVersions)
+                .ReturnsDbSet(dataSetVersions);
 
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
 
-            // Act 
-            var actualResult = await queryable.FindByVersion(dataSet.Id, versionString, CancellationToken.None);
+            // Act
+            var actualResult = await queryable.FindByVersion(
+                dataSet.Id,
+                versionString,
+                CancellationToken.None
+            );
 
             // Assert
             actualResult.AssertRight();
-            
+
             Assert.Equal(1, actualResult.Right.VersionMajor);
             Assert.Equal(2, actualResult.Right.VersionMinor);
             Assert.Equal(0, actualResult.Right.VersionPatch);
@@ -163,9 +192,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
         public async Task GetPreviousVersions_ReturnsAllMatchingMinorMajorVersion()
         {
             // Arrange
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
             var dataSetVersions = _dataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
@@ -186,36 +213,40 @@ public abstract class DataSetVersionQueryableExtensionsTests
                 .GenerateList();
 
             var publicDataDbContextMock = new Mock<PublicDataDbContext>();
-            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+            publicDataDbContextMock
+                .Setup(dbContext => dbContext.DataSetVersions)
+                .ReturnsDbSet(dataSetVersions);
 
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
-            
-            // Act 
-            var result = await queryable.GetPreviousPatchVersions(dataSet.Id, "3.2.3", CancellationToken.None);
+
+            // Act
+            var result = await queryable.GetPreviousPatchVersions(
+                dataSet.Id,
+                "3.2.3",
+                CancellationToken.None
+            );
 
             // Assert
             var actualResult = result.AssertRight();
             Assert.NotNull(actualResult);
             Assert.Equal(3, actualResult.Length);
-            
+
             Assert.Equal(3, actualResult[0].VersionMajor);
             Assert.Equal(2, actualResult[0].VersionMinor);
             Assert.Equal(0, actualResult[0].VersionPatch);
-            
+
             Assert.Equal(3, actualResult[1].VersionMajor);
             Assert.Equal(2, actualResult[1].VersionMinor);
             Assert.Equal(1, actualResult[1].VersionPatch);
-            
+
             Assert.Equal(3, actualResult[2].VersionMajor);
             Assert.Equal(2, actualResult[2].VersionMinor);
             Assert.Equal(2, actualResult[2].VersionPatch);
         }
-        
+
         private IQueryable<DataSetVersion> SetupDataSetVersions(out Guid dataSetGuid)
         {
-            DataSet dataSet = _dataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
             dataSetGuid = dataSet.Id;
 
             var dataSetVersions = _dataFixture
@@ -248,61 +279,67 @@ public abstract class DataSetVersionQueryableExtensionsTests
                 .GenerateList();
 
             var publicDataDbContextMock = new Mock<PublicDataDbContext>();
-            publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
+            publicDataDbContextMock
+                .Setup(dbContext => dbContext.DataSetVersions)
+                .ReturnsDbSet(dataSetVersions);
 
             return publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
         }
 
-        public static TheoryData<string, int, int, int> ValidVersions => new()
-        {
-            {"0.1.*", 0, 1, 3},
-            {"0.1.3", 0, 1, 3},
-            {"0.2", 0, 2, 0},
-            {"0.2.*", 0, 2, 1},
-            {"0.2.1", 0, 2, 1},
-            {"0.*", 0, 2, 1},
-            {"0.*.*", 0, 2, 1},
-            {"1.1.*", 1, 1, 1},
-            {"1.1.0", 1, 1, 0},
-            {"1.2.*", 1, 2, 0},
-            {"1.2.0", 1, 2, 0},
-            {"1.3", 1, 3, 0},
-            {"1.3.0", 1, 3, 0},
-            {"1.*", 1, 3, 0},
-            {"1.*.*", 1, 3, 0},
-            {"2.1", 2, 1, 0},
-            {"2.1.*", 2, 1, 4},
-            {"2.1.4", 2, 1, 4},
-            {"2.*", 2, 1, 4},
-            {"2.*.*", 2, 1, 4},
-            {"*", 5, 0, 0},
-            {"v0.1.*", 0, 1, 3},
-            {"v0.1.3", 0, 1, 3},
-            {"v0.2", 0, 2, 0},
-            {"v0.2.*", 0, 2, 1},
-            {"v0.2.1", 0, 2, 1},
-            {"v0.*", 0, 2, 1},
-            {"v0.*.*", 0, 2, 1},
-            {"v1.1.*", 1, 1, 1},
-            {"v1.1.0", 1, 1, 0},
-            {"v1.2.*", 1, 2, 0},
-            {"v1.2.0", 1, 2, 0},
-            {"v1.3", 1, 3, 0},
-            {"v1.3.0", 1, 3, 0},
-            {"v1.*", 1, 3, 0},
-            {"v1.*.*", 1, 3, 0},
-            {"v2.1", 2, 1, 0},
-            {"v2.1.*", 2, 1, 4},
-            {"v2.1.4", 2, 1, 4},
-            {"v2.*", 2, 1, 4},
-            {"v2.*.*", 2, 1, 4},
-            {"v*", 5, 0, 0}
-        };
-        
-        public static TheoryData<DataSetVersionStatus, string> NonPublishedStatusWithVersionStringTheoryData =>
-            new TheoryData<DataSetVersionStatus, string>()
-                .Cross(
-                    Enum.GetValues<DataSetVersionStatus>().Except([DataSetVersionStatus.Published]),
-                    ["1.*", "*", "v1.*", "v*"]);
+        public static TheoryData<string, int, int, int> ValidVersions =>
+            new()
+            {
+                { "0.1.*", 0, 1, 3 },
+                { "0.1.3", 0, 1, 3 },
+                { "0.2", 0, 2, 0 },
+                { "0.2.*", 0, 2, 1 },
+                { "0.2.1", 0, 2, 1 },
+                { "0.*", 0, 2, 1 },
+                { "0.*.*", 0, 2, 1 },
+                { "1.1.*", 1, 1, 1 },
+                { "1.1.0", 1, 1, 0 },
+                { "1.2.*", 1, 2, 0 },
+                { "1.2.0", 1, 2, 0 },
+                { "1.3", 1, 3, 0 },
+                { "1.3.0", 1, 3, 0 },
+                { "1.*", 1, 3, 0 },
+                { "1.*.*", 1, 3, 0 },
+                { "2.1", 2, 1, 0 },
+                { "2.1.*", 2, 1, 4 },
+                { "2.1.4", 2, 1, 4 },
+                { "2.*", 2, 1, 4 },
+                { "2.*.*", 2, 1, 4 },
+                { "*", 5, 0, 0 },
+                { "v0.1.*", 0, 1, 3 },
+                { "v0.1.3", 0, 1, 3 },
+                { "v0.2", 0, 2, 0 },
+                { "v0.2.*", 0, 2, 1 },
+                { "v0.2.1", 0, 2, 1 },
+                { "v0.*", 0, 2, 1 },
+                { "v0.*.*", 0, 2, 1 },
+                { "v1.1.*", 1, 1, 1 },
+                { "v1.1.0", 1, 1, 0 },
+                { "v1.2.*", 1, 2, 0 },
+                { "v1.2.0", 1, 2, 0 },
+                { "v1.3", 1, 3, 0 },
+                { "v1.3.0", 1, 3, 0 },
+                { "v1.*", 1, 3, 0 },
+                { "v1.*.*", 1, 3, 0 },
+                { "v2.1", 2, 1, 0 },
+                { "v2.1.*", 2, 1, 4 },
+                { "v2.1.4", 2, 1, 4 },
+                { "v2.*", 2, 1, 4 },
+                { "v2.*.*", 2, 1, 4 },
+                { "v*", 5, 0, 0 },
+            };
+
+        public static TheoryData<
+            DataSetVersionStatus,
+            string
+        > NonPublishedStatusWithVersionStringTheoryData =>
+            new TheoryData<DataSetVersionStatus, string>().Cross(
+                Enum.GetValues<DataSetVersionStatus>().Except([DataSetVersionStatus.Published]),
+                ["1.*", "*", "v1.*", "v*"]
+            );
     }
 }

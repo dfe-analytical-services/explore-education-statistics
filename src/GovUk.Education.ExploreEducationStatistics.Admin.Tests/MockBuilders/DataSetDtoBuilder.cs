@@ -21,36 +21,39 @@ public class DataSetDtoBuilder
 
         if (_dataFile is null)
         {
-            var dataMemoryStream = await FileStreamUtils.CreateMemoryStreamFromLocalResource(_dataFileName);
+            var dataMemoryStream = await FileStreamUtils.CreateMemoryStreamFromLocalResource(
+                _dataFileName
+            );
 
             _dataFile = new()
             {
                 FileName = _dataFileName,
                 FileSize = dataMemoryStream.Length,
-                FileStreamProvider = () => dataMemoryStream
+                FileStreamProvider = () => dataMemoryStream,
             };
         }
 
         if (_metaFile is null)
         {
-            var metaMemoryStream = await FileStreamUtils.CreateMemoryStreamFromLocalResource(_metaFileName);
+            var metaMemoryStream = await FileStreamUtils.CreateMemoryStreamFromLocalResource(
+                _metaFileName
+            );
 
             _metaFile = new()
             {
                 FileName = _metaFileName,
                 FileSize = metaMemoryStream.Length,
-                FileStreamProvider = () => metaMemoryStream
+                FileStreamProvider = () => metaMemoryStream,
             };
         }
 
-        return
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId ?? Guid.NewGuid(),
-                Title = _title,
-                DataFile = _dataFile,
-                MetaFile = _metaFile,
-            };
+        return new()
+        {
+            ReleaseVersionId = _releaseVersionId ?? Guid.NewGuid(),
+            Title = _title,
+            DataFile = _dataFile,
+            MetaFile = _metaFile,
+        };
     }
 
     public DataSetDtoBuilder WhereReleaseVersionIdIsEmpty()

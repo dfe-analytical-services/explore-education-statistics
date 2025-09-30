@@ -2,8 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
@@ -11,10 +11,14 @@ public class TimePeriodLabelFormatterTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
     private const int Year = 2018;
-    private static readonly string FormattedAcademicYear = $"{Year}/{(Year + 1).ToString().Substring(2)}";
-    private static readonly string FormattedAcademicCsvYear = $"{Year}{(Year + 1).ToString().Substring(2)}";
-    private static readonly string FormattedFiscalYear = $"{Year}-{(Year + 1).ToString().Substring(2)}";
-    private static readonly string FormattedFiscalCsvYear = $"{Year}{(Year + 1).ToString().Substring(2)}";
+    private static readonly string FormattedAcademicYear =
+        $"{Year}/{(Year + 1).ToString().Substring(2)}";
+    private static readonly string FormattedAcademicCsvYear =
+        $"{Year}{(Year + 1).ToString().Substring(2)}";
+    private static readonly string FormattedFiscalYear =
+        $"{Year}-{(Year + 1).ToString().Substring(2)}";
+    private static readonly string FormattedFiscalCsvYear =
+        $"{Year}{(Year + 1).ToString().Substring(2)}";
 
     public TimePeriodLabelFormatterTests(ITestOutputHelper testOutputHelper)
     {
@@ -90,7 +94,10 @@ public class TimePeriodLabelFormatterTests
         Assert.Equal($"{FormattedAcademicYear} Autumn term", Format(Year, AutumnTerm));
         Assert.Equal($"{FormattedAcademicYear} Spring term", Format(Year, SpringTerm));
         Assert.Equal($"{FormattedAcademicYear} Summer term", Format(Year, SummerTerm));
-        Assert.Equal($"{FormattedAcademicYear} Autumn and spring term", Format(Year, AutumnSpringTerm));
+        Assert.Equal(
+            $"{FormattedAcademicYear} Autumn and spring term",
+            Format(Year, AutumnSpringTerm)
+        );
     }
 
     [Fact]
@@ -153,38 +160,77 @@ public class TimePeriodLabelFormatterTests
     [Fact]
     public void FormatTimePeriodUsingFinancialYearPartIdentifiers()
     {
-        Assert.Equal($"{FormattedFiscalYear} Part 1 (Apr to Sep)", Format(Year, FinancialYearPart1));
-        Assert.Equal($"{FormattedFiscalYear} Part 2 (Oct to Mar)", Format(Year, FinancialYearPart2));
+        Assert.Equal(
+            $"{FormattedFiscalYear} Part 1 (Apr to Sep)",
+            Format(Year, FinancialYearPart1)
+        );
+        Assert.Equal(
+            $"{FormattedFiscalYear} Part 2 (Oct to Mar)",
+            Format(Year, FinancialYearPart2)
+        );
     }
 
     [Fact]
     public void FormatTimePeriodWithFullLabelFormat()
     {
         Assert.Equal($"{Year} Calendar year", Format(Year, CalendarYear, FullLabel));
-        Assert.Equal($"{FormattedAcademicYear} Academic year", Format(Year, AcademicYear, FullLabel));
-        Assert.Equal($"{FormattedAcademicYear} Academic year Q1", Format(Year, AcademicYearQ1, FullLabel));
-        Assert.Equal($"{FormattedFiscalYear} Financial year", Format(Year, FinancialYear, FullLabel));
+        Assert.Equal(
+            $"{FormattedAcademicYear} Academic year",
+            Format(Year, AcademicYear, FullLabel)
+        );
+        Assert.Equal(
+            $"{FormattedAcademicYear} Academic year Q1",
+            Format(Year, AcademicYearQ1, FullLabel)
+        );
+        Assert.Equal(
+            $"{FormattedFiscalYear} Financial year",
+            Format(Year, FinancialYear, FullLabel)
+        );
         Assert.Equal($"{FormattedFiscalYear} Tax year", Format(Year, TaxYear, FullLabel));
         Assert.Equal($"{Year} Reporting year", Format(Year, ReportingYear, FullLabel));
         Assert.Equal($"{Year} January", Format(Year, January, FullLabel));
         Assert.Equal($"{FormattedAcademicYear} Autumn term", Format(Year, AutumnTerm, FullLabel));
-        Assert.Equal($"{FormattedFiscalYear} Part 1 (April to September)", Format(Year, FinancialYearPart1, FullLabel));
-        Assert.Equal($"{FormattedFiscalYear} Part 2 (October to March)", Format(Year, FinancialYearPart2, FullLabel));
+        Assert.Equal(
+            $"{FormattedFiscalYear} Part 1 (April to September)",
+            Format(Year, FinancialYearPart1, FullLabel)
+        );
+        Assert.Equal(
+            $"{FormattedFiscalYear} Part 2 (October to March)",
+            Format(Year, FinancialYearPart2, FullLabel)
+        );
     }
 
     [Fact]
     public void FormatTimePeriodWithFullLabelBeforeYearFormat()
     {
         Assert.Equal($"Calendar year {Year}", Format(Year, CalendarYear, FullLabelBeforeYear));
-        Assert.Equal($"Academic year {FormattedAcademicYear}", Format(Year, AcademicYear, FullLabelBeforeYear));
-        Assert.Equal($"Academic year Q1 {FormattedAcademicYear}", Format(Year, AcademicYearQ1, FullLabelBeforeYear));
-        Assert.Equal($"Financial year {FormattedFiscalYear}", Format(Year, FinancialYear, FullLabelBeforeYear));
+        Assert.Equal(
+            $"Academic year {FormattedAcademicYear}",
+            Format(Year, AcademicYear, FullLabelBeforeYear)
+        );
+        Assert.Equal(
+            $"Academic year Q1 {FormattedAcademicYear}",
+            Format(Year, AcademicYearQ1, FullLabelBeforeYear)
+        );
+        Assert.Equal(
+            $"Financial year {FormattedFiscalYear}",
+            Format(Year, FinancialYear, FullLabelBeforeYear)
+        );
         Assert.Equal($"Tax year {FormattedFiscalYear}", Format(Year, TaxYear, FullLabelBeforeYear));
         Assert.Equal($"Reporting year {Year}", Format(Year, ReportingYear, FullLabelBeforeYear));
         Assert.Equal($"January {Year}", Format(Year, January, FullLabelBeforeYear));
-        Assert.Equal($"Autumn term {FormattedAcademicYear}", Format(Year, AutumnTerm, FullLabelBeforeYear));
-        Assert.Equal($"Part 1 (April to September) {FormattedFiscalYear}", Format(Year, FinancialYearPart1, FullLabelBeforeYear));
-        Assert.Equal($"Part 2 (October to March) {FormattedFiscalYear}", Format(Year, FinancialYearPart2, FullLabelBeforeYear));
+        Assert.Equal(
+            $"Autumn term {FormattedAcademicYear}",
+            Format(Year, AutumnTerm, FullLabelBeforeYear)
+        );
+        Assert.Equal(
+            $"Part 1 (April to September) {FormattedFiscalYear}",
+            Format(Year, FinancialYearPart1, FullLabelBeforeYear)
+        );
+        Assert.Equal(
+            $"Part 2 (October to March) {FormattedFiscalYear}",
+            Format(Year, FinancialYearPart2, FullLabelBeforeYear)
+        );
     }
 
     [Fact]
@@ -212,8 +258,14 @@ public class TimePeriodLabelFormatterTests
         Assert.Equal($"{Year}", Format(Year, ReportingYear, ShortLabel));
         Assert.Equal($"{Year}", Format(Year, January, ShortLabel));
         Assert.Equal($"{FormattedAcademicYear}", Format(Year, AutumnTerm, ShortLabel));
-        Assert.Equal($"{FormattedFiscalYear} Part 1 (Apr to Sep)", Format(Year, FinancialYearPart1, ShortLabel));
-        Assert.Equal($"{FormattedFiscalYear} Part 2 (Oct to Mar)", Format(Year, FinancialYearPart2, ShortLabel));
+        Assert.Equal(
+            $"{FormattedFiscalYear} Part 1 (Apr to Sep)",
+            Format(Year, FinancialYearPart1, ShortLabel)
+        );
+        Assert.Equal(
+            $"{FormattedFiscalYear} Part 2 (Oct to Mar)",
+            Format(Year, FinancialYearPart2, ShortLabel)
+        );
     }
 
     [Fact]
@@ -332,22 +384,54 @@ public class TimePeriodLabelFormatterTests
     [SuppressMessage("ReSharper", "xUnit1004")]
     public void Debug()
     {
-        _testOutputHelper.WriteLine($"Format({Year}, AcademicYear)      {Format(Year, AcademicYear)}");
-        _testOutputHelper.WriteLine($"Format({Year}, AcademicYearQ1)    {Format(Year, AcademicYearQ1)}");
-        _testOutputHelper.WriteLine($"Format({Year}, AcademicYearQ2)    {Format(Year, AcademicYearQ2)}");
-        _testOutputHelper.WriteLine($"Format({Year}, AcademicYearQ3)    {Format(Year, AcademicYearQ3)}");
-        _testOutputHelper.WriteLine($"Format({Year}, AcademicYearQ4)    {Format(Year, AcademicYearQ4)}");
-        _testOutputHelper.WriteLine($"Format({Year}, CalendarYear)      {Format(Year, CalendarYear)}");
-        _testOutputHelper.WriteLine($"Format({Year}, CalendarYearQ1)    {Format(Year, CalendarYearQ1)}");
-        _testOutputHelper.WriteLine($"Format({Year}, CalendarYearQ2)    {Format(Year, CalendarYearQ2)}");
-        _testOutputHelper.WriteLine($"Format({Year}, CalendarYearQ3)    {Format(Year, CalendarYearQ3)}");
-        _testOutputHelper.WriteLine($"Format({Year}, CalendarYearQ4)    {Format(Year, CalendarYearQ4)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYear)     {Format(Year, FinancialYear)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ1)   {Format(Year, FinancialYearQ1)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ2)   {Format(Year, FinancialYearQ2)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ3)   {Format(Year, FinancialYearQ3)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYearQ4)   {Format(Year, FinancialYearQ4)}");
-        _testOutputHelper.WriteLine($"Format({Year}, ReportingYear)     {Format(Year, ReportingYear)}");
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AcademicYear)      {Format(Year, AcademicYear)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AcademicYearQ1)    {Format(Year, AcademicYearQ1)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AcademicYearQ2)    {Format(Year, AcademicYearQ2)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AcademicYearQ3)    {Format(Year, AcademicYearQ3)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AcademicYearQ4)    {Format(Year, AcademicYearQ4)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, CalendarYear)      {Format(Year, CalendarYear)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, CalendarYearQ1)    {Format(Year, CalendarYearQ1)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, CalendarYearQ2)    {Format(Year, CalendarYearQ2)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, CalendarYearQ3)    {Format(Year, CalendarYearQ3)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, CalendarYearQ4)    {Format(Year, CalendarYearQ4)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYear)     {Format(Year, FinancialYear)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYearQ1)   {Format(Year, FinancialYearQ1)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYearQ2)   {Format(Year, FinancialYearQ2)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYearQ3)   {Format(Year, FinancialYearQ3)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYearQ4)   {Format(Year, FinancialYearQ4)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, ReportingYear)     {Format(Year, ReportingYear)}"
+        );
         _testOutputHelper.WriteLine($"Format({Year}, TaxYear)           {Format(Year, TaxYear)}");
         _testOutputHelper.WriteLine($"Format({Year}, TaxYearQ1)         {Format(Year, TaxYearQ1)}");
         _testOutputHelper.WriteLine($"Format({Year}, TaxYearQ2)         {Format(Year, TaxYearQ2)}");
@@ -365,10 +449,18 @@ public class TimePeriodLabelFormatterTests
         _testOutputHelper.WriteLine($"Format({Year}, October)           {Format(Year, October)}");
         _testOutputHelper.WriteLine($"Format({Year}, November)          {Format(Year, November)}");
         _testOutputHelper.WriteLine($"Format({Year}, December)          {Format(Year, December)}");
-        _testOutputHelper.WriteLine($"Format({Year}, AutumnTerm)        {Format(Year, AutumnTerm)}");
-        _testOutputHelper.WriteLine($"Format({Year}, SpringTerm)        {Format(Year, SpringTerm)}");
-        _testOutputHelper.WriteLine($"Format({Year}, SummerTerm)        {Format(Year, SummerTerm)}");
-        _testOutputHelper.WriteLine($"Format({Year}, AutumnSpringTerm)  {Format(Year, AutumnSpringTerm)}");
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AutumnTerm)        {Format(Year, AutumnTerm)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, SpringTerm)        {Format(Year, SpringTerm)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, SummerTerm)        {Format(Year, SummerTerm)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, AutumnSpringTerm)  {Format(Year, AutumnSpringTerm)}"
+        );
         _testOutputHelper.WriteLine($"Format({Year}, Week1)             {Format(Year, Week1)}");
         _testOutputHelper.WriteLine($"Format({Year}, Week2)             {Format(Year, Week2)}");
         _testOutputHelper.WriteLine($"Format({Year}, Week3)             {Format(Year, Week3)}");
@@ -421,7 +513,11 @@ public class TimePeriodLabelFormatterTests
         _testOutputHelper.WriteLine($"Format({Year}, Week50)            {Format(Year, Week50)}");
         _testOutputHelper.WriteLine($"Format({Year}, Week51)            {Format(Year, Week51)}");
         _testOutputHelper.WriteLine($"Format({Year}, Week52)            {Format(Year, Week52)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYearPart1)     {Format(Year, FinancialYearPart1)}");
-        _testOutputHelper.WriteLine($"Format({Year}, FinancialYearPart2)     {Format(Year, FinancialYearPart2)}");
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYearPart1)     {Format(Year, FinancialYearPart1)}"
+        );
+        _testOutputHelper.WriteLine(
+            $"Format({Year}, FinancialYearPart2)     {Format(Year, FinancialYearPart2)}"
+        );
     }
 }

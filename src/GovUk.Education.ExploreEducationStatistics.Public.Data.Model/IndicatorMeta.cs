@@ -31,23 +31,19 @@ public class IndicatorMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeO
     {
         public void Configure(EntityTypeBuilder<IndicatorMeta> builder)
         {
-            builder.Property(m => m.PublicId)
-                .HasMaxLength(10);
+            builder.Property(m => m.PublicId).HasMaxLength(10);
 
-            builder.Property(m => m.Column)
-                .HasMaxLength(50);
+            builder.Property(m => m.Column).HasMaxLength(50);
 
-            builder.Property(m => m.Label)
-                .HasMaxLength(100);
+            builder.Property(m => m.Label).HasMaxLength(100);
 
-            builder.Property(m => m.Unit)
+            builder
+                .Property(m => m.Unit)
                 .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
 
-            builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId })
-                .IsUnique();
+            builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId }).IsUnique();
 
-            builder.HasIndex(m => new { m.DataSetVersionId, m.Column })
-                .IsUnique();
+            builder.HasIndex(m => new { m.DataSetVersionId, m.Column }).IsUnique();
         }
     }
 }

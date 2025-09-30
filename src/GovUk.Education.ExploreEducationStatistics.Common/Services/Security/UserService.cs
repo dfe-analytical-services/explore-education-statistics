@@ -12,7 +12,10 @@ public class UserService : IUserService
     private readonly IAuthorizationService _authorizationService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserService(IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor)
+    public UserService(
+        IAuthorizationService authorizationService,
+        IHttpContextAccessor httpContextAccessor
+    )
     {
         _authorizationService = authorizationService;
         _httpContextAccessor = httpContextAccessor;

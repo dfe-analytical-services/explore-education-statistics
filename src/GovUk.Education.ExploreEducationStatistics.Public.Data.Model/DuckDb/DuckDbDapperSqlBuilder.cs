@@ -9,7 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 
 public class DuckDbDapperSqlBuilder : DuckDbSqlBuilder, IDapperSqlBuilder
 {
-    public DuckDbDapperSqlBuilder(IDbConnection connection, InterpolatedSqlBuilderOptions? options = null)
+    public DuckDbDapperSqlBuilder(
+        IDbConnection connection,
+        InterpolatedSqlBuilderOptions? options = null
+    )
         : base(options)
     {
         DbConnection = connection;
@@ -24,7 +27,8 @@ public class DuckDbDapperSqlBuilder : DuckDbSqlBuilder, IDapperSqlBuilder
     public DuckDbDapperSqlBuilder(
         IDbConnection connection,
         FormattableString value,
-        InterpolatedSqlBuilderOptions? options = null)
+        InterpolatedSqlBuilderOptions? options = null
+    )
         : base(value, options)
     {
         DbConnection = connection;
@@ -33,7 +37,8 @@ public class DuckDbDapperSqlBuilder : DuckDbSqlBuilder, IDapperSqlBuilder
     public DuckDbDapperSqlBuilder(
         IDbConnection connection,
         string value,
-        InterpolatedSqlBuilderOptions? options = null)
+        InterpolatedSqlBuilderOptions? options = null
+    )
         : base(value, options)
     {
         DbConnection = connection;
@@ -43,7 +48,8 @@ public class DuckDbDapperSqlBuilder : DuckDbSqlBuilder, IDapperSqlBuilder
         IDbConnection connection,
         InterpolatedSqlBuilderOptions? options,
         StringBuilder? format,
-        List<InterpolatedSqlParameter>? arguments)
+        List<InterpolatedSqlParameter>? arguments
+    )
         : base(options, format, arguments)
     {
         DbConnection = connection;

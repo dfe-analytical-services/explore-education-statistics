@@ -26,7 +26,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         public async Task WhenPublicationAndReleaseExist_ReturnsExpectedSearchableDocument()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
@@ -46,10 +47,12 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                 Published = releaseVersion.Published,
                 Title = release.Title,
                 Type = releaseVersion.Type,
-                HeadlinesSection = new ContentSectionViewModelBuilder()
-                    .AddHtmlContent("<p>here is the headline content</p>"),
-                SummarySection = new ContentSectionViewModelBuilder()
-                    .AddHtmlContent("<p>This is the release summary</p>"),
+                HeadlinesSection = new ContentSectionViewModelBuilder().AddHtmlContent(
+                    "<p>here is the headline content</p>"
+                ),
+                SummarySection = new ContentSectionViewModelBuilder().AddHtmlContent(
+                    "<p>This is the release summary</p>"
+                ),
                 Content =
                 [
                     new ContentSectionViewModelBuilder()
@@ -60,22 +63,21 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                         .AddHtmlContent("<p>content section body two</p>"),
                     new ContentSectionViewModelBuilder()
                         .WithHeading("section three")
-                        .AddHtmlContent("<p>content section body three</p>")
-                ]
+                        .AddHtmlContent("<p>content section body three</p>"),
+                ],
             };
 
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.GetRelease(
-                    publication.LatestPublishedReleaseVersionId!.Value,
-                    null))
+            releaseService
+                .Setup(mock =>
+                    mock.GetRelease(publication.LatestPublishedReleaseVersionId!.Value, null)
+                )
                 .ReturnsAsync(releaseViewModel);
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var sut = BuildService(
-                    context,
-                    releaseService.Object);
+                var sut = BuildService(context, releaseService.Object);
 
                 // Act
                 var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
@@ -84,44 +86,49 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                 releaseService.VerifyAll();
                 var actual = outcome.AssertRight();
 
-                var expectedHtmlContent =
-                    $"""
-                      <html>
-                         <head>
-                             <title>{publication.Title}</title>
-                         </head>
-                          <body>
-                              <h1>{publication.Title}</h1>
-                              <h2>{release.Title}</h2>
-                              <h3>Summary</h3>
-                              <p>This is the release summary</p>
-                              <h3>Headlines</h3>
-                              <p>here is the headline content</p>
-                              <h3>section one</h3>
-                              <p>content section body one</p>
-                              <h3>section two</h3>
-                              <p>content section body two</p>
-                              <h3>section three</h3>
-                              <p>content section body three</p>
-                          </body>
-                      </html>
-                     """;
+                var expectedHtmlContent = $"""
+                     <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                         <body>
+                             <h1>{publication.Title}</h1>
+                             <h2>{release.Title}</h2>
+                             <h3>Summary</h3>
+                             <p>This is the release summary</p>
+                             <h3>Headlines</h3>
+                             <p>here is the headline content</p>
+                             <h3>section one</h3>
+                             <p>content section body one</p>
+                             <h3>section two</h3>
+                             <p>content section body two</p>
+                             <h3>section three</h3>
+                             <p>content section body three</p>
+                         </body>
+                     </html>
+                    """;
 
-                Assert.Multiple([
-                    () => Assert.Equal(release.Id, actual.ReleaseId),
-                    () => Assert.Equal(release.Slug, actual.ReleaseSlug),
-                    () => Assert.Equal(releaseVersion.Id, actual.ReleaseVersionId),
-                    () => Assert.Equal(publication.Id, actual.PublicationId),
-                    () => Assert.Equal(publication.Slug, actual.PublicationSlug),
-                    () => Assert.Equal(publication.Summary, actual.Summary),
-                    () => Assert.Equal(publication.Title, actual.PublicationTitle),
-                    () => Assert.Equal(releaseVersion.Published!.Value, actual.Published),
-                    () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
-                    () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
-                    () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
-                    () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
-                    .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent)
-                ]);
+                Assert.Multiple(
+                    [
+                        () => Assert.Equal(release.Id, actual.ReleaseId),
+                        () => Assert.Equal(release.Slug, actual.ReleaseSlug),
+                        () => Assert.Equal(releaseVersion.Id, actual.ReleaseVersionId),
+                        () => Assert.Equal(publication.Id, actual.PublicationId),
+                        () => Assert.Equal(publication.Slug, actual.PublicationSlug),
+                        () => Assert.Equal(publication.Summary, actual.Summary),
+                        () => Assert.Equal(publication.Title, actual.PublicationTitle),
+                        () => Assert.Equal(releaseVersion.Published!.Value, actual.Published),
+                        () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
+                        () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
+                        () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
+                        () =>
+                            Assert.Equal(
+                                releaseVersion.Type.ToSearchDocumentTypeBoost(),
+                                actual.TypeBoost
+                            ),
+                        .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
+                    ]
+                );
             }
         }
 
@@ -145,7 +152,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         public async Task WhenReleaseDoesNotExist_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contextId = Guid.NewGuid().ToString();
@@ -171,9 +179,12 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         public async Task WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+                .WithReleases(_ =>
+                    [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+                );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -198,7 +209,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         public async Task WhenReleaseServiceReturnsNotFound_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
@@ -211,16 +223,15 @@ public abstract class ReleaseSearchableDocumentsServiceTests
 
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.GetRelease(
-                    publication.LatestPublishedReleaseVersionId!.Value,
-                    null))
+            releaseService
+                .Setup(mock =>
+                    mock.GetRelease(publication.LatestPublishedReleaseVersionId!.Value, null)
+                )
                 .ReturnsAsync(new NotFoundResult());
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var sut = BuildService(
-                    context,
-                    releaseService.Object);
+                var sut = BuildService(context, releaseService.Object);
 
                 // Act
                 var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
@@ -241,17 +252,17 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             [
                 () => Assert.Equal(expectedList.Count, actualList.Count),
                 .. expectedList
-                    .Zip(actualList, (expected, actual) => (Action)(() => Assert.Equal(expected, actual)))
-                    .ToArray()
+                    .Zip(
+                        actualList,
+                        (expected, actual) => (Action)(() => Assert.Equal(expected, actual))
+                    )
+                    .ToArray(),
             ];
         }
     }
 
-
     private static ReleaseSearchableDocumentsService BuildService(
         ContentDbContext contentDbContext,
-        IReleaseService? releaseService = null)
-        => new(
-            contentDbContext,
-            releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict));
+        IReleaseService? releaseService = null
+    ) => new(contentDbContext, releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict));
 }

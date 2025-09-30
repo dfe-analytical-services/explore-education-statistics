@@ -11,9 +11,14 @@ public class EnumToEnumValueConverterTests
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     private enum Numbers
     {
-        [EnumLabelValue("1", "Value-1")] One,
-        [EnumLabelValue("2", "Value-2")] Two,
-        [EnumLabelValue("3", "Value-3")] Three
+        [EnumLabelValue("1", "Value-1")]
+        One,
+
+        [EnumLabelValue("2", "Value-2")]
+        Two,
+
+        [EnumLabelValue("3", "Value-3")]
+        Three,
     }
 
     [Fact]
@@ -46,6 +51,8 @@ public class EnumToEnumValueConverterTests
     public void ConvertFromProvider_StoredValueIsOutOfRange()
     {
         var converter = new EnumToEnumValueConverter<Numbers>();
-        Assert.Throws<ArgumentOutOfRangeException>(() => converter.ConvertFromProvider.Invoke("Value-4"));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            converter.ConvertFromProvider.Invoke("Value-4")
+        );
     }
 }

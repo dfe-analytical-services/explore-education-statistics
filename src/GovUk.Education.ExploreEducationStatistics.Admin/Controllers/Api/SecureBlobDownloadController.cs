@@ -14,12 +14,11 @@ public class SecureBlobDownloadController(IPrivateBlobStorageService blobService
     [HttpGet("download-blob")]
     public async Task<ActionResult> StreamWithToken(
         [FromQuery] string token,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var decodedToken = BlobDownloadToken.FromBase64JsonString(token);
 
-        return await blobService
-            .StreamWithToken(decodedToken, cancellationToken)
-            .HandleFailures();
+        return await blobService.StreamWithToken(decodedToken, cancellationToken).HandleFailures();
     }
 }

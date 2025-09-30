@@ -16,7 +16,9 @@ public static class HtmlImageUtil
     // "releaseId" checks below.
     public static List<Guid> GetReleaseImages(string htmlContent)
     {
-        var idCapturingRegex = new Regex(@"^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$");
+        var idCapturingRegex = new Regex(
+            @"^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$"
+        );
         return GetImages(htmlContent, idCapturingRegex);
     }
 
@@ -28,7 +30,8 @@ public static class HtmlImageUtil
         }
 
         var htmlDocument = ParseContentAsHtml(htmlContent);
-        var imageIds = htmlDocument.DocumentNode.SelectNodes("//img")
+        var imageIds = htmlDocument
+            .DocumentNode.SelectNodes("//img")
             .Select(node => node.Attributes["src"].Value)
             .Select(srcVal => idCapturingRegex.Match(srcVal))
             .Where(match => match.Success)
@@ -49,8 +52,7 @@ public static class HtmlImageUtil
 
     private static List<Guid> ParseIdsAsGuids(IEnumerable<string> ids)
     {
-        return ids
-            .Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?) null)
+        return ids.Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?)null)
             .Where(id => id.HasValue)
             .Select(id => id.Value)
             .ToList();

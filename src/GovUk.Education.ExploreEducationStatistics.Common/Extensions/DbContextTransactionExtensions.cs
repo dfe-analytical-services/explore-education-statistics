@@ -14,7 +14,7 @@ public static class DbContextTransactionExtensions
     /// <summary>
     /// This method ensures that a transaction is available for the given unit of work and
     /// is shared between any DbContexts in use during the unit of work.
-    /// 
+    ///
     /// If an existing transaction already exists, the unit of work will use the
     /// existing transaction rather than this method creating a new one.
     ///
@@ -27,23 +27,23 @@ public static class DbContextTransactionExtensions
     /// one of the DbContexts that use this strategy to call "RequireTransaction" on,
     /// and thereafter any other DbContexts that also use the EnableRetryOnFailure()
     /// strategy will be functional. Not doing this will result in
-    /// InvalidOperationExceptions when those DbContexts are used. 
+    /// InvalidOperationExceptions when those DbContexts are used.
     /// </summary>
     public static async Task<TResult> RequireTransaction<TDbContext, TResult>(
         this TDbContext context,
-        Func<Task<TResult>> transactionalUnit)
+        Func<Task<TResult>> transactionalUnit
+    )
         where TDbContext : DbContext
     {
         var strategy = context.Database.CreateExecutionStrategy();
 
-        return await strategy.ExecuteAsync(
-            async () =>
-            {
-                using var transactionScope = CreateTransactionScope();
-                var result = await transactionalUnit.Invoke();
-                transactionScope.Complete();
-                return result;
-            });
+        return await strategy.ExecuteAsync(async () =>
+        {
+            using var transactionScope = CreateTransactionScope();
+            var result = await transactionalUnit.Invoke();
+            transactionScope.Complete();
+            return result;
+        });
     }
 
     /// <summary>
@@ -53,20 +53,24 @@ public static class DbContextTransactionExtensions
     /// </summary>
     public static async Task RequireTransaction<TDbContext>(
         this TDbContext context,
-        Func<Task> transactionalUnit)
+        Func<Task> transactionalUnit
+    )
         where TDbContext : DbContext
     {
-        await RequireTransaction(context, async () =>
-        {
-            await transactionalUnit.Invoke();
-            return Unit.Instance;
-        });
+        await RequireTransaction(
+            context,
+            async () =>
+            {
+                await transactionalUnit.Invoke();
+                return Unit.Instance;
+            }
+        );
     }
 
     /// <summary>
     /// This method ensures that a transaction is available for the given unit of work and
     /// is shared between any DbContexts in use during the unit of work.
-    /// 
+    ///
     /// If an existing transaction already exists, the unit of work will use the
     /// existing transaction rather than this method creating a new one.
     ///
@@ -81,32 +85,33 @@ public static class DbContextTransactionExtensions
     /// one of the DbContexts that use this strategy to call "RequireTransaction" on,
     /// and thereafter any other DbContexts that also use the EnableRetryOnFailure()
     /// strategy will be functional. Not doing this will result in
-    /// InvalidOperationExceptions when those DbContexts are used. 
+    /// InvalidOperationExceptions when those DbContexts are used.
     /// </summary>
-    public static async Task<Either<TFailure, TResult>> RequireTransaction<TDbContext, TFailure, TResult>(
-        this TDbContext context,
-        Func<Task<Either<TFailure, TResult>>> transactionalUnit)
+    public static async Task<Either<TFailure, TResult>> RequireTransaction<
+        TDbContext,
+        TFailure,
+        TResult
+    >(this TDbContext context, Func<Task<Either<TFailure, TResult>>> transactionalUnit)
         where TDbContext : DbContext
     {
         var strategy = context.Database.CreateExecutionStrategy();
 
-        return await strategy.ExecuteAsync(
-            async () =>
-            {
-                using var transactionScope = CreateTransactionScope();
-                return await transactionalUnit
-                    .Invoke()
-                    .OnSuccessDo(transactionScope.Complete);
-            });
+        return await strategy.ExecuteAsync(async () =>
+        {
+            using var transactionScope = CreateTransactionScope();
+            return await transactionalUnit.Invoke().OnSuccessDo(transactionScope.Complete);
+        });
     }
 
     private static TransactionScope CreateTransactionScope(
         TransactionScopeOption transactionScopeOption = TransactionScopeOption.Required,
-        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted
+    )
     {
         return new(
             scopeOption: transactionScopeOption,
-            transactionOptions: new TransactionOptions {IsolationLevel = isolationLevel},
-            asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled);
+            transactionOptions: new TransactionOptions { IsolationLevel = isolationLevel },
+            asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled
+        );
     }
 }

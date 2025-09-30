@@ -32,7 +32,8 @@ public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
         Release release,
         bool isLatestRelease,
         DateTime lastUpdated,
-        DateTime published) =>
+        DateTime published
+    ) =>
         new()
         {
             ReleaseId = release.Id,
@@ -43,7 +44,7 @@ public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
             Slug = release.Slug,
             Title = release.Title,
             CoverageTitle = release.TimePeriodCoverage.GetEnumLabel(),
-            YearTitle = release.YearTitle
+            YearTitle = release.YearTitle,
         };
 }
 
@@ -52,10 +53,11 @@ public record LegacyPublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
     public required string Url { get; init; }
 
     public static LegacyPublicationReleaseEntryDto FromLegacyPublicationReleaseEntry(
-        LegacyPublicationReleaseEntry legacyPublicationReleaseEntry) =>
+        LegacyPublicationReleaseEntry legacyPublicationReleaseEntry
+    ) =>
         new()
         {
             Title = legacyPublicationReleaseEntry.Title,
-            Url = legacyPublicationReleaseEntry.Url
+            Url = legacyPublicationReleaseEntry.Url,
         };
 }

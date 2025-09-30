@@ -14,8 +14,5 @@ public partial class EES3369_RemoveUnusedDataFactoryStoredProcedures : Migration
         migrationBuilder.Sql("DROP TYPE ReleaseType");
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

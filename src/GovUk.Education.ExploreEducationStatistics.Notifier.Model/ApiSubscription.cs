@@ -12,6 +12,7 @@ public class ApiSubscription : ITableEntity
     /// <inheritdoc/>
     /// </summary>
     public required string PartitionKey { get; set; }
+
     /// <summary>
     /// This should be set to the <b>email address</b> of the user subscribing.
     /// <br/><br/>
@@ -20,6 +21,7 @@ public class ApiSubscription : ITableEntity
     public required string RowKey { get; set; }
     public required string DataSetTitle { get; set; }
     public required ApiSubscriptionStatus Status { get; set; }
+
     /// <summary>
     /// This is only relevant to subscriptions which are <b>pending</b> and yet to be verified.
     /// It is to be set to <b>null</b> otherwise.

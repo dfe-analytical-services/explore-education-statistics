@@ -17,10 +17,6 @@ public record TimePeriodRangeBound
 
     public static TimePeriodRangeBound Create(TimePeriodMeta meta)
     {
-        return new TimePeriodRangeBound
-        {
-            Code = meta.Code,
-            Period = meta.Period
-        };
+        return new TimePeriodRangeBound { Code = meta.Code, Period = meta.Period };
     }
 }

@@ -13,50 +13,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 
 public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IReleaseUpdatesService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>> GetReleaseUpdates(
+    public async Task<
+        Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>
+    > GetReleaseUpdates(
         string publicationSlug,
         string releaseSlug,
         int page = 1,
         int pageSize = 10,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default
+    ) =>
         await GetPublicationBySlug(publicationSlug, cancellationToken)
             .OnSuccess(publication =>
                 GetLatestPublishedReleaseVersionByReleaseSlug(
                     publication,
                     releaseSlug,
-                    cancellationToken))
+                    cancellationToken
+                )
+            )
             .OnSuccess(async releaseVersion =>
                 await GetPaginatedUpdatesForReleaseVersion(
                     releaseVersion,
                     page,
                     pageSize,
-                    cancellationToken));
+                    cancellationToken
+                )
+            );
 
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
-        CancellationToken cancellationToken) =>
-        contentDbContext.Publications
-            .AsNoTracking()
+        CancellationToken cancellationToken
+    ) =>
+        contentDbContext
+            .Publications.AsNoTracking()
             .WhereHasPublishedRelease()
             .SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);
 
-    private Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersionByReleaseSlug(
+    private Task<
+        Either<ActionResult, ReleaseVersion>
+    > GetLatestPublishedReleaseVersionByReleaseSlug(
         Publication publication,
         string releaseSlug,
-        CancellationToken cancellationToken) =>
-        contentDbContext.ReleaseVersions
-            .AsNoTracking()
+        CancellationToken cancellationToken
+    ) =>
+        contentDbContext
+            .ReleaseVersions.AsNoTracking()
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
 
-    private async Task<PaginatedListViewModel<ReleaseUpdateDto>> GetPaginatedUpdatesForReleaseVersion(
+    private async Task<
+        PaginatedListViewModel<ReleaseUpdateDto>
+    > GetPaginatedUpdatesForReleaseVersion(
         ReleaseVersion releaseVersion,
         int page,
         int pageSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var updates = await contentDbContext.Update
-            .AsNoTracking()
+        var updates = await contentDbContext
+            .Update.AsNoTracking()
             .Where(u => u.ReleaseVersionId == releaseVersion.Id)
             .Select(u => ReleaseUpdateDto.FromUpdate(u))
             .ToListAsync(cancellationToken);
@@ -64,7 +78,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         var firstPublishedUpdate = new ReleaseUpdateDto
         {
             Date = await GetReleaseFirstPublishedDate(releaseVersion),
-            Summary = "First published"
+            Summary = "First published",
         };
 
         var allUpdates = updates
@@ -78,12 +92,15 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
 
     private async Task<DateTime> GetReleaseFirstPublishedDate(ReleaseVersion releaseVersion)
     {
-        var published = releaseVersion.Version == 0
-            ? releaseVersion.Published
-            : await contentDbContext.ReleaseVersions
-                .Where(rv => rv.ReleaseId == releaseVersion.ReleaseId && rv.Version == 0)
-                .Select(rv => rv.Published)
-                .SingleAsync();
+        var published =
+            releaseVersion.Version == 0
+                ? releaseVersion.Published
+                : await contentDbContext
+                    .ReleaseVersions.Where(rv =>
+                        rv.ReleaseId == releaseVersion.ReleaseId && rv.Version == 0
+                    )
+                    .Select(rv => rv.Published)
+                    .SingleAsync();
         return published!.Value;
     }
 }

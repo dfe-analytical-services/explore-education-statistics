@@ -15,6 +15,7 @@ public record GlossaryCategoryViewModel(char Heading, List<GlossaryEntryViewMode
             c => new GlossaryCategoryViewModel(
                 Heading: c,
                 Entries: new List<GlossaryEntryViewModel>()
-            ));
+            )
+        );
     }
 }

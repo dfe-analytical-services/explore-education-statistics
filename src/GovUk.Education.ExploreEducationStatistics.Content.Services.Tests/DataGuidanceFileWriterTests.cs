@@ -21,7 +21,8 @@ public class DataGuidanceFileWriterTests : IDisposable
 {
     private readonly DataFixture _dataFixture = new();
 
-    private const string TestDataGuidance = @"
+    private const string TestDataGuidance =
+        @"
             <h2>Description</h2>
             <p>
                 This document describes the data included in the ‘Children looked after in England 
@@ -43,7 +44,8 @@ public class DataGuidanceFileWriterTests : IDisposable
             </ul>
             ";
 
-    private const string TestBasicDataGuidance = @"
+    private const string TestBasicDataGuidance =
+        @"
             <p>
                 This document describes the data included in the ‘Children looked after in England'
             </p>
@@ -61,9 +63,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_ListDataSetsReturnsNotFound()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestDataGuidance);
 
         var contextId = Guid.NewGuid().ToString();
@@ -92,11 +96,15 @@ public class DataGuidanceFileWriterTests : IDisposable
             var path = GenerateFilePath();
             await using var stream = File.OpenWrite(path);
 
-            var exception = await Assert.ThrowsAsync<ArgumentException>(
-                async () => { await writer.WriteToStream(stream, releaseVersion); }
-            );
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await writer.WriteToStream(stream, releaseVersion);
+            });
 
-            Assert.Equal($"Could not find data sets for release version: {releaseVersion.Id}", exception.Message);
+            Assert.Equal(
+                $"Could not find data sets for release version: {releaseVersion.Id}",
+                exception.Message
+            );
         }
 
         VerifyAllMocks(dataGuidanceDataSetService);
@@ -105,9 +113,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_MultipleDataSets()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -116,17 +126,13 @@ public class DataGuidanceFileWriterTests : IDisposable
             {
                 Filename = "test-1.csv",
                 Name = "Test data 1",
-                Content = @"
+                Content =
+                    @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
                             measured on or around their birthday).
                         </p>",
-                GeographicLevels = new List<string>
-                {
-                    "Local Authority",
-                    "National",
-                    "Regional"
-                },
+                GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
                 {
@@ -139,21 +145,19 @@ public class DataGuidanceFileWriterTests : IDisposable
                 {
                     new(Guid.NewGuid(), "Data set 1 footnote 1"),
                     new(Guid.NewGuid(), "Data set 1 footnote 2"),
-                }
+                },
             },
             new()
             {
                 Filename = "test-2.csv",
                 Name = "Test data 2",
-                Content = @"
+                Content =
+                    @"
                         <p>
                             Number and proportion of population participating in education, training and employment 
                             by age, gender and labour market status.
                         </p>",
-                GeographicLevels = new List<string>
-                {
-                    "National",
-                },
+                GeographicLevels = new List<string> { "National" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),
                 Variables = new List<LabelValue>
                 {
@@ -168,8 +172,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                     new(Guid.NewGuid(), "Data set 2 footnote 2"),
                     new(Guid.NewGuid(), "Data set 2 footnote 3"),
                     new(Guid.NewGuid(), "Data set 2 footnote 4"),
-                }
-            }
+                },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -207,9 +211,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_SingleDataSet()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -218,17 +224,13 @@ public class DataGuidanceFileWriterTests : IDisposable
             {
                 Filename = "test-1.csv",
                 Name = "Test data 1",
-                Content = @"
+                Content =
+                    @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
                             measured on or around their birthday). See <a href=""https://test.com"">reference information</a>.
                         </p>",
-                GeographicLevels = new List<string>
-                {
-                    "Local Authority",
-                    "National",
-                    "Regional"
-                },
+                GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
                 {
@@ -241,8 +243,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 {
                     new(Guid.NewGuid(), "Footnote 1"),
                     new(Guid.NewGuid(), "Footnote 2"),
-                }
-            }
+                },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -281,9 +283,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     public async Task WriteToStream_NoDataGuidance()
     {
         // Release has no data guidance (aka data guidance)
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(string.Empty);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -292,17 +296,13 @@ public class DataGuidanceFileWriterTests : IDisposable
             {
                 Filename = "test-1.csv",
                 Name = "Test data 1",
-                Content = @"
+                Content =
+                    @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
                             measured on or around their birthday).
                         </p>",
-                GeographicLevels = new List<string>
-                {
-                    "Local Authority",
-                    "National",
-                    "Regional"
-                },
+                GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
                 {
@@ -310,8 +310,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                     new("Age at end", "age_end"),
                     new("Number of leavers", "number_of_leavers"),
                     new("Percentage of leavers by accommodation type", "percentage_of_leavers"),
-                }
-            }
+                },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -349,9 +349,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_EmptyDataSets()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestDataGuidance);
 
         var contextId = Guid.NewGuid().ToString();
@@ -389,9 +391,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithSingleProperties()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -401,20 +405,14 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content = "<p>Test file content</p>",
-                GeographicLevels = new List<string>
-                {
-                    "Local Authority",
-                },
+                GeographicLevels = new List<string> { "Local Authority" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),
                 Variables = new List<LabelValue>
                 {
                     new("Accommodation type", "accommodation_type"),
                 },
-                Footnotes = new List<FootnoteViewModel>
-                {
-                    new(Guid.NewGuid(), "Footnote 1")
-                }
-            }
+                Footnotes = new List<FootnoteViewModel> { new(Guid.NewGuid(), "Footnote 1") },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -452,18 +450,16 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithEmptyProperties()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
         {
-            new()
-            {
-                Filename = "test-1.csv",
-                Name = "Test data 1",
-            }
+            new() { Filename = "test-1.csv", Name = "Test data 1" },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -501,9 +497,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithEmptyTimePeriodStart()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -515,8 +513,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Content = "",
                 GeographicLevels = new List<string>(),
                 TimePeriods = new TimePeriodLabels("", "2019"),
-                Variables = new List<LabelValue>()
-            }
+                Variables = new List<LabelValue>(),
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -554,9 +552,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithEmptyTimePeriodEnd()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -566,7 +566,7 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 TimePeriods = new TimePeriodLabels("2018", ""),
-            }
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -604,9 +604,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithEmptyVariable()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -616,11 +618,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 TimePeriods = new TimePeriodLabels("2018", ""),
-                Variables = new List<LabelValue>
-                {
-                    new("", "")
-                }
-            }
+                Variables = new List<LabelValue> { new("", "") },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -658,9 +657,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithOverTenFootnotesAndMultiline()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -687,17 +688,14 @@ public class DataGuidanceFileWriterTests : IDisposable
                     new(Guid.NewGuid(), "Footnote 7"),
                     new(Guid.NewGuid(), "Footnote 8"),
                     // New lines are stripped out by text conversion
-                    new(
-                        Guid.NewGuid(),
-                        string.Join("\n", "Footnote 9", "over some", "lines.")
-                    ),
+                    new(Guid.NewGuid(), string.Join("\n", "Footnote 9", "over some", "lines.")),
                     new(Guid.NewGuid(), "Footnote 10"),
                     new(
                         Guid.NewGuid(),
                         string.Join("\n", "Footnote 11", "over some", "other lines.")
                     ),
-                }
-            }
+                },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -735,9 +733,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithHtmlFootnotes()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -756,11 +756,17 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Footnotes = new List<FootnoteViewModel>
                 {
                     new(Guid.NewGuid(), "<p>Footnote with paragraph 1</p><p>And paragraph 2</p>"),
-                    new(Guid.NewGuid(), @"Footnote with <a href=""https://test.com"">some link</a> embedded"),
-                    new(Guid.NewGuid(), @"<a href=""https://test-2.com"">Another footnote link</a>"),
+                    new(
+                        Guid.NewGuid(),
+                        @"Footnote with <a href=""https://test.com"">some link</a> embedded"
+                    ),
+                    new(
+                        Guid.NewGuid(),
+                        @"<a href=""https://test-2.com"">Another footnote link</a>"
+                    ),
                     new(Guid.NewGuid(), "A plain footnote"),
-                }
-            }
+                },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -798,9 +804,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileWithEmptyFootnote()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var dataSets = new List<DataGuidanceDataSetViewModel>
@@ -816,11 +824,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 {
                     new("Accommodation type", "accommodation_type"),
                 },
-                Footnotes = new List<FootnoteViewModel>
-                {
-                    new(Guid.NewGuid(), "")
-                }
-            }
+                Footnotes = new List<FootnoteViewModel> { new(Guid.NewGuid(), "") },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -858,9 +863,11 @@ public class DataGuidanceFileWriterTests : IDisposable
     [Fact]
     public async Task WriteToStream_FileStream()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+            )
             .WithDataGuidance(TestBasicDataGuidance);
 
         var contextId = Guid.NewGuid().ToString();
@@ -909,7 +916,8 @@ public class DataGuidanceFileWriterTests : IDisposable
 
     private static DataGuidanceFileWriter BuildDataGuidanceFileWriter(
         ContentDbContext contentDbContext,
-        IDataGuidanceDataSetService? dataGuidanceDataSetService = null)
+        IDataGuidanceDataSetService? dataGuidanceDataSetService = null
+    )
     {
         return new DataGuidanceFileWriter(
             contentDbContext,

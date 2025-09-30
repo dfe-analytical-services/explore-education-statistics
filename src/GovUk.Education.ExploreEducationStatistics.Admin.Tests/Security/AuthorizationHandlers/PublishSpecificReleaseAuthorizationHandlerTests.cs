@@ -25,17 +25,20 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
         public async Task FailsWhenDraft()
         {
             // Assert that no claims will allow a draft release version to be published
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
-                CreateHandler,
-                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Draft }
-            );
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                PublishSpecificReleaseRequirement
+            >(CreateHandler, new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Draft });
         }
 
         [Fact]
         public async Task SucceedsWhenApproved()
         {
             // Assert that the PublishAllReleases claim will allow an approved release version to be published
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, PublishSpecificReleaseRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ReleaseVersion,
+                PublishSpecificReleaseRequirement
+            >(
                 CreateHandler,
                 new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Approved },
                 PublishAllReleases
@@ -62,24 +65,29 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
                 CreateHandler,
                 new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Approved },
-                Approver);
+                Approver
+            );
         }
     }
 
-    private static PublishSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static PublishSpecificReleaseAuthorizationHandler CreateHandler(
+        ContentDbContext contentDbContext
+    )
     {
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+        );
 
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext);
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
         return new PublishSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: userReleaseRoleRepository,
                 userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

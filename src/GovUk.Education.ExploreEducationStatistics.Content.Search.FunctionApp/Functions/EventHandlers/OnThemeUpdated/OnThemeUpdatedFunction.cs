@@ -11,31 +11,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnThemeUpdatedFunction(
     IEventGridEventHandler eventGridEventHandler,
     IContentApiClient contentApiClient,
-    ILogger<OnThemeUpdatedFunction> logger)
+    ILogger<OnThemeUpdatedFunction> logger
+)
 {
     [Function(nameof(OnThemeUpdated))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnThemeUpdated(
-        [QueueTrigger("%ThemeUpdatedQueueName%")]
-        EventGridEvent eventDto,
-        FunctionContext context) =>
-        await eventGridEventHandler.Handle<ThemeUpdatedEventDto, RefreshSearchableDocumentMessageDto[]>(
-            context, 
+        [QueueTrigger("%ThemeUpdatedQueueName%")] EventGridEvent eventDto,
+        FunctionContext context
+    ) =>
+        await eventGridEventHandler.Handle<
+            ThemeUpdatedEventDto,
+            RefreshSearchableDocumentMessageDto[]
+        >(
+            context,
             eventDto,
             async (_, ct) =>
             {
                 // Look up Publications for this Theme
                 var themeId = Guid.Parse(eventDto.Subject);
 
-                var publicationsForTheme = await contentApiClient.GetPublicationsForTheme(themeId, ct);
-                
+                var publicationsForTheme = await contentApiClient.GetPublicationsForTheme(
+                    themeId,
+                    ct
+                );
+
                 logger.LogInformation(
                     "Refreshing Searchable Documents for Theme {ThemeId}: Publications {@PublicationInfos}",
                     themeId,
-                    publicationsForTheme);
-                
+                    publicationsForTheme
+                );
+
                 return publicationsForTheme
-                    .Select(p => new RefreshSearchableDocumentMessageDto { PublicationSlug = p.PublicationSlug })
+                    .Select(p => new RefreshSearchableDocumentMessageDto
+                    {
+                        PublicationSlug = p.PublicationSlug,
+                    })
                     .ToArray();
-            });
+            }
+        );
 }

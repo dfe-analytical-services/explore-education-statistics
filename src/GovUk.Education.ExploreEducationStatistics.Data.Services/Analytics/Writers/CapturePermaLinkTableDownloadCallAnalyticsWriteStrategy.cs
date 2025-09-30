@@ -7,30 +7,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Wri
 
 public class CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
-    ICommonAnalyticsWriteStrategyWorkflow<CapturePermaLinkTableDownloadCall> workflow) : IAnalyticsWriteStrategy
+    ICommonAnalyticsWriteStrategyWorkflow<CapturePermaLinkTableDownloadCall> workflow
+) : IAnalyticsWriteStrategy
 {
-    public static readonly string[] OutputSubPaths = ["public", "table-tool-downloads", "permalinks"];
-    
+    public static readonly string[] OutputSubPaths =
+    [
+        "public",
+        "table-tool-downloads",
+        "permalinks",
+    ];
+
     private readonly IWorkflowActor<CapturePermaLinkTableDownloadCall> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-    
+        new WorkflowActor(
+            analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths)
+        );
+
     public Type RequestType => typeof(CapturePermaLinkTableDownloadCall);
 
-    public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken = default)
+    public async Task Report(
+        IAnalyticsCaptureRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         if (request is not CapturePermaLinkTableDownloadCall captureRequest)
         {
             throw new ArgumentException(
-                $"Request must be of type {nameof(CapturePermaLinkTableDownloadCall)}. It is {request.GetType().FullName}", 
-                nameof(request));
+                $"Request must be of type {nameof(CapturePermaLinkTableDownloadCall)}. It is {request.GetType().FullName}",
+                nameof(request)
+            );
         }
-        await workflow.Report(_workflowActor, captureRequest, cancellationToken);   
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
-    
+
     private class WorkflowActor(string analyticsPath)
         : WorkflowActorBase<CapturePermaLinkTableDownloadCall>(analyticsPath)
     {
-        public override string GetFilenamePart(CapturePermaLinkTableDownloadCall request) => 
+        public override string GetFilenamePart(CapturePermaLinkTableDownloadCall request) =>
             request.PermalinkId.ToString();
     }
 }

@@ -47,8 +47,8 @@ public static class DbContextUtils
 
                 default:
                     throw new NotImplementedException(
-                        "Entity does not implement valid timestamp field for " +
-                        $"{typeof(ICreatedTimestamp<>).GetNameWithoutGenericArity()}"
+                        "Entity does not implement valid timestamp field for "
+                            + $"{typeof(ICreatedTimestamp<>).GetNameWithoutGenericArity()}"
                     );
             }
 
@@ -77,8 +77,8 @@ public static class DbContextUtils
 
                 default:
                     throw new NotImplementedException(
-                        "Entity does not implement valid timestamp field for " +
-                        $"{typeof(IUpdatedTimestamp<>).GetNameWithoutGenericArity()}"
+                        "Entity does not implement valid timestamp field for "
+                            + $"{typeof(IUpdatedTimestamp<>).GetNameWithoutGenericArity()}"
                     );
             }
 
@@ -107,8 +107,8 @@ public static class DbContextUtils
 
                 default:
                     throw new NotImplementedException(
-                        "Entity does not implement valid timestamp field for " +
-                        $"{typeof(ISoftDeletedTimestamp<>).GetNameWithoutGenericArity()}"
+                        "Entity does not implement valid timestamp field for "
+                            + $"{typeof(ISoftDeletedTimestamp<>).GetNameWithoutGenericArity()}"
                     );
             }
 

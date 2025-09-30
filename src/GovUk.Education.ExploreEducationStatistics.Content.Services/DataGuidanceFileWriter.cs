@@ -17,20 +17,21 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
     public DataGuidanceFileWriter(
         ContentDbContext contentDbContext,
-        IDataGuidanceDataSetService dataGuidanceDataSetService)
+        IDataGuidanceDataSetService dataGuidanceDataSetService
+    )
     {
         _contentDbContext = contentDbContext;
         _dataGuidanceDataSetService = dataGuidanceDataSetService;
     }
 
-    public async Task<Stream> WriteToStream(Stream stream,
+    public async Task<Stream> WriteToStream(
+        Stream stream,
         ReleaseVersion releaseVersion,
-        IList<Guid>? dataFileIds = null)
+        IList<Guid>? dataFileIds = null
+    )
     {
         // Make sure publication has been hydrated
-        await _contentDbContext.Entry(releaseVersion)
-            .Reference(rv => rv.Publication)
-            .LoadAsync();
+        await _contentDbContext.Entry(releaseVersion).Reference(rv => rv.Publication).LoadAsync();
 
         var dataSets = await ListDataSets(releaseVersion, dataFileIds);
 
@@ -50,13 +51,19 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
     private async Task<List<DataGuidanceDataSetViewModel>> ListDataSets(
         ReleaseVersion releaseVersion,
-        IList<Guid>? dataFileIds = null)
+        IList<Guid>? dataFileIds = null
+    )
     {
-        var dataSets = await _dataGuidanceDataSetService.ListDataSets(releaseVersion.Id, dataFileIds);
+        var dataSets = await _dataGuidanceDataSetService.ListDataSets(
+            releaseVersion.Id,
+            dataFileIds
+        );
 
         if (dataSets.IsLeft)
         {
-            throw new ArgumentException($"Could not find data sets for release version: {releaseVersion.Id}");
+            throw new ArgumentException(
+                $"Could not find data sets for release version: {releaseVersion.Id}"
+            );
         }
 
         return dataSets.Right;
@@ -65,7 +72,8 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
     private static async Task DoWrite(
         TextWriter file,
         ReleaseVersion releaseVersion,
-        IList<DataGuidanceDataSetViewModel> dataSets)
+        IList<DataGuidanceDataSetViewModel> dataSets
+    )
     {
         // Add header information including publication/release title
         await file.WriteLineAsync(releaseVersion.Release.Publication.Title);
@@ -84,7 +92,10 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
         await WriteDataFiles(file, dataSets);
     }
 
-    private static async Task WriteDataFiles(TextWriter file, IList<DataGuidanceDataSetViewModel> dataSets)
+    private static async Task WriteDataFiles(
+        TextWriter file,
+        IList<DataGuidanceDataSetViewModel> dataSets
+    )
     {
         if (dataSets.Count == 0)
         {
@@ -108,8 +119,9 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
                     if (dataSet.GeographicLevels.Any())
                     {
-                        await file.WriteLineAsync("Geographic levels: " +
-                                                  string.Join("; ", dataSet.GeographicLevels));
+                        await file.WriteLineAsync(
+                            "Geographic levels: " + string.Join("; ", dataSet.GeographicLevels)
+                        );
                     }
 
                     var timePeriodsLabel = dataSet.TimePeriods.ToLabel();
@@ -125,11 +137,10 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
                         await file.WriteLineAsync($"Content summary: {content}");
                     }
 
-                    var variables = dataSet.Variables
-                        .Where(
-                            variable =>
-                                !variable.Label.IsNullOrWhitespace()
-                                || !variable.Value.IsNullOrWhitespace()
+                    var variables = dataSet
+                        .Variables.Where(variable =>
+                            !variable.Label.IsNullOrWhitespace()
+                            || !variable.Value.IsNullOrWhitespace()
                         )
                         .ToList();
 
@@ -137,7 +148,8 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
                     {
                         await file.WriteLineAsync();
                         await file.WriteLineAsync(
-                            "Variable names and descriptions for this file are provided below:");
+                            "Variable names and descriptions for this file are provided below:"
+                        );
                         await file.WriteLineAsync();
 
                         var padding = variables.Aggregate(
@@ -160,26 +172,27 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
                         // Adds a table header for variable names/descriptions
                         await file.WriteLineAsync(
-                            "Variable name".PadRight(padding.Value) + VariableSeparator + "Variable description"
+                            "Variable name".PadRight(padding.Value)
+                                + VariableSeparator
+                                + "Variable description"
                         );
                         await file.WriteLineAsync(
-                            string.Empty.PadRight(
-                                padding.Value,
-                                '-'
-                            ) + VariableSeparator + string.Empty.PadRight(padding.Label, '-')
+                            string.Empty.PadRight(padding.Value, '-')
+                                + VariableSeparator
+                                + string.Empty.PadRight(padding.Label, '-')
                         );
 
                         // Add table body for variable names/descriptions
                         await variables
                             .ToAsyncEnumerable()
-                            .ForEachAwaitAsync(
-                                async variable =>
-                                {
-                                    await file.WriteLineAsync(
-                                        variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
-                                    );
-                                }
-                            );
+                            .ForEachAwaitAsync(async variable =>
+                            {
+                                await file.WriteLineAsync(
+                                    variable.Value.PadRight(padding.Value)
+                                        + VariableSeparator
+                                        + variable.Label
+                                );
+                            });
                     }
 
                     await WriteFootnotes(file, dataSet);
@@ -196,8 +209,8 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
     private static async Task WriteFootnotes(TextWriter file, DataGuidanceDataSetViewModel dataSet)
     {
-        var footnotes = dataSet.Footnotes
-            .Where(footnote => !footnote.Label.IsNullOrWhitespace())
+        var footnotes = dataSet
+            .Footnotes.Where(footnote => !footnote.Label.IsNullOrWhitespace())
             .ToList();
 
         if (!footnotes.Any())

@@ -11,21 +11,24 @@ public static class UserServiceExtensions
 {
     public static Task<Either<ActionResult, MethodologyVersion>> CheckCanViewMethodologyVersion(
         this IUserService userService,
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         return userService.CheckPolicy(methodologyVersion, CanViewSpecificMethodologyVersion);
     }
 
     public static Task<Either<ActionResult, Publication>> CheckCanViewPublication(
         this IUserService userService,
-        Publication publication)
+        Publication publication
+    )
     {
         return userService.CheckPolicy(publication, CanViewSpecificPublication);
     }
 
     public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseVersion(
         this IUserService userService,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         return userService.CheckPolicy(releaseVersion, CanViewSpecificReleaseVersion);
     }

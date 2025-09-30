@@ -17,14 +17,18 @@ public abstract class ReleasePublishingStatusServiceTests
     private readonly AsyncPageable<ReleasePublishingStatus> _emptyTableResponse =
         BuildResponse<ReleasePublishingStatus>([]);
 
-    public class GetScheduledReleasesForPublishingRelativeToDateTests : ReleasePublishingStatusServiceTests
+    public class GetScheduledReleasesForPublishingRelativeToDateTests
+        : ReleasePublishingStatusServiceTests
     {
-        public static readonly TheoryData<DateComparison> DateComparisonTheoryData =
-            new(EnumUtil.GetEnums<DateComparison>());
+        public static readonly TheoryData<DateComparison> DateComparisonTheoryData = new(
+            EnumUtil.GetEnums<DateComparison>()
+        );
 
         [Theory]
         [MemberData(nameof(DateComparisonTheoryData))]
-        public async Task QueryFilterIncludesExpectedStageAndPublishDate(DateComparison dateComparison)
+        public async Task QueryFilterIncludesExpectedStageAndPublishDate(
+            DateComparison dateComparison
+        )
         {
             // Arrange
             var referenceDate = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
@@ -36,28 +40,40 @@ public abstract class ReleasePublishingStatusServiceTests
                 DateComparison.AfterOrOn => "ge",
                 DateComparison.Equal => "eq",
                 DateComparison.NotEqual => "ne",
-                _ => throw new ArgumentOutOfRangeException(nameof(dateComparison), dateComparison, null)
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(dateComparison),
+                    dateComparison,
+                    null
+                ),
             };
             var expectedFilter =
                 $"OverallStage eq 'Scheduled' and Publish {expectedDateOperator} datetime'2025-01-01T12:00:00Z'";
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         expectedFilter,
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(_emptyTableResponse);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             await service.GetScheduledReleasesForPublishingRelativeToDate(
                 dateComparison,
-                referenceDate);
+                referenceDate
+            );
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
@@ -71,28 +87,38 @@ public abstract class ReleasePublishingStatusServiceTests
             ReleasePublishingKey[] expectedKeys =
             [
                 new(Guid.NewGuid(), Guid.NewGuid()),
-                new(Guid.NewGuid(), Guid.NewGuid())
+                new(Guid.NewGuid(), Guid.NewGuid()),
             ];
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            var response = BuildResponse(expectedKeys.Select(BuildReleasePublishingStatus).ToList());
+            var response = BuildResponse(
+                expectedKeys.Select(BuildReleasePublishingStatus).ToList()
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         It.IsAny<string>(),
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(response);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             var result = await service.GetScheduledReleasesForPublishingRelativeToDate(
                 DateComparison.BeforeOrOn,
-                referenceDate);
+                referenceDate
+            );
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
@@ -109,18 +135,25 @@ public abstract class ReleasePublishingStatusServiceTests
             const string expectedFilter =
                 "OverallStage eq 'Started' and ContentStage eq 'Scheduled' and FilesStage eq 'Complete' and PublishingStage eq 'Scheduled'";
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         expectedFilter,
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(_emptyTableResponse);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             await service.GetScheduledReleasesReadyForPublishing();
@@ -136,23 +169,32 @@ public abstract class ReleasePublishingStatusServiceTests
             ReleasePublishingKey[] expectedKeys =
             [
                 new(Guid.NewGuid(), Guid.NewGuid()),
-                new(Guid.NewGuid(), Guid.NewGuid())
+                new(Guid.NewGuid(), Guid.NewGuid()),
             ];
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            var response = BuildResponse(expectedKeys.Select(BuildReleasePublishingStatus).ToList());
+            var response = BuildResponse(
+                expectedKeys.Select(BuildReleasePublishingStatus).ToList()
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         It.IsAny<string>(),
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(response);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             var result = await service.GetScheduledReleasesReadyForPublishing();
@@ -170,26 +212,36 @@ public abstract class ReleasePublishingStatusServiceTests
         {
             // Arrange
             var releaseVersionId = Guid.NewGuid();
-            const ReleasePublishingStatusOverallStage overallStage = ReleasePublishingStatusOverallStage.Complete;
-            var expectedFilter = $"PartitionKey eq '{releaseVersionId}' and OverallStage eq 'Complete'";
+            const ReleasePublishingStatusOverallStage overallStage =
+                ReleasePublishingStatusOverallStage.Complete;
+            var expectedFilter =
+                $"PartitionKey eq '{releaseVersionId}' and OverallStage eq 'Complete'";
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         expectedFilter,
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(_emptyTableResponse);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             await service.GetReleasesWithOverallStages(
                 releaseVersionId,
-                overallStages: [overallStage]);
+                overallStages: [overallStage]
+            );
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
@@ -203,28 +255,36 @@ public abstract class ReleasePublishingStatusServiceTests
             ReleasePublishingStatusOverallStage[] overallStages =
             [
                 ReleasePublishingStatusOverallStage.Scheduled,
-                ReleasePublishingStatusOverallStage.Started
+                ReleasePublishingStatusOverallStage.Started,
             ];
             var expectedFilter =
                 $"PartitionKey eq '{releaseVersionId}' and (OverallStage eq 'Scheduled' or OverallStage eq 'Started')";
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         expectedFilter,
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(_emptyTableResponse);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             await service.GetReleasesWithOverallStages(
                 releaseVersionId,
-                overallStages: overallStages);
+                overallStages: overallStages
+            );
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
@@ -237,33 +297,43 @@ public abstract class ReleasePublishingStatusServiceTests
             var releaseVersionId = Guid.NewGuid();
             ReleasePublishingStatusOverallStage[] overallStages =
             [
-                ReleasePublishingStatusOverallStage.Complete
+                ReleasePublishingStatusOverallStage.Complete,
             ];
             ReleasePublishingKey[] expectedKeys =
             [
                 new(releaseVersionId, Guid.NewGuid()),
-                new(releaseVersionId, Guid.NewGuid())
+                new(releaseVersionId, Guid.NewGuid()),
             ];
 
-            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
+            var publisherTableStorageService = new Mock<IPublisherTableStorageService>(
+                MockBehavior.Strict
+            );
 
-            var response = BuildResponse(expectedKeys.Select(BuildReleasePublishingStatus).ToList());
+            var response = BuildResponse(
+                expectedKeys.Select(BuildReleasePublishingStatus).ToList()
+            );
 
-            publisherTableStorageService.Setup(service =>
+            publisherTableStorageService
+                .Setup(service =>
                     service.QueryEntities<ReleasePublishingStatus>(
                         TableStorageTableNames.PublisherReleaseStatusTableName,
                         It.IsAny<string>(),
                         1000,
                         null,
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(response);
 
-            var service = BuildService(publisherTableStorageService: publisherTableStorageService.Object);
+            var service = BuildService(
+                publisherTableStorageService: publisherTableStorageService.Object
+            );
 
             // Act
             var result = await service.GetReleasesWithOverallStages(
                 releaseVersionId,
-                overallStages: overallStages);
+                overallStages: overallStages
+            );
 
             // Assert
             MockUtils.VerifyAllMocks(publisherTableStorageService);
@@ -280,9 +350,9 @@ public abstract class ReleasePublishingStatusServiceTests
             var service = BuildService();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => service.GetReleasesWithOverallStages(
-                releaseVersionId,
-                overallStages: overallStages));
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.GetReleasesWithOverallStages(releaseVersionId, overallStages: overallStages)
+            );
         }
     }
 
@@ -290,26 +360,25 @@ public abstract class ReleasePublishingStatusServiceTests
         new()
         {
             PartitionKey = key.ReleaseVersionId.ToString(),
-            RowKey = key.ReleaseStatusId.ToString()
+            RowKey = key.ReleaseStatusId.ToString(),
         };
 
-    private static AsyncPageable<T> BuildResponse<T>(IReadOnlyList<T> values) where T : notnull =>
-        AsyncPageable<T>.FromPages([BuildResponsePage(values)]);
+    private static AsyncPageable<T> BuildResponse<T>(IReadOnlyList<T> values)
+        where T : notnull => AsyncPageable<T>.FromPages([BuildResponsePage(values)]);
 
     private static Page<T> BuildResponsePage<T>(IReadOnlyList<T> values) =>
-        Page<T>.FromValues(
-            values: values,
-            continuationToken: null,
-            response: Mock.Of<Response>());
+        Page<T>.FromValues(values: values, continuationToken: null, response: Mock.Of<Response>());
 
     private static ReleasePublishingStatusService BuildService(
         ContentDbContext? contentDbContext = null,
-        IPublisherTableStorageService? publisherTableStorageService = null)
+        IPublisherTableStorageService? publisherTableStorageService = null
+    )
     {
         return new ReleasePublishingStatusService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             NullLogger<ReleasePublishingStatusService>.Instance,
-            publisherTableStorageService ?? Mock.Of<IPublisherTableStorageService>(MockBehavior.Strict)
+            publisherTableStorageService
+                ?? Mock.Of<IPublisherTableStorageService>(MockBehavior.Strict)
         );
     }
 }

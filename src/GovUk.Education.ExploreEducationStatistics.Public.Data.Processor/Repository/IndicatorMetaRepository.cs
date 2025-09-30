@@ -12,44 +12,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class IndicatorMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : IIndicatorMetaRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : IIndicatorMetaRepository
 {
     public async Task<IList<IndicatorMeta>> ReadIndicatorMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await GetIndicatorMetas(duckDbConnection, dataSetVersion, allowedColumns, cancellationToken);
+        return await GetIndicatorMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken
+        );
     }
 
     public async Task CreateIndicatorMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var sourceDataSetVersionId = await GetSourceDataSetVersionId(dataSetVersion, cancellationToken);
+        var sourceDataSetVersionId = await GetSourceDataSetVersionId(
+            dataSetVersion,
+            cancellationToken
+        );
 
         var existingPublicIdMappings = sourceDataSetVersionId is not null
-            ? await publicDataDbContext.IndicatorMetas
-                .Where(meta => meta.DataSetVersionId == sourceDataSetVersionId)
-                .ToDictionaryAsync(
-                    meta => meta.Column,
-                    meta => meta.PublicId,
-                    cancellationToken
-                )
+            ? await publicDataDbContext
+                .IndicatorMetas.Where(meta => meta.DataSetVersionId == sourceDataSetVersionId)
+                .ToDictionaryAsync(meta => meta.Column, meta => meta.PublicId, cancellationToken)
             : [];
 
         var metas = await GetIndicatorMetas(
             duckDbConnection,
             dataSetVersion,
             allowedColumns,
-            cancellationToken);
+            cancellationToken
+        );
 
         var currentId = await publicDataDbContext.NextSequenceValue(
             PublicDataDbContext.IndicatorMetasIdSequence,
-            cancellationToken);
+            cancellationToken
+        );
 
         foreach (var meta in metas)
         {
@@ -66,22 +75,26 @@ public class IndicatorMetaRepository(
         await publicDataDbContext.SetSequenceValue(
             PublicDataDbContext.IndicatorMetasIdSequence,
             currentId - 1,
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     private async Task<List<IndicatorMeta>> GetIndicatorMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var metaRows = await duckDbConnection.SqlBuilder(
+        var metaRows = await duckDbConnection
+            .SqlBuilder(
                 $"""
-                 SELECT *
-                 FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
-                 WHERE "col_type" = {MetaFileRow.ColumnType.Indicator.ToString()}
-                 AND "col_name" IN ({allowedColumns})
-                 """)
+                SELECT *
+                FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
+                WHERE "col_type" = {MetaFileRow.ColumnType.Indicator.ToString()}
+                AND "col_name" IN ({allowedColumns})
+                """
+            )
             .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken);
 
         return metaRows
@@ -93,17 +106,20 @@ public class IndicatorMetaRepository(
                 Column = row.ColName,
                 Label = row.Label,
                 Unit = row.ParsedIndicatorUnit,
-                DecimalPlaces = row.IndicatorDp
+                DecimalPlaces = row.IndicatorDp,
             })
             .ToList();
     }
 
     private async Task<Guid?> GetSourceDataSetVersionId(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await publicDataDbContext.DataSetVersionMappings
-            .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
+        return await publicDataDbContext
+            .DataSetVersionMappings.Where(mapping =>
+                mapping.TargetDataSetVersionId == dataSetVersion.Id
+            )
             .Select(mapping => mapping.SourceDataSetVersionId)
             .SingleOrDefaultAsync(cancellationToken);
     }

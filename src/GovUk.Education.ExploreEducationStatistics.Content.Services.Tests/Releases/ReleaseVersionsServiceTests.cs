@@ -20,16 +20,16 @@ public abstract class ReleaseVersionsServiceTests
         public async Task WhenPublicationAndReleaseExist_ReturnsExpectedSummary()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1)
-                        .WithLabel("Final")
-                ]);
+                    [_dataFixture.DefaultRelease(publishedVersions: 1).WithLabel("Final")]
+                );
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.Updates = _dataFixture.DefaultUpdate()
+            releaseVersion.Updates = _dataFixture
+                .DefaultUpdate()
                 .WithReleaseVersionId(releaseVersion.Id)
                 .GenerateList(2);
 
@@ -47,7 +47,8 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -88,7 +89,8 @@ public abstract class ReleaseVersionsServiceTests
             // Act
             var outcome = await sut.GetReleaseVersionSummary(
                 publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug);
+                releaseSlug: releaseSlug
+            );
 
             // Assert
             outcome.AssertNotFound();
@@ -115,7 +117,8 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: releaseSlug);
+                    releaseSlug: releaseSlug
+                );
 
                 // Assert
                 outcome.AssertNotFound();
@@ -126,8 +129,11 @@ public abstract class ReleaseVersionsServiceTests
         public async Task WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]
+                );
             var release = publication.Releases[0];
 
             var contextId = Guid.NewGuid().ToString();
@@ -144,7 +150,8 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 outcome.AssertNotFound();
@@ -155,13 +162,16 @@ public abstract class ReleaseVersionsServiceTests
         public async Task WhenReleaseHasMultiplePublishedVersions_ReturnsLatestPublishedVersion()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2)]);
             var release = publication.Releases[0];
 
             // Ensure the generated release versions have different published dates
-            Assert.True(release.Versions[0].Published < release.Versions[1].Published,
-                "The first version should have an earlier published date than the second version");
+            Assert.True(
+                release.Versions[0].Published < release.Versions[1].Published,
+                "The first version should have an earlier published date than the second version"
+            );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -177,7 +187,8 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -193,12 +204,14 @@ public abstract class ReleaseVersionsServiceTests
         public async Task WhenReleaseIsNotLatestForPublication_ReturnsIsLatestReleaseFalse()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025)
-                ]);
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
+                    ]
+                );
 
             var nonLatestRelease = publication.Releases.Single(r => r.Year == 2024);
             var latestRelease = publication.Releases.Single(r => r.Year == 2025);
@@ -220,7 +233,8 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: nonLatestRelease.Slug);
+                    releaseSlug: nonLatestRelease.Slug
+                );
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -236,12 +250,14 @@ public abstract class ReleaseVersionsServiceTests
         public async Task WhenPublishingOrganisationsExist_ReturnsPublishingOrganisationsOrderedByTitle()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.PublishingOrganisations = _dataFixture.DefaultOrganisation()
+            releaseVersion.PublishingOrganisations = _dataFixture
+                .DefaultOrganisation()
                 .ForIndex(0, s => s.SetTitle("Organisation C"))
                 .ForIndex(1, s => s.SetTitle("Organisation A"))
                 .ForIndex(2, s => s.SetTitle("Organisation B"))
@@ -261,24 +277,27 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 var result = outcome.AssertRight();
 
-                var expectedOrganisations = releaseVersion.PublishingOrganisations
-                    .OrderBy(o => o.Title)
+                var expectedOrganisations = releaseVersion
+                    .PublishingOrganisations.OrderBy(o => o.Title)
                     .ToArray();
 
                 Assert.Equal(expectedOrganisations.Length, result.PublishingOrganisations.Length);
-                Assert.All(expectedOrganisations,
+                Assert.All(
+                    expectedOrganisations,
                     (expectedOrganisation, index) =>
                     {
                         var actualOrganisation = result.PublishingOrganisations[index];
                         Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
                         Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
                         Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
-                    });
+                    }
+                );
             }
         }
 
@@ -286,7 +305,8 @@ public abstract class ReleaseVersionsServiceTests
         public async Task WhenNoUpdatesExist_ReturnsUpdateCountForFirstPublishedEntry()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
 
@@ -304,7 +324,8 @@ public abstract class ReleaseVersionsServiceTests
                 // Act
                 var outcome = await sut.GetReleaseVersionSummary(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 var result = outcome.AssertRight();

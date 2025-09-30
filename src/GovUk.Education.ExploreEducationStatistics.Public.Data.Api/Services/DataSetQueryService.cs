@@ -39,8 +39,8 @@ internal class DataSetQueryService(
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
     IParquetTimePeriodRepository timePeriodRepository,
-    IAnalyticsService analyticsService)
-    : IDataSetQueryService
+    IAnalyticsService analyticsService
+) : IDataSetQueryService
 {
     private static readonly Dictionary<string, string> ReservedSorts = new()
     {
@@ -56,10 +56,10 @@ internal class DataSetQueryService(
         Guid dataSetId,
         DataSetGetQueryRequest request,
         string? dataSetVersion = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        using var _ = MiniProfiler.Current
-            .Step($"{nameof(DataSetQueryService)}.{nameof(Query)}");
+        using var _ = MiniProfiler.Current.Step($"{nameof(DataSetQueryService)}.{nameof(Query)}");
 
         var query = new DataSetQueryRequest
         {
@@ -79,17 +79,30 @@ internal class DataSetQueryService(
 
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
-            .OnSuccess(dsv => RunQueryWithAnalytics(
-                dataSetVersion: dsv,
-                requestedDataSetVersion: dataSetVersion,
-                query: query,
-                cancellationToken: cancellationToken
-            ))
-            .OnSuccess(results => results with { Warnings = results.Warnings.Select(MapGetQueryWarning).ToList() })
+            .OnSuccess(dsv =>
+                RunQueryWithAnalytics(
+                    dataSetVersion: dsv,
+                    requestedDataSetVersion: dataSetVersion,
+                    query: query,
+                    cancellationToken: cancellationToken
+                )
+            )
+            .OnSuccess(results =>
+                results with
+                {
+                    Warnings = results.Warnings.Select(MapGetQueryWarning).ToList(),
+                }
+            )
             .OnFailureFailWith(result =>
-                result is not BadRequestObjectResult { Value: ValidationProblemViewModel validationProblem }
+                result
+                    is not BadRequestObjectResult
+                    {
+                        Value: ValidationProblemViewModel validationProblem
+                    }
                     ? result
-                    : ValidationUtils.ValidationResult(validationProblem.Errors.Select(MapGetQueryError))
+                    : ValidationUtils.ValidationResult(
+                        validationProblem.Errors.Select(MapGetQueryError)
+                    )
             );
     }
 
@@ -97,80 +110,88 @@ internal class DataSetQueryService(
         Guid dataSetId,
         DataSetQueryRequest request,
         string? dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
-            .OnSuccess(dsv => RunQueryWithAnalytics(
-                dataSetVersion: dsv,
-                requestedDataSetVersion: dataSetVersion,
-                query: request,
-                cancellationToken: cancellationToken,
-                baseCriteriaPath: "criteria"
-            ));
+            .OnSuccess(dsv =>
+                RunQueryWithAnalytics(
+                    dataSetVersion: dsv,
+                    requestedDataSetVersion: dataSetVersion,
+                    query: request,
+                    cancellationToken: cancellationToken,
+                    baseCriteriaPath: "criteria"
+                )
+            );
     }
 
     private async Task<Either<ActionResult, DataSetVersion>> FindDataSetVersion(
         Guid dataSetId,
         string? dataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        using var _ = MiniProfiler.Current
-            .Step($"{nameof(DataSetQueryService)}.{nameof(FindDataSetVersion)}");
+        using var _ = MiniProfiler.Current.Step(
+            $"{nameof(DataSetQueryService)}.{nameof(FindDataSetVersion)}"
+        );
 
         return dataSetVersion is null or "*"
             ? await publicDataDbContext
-                .DataSets
-                .AsNoTracking()
+                .DataSets.AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
                 .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken)
             : await publicDataDbContext
-                .DataSetVersions
-                .AsNoTracking()
+                .DataSetVersions.AsNoTracking()
                 .Include(dsv => dsv.DataSet)
-                .FindByVersion(
-                    dataSetId: dataSetId,
-                    version: dataSetVersion,
-                    cancellationToken);
+                .FindByVersion(dataSetId: dataSetId, version: dataSetVersion, cancellationToken);
     }
 
-    private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
+    private async Task<
+        Either<ActionResult, DataSetQueryPaginatedResultsViewModel>
+    > RunQueryWithAnalytics(
         DataSetVersion dataSetVersion,
         string? requestedDataSetVersion,
         DataSetQueryRequest query,
         CancellationToken cancellationToken,
-        string baseCriteriaPath = "")
+        string baseCriteriaPath = ""
+    )
     {
         var startTime = DateTime.UtcNow;
 
-        return await 
-            RunQuery(
+        return await RunQuery(
                 dataSetVersion: dataSetVersion,
                 query: query,
                 cancellationToken: cancellationToken,
-                baseCriteriaPath: baseCriteriaPath)
-            .OnSuccessDo(results => analyticsService.CaptureDataSetVersionQuery(
-                dataSetVersion: dataSetVersion,
-                requestedDataSetVersion: requestedDataSetVersion,
-                query: query,
-                results: results,
-                startTime: startTime,
-                cancellationToken: cancellationToken));
+                baseCriteriaPath: baseCriteriaPath
+            )
+            .OnSuccessDo(results =>
+                analyticsService.CaptureDataSetVersionQuery(
+                    dataSetVersion: dataSetVersion,
+                    requestedDataSetVersion: requestedDataSetVersion,
+                    query: query,
+                    results: results,
+                    startTime: startTime,
+                    cancellationToken: cancellationToken
+                )
+            );
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
         DataSetVersion dataSetVersion,
         DataSetQueryRequest query,
         CancellationToken cancellationToken,
-        string baseCriteriaPath = "")
+        string baseCriteriaPath = ""
+    )
     {
         duckDbConnection.Open();
 
-        using var _ = MiniProfiler.Current
-            .Step($"{nameof(DataSetQueryService)}.{nameof(RunQuery)}");
+        using var _ = MiniProfiler.Current.Step(
+            $"{nameof(DataSetQueryService)}.{nameof(RunQuery)}"
+        );
 
         var queryState = new QueryState();
 
@@ -188,8 +209,14 @@ internal class DataSetQueryService(
         }
 
         var columnsTask = dataRepository.ListColumns(dataSetVersion, cancellationToken);
-        var filterColumnsByIdTask = filterRepository.GetFilterColumnsById(dataSetVersion, cancellationToken);
-        var indicatorColumnsByIdTask = indicatorRepository.GetColumnsById(dataSetVersion, cancellationToken);
+        var filterColumnsByIdTask = filterRepository.GetFilterColumnsById(
+            dataSetVersion,
+            cancellationToken
+        );
+        var indicatorColumnsByIdTask = indicatorRepository.GetColumnsById(
+            dataSetVersion,
+            cancellationToken
+        );
 
         await Task.WhenAll(columnsTask, filterColumnsByIdTask, indicatorColumnsByIdTask);
 
@@ -199,12 +226,14 @@ internal class DataSetQueryService(
             columns: columnsTask.Result,
             filterColumnsById: filterColumnsByIdTask.Result,
             indicatorColumnsById: indicatorColumnsByIdTask.Result,
-            selectedIndicators: indicators);
+            selectedIndicators: indicators
+        );
 
         var sorts = GetSorts(
             request: query,
             columnMappings: columnMappings,
-            queryState: queryState);
+            queryState: queryState
+        );
 
         if (queryState.Errors.Count != 0)
         {
@@ -216,7 +245,8 @@ internal class DataSetQueryService(
         var countTask = dataRepository.CountRows(
             dataSetVersion: dataSetVersion,
             where: whereSql,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         var rowsTask = dataRepository.ListRows(
             dataSetVersion: dataSetVersion,
@@ -224,32 +254,37 @@ internal class DataSetQueryService(
             [
                 DataTable.Cols.TimePeriodId,
                 DataTable.Cols.GeographicLevel,
-                ..columnMappings.Columns
+                .. columnMappings.Columns,
             ],
             where: whereSql,
             sorts: sorts,
             page: query.Page,
             pageSize: query.PageSize,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         await Task.WhenAll(countTask, rowsTask);
 
         if (query.Debug)
         {
-            queryState.Warnings.Add(new WarningViewModel
-            {
-                Code = ValidationMessages.DebugEnabled.Code,
-                Message = ValidationMessages.DebugEnabled.Message,
-            });
+            queryState.Warnings.Add(
+                new WarningViewModel
+                {
+                    Code = ValidationMessages.DebugEnabled.Code,
+                    Message = ValidationMessages.DebugEnabled.Message,
+                }
+            );
         }
 
         if (countTask.Result == 0)
         {
-            queryState.Warnings.Add(new WarningViewModel
-            {
-                Code = ValidationMessages.QueryNoResults.Code,
-                Message = ValidationMessages.QueryNoResults.Message,
-            });
+            queryState.Warnings.Add(
+                new WarningViewModel
+                {
+                    Code = ValidationMessages.QueryNoResults.Code,
+                    Message = ValidationMessages.QueryNoResults.Message,
+                }
+            );
         }
 
         var results = await MapQueryResults(
@@ -257,7 +292,8 @@ internal class DataSetQueryService(
             dataSetVersion: dataSetVersion,
             columnMappings: columnMappings,
             debug: query.Debug,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         duckDbConnection.Close();
 
@@ -266,22 +302,24 @@ internal class DataSetQueryService(
             Paging = new PagingViewModel(
                 page: query.Page,
                 pageSize: query.PageSize,
-                totalResults: (int)countTask.Result),
+                totalResults: (int)countTask.Result
+            ),
             Results = results,
-            Warnings = queryState.Warnings
+            Warnings = queryState.Warnings,
         };
     }
 
     private static HashSet<string> GetIndicators(
         DataSetQueryRequest request,
         Dictionary<string, string> indicatorColumnsById,
-        QueryState queryState)
+        QueryState queryState
+    )
     {
         if (request.Indicators == null)
         {
             return [.. indicatorColumnsById.Values];
         }
-        
+
         var validIndicatorColumns = new HashSet<string>();
         var invalidIndicatorIds = new HashSet<string>();
 
@@ -299,13 +337,15 @@ internal class DataSetQueryService(
 
         if (invalidIndicatorIds.Count != 0)
         {
-            queryState.Errors.Add(new ErrorViewModel
-            {
-                Code = ValidationMessages.IndicatorsNotFound.Code,
-                Message = ValidationMessages.IndicatorsNotFound.Message,
-                Path = "indicators",
-                Detail = new NotFoundItemsErrorDetail<string>(invalidIndicatorIds)
-            });
+            queryState.Errors.Add(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.IndicatorsNotFound.Code,
+                    Message = ValidationMessages.IndicatorsNotFound.Message,
+                    Path = "indicators",
+                    Detail = new NotFoundItemsErrorDetail<string>(invalidIndicatorIds),
+                }
+            );
         }
 
         return validIndicatorColumns;
@@ -314,7 +354,8 @@ internal class DataSetQueryService(
     private static List<Sort> GetSorts(
         DataSetQueryRequest request,
         ColumnMappings columnMappings,
-        QueryState queryState)
+        QueryState queryState
+    )
     {
         var sorts = new List<Sort>();
 
@@ -335,13 +376,15 @@ internal class DataSetQueryService(
 
             if (invalidSorts.Count != 0)
             {
-                queryState.Errors.Add(new ErrorViewModel
-                {
-                    Message = ValidationMessages.SortFieldsNotFound.Message,
-                    Code = ValidationMessages.SortFieldsNotFound.Code,
-                    Path = "sorts",
-                    Detail = new NotFoundItemsErrorDetail<DataSetQuerySort>(invalidSorts)
-                });
+                queryState.Errors.Add(
+                    new ErrorViewModel
+                    {
+                        Message = ValidationMessages.SortFieldsNotFound.Message,
+                        Code = ValidationMessages.SortFieldsNotFound.Code,
+                        Path = "sorts",
+                        Detail = new NotFoundItemsErrorDetail<DataSetQuerySort>(invalidSorts),
+                    }
+                );
             }
         }
 
@@ -361,7 +404,8 @@ internal class DataSetQueryService(
     private static bool TryGetSortColumn(
         DataSetQuerySort sort,
         ColumnMappings columnMappings,
-        [NotNullWhen(true)] out string? column)
+        [NotNullWhen(true)] out string? column
+    )
     {
         column = null;
 
@@ -385,7 +429,7 @@ internal class DataSetQueryService(
             SortTypeFilter => columnMappings.Filters.TryGetValue(fieldId, out column),
             SortTypeIndicator => columnMappings.Indicators.TryGetValue(fieldId, out column),
             SortTypeLocation => columnMappings.LocationLevels.TryGetValue(fieldId, out column),
-            _ => false
+            _ => false,
         };
     }
 
@@ -393,14 +437,12 @@ internal class DataSetQueryService(
         ISet<string> columns,
         Dictionary<string, string> filterColumnsById,
         Dictionary<string, string> indicatorColumnsById,
-        ISet<string> selectedIndicators)
+        ISet<string> selectedIndicators
+    )
     {
-        var locationLevels = GeographicLevelUtils.Levels
-            .Where(level => columns.Contains(DataTable.Cols.LocationId(level)))
-            .ToDictionary(
-                level => level.GetEnumValue(),
-                DataTable.Cols.LocationId
-            );
+        var locationLevels = GeographicLevelUtils
+            .Levels.Where(level => columns.Contains(DataTable.Cols.LocationId(level)))
+            .ToDictionary(level => level.GetEnumValue(), DataTable.Cols.LocationId);
 
         var indicators = indicatorColumnsById
             .Where(kv => selectedIndicators.Contains(kv.Value))
@@ -410,7 +452,7 @@ internal class DataSetQueryService(
         {
             Filters = filterColumnsById,
             LocationLevels = locationLevels,
-            Indicators = indicators
+            Indicators = indicators,
         };
     }
 
@@ -419,10 +461,12 @@ internal class DataSetQueryService(
         DataSetVersion dataSetVersion,
         ColumnMappings columnMappings,
         bool debug,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         using var _ = MiniProfiler.Current.Step(
-            $"{nameof(DataSetQueryService)}.{nameof(MapQueryResults)}");
+            $"{nameof(DataSetQueryService)}.{nameof(MapQueryResults)}"
+        );
 
         var timePeriodIds = new HashSet<int>();
         var locationOptionIds = new HashSet<int>();
@@ -453,61 +497,74 @@ internal class DataSetQueryService(
         // instead of joining everything in one big data query as joins on larger data sets are
         // quite expensive. This also avoids excessive data transfer over the wire and
         // should be more efficient overall (despite the additional requests).
-        var filterOptionsById =
-            GetFilterOptionsById(dataSetVersion, filterOptionIds, debug, cancellationToken);
-        var locationOptionsById =
-            GetLocationOptionsById(dataSetVersion, locationOptionIds, debug, cancellationToken);
-        var timePeriodsById =
-            GetTimePeriodsById(dataSetVersion, timePeriodIds, cancellationToken);
+        var filterOptionsById = GetFilterOptionsById(
+            dataSetVersion,
+            filterOptionIds,
+            debug,
+            cancellationToken
+        );
+        var locationOptionsById = GetLocationOptionsById(
+            dataSetVersion,
+            locationOptionIds,
+            debug,
+            cancellationToken
+        );
+        var timePeriodsById = GetTimePeriodsById(dataSetVersion, timePeriodIds, cancellationToken);
 
         await Task.WhenAll(filterOptionsById, locationOptionsById, timePeriodsById);
 
         return rows.Select(row => new DataSetQueryResultViewModel
-        {
-            GeographicLevel = EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
-            TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
-            Filters = columnMappings.Filters
-                .Where(kv => row[kv.Value] is int and not 0)
-                .ToDictionary(
-                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
-                    kv => filterOptionsById.Result[(int)row[kv.Value]!]
+            {
+                GeographicLevel = EnumUtil.GetFromEnumLabel<GeographicLevel>(
+                    (string)row[DataTable.Cols.GeographicLevel]!
                 ),
-            Locations = columnMappings.LocationLevels
-                .Where(kv => row[kv.Value] is int and not 0)
-                .ToDictionary(
-                    kv => kv.Key,
-                    kv => locationOptionsById.Result[(int)row[kv.Value]!]
-                ),
-            Values = columnMappings.Indicators
-                .ToDictionary(
+                TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
+                Filters = columnMappings
+                    .Filters.Where(kv => row[kv.Value] is int and not 0)
+                    .ToDictionary(
+                        kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                        kv => filterOptionsById.Result[(int)row[kv.Value]!]
+                    ),
+                Locations = columnMappings
+                    .LocationLevels.Where(kv => row[kv.Value] is int and not 0)
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => locationOptionsById.Result[(int)row[kv.Value]!]
+                    ),
+                Values = columnMappings.Indicators.ToDictionary(
                     kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
                     kv => row[kv.Value] as string ?? string.Empty
-                )
-        })
-        .ToList();
+                ),
+            })
+            .ToList();
     }
 
     private static WarningViewModel MapGetQueryWarning(WarningViewModel warning)
     {
-        if (warning.Code == ValidationMessages.LocationsNotFound.Code
-            && warning.Detail is NotFoundItemsErrorDetail<IDataSetQueryLocation> notFoundLocations)
+        if (
+            warning.Code == ValidationMessages.LocationsNotFound.Code
+            && warning.Detail is NotFoundItemsErrorDetail<IDataSetQueryLocation> notFoundLocations
+        )
         {
             return warning with
             {
                 Detail = new NotFoundItemsErrorDetail<string>(
                     notFoundLocations.Items.Select(item => item.ToLocationString())
-                )
+                ),
             };
         }
 
-        if (warning.Code == ValidationMessages.TimePeriodsNotFound.Code
-            && warning.Detail is NotFoundItemsErrorDetail<DataSetQueryTimePeriod> notFoundTimePeriods)
+        if (
+            warning.Code == ValidationMessages.TimePeriodsNotFound.Code
+            && warning.Detail
+                is NotFoundItemsErrorDetail<DataSetQueryTimePeriod> notFoundTimePeriods
+        )
         {
             return warning with
             {
                 Detail = new NotFoundItemsErrorDetail<string>(
                     notFoundTimePeriods.Items.Select(item => item.ToTimePeriodString())
-                )
+                ),
             };
         }
 
@@ -516,14 +573,16 @@ internal class DataSetQueryService(
 
     private static ErrorViewModel MapGetQueryError(ErrorViewModel error)
     {
-        if (error.Code == ValidationMessages.SortFieldsNotFound.Code
-            && error.Detail is NotFoundItemsErrorDetail<DataSetQuerySort> notFoundSortFields)
+        if (
+            error.Code == ValidationMessages.SortFieldsNotFound.Code
+            && error.Detail is NotFoundItemsErrorDetail<DataSetQuerySort> notFoundSortFields
+        )
         {
             return error with
             {
                 Detail = new NotFoundItemsErrorDetail<string>(
                     notFoundSortFields.Items.Select(item => item.ToSortString())
-                )
+                ),
             };
         }
 
@@ -534,12 +593,16 @@ internal class DataSetQueryService(
         DataSetVersion dataSetVersion,
         IEnumerable<int> filterOptionIds,
         bool debug,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         if (debug)
         {
-            var options =
-                await filterRepository.ListOptions(dataSetVersion, filterOptionIds, cancellationToken);
+            var options = await filterRepository.ListOptions(
+                dataSetVersion,
+                filterOptionIds,
+                cancellationToken
+            );
 
             return options.ToDictionary(
                 option => option.Id,
@@ -547,47 +610,53 @@ internal class DataSetQueryService(
             );
         }
 
-        var publicIds =
-            await filterRepository.ListOptionPublicIds(dataSetVersion, filterOptionIds, cancellationToken);
-
-        return publicIds.ToDictionary(
-            option => option.Id,
-            option => option.PublicId
+        var publicIds = await filterRepository.ListOptionPublicIds(
+            dataSetVersion,
+            filterOptionIds,
+            cancellationToken
         );
+
+        return publicIds.ToDictionary(option => option.Id, option => option.PublicId);
     }
 
     private async Task<Dictionary<int, string>> GetLocationOptionsById(
         DataSetVersion dataSetVersion,
         IEnumerable<int> locationOptionIds,
         bool debug,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         if (debug)
         {
-            var options =
-                await locationRepository.ListOptions(dataSetVersion, locationOptionIds, cancellationToken);
+            var options = await locationRepository.ListOptions(
+                dataSetVersion,
+                locationOptionIds,
+                cancellationToken
+            );
 
-            return options.ToDictionary(
-                o => o.Id,
-                GetLocationOptionDebugLabel);
+            return options.ToDictionary(o => o.Id, GetLocationOptionDebugLabel);
         }
 
-        var publicIds =
-            await locationRepository.ListOptionPublicIds(dataSetVersion, locationOptionIds, cancellationToken);
-
-        return publicIds.ToDictionary(
-            option => option.Id,
-            option => option.PublicId
+        var publicIds = await locationRepository.ListOptionPublicIds(
+            dataSetVersion,
+            locationOptionIds,
+            cancellationToken
         );
+
+        return publicIds.ToDictionary(option => option.Id, option => option.PublicId);
     }
 
     private async Task<Dictionary<int, TimePeriodViewModel>> GetTimePeriodsById(
         DataSetVersion dataSetVersion,
         IEnumerable<int> timePeriodIds,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var timePeriods =
-            await timePeriodRepository.List(dataSetVersion, timePeriodIds, cancellationToken);
+        var timePeriods = await timePeriodRepository.List(
+            dataSetVersion,
+            timePeriodIds,
+            cancellationToken
+        );
 
         return timePeriods.ToDictionary(
             timePeriod => timePeriod.Id,
@@ -609,11 +678,10 @@ internal class DataSetQueryService(
                 $"{option.PublicId} :: {option.Label} (code = {option.Code}, oldCode = {option.OldCode})",
             GeographicLevel.Provider =>
                 $"{option.PublicId} :: {option.Label} (ukprn = {option.Ukprn})",
-            GeographicLevel.RscRegion =>
-                $"{option.PublicId} :: {option.Label}",
+            GeographicLevel.RscRegion => $"{option.PublicId} :: {option.Label}",
             GeographicLevel.School =>
                 $"{option.PublicId} :: {option.Label} (urn = {option.Urn}, laEstab = {option.LaEstab})",
-            _ => $"{option.PublicId} :: {option.Label} (code = {option.Code})"
+            _ => $"{option.PublicId} :: {option.Label} (code = {option.Code})",
         };
     }
 
@@ -635,10 +703,6 @@ internal class DataSetQueryService(
         public required Dictionary<string, string> Indicators { get; init; } = [];
 
         public IEnumerable<string> Columns =>
-        [
-            ..LocationLevels.Values,
-            ..Filters.Values,
-            ..Indicators.Values
-        ];
+            [.. LocationLevels.Values, .. Filters.Values, .. Indicators.Values];
     }
 }

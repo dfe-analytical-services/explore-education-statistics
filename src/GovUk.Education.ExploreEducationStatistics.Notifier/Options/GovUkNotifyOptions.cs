@@ -27,10 +27,12 @@ public class GovUkNotifyOptions
         public string SubscriptionVerificationId { get; init; } = null!;
 
         public string ApiSubscriptionConfirmationId { get; init; } = null!;
+
         /// <summary>
         /// The email template to use when a new non-breaking dataset version is published (e.g., 1.0, 2.1, 3.1 etc)
         /// </summary>
         public string ApiSubscriptionDataSetVersionPublishedId { get; init; } = null!;
+
         /// <summary>
         /// The email template to use when a new dataset version with breaking changes is published (e.g., 2.0, 3.0, 4.0, 5.0 etc)
         /// </summary>
@@ -39,7 +41,7 @@ public class GovUkNotifyOptions
         public string ApiSubscriptionVerificationId { get; init; } = null!;
 
         public string ReleasePublishingFeedbackId { get; init; } = null!;
-        
+
         /// <summary>
         /// Returns the email template to use when a new breaking or non-breaking dataset version is published
         /// </summary>
@@ -52,10 +54,13 @@ public class GovUkNotifyOptions
             {
                 throw new ArgumentException(ValidationMessages.InvalidDataSetVersion.Message);
             }
-            var isNewMajorVersion = dataSetVersionNumber.Major >= 2
+            var isNewMajorVersion =
+                dataSetVersionNumber.Major >= 2
                 && dataSetVersionNumber.Patch == 0
                 && dataSetVersionNumber.Minor == 0;
-            return isNewMajorVersion ? ApiSubscriptionMajorDataSetVersionPublishedId : ApiSubscriptionDataSetVersionPublishedId;
+            return isNewMajorVersion
+                ? ApiSubscriptionMajorDataSetVersionPublishedId
+                : ApiSubscriptionDataSetVersionPublishedId;
         }
     }
 }

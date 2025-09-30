@@ -75,7 +75,7 @@ public record DataSetGetQueryTimePeriods
             Gt = Gt is not null ? DataSetQueryTimePeriod.Parse(Gt) : null,
             Gte = Gte is not null ? DataSetQueryTimePeriod.Parse(Gte) : null,
             Lt = Lt is not null ? DataSetQueryTimePeriod.Parse(Lt) : null,
-            Lte = Lte is not null ? DataSetQueryTimePeriod.Parse(Lte) : null
+            Lte = Lte is not null ? DataSetQueryTimePeriod.Parse(Lte) : null,
         };
     }
 
@@ -91,21 +91,23 @@ public record DataSetGetQueryTimePeriods
                 .TimePeriodString()
                 .When(request => request.NotEq is not null);
 
-            When(q => q.In is not null, () =>
-            {
-                RuleFor(request => request.In)
-                    .NotEmpty();
-                RuleForEach(request => request.In)
-                    .TimePeriodString();
-            });
+            When(
+                q => q.In is not null,
+                () =>
+                {
+                    RuleFor(request => request.In).NotEmpty();
+                    RuleForEach(request => request.In).TimePeriodString();
+                }
+            );
 
-            When(q => q.NotIn is not null, () =>
-            {
-                RuleFor(request => request.NotIn)
-                    .NotEmpty();
-                RuleForEach(request => request.NotIn)
-                    .TimePeriodString();
-            });
+            When(
+                q => q.NotIn is not null,
+                () =>
+                {
+                    RuleFor(request => request.NotIn).NotEmpty();
+                    RuleForEach(request => request.NotIn).TimePeriodString();
+                }
+            );
 
             RuleFor(request => request.Gt)!
                 .TimePeriodString()

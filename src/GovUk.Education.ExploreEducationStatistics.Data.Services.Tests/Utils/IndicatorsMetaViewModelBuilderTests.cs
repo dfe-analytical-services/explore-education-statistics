@@ -33,7 +33,7 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 1,
                         Label = "Indicator a",
                         Name = "indicator_a",
-                        Unit = IndicatorUnit.Percent
+                        Unit = IndicatorUnit.Percent,
                     },
                     new()
                     {
@@ -41,9 +41,9 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 2,
                         Label = "Indicator b",
                         Name = "indicator_b",
-                        Unit = IndicatorUnit.Pound
-                    }
-                }
+                        Unit = IndicatorUnit.Pound,
+                    },
+                },
             },
             new()
             {
@@ -57,7 +57,7 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 1,
                         Label = "Indicator c",
                         Name = "indicator_c",
-                        Unit = IndicatorUnit.Percent
+                        Unit = IndicatorUnit.Percent,
                     },
                     new()
                     {
@@ -65,13 +65,14 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 2,
                         Label = "Indicator d",
                         Name = "indicator_d",
-                        Unit = IndicatorUnit.Pound
-                    }
-                }
-            }
+                        Unit = IndicatorUnit.Pound,
+                    },
+                },
+            },
         };
 
-        var result = (IDictionary<string, IndicatorGroupMetaViewModel>) BuildIndicatorGroups(indicatorGroups);
+        var result =
+            (IDictionary<string, IndicatorGroupMetaViewModel>)BuildIndicatorGroups(indicatorGroups);
 
         Assert.Equal(2, result.Count);
 
@@ -85,13 +86,19 @@ public class IndicatorsMetaViewModelBuilderTests
         Assert.Equal(2, groupA.Options.Count);
 
         Assert.Equal(indicatorGroups[0].Indicators[0].Id, groupA.Options[0].Value);
-        Assert.Equal(indicatorGroups[0].Indicators[0].DecimalPlaces, groupA.Options[0].DecimalPlaces);
+        Assert.Equal(
+            indicatorGroups[0].Indicators[0].DecimalPlaces,
+            groupA.Options[0].DecimalPlaces
+        );
         Assert.Equal(indicatorGroups[0].Indicators[0].Label, groupA.Options[0].Label);
         Assert.Equal(indicatorGroups[0].Indicators[0].Name, groupA.Options[0].Name);
         Assert.Equal(indicatorGroups[0].Indicators[0].Unit, groupA.Options[0].Unit);
 
         Assert.Equal(indicatorGroups[0].Indicators[1].Id, groupA.Options[1].Value);
-        Assert.Equal(indicatorGroups[0].Indicators[1].DecimalPlaces, groupA.Options[1].DecimalPlaces);
+        Assert.Equal(
+            indicatorGroups[0].Indicators[1].DecimalPlaces,
+            groupA.Options[1].DecimalPlaces
+        );
         Assert.Equal(indicatorGroups[0].Indicators[1].Label, groupA.Options[1].Label);
         Assert.Equal(indicatorGroups[0].Indicators[1].Name, groupA.Options[1].Name);
         Assert.Equal(indicatorGroups[0].Indicators[1].Unit, groupA.Options[1].Unit);
@@ -106,13 +113,19 @@ public class IndicatorsMetaViewModelBuilderTests
         Assert.Equal(2, groupB.Options.Count);
 
         Assert.Equal(indicatorGroups[1].Indicators[0].Id, groupB.Options[0].Value);
-        Assert.Equal(indicatorGroups[1].Indicators[0].DecimalPlaces, groupB.Options[0].DecimalPlaces);
+        Assert.Equal(
+            indicatorGroups[1].Indicators[0].DecimalPlaces,
+            groupB.Options[0].DecimalPlaces
+        );
         Assert.Equal(indicatorGroups[1].Indicators[0].Label, groupB.Options[0].Label);
         Assert.Equal(indicatorGroups[1].Indicators[0].Name, groupB.Options[0].Name);
         Assert.Equal(indicatorGroups[1].Indicators[0].Unit, groupB.Options[0].Unit);
 
         Assert.Equal(indicatorGroups[1].Indicators[1].Id, groupB.Options[1].Value);
-        Assert.Equal(indicatorGroups[1].Indicators[1].DecimalPlaces, groupB.Options[1].DecimalPlaces);
+        Assert.Equal(
+            indicatorGroups[1].Indicators[1].DecimalPlaces,
+            groupB.Options[1].DecimalPlaces
+        );
         Assert.Equal(indicatorGroups[1].Indicators[1].Label, groupB.Options[1].Label);
         Assert.Equal(indicatorGroups[1].Indicators[1].Name, groupB.Options[1].Name);
         Assert.Equal(indicatorGroups[1].Indicators[1].Unit, groupB.Options[1].Unit);
@@ -129,22 +142,10 @@ public class IndicatorsMetaViewModelBuilderTests
                 Label = "Group c",
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator i"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator g"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator h"
-                    }
-                }
+                    new() { Id = Guid.NewGuid(), Label = "Indicator i" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator g" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator h" },
+                },
             },
             new()
             {
@@ -152,22 +153,10 @@ public class IndicatorsMetaViewModelBuilderTests
                 Label = "Group a",
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator c"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator a"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator b"
-                    }
-                }
+                    new() { Id = Guid.NewGuid(), Label = "Indicator c" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator a" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator b" },
+                },
             },
             new()
             {
@@ -175,26 +164,15 @@ public class IndicatorsMetaViewModelBuilderTests
                 Label = "Group b",
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator f"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator d"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator e"
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Label = "Indicator f" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator d" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator e" },
+                },
+            },
         };
 
-        var result = (IDictionary<string, IndicatorGroupMetaViewModel>) BuildIndicatorGroups(indicatorGroups);
+        var result =
+            (IDictionary<string, IndicatorGroupMetaViewModel>)BuildIndicatorGroups(indicatorGroups);
 
         Assert.Equal(3, result.Count);
 
@@ -237,22 +215,10 @@ public class IndicatorsMetaViewModelBuilderTests
                 Label = "Group a",
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator a"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator b"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator c"
-                    }
-                }
+                    new() { Id = Guid.NewGuid(), Label = "Indicator a" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator b" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator c" },
+                },
             },
             new()
             {
@@ -260,22 +226,10 @@ public class IndicatorsMetaViewModelBuilderTests
                 Label = "Group b",
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator d"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator e"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator f"
-                    }
-                }
+                    new() { Id = Guid.NewGuid(), Label = "Indicator d" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator e" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator f" },
+                },
             },
             new()
             {
@@ -283,23 +237,11 @@ public class IndicatorsMetaViewModelBuilderTests
                 Label = "Group c",
                 Indicators = new List<Indicator>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator g"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator h"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator i"
-                    }
-                }
-            }
+                    new() { Id = Guid.NewGuid(), Label = "Indicator g" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator h" },
+                    new() { Id = Guid.NewGuid(), Label = "Indicator i" },
+                },
+            },
         };
 
         // Define a sequence to sort each of the indicator groups and their indicators into the following order.
@@ -320,13 +262,7 @@ public class IndicatorsMetaViewModelBuilderTests
         var ordering = new List<IndicatorGroupSequenceEntry>
         {
             // A group that does not exist in the input list
-            new(
-                Guid.NewGuid(),
-                new List<Guid>
-                {
-                    Guid.NewGuid()
-                }
-            ),
+            new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() }),
             // Group c
             new(
                 indicatorGroups[2].Id,
@@ -335,7 +271,7 @@ public class IndicatorsMetaViewModelBuilderTests
                     // Indicator i, Indicator g, Indicator h
                     indicatorGroups[2].Indicators[2].Id,
                     indicatorGroups[2].Indicators[0].Id,
-                    indicatorGroups[2].Indicators[1].Id
+                    indicatorGroups[2].Indicators[1].Id,
                 }
             ),
             // Group a
@@ -346,7 +282,7 @@ public class IndicatorsMetaViewModelBuilderTests
                     //Indicator c, Indicator a, Indicator b
                     indicatorGroups[0].Indicators[2].Id,
                     indicatorGroups[0].Indicators[0].Id,
-                    indicatorGroups[0].Indicators[1].Id
+                    indicatorGroups[0].Indicators[1].Id,
                 }
             ),
             // Group b
@@ -357,21 +293,16 @@ public class IndicatorsMetaViewModelBuilderTests
                     // Indicator f, Indicator d, Indicator e
                     indicatorGroups[1].Indicators[2].Id,
                     indicatorGroups[1].Indicators[0].Id,
-                    indicatorGroups[1].Indicators[1].Id
+                    indicatorGroups[1].Indicators[1].Id,
                 }
             ),
             // Another group that does not exist in the input list
-            new(
-                Guid.NewGuid(),
-                new List<Guid>
-                {
-                    Guid.NewGuid()
-                }
-            )
+            new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() }),
         };
 
         var result =
-            (IDictionary<string, IndicatorGroupMetaViewModel>) BuildIndicatorGroups(indicatorGroups, ordering);
+            (IDictionary<string, IndicatorGroupMetaViewModel>)
+                BuildIndicatorGroups(indicatorGroups, ordering);
 
         Assert.Equal(3, result.Count);
 
@@ -420,7 +351,7 @@ public class IndicatorsMetaViewModelBuilderTests
                 DecimalPlaces = 1,
                 Label = "Indicator a",
                 Name = "indicator_a",
-                Unit = IndicatorUnit.Percent
+                Unit = IndicatorUnit.Percent,
             },
             new()
             {
@@ -428,8 +359,8 @@ public class IndicatorsMetaViewModelBuilderTests
                 DecimalPlaces = 2,
                 Label = "Indicator b",
                 Name = "indicator_b",
-                Unit = IndicatorUnit.Pound
-            }
+                Unit = IndicatorUnit.Pound,
+            },
         };
 
         var result = BuildIndicators(indicators);
@@ -454,21 +385,9 @@ public class IndicatorsMetaViewModelBuilderTests
     {
         var indicators = new List<Indicator>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator c"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator a"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator b"
-            }
+            new() { Id = Guid.NewGuid(), Label = "Indicator c" },
+            new() { Id = Guid.NewGuid(), Label = "Indicator a" },
+            new() { Id = Guid.NewGuid(), Label = "Indicator b" },
         };
 
         var result = BuildIndicators(indicators);
@@ -486,21 +405,9 @@ public class IndicatorsMetaViewModelBuilderTests
     {
         var indicators = new List<Indicator>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator a"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator b"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator c"
-            }
+            new() { Id = Guid.NewGuid(), Label = "Indicator a" },
+            new() { Id = Guid.NewGuid(), Label = "Indicator b" },
+            new() { Id = Guid.NewGuid(), Label = "Indicator c" },
         };
 
         // Define a sequence to sort each of the indicators.
@@ -512,7 +419,7 @@ public class IndicatorsMetaViewModelBuilderTests
             indicators[2].Id, // Indicator c
             indicators[0].Id, // Indicator a
             indicators[1].Id, // Indicator b
-            Guid.NewGuid()
+            Guid.NewGuid(),
         };
 
         var result = BuildIndicators(indicators, ordering);

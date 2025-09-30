@@ -14,7 +14,10 @@ public static class FluentValidationServiceCollectionExtensions
         return AddFluentValidation(services, Assembly.GetCallingAssembly());
     }
 
-    private static IServiceCollection AddFluentValidation(IServiceCollection services, Assembly assembly)
+    private static IServiceCollection AddFluentValidation(
+        IServiceCollection services,
+        Assembly assembly
+    )
     {
         ValidatorOptions.Global.LanguageManager = new FluentValidationLanguageManager();
 

@@ -33,42 +33,26 @@ public record DataSetQueryCriteriaFilters
 
     public HashSet<string> GetOptions()
     {
-        List<string?> filters =
-        [
-            Eq,
-            NotEq,
-            ..In ?? [],
-            ..NotIn ?? []
-        ];
+        List<string?> filters = [Eq, NotEq, .. In ?? [], .. NotIn ?? []];
 
-        return filters
-            .OfType<string>()
-            .ToHashSet();
+        return filters.OfType<string>().ToHashSet();
     }
 
-    public static DataSetQueryCriteriaFilters Create(
-        string comparator,
-        IList<string> optionIds)
+    public static DataSetQueryCriteriaFilters Create(string comparator, IList<string> optionIds)
     {
         return comparator switch
         {
             nameof(Eq) => new DataSetQueryCriteriaFilters
             {
-                Eq = optionIds.Count > 0 ? optionIds[0] : null
+                Eq = optionIds.Count > 0 ? optionIds[0] : null,
             },
             nameof(NotEq) => new DataSetQueryCriteriaFilters
             {
-                NotEq = optionIds.Count > 0 ? optionIds[0] : null
+                NotEq = optionIds.Count > 0 ? optionIds[0] : null,
             },
-            nameof(In) => new DataSetQueryCriteriaFilters
-            {
-                In = optionIds.ToList()
-            },
-            nameof(NotIn) => new DataSetQueryCriteriaFilters
-            {
-                NotIn = optionIds.ToList()
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+            nameof(In) => new DataSetQueryCriteriaFilters { In = optionIds.ToList() },
+            nameof(NotIn) => new DataSetQueryCriteriaFilters { NotIn = optionIds.ToList() },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null),
         };
     }
 
@@ -76,35 +60,29 @@ public record DataSetQueryCriteriaFilters
     {
         public Validator()
         {
-            RuleFor(q => q.Eq)
-                .NotEmpty()
-                .MaximumLength(10)
-                .When(q => q.Eq is not null);
+            RuleFor(q => q.Eq).NotEmpty().MaximumLength(10).When(q => q.Eq is not null);
 
-            RuleFor(q => q.NotEq)
-                .NotEmpty()
-                .MaximumLength(10)
-                .When(q => q.NotEq is not null);
+            RuleFor(q => q.NotEq).NotEmpty().MaximumLength(10).When(q => q.NotEq is not null);
 
-            When(q => q.In is not null, () =>
-            {
-                RuleFor(q => q.In)
-                    .NotEmpty();
+            When(
+                q => q.In is not null,
+                () =>
+                {
+                    RuleFor(q => q.In).NotEmpty();
 
-                RuleForEach(q => q.In)
-                    .NotEmpty()
-                    .MaximumLength(10);
-            });
+                    RuleForEach(q => q.In).NotEmpty().MaximumLength(10);
+                }
+            );
 
-            When(q => q.NotIn is not null, () =>
-            {
-                RuleFor(q => q.NotIn)
-                    .NotEmpty();
+            When(
+                q => q.NotIn is not null,
+                () =>
+                {
+                    RuleFor(q => q.NotIn).NotEmpty();
 
-                RuleForEach(q => q.NotIn)
-                    .NotEmpty()
-                    .MaximumLength(10);
-            });
+                    RuleForEach(q => q.NotIn).NotEmpty().MaximumLength(10);
+                }
+            );
         }
     }
 }

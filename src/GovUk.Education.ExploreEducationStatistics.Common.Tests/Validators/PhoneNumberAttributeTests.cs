@@ -59,7 +59,10 @@ public class PhoneNumberAttributeTests
         var attribute = new PhoneNumberAttribute();
         var result = attribute.GetValidationResult(value, new ValidationContext(value));
 
-        Assert.Equal("A phone number cannot be an empty string or whitespace", result?.ErrorMessage);
+        Assert.Equal(
+            "A phone number cannot be an empty string or whitespace",
+            result?.ErrorMessage
+        );
     }
 
     [Theory]
@@ -73,6 +76,9 @@ public class PhoneNumberAttributeTests
         var attribute = new PhoneNumberAttribute();
         var result = attribute.GetValidationResult(value, new ValidationContext(value));
 
-        Assert.Equal("The value must start with a '0' and  contain only numbers or spaces.", result?.ErrorMessage);
+        Assert.Equal(
+            "The value must start with a '0' and  contain only numbers or spaces.",
+            result?.ErrorMessage
+        );
     }
 }

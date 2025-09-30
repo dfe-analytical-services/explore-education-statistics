@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 public interface IWorkflowActor
 {
     string GetSourceDirectory();
-    
+
     string GetReportsDirectory();
 
     /// <summary>
@@ -45,5 +45,8 @@ public interface IWorkflowActor
     /// <param name="connection">
     /// An open DuckDB connection that supports JSON reading and Parquet writing.
     /// </param>
-    Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection);
+    Task CreateParquetReports(
+        string reportsFolderPathAndFilenamePrefix,
+        DuckDbConnection connection
+    );
 }

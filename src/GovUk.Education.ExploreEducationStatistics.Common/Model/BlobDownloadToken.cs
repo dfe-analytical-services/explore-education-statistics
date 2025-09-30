@@ -8,7 +8,8 @@ public record BlobDownloadToken(
     string ContainerName,
     string Path,
     string Filename,
-    string ContentType)
+    string ContentType
+)
 {
     public string ToBase64JsonString()
     {

@@ -18,14 +18,15 @@ public enum ChartLegendPosition
     none,
     bottom,
     top,
-    inline
+    inline,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ChartLegendLabelColour
 {
-    black, inherit
+    black,
+    inherit,
 }
 
 public class ChartLegendItem
