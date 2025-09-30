@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,12 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Utils.ContentFilterUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
@@ -24,8 +23,6 @@ public class ReleaseService : IReleaseService
     private readonly IReleaseVersionRepository _releaseVersionRepository;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
-
-    private static readonly Regex CommentsRegex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
 
     public ReleaseService(
         ContentDbContext contentDbContext,
@@ -143,7 +140,7 @@ public class ReleaseService : IReleaseService
         switch (block)
         {
             case HtmlBlockViewModel htmlBlock:
-                htmlBlock.Body = CommentsRegex.Replace(htmlBlock.Body, string.Empty);
+                htmlBlock.Body = CommentsRegex().Replace(htmlBlock.Body, string.Empty);
                 break;
         }
     }

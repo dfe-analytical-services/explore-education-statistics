@@ -1,24 +1,21 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using System.Text.RegularExpressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 
-public static class ContentFilterUtils
+public static partial class ContentFilterUtils
 {
     /// <summary>
-    /// Strips out anything that looks like a comment.
+    /// Markers are created by CKEditor and have characteristic start and end elements:
+    /// comment, commentplaceholder and resolvedcomment.
     /// </summary>
-    public static readonly string CommentsFilterPattern = MarkerElementPattern(
-        "comment",
-        "commentplaceholder",
-        "resolvedcomment"
-    );
+    private const string CommentsFilterPattern =
+        @"<\s*comment-(start|end)[^>]*(>[^>]*<\/\s*comment-(start|end)[^>]*>|\/>)|<\s*commentplaceholder-(start|end)[^>]*(>[^>]*<\/\s*commentplaceholder-(start|end)[^>]*>|\/>)|<\s*resolvedcomment-(start|end)[^>]*(>[^>]*<\/\s*resolvedcomment-(start|end)[^>]*>|\/>)";
 
-    private static string MarkerElementPattern(params string[] elements)
-    {
-        // Markers are created by CKEditor and have characteristic start and end elements
-        return elements
-            .Select(el => $@"<\s*{el}-(start|end)[^>]*(>[^>]*<\/\s*{el}-(start|end)[^>]*>|\/>)")
-            .JoinToString('|');
-    }
+    /// <summary>
+    /// Source-generated regular expression for matching comments in content.
+    /// </summary>
+    /// <returns></returns>
+    [GeneratedRegex(CommentsFilterPattern)]
+    public static partial Regex CommentsRegex();
 }
