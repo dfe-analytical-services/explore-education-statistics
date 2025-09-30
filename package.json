@@ -89,6 +89,9 @@
       "python3 -m pipenv run flake8",
       "python3 -m pipenv run black",
       "python3 -m pipenv run isort"
+    ],
+    "*.cs": [
+      "dotnet csharpier check"
     ]
   }
 }

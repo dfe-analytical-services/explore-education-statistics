@@ -1,0 +1,6 @@
+# Settings for dotnet csharpier formatting
+
+# https://github.com/belav/csharpier/issues/997
+{
+    "printWidth": 120
+}
