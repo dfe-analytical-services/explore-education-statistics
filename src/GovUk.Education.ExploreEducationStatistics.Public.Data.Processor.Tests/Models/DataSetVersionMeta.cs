@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 

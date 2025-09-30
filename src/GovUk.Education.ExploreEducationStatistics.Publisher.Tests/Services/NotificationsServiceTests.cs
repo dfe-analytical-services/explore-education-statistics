@@ -211,20 +211,20 @@ public abstract class NotificationsServiceTests
                     expectedRole: PublicationRole.Owner,
                     expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
                     expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title);
-                
+
                 var approverFeedbackEntry1 = feedbackEntries
                     .First(f => f.UserPublicationRole == PublicationRole.Allower);
-                
+
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: approverFeedbackEntry1,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
                     expectedRole: PublicationRole.Allower,
                     expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
                     expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title);
-                
+
                 var approverFeedbackEntry2 = feedbackEntries
                     .Last(f => f.UserPublicationRole == PublicationRole.Allower);
-                
+
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: approverFeedbackEntry2,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
@@ -311,7 +311,7 @@ public abstract class NotificationsServiceTests
 
                 var release1OwnerFeedbackEntry = feedbackEntries
                     .Single(f => f.ReleaseVersionId == release1Version.Id);
-                
+
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: release1OwnerFeedbackEntry,
                     expectedReleaseVersionId: release1Version.Id,
@@ -321,7 +321,7 @@ public abstract class NotificationsServiceTests
 
                 var release2OwnerFeedbackEntry = feedbackEntries
                     .Single(f => f.ReleaseVersionId == release2Version.Id);
-                
+
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: release2OwnerFeedbackEntry,
                     expectedReleaseVersionId: release2Version.Id,
@@ -343,7 +343,7 @@ public abstract class NotificationsServiceTests
 
             VerifyAllMocks(notifierClient);
         }
-        
+
         [Fact]
         public async Task OldApproverRoleAndDrafterRole_NoEmailsSent()
         {

@@ -15,25 +15,25 @@ public abstract class AnalyticsWritePublicationCallsStrategyTests
     public class ReportTests : AnalyticsWritePublicationCallsStrategyTests
     {
         private const string SnapshotPrefix = $"{nameof(AnalyticsWritePublicationCallsStrategyTests)}.{nameof(ReportTests)}";
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithCorePublicationDetails()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(
                 pathResolver: pathResolver,
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z")));
-            
+
             await strategy.Report(new CapturePublicationCallRequest(
                 PublicationId: new Guid("01d29401-7274-a871-a8db-d4bc4e98c324"),
                 PublicationTitle: "Publication 1",
                 StartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
                 Type: PublicationCallType.GetSummary), default);
-            
+
             var files = Directory
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
-            
+
             var filePath = Assert.Single(files);
 
             var filename = filePath
@@ -44,26 +44,26 @@ public abstract class AnalyticsWritePublicationCallsStrategyTests
                 currentResult: await File.ReadAllTextAsync(filePath),
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithCorePublicationDetails)}");
         }
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithParameters()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(
                 pathResolver: pathResolver,
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z")));
-            
+
             await strategy.Report(new CapturePublicationCallRequest(
                 PublicationId: new Guid("01d29401-7274-a871-a8db-d4bc4e98c324"),
                 PublicationTitle: "Publication 1",
                 StartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
                 Parameters: new PaginationParameters(Page: 1, PageSize: 10),
                 Type: PublicationCallType.GetDataSets), default);
-            
+
             var files = Directory
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths));
-            
+
             var filePath = Assert.Single(files);
 
             var filename = filePath
@@ -75,7 +75,7 @@ public abstract class AnalyticsWritePublicationCallsStrategyTests
                 currentResult: await File.ReadAllTextAsync(filePath),
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithParameters)}");
         }
-        
+
         private static AnalyticsWritePublicationCallsStrategy BuildStrategy(
             IAnalyticsPathResolver pathResolver,
             DateTimeProvider? dateTimeProvider = null)

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;

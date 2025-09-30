@@ -632,7 +632,7 @@ public class PublicationService(
 
                 // If the publication's latest published release version has changed,
                 // update the publication's cached latest release version
-                if (oldLatestPublishedReleaseAndVersion != newLatestPublishedReleaseAndVersion 
+                if (oldLatestPublishedReleaseAndVersion != newLatestPublishedReleaseAndVersion
                     && newLatestPublishedReleaseAndVersion != null)
                 {
                     await releaseCacheService.UpdateRelease(
@@ -679,9 +679,9 @@ public class PublicationService(
             context.PublicationMethodologies.Any(pm =>
                 pm.Publication.Id == publicationId
                 && pm.Owner)
-            // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
-            // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
-            // this check is expensive and an unlikely edge case, so doesn't seem worth it.
+           // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
+           // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
+           // this check is expensive and an unlikely edge case, so doesn't seem worth it.
            )
         {
             var methodologySlugValidation = await methodologyService
@@ -738,6 +738,6 @@ public class PublicationService(
             _ => throw new Exception(),
         };
     }
-    
+
     private record ReleaseAndVersion(Guid ReleaseId, Guid ReleaseVersionId);
 }

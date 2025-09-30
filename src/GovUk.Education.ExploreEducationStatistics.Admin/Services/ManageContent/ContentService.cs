@@ -354,7 +354,7 @@ public class ContentService : IContentService
     }
 
     private async Task<T> SaveContentBlock<T>(ContentBlock blockToUpdate)
-        where T: IContentBlockViewModel
+        where T : IContentBlockViewModel
     {
         _context.ContentBlocks.Update(blockToUpdate);
         await _context.SaveChangesAsync();
@@ -364,7 +364,7 @@ public class ContentService : IContentService
     private static ContentBlock CreateContentBlockForType(ContentBlockType type)
     {
         var classType = GetContentBlockClassTypeFromEnumValue(type);
-        return (ContentBlock) Activator.CreateInstance(classType);
+        return (ContentBlock)Activator.CreateInstance(classType);
     }
 
     private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)

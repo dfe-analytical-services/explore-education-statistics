@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Builders;
 

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
 public class IdAndPreviousVersionIdPair<TId> where TId : class, IComparable
@@ -54,14 +54,14 @@ public static class VersionedEntityDeletionOrderUtil
         //
         // Add them as the first entries in the sorted list. 
         var entityIds = unsorted.Select(entity => entity.Id);
-        
+
         var deepestAncestors = unsorted
             .Where(entity => entity.FirstVersion || !entityIds.Contains(entity.PreviousVersionId))
             .ToList();
-        
+
         sorted.AddRange(deepestAncestors.OrderBy(entity => entity.Id).ToList());
-        unsorted.RemoveAll(entity => deepestAncestors.Contains(entity));
-        
+        unsorted.RemoveAll(deepestAncestors.Contains);
+
         // Now repeatedly select the immediate descendents of items in the sorted list and add them before their
         // direct ancestors in the sorted list.
         //
@@ -71,7 +71,7 @@ public static class VersionedEntityDeletionOrderUtil
             foreach (var descendant in unsorted.ToList())
             {
                 var directAncestor =
-                    sorted.FirstOrDefault(ancestor => descendant.DirectDescendantOf(ancestor));
+                    sorted.FirstOrDefault(descendant.DirectDescendantOf);
 
                 if (directAncestor != null)
                 {

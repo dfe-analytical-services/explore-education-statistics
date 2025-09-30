@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.Data.SqlClient;

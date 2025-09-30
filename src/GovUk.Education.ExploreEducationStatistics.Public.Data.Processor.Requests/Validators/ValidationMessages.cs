@@ -75,7 +75,7 @@ public static class ValidationMessages
         Code: nameof(DataSetVersionMappingsNotComplete),
         Message: "The data set version mappings are not complete."
     );
-    
+
     public static readonly LocalizableMessage NextDataSetVersionNotFound = new(
         Code: nameof(NextDataSetVersionNotFound),
         Message: "The data set version required for creating the next version was not found."

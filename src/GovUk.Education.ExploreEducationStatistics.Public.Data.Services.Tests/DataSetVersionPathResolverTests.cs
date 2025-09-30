@@ -44,13 +44,13 @@ public abstract class DataSetVersionPathResolverTests
             HostEnvironmentExtensions.IntegrationTestEnvironment,
             Environments.Production
         ];
-        
+
         public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
-        
-        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPublicStatuses = 
+
+        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPublicStatuses =
             new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PublicStatuses));
 
-        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPrivateStatuses = 
+        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPrivateStatuses =
             new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PrivateStatuses));
 
         [Fact]
@@ -127,7 +127,7 @@ public abstract class DataSetVersionPathResolverTests
         public void ValidDirectoryPath_PublicVersion((string, DataSetVersionStatus) environmentNameAndStatus)
         {
             var (environmentName, status) = environmentNameAndStatus;
-            
+
             DataSetVersion version = _dataFixture
                 .DefaultDataSetVersion()
                 .WithStatus(status);
@@ -155,11 +155,11 @@ public abstract class DataSetVersionPathResolverTests
         public void ValidDirectoryPath_PrivateVersion((string, DataSetVersionStatus) environmentNameAndStatus)
         {
             var (environmentName, status) = environmentNameAndStatus;
-            
+
             DataSetVersion version = _dataFixture
                 .DefaultDataSetVersion()
                 .WithStatus(status);
-            
+
             _webHostEnvironmentMock
                 .SetupGet(s => s.EnvironmentName)
                 .Returns(environmentName);

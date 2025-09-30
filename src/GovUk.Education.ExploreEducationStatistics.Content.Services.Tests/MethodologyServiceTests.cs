@@ -51,7 +51,7 @@ public class MethodologyServiceTests
             LatestPublishedReleaseVersion = new ReleaseVersion
             {
                 Release = new Release
-                { 
+                {
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
@@ -80,7 +80,7 @@ public class MethodologyServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             await contentDbContext.Publications.AddAsync(publication);
-            await contentDbContext.Methodologies.AddAsync(methodology);              
+            await contentDbContext.Methodologies.AddAsync(methodology);
             await contentDbContext.SaveChangesAsync();
         }
 

@@ -14,7 +14,7 @@ public static class DataSetQueryNormalisationUtil
                 .Indicators?
                 .Order()
                 .ToList(),
-            
+
             Criteria = original.Criteria != null ? NormaliseCriteria(original.Criteria) : null
         };
     }
@@ -31,7 +31,7 @@ public static class DataSetQueryNormalisationUtil
                 return NormaliseOr(or);
             case DataSetQueryCriteriaNot not:
                 return NormaliseNot(not);
-            default: 
+            default:
                 throw new ArgumentException($"Unknown data set query criteria type {original.GetType()}");
         }
     }
@@ -51,7 +51,7 @@ public static class DataSetQueryNormalisationUtil
             TimePeriods = NormaliseTimePeriods(original.TimePeriods)
         };
     }
-    
+
     private static DataSetQueryCriteriaAnd NormaliseAnd(DataSetQueryCriteriaAnd original)
     {
         return new DataSetQueryCriteriaAnd
@@ -68,7 +68,7 @@ public static class DataSetQueryNormalisationUtil
                 .ToList()
         };
     }
-    
+
     private static DataSetQueryCriteriaOr NormaliseOr(DataSetQueryCriteriaOr original)
     {
         return new DataSetQueryCriteriaOr
@@ -84,7 +84,7 @@ public static class DataSetQueryNormalisationUtil
                 .ToList()
         };
     }
-    
+
     private static DataSetQueryCriteriaNot NormaliseNot(DataSetQueryCriteriaNot original)
     {
         return new DataSetQueryCriteriaNot
@@ -110,7 +110,7 @@ public static class DataSetQueryNormalisationUtil
                     .In?
                     .OrderBy(location => location.ToLocationString())
                     .ToList(),
-                
+
                 NotIn = original
                     .NotIn?
                     .OrderBy(location => location.ToLocationString())
@@ -129,14 +129,15 @@ public static class DataSetQueryNormalisationUtil
     {
         return original == null
             ? null
-            : original with {
-                
+            : original with
+            {
+
                 In = original
                     .In?
                     .OrderBy(timePeriod => timePeriod.Code)
                     .ThenBy(timePeriod => timePeriod.Period)
                     .ToList(),
-                
+
                 NotIn = original
                     .NotIn?
                     .OrderBy(timePeriod => timePeriod.Code)

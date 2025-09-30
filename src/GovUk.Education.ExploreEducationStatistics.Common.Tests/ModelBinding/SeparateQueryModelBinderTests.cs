@@ -49,7 +49,7 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
             Items = new List<int> { 1, 2, 3 }
         });
     }
-    
+
     [Fact]
     public async Task BindsToIntArray()
     {

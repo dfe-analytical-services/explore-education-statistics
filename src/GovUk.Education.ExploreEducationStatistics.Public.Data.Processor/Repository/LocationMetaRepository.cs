@@ -183,7 +183,7 @@ public class LocationMetaRepository(
     {
         var nameCol = meta.Level.CsvNameColumn();
         var codeCols = meta.Level.CsvCodeColumns();
-        string[] cols = [..codeCols, nameCol];
+        string[] cols = [.. codeCols, nameCol];
 
         return (await duckDbConnection.SqlBuilder(
                     $"""

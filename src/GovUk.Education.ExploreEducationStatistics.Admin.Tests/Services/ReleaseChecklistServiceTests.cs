@@ -108,7 +108,7 @@ public class ReleaseChecklistServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            context.ReleaseVersions.AddRange( releaseVersion);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -161,7 +161,7 @@ public class ReleaseChecklistServiceTests
                     Title: "Data set 4",
                     Status: DataSetVersionStatus.Failed)
             ];
-            
+
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(dataSetVersionStatusSummaries);

@@ -124,11 +124,11 @@ public class ThemeServiceTests
             Slug = "test-theme",
             Summary = "Test summary",
             Publications = expectedPublicationSlugs
-                .Select(publicationSlug => new Publication{ Slug = publicationSlug })
+                .Select(publicationSlug => new Publication { Slug = publicationSlug })
                 .ToList()
-             
+
         };
-        
+
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -311,7 +311,7 @@ public class ThemeServiceTests
         Publication publication2 = _fixture.DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
             .WithTheme(theme);
-        
+
         Publication publication3 = _fixture.DefaultPublication()
             .WithTheme(theme);
 
@@ -989,7 +989,7 @@ public class ThemeServiceTests
                 new() { Slug = "different-theme-publication-slug-A", ThemeId = Guid.NewGuid() },
                 new() { Slug = "different-theme-publication-slug-B", ThemeId = Guid.NewGuid() },
             ];
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1021,7 +1021,7 @@ public class ThemeServiceTests
                 publicationCacheService.Assert.CacheNotInvalidatedForPublicationEntry(notExpected.Slug);
             }
         }
-        
+
         [Fact]
         public async Task
             GivenPublicationsForTheme_WhenInvalidatingPublicationThrows_ThenOtherPublicationsAreStillInvalidated()
@@ -1034,7 +1034,7 @@ public class ThemeServiceTests
                 new() { Slug = "publication-slug-2", ThemeId = themeId },
                 new() { Slug = "publication-slug-3", ThemeId = themeId }
             ];
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1061,7 +1061,7 @@ public class ThemeServiceTests
             publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-2");
             publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-3");
         }
-        
+
         [Fact]
         public async Task
             GivenPublicationsForTheme_WhenInvalidatingPublicationFails_ThenOtherPublicationsAreStillInvalidated()
@@ -1074,7 +1074,7 @@ public class ThemeServiceTests
                 new() { Slug = "publication-slug-2", ThemeId = themeId },
                 new() { Slug = "publication-slug-3", ThemeId = themeId }
             ];
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {

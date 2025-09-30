@@ -44,8 +44,8 @@ public record DataSetQueryCriteriaLocations
         [
             Eq,
             NotEq,
-            ..In ?? [],
-            ..NotIn ?? []
+            .. In ?? [],
+            .. NotIn ?? []
         ];
 
         return locations

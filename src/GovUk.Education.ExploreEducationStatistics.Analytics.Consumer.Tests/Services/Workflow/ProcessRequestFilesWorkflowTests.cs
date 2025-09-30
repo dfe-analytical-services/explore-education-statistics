@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 public abstract class ProcessRequestFilesWorkflowTests
 {
     private static readonly string ProcessingFolder = Path.Combine(SourceFolder, "processing");
-    
+
     public const string SourceFolder = "source";
     public const string ReportsFolder = "reports";
     public static readonly string TemporaryProcessingDirectory = Path.Combine(ProcessingFolder, "temp-processing-folder");
@@ -83,8 +83,8 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
-            
-            List<(string, string[])> batchProcessingFoldersAndFiles = 
+
+            List<(string, string[])> batchProcessingFoldersAndFiles =
             [
                 (batch1ProcessingDirectory, batch1Files),
                 (batch2ProcessingDirectory, batch2Files),
@@ -95,7 +95,7 @@ public abstract class ProcessRequestFilesWorkflowTests
             batchProcessingFoldersAndFiles.ForEach(folderAndFiles =>
             {
                 var (batchFolder, batchOfFiles) = folderAndFiles;
-                
+
                 _fileAccessorMockBuilder
                     .WhereBatchOfFilesIsPreparedForProcessing(
                         batchProcessingDirectory: batchFolder,
@@ -130,7 +130,7 @@ public abstract class ProcessRequestFilesWorkflowTests
             batchProcessingFoldersAndFiles.ForEach(folderAndFiles =>
             {
                 var (batchFolder, batchOfFiles) = folderAndFiles;
-                
+
                 _fileAccessorAsserter
                     .BatchOfFilesWasPreparedForProcessing(
                         batchProcessingDirectory: batchFolder,
@@ -151,7 +151,7 @@ public abstract class ProcessRequestFilesWorkflowTests
         public async Task ErrorInitialisingDuckDb_ExceptionThrownAndExitedEarly()
         {
             string[] sourceFiles = ["file1", "file2"];
-            
+
             _fileAccessorMockBuilder
                 .WhereSourceFilesExist(sourceFiles);
 
@@ -186,7 +186,7 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
-            
+
             // Batch 1 is processed successfully.
             _fileAccessorMockBuilder
                 .WhereBatchOfFilesIsPreparedForProcessing(
@@ -196,7 +196,7 @@ public abstract class ProcessRequestFilesWorkflowTests
             _workflowActorMockBuilder
                 .WhereSourceFileBatchIsProcessedSuccessfully(
                     batchProcessingFolder: batch1ProcessingDirectory);
-            
+
             // Batch 2 is processed with failures.
             _fileAccessorMockBuilder
                 .WhereBatchOfFilesIsPreparedForProcessing(
@@ -211,7 +211,7 @@ public abstract class ProcessRequestFilesWorkflowTests
                 .WhereBatchOfFilesFailsProcessing(
                     batchProcessingDirectory: batch2ProcessingDirectory,
                     batchNumber: 2);
-            
+
             // Batch 3 is processed successfully.
             _fileAccessorMockBuilder
                 .WhereBatchOfFilesIsPreparedForProcessing(
@@ -264,7 +264,7 @@ public abstract class ProcessRequestFilesWorkflowTests
                 .FailedSourceFileBatchMovedToFailureDirectory(
                     batchProcessingDirectory: batch2ProcessingDirectory,
                     batchNumber: 2);
-                
+
             _fileAccessorAsserter
                 .TemporaryProcessingDirectoryWasRemovedAfterProcessing()
                 .ReportsDirectoryWasCreatedForReportGeneration();
@@ -288,18 +288,18 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             // The workflow calls the implementation to set up its source tables.
             _workflowActorMockBuilder.WhereDuckDbInitialisedSuccessfully();
-            
-            List<(string, string[], int)> batchProcessingFoldersAndFiles = 
+
+            List<(string, string[], int)> batchProcessingFoldersAndFiles =
             [
                 (batch1ProcessingDirectory, batch1Files, 1),
                 (batch2ProcessingDirectory, batch2Files, 2),
             ];
-            
+
             // All batches fail processing.
             batchProcessingFoldersAndFiles.ForEach(folderAndFiles =>
             {
                 var (batchFolder, batchOfFiles, batchNumber) = folderAndFiles;
-                
+
                 _fileAccessorMockBuilder
                     .WhereBatchOfFilesIsPreparedForProcessing(
                         batchProcessingDirectory: batchFolder,
@@ -331,7 +331,7 @@ public abstract class ProcessRequestFilesWorkflowTests
 
             _fileAccessorAsserter.SourceFilesChecked();
             _workflowActorAsserter.InitialiseDuckDbCalled();
-                
+
             batchProcessingFoldersAndFiles.ForEach(folderAndFiles =>
             {
                 var (batchFolder, batchOfFiles, batchNumber) = folderAndFiles;
@@ -349,7 +349,7 @@ public abstract class ProcessRequestFilesWorkflowTests
                         batchProcessingDirectory: batchFolder,
                         batchNumber: batchNumber);
             });
-                
+
             _fileAccessorAsserter.TemporaryProcessingDirectoryWasRemovedAfterProcessing();
         }
 
@@ -396,7 +396,7 @@ public abstract class ProcessRequestFilesWorkflowTests
                 fileAccessor: _fileAccessorMockBuilder.Build(),
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2022-03-16T12:01:02Z")));
 
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 workflow.Process(_workflowActorMockBuilder.Build()));
 
             _fileAccessorAsserter.SourceFilesChecked();
@@ -463,7 +463,7 @@ public static class FileAccessorMockBuilderExtensions
                 sourceDirectory: ProcessRequestFilesWorkflowTests.SourceFolder,
                 destinationDirectory: batchProcessingDirectory);
     }
-    
+
     /// <summary>
     /// When a batch of files fails processing, the folder containing the file batch is moved under
     /// a source-folder/failures-folder/temp-processing-folder/batch-number folder structure.
@@ -479,7 +479,7 @@ public static class FileAccessorMockBuilderExtensions
                 sourcePath: batchProcessingDirectory,
                 destinationPath: Path.Combine(ProcessRequestFilesWorkflowTests.FailuresFolder, batchNumber.ToString()));
     }
-    
+
     /// <summary>
     /// The temporary processing folder that was set up for this run of the function is removed
     /// after source files are processed.
@@ -490,7 +490,7 @@ public static class FileAccessorMockBuilderExtensions
         return fileAccessorMockBuilder
             .WhereDirectoryIsDeleted(ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory);
     }
-    
+
     /// <summary>
     /// The reports folder is created, ready for new reports to be created.
     /// </summary>
@@ -514,20 +514,20 @@ public static class FileAccessorMockBuilderAsserterExtensions
             .DirectoryExistsCalledFor(ProcessRequestFilesWorkflowTests.SourceFolder)
             .FileListForDirectoryCalledFor(ProcessRequestFilesWorkflowTests.SourceFolder);
     }
-    
+
     public static FileAccessorMockBuilder.Asserter BatchOfFilesWasPreparedForProcessing(
         this FileAccessorMockBuilder.Asserter asserter,
         string batchProcessingDirectory,
         IEnumerable<string> sourceFiles)
     {
-        return asserter    
+        return asserter
             .CreateDirectoryCalledFor(batchProcessingDirectory)
             .MoveBetweenFoldersCalledFor(
                 files: sourceFiles,
                 sourceDirectory: ProcessRequestFilesWorkflowTests.SourceFolder,
                 destinationDirectory: batchProcessingDirectory);
     }
-    
+
     public static FileAccessorMockBuilder.Asserter FailedSourceFileBatchMovedToFailureDirectory(
         this FileAccessorMockBuilder.Asserter asserter,
         string batchProcessingDirectory,
@@ -539,18 +539,18 @@ public static class FileAccessorMockBuilderAsserterExtensions
                 sourcePath: batchProcessingDirectory,
                 destinationPath: Path.Combine(ProcessRequestFilesWorkflowTests.FailuresFolder, batchNumber.ToString()));
     }
-    
+
     public static FileAccessorMockBuilder.Asserter TemporaryProcessingDirectoryWasRemovedAfterProcessing(
         this FileAccessorMockBuilder.Asserter asserter)
     {
-        return asserter    
+        return asserter
             .DeleteDirectoryCalledFor(ProcessRequestFilesWorkflowTests.TemporaryProcessingDirectory);
     }
 
     public static FileAccessorMockBuilder.Asserter ReportsDirectoryWasCreatedForReportGeneration(
         this FileAccessorMockBuilder.Asserter asserter)
     {
-        return asserter    
+        return asserter
             .CreateDirectoryCalledFor(ProcessRequestFilesWorkflowTests.ReportsFolder);
     }
 }

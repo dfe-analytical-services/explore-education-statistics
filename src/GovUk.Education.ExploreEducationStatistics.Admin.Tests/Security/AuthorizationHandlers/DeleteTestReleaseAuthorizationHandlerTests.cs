@@ -18,7 +18,7 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
             Version = 1,
             Publication = new Publication { Theme = new Theme { Title = "UI test theme" } }
         };
-        
+
         private static readonly ReleaseVersion SeedReleaseVersion = new()
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -41,7 +41,7 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
                 TestReleaseVersion,
                 rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
         }
-        
+
         [Fact]
         public async Task Success_SeedRelease()
         {

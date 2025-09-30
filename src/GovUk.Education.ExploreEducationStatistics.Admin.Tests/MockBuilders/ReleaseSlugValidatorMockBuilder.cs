@@ -39,7 +39,7 @@ public class ReleaseSlugValidatorMockBuilder
                 It.Is<Guid?>(id => releaseId == null || id == releaseId),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidationUtils.ValidationActionResult(validationErrorMessage));
-        
+
         return this;
     }
 

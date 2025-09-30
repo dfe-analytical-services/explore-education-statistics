@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -79,12 +79,12 @@ public class AdminEventRaiserMockBuilder
                 It.IsAny<Guid>(),
                 It.IsAny<Guid>()))
             .Callback((
-                    Publication publication, 
+                    Publication publication,
                     Guid oldLatestPublishedReleaseId,
                     Guid oldLatestPublishedReleaseVersionId) =>
                 _invocations
                     .Add(new InvokeArguments(
-                        publication, 
+                        publication,
                         oldLatestPublishedReleaseId,
                         oldLatestPublishedReleaseVersionId)))
             .Returns(Task.CompletedTask);
@@ -95,7 +95,7 @@ public class AdminEventRaiserMockBuilder
     }
 
     private record InvokeArguments(
-        Publication Publication, 
+        Publication Publication,
         Guid OldLatestPublishedReleaseId,
         Guid OldLatestPublishedReleaseVersionId)
     {
@@ -112,11 +112,11 @@ public class AdminEventRaiserMockBuilder
             string? expectedNewReleaseSlug = null,
             Guid? expectedPublicationId = null,
             string? expectedPublicationSlug = null,
-            bool? expectedIsPublicationArchived = null) => 
+            bool? expectedIsPublicationArchived = null) =>
             mockBuilder._mock.Verify(m => m.OnReleaseSlugChanged(
-                    It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId), 
-                    It.Is<string>(newReleaseSlug => expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug), 
-                    It.Is<Guid>(publicationId => expectedPublicationId == null || publicationId == expectedPublicationId), 
+                    It.Is<Guid>(releaseId => expectedReleaseId == null || releaseId == expectedReleaseId),
+                    It.Is<string>(newReleaseSlug => expectedNewReleaseSlug == null || newReleaseSlug == expectedNewReleaseSlug),
+                    It.Is<Guid>(publicationId => expectedPublicationId == null || publicationId == expectedPublicationId),
                     It.Is<string>(publicationSlug => expectedPublicationSlug == null || publicationSlug == expectedPublicationSlug),
                     It.Is<bool>(isPublicationArchived => expectedIsPublicationArchived == null || isPublicationArchived == expectedIsPublicationArchived)),
                 Times.Once);

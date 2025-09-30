@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public enum SortDirection
 {

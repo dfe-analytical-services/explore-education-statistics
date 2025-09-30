@@ -54,7 +54,7 @@ public class ViewDataSetAuthorizationHandlerTests
 
         Assert.False(context.HasSucceeded);
     }
-    
+
     [Theory]
     [MemberData(nameof(DataSetStatusTheoryData.AllStatuses),
         MemberType = typeof(DataSetStatusTheoryData))]
@@ -87,7 +87,7 @@ public class ViewDataSetAuthorizationHandlerTests
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// Despite the Preview Token being used is expired, the DataSet's status itself is
     /// available to the public, and so the auth succeeds.
@@ -124,7 +124,7 @@ public class ViewDataSetAuthorizationHandlerTests
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// The Preview Token being used is expired and the DataSet's status is
     /// unavailable to the public, and so the auth fails.
@@ -161,7 +161,7 @@ public class ViewDataSetAuthorizationHandlerTests
 
         Assert.False(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// Despite the Preview Token being used is for a non-draft DataSetVersion, the DataSet's
     /// status itself is available to the public, and so the auth succeeds.
@@ -198,7 +198,7 @@ public class ViewDataSetAuthorizationHandlerTests
 
         Assert.True(context.HasSucceeded);
     }
-    
+
     /// <summary>
     /// The Preview Token being used is for a non-draft DataSetVersion and the DataSet's
     /// status itself is unavailable to the public, and so the auth false.
@@ -241,14 +241,14 @@ public class ViewDataSetAuthorizationHandlerTests
         IList<KeyValuePair<string, StringValues>>? requestHeaders = null)
     {
         var dbContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
-        
+
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext()
         };
-        
+
         var headers = httpContextAccessor.HttpContext.Request.Headers;
-        requestHeaders?.ForEach(header => 
+        requestHeaders?.ForEach(header =>
             headers.Append(header.Key, header.Value));
 
         var previewTokenService = new PreviewTokenService(
@@ -259,7 +259,7 @@ public class ViewDataSetAuthorizationHandlerTests
             httpContextAccessor: httpContextAccessor,
             environment: Mock.Of<IWebHostEnvironment>(),
             previewTokenService);
-        
+
         return new ViewDataSetAuthorizationHandler(authorizationHandlerService);
     }
 

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.IO.Compression;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;

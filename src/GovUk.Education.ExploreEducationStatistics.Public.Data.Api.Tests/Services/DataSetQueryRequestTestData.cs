@@ -68,7 +68,8 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location2"
+                                                    Level = "Level",
+                                                    Ukprn = "Location2"
                                                 },
                                                 new DataSetQueryLocationId { Level = "Level", Id = "Location3" }
                                             ]
@@ -82,7 +83,8 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location4"
+                                                    Level = "Level",
+                                                    Ukprn = "Location4"
                                                 },
                                                 new DataSetQueryLocationId { Level = "Level", Id = "Location1" }
                                             ]
@@ -124,12 +126,12 @@ internal static class DataSetQueryRequestTestData
         Sorts = [
             new DataSetQuerySort
             {
-                Field = "Field2", 
+                Field = "Field2",
                 Direction = "ASC",
             },
             new DataSetQuerySort
             {
-                Field = "Field1", 
+                Field = "Field1",
                 Direction = "ASC",
             }
         ],
@@ -138,7 +140,7 @@ internal static class DataSetQueryRequestTestData
         Page = 3,
         PageSize = 300
     };
-    
+
     /// <summary>
     /// This query request is logically the same as NestedQuery1 but with sub-criteria and
     /// list elements in different orders.
@@ -189,7 +191,8 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location4"
+                                                    Level = "Level",
+                                                    Ukprn = "Location4"
                                                 },
                                                 new DataSetQueryLocationId { Level = "Level", Id = "Location1" }
                                             ]
@@ -203,7 +206,8 @@ internal static class DataSetQueryRequestTestData
                                             [
                                                 new DataSetQueryLocationProviderUkprn
                                                 {
-                                                    Level = "Level", Ukprn = "Location2"
+                                                    Level = "Level",
+                                                    Ukprn = "Location2"
                                                 },
                                                 new DataSetQueryLocationId { Level = "Level", Id = "Location3" }
                                             ]
@@ -263,12 +267,12 @@ internal static class DataSetQueryRequestTestData
         Sorts = [
             new DataSetQuerySort
             {
-                Field = "Field2", 
+                Field = "Field2",
                 Direction = "ASC",
             },
             new DataSetQuerySort
             {
-                Field = "Field1", 
+                Field = "Field1",
                 Direction = "ASC",
             }
         ],

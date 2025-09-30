@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Identity;
 using Moq;

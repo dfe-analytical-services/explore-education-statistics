@@ -62,7 +62,7 @@ public static class PublisherHostBuilderExtensions
             })
             .ConfigureServices();
     }
-    
+
     public static IHostBuilder ConfigureServices(this IHostBuilder hostBuilder)
     {
         return hostBuilder

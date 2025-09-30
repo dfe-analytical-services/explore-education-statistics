@@ -10,10 +10,10 @@ public class AnalyticsWritePublicationCallsStrategy(
     ) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public-api", "publications"];
-    
+
     private readonly IWorkflowActor<CapturePublicationCallRequest> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-        
+
     public Type RequestType => typeof(CapturePublicationCallRequest);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)

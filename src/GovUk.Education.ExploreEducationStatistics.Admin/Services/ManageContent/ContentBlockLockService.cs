@@ -66,13 +66,7 @@ public class ContentBlockLockService : IContentBlockLockService
 
     private async Task<ContentBlockLockViewModel> DoContentBlockLock(ContentBlock block, Guid userId)
     {
-        var user = await _contentDbContext.Users.FindAsync(userId);
-
-        if (user is null)
-        {
-            throw new ArgumentException($"User with id {userId} does not exist", nameof(userId));
-        }
-
+        var user = await _contentDbContext.Users.FindAsync(userId) ?? throw new ArgumentException($"User with id {userId} does not exist", nameof(userId));
         var now = DateTime.UtcNow;
 
         block.Locked = now;

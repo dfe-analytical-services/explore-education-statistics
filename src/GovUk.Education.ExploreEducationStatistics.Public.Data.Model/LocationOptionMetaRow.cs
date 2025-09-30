@@ -39,7 +39,7 @@ public class LocationOptionMetaRow
 
     public string GetRowKeyPretty()
     {
-        var rowKey = 
+        var rowKey =
             $"{nameof(Type)}:{Type}," +
             $"{nameof(Label)}:{Label}," +
             (Code is not null ? $"{nameof(Code)}:{Code}," : "") +

@@ -29,9 +29,9 @@ public class DeleteSpecificCommentAuthorizationHandler
     {
         var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
         var updateSpecificReleaseVersionContext = new AuthorizationHandlerContext(
-            requirements: [new UpdateSpecificReleaseVersionRequirement()], 
-            user: 
-            context.User, 
+            requirements: [new UpdateSpecificReleaseVersionRequirement()],
+            user:
+            context.User,
             resource: releaseVersion);
         await new UpdateSpecificReleaseVersionAuthorizationHandler(
                 _authorizationHandlerService)

@@ -9,7 +9,7 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         "ExploreEducationStatistics",
         "Analytics",
         Guid.NewGuid().ToString());
-    
+
     public void Dispose()
     {
         if (Directory.Exists(_basePath))
@@ -17,6 +17,6 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
             Directory.Delete(_basePath, recursive: true);
         }
     }
-    
-    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, ..subPaths]);
+
+    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, .. subPaths]);
 }

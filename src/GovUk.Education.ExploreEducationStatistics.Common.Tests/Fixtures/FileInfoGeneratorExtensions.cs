@@ -45,10 +45,10 @@ public static class FileInfoGeneratorExtensions
 
     public static InstanceSetters<FileInfo> SetSummary(this InstanceSetters<FileInfo> setters, string summary)
         => setters.Set(f => f.Summary, summary);
-    
+
     public static InstanceSetters<FileInfo> SetFileName(this InstanceSetters<FileInfo> setters, string fileName)
         => setters.Set(f => f.FileName, fileName);
-    
+
     public static InstanceSetters<FileInfo> SetSize(this InstanceSetters<FileInfo> setters, string size)
         => setters.Set(f => f.Size, size);
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 public class ApplicationUser : IdentityUser
 {
     public string FirstName { get; set; }
-    
+
     public string LastName { get; set; }
 }

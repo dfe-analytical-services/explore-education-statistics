@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Xunit;

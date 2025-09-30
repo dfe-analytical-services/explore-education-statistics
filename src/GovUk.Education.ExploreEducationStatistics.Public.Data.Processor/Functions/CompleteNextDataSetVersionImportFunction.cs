@@ -38,10 +38,10 @@ public class CompleteNextDataSetVersionImportFunction(
 
                 importToContinue.InstanceId = Guid.NewGuid();
                 publicDataDbContext.DataSetVersionImports.Update(importToContinue);
-                
+
                 nextVersion.Status = DataSetVersionStatus.Finalising;
                 publicDataDbContext.DataSetVersions.Update(nextVersion);
-                
+
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
                 await ProcessCompletionOfNextDataSetVersionImport(

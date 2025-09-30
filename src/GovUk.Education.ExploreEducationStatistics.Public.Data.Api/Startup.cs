@@ -61,7 +61,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     private readonly AppInsightsOptions _appInsightsOptions = configuration
         .GetSection(AppInsightsOptions.Section)
         .Get<AppInsightsOptions>()!;
-    
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {

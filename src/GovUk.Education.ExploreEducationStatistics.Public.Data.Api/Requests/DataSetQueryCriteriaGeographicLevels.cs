@@ -58,8 +58,8 @@ public record DataSetQueryCriteriaGeographicLevels
         [
             ParsedEq(),
             ParsedNotEq(),
-            ..ParsedIn() ?? [],
-            ..ParsedNotIn() ?? []
+            .. ParsedIn() ?? [],
+            .. ParsedNotIn() ?? []
         ];
 
         return options

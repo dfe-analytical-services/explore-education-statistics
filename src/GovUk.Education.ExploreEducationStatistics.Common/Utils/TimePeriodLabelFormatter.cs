@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public class TimePeriodLabelFormatter
 {
-    private static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
+    private static readonly Regex YearRegex = new(@"^([0-9]{4})?$");
     private TimePeriodLabelFormat LabelFormat { get; }
     private TimePeriodYearFormat YearFormat { get; }
 

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -185,7 +185,7 @@ public class HtmlImageUtilTests
         Assert.Single(result);
         Assert.Equal(Guid.Parse("8205b65b-9fd4-40b9-9d77-08d8e53df837"), result[0]);
     }
-    
+
     // TODO EES-5901 - migrate all content placeholders to be "releaseVersionId" and then remove the legacy
     // "releaseId" test below.
     [Fact]

@@ -44,7 +44,7 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             {
                 var releaseFilesQueryable = _contentDbContext.ReleaseFiles
                     .Include(rf => rf.File)
-                    .Where(rf => rf.ReleaseVersionId == releaseVersionId 
+                    .Where(rf => rf.ReleaseVersionId == releaseVersionId
                         && rf.File.Type == FileType.Data
                         && rf.File.ReplacingId == null);
 

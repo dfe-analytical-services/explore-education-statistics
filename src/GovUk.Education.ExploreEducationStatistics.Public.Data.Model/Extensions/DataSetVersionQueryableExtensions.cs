@@ -20,7 +20,7 @@ public static class DataSetVersionQueryableExtensions
         Guid dataSetId,
         string version,
         CancellationToken cancellationToken = default)
-    { 
+    {
         if (!DataSetVersionNumber.TryParse(version, out var parsedVersion))
         {
             return new NotFoundResult();
@@ -59,12 +59,12 @@ public static class DataSetVersionQueryableExtensions
         Guid dataSetId,
         string version,
         CancellationToken cancellationToken = default) =>
-        DataSetVersionNumber.TryParse(version, out var versionNumber) 
+        DataSetVersionNumber.TryParse(version, out var versionNumber)
             ? versionNumber.Patch == 0 ? throw new ArgumentException($"Patch version must be specified in version supplied ({version}).")
                 : await queryable
                     .Where(dsv => dsv.DataSetId == dataSetId)
                     .WherePreviousPatchVersion(versionNumber)
-                    .ToArrayAsync(cancellationToken) 
+                    .ToArrayAsync(cancellationToken)
             : throw new ArgumentException($"Version supplied ({version}) is not a valid version number.");
 
     private static IQueryable<DataSetVersion> WherePreviousPatchVersion(

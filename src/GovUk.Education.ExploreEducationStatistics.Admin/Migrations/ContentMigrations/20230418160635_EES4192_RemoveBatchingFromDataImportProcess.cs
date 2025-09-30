@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -24,7 +24,7 @@ public partial class EES4192_RemoveBatchingFromDataImportProcess : Migration
             name: "ImportedRows",
             table: "DataImports",
             newName: "ExpectedImportedRows");
-        
+
         migrationBuilder.AddColumn<int>(
             name: "ImportedRows",
             table: "DataImports",
@@ -37,7 +37,7 @@ public partial class EES4192_RemoveBatchingFromDataImportProcess : Migration
             table: "DataImports",
             type: "int",
             nullable: true);
-        
+
         migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath,
             $"{MigrationId}_EES4192_RemoveBatchingFromDataImportProcess.sql");
     }
@@ -51,7 +51,7 @@ public partial class EES4192_RemoveBatchingFromDataImportProcess : Migration
         migrationBuilder.DropColumn(
             name: "LastProcessedRowIndex",
             table: "DataImports");
-        
+
         migrationBuilder.RenameColumn(
             name: "ExpectedImportedRows",
             table: "DataImports",

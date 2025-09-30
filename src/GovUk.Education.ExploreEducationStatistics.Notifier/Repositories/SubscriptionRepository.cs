@@ -40,7 +40,7 @@ public class SubscriptionRepository(
                 Status = SubscriptionStatus.SubscriptionPending,
             };
         }
-        
+
         var activeSub = await notifierTableStorage.GetEntityIfExists<SubscriptionEntity>(
             tableName: NotifierTableStorage.PublicationSubscriptionsTable,
             partitionKey: publicationId,

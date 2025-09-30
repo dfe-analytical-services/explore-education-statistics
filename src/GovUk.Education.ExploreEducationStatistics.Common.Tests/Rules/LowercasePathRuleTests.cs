@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;

@@ -19,7 +19,7 @@ public class PublisherEventRaiserTests
 {
     private readonly EventRaiserMockBuilder _eventRaiserMockBuilder = new();
 
-    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) => 
+    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) =>
         new PublisherEventRaiser(eventRaiser ?? _eventRaiserMockBuilder.Build());
 
     public class BasicTests : PublisherEventRaiserTests

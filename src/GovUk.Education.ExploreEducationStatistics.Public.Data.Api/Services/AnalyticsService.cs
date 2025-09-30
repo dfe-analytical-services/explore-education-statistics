@@ -57,7 +57,7 @@ public class AnalyticsService(
             },
             cancellationToken: cancellationToken);
     }
-    
+
     public async Task CapturePublicationCall(
         Guid publicationId,
         string publicationTitle,
@@ -75,7 +75,7 @@ public class AnalyticsService(
                     Type: type)),
             cancellationToken: cancellationToken);
     }
-    
+
     public async Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
@@ -99,7 +99,7 @@ public class AnalyticsService(
             },
             cancellationToken: cancellationToken);
     }
-    
+
     public async Task CaptureDataSetVersionCall(
         Guid dataSetVersionId,
         DataSetVersionCallType type,
@@ -128,7 +128,7 @@ public class AnalyticsService(
             },
             cancellationToken: cancellationToken);
     }
-    
+
     public async Task CaptureDataSetVersionQuery(
         DataSetVersion dataSetVersion,
         string? requestedDataSetVersion,

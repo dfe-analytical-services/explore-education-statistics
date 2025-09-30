@@ -111,7 +111,7 @@ public class FileAccessorMockBuilder
             mock.Verify(m => m.Move(sourcePath, destinationPath));
             return this;
         }
-        
+
         public Asserter MoveBetweenFoldersCalledFor(
             IEnumerable<string> files,
             string sourceDirectory,

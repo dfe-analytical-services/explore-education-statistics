@@ -49,11 +49,11 @@ public static class AnalyticsTestAssertions
         var analyticsFiles = Directory.GetFiles(expectedAnalyticsPath);
         var analyticFile = Assert.Single(analyticsFiles);
         var capturedCall = await ReadFile<CaptureTopLevelCallRequest>(analyticFile);
-        
+
         Assert.NotNull(capturedCall);
         Assert.Equal(expectedType, capturedCall.Type);
         capturedCall.StartTime.AssertUtcNow();
-        
+
         if (expectedParameters == null)
         {
             Assert.Null(capturedCall.Parameters);
@@ -126,7 +126,7 @@ public static class AnalyticsTestAssertions
         Assert.Equal(dataSet.Id, capturedCall.DataSetId);
         Assert.Equal(dataSet.Title, capturedCall.DataSetTitle);
         capturedCall.StartTime.AssertUtcNow();
-        
+
         if (expectedParameters == null)
         {
             Assert.Null(capturedCall.Parameters);
@@ -155,7 +155,7 @@ public static class AnalyticsTestAssertions
             Assert.Equal(expectedPreviewToken.Expiry.TruncateMicroseconds(), capturedCall.PreviewToken.Expiry);
         }
     }
-    
+
     public static async Task AssertDataSetVersionAnalyticsCallCaptured(
         DataSet dataSet,
         DataSetVersion dataSetVersion,
@@ -195,7 +195,7 @@ public static class AnalyticsTestAssertions
             Assert.NotNull(parameters);
             parameters.AssertDeepEqualTo(expectedParameters);
         }
-        
+
         if (expectedPreviewToken == null)
         {
             Assert.Null(capturedCall.PreviewToken);
@@ -226,7 +226,7 @@ public static class AnalyticsTestAssertions
         var queryFiles = Directory.GetFiles(expectedAnalyticsPath);
         var queryFile = Assert.Single(queryFiles);
         var capturedQuery = await ReadFile<CaptureDataSetVersionQueryRequest>(queryFile, useSystemJson: false);
-        
+
         Assert.NotNull(capturedQuery);
 
         capturedQuery.Query.AssertDeepEqualTo(expectedRequest);
@@ -260,7 +260,7 @@ public static class AnalyticsTestAssertions
             failureMessage: $"Directory {expectedPath} does not exist after {timeoutMillis} milliseconds",
             timeoutMillis: timeoutMillis);
     }
-    
+
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
     private static async Task WaitForFilesToExistInDirectory(string expectedPath, int timeoutMillis = 5000)
@@ -270,7 +270,7 @@ public static class AnalyticsTestAssertions
             failureMessage: $"Directory {expectedPath} does not exist after {timeoutMillis} milliseconds",
             timeoutMillis: timeoutMillis);
     }
-    
+
     // Allow waiting for a slight delay, as the writing of the analytics capture is non-blocking
     // and could occur slightly after the Controller response is returned to the user.
     private static async Task WaitForConditionToBeTrue(
@@ -279,24 +279,24 @@ public static class AnalyticsTestAssertions
         int timeoutMillis = 2000)
     {
         var stopwatch = Stopwatch.StartNew();
-        
+
         while (stopwatch.ElapsedMilliseconds <= timeoutMillis)
         {
             if (await conditionTest())
             {
                 return;
             }
-            
+
             await Task.Delay(100);
         }
-        
+
         Assert.Fail(failureMessage);
     }
 
     private static async Task<TResult?> ReadFile<TResult>(string filePath, bool useSystemJson = true)
     {
         var result = default(TResult?);
-        
+
         // Wait for the JSON file to be fully written before reading successfully.
         await WaitForConditionToBeTrue(async () =>
         {

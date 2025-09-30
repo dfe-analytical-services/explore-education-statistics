@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 
 public class ReleaseNoteSaveRequest
 {

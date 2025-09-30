@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;

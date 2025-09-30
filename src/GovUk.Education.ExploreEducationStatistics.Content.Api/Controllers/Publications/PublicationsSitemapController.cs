@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Microsoft.AspNetCore.Mvc;

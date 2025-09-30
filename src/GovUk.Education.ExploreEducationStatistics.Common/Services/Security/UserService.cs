@@ -30,25 +30,13 @@ public class UserService : IUserService
 
     public Guid GetUserId()
     {
-        var user = GetUser();
-
-        if (user == null)
-        {
-            throw new AuthenticationException("No user was found to get Id from");
-        }
-
+        var user = GetUser() ?? throw new AuthenticationException("No user was found to get Id from");
         return user.GetUserId();
     }
 
     public UserProfileFromClaims GetProfileFromClaims()
     {
-        var user = GetUser();
-
-        if (user == null)
-        {
-            throw new AuthenticationException("No user was found to get Claims from");
-        }
-
+        var user = GetUser() ?? throw new AuthenticationException("No user was found to get Claims from");
         var email = user.GetEmail();
         var (firstName, lastName) = user.GetNameParts();
         return new UserProfileFromClaims(Email: email, FirstName: firstName, LastName: lastName);

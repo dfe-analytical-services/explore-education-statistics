@@ -15,5 +15,5 @@ public class MetaControllerTests
         var result = controller.GetTimeIdentifiersByCategory();
         result.AssertOkResult();
     }
-    
+
 }

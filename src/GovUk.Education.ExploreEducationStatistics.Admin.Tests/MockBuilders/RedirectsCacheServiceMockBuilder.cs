@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Moq;
 
@@ -12,7 +12,7 @@ public class RedirectsCacheServiceMockBuilder
         _mock
             .Setup(m => m.UpdateRedirects())
             .ReturnsAsync(() => new RedirectsViewModel([], [], []));
-        
+
         return _mock.Object;
     }
 }

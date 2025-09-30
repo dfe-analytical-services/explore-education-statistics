@@ -16,7 +16,7 @@ public class DbContextSupplier : IDbContextSupplier
         {
             nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
             nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
-            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " + 
+            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " +
                                                        typeof(TDbContext).Name)
         })!;
     }

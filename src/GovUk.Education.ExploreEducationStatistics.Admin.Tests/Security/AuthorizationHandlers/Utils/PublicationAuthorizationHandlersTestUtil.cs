@@ -22,7 +22,7 @@ public static class PublicationAuthorizationHandlersTestUtil
         var publication = new Publication();
         await AssertHandlerSucceedsWithPublicationRoles<Publication, TRequirement>(
             handlerSupplier: handlerSupplier,
-            entity: publication, 
+            entity: publication,
             publicationId: publication.Id,
             publicationRolesExpectedToPass: publicationRolesExpectedToPass);
     }
@@ -71,11 +71,11 @@ public static class PublicationAuthorizationHandlersTestUtil
                     await handler.HandleAsync(authContext);
                     if (rolesExpectedToSucceed.Contains(role))
                     {
-                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role.ToString()}");
+                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role}");
                     }
                     else
                     {
-                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role.ToString()}");
+                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role}");
                     }
                 }
             });

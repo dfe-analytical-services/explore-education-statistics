@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;

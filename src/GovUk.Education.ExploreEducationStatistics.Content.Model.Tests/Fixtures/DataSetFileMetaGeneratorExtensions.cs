@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -19,19 +19,19 @@ public static class DataSetFileMetaGeneratorExtensions
                 Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
                 End = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2001", },
             })
-            .SetFilters([ new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Filter 1",
-                    ColumnName = "filter_1",
-                },
+            .SetFilters([new()
+            {
+                Id = Guid.NewGuid(),
+                Label = "Filter 1",
+                ColumnName = "filter_1",
+            },
             ])
-            .SetIndicators([ new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Indicator 1",
-                    ColumnName = "indicator_1",
-                },
+            .SetIndicators([new()
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator 1",
+                ColumnName = "indicator_1",
+            },
             ]);
 
     public static Generator<DataSetFileMeta> WithNumDataFileRows(

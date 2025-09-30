@@ -81,7 +81,7 @@ public class Startup(
         services.AddDbContext<StatisticsDbContext>(options =>
             options
                 .UseSqlServer(configuration.GetConnectionString("StatisticsDb"),
-                    providerOptions => 
+                    providerOptions =>
                         providerOptions
                             .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                             .EnableCustomRetryOnFailure()
@@ -92,7 +92,7 @@ public class Startup(
         services.AddDbContext<ContentDbContext>(options =>
             options
                 .UseSqlServer(configuration.GetConnectionString("ContentDb"),
-                    providerOptions => 
+                    providerOptions =>
                         providerOptions
                             .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                             .EnableCustomRetryOnFailure()
@@ -226,7 +226,7 @@ public class Startup(
         var rewriteOptions = new RewriteOptions()
             .Add(new LowercasePathRule());
 
-        if(configuration.GetValue<bool>("enableSwagger"))
+        if (configuration.GetValue<bool>("enableSwagger"))
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>

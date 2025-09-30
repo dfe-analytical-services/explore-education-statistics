@@ -67,7 +67,7 @@ public interface IBlobStorageService
         string path,
         bool decompress = true,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Obtain a secure,short-lived download token for use with <see cref="StreamWithToken"/>.
     /// Any relevant permission checks for the current business process situation should be
@@ -88,7 +88,7 @@ public interface IBlobStorageService
         string filename,
         string path,
         CancellationToken cancellationToken);
-    
+
     /// <summary>
     /// Use a secure, short-lived <see cref="BlobDownloadToken"/> obtained from
     /// <see cref="GetBlobDownloadToken"/> to stream a Blob from storage.

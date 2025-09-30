@@ -334,7 +334,7 @@ public class EitherTest
         Assert.True(aggregate.IsLeft);
         Assert.Equal(["failure 1"], aggregate.Left);
     }
-    
+
     [Fact]
     public void OnSuccessAll()
     {
@@ -364,7 +364,7 @@ public class EitherTest
         Assert.True(results.IsLeft);
         Assert.Equal(2, results.Left);
     }
-    
+
     [Fact]
     public void OnSuccessAllReturnVoid()
     {
@@ -1731,7 +1731,7 @@ public class EitherTaskTest
 
         Assert.Equal("Success1", result);
     }
-    
+
     [Fact]
     public async Task OrThrow_EitherTask_FirstSucceeds()
     {
@@ -1741,12 +1741,12 @@ public class EitherTaskTest
 
         Assert.Equal("Success1", result);
     }
-    
+
     [Fact]
     public async Task OrThrow_EitherTask_FirstFails()
     {
-        var exception = await 
-            Assert.ThrowsAsync<ArgumentException>(() => 
+        var exception = await
+            Assert.ThrowsAsync<ArgumentException>(() =>
                 Task.FromResult(new Either<int, string>(1))
                     .OrThrow(failure => new ArgumentException($"Error {failure}")));
 
@@ -1774,10 +1774,7 @@ public class EitherTaskTest
 
         var result = await Task.FromResult(new Either<int, string>("Success"))
             .OnFailureVoid(
-                failure =>
-                {
-                    failures.Add(failure);
-                }
+                failures.Add
             );
 
         result.AssertRight("Success");

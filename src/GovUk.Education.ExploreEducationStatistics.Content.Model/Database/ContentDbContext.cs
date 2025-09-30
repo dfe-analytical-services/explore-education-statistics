@@ -804,11 +804,11 @@ public class ContentDbContext : DbContext
 
         modelBuilder.Entity<UserPublicationInvite>()
             .HasIndex(upi => new
-                {
-                    upi.PublicationId,
-                    upi.Email,
-                    upi.Role
-                })
+            {
+                upi.PublicationId,
+                upi.Email,
+                upi.Role
+            })
             .IsUnique();
     }
 

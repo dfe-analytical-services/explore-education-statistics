@@ -426,7 +426,7 @@ public static class ValidationMessages
             Message = string.Format(CannotReplaceDraftApiDataSet.Message, title),
         };
     }
-    
+
     public static readonly LocalizableMessage CannotCreateMultipleDraftApiDataSet = new(
         Code: nameof(CannotCreateMultipleDraftApiDataSet),
         Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set." +

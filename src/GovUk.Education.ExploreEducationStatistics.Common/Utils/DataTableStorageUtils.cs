@@ -14,7 +14,7 @@ public static class DataTableStorageUtils
         TableClient tableClient,
         IEnumerable<TEntity> entities,
         TableTransactionActionType tableTransactionActionType,
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default)
         where TEntity : class, ITableEntity
     {
         var groups = entities.GroupBy(entity => entity.PartitionKey);

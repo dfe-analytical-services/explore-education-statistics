@@ -15,7 +15,7 @@ public class PublicationMethodologyPersistenceTests
         var methodologyVersionId = Guid.NewGuid();
         var publication1 = new Publication();
         var publication2 = new Publication();
-        
+
         // Store a new Methodology, linked to 2 Publications
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -55,7 +55,7 @@ public class PublicationMethodologyPersistenceTests
             Assert.Equal(methodology
                 .Methodology
                 .Publications
-                .Select(p => p.PublicationId), 
+                .Select(p => p.PublicationId),
                 AsList(publication1.Id, publication2.Id));
         }
 
@@ -65,7 +65,7 @@ public class PublicationMethodologyPersistenceTests
             context.Publications.Remove(publication1);
             await context.SaveChangesAsync();
         }
-        
+
         // Retrieve the Methodology, and ensure it remains linked to the non-deleted Publication
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -78,7 +78,7 @@ public class PublicationMethodologyPersistenceTests
             Assert.Equal(methodologyVersion
                     .Methodology
                     .Publications
-                    .Select(p => p.PublicationId), 
+                    .Select(p => p.PublicationId),
                 AsList(publication2.Id));
         }
     }

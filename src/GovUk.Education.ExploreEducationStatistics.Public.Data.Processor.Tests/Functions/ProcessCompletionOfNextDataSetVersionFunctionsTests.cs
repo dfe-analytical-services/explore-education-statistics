@@ -2168,7 +2168,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                 change: locationOptionMetaChanges[11]);
         }
 
-        
+
         private static void AssertSingleLocationDeleted(
             IReadOnlyList<LocationMetaChange> changes,
             LocationMeta expectedLocation)
@@ -2884,11 +2884,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                     GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
                     TimePeriodMetas =
                     [
-                        ..DataFixture.DefaultTimePeriodMeta()
+                        .. DataFixture.DefaultTimePeriodMeta()
                             .WithCode(TimeIdentifier.CalendarYear)
                             .WithPeriod("2020")
                             .Generate(1),
-                        ..DataFixture.DefaultTimePeriodMeta()
+                        .. DataFixture.DefaultTimePeriodMeta()
                             .WithCode(TimeIdentifier.AcademicYear)
                             .ForIndex(0, s => s.SetPeriod("2019"))
                             .ForIndex(1, s => s.SetPeriod("2020"))
@@ -2933,7 +2933,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                             .WithCode(TimeIdentifier.CalendarYear)
                             .WithPeriod("2020")
                             .Generate(1),
-                        ..DataFixture.DefaultTimePeriodMeta()
+                        .. DataFixture.DefaultTimePeriodMeta()
                             .WithCode(TimeIdentifier.AcademicYear)
                             .ForIndex(0, s => s.SetPeriod("2019"))
                             .ForIndex(1, s => s.SetPeriod("2020"))

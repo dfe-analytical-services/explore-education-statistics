@@ -554,7 +554,7 @@ public class PublicationServicePermissionTests
 
         await PermissionTestUtil.PolicyCheckBuilder()
             .SetupResourceCheckToFail(_publication, SecurityPolicies.CanViewSpecificPublication)
-            .AssertForbidden(async userService => 
+            .AssertForbidden(async userService =>
             {
                 await using var contentDbContext = InMemoryApplicationDbContext();
                 contentDbContext.Publications.Add(_publication);

@@ -217,7 +217,7 @@ public static class TypeExtensionsTests
         {
             Assert.True(simpleType.IsSimple());
         }
-        
+
         [Theory]
         [MemberData(nameof(ComplexTypes))]
         public void ComplexType_ReturnsFalse(Type complexType)

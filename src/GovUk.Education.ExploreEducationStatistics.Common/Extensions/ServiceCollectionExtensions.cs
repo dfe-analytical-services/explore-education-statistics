@@ -97,7 +97,7 @@ public static class ServiceCollectionExtensions
     {
         var accessTokenProvider = managedIdentityClientId != null
             ? new DefaultAzureCredential(
-                new DefaultAzureCredentialOptions {ManagedIdentityClientId = managedIdentityClientId})
+                new DefaultAzureCredentialOptions { ManagedIdentityClientId = managedIdentityClientId })
             : new DefaultAzureCredential();
 
         var dataSource = new NpgsqlDataSourceBuilder(connectionString)

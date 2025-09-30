@@ -53,7 +53,7 @@ public class ManagedStreamFormFile(IFormFile formFile) : IManagedStreamFile
 public class ManagedStreamZipEntry(ZipArchiveEntry entry) : IManagedStreamFile
 {
     private readonly List<Stream> _openStreams = [];
-    
+
     public string Name => entry.Name;
 
     public long Length => entry.Length;
@@ -81,7 +81,7 @@ public class ManagedStreamZipEntry(ZipArchiveEntry entry) : IManagedStreamFile
         foreach (var stream in _openStreams)
         {
             await stream.DisposeAsync();
-        }   
+        }
     }
 }
 

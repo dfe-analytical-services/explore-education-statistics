@@ -1295,14 +1295,14 @@ public class PublicationServiceTests
     [InlineData(false)]
     public async Task UpdatePublication_TitleChangesPublicationAndMethodologySlug(bool isPublicationArchived)
     {
-        var supersedingPublication = isPublicationArchived 
+        var supersedingPublication = isPublicationArchived
             ? new Publication
-                {
-                    Id = Guid.NewGuid(), 
-                    LatestPublishedReleaseVersionId = Guid.NewGuid()
-                } 
+            {
+                Id = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid()
+            }
             : null;
-        
+
         var publication = new Publication
         {
             Slug = "old-title",
@@ -1430,7 +1430,7 @@ public class PublicationServiceTests
             var redirect = Assert.Single(publicationRedirects);
             Assert.Equal(publication.Id, redirect.PublicationId);
             Assert.Equal("old-title", redirect.Slug);
-            
+
             AssertOnPublicationChangedEventRaised(updatedPublication);
         }
     }
@@ -2531,7 +2531,7 @@ public class PublicationServiceTests
                     latestReleaseVersion2022.Id,
                     latestReleaseVersion2021.Id,
                     latestReleaseVersion2020.Id
-                ], 
+                ],
                 releaseVersions.Select(r => r.Id));
         }
     }
@@ -2630,7 +2630,7 @@ public class PublicationServiceTests
                 [
                     latestPublishedReleaseVersion2022.Id,
                     latestPublishedReleaseVersion2020.Id
-                ], 
+                ],
                 releaseVersions.Select(r => r.Id));
         }
     }
@@ -2678,7 +2678,7 @@ public class PublicationServiceTests
                 [
                     latestDraftReleaseVersion2021.Id,
                     latestDraftReleaseVersion2020.Id
-                ], 
+                ],
                 releaseVersions.Select(r => r.Id));
         }
     }
@@ -2704,7 +2704,7 @@ public class PublicationServiceTests
             var publicationService = BuildPublicationService(context);
 
             var result = await publicationService.ListReleaseVersions(
-                publicationId: publication.Id, 
+                publicationId: publication.Id,
                 versionsType: ReleaseVersionsType.Latest,
                 includePermissions: true);
 
@@ -3217,7 +3217,7 @@ public class PublicationServiceTests
             // as the first release after the legacy link
             Assert.Equal(release2022.Versions[1].Id, actualPublication.LatestPublishedReleaseVersionId);
         }
-        
+
         // The latest release is unchanged so no events should have been raised
         AssertOnPublicationChangedEventsNotRaised();
     }
@@ -3241,12 +3241,12 @@ public class PublicationServiceTests
 
         if (isPublicationArchived)
         {
-           publicationBuilder.WithSupersededBy(
-               _dataFixture.DefaultPublication()
-                   .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
+            publicationBuilder.WithSupersededBy(
+                _dataFixture.DefaultPublication()
+                    .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
         }
 
-        var publication = publicationBuilder.Generate();        
+        var publication = publicationBuilder.Generate();
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
         var release2022 = publication.Releases.Single(r => r.Year == 2022);
@@ -3336,7 +3336,7 @@ public class PublicationServiceTests
             // version since it was positioned as the first release
             Assert.Equal(expectedLatestPublishedReleaseVersionId,
                 actualPublication.LatestPublishedReleaseVersionId);
-            
+
             AssertOnPublicationLatestPublishedReleaseReorderedWasRaised(
                 actualPublication,
                 originalLatestPublishedReleaseId,
@@ -3367,7 +3367,7 @@ public class PublicationServiceTests
                 _dataFixture.DefaultPublication()
                     .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion()));
         }
-        
+
         var publication = publicationBuilder.Generate();
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 
@@ -16,7 +16,7 @@ public class MethodologyServiceMockBuilder
             .Setup(m => m.GetLatestVersionByRelease(It.IsAny<ReleaseVersion>()))
             .ReturnsAsync([]);
     }
-    
+
     public IMethodologyService Build() => _mock.Object;
 
     public MethodologyServiceMockBuilder WhereGetLatestVersionByReleaseReturns(
@@ -26,20 +26,20 @@ public class MethodologyServiceMockBuilder
         _mock
             .Setup(m => m.GetLatestVersionByRelease(releaseVersion))
             .ReturnsAsync(methodologyVersions.ToList());
-        
+
         _mock
             .Setup(m => m.Publish(It.IsAny<MethodologyVersion>()))
             .Returns(Task.CompletedTask);
-        
+
         return this;
     }
-    
+
     public MethodologyServiceMockBuilder WhereGetLatestVersionByReleaseReturnsNoMethodologies(ReleaseVersion releaseVersion)
     {
         _mock
             .Setup(m => m.GetLatestVersionByRelease(releaseVersion))
             .ReturnsAsync([]);
-        
+
         return this;
     }
 
@@ -48,7 +48,7 @@ public class MethodologyServiceMockBuilder
         _mock
             .Setup(m => m.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
             .ReturnsAsync(true);
-        
+
         return this;
     }
     public MethodologyServiceMockBuilder WhereIsNotBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
@@ -56,10 +56,10 @@ public class MethodologyServiceMockBuilder
         _mock
             .Setup(m => m.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
             .ReturnsAsync(false);
-        
+
         return this;
     }
-    
+
     public class Asserter(Mock<IMethodologyService> mock)
     {
         public void NoMethodologiesPublished()

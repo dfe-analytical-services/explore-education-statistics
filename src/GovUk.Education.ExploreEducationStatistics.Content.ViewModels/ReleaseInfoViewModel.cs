@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record ReleaseInfoViewModel
 {

@@ -54,7 +54,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    timePeriods: [..facets.TimePeriods.In],
+                    timePeriods: [.. facets.TimePeriods.In],
                     path: QueryUtils.Path(path, "timePeriods.in")
                 )
             );
@@ -64,7 +64,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    timePeriods: [..facets.TimePeriods.NotIn],
+                    timePeriods: [.. facets.TimePeriods.NotIn],
                     path: QueryUtils.Path(path, "timePeriods.notIn"),
                     negate: true
                 )

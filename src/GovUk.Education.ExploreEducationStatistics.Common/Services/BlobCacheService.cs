@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -33,7 +33,7 @@ public class BlobCacheService : IBlobCacheService
         try
         {
             var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType)
-                .OrElse(() => (object?) null);
+                .OrElse(() => (object?)null);
 
             _logger.LogDebug("Blob cache {HitOrMiss} - for key {CacheKey}",
                 result != null ? "hit" : "miss", key);

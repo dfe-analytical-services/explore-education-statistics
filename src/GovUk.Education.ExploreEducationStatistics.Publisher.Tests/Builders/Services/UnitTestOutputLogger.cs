@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Se
 public class UnitTestOutputLoggerBuilder<T>
 {
     private XunitLogger? _logger;
-    
+
     /// <summary>
     /// Build the ILogger implementation. Pass in the instance of ITestOutputHelper injected into the xunit test class. 
     /// </summary>
@@ -29,7 +29,7 @@ public class UnitTestOutputLoggerBuilder<T>
             output.WriteLine(formatter(state, exception));
         }
     }
-    
+
     public record LogItem(LogLevel LogLevel, string Message);
 
     public Asserter Assert => new(_logger?.LogItems ?? throw new InvalidOperationException("Do not attempt to assert on this builder before it has been built"));

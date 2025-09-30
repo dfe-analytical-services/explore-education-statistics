@@ -37,8 +37,8 @@ public record DataSetQueryCriteriaFilters
         [
             Eq,
             NotEq,
-            ..In ?? [],
-            ..NotIn ?? []
+            .. In ?? [],
+            .. NotIn ?? []
         ];
 
         return filters

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Models;
 
@@ -11,7 +11,7 @@ public class ReleasePublishingStatusBuilder(ReleasePublishingKey releasePublishi
     {
         var releasePublishingStatus = new ReleasePublishingStatus
         {
-            
+
             PartitionKey = releasePublishingKey.ReleaseVersionId.ToString(),
             RowKey = releasePublishingKey.ReleaseStatusId.ToString(),
             State = new(

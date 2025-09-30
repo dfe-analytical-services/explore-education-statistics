@@ -1154,10 +1154,10 @@ public abstract class DataSetVersionMappingControllerTests(
                         Mapping = mapping.GetFilterOptionMapping(
                                 filterKey: "filter-1-key",
                                 filterOptionKey: "filter-1-option-1-key") with
-                            {
-                                Type = MappingType.ManualMapped,
-                                CandidateKey = "filter-1-option-1-key"
-                            }
+                        {
+                            Type = MappingType.ManualMapped,
+                            CandidateKey = "filter-1-option-1-key"
+                        }
                     },
                     new FilterOptionMappingUpdateResponseViewModel
                     {
@@ -1166,10 +1166,10 @@ public abstract class DataSetVersionMappingControllerTests(
                         Mapping = mapping.GetFilterOptionMapping(
                                 filterKey: "filter-2-key",
                                 filterOptionKey: "filter-2-option-1-key") with
-                            {
-                                Type = MappingType.ManualNone,
-                                CandidateKey = null
-                            }
+                        {
+                            Type = MappingType.ManualNone,
+                            CandidateKey = null
+                        }
                     },
                 ]
             };

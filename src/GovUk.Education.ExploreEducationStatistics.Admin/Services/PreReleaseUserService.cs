@@ -195,8 +195,8 @@ public class PreReleaseUserService(ContentDbContext context,
     {
         var user = await userRepository.FindByEmail(email);
 
-        return user is null 
-            ? new NotFoundResult() 
+        return user is null
+            ? new NotFoundResult()
             : user;
     }
 

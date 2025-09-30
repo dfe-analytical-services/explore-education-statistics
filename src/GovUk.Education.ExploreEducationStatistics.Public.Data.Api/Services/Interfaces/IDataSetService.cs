@@ -18,12 +18,12 @@ public interface IDataSetService
 
     Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
-        int pageSize, 
+        int pageSize,
         Guid publicationId,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetVersionViewModel>> GetVersion(
-        Guid dataSetId, 
+        Guid dataSetId,
         string dataSetVersion,
         CancellationToken cancellationToken = default);
 

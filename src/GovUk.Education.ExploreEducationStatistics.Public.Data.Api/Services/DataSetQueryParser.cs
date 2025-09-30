@@ -41,7 +41,7 @@ internal class DataSetQueryParser(
         IFacetsParser[] parsers =
         [
             new FilterFacetsParser(queryState, filterOptionMetas.Result),
-            new GeographicLevelFacetsParser(queryState, [..dataSetVersion.MetaSummary!.GeographicLevels]),
+            new GeographicLevelFacetsParser(queryState, [.. dataSetVersion.MetaSummary!.GeographicLevels]),
             new LocationFacetsParser(queryState, locationOptionMetas.Result),
             new TimePeriodFacetsParser(queryState, timePeriodMetas.Result),
         ];

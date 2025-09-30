@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;

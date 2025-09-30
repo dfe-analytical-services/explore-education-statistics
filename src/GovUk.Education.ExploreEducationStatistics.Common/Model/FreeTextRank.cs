@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,7 +12,7 @@ public record FreeTextRank(Guid Id, int Rank)
         {
             builder
                 .HasNoKey()
-                .ToTable((string?) null);
+                .ToTable((string?)null);
         }
     }
 }

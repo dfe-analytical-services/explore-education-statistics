@@ -169,7 +169,7 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
 
             Assert.All(actualDataSetVersions,
                 [UsedImplicitly]
-                (dataSetVersion) =>
+            (dataSetVersion) =>
                 {
                     Assert.Equal(updatedReleaseSlug, dataSetVersion.Release.Slug);
                     Assert.Equal(updatedReleaseTitle, dataSetVersion.Release.Title);

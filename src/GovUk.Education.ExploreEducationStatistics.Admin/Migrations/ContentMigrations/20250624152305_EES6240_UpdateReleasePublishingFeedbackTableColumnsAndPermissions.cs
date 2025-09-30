@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -23,11 +23,11 @@ public partial class EES6240_UpdateReleasePublishingFeedbackTableColumnsAndPermi
 
         migrationBuilder.Sql("REVOKE INSERT ON dbo.ReleasePublishingFeedback TO [content];");
         migrationBuilder.Sql("GRANT SELECT, UPDATE ON dbo.ReleasePublishingFeedback TO [content];");
-        
+
         migrationBuilder.Sql("GRANT SELECT, INSERT ON dbo.ReleasePublishingFeedback TO [publisher];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.UserPublicationRoles TO [publisher];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.Users TO [publisher];");
-        
+
         migrationBuilder.Sql("GRANT SELECT ON dbo.ReleasePublishingFeedback TO [notifier];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.Releases TO [notifier];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.ReleaseVersions TO [notifier];");

@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using Azure.Messaging.EventGrid;
 using Microsoft.Extensions.Logging;
 
@@ -27,8 +27,8 @@ public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client
             if (response.IsError)
             {
                 logger.LogError(
-                    "Error occurred whilst trying to raise event {@Event}. Response:{@SendEventResponse}", 
-                    eventGridEvent, 
+                    "Error occurred whilst trying to raise event {@Event}. Response:{@SendEventResponse}",
+                    eventGridEvent,
                     response);
             }
             logger.LogDebug("Event raised: {@Event}", eventGridEvent);
@@ -37,8 +37,8 @@ public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client
         catch (Exception exception)
         {
             logger.LogError(
-                "Error occurred whilst trying to raise event {@Event}. Exception:{@Exception}", 
-                eventGridEvent, 
+                "Error occurred whilst trying to raise event {@Event}. Exception:{@Exception}",
+                eventGridEvent,
                 exception);
             return null;
         }

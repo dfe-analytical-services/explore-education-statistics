@@ -14,19 +14,19 @@ public class EnumerableExtensionsTests
         {
             TestRecord[] testRecords = [
                     new() { Value = "d" },
-                    new() { Value = "1" },
-                    new() { Value = "b" },
-                    new() { Value = "c" },
-                    new() { Value = "a" },
-                ];
+                new() { Value = "1" },
+                new() { Value = "b" },
+                new() { Value = "c" },
+                new() { Value = "a" },
+            ];
 
             TestRecord[] expected = [
                     new() { Value = "1" },
-                    new() { Value = "a" },
-                    new() { Value = "b" },
-                    new() { Value = "c" },
-                    new() { Value = "d" },
-                ];
+                new() { Value = "a" },
+                new() { Value = "b" },
+                new() { Value = "c" },
+                new() { Value = "d" },
+            ];
 
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.Value);
@@ -39,35 +39,35 @@ public class EnumerableExtensionsTests
         {
             TestRecord[] testRecords = [
                     new() { Value = "z24" },
-                    new() { Value = "z2" },
-                    new() { Value = "abcde" },
-                    new() { Value = "z15" },
-                    new() { Value = "abd" },
-                    new() { Value = "z1" },
-                    new() { Value = "z3" },
-                    new() { Value = "abc" },
-                    new() { Value = "z20" },
-                    new() { Value = "z5" },
-                    new() { Value = "abcd" },
-                    new() { Value = "z11" },
-                    new() { Value = "z22" },
-                ];
+                new() { Value = "z2" },
+                new() { Value = "abcde" },
+                new() { Value = "z15" },
+                new() { Value = "abd" },
+                new() { Value = "z1" },
+                new() { Value = "z3" },
+                new() { Value = "abc" },
+                new() { Value = "z20" },
+                new() { Value = "z5" },
+                new() { Value = "abcd" },
+                new() { Value = "z11" },
+                new() { Value = "z22" },
+            ];
 
             TestRecord[] expected = [
                     new() { Value = "abc" },
-                    new() { Value = "abcd" },
-                    new() { Value = "abcde" },
-                    new() { Value = "abd" },
-                    new() { Value = "z1" },
-                    new() { Value = "z2" },
-                    new() { Value = "z3" },
-                    new() { Value = "z5" },
-                    new() { Value = "z11" },
-                    new() { Value = "z15" },
-                    new() { Value = "z20" },
-                    new() { Value = "z22" },
-                    new() { Value = "z24" },
-                ];
+                new() { Value = "abcd" },
+                new() { Value = "abcde" },
+                new() { Value = "abd" },
+                new() { Value = "z1" },
+                new() { Value = "z2" },
+                new() { Value = "z3" },
+                new() { Value = "z5" },
+                new() { Value = "z11" },
+                new() { Value = "z15" },
+                new() { Value = "z20" },
+                new() { Value = "z22" },
+                new() { Value = "z24" },
+            ];
 
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.Value);
@@ -88,26 +88,26 @@ public class EnumerableExtensionsTests
         {
             TestRecord[] testRecords =
             [
-                new() { FirstString = "1", SecondString = "d" }, 
+                new() { FirstString = "1", SecondString = "d" },
                 new() { FirstString = "1", SecondString = "1" },
-                new() { FirstString = "1", SecondString = "b" }, 
+                new() { FirstString = "1", SecondString = "b" },
                 new() { FirstString = "1", SecondString = "c" },
                 new() { FirstString = "1", SecondString = "a" },
             ];
-            
+
             TestRecord[] expected =
             [
                 new() { FirstString = "1", SecondString = "1" },
                 new() { FirstString = "1", SecondString = "a" },
-                new() { FirstString = "1", SecondString = "b" }, 
+                new() { FirstString = "1", SecondString = "b" },
                 new() { FirstString = "1", SecondString = "c" },
                 new() { FirstString = "1", SecondString = "d" },
             ];
-            
+
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.FirstString)
                 .NaturalThenBy(r => r.SecondString);
-            
+
             Assert.Equal(expected, orderedRecords);
         }
 
@@ -116,42 +116,42 @@ public class EnumerableExtensionsTests
         {
             TestRecord[] testRecords =
             [
-                new() { FirstString = "1", SecondString = "z24" }, 
+                new() { FirstString = "1", SecondString = "z24" },
                 new() { FirstString = "1", SecondString = "z2" },
-                new() { FirstString = "1", SecondString = "abcde" }, 
+                new() { FirstString = "1", SecondString = "abcde" },
                 new() { FirstString = "1", SecondString = "z15" },
-                new() { FirstString = "1", SecondString = "abd" }, 
+                new() { FirstString = "1", SecondString = "abd" },
                 new() { FirstString = "1", SecondString = "z1" },
-                new() { FirstString = "1", SecondString = "z3" }, 
+                new() { FirstString = "1", SecondString = "z3" },
                 new() { FirstString = "1", SecondString = "abc" },
-                new() { FirstString = "1", SecondString = "z20" }, 
+                new() { FirstString = "1", SecondString = "z20" },
                 new() { FirstString = "1", SecondString = "z5" },
                 new() { FirstString = "1", SecondString = "abcd" },
                 new() { FirstString = "1", SecondString = "z11" },
                 new() { FirstString = "1", SecondString = "z22" },
             ];
-            
+
             TestRecord[] expected =
             [
-                new() { FirstString = "1", SecondString = "abc" }, 
+                new() { FirstString = "1", SecondString = "abc" },
                 new() { FirstString = "1", SecondString = "abcd" },
-                new() { FirstString = "1", SecondString = "abcde" }, 
+                new() { FirstString = "1", SecondString = "abcde" },
                 new() { FirstString = "1", SecondString = "abd" },
-                new() { FirstString = "1", SecondString = "z1" }, 
+                new() { FirstString = "1", SecondString = "z1" },
                 new() { FirstString = "1", SecondString = "z2" },
-                new() { FirstString = "1", SecondString = "z3" }, 
+                new() { FirstString = "1", SecondString = "z3" },
                 new() { FirstString = "1", SecondString = "z5" },
-                new() { FirstString = "1", SecondString = "z11" }, 
+                new() { FirstString = "1", SecondString = "z11" },
                 new() { FirstString = "1", SecondString = "z15" },
-                new() { FirstString = "1", SecondString = "z20" }, 
+                new() { FirstString = "1", SecondString = "z20" },
                 new() { FirstString = "1", SecondString = "z22" },
                 new() { FirstString = "1", SecondString = "z24" },
             ];
-            
+
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.FirstString)
                 .NaturalThenBy(r => r.SecondString);
-            
+
             Assert.Equal(expected, orderedRecords);
         }
 
@@ -160,21 +160,21 @@ public class EnumerableExtensionsTests
         {
             TestRecord[] testRecords =
             [
-                new() { FirstString = "2", SecondString = "a" }, 
+                new() { FirstString = "2", SecondString = "a" },
                 new() { FirstString = "2", SecondString = "b" },
-                new() { FirstString = "1", SecondString = "b" }, 
+                new() { FirstString = "1", SecondString = "b" },
                 new() { FirstString = "1", SecondString = "a" },
-                new() { FirstString = "3", SecondString = "b" }, 
+                new() { FirstString = "3", SecondString = "b" },
                 new() { FirstString = "3", SecondString = "a" },
             ];
-            
+
             TestRecord[] expected =
             [
-                new() { FirstString = "1", SecondString = "a" }, 
+                new() { FirstString = "1", SecondString = "a" },
                 new() { FirstString = "1", SecondString = "b" },
-                new() { FirstString = "2", SecondString = "a" }, 
+                new() { FirstString = "2", SecondString = "a" },
                 new() { FirstString = "2", SecondString = "b" },
-                new() { FirstString = "3", SecondString = "a" }, 
+                new() { FirstString = "3", SecondString = "a" },
                 new() { FirstString = "3", SecondString = "b" },
             ];
 
@@ -463,21 +463,21 @@ public class EnumerableExtensionsTests
             var actual = list1.Cartesian(list2);
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void TwoLists_EmptyList()
         {
             List<int> list1 = [1, 2];
             Assert.Empty(list1.Cartesian(new List<string>()));
         }
-        
+
         [Fact]
         public void TwoLists_NullList()
         {
             List<int> list1 = [1, 2];
-            Assert.Empty(list1.Cartesian((List<string>?) null));
+            Assert.Empty(list1.Cartesian((List<string>?)null));
         }
-        
+
         [Fact]
         public void ThreeLists_Cartesian()
         {
@@ -500,7 +500,7 @@ public class EnumerableExtensionsTests
             var actual = list1.Cartesian(list2, list3);
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void ThreeLists_EmptyFirstList()
         {
@@ -508,7 +508,7 @@ public class EnumerableExtensionsTests
             List<char> list3 = ['5', '6'];
             Assert.Empty(list1.Cartesian(new List<string>(), list3));
         }
-        
+
         [Fact]
         public void ThreeLists_EmptySecondList()
         {
@@ -516,21 +516,21 @@ public class EnumerableExtensionsTests
             List<string> list2 = ["3", "4"];
             Assert.Empty(list1.Cartesian(list2, new List<char>()));
         }
-        
+
         [Fact]
         public void ThreeLists_NullFirstList()
         {
             List<int> list1 = [1, 2];
             List<char> list3 = ['5', '6'];
-            Assert.Empty(list1.Cartesian((List<string>?) null, list3));
+            Assert.Empty(list1.Cartesian((List<string>?)null, list3));
         }
-        
+
         [Fact]
         public void ThreeLists_NullSecondList()
         {
             List<int> list1 = [1, 2];
             List<string> list2 = ["3", "4"];
-            Assert.Empty(list1.Cartesian(list2, (List<char>?) null));
+            Assert.Empty(list1.Cartesian(list2, (List<char>?)null));
         }
     }
 

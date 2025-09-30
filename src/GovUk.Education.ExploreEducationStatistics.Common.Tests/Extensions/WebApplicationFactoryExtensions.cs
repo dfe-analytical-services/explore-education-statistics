@@ -23,8 +23,8 @@ public static class WebApplicationFactoryExtensions
         return app.WithWebHostBuilder(builder => builder
             .ResetDbContext<TDbContext>());
     }
-    
-    public static TDbContext GetDbContext<TDbContext, TEntrypoint>(this WebApplicationFactory<TEntrypoint> app) 
+
+    public static TDbContext GetDbContext<TDbContext, TEntrypoint>(this WebApplicationFactory<TEntrypoint> app)
         where TDbContext : DbContext
         where TEntrypoint : class
     {

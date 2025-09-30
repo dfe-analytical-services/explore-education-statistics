@@ -128,28 +128,28 @@ public class ReleaseChecklistService : IReleaseChecklistService
             errors.Add(new ReleaseChecklistIssue(
                 ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
         }
-        
-        var dataSetVersionStatuses = 
+
+        var dataSetVersionStatuses =
             await _dataSetVersionService.GetStatusesForReleaseVersion(releaseVersion.Id);
-        
+
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
         {
             errors.Add(new ReleaseChecklistIssue(
                 ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted));
         }
-        
+
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Cancelled))
         {
             errors.Add(new ReleaseChecklistIssue(
                 ValidationErrorMessages.PublicApiDataSetCancellationsMustBeResolved));
         }
-        
+
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Failed))
         {
             errors.Add(new ReleaseChecklistIssue(
                 ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved));
         }
-        
+
         if (dataSetVersionStatuses.Any(status => status.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Finalising))
         {
             errors.Add(new ReleaseChecklistIssue(

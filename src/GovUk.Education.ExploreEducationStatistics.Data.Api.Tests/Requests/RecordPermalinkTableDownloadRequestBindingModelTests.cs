@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 using Xunit;
 
@@ -13,10 +13,10 @@ public class RecordPermalinkTableDownloadRequestBindingModelTests
     {
         // ARRANGE
         var validator = new RecordPermalinkTableDownloadRequestBindingModel.Validator();
-        
+
         // ACT
         var result = validator.Validate(incompleteModel);
-        
+
         // ASSERT
         Assert.NotNull(result);
         Assert.False(result.IsValid);
@@ -28,15 +28,15 @@ public class RecordPermalinkTableDownloadRequestBindingModelTests
     {
         // ARRANGE
         var validator = new RecordPermalinkTableDownloadRequestBindingModel.Validator();
-        
+
         // ACT
         var result = validator.Validate(FullyPopulatedModel());
-        
+
         // ASSERT
         Assert.NotNull(result);
         Assert.True(result.IsValid);
     }
-    
+
     [Fact]
     public void GivenAFullyPopulatedBindingModel_WhenConvertedToModel_ThenShouldSucceed()
     {
@@ -47,10 +47,10 @@ public class RecordPermalinkTableDownloadRequestBindingModelTests
             PermalinkId = Guid.Parse("4e3f5743-fb44-4183-950c-39f4032dd174"),
             DownloadFormat = TableDownloadFormat.ODS
         };
-        
+
         // ACT
         var actual = bindingModel.ToModel();
-        
+
         // ASSERT
         var expected = new CapturePermaLinkTableDownloadCall
         {

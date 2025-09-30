@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 

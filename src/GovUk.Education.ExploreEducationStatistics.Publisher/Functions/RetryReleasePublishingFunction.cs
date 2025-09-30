@@ -13,7 +13,8 @@ public class RetryReleasePublishingFunction(
 {
     private static readonly ReleasePublishingStatusOverallStage[] ValidStates =
     [
-        ReleasePublishingStatusOverallStage.Complete, ReleasePublishingStatusOverallStage.Failed
+        ReleasePublishingStatusOverallStage.Complete,
+        ReleasePublishingStatusOverallStage.Failed
     ];
 
     /// <summary>

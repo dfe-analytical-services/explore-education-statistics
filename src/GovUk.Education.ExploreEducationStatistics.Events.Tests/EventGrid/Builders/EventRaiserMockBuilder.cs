@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders;
 
@@ -10,7 +10,7 @@ public class EventRaiserMockBuilder
 
     public class Asserter(EventRaiserMockBuilder parent)
     {
-        public void EventRaised<TEventBuilder>(TEventBuilder expectedEvent) 
+        public void EventRaised<TEventBuilder>(TEventBuilder expectedEvent)
             where TEventBuilder : IEvent
             => Xunit.Assert.True(parent._mock.EventWasRaised(expectedEvent));
 
@@ -18,7 +18,7 @@ public class EventRaiserMockBuilder
             where TEventBuilder : IEvent
             => Xunit.Assert.All(expectedEvents, e => Xunit.Assert.True(parent._mock.EventWasRaised(e)));
 
-        public void NoEventRaised() 
+        public void NoEventRaised()
             => Xunit.Assert.False(parent._mock.EventWasRaised());
     }
 
@@ -37,17 +37,17 @@ public class EventRaiserMockBuilder
             return Task.CompletedTask;
         }
 
-        public bool EventWasRaised<TEventBuilder>(TEventBuilder expectedEvent) => 
+        public bool EventWasRaised<TEventBuilder>(TEventBuilder expectedEvent) =>
             _events.OfType<TEventBuilder>().Any(actual => actual!.Equals(expectedEvent));
 
         public bool EventWasRaised() => _events.Any();
 
-        public Task RaiseEvent<TEventBuilder>(TEventBuilder eventBuilder, CancellationToken cancellationToken = default) 
-            where TEventBuilder : IEvent => 
+        public Task RaiseEvent<TEventBuilder>(TEventBuilder eventBuilder, CancellationToken cancellationToken = default)
+            where TEventBuilder : IEvent =>
             AddEvent(eventBuilder);
 
-        public Task RaiseEvents<TEventBuilder>(IEnumerable<TEventBuilder> eventBuilders, CancellationToken cancellationToken = default) 
-            where TEventBuilder : IEvent => 
+        public Task RaiseEvents<TEventBuilder>(IEnumerable<TEventBuilder> eventBuilders, CancellationToken cancellationToken = default)
+            where TEventBuilder : IEvent =>
             AddEvents(eventBuilders);
     }
 }

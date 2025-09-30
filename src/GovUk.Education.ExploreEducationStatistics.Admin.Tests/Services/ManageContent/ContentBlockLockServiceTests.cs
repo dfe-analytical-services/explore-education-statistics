@@ -617,7 +617,7 @@ public class ContentBlockLockServiceTests
             var savedContentBlock = await contentDbContext.ContentBlocks
                 .Include(cb => cb.LockedBy)
                 .FirstAsync(cb => cb.Id == contentBlock.Id);
-            
+
             Assert.Null(savedContentBlock.Locked);
             Assert.Null(savedContentBlock.LockedBy);
             Assert.Null(savedContentBlock.LockedById);

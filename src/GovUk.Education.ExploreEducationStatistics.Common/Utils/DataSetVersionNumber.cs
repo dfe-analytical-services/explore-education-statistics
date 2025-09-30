@@ -26,7 +26,7 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
         {
             return false;
         }
-        
+
         version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch);
         return successful;
     }

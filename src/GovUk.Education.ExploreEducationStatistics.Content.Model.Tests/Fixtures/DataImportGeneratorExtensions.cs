@@ -10,12 +10,12 @@ public static class DataImportGeneratorExtensions
 
     public static Generator<DataImport> WithDefaults(this Generator<DataImport> generator)
         => generator.ForInstance(d => d.SetDefaults());
-    
+
     public static Generator<DataImport> WithSubjectId(
         this Generator<DataImport> generator,
         Guid subjectId)
         => generator.ForInstance(s => s.SetSubjectId(subjectId));
-    
+
     public static Generator<DataImport> WithDefaultFiles(
         this Generator<DataImport> generator,
         string dataFileName,
@@ -152,7 +152,7 @@ public static class DataImportGeneratorExtensions
         this InstanceSetters<DataImport> setters,
         DataImportStatus status)
         => setters.Set(d => d.Status, status);
-    
+
     public static InstanceSetters<DataImport> SetStagePercentageComplete(
         this InstanceSetters<DataImport> setters,
         int stagePercentageComplete)

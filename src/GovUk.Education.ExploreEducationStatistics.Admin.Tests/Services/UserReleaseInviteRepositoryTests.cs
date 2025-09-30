@@ -683,7 +683,7 @@ public abstract class UserReleaseInviteRepositoryTests
                         .WithEmail(email1)
                         .WithRole(targetRole)
                         .Generate(),
-                        _fixture.DefaultUserReleaseInvite()
+                    _fixture.DefaultUserReleaseInvite()
                         .WithReleaseVersion(otherReleaseVersion)
                         .WithEmail(email2)
                         .WithRole(targetRole)

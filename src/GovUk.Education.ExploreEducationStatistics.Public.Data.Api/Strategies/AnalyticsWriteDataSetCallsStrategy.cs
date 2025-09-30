@@ -10,10 +10,10 @@ public class AnalyticsWriteDataSetCallsStrategy(
     ) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public-api", "data-sets"];
-    
+
     private readonly IWorkflowActor<CaptureDataSetCallRequest> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-        
+
     public Type RequestType => typeof(CaptureDataSetCallRequest);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)

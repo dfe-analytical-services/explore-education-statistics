@@ -136,7 +136,8 @@ public class MethodologyAmendmentServiceTests
         var originalVersion = new MethodologyVersion
         {
             Id = Guid.NewGuid(),
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Annexes = new List<ContentSection>
                 {
                     new()
@@ -221,7 +222,8 @@ public class MethodologyAmendmentServiceTests
         var originalVersion = new MethodologyVersion
         {
             Id = Guid.NewGuid(),
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -468,7 +470,8 @@ public class MethodologyAmendmentServiceTests
                 OwningPublicationTitle = "Owning Publication Title",
                 OwningPublicationSlug = "owning-publication-slug",
             },
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = AsList(new ContentSection
                 {
                     Content = AsList<ContentBlock>(new HtmlBlock
@@ -542,11 +545,11 @@ public class MethodologyAmendmentServiceTests
             Assert.Equal(2, amendmentMethodologyFiles.Count());
 
             var methodologyFile1ForAmendment =
-                Assert.Single(amendmentMethodologyFiles, 
+                Assert.Single(amendmentMethodologyFiles,
                     f => f.FileId == originalMethodologyFile1.FileId);
 
             var methodologyFile2ForAmendment =
-                Assert.Single(amendmentMethodologyFiles, 
+                Assert.Single(amendmentMethodologyFiles,
                     f => f.FileId == originalMethodologyFile2.FileId);
 
             Assert.NotEqual(originalMethodologyFile1.Id, methodologyFile1ForAmendment.Id);

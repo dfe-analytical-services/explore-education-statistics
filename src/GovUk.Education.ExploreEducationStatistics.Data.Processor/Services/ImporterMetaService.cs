@@ -95,7 +95,7 @@ public class ImporterMetaService : IImporterMetaService
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);
-        
+
         var filters = (await GetFilters(metaRows, subject, context)).ToList();
         var indicators = GetIndicators(metaRows, subject, context).ToList();
 
@@ -129,10 +129,10 @@ public class ImporterMetaService : IImporterMetaService
     {
         var groupingColumns = metaRows
             .Select(mr => mr.FilterGroupingColumn?.ToLower())
-            .WhereNotNull() ;
+            .WhereNotNull();
 
         return metaRows
-            .Where(r => r.ColumnType != ColumnType.Filter 
+            .Where(r => r.ColumnType != ColumnType.Filter
                     || !groupingColumns.Contains(r.ColumnName.ToLower()))
             .ToList();
     }

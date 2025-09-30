@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;

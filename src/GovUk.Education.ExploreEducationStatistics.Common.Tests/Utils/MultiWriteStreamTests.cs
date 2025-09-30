@@ -31,7 +31,7 @@ public class MultiWriteStreamTests
 
         var multiWriteStream = new MultiWriteStream(stream1, stream2);
 
-        var buffer = new byte[] {};
+        var buffer = ""u8.ToArray();
 
         Assert.Throws<NotSupportedException>(() => multiWriteStream.Read(buffer, 0, 0));
     }

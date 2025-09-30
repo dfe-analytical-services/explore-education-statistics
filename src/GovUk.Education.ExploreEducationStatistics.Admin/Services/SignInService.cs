@@ -223,8 +223,8 @@ public class SignInService(
             .Select(u => u.Id)
             .SingleOrDefaultAsync();
 
-        return createdByInternalUserId == Guid.Empty 
-            ? await GetDeletedUserId() 
+        return createdByInternalUserId == Guid.Empty
+            ? await GetDeletedUserId()
             : createdByInternalUserId;
     }
 }

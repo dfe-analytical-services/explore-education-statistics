@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 
 public class FootnoteIndicatorGroupViewModel
 {

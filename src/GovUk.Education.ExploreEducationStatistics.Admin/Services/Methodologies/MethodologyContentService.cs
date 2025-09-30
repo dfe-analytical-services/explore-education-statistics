@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -180,7 +180,7 @@ public class MethodologyContentService : IMethodologyContentService
             .OnSuccess(async tuple =>
             {
                 var (methodologyContent, contentSections) = tuple;
-                var sectionToRemove = contentSections.Single(section => section.Id == contentSectionId); 
+                var sectionToRemove = contentSections.Single(section => section.Id == contentSectionId);
 
                 contentSections.Remove(sectionToRemove);
 
@@ -317,7 +317,7 @@ public class MethodologyContentService : IMethodologyContentService
     {
         if (order.HasValue)
         {
-            return (int) order;
+            return (int)order;
         }
 
         if (!section.Content.IsNullOrEmpty())
@@ -353,7 +353,7 @@ public class MethodologyContentService : IMethodologyContentService
     private static ContentBlock CreateContentBlockForType(ContentBlockType type)
     {
         var classType = GetContentBlockClassTypeFromEnumValue(type);
-        var newContentBlock = (ContentBlock) (Activator.CreateInstance(classType) 
+        var newContentBlock = (ContentBlock)(Activator.CreateInstance(classType)
                                               ?? throw new ArgumentException($"Could not create content block for {type} with class type {classType}"));
         newContentBlock.Id = Guid.NewGuid();
         newContentBlock.Created = DateTime.UtcNow;
@@ -482,9 +482,9 @@ public class MethodologyContentService : IMethodologyContentService
         if (ComparerUtils.SequencesAreEqualIgnoringOrder(
                 content.Content.Select(section => section.Id),
                 contentSectionIds))
-            {
-                return TupleOf(content, content.Content);
-            }
+        {
+            return TupleOf(content, content.Content);
+        }
 
         if (ComparerUtils.SequencesAreEqualIgnoringOrder(
             content.Annexes.Select(section => section.Id),

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
@@ -22,20 +22,20 @@ public static class ServiceCollectionExtensions
 
     public class AnalyticsRegistrar(IServiceCollection services, IConfiguration configuration)
     {
-        private readonly bool _isAnalyticsEnabled = 
+        private readonly bool _isAnalyticsEnabled =
             configuration
                 .GetSection(AnalyticsOptions.Section)
                 .Get<AnalyticsOptions>()?
                 .Enabled == true;
-        
-        private readonly IServiceCollection _services = 
+
+        private readonly IServiceCollection _services =
             services
                 .AddOptions<AnalyticsOptions>().Bind(configuration.GetSection(AnalyticsOptions.Section)).Services
                 .AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
 
         public AnalyticsEnabledRegistrar WhenEnabled => _services.AddAnalyticsCommon(_isAnalyticsEnabled);
     }
-    
+
     private static AnalyticsEnabledRegistrar AddAnalyticsCommon(this IServiceCollection services, bool isAnalyticsEnabled) =>
         new(
             isAnalyticsEnabled
@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
     }
     public class AnalyticsEnabledRegistrar(IServiceCollection services, bool isAnalyticsEnabled)
     {
-        public AnalyticsEnabledRegistrar AddWriteStrategy<TWriter>() 
+        public AnalyticsEnabledRegistrar AddWriteStrategy<TWriter>()
             where TWriter : class, IAnalyticsWriteStrategy
         {
             if (isAnalyticsEnabled)
@@ -86,7 +86,7 @@ public static class ServiceCollectionExtensions
         public IServiceCollection Services => services;
         public AnalyticsDisabledRegistrar WhenDisabled => new(services, isAnalyticsEnabled);
     }
-    
+
     private static IServiceCollection TryAddSingletonInline<TService>(this IServiceCollection services)
         where TService : class
     {

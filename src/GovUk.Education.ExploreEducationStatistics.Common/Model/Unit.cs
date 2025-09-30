@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 /// <summary>
 /// Class that can be used as a return type representing no meaningful value. 
@@ -9,5 +9,5 @@ public sealed class Unit
     {
     }
 
-    public static readonly Unit Instance = new Unit();
+    public static readonly Unit Instance = new();
 }

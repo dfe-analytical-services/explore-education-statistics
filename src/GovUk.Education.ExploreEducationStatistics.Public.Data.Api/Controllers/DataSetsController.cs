@@ -57,7 +57,7 @@ public class DataSetsController(
         [FromQuery, SwaggerParameter("""
                                      The data set version e.g. 1.0, 1.1, 2.0, etc.
                                      Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
-                                     """)]string? dataSetVersion,
+                                     """)] string? dataSetVersion,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         CancellationToken cancellationToken)
     {

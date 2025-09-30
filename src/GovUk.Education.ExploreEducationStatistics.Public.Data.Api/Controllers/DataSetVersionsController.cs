@@ -89,7 +89,7 @@ public class DataSetVersionsController(
                           """)] string dataSetVersion,
         [SwaggerParameter("Whether to include change logs for all associated patches will be in the results."
             )] bool includePatchHistory = false,
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default)
     {
         return await dataSetVersionChangeService
             .GetChanges(

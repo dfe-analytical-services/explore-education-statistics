@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
-    
+
 public class MemoryCacheService : IMemoryCacheService
 {
     private readonly JsonSerializerSettings _jsonSerializerSettings = new()
@@ -18,10 +18,10 @@ public class MemoryCacheService : IMemoryCacheService
         NullValueHandling = NullValueHandling.Ignore,
         TypeNameHandling = TypeNameHandling.Auto
     };
-    
+
     private readonly IMemoryCache _cache;
     private readonly ILogger<MemoryCacheService> _logger;
-    
+
     public MemoryCacheService(
         IMemoryCache cache,
         ILogger<MemoryCacheService> logger)

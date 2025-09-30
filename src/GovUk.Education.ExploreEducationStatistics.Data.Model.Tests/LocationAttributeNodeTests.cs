@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests;

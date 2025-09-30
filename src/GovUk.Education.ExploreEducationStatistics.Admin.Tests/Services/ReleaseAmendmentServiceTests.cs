@@ -1148,7 +1148,7 @@ public class ReleaseAmendmentServiceTests
         Assert.Empty(amendedBlock.Comments);
     }
 
-    [UsedImplicitly] 
+    [UsedImplicitly]
     private static void AssertAmendedReleaseRoleCorrect(
         UserReleaseRole originalReleaseRole,
         UserReleaseRole amendedReleaseRole,
@@ -1163,7 +1163,7 @@ public class ReleaseAmendmentServiceTests
         Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
     }
 
-    [UsedImplicitly] 
+    [UsedImplicitly]
     private static void AssertAmendedReleaseFileCorrect(
         ReleaseFile originalFile,
         ReleaseFile amendmentDataFile,

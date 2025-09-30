@@ -16,7 +16,7 @@ public record NextDataSetVersionMappingsCreateRequest
         {
             RuleFor(request => request.DataSetId)
                 .NotEmpty();
-            
+
             RuleFor(request => request.ReleaseFileId)
                 .NotEmpty();
         }

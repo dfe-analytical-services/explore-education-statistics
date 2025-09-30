@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -42,7 +42,8 @@ public static class ClaimsPrincipalExtensions
         var givenName = principal.FindFirstValue(ClaimTypes.GivenName);
         var surname = principal.FindFirstValue(ClaimTypes.Surname);
 
-        if (givenName != null && surname != null) {
+        if (givenName != null && surname != null)
+        {
             return (FirstName: givenName, LastName: surname);
         }
 
@@ -55,7 +56,8 @@ public static class ClaimsPrincipalExtensions
 
         var nameClaimParts = nameClaim.Trim().Split(' ');
 
-        if (nameClaimParts.Length > 1) {
+        if (nameClaimParts.Length > 1)
+        {
             return (FirstName: nameClaimParts.First(), LastName: nameClaimParts.Last());
         }
 

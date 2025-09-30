@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 public class ReleaseSlugValidator(ContentDbContext context) : IReleaseSlugValidator
 {
     public async Task<Either<ActionResult, Unit>> ValidateNewSlug(
-        string newReleaseSlug, 
+        string newReleaseSlug,
         Guid publicationId,
         Guid? releaseId = null,
         CancellationToken cancellationToken = default)

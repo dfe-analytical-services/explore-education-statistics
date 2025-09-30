@@ -28,26 +28,26 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
 
             var releaseVersionId1 = Guid.Parse("5d3c0aec-c147-48ce-ae26-ef765ffa4a5b");
             await strategy.Report(new CaptureZipDownloadRequest
-                {
-                    PublicationName = "publication name 1",
-                    ReleaseVersionId = releaseVersionId1,
-                    ReleaseName = "release name 1",
-                    ReleaseLabel = "release label 1",
-                    FromPage = AnalyticsFromPage.DataCatalogue
-                },
+            {
+                PublicationName = "publication name 1",
+                ReleaseVersionId = releaseVersionId1,
+                ReleaseName = "release name 1",
+                ReleaseLabel = "release label 1",
+                FromPage = AnalyticsFromPage.DataCatalogue
+            },
                 default);
 
             var releaseVersionId2 = Guid.Parse("254d53e4-1194-4285-82bd-d8a3b7c0853d");
             await strategy.Report(new CaptureZipDownloadRequest
-                {
-                    PublicationName = "publication name 2",
-                    ReleaseVersionId = releaseVersionId2,
-                    ReleaseName = "release name 2",
-                    ReleaseLabel = "release label 2",
-                    FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
-                    SubjectId = Guid.Parse("39132b60-d4a0-4b62-befe-ba10cea4b30e"),
-                    DataSetTitle = "data set title 2",
-                },
+            {
+                PublicationName = "publication name 2",
+                ReleaseVersionId = releaseVersionId2,
+                ReleaseName = "release name 2",
+                ReleaseLabel = "release label 2",
+                FromPage = AnalyticsFromPage.ReleaseUsefulInfo,
+                SubjectId = Guid.Parse("39132b60-d4a0-4b62-befe-ba10cea4b30e"),
+                DataSetTitle = "data set title 2",
+            },
                 default);
 
             var files = Directory.GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicZipDownloadStrategy.OutputSubPaths))

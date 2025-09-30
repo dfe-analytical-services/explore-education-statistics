@@ -8,7 +8,7 @@ public interface IPublicationService
 {
     Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
-        int pageSize, 
+        int pageSize,
         string? search = null,
         CancellationToken cancellationToken = default);
 

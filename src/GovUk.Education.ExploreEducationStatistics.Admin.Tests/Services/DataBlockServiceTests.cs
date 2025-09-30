@@ -405,11 +405,11 @@ public class DataBlockServiceTests
                 {
                     Rows = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                     },
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Filter)
                     }
                 }
             },
@@ -456,11 +456,11 @@ public class DataBlockServiceTests
                 {
                     Rows = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                     },
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Filter)
                     }
                 }
             },
@@ -583,11 +583,11 @@ public class DataBlockServiceTests
                 {
                     Rows = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                     },
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Filter)
                     }
                 }
             },
@@ -960,7 +960,7 @@ public class DataBlockServiceTests
             releaseFileService
                 .Setup(
                     s =>
-                        s.Delete(releaseVersion.Id, new List<Guid> {fileId}, false)
+                        s.Delete(releaseVersion.Id, new List<Guid> { fileId }, false)
                 )
                 .ReturnsAsync(Unit.Instance);
 

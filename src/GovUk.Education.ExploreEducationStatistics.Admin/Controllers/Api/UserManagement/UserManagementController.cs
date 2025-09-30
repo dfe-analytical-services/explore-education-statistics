@@ -92,7 +92,8 @@ public class UserManagementController : ControllerBase
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    [HttpDelete("user/{userId:guid}/resource-roles/all")] [ProducesResponseType(204)]
+    [HttpDelete("user/{userId:guid}/resource-roles/all")]
+    [ProducesResponseType(204)]
     public async Task<ActionResult<Unit>> DeleteAllUserResourceRoles(Guid userId)
     {
         return await _userRoleService

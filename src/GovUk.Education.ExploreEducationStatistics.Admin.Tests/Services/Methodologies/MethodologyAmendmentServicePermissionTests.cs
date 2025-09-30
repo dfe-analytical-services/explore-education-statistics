@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyAmendmentServicePermissionTests
 {
-    private readonly MethodologyVersion _methodologyVersion = new MethodologyVersion
+    private readonly MethodologyVersion _methodologyVersion = new()
     {
         Id = Guid.NewGuid()
     };

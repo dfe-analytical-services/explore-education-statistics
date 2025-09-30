@@ -169,7 +169,7 @@ public class Startup(
 
         services.AddValidatorsFromAssemblies([
             typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
-                typeof(FullTableQueryRequest.Validator).Assembly // Adds *all* validators from Common
+            typeof(FullTableQueryRequest.Validator).Assembly // Adds *all* validators from Common
         ]);
 
         services.AddMvc(options =>

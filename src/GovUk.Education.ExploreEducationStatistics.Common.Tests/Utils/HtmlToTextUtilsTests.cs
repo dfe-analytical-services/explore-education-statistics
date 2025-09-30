@@ -228,7 +228,7 @@ public class HtmlToTextUtilsTests
     [Fact]
     public async Task HtmlToText_MultipleElements_Blocks_CrlfLineEndingsOnly()
     {
-        var lines = new []
+        var lines = new[]
         {
             "<h1>Test heading 1</h1>",
             "<h2>Test heading 2</h2>",
@@ -241,7 +241,7 @@ public class HtmlToTextUtilsTests
 
         var text = await HtmlToTextUtils.HtmlToText(lines.JoinToString());
 
-        var expectedLines = new []
+        var expectedLines = new[]
         {
             "Test heading 1",
             "Test heading 2",

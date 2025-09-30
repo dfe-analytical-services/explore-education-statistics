@@ -598,9 +598,9 @@ public class DataSetFileStorageTests
             UploadedBy = _user.Email,
             Status = DataSetUploadStatus.SCREENING,
         };
-        
+
         await using var contentDbContext = InMemoryApplicationDbContext();
-        
+
         contentDbContext.DataSetUploads.Add(dataSetUpload);
 
         await contentDbContext.SaveChangesAsync();
@@ -609,7 +609,7 @@ public class DataSetFileStorageTests
 
         var expectedBlobPath =
             $"{FileStoragePathUtils.FilesPath(dataSetUpload.ReleaseVersionId, FileType.Data)}{dataSetUpload.DataFileId}";
-        
+
         privateBlobStorageService
             .SetupGetDownloadToken(
                 container: PrivateReleaseTempFiles,
@@ -632,7 +632,7 @@ public class DataSetFileStorageTests
         // Assert
         privateBlobStorageService.Verify();
         var token = result.AssertRight();
-        
+
         Assert.Equal(ContentTypes.Csv, token.ContentType);
         Assert.Equal(dataSetUpload.DataFileName, token.Filename);
         Assert.Equal("token", token.Token);
@@ -645,9 +645,9 @@ public class DataSetFileStorageTests
     {
         // Arrange
         await using var contentDbContext = InMemoryApplicationDbContext();
-    
+
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-        
+
         var service = SetupReleaseDataFileService(
             privateBlobStorageService: privateBlobStorageService.Object,
             contentDbContext: contentDbContext);
@@ -658,13 +658,13 @@ public class DataSetFileStorageTests
             dataSetUploadId: Guid.NewGuid(),
             FileType.Data,
             cancellationToken: default);
-    
+
         // Assert
         result
             .AssertLeft()
             .AssertNotFoundResult();
     }
-    
+
     [Fact]
     public async Task GetTemporaryFileDownloadToken_InvalidFileType_ThrowsBadResult()
     {
@@ -683,15 +683,15 @@ public class DataSetFileStorageTests
             UploadedBy = _user.Email,
             Status = DataSetUploadStatus.SCREENING,
         };
-    
+
         await using var contentDbContext = InMemoryApplicationDbContext();
-        
+
         contentDbContext.DataSetUploads.Add(dataSetUpload);
-    
+
         await contentDbContext.SaveChangesAsync();
-    
+
         var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
-    
+
         // Act & Assert
         var result = await service.GetTemporaryFileDownloadToken(
             dataSetUpload.ReleaseVersionId,
@@ -768,9 +768,12 @@ public class DataSetFileStorageTests
 
         var dataSet = new DataSet
         {
-            Title = dataSetName, DataFile = dataSetFile, MetaFile = metaSetFile, ReplacingFile =testFixture.DataFileReplace
+            Title = dataSetName,
+            DataFile = dataSetFile,
+            MetaFile = metaSetFile,
+            ReplacingFile = testFixture.DataFileReplace
         };
-          
+
         var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
@@ -780,12 +783,12 @@ public class DataSetFileStorageTests
             cancellationToken: default);
 
         // Assert
-        MockUtils.VerifyAllMocks(testFixture.DataSetService,testFixture.DataSetVersionService,testFixture.DataImportService,
-            testFixture.ReleaseVersionRepository,testFixture.ReleaseDataFileRepository);
+        MockUtils.VerifyAllMocks(testFixture.DataSetService, testFixture.DataSetVersionService, testFixture.DataImportService,
+            testFixture.ReleaseVersionRepository, testFixture.ReleaseDataFileRepository);
 
         AssertUploadSummary(uploadSummary, dataSetName, dataFileName, metaFileName);
     }
-    
+
     [Fact]
     public async Task UploadDataSet_ReplaceDraft_ApiDataSet_ReturnsUploadSummary()
     {
@@ -805,7 +808,7 @@ public class DataSetFileStorageTests
         );
 
         testFixture.SetupDraftDataSetVersionRecreation();
-           
+
         var dataSetFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaSetFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
@@ -816,7 +819,7 @@ public class DataSetFileStorageTests
             MetaFile = metaSetFile,
             ReplacingFile = testFixture.DataFileReplace
         };
-          
+
         var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
@@ -826,8 +829,8 @@ public class DataSetFileStorageTests
             cancellationToken: default);
 
         // Assert
-        MockUtils.VerifyAllMocks(testFixture.DataSetService,testFixture.DataSetVersionService,testFixture.DataImportService,
-            testFixture.ReleaseVersionRepository,testFixture.ReleaseDataFileRepository);
+        MockUtils.VerifyAllMocks(testFixture.DataSetService, testFixture.DataSetVersionService, testFixture.DataImportService,
+            testFixture.ReleaseVersionRepository, testFixture.ReleaseDataFileRepository);
 
         AssertUploadSummary(uploadSummary, dataSetName, dataFileName, metaFileName);
     }
@@ -857,9 +860,12 @@ public class DataSetFileStorageTests
 
         var dataSet = new DataSet
         {
-            Title = dataSetName, DataFile = dataSetFile, MetaFile = metaSetFile, ReplacingFile = testFixture.DataFileReplace
+            Title = dataSetName,
+            DataFile = dataSetFile,
+            MetaFile = metaSetFile,
+            ReplacingFile = testFixture.DataFileReplace
         };
-          
+
         var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
@@ -884,7 +890,7 @@ public class DataSetFileStorageTests
         var metaFileName = "test-data.meta.csv";
         var contentDbContextId = Guid.NewGuid();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId.ToString());
-        
+
         var testFixture = await DataSetFileStorageTestFixture
             .CreateZipUploadDataSetTestFixture(
                 fixture: _fixture,
@@ -911,7 +917,7 @@ public class DataSetFileStorageTests
             Status = DataSetUploadStatus.SCREENING,
             UploadedBy = _user.Email
         };
-        
+
         var service = CreateServiceForApiPatchReplacement(testFixture, contentDbContext);
 
         // Act
@@ -929,7 +935,7 @@ public class DataSetFileStorageTests
         Assert.Equivalent(testFixture.ReleaseFile.File, uploadSummary.File);
         Assert.Equal(testFixture.ReleaseFile.Order, uploadSummary.Order);
     }
-  
+
     [Fact]
     public async Task MoveDataSetsToPermanentStorage_ReplaceMultiplePublishedViaPatchApiDataSet_ReturnsReleaseFile()
     {
@@ -950,17 +956,17 @@ public class DataSetFileStorageTests
                 isPublished: true,
                 version: new SemVersion(2, 0, 0)
             );
-        
+
         var releaseFilesAndDataSets = testFixture.ReleaseFilesReplacing!
-            .Zip(dataSetNames, 
-                (releaseFile, dataSetName) => (releaseFile, dataSetName)).ToArray(); 
+            .Zip(dataSetNames,
+                (releaseFile, dataSetName) => (releaseFile, dataSetName)).ToArray();
 
         var dataSets = new DataSetUpload[dataSetNames.Length];
         for (var i = 0; i < releaseFilesAndDataSets.Length; i++)
         {
             dataSets[i] = new DataSetUpload
             {
-                DataFileSizeInBytes =  releaseFilesAndDataSets[i].releaseFile.File.ContentLength,
+                DataFileSizeInBytes = releaseFilesAndDataSets[i].releaseFile.File.ContentLength,
                 MetaFileSizeInBytes = 157,
                 ReleaseVersionId = testFixture.ReleaseVersion.Id,
                 DataSetTitle = releaseFilesAndDataSets[i].dataSetName,
@@ -1028,9 +1034,9 @@ public class DataSetFileStorageTests
                 contentDbContext,
                 version,
                 isPublished);
-    
+
     private DataSetFileStorage CreateServiceForApiPatchReplacement(
-        DataSetFileStorageTestFixture fileStorageTestFixture, 
+        DataSetFileStorageTestFixture fileStorageTestFixture,
         ContentDbContext contentDbContext)
     {
         var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions

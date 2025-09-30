@@ -29,8 +29,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     }
 
     public async Task<TEntity?> GetEntityIfExists<TEntity>(
-        string tableName, 
-        string partitionKey, 
+        string tableName,
+        string partitionKey,
         string rowKey,
         IEnumerable<string>? select = null,
         CancellationToken cancellationToken = default)
@@ -50,7 +50,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     }
 
     public async Task CreateEntity(
-        string tableName, 
+        string tableName,
         ITableEntity entity,
         CancellationToken cancellationToken = default)
     {
@@ -77,7 +77,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     }
 
     public async Task DeleteEntity(
-        string tableName, 
+        string tableName,
         string partitionKey,
         string rowKey,
         CancellationToken cancellationToken = default)
@@ -128,8 +128,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     }
 
     public async Task BatchManipulateEntities<TEntity>(
-        string tableName, 
-        IEnumerable<TEntity> entities, 
+        string tableName,
+        IEnumerable<TEntity> entities,
         TableTransactionActionType tableTransactionActionType,
         CancellationToken cancellationToken = default)
         where TEntity : class, ITableEntity

@@ -10,7 +10,7 @@ public class AnalyticsWritePublicZipDownloadStrategy(
 ) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public", "zip-downloads"];
-    
+
     private readonly IWorkflowActor<CaptureZipDownloadRequest> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
 

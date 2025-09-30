@@ -16,16 +16,16 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
     public class ReportTests : AnalyticsWriteDataSetVersionCallsStrategyTests
     {
         private const string SnapshotPrefix = $"{nameof(AnalyticsWriteDataSetVersionCallsStrategyTests)}.{nameof(ReportTests)}";
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithCoreDataSetVersionDetails()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(
                 pathResolver: pathResolver,
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z")));
-            
+
             await strategy.Report(new CaptureDataSetVersionCallRequest(
                 DataSetId: new Guid("01d29401-7274-a871-a8db-d4bc4e98c324"),
                 DataSetVersionId: new Guid("01d29401-7974-1276-a06b-b28a6a5385c6"),
@@ -36,10 +36,10 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 PreviewToken: null,
                 RequestedDataSetVersion: null,
                 Type: DataSetVersionCallType.GetSummary), default);
-            
+
             var files = Directory
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
-            
+
             var filePath = Assert.Single(files);
 
             var filename = filePath
@@ -50,16 +50,16 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 currentResult: await File.ReadAllTextAsync(filePath),
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithCoreDataSetVersionDetails)}");
         }
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithPreviewTokenAndRequestedDataSetVersion()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(
                 pathResolver: pathResolver,
                 dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z")));
-            
+
             await strategy.Report(new CaptureDataSetVersionCallRequest(
                 DataSetId: new Guid("01d29401-7274-a871-a8db-d4bc4e98c324"),
                 DataSetVersionId: new Guid("01d29401-7974-1276-a06b-b28a6a5385c6"),
@@ -74,10 +74,10 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                     Expiry: DateTime.Parse("2025-02-24T11:02:44.850Z")),
                 RequestedDataSetVersion: "1.*",
                 Type: DataSetVersionCallType.DownloadCsv), default);
-            
+
             var files = Directory
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
-            
+
             var filePath = Assert.Single(files);
 
             var filename = filePath
@@ -88,12 +88,12 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
                 currentResult: await File.ReadAllTextAsync(filePath),
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithPreviewTokenAndRequestedDataSetVersion)}");
         }
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithParameters()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(pathResolver);
 
             await strategy.Report(new CaptureDataSetVersionCallRequest(
@@ -115,7 +115,7 @@ public abstract class AnalyticsWriteDataSetVersionCallsStrategyTests
 
             var filePath = Assert.Single(Directory
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths)));
-            
+
             Snapshot.Match(
                 currentResult: await File.ReadAllTextAsync(filePath),
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithParameters)}");

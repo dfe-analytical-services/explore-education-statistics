@@ -38,7 +38,7 @@ public class DataSetFileStorage(
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
     IDataSetService dataSetService,
-    IOptions<FeatureFlagsOptions> featureFlags, 
+    IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
 {
     // TODO (EES-6176): Remove once manual replacement processes have been consolidated to use Upload* methods.
@@ -92,11 +92,11 @@ public class DataSetFileStorage(
             createdById: userService.GetUserId());
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-        
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-            && dataSet.ReplacingFile is not null 
+
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            && dataSet.ReplacingFile is not null
             && replacedReleaseDataFile!.PublicApiDataSetId != null)
-        { 
+        {
             await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
 
@@ -283,7 +283,7 @@ public class DataSetFileStorage(
                     releaseVersionId: releaseVersionId,
                     fileType: fileType,
                     upload: upload);
-                
+
                 return privateBlobStorageService.GetBlobDownloadToken(
                     container: PrivateReleaseTempFiles,
                     filename: fileDetails.FileName,
@@ -450,11 +450,11 @@ public class DataSetFileStorage(
 
             await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceDataFilePath, destinationDataFilePath, PrivateReleaseFiles);
             await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceMetaFilePath, destinationMetaFilePath, PrivateReleaseFiles);
-            
-            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+
+            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets
                 && replacingFile is not null
                 && replacedReleaseDataFile!.PublicApiDataSetId != null)
-            { 
+            {
                 await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
             }
 
@@ -525,7 +525,7 @@ public class DataSetFileStorage(
                 FileName: upload.DataFileName
             );
         }
-        
+
         return (
             FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
             FileName: upload.MetaFileName

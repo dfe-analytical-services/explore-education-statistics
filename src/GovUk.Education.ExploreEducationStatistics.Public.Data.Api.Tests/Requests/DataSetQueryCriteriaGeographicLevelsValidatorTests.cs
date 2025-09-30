@@ -25,7 +25,7 @@ public abstract class DataSetQueryCriteriaGeographicLevelsValidatorTests
         new [] { "PROV" },
     };
 
-    public static readonly  TheoryData<string> InvalidGeographicLevelsSingle = new()
+    public static readonly TheoryData<string> InvalidGeographicLevelsSingle = new()
     {
         "",
         " ",

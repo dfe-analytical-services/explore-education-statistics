@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record GlossaryEntryViewModel(string Title, string Slug, string Body);

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -48,7 +48,7 @@ public class RemoveDataSetTestFixture
         Mock<IFootnoteRepository>? footnoteRepository = null,
         Mock<IDataBlockService>? dataBlockService = null,
         Mock<IReleaseSubjectRepository>? releaseSubjectRepository = null,
-        Mock<IPrivateBlobCacheService>? privateBlobCacheService = null, 
+        Mock<IPrivateBlobCacheService>? privateBlobCacheService = null,
         Mock<ILogger<ReleaseVersionService>>? logger = null)
     {
         ReleaseDataFileService = releaseDataFileService ?? new Mock<IReleaseDataFileService>(Strict);
@@ -67,46 +67,46 @@ public class RemoveDataSetTestFixture
         StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext)
     {
-        var instance = await InitializeApiLinkedData(dataFixture, 
-            dataSetVersionStatus, 
-            statisticsDbContext, 
+        var instance = await InitializeApiLinkedData(dataFixture,
+            dataSetVersionStatus,
+            statisticsDbContext,
             contentDbContext);
-        
+
         instance.SetUpMocksForApiLinkedValidationErrors();
-        
+
         return instance;
     }
-    
+
     public static async Task<RemoveDataSetTestFixture> CreateApiLinkedThrows404VersionException(
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
         StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext)
     {
-        var instance = await InitializeApiLinkedData(dataFixture, 
-            dataSetVersionStatus, 
-            statisticsDbContext, 
+        var instance = await InitializeApiLinkedData(dataFixture,
+            dataSetVersionStatus,
+            statisticsDbContext,
             contentDbContext);
-        
+
         instance.SetUpMocksForApiLinkedExceptions();
-        
+
         return instance;
     }
-    
+
     public static async Task<RemoveDataSetTestFixture> CreateApiLinkedToRelease(
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
         StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
-        Guid? replacedById = null, 
+        Guid? replacedById = null,
         Guid? replacingId = null,
         bool releaseVersionPublished = false)
     {
-        var instance = await InitializeApiLinkedData(dataFixture, 
-            dataSetVersionStatus, 
-            statisticsDbContext, 
+        var instance = await InitializeApiLinkedData(dataFixture,
+            dataSetVersionStatus,
+            statisticsDbContext,
             contentDbContext);
-        
+
         instance.SetupApiLinkedDataFixtures(
             dataFixture,
             dataSetVersionStatus,
@@ -115,7 +115,7 @@ public class RemoveDataSetTestFixture
         await instance.SetupStatsAndContentDbContext(statisticsDbContext, contentDbContext);
         instance.SetUpMocksForCheckApiLinkedServices();
         instance.SetUpMocksForApiLinkedValidationErrors();
-        
+
         return instance;
     }
 
@@ -136,7 +136,7 @@ public class RemoveDataSetTestFixture
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()))
             .Verifiable(Times.Once);
     }
-    
+
     private void SetUpMocksForApiLinkedValidationErrors()
     {
         DataImportService.Setup(service => service.GetImport(File.Id))
@@ -169,7 +169,7 @@ public class RemoveDataSetTestFixture
         File.ReplacedById = replacedById;
         File.ReplacingId = replacingId;
     }
-    
+
     private void SetupApiLinkedDataFixtures(
         DataFixture dataFixture,
         DataSetVersionStatus dataSetVersionStatus,
@@ -190,7 +190,7 @@ public class RemoveDataSetTestFixture
         {
             ReleaseVersion.Published = DateTime.Now.AddDays(-1);
         }
-        
+
         Subject = dataFixture
             .DefaultSubject()
             .Generate();
@@ -215,7 +215,7 @@ public class RemoveDataSetTestFixture
         contentDbContext.ReleaseVersions.Add(ReleaseVersion);
         contentDbContext.ReleaseFiles.Add(ReleaseFile);
         await contentDbContext.SaveChangesAsync();
-                
+
         statisticsDbContext.Subject.Add(Subject);
         await statisticsDbContext.SaveChangesAsync();
     }
@@ -236,7 +236,7 @@ public class RemoveDataSetTestFixture
         DataBlockService.Setup(service =>
                 service.GetDeletePlan(ReleaseVersion.Id, It.Is<Subject>(s => s.Id == Subject.Id)))
             .ReturnsAsync(deleteDataBlockPlan);
-               
+
         DataBlockService.Setup(service =>
                 service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
             .ReturnsAsync(Unit.Instance);

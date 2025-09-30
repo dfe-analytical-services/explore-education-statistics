@@ -146,7 +146,7 @@ internal class DataSetQueryService(
     {
         var startTime = DateTime.UtcNow;
 
-        return await 
+        return await
             RunQuery(
                 dataSetVersion: dataSetVersion,
                 query: query,
@@ -224,7 +224,7 @@ internal class DataSetQueryService(
             [
                 DataTable.Cols.TimePeriodId,
                 DataTable.Cols.GeographicLevel,
-                ..columnMappings.Columns
+                .. columnMappings.Columns
             ],
             where: whereSql,
             sorts: sorts,
@@ -281,7 +281,7 @@ internal class DataSetQueryService(
         {
             return [.. indicatorColumnsById.Values];
         }
-        
+
         var validIndicatorColumns = new HashSet<string>();
         var invalidIndicatorIds = new HashSet<string>();
 
@@ -636,9 +636,9 @@ internal class DataSetQueryService(
 
         public IEnumerable<string> Columns =>
         [
-            ..LocationLevels.Values,
-            ..Filters.Values,
-            ..Indicators.Values
+            .. LocationLevels.Values,
+            .. Filters.Values,
+            .. Indicators.Values
         ];
     }
 }

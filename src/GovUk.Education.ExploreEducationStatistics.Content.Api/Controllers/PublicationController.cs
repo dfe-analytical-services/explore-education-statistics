@@ -61,10 +61,10 @@ public class PublicationController : ControllerBase
             })
             .HandleFailuresOrOk();
     }
-    
+
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(
-        [FromQuery] GetPublicationInfosRequest request, 
+        [FromQuery] GetPublicationInfosRequest request,
         CancellationToken cancellationToken = default) =>
         Ok(await _publicationService.ListPublicationInfos(request.ThemeId, cancellationToken));
 }

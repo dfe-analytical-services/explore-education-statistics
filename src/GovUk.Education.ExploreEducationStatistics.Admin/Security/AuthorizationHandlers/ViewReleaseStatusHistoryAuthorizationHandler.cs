@@ -31,7 +31,7 @@ public class ViewReleaseStatusHistoryAuthorizationHandler
             context.Succeed(requirement);
             return;
         }
-        
+
         if (await _authorizationHandlerService
                 .HasRolesOnPublicationOrReleaseVersion(
                     context.User.GetUserId(),

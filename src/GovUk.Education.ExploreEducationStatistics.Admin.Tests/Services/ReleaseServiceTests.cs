@@ -75,7 +75,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(
-                    contentDbContext: context, 
+                    contentDbContext: context,
                     releaseVersionService: releaseVersionServiceMock.Object);
 
                 var result = await releaseService.CreateRelease(
@@ -211,7 +211,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(
-                    contentDbContext: context, 
+                    contentDbContext: context,
                     releaseVersionService: releaseVersionServiceMock.Object);
 
                 var result = await releaseService.CreateRelease(
@@ -521,7 +521,7 @@ public abstract class ReleaseServiceTests
             var label = "this is the new label";
             var year = 2025;
             var timePeriod = TimeIdentifier.April;
-            
+
             var publication = _dataFixture.DefaultPublication()
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
@@ -535,7 +535,7 @@ public abstract class ReleaseServiceTests
                 .Generate();
 
             var currentReleaseSlug = release.Slug;
-            
+
             // Release Version is not published
             var releaseVersion = _dataFixture.DefaultReleaseVersion()
                 .WithRelease(release)
@@ -554,7 +554,7 @@ public abstract class ReleaseServiceTests
                 .SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
-            
+
             var sut = BuildService(
                                     context,
                                     releaseVersionService: releaseVersionService.Build(),
@@ -563,7 +563,7 @@ public abstract class ReleaseServiceTests
                                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
                                     adminEventRaiser: adminEventRaiser.Build());
-            
+
             var request = new ReleaseUpdateRequest
             {
                 Label = label
@@ -571,16 +571,16 @@ public abstract class ReleaseServiceTests
 
             // ACT
             var result = await sut.UpdateRelease(release.Id, request);
-            
+
             // ASSERT
             result.AssertRight();
 
             var newReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, label);
             Assert.NotEqual(currentReleaseSlug, newReleaseSlug);
-            
+
             adminEventRaiser.Assert.OnReleaseSlugChangedWasNotRaised();
         }
-        
+
         [Fact]
         public async Task GivenLiveRelease_WhenReleaseUpdatedButSlugUnchanged_ThenNoEventRaised()
         {
@@ -592,7 +592,7 @@ public abstract class ReleaseServiceTests
             var year = 2025;
             var timePeriod = TimeIdentifier.April;
             var currentReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, currentLabel);
-            
+
             var publication = _dataFixture.DefaultPublication()
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
@@ -606,7 +606,7 @@ public abstract class ReleaseServiceTests
                 .WithLabel(currentLabel)
                 .WithSlug(currentReleaseSlug)
                 .Generate();
-            
+
             var releaseVersion = _dataFixture.DefaultReleaseVersion()
                 .WithRelease(release)
                 .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
@@ -634,7 +634,7 @@ public abstract class ReleaseServiceTests
                                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
                                     adminEventRaiser: adminEventRaiser.Build());
-            
+
             var request = new ReleaseUpdateRequest
             {
                 Label = currentLabel
@@ -642,7 +642,7 @@ public abstract class ReleaseServiceTests
 
             // ACT
             var result = await sut.UpdateRelease(release.Id, request);
-            
+
             // ASSERT
             result.AssertRight();
             adminEventRaiser.Assert.OnReleaseSlugChangedWasNotRaised();

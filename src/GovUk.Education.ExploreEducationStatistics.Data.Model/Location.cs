@@ -353,14 +353,14 @@ public class Location
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((Location) obj);
+        return Equals((Location)obj);
     }
 
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
         hashCode.Add(Id);
-        hashCode.Add((int) GeographicLevel);
+        hashCode.Add((int)GeographicLevel);
         hashCode.Add(Country_Code);
         hashCode.Add(Country_Name);
         hashCode.Add(EnglishDevolvedArea_Code);
@@ -481,14 +481,9 @@ public static class LocationListExtensions
             {
                 // Function which resolves an ILocationAttribute from a Location by property name e.g. 'Region'.
                 // This gets used when grouping the attributes of a location by a property name configured in a hierarchy.
-                return (Func<Location, LocationAttribute>) (location =>
+                return (Func<Location, LocationAttribute>)(location =>
                 {
-                    var propertyInfo = typeof(Location).GetProperty(propertyName);
-
-                    if (propertyInfo == null)
-                    {
-                        throw new ArgumentException($"{nameof(Location)} does not have a property {propertyName}");
-                    }
+                    var propertyInfo = typeof(Location).GetProperty(propertyName) ?? throw new ArgumentException($"{nameof(Location)} does not have a property {propertyName}");
 
                     // Only allow properties of Location that derive from LocationAttribute to be used in a hierarchy 
                     if (!typeof(LocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))

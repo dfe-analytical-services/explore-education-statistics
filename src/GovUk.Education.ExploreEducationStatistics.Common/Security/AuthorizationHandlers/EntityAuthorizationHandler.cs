@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Security.Authorizati
 public class EntityAuthorizationContext<TEntity>
 {
     public TEntity Entity { get; set; }
-    
+
     public ClaimsPrincipal User { get; set; }
-    
+
     public EntityAuthorizationContext(TEntity entity, ClaimsPrincipal user)
     {
         Entity = entity;
@@ -16,7 +16,7 @@ public class EntityAuthorizationContext<TEntity>
     }
 }
 
-public abstract class EntityAuthorizationHandler<TRequirement, TEntity> : AuthorizationHandler<TRequirement, TEntity> 
+public abstract class EntityAuthorizationHandler<TRequirement, TEntity> : AuthorizationHandler<TRequirement, TEntity>
     where TRequirement : IAuthorizationRequirement
 {
     private readonly Predicate<EntityAuthorizationContext<TEntity>> _entityTest;
@@ -30,9 +30,9 @@ public abstract class EntityAuthorizationHandler<TRequirement, TEntity> : Author
         TRequirement requirement,
         TEntity entity)
     {
-        if (_entityTest.Invoke(new EntityAuthorizationContext<TEntity>(entity, authContext.User))) 
+        if (_entityTest.Invoke(new EntityAuthorizationContext<TEntity>(entity, authContext.User)))
         {
-            authContext.Succeed(requirement);    
+            authContext.Succeed(requirement);
         }
 
         return Task.CompletedTask;

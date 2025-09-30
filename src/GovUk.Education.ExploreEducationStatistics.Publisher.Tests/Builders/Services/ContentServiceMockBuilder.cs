@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
@@ -15,11 +15,11 @@ public class ContentServiceMockBuilder
         _mock
             .Setup(m => m.DeletePreviousVersionsDownloadFiles(It.IsAny<IReadOnlyList<Guid>>()))
             .Returns(Task.CompletedTask);
-        
+
         _mock
             .Setup(m => m.DeletePreviousVersionsContent(It.IsAny<IReadOnlyList<Guid>>()))
             .Returns(Task.CompletedTask);
-        
+
         _mock
             .Setup(m => m.UpdateCachedTaxonomyBlobs())
             .Returns(Task.CompletedTask);
@@ -31,7 +31,7 @@ public class ContentServiceMockBuilder
         {
             mock.Verify(m => m.DeletePreviousVersionsDownloadFiles(It.Is<IReadOnlyList<Guid>>(actual => expectedReleaseVersionIds.OrderBy(g => g).SequenceEqual(actual.OrderBy(g => g)))), Times.Once);
         }
-        
+
         public void DeletePreviousVersionsContentCalled(params Guid[] expectedReleaseVersionIds)
         {
             mock.Verify(m => m.DeletePreviousVersionsContent(It.Is<IReadOnlyList<Guid>>(actual => expectedReleaseVersionIds.OrderBy(g => g).SequenceEqual(actual.OrderBy(g => g)))), Times.Once);

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;

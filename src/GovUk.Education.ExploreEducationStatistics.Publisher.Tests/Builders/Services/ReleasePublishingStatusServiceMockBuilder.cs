@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 
@@ -22,7 +22,7 @@ public class ReleasePublishingStatusServiceMockBuilder
             .Returns(Task.CompletedTask);
 
     }
-    
+
     public ReleasePublishingStatusServiceMockBuilder WhereGetReturns(
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatus releasePublishingStatus)
@@ -32,7 +32,7 @@ public class ReleasePublishingStatusServiceMockBuilder
             .ReturnsAsync(releasePublishingStatus);
         return this;
     }
-    
+
     public class Asserter(Mock<IReleasePublishingStatusService> mock)
     {
         public void UpdatePublishingStageWasNotCalled()
@@ -56,7 +56,7 @@ public class ReleasePublishingStatusServiceMockBuilder
                 ),
                 Times.Never);
         }
-        
+
         public void UpdatePublishingStageWasCalled(ReleasePublishingKey key, ReleasePublishingStatusPublishingStage publishingStage)
         {
             mock.Verify(

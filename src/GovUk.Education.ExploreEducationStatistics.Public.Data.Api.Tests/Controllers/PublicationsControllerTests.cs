@@ -264,9 +264,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 Assert.Single(validationProblem.Errors);
 
                 validationProblem.AssertHasMinimumLengthError("search", minLength: 3);
-            }            
+            }
         }
-        
+
         public class AnalyticsEnabledTests : ListPublicationsTests, IDisposable
         {
             public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
@@ -297,20 +297,20 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                         pageSize: 10));
 
                 var client = BuildApp(contentApiClient.Object).CreateClient();
-                
+
                 var response = await ListPublications(
                     client: client,
                     page: 1,
                     pageSize: 10);
 
                 response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
-                
+
                 await AnalyticsTestAssertions.AssertTopLevelAnalyticsCallCaptured(
                     expectedType: TopLevelCallType.GetPublications,
                     expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths),
                     expectedParameters: new PaginationParameters(Page: 1, PageSize: 10));
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
@@ -331,7 +331,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 var client = BuildApp(contentApiClient.Object)
                     .CreateClient()
                     .WithRequestSourceHeader("EES");
-                
+
                 var response = await ListPublications(
                     client: client,
                     page: 1,
@@ -471,7 +471,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                 Assert.Contains("something went wrong", await response.Content.ReadAsStringAsync());
             }
         }
-        
+
         public class AnalyticsEnabledTests : GetPublicationTests, IDisposable
         {
             public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
@@ -513,7 +513,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicationCallsStrategy.OutputSubPaths),
                     expectedParameters: null);
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {

@@ -14,7 +14,7 @@ public record RecordTableToolDownloadRequestBindingModel
     public string? DataSetName { get; init; }
     public TableDownloadFormat? DownloadFormat { get; init; }
     public FullTableQueryRequest? Query { get; init; }
-    
+
     public class Validator : AbstractValidator<RecordTableToolDownloadRequestBindingModel>
     {
         public Validator()

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 
@@ -18,10 +18,10 @@ public class ReleasePublishingStatusRepositoryMockBuilder
                 It.Is<Guid>(g => g == releaseVersionId),
                 It.IsAny<ReleasePublishingStatusOverallStage[]>()))
             .ReturnsAsync(() => releaseStatus);
-        
+
         return this;
     }
-    
+
     public ReleasePublishingStatusRepositoryMockBuilder SetNoReleaseVersionStatus(
         Guid releaseVersionId)
     {
@@ -30,7 +30,7 @@ public class ReleasePublishingStatusRepositoryMockBuilder
                 It.Is<Guid>(g => g == releaseVersionId),
                 It.IsAny<ReleasePublishingStatusOverallStage[]>()))
             .ReturnsAsync(Array.Empty<ReleasePublishingStatus>);
-        
+
         return this;
     }
 }

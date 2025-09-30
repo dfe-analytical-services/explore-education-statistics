@@ -48,12 +48,12 @@ public class MessageAwareSqlServerRetryingExecutionStrategy : SqlServerRetryingE
     private readonly ILogger _logger;
 
     public MessageAwareSqlServerRetryingExecutionStrategy(
-        ExecutionStrategyDependencies dependencies, 
-        int maxRetryCount, 
-        TimeSpan maxRetryDelay) 
+        ExecutionStrategyDependencies dependencies,
+        int maxRetryCount,
+        TimeSpan maxRetryDelay)
         : base(
-            dependencies, 
-            maxRetryCount, 
+            dependencies,
+            maxRetryCount,
             maxRetryDelay,
             errorNumbersToAdd: null)
     {
@@ -72,14 +72,14 @@ public class MessageAwareSqlServerRetryingExecutionStrategy : SqlServerRetryingE
         {
             return false;
         }
-        
+
         // Check the SQL exception for an error message that matches one of the messages that we have registered in
         // this class. 
         foreach (SqlError error in sqlException.Errors)
         {
             var matchingRegex =
                 TransientErrorMessages.FirstOrDefault(messageRegex => messageRegex.IsMatch(error.Message));
-                
+
             if (matchingRegex != null)
             {
                 _logger.LogWarning($"SQL error can be retried - matches regex {matchingRegex}");

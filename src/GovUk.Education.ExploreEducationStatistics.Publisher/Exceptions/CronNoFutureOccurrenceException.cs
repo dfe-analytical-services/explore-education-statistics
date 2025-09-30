@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Publisher.Exceptions;
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Exceptions;
 
 /// <summary>
 /// Exception thrown when there is no future occurrence for a given Cron expression.

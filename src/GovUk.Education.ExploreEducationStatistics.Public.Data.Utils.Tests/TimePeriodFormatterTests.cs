@@ -19,7 +19,7 @@ public class TimePeriodFormatterTests
         [InlineData("1000000000")]
         public void SingleYearHasInvalidNumberOfDigits_Throws(string year)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => 
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
                 TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYear));
         }
 
@@ -34,7 +34,7 @@ public class TimePeriodFormatterTests
         [InlineData("20030/2004")]
         public void InvalidRange_Throws(string year)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => 
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
                 TimePeriodFormatter.FormatLabel(year, TimeIdentifier.AcademicYear));
         }
 
@@ -122,7 +122,7 @@ public class TimePeriodFormatterTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => TimePeriodFormatter.FormatToCsv(period));
         }
-        
+
         [Theory]
         [InlineData("1997/1999")]
         [InlineData("1998/2000")]

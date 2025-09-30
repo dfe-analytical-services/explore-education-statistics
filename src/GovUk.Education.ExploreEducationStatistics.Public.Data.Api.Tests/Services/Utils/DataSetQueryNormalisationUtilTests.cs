@@ -17,7 +17,8 @@ public abstract class DataSetQueryNormalisationUtilTests
                 {
                     Filters = new DataSetQueryCriteriaFilters
                     {
-                        In = ["Filter1", "Filter3", "Filter2"], NotIn = ["Filter6", "Filter5", "Filter4"]
+                        In = ["Filter1", "Filter3", "Filter2"],
+                        NotIn = ["Filter6", "Filter5", "Filter4"]
                     }
                 }
             };
@@ -81,7 +82,8 @@ public abstract class DataSetQueryNormalisationUtilTests
                 {
                     Locations = new DataSetQueryCriteriaLocations
                     {
-                        In = originalLocations, NotIn = originalLocations
+                        In = originalLocations,
+                        NotIn = originalLocations
                     }
                 }
             };
@@ -102,7 +104,8 @@ public abstract class DataSetQueryNormalisationUtilTests
                 {
                     GeographicLevels = new DataSetQueryCriteriaGeographicLevels
                     {
-                        In = ["Level3", "Level1", "Level2"], NotIn = ["Level6", "Level4", "Level5"],
+                        In = ["Level3", "Level1", "Level2"],
+                        NotIn = ["Level6", "Level4", "Level5"],
                     }
                 }
             };
@@ -180,7 +183,7 @@ public abstract class DataSetQueryNormalisationUtilTests
                 new() { Field = "Sort3", Direction = "Asc" },
                 new() { Field = "Sort2", Direction = "Asc" }
             ];
-            
+
             var query = new DataSetQueryRequest
             {
                 Sorts = originalSortOrders

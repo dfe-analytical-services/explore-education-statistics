@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Options;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 public class FeatureFlagsOptions
 {

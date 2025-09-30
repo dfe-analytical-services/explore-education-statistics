@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.TableBuilderUtils;

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -19,7 +19,7 @@ public partial class EES4467_AddCascadeDeletesToContentBlockAndContentSectionRel
         migrationBuilder.DropForeignKey(
             name: "FK_FeaturedTables_Releases_ReleaseId",
             table: "FeaturedTables");
-        
+
         migrationBuilder.AddForeignKey(
             name: "FK_FeaturedTables_Releases_ReleaseId",
             table: "FeaturedTables",
@@ -27,7 +27,7 @@ public partial class EES4467_AddCascadeDeletesToContentBlockAndContentSectionRel
             principalTable: "Releases",
             principalColumn: "Id",
             onDelete: ReferentialAction.Restrict);
-        
+
         // Amend the ContentBlock foreign key cascade now that the cyclical cascade delete from the
         // ReleaseContentBlocks table is no longer present.
         migrationBuilder.DropForeignKey(
@@ -41,13 +41,13 @@ public partial class EES4467_AddCascadeDeletesToContentBlockAndContentSectionRel
             principalTable: "Releases",
             principalColumn: "Id",
             onDelete: ReferentialAction.Cascade);
-        
+
         // Amend the ContentSections foreign key cascade now that the cyclical cascade delete from the
         // ReleaseContentSections table is no longer present.
         migrationBuilder.DropForeignKey(
             name: "FK_ContentSections_Releases_ReleaseId",
             table: "ContentSections");
-        
+
         migrationBuilder.AddForeignKey(
             name: "FK_ContentSections_Releases_ReleaseId",
             table: "ContentSections",

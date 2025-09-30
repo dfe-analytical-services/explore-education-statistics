@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -50,10 +50,7 @@ public class ContentBlockService : IContentBlockService
             .Content
             .ToList()
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async contentBlock =>
-            {
-                await DeleteContentBlock(contentBlock);
-            });
+            .ForEachAwaitAsync(DeleteContentBlock);
 
         await _context.SaveChangesAsync();
     }

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;

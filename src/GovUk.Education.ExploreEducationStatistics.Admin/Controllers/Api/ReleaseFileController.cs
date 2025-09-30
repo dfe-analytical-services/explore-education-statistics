@@ -110,7 +110,7 @@ public class ReleaseFileController(
             .OnSuccess(token => token.ToBase64JsonString())
             .HandleFailuresOrOk();
     }
-    
+
     [HttpPatch("release/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult<Unit>> UpdateDataFileDetails(
         Guid releaseVersionId,

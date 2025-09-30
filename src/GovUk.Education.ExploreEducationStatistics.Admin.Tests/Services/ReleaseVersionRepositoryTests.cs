@@ -67,7 +67,7 @@ public class ReleaseVersionRepositoryTests
                     releaseApprovalStatus);
                 Assert.Equal([
                         userReleaseRoles[0].ReleaseVersionId,
-                        userPublicationRole.Publication.Releases[0].Versions[0].Id
+                    userPublicationRole.Publication.Releases[0].Versions[0].Id
                     ],
                     result.Select(rv => rv.Id));
             }

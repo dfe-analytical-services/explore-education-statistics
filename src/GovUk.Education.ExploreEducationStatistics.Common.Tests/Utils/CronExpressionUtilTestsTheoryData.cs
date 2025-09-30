@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using static System.TimeZoneInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;

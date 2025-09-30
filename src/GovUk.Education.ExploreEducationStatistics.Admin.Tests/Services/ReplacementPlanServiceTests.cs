@@ -366,8 +366,8 @@ public class ReplacementPlanServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] {originalFilterItem.Id},
-                Indicators = new[] {originalIndicator.Id},
+                Filters = new[] { originalFilterItem.Id },
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod
             },
@@ -826,7 +826,7 @@ public class ReplacementPlanServiceTests
                     originalDefaultFilterItem.Id,
                     originalDefaultFilterItem2.Id
                 },
-                Indicators = new[] {originalIndicator.Id},
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod
             },
@@ -1054,7 +1054,7 @@ public class ReplacementPlanServiceTests
                 {
                     originalDefaultFilterItem.Id
                 },
-                Indicators = new[] {originalIndicator.Id},
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod
             },
@@ -1307,7 +1307,7 @@ public class ReplacementPlanServiceTests
                 {
                     originalDefaultFilterItem.Id
                 },
-                Indicators = new[] {originalIndicator.Id},
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod
             },
@@ -1541,8 +1541,8 @@ public class ReplacementPlanServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] {originalFilterItem.Id},
-                Indicators = new[] {originalIndicator.Id},
+                Filters = new[] { originalFilterItem.Id },
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod
             },
@@ -1674,9 +1674,9 @@ public class ReplacementPlanServiceTests
     [InlineData(DataSetVersionStatus.Withdrawn, false, false, false)]
     [InlineData(DataSetVersionStatus.Cancelled, false, false, false)]
     public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(
-        DataSetVersionStatus dataSetVersionStatus, 
-        bool  majorVersionUpdate,
-        bool enableReplacementOfPublicApiDataSets, 
+        DataSetVersionStatus dataSetVersionStatus,
+        bool majorVersionUpdate,
+        bool enableReplacementOfPublicApiDataSets,
         bool expectedValidValue)
     {
         DataSet dataSet = _fixture
@@ -1728,7 +1728,7 @@ public class ReplacementPlanServiceTests
         var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
         dataSetVersionService.Setup(mock => mock.GetDataSetVersion(
             originalReleaseFile.PublicApiDataSetId!.Value,
-            originalReleaseFile.PublicApiDataSetVersion!, 
+            originalReleaseFile.PublicApiDataSetVersion!,
             It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSetVersion);
 
@@ -1757,12 +1757,12 @@ public class ReplacementPlanServiceTests
                 FiltersHaveMajorChange = majorVersionUpdate,
                 LocationsHaveMajorChange = majorVersionUpdate
             });
-        
+
         var options = Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
         {
             EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
         });
-        
+
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -1793,7 +1793,7 @@ public class ReplacementPlanServiceTests
             VerifyAllMocks(dataSetVersionService);
 
             var replacementPlan = result.AssertRight();
-            
+
             Assert.NotNull(replacementPlan.ApiDataSetVersionPlan);
             Assert.Equal(dataSet.Id, replacementPlan.ApiDataSetVersionPlan.DataSetId);
             Assert.Equal(dataSet.Title, replacementPlan.ApiDataSetVersionPlan.DataSetTitle);
@@ -2050,7 +2050,7 @@ public class ReplacementPlanServiceTests
                     originalPrimarySchoolsFilterItem.Id,
                     originalPrimaryAndSecondarySchoolsFilterItem.Id,
                 },
-                Indicators = new[] {originalIndicator.Id},
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod
             },

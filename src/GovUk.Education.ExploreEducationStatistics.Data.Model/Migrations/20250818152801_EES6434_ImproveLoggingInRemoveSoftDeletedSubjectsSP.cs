@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 

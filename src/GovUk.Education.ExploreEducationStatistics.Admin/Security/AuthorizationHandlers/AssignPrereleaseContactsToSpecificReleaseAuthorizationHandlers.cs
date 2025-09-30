@@ -32,7 +32,7 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
             context.Succeed(requirement);
             return;
         }
-        
+
         if (await _authorizationHandlerService
                 .HasRolesOnPublicationOrReleaseVersion(
                     context.User.GetUserId(),

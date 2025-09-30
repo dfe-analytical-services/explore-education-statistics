@@ -11,7 +11,7 @@ public class ManageExternalMethodologyForSpecificPublicationRequirement : IAutho
 {
 }
 
-public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler 
+public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
     : AuthorizationHandler<ManageExternalMethodologyForSpecificPublicationRequirement, Publication>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
@@ -31,7 +31,7 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             context.Succeed(requirement);
             return;
         }
-        
+
         if (await _authorizationHandlerService
                 .HasRolesOnPublication(
                     context.User.GetUserId(),

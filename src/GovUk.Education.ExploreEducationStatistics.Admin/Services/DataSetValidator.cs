@@ -81,7 +81,7 @@ public class DataSetValidator(
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDraftApiDataSet(dataSet.Title));
                     return errors;
                 }
-                
+
                 await dataSetService
                     .HasDraftVersion(releaseFileWithApiDataSet.PublicApiDataSetId!.Value)
                     .OnSuccessDo(hasDraftVersion =>

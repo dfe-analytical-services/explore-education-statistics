@@ -25,7 +25,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
         .Build();
-    
+
     private readonly HashSet<string> _additionalAppsettingsFiles = new();
 
     public async Task Initialize()
@@ -62,14 +62,14 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
             .ConfigureAppConfiguration((_, builder) =>
             {
                 var configuration = new ConfigurationBuilder();
-                
+
                 _additionalAppsettingsFiles.ForEach(settingsFile =>
                 {
                     configuration.AddJsonFile(
                         Path.Combine(Assembly.GetExecutingAssembly().GetDirectoryPath(),
                             settingsFile), optional: false);
                 });
-                
+
                 builder.AddConfiguration(configuration.Build());
             })
             .ConfigureServices(services =>
@@ -85,7 +85,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, null);
 
                 services.AddSingleton<TestAuthHandlerUserProvider>();
-                
+
                 services
                     .ReplaceService<IAnalyticsPathResolver>(new TestAnalyticsPathResolver(), optional: true);
             });
@@ -95,7 +95,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     {
         public ClaimsPrincipal? User { get; set; }
     }
-    
+
     /// <summary>
     /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
     /// for authentication and authorization mechanisms to use.

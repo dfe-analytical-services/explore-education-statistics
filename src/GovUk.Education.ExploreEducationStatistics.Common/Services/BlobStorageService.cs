@@ -98,7 +98,7 @@ public abstract class BlobStorageService(
 
             var deleteTasks = new List<Task>();
 
-            await foreach (Page<BlobItem> page in blobPages)
+            await foreach (var page in blobPages)
             {
                 foreach (var blob in page.Values)
                 {
@@ -256,7 +256,7 @@ public abstract class BlobStorageService(
         };
 
         var compress = contentEncoding != null;
-        
+
         if (compress)
         {
             await using var blobStream = await blob.OpenWriteAsync(
@@ -413,7 +413,8 @@ public abstract class BlobStorageService(
             .OnSuccess(blobClient => GetDownloadStream(blob: blobClient, decompress: true, cancellationToken))
             .OnSuccess(stream => new FileStreamResult(
                 fileStream: stream,
-                contentType: token.ContentType) { FileDownloadName = token.Filename });
+                contentType: token.ContentType)
+            { FileDownloadName = token.Filename });
     }
 
     public async Task<Either<ActionResult, BlobDownloadToken>> GetBlobDownloadToken(
@@ -670,7 +671,7 @@ public abstract class BlobStorageService(
             defaultConnectionString,
             AzureStorageType.Blob,
             containerName,
-            () => containerClient.CreateIfNotExistsAsync());
+            containerClient.CreateIfNotExistsAsync);
 
         return containerClient;
     }

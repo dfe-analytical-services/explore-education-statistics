@@ -83,7 +83,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                 ReleaseVersion,
                 rolesExpectedToSucceed:
                 [
-                    ReleaseRole.Contributor, ReleaseRole.Approver
+                    ReleaseRole.Contributor,
+                    ReleaseRole.Approver
                 ]);
         }
 

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;

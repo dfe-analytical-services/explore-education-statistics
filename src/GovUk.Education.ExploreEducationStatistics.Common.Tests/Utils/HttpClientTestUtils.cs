@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Moq;
 using Moq.Protected;
 
@@ -33,7 +33,7 @@ public static class HttpClientTestUtils
 
         messageHandlerMock
             .Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync", 
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
                 ItExpr.Is<HttpRequestMessage>(message => message.Method == httpMethod
                                                          && message.RequestUri == expectedRequestUri),
                 ItExpr.IsAny<CancellationToken>())

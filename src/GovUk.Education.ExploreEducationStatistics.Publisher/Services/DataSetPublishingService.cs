@@ -45,9 +45,9 @@ public class DataSetPublishingService(
         foreach (var dataSet in dataSets)
         {
             var currentDraftVersion = dataSet.LatestDraftVersion!;
-            
+
             var originalFilePath = dataSetVersionPathResolver.DirectoryPath(currentDraftVersion);
-            
+
             currentDraftVersion.Status = DataSetVersionStatus.Published;
             currentDraftVersion.Published = DateTimeOffset.UtcNow;
 
@@ -59,7 +59,7 @@ public class DataSetPublishingService(
 
             dataSet.LatestDraftVersion = null;
             dataSet.LatestDraftVersionId = null;
-            
+
             var newFilePath = dataSetVersionPathResolver.DirectoryPath(currentDraftVersion);
             Directory.Move(sourceDirName: originalFilePath, destDirName: newFilePath);
 

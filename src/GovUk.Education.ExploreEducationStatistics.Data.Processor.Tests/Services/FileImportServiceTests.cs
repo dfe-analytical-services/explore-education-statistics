@@ -169,7 +169,7 @@ public class FileImportServiceTests
         var dataImportService = new Mock<IDataImportService>(Strict);
 
         dataImportService
-            .Setup(s => s.FailImport(import.Id, 
+            .Setup(s => s.FailImport(import.Id,
                 $"Number of observations inserted (2) does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry"))
             .Returns(Task.CompletedTask);
 
@@ -292,7 +292,7 @@ public class FileImportServiceTests
                 VerifyAllMocks(dataImportService);
             });
     }
-    
+
     private static FileImportService BuildFileImportService(
         IPrivateBlobStorageService privateBlobStorageService = null,
         IImporterService importerService = null,

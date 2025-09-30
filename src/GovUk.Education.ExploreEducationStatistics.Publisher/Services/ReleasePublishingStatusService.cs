@@ -50,17 +50,11 @@ public class ReleasePublishingStatusService(
         var result = await publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
             tableName: PublisherReleaseStatusTableName,
             partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
-            rowKey: releasePublishingKey.ReleaseStatusId.ToString());
-
-        if (result == null)
-        {
-            throw new Exception($"""
+            rowKey: releasePublishingKey.ReleaseStatusId.ToString()) ?? throw new Exception($"""
                                  Failed to fetch entity from PublisherReleaseStatusTable.
                                  ReleaseVersionId/PartitionKey: {releasePublishingKey.ReleaseVersionId}
                                  ReleaseStatusId/RowKey: {releasePublishingKey.ReleaseStatusId}
                                  """);
-        }
-
         return result;
     }
 

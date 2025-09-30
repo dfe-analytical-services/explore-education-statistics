@@ -38,7 +38,7 @@ public record ReleaseSlugChangedEvent : IEvent
     /// The event payload
     /// </summary>
     public EventPayload Payload { get; }
-    
+
     public record EventPayload
     {
         public required string NewReleaseSlug { get; init; }

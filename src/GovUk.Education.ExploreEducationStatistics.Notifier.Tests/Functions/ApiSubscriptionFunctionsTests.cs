@@ -55,7 +55,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         string clientReference,
                         string emailReplyToId,
                         string oneClickUnsubscribeUrl)
-                        // ReSharper restore UnusedParameter.Local
+                    // ReSharper restore UnusedParameter.Local
                     => verificationUrl = personalisation[NotifierEmailTemplateFields.VerificationUrl]);
 
             var result = await RequestPendingSubscription(
@@ -275,7 +275,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         string clientReference,
                         string emailReplyToId,
                         string oneClickUnsubscribeUrl)
-                        // ReSharper restore UnusedParameter.Local
+                    // ReSharper restore UnusedParameter.Local
                     => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
 
             var tokenService = GetRequiredService<ITokenService>();
@@ -593,7 +593,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         string clientReference,
                         string emailReplyToId,
                         string oneClickUnsubscribeUrl)
-                        // ReSharper restore UnusedParameter.Local
+                    // ReSharper restore UnusedParameter.Local
                     => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
 
             await NotifyApiSubscribers(
@@ -785,7 +785,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     ApiSubscriptionMajorDataSetVersionPublishedId = "breaking-change-template-id",
                     ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id"
                 }
-            }; 
+            };
             var templateId = govUkNotifyOptions.EmailTemplates.SelectDataSetPublishedTemplateId(version);
             Assert.Equal(expectedTemplateId, templateId);
         }

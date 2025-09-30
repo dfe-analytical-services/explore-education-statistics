@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Events;
+namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 /// <summary>
 /// Information about the latest published release associated with a publication.

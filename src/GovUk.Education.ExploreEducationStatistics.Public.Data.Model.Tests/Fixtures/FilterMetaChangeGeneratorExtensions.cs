@@ -41,7 +41,7 @@ public static class FilterMetaChangeGeneratorExtensions
         this Generator<FilterMetaChange> generator,
         FilterMeta? previousState)
         => generator.ForInstance(s => s.SetPreviousState(previousState));
-    
+
     public static Generator<FilterMetaChange> WithPreviousState(
         this Generator<FilterMetaChange> generator,
         Func<FilterMeta?> previousState)

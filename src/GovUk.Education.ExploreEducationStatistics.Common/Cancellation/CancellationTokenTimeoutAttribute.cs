@@ -23,37 +23,37 @@ public class CancellationTokenTimeoutAttribute : Attribute
     private static IConfiguration? _timeoutConfiguration;
 
     public int TimeoutMillis { get; }
-    
+
     public CancellationTokenTimeoutAttribute(int timeoutMillis)
     {
         TimeoutMillis = timeoutMillis;
     }
-    
+
     public CancellationTokenTimeoutAttribute(string configurationKey)
     {
         if (!CancellationTokenTimeoutAspect.Enabled)
         {
             return;
         }
-        
+
         if (_timeoutConfiguration == null)
         {
             throw new ArgumentException("Timeout configuration section cannot be null when using the " +
                                         $"{nameof(CancellationTokenTimeoutAttribute)} alongside a timeout " +
                                         "configuration key");
         }
-        
+
         var timeoutConfig = _timeoutConfiguration.GetSection(configurationKey).Value
             ?? throw new ArgumentException($"Could not find timeout configuration setting for " +
                                         $"key {configurationKey}");
-        
-        
+
+
         if (!int.TryParse(timeoutConfig, out var timeoutValue))
         {
             throw new ArgumentException($"Timeout configuration setting for " +
                                         $"key {configurationKey} must be an integer");
         }
-        
+
         TimeoutMillis = timeoutValue;
     }
 

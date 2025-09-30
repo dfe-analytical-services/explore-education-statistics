@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -10,12 +10,12 @@ public class MetaService : IMetaService
 {
     public List<TimeIdentifierCategoryModel> GetTimeIdentifiersByCategory()
     {
-        var all = (TimeIdentifierCategory[]) Enum.GetValues(typeof(TimeIdentifierCategory));
+        var all = (TimeIdentifierCategory[])Enum.GetValues(typeof(TimeIdentifierCategory));
         return all.Select(category => new TimeIdentifierCategoryModel
         {
             Category = category,
             TimeIdentifiers = category.GetTimeIdentifiers()
-                .Select(identifier => new TimeIdentifierModel {Identifier = identifier}).ToList()
+                .Select(identifier => new TimeIdentifierModel { Identifier = identifier }).ToList()
         }).ToList();
     }
 }

@@ -171,63 +171,63 @@ public class SubjectMetaService(
         switch (subjectMetaStep)
         {
             case SubjectMetaQueryStep.GetTimePeriods:
-            {
-                var stopwatch = Stopwatch.StartNew();
-
-                var observations = statisticsDbContext
-                    .Observation
-                    .AsNoTracking()
-                    .Where(o =>
-                        o.SubjectId == request.SubjectId &&
-                        EF.Constant(request.LocationIds).Contains(o.LocationId));
-
-                var timePeriods = await GetTimePeriods(observations);
-
-                logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-
-                return new SubjectMetaViewModel
                 {
-                    TimePeriod = timePeriods
-                };
-            }
+                    var stopwatch = Stopwatch.StartNew();
+
+                    var observations = statisticsDbContext
+                        .Observation
+                        .AsNoTracking()
+                        .Where(o =>
+                            o.SubjectId == request.SubjectId &&
+                            EF.Constant(request.LocationIds).Contains(o.LocationId));
+
+                    var timePeriods = await GetTimePeriods(observations);
+
+                    logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+
+                    return new SubjectMetaViewModel
+                    {
+                        TimePeriod = timePeriods
+                    };
+                }
 
             case SubjectMetaQueryStep.GetFilterItems:
-            {
-                var stopwatch = Stopwatch.StartNew();
-
-                var releaseFile = await contentDbContext.ReleaseFiles
-                    .Include(rf => rf.File)
-                    .Where(rf => rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                                 && rf.File.SubjectId == releaseSubject.SubjectId
-                                 && rf.File.Type == FileType.Data)
-                    .SingleAsync(cancellationToken: cancellationToken);
-
-                var observations =
-                    await observationService.GetMatchedObservations(
-                        request.AsFullTableQuery(),
-                        cancellationToken);
-                logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
-
-                var filterItems = await
-                    filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations);
-                var filters =
-                    FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
-                        filterItems, releaseFile.FilterSequence);
-                logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
-
-                var indicators = await GetIndicators(
-                    releaseSubject.SubjectId, releaseFile.IndicatorSequence);
-                logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-
-                return new SubjectMetaViewModel
                 {
-                    Filters = filters,
-                    Indicators = indicators,
-                    FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
-                };
-            }
+                    var stopwatch = Stopwatch.StartNew();
+
+                    var releaseFile = await contentDbContext.ReleaseFiles
+                        .Include(rf => rf.File)
+                        .Where(rf => rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
+                                     && rf.File.SubjectId == releaseSubject.SubjectId
+                                     && rf.File.Type == FileType.Data)
+                        .SingleAsync(cancellationToken: cancellationToken);
+
+                    var observations =
+                        await observationService.GetMatchedObservations(
+                            request.AsFullTableQuery(),
+                            cancellationToken);
+                    logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var filterItems = await
+                        filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations);
+                    var filters =
+                        FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
+                            filterItems, releaseFile.FilterSequence);
+                    logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var indicators = await GetIndicators(
+                        releaseSubject.SubjectId, releaseFile.IndicatorSequence);
+                    logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+
+                    return new SubjectMetaViewModel
+                    {
+                        Filters = filters,
+                        Indicators = indicators,
+                        FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
+                    };
+                }
             default:
                 throw new ArgumentOutOfRangeException($"{nameof(subjectMetaStep)}",
                     "Unable to determine which SubjectMeta information has requested");

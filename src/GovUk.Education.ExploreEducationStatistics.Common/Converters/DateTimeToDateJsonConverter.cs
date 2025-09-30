@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Models;
 
@@ -25,13 +25,13 @@ public class ReleaseVersionBuilder(Guid? releaseVersionId = null)
         _publicationId = publicationId; // remove this line when EES-5818 removes ReleaseVersion.PublicationId
         return this;
     }
-    
+
     public ReleaseVersionBuilder ForRelease(Func<ReleaseBuilder, ReleaseBuilder> modifyRelease)
     {
         modifyRelease(_releaseBuilder);
         return this;
     }
-    
+
     public ReleaseVersionBuilder ForRelease(Release release)
     {
         _release = release;

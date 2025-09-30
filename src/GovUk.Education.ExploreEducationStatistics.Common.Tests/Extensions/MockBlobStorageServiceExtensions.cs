@@ -40,7 +40,7 @@ public static class MockBlobStorageServiceExtensions
         return service.Setup(s => s.DeleteBlob(container, path))
             .Returns(Task.CompletedTask);
     }
-    
+
     public static IReturnsResult<T> SetupGetDownloadStreamWithFilePath<T>(
         this Mock<T> service,
         IBlobContainer container,
@@ -57,7 +57,7 @@ public static class MockBlobStorageServiceExtensions
             .Callback(callback ?? (() => { }))
             .ReturnsAsync(() => File.OpenRead(filePathToStream));
     }
-    
+
     public static IReturnsResult<T> SetupGetDownloadStream<T>(
         this Mock<T> service,
         IBlobContainer container,
@@ -98,7 +98,7 @@ public static class MockBlobStorageServiceExtensions
                 return stream;
             });
     }
-    
+
     public static IReturnsResult<T> SetupGetDownloadStreamNotFound<T>(
         this Mock<T> service,
         IBlobContainer container,
@@ -127,7 +127,7 @@ public static class MockBlobStorageServiceExtensions
             Path: path,
             Filename: filename,
             ContentType: contentType);
-        
+
         return service.Setup(
             s => s.GetBlobDownloadToken(
                 container,
@@ -136,7 +136,7 @@ public static class MockBlobStorageServiceExtensions
                 cancellationToken)
         ).ReturnsAsync(new Either<ActionResult, BlobDownloadToken>(token));
     }
-    
+
     public static IReturnsResult<T> SetupGetDownloadTokenNotFound<T>(
         this Mock<T> service,
         IBlobContainer container,

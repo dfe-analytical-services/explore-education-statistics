@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;

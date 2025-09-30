@@ -149,7 +149,7 @@ public class UserReleaseInviteRepository(
             publicationId: publicationId,
             email: null,
             cancellationToken: cancellationToken,
-            rolesToInclude:rolesToInclude);
+            rolesToInclude: rolesToInclude);
     }
 
     public async Task RemoveByPublicationAndEmail(

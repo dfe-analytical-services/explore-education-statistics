@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 
 public static class PublicationQueries
 {

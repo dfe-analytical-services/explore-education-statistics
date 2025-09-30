@@ -242,7 +242,7 @@ public class PermalinkService : IPermalinkService
         if (meta.FiltersByGroupingColumn.TryGetValue(header, out var filterFoundFromGroupHeader))
         {
             var match = observation.Filters
-                .Where(filterItemId => filterFoundFromGroupHeader.Items.ContainsKey(filterItemId))
+                .Where(filterFoundFromGroupHeader.Items.ContainsKey)
                 .OfType<Guid?>()
                 .FirstOrDefault(null as Guid?);
 
@@ -255,7 +255,7 @@ public class PermalinkService : IPermalinkService
         if (meta.Filters.TryGetValue(header, out var filter))
         {
             var match = observation.Filters
-                .Where(filterItemId => filter.Items.ContainsKey(filterItemId))
+                .Where(filter.Items.ContainsKey)
                 .OfType<Guid?>()
                 .FirstOrDefault(null as Guid?);
 

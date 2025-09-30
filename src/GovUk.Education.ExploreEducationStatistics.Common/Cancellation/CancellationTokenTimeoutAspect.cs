@@ -18,7 +18,7 @@ public class CancellationTokenTimeoutAspect
     /// </para>
     /// </summary>
     public static bool Enabled { get; set; }
-    
+
     [Advice(Kind.Around)]
     public object Handle(
         [Argument(Source.Target)] Func<object[], object> target,
@@ -31,7 +31,7 @@ public class CancellationTokenTimeoutAspect
             .Where(parameter => parameter.ParameterType == typeof(CancellationToken)
                                 || parameter.ParameterType == typeof(CancellationToken?))
             .ToArray();
-        
+
         if (cancellationTokenParameters.Count() != 1)
         {
             throw new ArgumentException($"Method {method.Name} annotated with the " +
@@ -43,12 +43,12 @@ public class CancellationTokenTimeoutAspect
             .GetParameters()
             .ToList()
             .IndexOf(cancellationTokenParameters.Single());
-        
+
         if (!Enabled)
         {
             return target(args);
         }
-        
+
         var trigger = triggers
             .OfType<CancellationTokenTimeoutAttribute>()
             .Single();

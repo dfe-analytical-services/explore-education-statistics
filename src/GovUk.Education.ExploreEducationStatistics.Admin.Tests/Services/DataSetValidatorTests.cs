@@ -58,7 +58,7 @@ public class DataSetValidatorTests
     [Theory]
     [InlineData("test-data.csv")]
     [InlineData("Test-Data.csv")]
-    public async Task ValidateDataSet_ValidWithReplacement_ReturnsDataSetObject(string replacementFilename)
+    public async Task ValidateDataSet_ValidWithReplacement_ReturnsDataSetObject()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion
@@ -388,7 +388,7 @@ public class DataSetValidatorTests
     public async Task ValidateDataSet_ReplacementHasApiDataSet_ReturnsErrorDetails(bool enableFeatureFlagPatchReplacements)
     {
         // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2};
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -455,13 +455,13 @@ public class DataSetValidatorTests
             Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
         }
     }
-    
+
     [Fact]
     public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsErrorDetails()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
-        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2};
+        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -512,9 +512,9 @@ public class DataSetValidatorTests
         await using var context = InMemoryContentDbContext(contentDbContextId);
 
         context.ReleaseFiles.AddRange(
-            existingDataReleaseFile, 
-            existingMetaReleaseFile, 
-            replacementDataReleaseFile, 
+            existingDataReleaseFile,
+            existingMetaReleaseFile,
+            replacementDataReleaseFile,
             replacementMetaReleaseFile);
         await context.SaveChangesAsync();
 
@@ -541,13 +541,13 @@ public class DataSetValidatorTests
         Assert.Single(errors);
         Assert.Equal(ValidationMessages.AnalystCannotReplaceApiDataSet.Code, errors[0].Code);
     }
-    
+
     [Fact]
     public async Task ValidateDataSet_MultipleDraftAPIDatasetVersions_ReturnsErrorDetails()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
-        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2};
+        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -598,19 +598,19 @@ public class DataSetValidatorTests
         await using var context = InMemoryContentDbContext(contentDbContextId);
 
         context.ReleaseFiles.AddRange(
-            existingDataReleaseFile, 
-            existingMetaReleaseFile, 
-            replacementDataReleaseFile, 
+            existingDataReleaseFile,
+            existingMetaReleaseFile,
+            replacementDataReleaseFile,
             replacementMetaReleaseFile);
         await context.SaveChangesAsync();
-        
+
         var dataSetServiceMock = new Mock<IDataSetService>(MockBehavior.Strict);
         dataSetServiceMock
             .Setup(s => s.HasDraftVersion(existingDataReleaseFile.PublicApiDataSetId.Value, CancellationToken.None))
             .ReturnsAsync(true);
 
         var sut = BuildService(
-                contentDbContext: context, 
+                contentDbContext: context,
                 dataSetService: dataSetServiceMock.Object
             );
 
@@ -931,7 +931,7 @@ public class DataSetValidatorTests
 
         if (dataSetService is null)
         {
-            
+
             var dataSetServiceMock = new Mock<IDataSetService>(MockBehavior.Strict);
             dataSetServiceMock
                 .Setup(s => s.HasDraftVersion(It.IsAny<Guid>(), CancellationToken.None))

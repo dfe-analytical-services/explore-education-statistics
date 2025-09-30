@@ -343,8 +343,8 @@ public class ReleaseServiceTests
             Assert.Equal(Release1V1.KeyStatistics[0].Id, viewModel.KeyStatistics[1].Id);
             Assert.Equal(1, viewModel.KeyStatistics[1].Order);
             var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(viewModel.KeyStatistics[1]);
-            Assert.Equal(Release1DataBlockVersion1.Id ,keyStatDataBlockViewModel.DataBlockId);
-            Assert.Equal(Release1DataBlockVersion1.DataBlockParent.Id ,keyStatDataBlockViewModel.DataBlockParentId);
+            Assert.Equal(Release1DataBlockVersion1.Id, keyStatDataBlockViewModel.DataBlockId);
+            Assert.Equal(Release1DataBlockVersion1.DataBlockParent.Id, keyStatDataBlockViewModel.DataBlockParentId);
 
             var summarySection = viewModel.SummarySection;
             Assert.NotNull(summarySection);

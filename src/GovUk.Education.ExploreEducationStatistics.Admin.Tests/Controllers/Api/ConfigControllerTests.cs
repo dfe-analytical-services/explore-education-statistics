@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
@@ -68,7 +68,7 @@ public class ConfigControllerTests
             viewModel.PublicApiDocsUrl
         );
         Assert.Equal(
-            new []
+            new[]
             {
                 "https://department-for-education.shinyapps.io",
                 "https://dfe-analytical-services.github.io"
@@ -78,7 +78,7 @@ public class ConfigControllerTests
         const string realm = "https://ees.local:5031/auth/realms/ees-realm";
         Assert.Equal("ees-admin-client", viewModel.Oidc.ClientId);
         Assert.Equal(realm, viewModel.Oidc.Authority);
-        Assert.Equal(new [] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
+        Assert.Equal(new[] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
         Assert.Equal(SecurityScopes.AccessAdminApiScope, viewModel.Oidc.AdminApiScope);
 
         var authorityMetadata = viewModel.Oidc.AuthorityMetadata!;

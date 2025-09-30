@@ -36,7 +36,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
     public static readonly TheoryData<IDataSetQueryLocation[]> InvalidLocationQueriesMultiple =
         DataSetQueryCriteriaLocationsValidatorTests.InvalidLocationsMultiple;
-    
+
     public class EqTests : DataSetGetQueryLocationsValidatorTests
     {
         [Theory]
@@ -147,7 +147,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations
             {
-                In = [..locations.Select(l => l.ToLocationString())]
+                In = [.. locations.Select(l => l.ToLocationString())]
             };
 
             var result = _validator.TestValidate(query);
@@ -202,7 +202,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         {
             var query = new DataSetGetQueryLocations
             {
-                NotIn = [..locations.Select(l => l.ToLocationString())]
+                NotIn = [.. locations.Select(l => l.ToLocationString())]
             };
 
             var result = _validator.TestValidate(query);

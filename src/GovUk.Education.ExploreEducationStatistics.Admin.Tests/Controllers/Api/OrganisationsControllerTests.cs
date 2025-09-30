@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;

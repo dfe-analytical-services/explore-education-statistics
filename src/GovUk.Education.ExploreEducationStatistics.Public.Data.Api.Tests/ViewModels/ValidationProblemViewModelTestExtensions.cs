@@ -28,10 +28,10 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
-        public static ErrorViewModel AssertHasLocationFormatError(
-        this ValidationProblemViewModel validationProblem,
-        string expectedPath,
-        string value)
+    public static ErrorViewModel AssertHasLocationFormatError(
+    this ValidationProblemViewModel validationProblem,
+    string expectedPath,
+    string value)
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -149,7 +149,7 @@ public static class ValidationProblemViewModelTestExtensions
 
         return error;
     }
-    
+
     public static ErrorViewModel AssertHasSortFieldMaxLengthError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,

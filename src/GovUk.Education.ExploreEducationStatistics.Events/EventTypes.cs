@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Events;
+namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 /// <summary>
 /// Defines constants for event types that are published to the Publication Changed event topic.

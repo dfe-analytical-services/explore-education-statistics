@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -27,7 +27,7 @@ public class ObservationServiceTests
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
         await using var context = InMemoryStatisticsDbContext();
-        
+
         const string sql = "Some SQL here";
 
         var sqlParameters = ListOf(new SqlParameter("param1", "value"));
@@ -78,13 +78,13 @@ public class ObservationServiceTests
         await service.GetMatchedObservations(fullTableQuery, cancellationToken);
         VerifyAllMocks(queryGenerator, sqlExecutor, tempTable1, tempTable2);
     }
-    
+
     [Fact]
     public async Task QueryGenerator_MinimalQuery()
     {
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
-        
+
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
@@ -92,16 +92,16 @@ public class ObservationServiceTests
         tempTableCreator
             .Setup(s => s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
             .Returns(Task.CompletedTask);
-        
+
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
             TempTableCreator = tempTableCreator.Object
         };
 
-        var (sql, sqlParameters, tempTableReferences) = 
+        var (sql, sqlParameters, tempTableReferences) =
             await queryGenerator
                 .GetMatchingObservationsQuery(
-                    context, 
+                    context,
                     subjectId,
                     [],
                     [],
@@ -109,24 +109,24 @@ public class ObservationServiceTests
                     cancellationToken);
 
         VerifyAllMocks(tempTableCreator);
-        
+
         const string expectedSql = @"
                   INSERT INTO #MatchedObservation 
                   SELECT o.id FROM Observation o
                   WHERE o.SubjectId = @subjectId
                   ORDER BY o.Id;";
-        
+
         Assert.Equal(FormatSql(expectedSql), FormatSql(sql));
         sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
         Assert.Empty(tempTableReferences);
     }
-    
+
     [Fact]
     public async Task QueryGenerator_TimePeriodQuery()
     {
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
-        
+
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
@@ -134,16 +134,16 @@ public class ObservationServiceTests
         tempTableCreator
             .Setup(s => s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
             .Returns(Task.CompletedTask);
-        
+
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
             TempTableCreator = tempTableCreator.Object
         };
 
-        var (sql, sqlParameters, tempTableReferences) = 
+        var (sql, sqlParameters, tempTableReferences) =
             await queryGenerator
                 .GetMatchingObservationsQuery(
-                    context, 
+                    context,
                     subjectId,
                     [],
                     [],
@@ -157,7 +157,7 @@ public class ObservationServiceTests
                     cancellationToken);
 
         VerifyAllMocks(tempTableCreator);
-        
+
         const string expectedSql = @"
                   INSERT INTO #MatchedObservation 
                   SELECT o.id FROM Observation o
@@ -168,12 +168,12 @@ public class ObservationServiceTests
                     (o.TimeIdentifier = 'AY' AND o.Year = 2017)
                   ) 
                   ORDER BY o.Id;";
-        
+
         Assert.Equal(FormatSql(expectedSql), FormatSql(sql));
         sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
         Assert.Empty(tempTableReferences);
     }
-    
+
     [Fact]
     public async Task QueryGenerator_LocationIds()
     {
@@ -182,26 +182,26 @@ public class ObservationServiceTests
 
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
-        
+
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>();
-        
+
         tempTableCreator
             .Setup(s => s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
             .Returns(Task.CompletedTask);
-        
+
         var locationIdsTempTableReference = new Mock<ITempTableQuery<IdTempTable>>();
         locationIdsTempTableReference
             .SetupGet(t => t.Name)
             .Returns("#LocationTempTable");
-        
+
         tempTableCreator
             .Setup(s => s
                 .CreateTemporaryTableAndPopulate(
-                    context, 
-                    locationIdsTempTableEntries, 
+                    context,
+                    locationIdsTempTableEntries,
                     cancellationToken))
             .ReturnsAsync(locationIdsTempTableReference.Object);
 
@@ -210,10 +210,10 @@ public class ObservationServiceTests
             TempTableCreator = tempTableCreator.Object
         };
 
-        var (sql, sqlParameters, tempTableReferences) = 
+        var (sql, sqlParameters, tempTableReferences) =
             await queryGenerator
                 .GetMatchingObservationsQuery(
-                    context, 
+                    context,
                     subjectId,
                     [],
                     locationIds,
@@ -221,19 +221,19 @@ public class ObservationServiceTests
                     cancellationToken);
 
         VerifyAllMocks(tempTableCreator, locationIdsTempTableReference);
-        
+
         const string expectedSql = @"
                   INSERT INTO #MatchedObservation 
                   SELECT o.id FROM Observation o
                   WHERE o.SubjectId = @subjectId
                   AND (o.LocationId IN (SELECT Id FROM #LocationTempTable)) 
                   ORDER BY o.Id;";
-        
+
         Assert.Equal(FormatSql(expectedSql), FormatSql(sql));
         sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
         Assert.Equal(locationIdsTempTableReference.Object, Assert.Single(tempTableReferences));
     }
-    
+
     [Fact]
     public async Task QueryGenerator_FilterItems()
     {
@@ -245,7 +245,7 @@ public class ObservationServiceTests
             SubjectId = subjectId,
             FilterGroups = CreateFilterGroups(5, 5)
         };
-        
+
         var filter2 = new Filter
         {
             Id = Guid.NewGuid(),
@@ -259,36 +259,36 @@ public class ObservationServiceTests
             SubjectId = subjectId,
             FilterGroups = CreateFilterGroups(2, 2, 2, 2, 2)
         };
-        
+
         var unselectedFilter4 = new Filter
         {
             Id = Guid.NewGuid(),
             SubjectId = subjectId,
             FilterGroups = CreateFilterGroups(2)
         };
-        
+
         var unrelatedFilter = new Filter
         {
             Id = Guid.NewGuid(),
             SubjectId = Guid.NewGuid(),
             FilterGroups = CreateFilterGroups(5)
         };
-        
+
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
             await context.AddRangeAsync(
-                filter1, 
-                filter2, 
-                filter3, 
-                unselectedFilter4, 
+                filter1,
+                filter2,
+                filter3,
+                unselectedFilter4,
                 unrelatedFilter);
-            
+
             await context.SaveChangesAsync();
         }
-        
+
         var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>(Strict);
-        
+
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
             TempTableCreator = tempTableCreator.Object
@@ -312,7 +312,7 @@ public class ObservationServiceTests
                 filter1.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter1.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
                 filter1.FilterGroups.ToList()[1].FilterItems.ToList()[1].Id);
-            
+
             var selectedFilter2FilterItemIds = ListOf(
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
@@ -321,7 +321,7 @@ public class ObservationServiceTests
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[7].Id,
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[6].Id,
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[8].Id);
-            
+
             var selectedFilter3FilterItemIds = ListOf(
                 filter3.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter3.FilterGroups.ToList()[0].FilterItems.ToList()[1].Id,
@@ -342,13 +342,13 @@ public class ObservationServiceTests
                 .ToList();
 
             tempTableCreator
-                .Setup(s => 
+                .Setup(s =>
                     s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
                 .Returns(Task.CompletedTask);
 
             var selectedFilterItemsByFilter = ListOf(
                 selectedFilter1FilterItemIds,
-                selectedFilter2FilterItemIds, 
+                selectedFilter2FilterItemIds,
                 selectedFilter3FilterItemIds);
 
             var selectedFilterItemTempTableEntriesByFilter = selectedFilterItemsByFilter
@@ -357,7 +357,7 @@ public class ObservationServiceTests
                     .ToList())
                 .ToList();
 
-            var filterItemIdTempTableReferences = 
+            var filterItemIdTempTableReferences =
                 selectedFilterItemTempTableEntriesByFilter
                     .Select(tempTableEntries =>
                     {
@@ -366,7 +366,7 @@ public class ObservationServiceTests
                         var orderedIds = tempTableEntries
                             .OrderBy(t => t.Id)
                             .ToList();
-                        
+
                         var tempTableReference = new Mock<ITempTableQuery<IdTempTable>>();
                         tempTableReference
                             .SetupGet(t => t.Name)
@@ -383,17 +383,17 @@ public class ObservationServiceTests
                         return tempTableReference;
                     })
                     .ToList();
-            
-            var (sql, sqlParameters, tempTableReferences) = 
+
+            var (sql, sqlParameters, tempTableReferences) =
                 await queryGenerator
                     .GetMatchingObservationsQuery(
-                        context, 
+                        context,
                         subjectId,
                         selectFilterItemIds,
                         [],
                         null,
                         cancellationToken);
-            
+
             VerifyAllMocks(tempTableCreator);
             VerifyAllMocks(filterItemIdTempTableReferences.Cast<Mock>().ToArray());
 
@@ -415,23 +415,23 @@ public class ObservationServiceTests
                                   AND ofi.FilterItemId IN (SELECT Id FROM #Filter2TempTable))
                       )
                       ORDER BY o.Id;";
-            
+
             Assert.Equal(FormatSql(expectedSql), FormatSql(sql));
-            
+
             sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
 
-            var expectedTempTableReferences = 
+            var expectedTempTableReferences =
                 filterItemIdTempTableReferences.Select(mock => mock.Object);
 
             // Assert that the temporary table for the LocationIds, and the 3 temporary tables for the
             // 3 Filters' sets of selected FilterItemIds are returned so that the calling code can
             // dispose of them as it needs to (the order they are returned in is not important).
             Assert.Equal(
-                expectedTempTableReferences.OrderBy(t => t.GetHashCode()), 
+                expectedTempTableReferences.OrderBy(t => t.GetHashCode()),
                 tempTableReferences.OrderBy(t => t.GetHashCode()));
         }
     }
-    
+
     [Fact]
     public async Task QueryGenerator_FullQuery()
     {
@@ -443,16 +443,16 @@ public class ObservationServiceTests
             SubjectId = subjectId,
             FilterGroups = CreateFilterGroups(5, 5)
         };
-        
+
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
             await context.AddAsync(filter);
             await context.SaveChangesAsync();
         }
-        
+
         var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>(Strict);
-        
+
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
             TempTableCreator = tempTableCreator.Object
@@ -467,14 +467,14 @@ public class ObservationServiceTests
                 filter.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
                 filter.FilterGroups.ToList()[1].FilterItems.ToList()[1].Id);
-            
+
             tempTableCreator
-                .Setup(s => 
+                .Setup(s =>
                     s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
                 .Returns(Task.CompletedTask);
 
             var selectedLocationIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
-            
+
             var selectedLocationIdTempTableEntries = selectedLocationIds
                     .Select(id => new IdTempTable(id))
                     .ToList();
@@ -483,7 +483,7 @@ public class ObservationServiceTests
             locationIdsTempTableReference
                 .SetupGet(t => t.Name)
                 .Returns("#LocationTempTable");
-            
+
             tempTableCreator
                 .Setup(s =>
                     s.CreateTemporaryTableAndPopulate(
@@ -507,15 +507,15 @@ public class ObservationServiceTests
                                 .Select(id => new IdTempTable(id))
                                 .ToList()),
                         cancellationToken))
-                .ReturnsAsync(filterItemIdsTempTableReference.Object);     
-            
-            var tempTableMocks = ListOf(locationIdsTempTableReference);
-            tempTableMocks.Add(filterItemIdsTempTableReference);            
+                .ReturnsAsync(filterItemIdsTempTableReference.Object);
 
-            var (sql, sqlParameters, tempTableReferences) = 
+            var tempTableMocks = ListOf(locationIdsTempTableReference);
+            tempTableMocks.Add(filterItemIdsTempTableReference);
+
+            var (sql, sqlParameters, tempTableReferences) =
                 await queryGenerator
                     .GetMatchingObservationsQuery(
-                        context, 
+                        context,
                         subjectId,
                         selectedFilterItemIds,
                         selectedLocationIds,
@@ -527,7 +527,7 @@ public class ObservationServiceTests
                             EndYear = 2017
                         },
                         cancellationToken);
-            
+
             VerifyAllMocks(tempTableCreator);
             VerifyAllMocks(tempTableMocks.Cast<Mock>().ToArray());
 
@@ -547,19 +547,19 @@ public class ObservationServiceTests
                                   AND ofi.FilterItemId IN (SELECT Id FROM #FilterTempTable))
                       )
                       ORDER BY o.Id;";
-            
+
             Assert.Equal(FormatSql(expectedSql), FormatSql(sql));
-            
+
             sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
 
-            var expectedTempTableReferences = 
+            var expectedTempTableReferences =
                 tempTableMocks.Select(mock => mock.Object);
 
             // Assert that the temporary table for the LocationIds, and the 3 temporary tables for the
             // 3 Filters' sets of selected FilterItemIds are returned so that the calling code can
             // dispose of them as it needs to (the order they are returned in is not important).
             Assert.Equal(
-                expectedTempTableReferences.OrderBy(t => t.GetHashCode()), 
+                expectedTempTableReferences.OrderBy(t => t.GetHashCode()),
                 tempTableReferences.OrderBy(t => t.GetHashCode()));
         }
     }
@@ -591,7 +591,7 @@ public class ObservationServiceTests
             QueryGenerator = queryGenerator ?? Mock.Of<IMatchingObservationsQueryGenerator>(Strict),
             SqlExecutor = sqlExecutor ?? Mock.Of<IRawSqlExecutor>(Strict)
         };
-        
+
         return service;
     }
 

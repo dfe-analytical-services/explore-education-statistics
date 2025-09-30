@@ -75,7 +75,9 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             await AddTestData<ContentDbContext>(context =>
             {
                 context.ReleaseFiles.AddRange([
-                    previousReleaseFile, targetReleaseFileWithOldFile, .. targetReleaseFilesWithNewFiles
+                    previousReleaseFile,
+                    targetReleaseFileWithOldFile,
+                    .. targetReleaseFilesWithNewFiles
                 ]);
             });
 
@@ -151,7 +153,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.UpdateRange([
                 previousReleaseFile,
                 targetReleaseFileWithOldFile,
-                ..targetReleaseFilesWithNewFiles
+                .. targetReleaseFilesWithNewFiles
             ]));
 
             foreach (var targetDataSetVersion in targetDataSetVersions)

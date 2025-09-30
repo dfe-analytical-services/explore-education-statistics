@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;

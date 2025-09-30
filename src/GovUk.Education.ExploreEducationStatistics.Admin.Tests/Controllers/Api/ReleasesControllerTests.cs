@@ -230,7 +230,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             await TestApp.AddTestData<ContentDbContext>(
                 context => context.Publications.Add(publication));
-                
+
             var response = await CreateRelease(
                 publicationId: publication.Id,
                 year: 2020,
@@ -473,7 +473,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 as PublicationCacheViewModel;
 
             var oldReleaseParentPathTestDataCachedValue1 = await publicBlobCacheService.GetItemAsync(
-                oldReleaseParentPathTestDataCacheKey1, 
+                oldReleaseParentPathTestDataCacheKey1,
                 typeof(TestReleaseParentPathDataViewModel));
             var oldReleaseParentPathTestDataCachedValue2 = await publicBlobCacheService.GetItemAsync(
                 oldReleaseParentPathTestDataCacheKey2,
@@ -740,8 +740,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.False(releaseRedirectsExist);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedValue= Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
-            
+            var newRedirectsCachedValue = Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
+
             Assert.Empty(newRedirectsCachedValue.PublicationRedirects);
             Assert.Empty(newRedirectsCachedValue.MethodologyRedirects);
             Assert.Empty(newRedirectsCachedValue.ReleaseRedirectsByPublicationSlug);
@@ -1092,7 +1092,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             ClaimsPrincipal? user = null)
         {
             return WithAzurite(
-                testApp: TestApp.SetUser(user ?? DataFixture.BauUser()), 
+                testApp: TestApp.SetUser(user ?? DataFixture.BauUser()),
                 enabled: true);
         }
 
@@ -1119,7 +1119,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             public IBlobContainer Container => BlobContainers.PublicContent;
 
             public string Key => $"{FileStoragePathUtils.PublicContentReleaseParentPath(
-                publicationSlug: PublicationSlug, 
+                publicationSlug: PublicationSlug,
                 releaseSlug: ReleaseSlug)}/{FileParentPath}/test-data.json";
         }
 

@@ -45,7 +45,7 @@ public class UpdateSpecificCommentAuthorizationHandler
         }
 
         var canUpdateOwnCommentContext =
-            new AuthorizationHandlerContext(new[] {requirement}, context.User, resource);
+            new AuthorizationHandlerContext(new[] { requirement }, context.User, resource);
 
         await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(canUpdateOwnCommentContext);
 

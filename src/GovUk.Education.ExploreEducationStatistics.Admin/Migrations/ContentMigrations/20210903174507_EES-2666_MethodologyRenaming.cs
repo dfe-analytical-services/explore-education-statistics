@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
@@ -143,7 +143,7 @@ public partial class EES2666_MethodologyRenaming : Migration
         migrationBuilder.RenameColumn(
             name: "MethodologyId",
             table: "PublicationMethodologies",
-            newName:"MethodologyParentId");
+            newName: "MethodologyParentId");
 
         migrationBuilder.RenameColumn(
             name: "MethodologyVersionId",

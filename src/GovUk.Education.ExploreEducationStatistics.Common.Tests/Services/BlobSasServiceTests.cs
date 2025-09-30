@@ -125,7 +125,7 @@ public abstract class BlobSasServiceTests
                 contentType: MediaTypeNames.Application.Pdf,
                 metadata: new Dictionary<string, string>()
             );
-            
+
             var secureClient = MockBlobClient(
                 name: originalToken.Path,
                 createdOn: DateTimeOffset.UtcNow.AddMinutes(1),
@@ -154,14 +154,14 @@ public abstract class BlobSasServiceTests
                     It.Is<Uri>(uri => uri.Equals(originalBlobClientUri)),
                     originalToken.Token))
                 .Returns(secureClient.Object);
-            
+
             var service = BuildService(secureBlobClientCreator: secureBlobClientCreator.Object);
 
             var result = await service
                 .CreateSecureBlobClient(
                     blobServiceClient: blobServiceClient.Object,
                     token: originalToken);
-            
+
             secureBlobClientCreator.Verify();
 
             var returnedClient = result.AssertRight();

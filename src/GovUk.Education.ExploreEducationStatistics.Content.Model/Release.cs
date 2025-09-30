@@ -53,12 +53,12 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
                 .HasMaxLength(5);
 
             builder.HasIndex(dsv => new
-                {
-                    dsv.PublicationId,
-                    dsv.Year,
-                    dsv.TimePeriodCoverage,
-                    dsv.Label,
-                })
+            {
+                dsv.PublicationId,
+                dsv.Year,
+                dsv.TimePeriodCoverage,
+                dsv.Label,
+            })
                 .IsUnique()
                 .HasFilter(null);
         }

@@ -135,7 +135,7 @@ public static class EnumUtilsTests
         [Fact]
         public void Success()
         {
-            var expected = new []
+            var expected = new[]
             {
                 TestEnum.WithLabel,
                 TestEnum.WithLabelValue

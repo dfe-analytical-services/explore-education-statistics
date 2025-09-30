@@ -298,7 +298,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         ClaimsPrincipal? claimsPrincipal = null)
     {
         var dbContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
-        
+
         var httpContextAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext
@@ -312,7 +312,7 @@ public class ViewDataSetVersionAuthorizationHandlerTests
 
         var headers = httpContextAccessor.HttpContext.Request.Headers;
         headers.UserAgent = userAgentValue;
-        requestHeaders?.ForEach(header => 
+        requestHeaders?.ForEach(header =>
             headers.Append(header.Key, header.Value));
 
         var environment = new Mock<IWebHostEnvironment>(MockBehavior.Strict);

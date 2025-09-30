@@ -11,10 +11,10 @@ public class AnalyticsWritePublicApiQueryStrategy(
     ) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public-api", "queries"];
-    
+
     private readonly IWorkflowActor<CaptureDataSetVersionQueryRequest> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-        
+
     public Type RequestType => typeof(CaptureDataSetVersionQueryRequest);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
@@ -26,7 +26,7 @@ public class AnalyticsWritePublicApiQueryStrategy(
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
-    private class WorkflowActor(string analyticsPath) 
+    private class WorkflowActor(string analyticsPath)
         : WorkflowActorBase<CaptureDataSetVersionQueryRequest>(analyticsPath)
     {
         public override string GetFilenamePart(CaptureDataSetVersionQueryRequest request)

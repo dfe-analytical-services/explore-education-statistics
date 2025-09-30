@@ -72,10 +72,10 @@ public class NotificationsService(
 
         var feedbackEntries = feedbackEntriesAndEmails
             .Select(feedbackEntry => feedbackEntry.feedback);
-        
+
         context.ReleasePublishingFeedback.AddRange(feedbackEntries);
         await context.SaveChangesAsync();
-        
+
         var messages = feedbackEntriesAndEmails
             .Select(feedbackAndEmail => new ReleasePublishingFeedbackMessage(
                 ReleasePublishingFeedbackId: feedbackAndEmail.feedback.Id,

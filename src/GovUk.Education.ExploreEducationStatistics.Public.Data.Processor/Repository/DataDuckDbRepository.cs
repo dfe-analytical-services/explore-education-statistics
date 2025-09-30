@@ -39,10 +39,10 @@ public class DataDuckDbRepository(
             $"{DataTable.Cols.Id} UINTEGER NOT NULL PRIMARY KEY",
             $"{DataTable.Cols.TimePeriodId} INTEGER NOT NULL",
             $"{DataTable.Cols.GeographicLevel} VARCHAR NOT NULL",
-            ..dataSetVersion.LocationMetas.Select(location =>
+            .. dataSetVersion.LocationMetas.Select(location =>
                 $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"),
-            ..dataSetVersion.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
-            ..dataSetVersion.IndicatorMetas.Select(indicator =>
+            .. dataSetVersion.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
+            .. dataSetVersion.IndicatorMetas.Select(indicator =>
                 $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
         ];
 
@@ -58,23 +58,23 @@ public class DataDuckDbRepository(
             "nextval('data_seq') AS id",
             $"{TimePeriodsTable.Ref().Id} AS {DataTable.Cols.TimePeriodId}",
             DataSourceTable.Ref.GeographicLevel,
-            ..dataSetVersion.LocationMetas.Select(location =>
+            .. dataSetVersion.LocationMetas.Select(location =>
                 $"COALESCE({LocationOptionsTable.Ref(location).Id}, 0) AS {DataTable.Cols.LocationId(location)}"),
-            ..dataSetVersion.FilterMetas.Select(filter =>
+            .. dataSetVersion.FilterMetas.Select(filter =>
                 $"COALESCE({FilterOptionsTable.Ref(filter).Id}, 0) AS {DataTable.Cols.Filter(filter)}"),
-            ..dataSetVersion.IndicatorMetas.Select(DataTable.Cols.Indicator),
+            .. dataSetVersion.IndicatorMetas.Select(DataTable.Cols.Indicator),
         ];
 
         string[] insertJoins =
         [
-            ..dataSetVersion.LocationMetas.Select(
+            .. dataSetVersion.LocationMetas.Select(
                 location =>
                 {
                     var codeColumns = GetLocationCodeColumns(location.Level);
 
                     string[] conditions =
                     [
-                        ..codeColumns.Select(col =>
+                        .. codeColumns.Select(col =>
                             $"{LocationOptionsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"),
                         $"{LocationOptionsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}"
                     ];
@@ -85,7 +85,7 @@ public class DataDuckDbRepository(
                             """;
                 }
             ),
-            ..dataSetVersion.FilterMetas.Select(
+            .. dataSetVersion.FilterMetas.Select(
                 filter => $"""
                            LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
                            ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'

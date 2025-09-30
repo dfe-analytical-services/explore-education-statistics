@@ -17,7 +17,7 @@ public class Publication
 
     public List<Release> Releases { get; set; } = [];
 
-    [Obsolete("Use indirect relationship via Publication.Releases. This will be removed in EES-5818")] 
+    [Obsolete("Use indirect relationship via Publication.Releases. This will be removed in EES-5818")]
     public List<ReleaseVersion> ReleaseVersions { get; set; } = [];
 
     public List<PublicationRedirect> PublicationRedirects { get; set; } = [];

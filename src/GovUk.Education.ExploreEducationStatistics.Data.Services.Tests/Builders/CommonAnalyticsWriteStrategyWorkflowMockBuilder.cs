@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using Moq;
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Builder
 public class CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRequest> where TAnalyticsCaptureRequest : IAnalyticsCaptureRequest
 {
     private readonly Mock<ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsCaptureRequest>> _mock = new(MockBehavior.Strict);
-    
+
     public ICommonAnalyticsWriteStrategyWorkflow<TAnalyticsCaptureRequest> Build()
     {
         _mock
@@ -16,10 +16,10 @@ public class CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRe
             .Callback(
                 (IWorkflowActor<TAnalyticsCaptureRequest> workflowActor,
                 TAnalyticsCaptureRequest _,
-                CancellationToken _) 
+                CancellationToken _)
                     => _reportCalls.Add(new ReportCallArguments(workflowActor)))
             .Returns(Task.CompletedTask);
-        
+
         return _mock.Object;
     }
 
@@ -27,7 +27,7 @@ public class CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRe
     private record ReportCallArguments(IWorkflowActor<TAnalyticsCaptureRequest> WorkflowActor);
 
     public Asserter Assert => new(this);
-    
+
     public class Asserter(CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRequest> parent)
     {
         public void ReportCalled(
@@ -35,8 +35,8 @@ public class CommonAnalyticsWriteStrategyWorkflowMockBuilder<TAnalyticsCaptureRe
         )
         {
             parent._mock.Verify(m => m.Report(
-                It.IsAny<IWorkflowActor<TAnalyticsCaptureRequest>>(), 
-                It.Is<TAnalyticsCaptureRequest>(actual => requestPredicate == null || requestPredicate(actual)), 
+                It.IsAny<IWorkflowActor<TAnalyticsCaptureRequest>>(),
+                It.Is<TAnalyticsCaptureRequest>(actual => requestPredicate == null || requestPredicate(actual)),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
 

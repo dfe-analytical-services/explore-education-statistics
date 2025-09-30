@@ -182,7 +182,7 @@ public abstract class DataSetsControllerTests(
             Publication publication = DataFixture.DefaultPublication();
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () =>
                     DataFixture.DefaultReleaseVersion()
                         .WithRelease(DataFixture.DefaultRelease()
                             .WithPublication(publication))))
@@ -248,7 +248,7 @@ public abstract class DataSetsControllerTests(
             Publication publication = DataFixture.DefaultPublication();
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () =>
                     DataFixture.DefaultReleaseVersion()
                         .WithRelease(DataFixture.DefaultRelease()
                             .WithPublication(publication))))

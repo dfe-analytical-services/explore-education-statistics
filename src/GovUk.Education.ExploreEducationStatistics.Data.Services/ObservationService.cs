@@ -60,7 +60,7 @@ public class ObservationService : IObservationService
             }
 
             return matchedObservations;
-        }            
+        }
         finally
         {
             // Although EF and SQL Server will clean temporary tables up eventually themselves when the Controller
@@ -73,7 +73,7 @@ public class ObservationService : IObservationService
                 .ForEachAwaitAsync(async tempTable => await tempTable.DisposeAsync());
         }
     }
-    
+
     public interface IMatchingObservationsQueryGenerator
     {
         Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
@@ -118,10 +118,11 @@ public class ObservationService : IObservationService
                 "ORDER BY o.Id;";
 
             var parameters = ListOf(new SqlParameter("subjectId", subjectId));
-            
+
             var tableReferences = new List<IAsyncDisposable>();
 
-            if (locationIdsTempTable != null) {
+            if (locationIdsTempTable != null)
+            {
                 tableReferences.Add(locationIdsTempTable);
             }
 
@@ -132,10 +133,10 @@ public class ObservationService : IObservationService
 
             return (sql, parameters, tableReferences);
         }
-        
+
         private async Task<(string, List<ITempTableQuery<IdTempTable>>)> GetSelectedFilterItemIdsClause(
             StatisticsDbContext context,
-            Guid subjectId, 
+            Guid subjectId,
             IList<Guid> filterItemIds,
             CancellationToken cancellationToken)
         {
@@ -158,7 +159,7 @@ public class ObservationService : IObservationService
             var selectedFilterItemsInLeastOptionsOrder = selectedFilterItemIdsByFilter
                 .Where(filterItemIdsForFilter => !filterItemIdsForFilter.Value.IsNullOrEmpty())
                 .OrderBy(filterItemIdsForFilter => filterItemIdsForFilter.Value.Count);
-            
+
             var filterItemIdTempTablesPerFilter = selectedFilterItemsInLeastOptionsOrder
                 .ToDictionary(
                     filterItemIdsForFilter => filterItemIdsForFilter.Key,
@@ -169,16 +170,16 @@ public class ObservationService : IObservationService
                             .OrderBy(id => id)
                             .Select(id => new IdTempTable(id))
                             .ToList();
-                        
+
                         return TempTableCreator.CreateTemporaryTableAndPopulate(context, ids, cancellationToken).Result;
                     });
 
             var clauses = filterItemIdTempTablesPerFilter
                 .Select(filterItemIdTempTableForFilter =>
                 {
-                    var filterItemIdsTempTableName = 
+                    var filterItemIdsTempTableName =
                         SanitizeTempTableName(filterItemIdTempTableForFilter.Value.Name);
-                    
+
                     return $"EXISTS (" +
                            $"    SELECT 1 FROM ObservationFilterItem ofi WHERE ofi.ObservationId = o.id " +
                            $"    AND ofi.FilterItemId IN (SELECT Id FROM {filterItemIdsTempTableName})" +
@@ -218,7 +219,7 @@ public class ObservationService : IObservationService
         }
 
         private async Task<(string, ITempTableQuery<IdTempTable>)> GetLocationsClause(
-            StatisticsDbContext context, 
+            StatisticsDbContext context,
             IList<Guid> locationIds,
             CancellationToken cancellationToken)
         {
@@ -250,22 +251,22 @@ public class ObservationService : IObservationService
             Task CreateTemporaryTable<TEntity>(
                 StatisticsDbContext context,
                 CancellationToken cancellationToken) where TEntity : class;
-        
+
             Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(
                 StatisticsDbContext context,
                 IEnumerable<TEntity> values,
                 CancellationToken cancellationToken) where TEntity : class;
         }
-        
+
         public class TemporaryTableCreator : ITemporaryTableCreator
         {
             public async Task CreateTemporaryTable<TEntity>(
-                StatisticsDbContext context, 
+                StatisticsDbContext context,
                 CancellationToken cancellationToken) where TEntity : class
             {
                 var options = new TempTableCreationOptions
                 {
-                   TableNameProvider = new DefaultTempTableNameProvider(),
+                    TableNameProvider = new DefaultTempTableNameProvider(),
                 };
 
                 await context.CreateTempTableAsync<TEntity>(
@@ -274,7 +275,7 @@ public class ObservationService : IObservationService
             }
 
             public async Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(
-                StatisticsDbContext context, 
+                StatisticsDbContext context,
                 IEnumerable<TEntity> values,
                 CancellationToken cancellationToken) where TEntity : class
             {
@@ -295,9 +296,9 @@ public class ObservationService : IObservationService
     public class RawSqlExecutor : IRawSqlExecutor
     {
         public async Task ExecuteSqlRaw(
-            StatisticsDbContext context, 
-            string sql, 
-            IList<SqlParameter> parameters, 
+            StatisticsDbContext context,
+            string sql,
+            IList<SqlParameter> parameters,
             CancellationToken cancellationToken)
         {
             await context

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -71,7 +71,7 @@ public class IndicatorsMetaViewModelBuilderTests
             }
         };
 
-        var result = (IDictionary<string, IndicatorGroupMetaViewModel>) BuildIndicatorGroups(indicatorGroups);
+        var result = (IDictionary<string, IndicatorGroupMetaViewModel>)BuildIndicatorGroups(indicatorGroups);
 
         Assert.Equal(2, result.Count);
 
@@ -194,7 +194,7 @@ public class IndicatorsMetaViewModelBuilderTests
             }
         };
 
-        var result = (IDictionary<string, IndicatorGroupMetaViewModel>) BuildIndicatorGroups(indicatorGroups);
+        var result = (IDictionary<string, IndicatorGroupMetaViewModel>)BuildIndicatorGroups(indicatorGroups);
 
         Assert.Equal(3, result.Count);
 
@@ -371,7 +371,7 @@ public class IndicatorsMetaViewModelBuilderTests
         };
 
         var result =
-            (IDictionary<string, IndicatorGroupMetaViewModel>) BuildIndicatorGroups(indicatorGroups, ordering);
+            (IDictionary<string, IndicatorGroupMetaViewModel>)BuildIndicatorGroups(indicatorGroups, ordering);
 
         Assert.Equal(3, result.Count);
 

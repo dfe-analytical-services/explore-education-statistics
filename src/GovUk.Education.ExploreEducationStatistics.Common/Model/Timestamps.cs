@@ -29,7 +29,7 @@ public interface ICreatedUpdatedTimestamps<TCreated, TUpdated>
 /// </summary>
 public interface ITimestampsInternal
 {
-    public interface ICreated {}
-    public interface IUpdated {}
-    public interface ISoftDeleted {}
+    public interface ICreated { }
+    public interface IUpdated { }
+    public interface ISoftDeleted { }
 }

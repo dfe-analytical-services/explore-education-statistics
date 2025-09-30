@@ -29,12 +29,12 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var zipDownloadsReport = Assert.Single(reports);
 
@@ -157,7 +157,7 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
                 .ToList();
         }
     }
-    
+
     private PublicZipDownloadsProcessor BuildService()
     {
         return new PublicZipDownloadsProcessor(
@@ -194,7 +194,7 @@ public abstract class PublicZipDownloadsProcessorTests : ProcessorTestsBase
         Assert.Equal(hashSb.ToString(), row.ZipDownloadHash);
         Assert.Equal(numRequests, row.Downloads);
     }
-    
+
     public record CaptureZipDownloadRequest(
         string PublicationName,
         Guid ReleaseVersionId,

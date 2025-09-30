@@ -98,7 +98,7 @@ public class AssertExtensionsTests
         [Fact]
         public void NullableDateTime_Null()
         {
-            Assert.Throws<NotNullException>(() => ((DateTime?) null).AssertUtcNow());
+            Assert.Throws<NotNullException>(() => ((DateTime?)null).AssertUtcNow());
         }
     }
 }

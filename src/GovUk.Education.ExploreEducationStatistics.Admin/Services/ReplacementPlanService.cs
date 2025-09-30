@@ -84,7 +84,7 @@ public class ReplacementPlanService(
             return apiDataSetVersionPlan;
         }
 
-        var mappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+        var mappingStatus = await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
         var isPatch = DataSetVersionNumber.TryParse(apiDataSetVersionPlan.Version, out var number) && number.Patch > 0;
 
         // If no mapping is found and the api version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)

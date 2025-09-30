@@ -103,14 +103,14 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             response.AssertNotFound();
         }
-        
+
         [Theory]
         [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
             MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
         public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
         {
             var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
-            
+
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: "2.*",
@@ -119,12 +119,12 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             response.AssertNotFound();
         }
-        
+
         [Fact]
         public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
         {
             var (dataSet, versions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
-            
+
             var response = await QueryDataSet(
                 dataSetId: dataSet.Id,
                 dataSetVersion: "2.*",
@@ -132,7 +132,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised]);
 
             response.AssertOk();
-            
+
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
             Assert.Equal(1, viewModel.Paging.Page);
             Assert.Equal(1, viewModel.Paging.TotalPages);
@@ -1136,7 +1136,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: [AbsenceSchoolData.IndicatorSessAuthorised],
-                sorts: ["timePeriod|Asc", ..notFoundSorts]
+                sorts: ["timePeriod|Asc", .. notFoundSorts]
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2083,7 +2083,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
                 indicators: includeIndicatorsQueryParam
-                    ? 
+                    ?
                 [
                     AbsenceSchoolData.IndicatorEnrolments,
                     AbsenceSchoolData.IndicatorSessAuthorised,
@@ -2881,7 +2881,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-            
+
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
@@ -2925,7 +2925,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 }),
                 Debug = true
             };
-            
+
             await AnalyticsTestAssertions.AssertDataSetVersionQueryAnalyticsCaptured(
                 dataSetVersion: dataSetVersion,
                 expectedAnalyticsPath: _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths),
@@ -2949,7 +2949,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             response.AssertBadRequest();
-            
+
             // Check that the folder for capturing queries for analytics was never created.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
                 _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
@@ -2981,19 +2981,19 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-            
+
             // Expect the successful call to have been omitted from analytics because it originates
             // from the EES service.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
                 _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
         }
-        
+
         [Fact]
         public async Task ExceptionThrownByQueryAnalyticsManager_SuccessfulResultsStillReturned()
         {
             // Set up the manager to throw an exception when the service attempts to add a query to it.
             var analyticsManagerMock = new Mock<IAnalyticsManager>(MockBehavior.Strict);
-            
+
             analyticsManagerMock
                 .Setup(m => m.Read(It.IsAny<CancellationToken>()))
                 .Returns(async () =>
@@ -3001,17 +3001,17 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     await Task.Delay(Timeout.Infinite);
                     return null!;
                 });
-            
+
             analyticsManagerMock
                 .Setup(m => m.Add(
-                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
+                    It.IsAny<CaptureDataSetVersionQueryRequest>(),
                     It.IsAny<CancellationToken>()))
                 .Throws(new Exception("Error"));
 
             var app = TestApp.ConfigureServices(services => services
                 .ReplaceService<IDataSetVersionPathResolver>(_dataSetVersionPathResolver)
                 .ReplaceService(analyticsManagerMock));
-            
+
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             var response = await QueryDataSet(
@@ -3031,7 +3031,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             // Verify that the manager threw the Exception as planned.
             analyticsManagerMock
                 .Verify(s => s.Add(
-                    It.IsAny<CaptureDataSetVersionQueryRequest>(), 
+                    It.IsAny<CaptureDataSetVersionQueryRequest>(),
                     It.IsAny<CancellationToken>()));
 
             // Verify that despite the Exception being thrown, the service still returned
@@ -3065,18 +3065,18 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             );
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-            
+
             // There are 4 results for the query above, but we are requesting page 2 and a page size of 3,
             // and so this 2nd page only displays the final single result of the 4.
             Assert.Single(viewModel.Results);
-            
+
             // Expect the successful query not to have recorded its query for analytics, as this
             // feature was disabled by appsettings.
             AnalyticsTestAssertions.AssertAnalyticsCallNotCaptured(
                 _analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths));
         }
     }
-        
+
     private async Task<HttpResponseMessage> QueryDataSet(
         Guid dataSetId,
         IEnumerable<string>? indicators,

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 public interface IWorkflowActor
 {
     string GetSourceDirectory();
-    
+
     string GetReportsDirectory();
 
     /// <summary>

@@ -56,7 +56,7 @@ internal class DataSetVersionService(
     {
         return await GetDataSet(dataSetId, cancellationToken)
             .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplaceId))
-            .OnSuccess(dataSet => (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+            .OnSuccess(dataSet => (featureFlags.Value.EnableReplacementOfPublicApiDataSets
                                    && dataSetVersionToReplaceId is not null
                     ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplaceId.Value)
                     : (DataSetVersion?)null)
@@ -141,7 +141,7 @@ internal class DataSetVersionService(
         var versionsWhichCanNotBeDeleted = await dataSetVersions
             .ToAsyncEnumerable()
             .WhereAwait(async dsv => !await CanDeleteDataSetVersion(
-                dataSetVersion: dsv, 
+                dataSetVersion: dsv,
                 forceDeleteAll: forceDeleteAll))
             .Select(dsv => dsv.Id)
             .ToListAsync();
@@ -173,7 +173,7 @@ internal class DataSetVersionService(
         {
             return false;
         }
-        
+
         var releaseFile = await contentDbContext
             .ReleaseFiles
             .AsNoTracking()
@@ -357,7 +357,7 @@ internal class DataSetVersionService(
             dataSetVersionToReplaceId is null && dataSet.LatestLiveVersionId is null;
 
         //TODO: Action for EES-5996: Reword the validation error message to be more appropriate when EES-5779 is LIVE.
-        return isNotReplacingAndIsMissingLiveVersion 
+        return isNotReplacingAndIsMissingLiveVersion
             ? ValidationUtils.ValidationResult(CreateDataSetIdError(
                 message: ValidationMessages.DataSetNoLiveVersion,
                 dataSetId: dataSet.Id))
@@ -499,7 +499,7 @@ internal class DataSetVersionService(
             //Therefore, we can skip validation that ensures data file is in a different release to current release.  
             return ValidationResult();
         }
-        
+
         var previousReleaseIds = await GetReleaseIdsForReleaseFiles(
             contentDbContext,
             previousReleaseFileIds,
@@ -520,7 +520,7 @@ internal class DataSetVersionService(
 
         return ValidationResult();
 
-        Either<ActionResult, Unit> ValidationResult() => 
+        Either<ActionResult, Unit> ValidationResult() =>
             errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
     }
 

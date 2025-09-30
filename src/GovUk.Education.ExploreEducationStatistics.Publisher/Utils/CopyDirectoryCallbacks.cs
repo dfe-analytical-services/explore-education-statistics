@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;

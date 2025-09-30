@@ -10,10 +10,10 @@ public class PublicApiDataSetVersionCallsProcessor(
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
     private static readonly string[] PublicApiDataSetVersionsSubPath = ["public-api", "data-set-versions"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiDataSetVersionsSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiDataSetVersionsSubPath);
-    
+
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
@@ -21,7 +21,7 @@ public class PublicApiDataSetVersionCallsProcessor(
             reportsDirectory: ReportsDirectory));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : IWorkflowActor
     {
         public string GetSourceDirectory()
@@ -33,7 +33,7 @@ public class PublicApiDataSetVersionCallsProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
@@ -60,9 +60,9 @@ public class PublicApiDataSetVersionCallsProcessor(
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            var reportFilePath = 
+            var reportFilePath =
                 $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
-        
+
             await connection.ExecuteNonQueryAsync($@"
                 COPY (
                     SELECT * EXCLUDE previewToken,

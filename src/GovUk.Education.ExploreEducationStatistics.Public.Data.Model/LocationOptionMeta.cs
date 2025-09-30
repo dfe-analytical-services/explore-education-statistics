@@ -87,15 +87,16 @@ public abstract class LocationOptionMeta
             // preventing duplicates making it into the table by accident.
             // Unfortunately, it comes at the cost of essentially doubling the table's
             // size, but it's worth having for now (can remove it later if needed).
-            builder.HasIndex(o => new {
-                    o.Type,
-                    o.Label,
-                    o.Code,
-                    o.OldCode,
-                    o.Urn,
-                    o.LaEstab,
-                    o.Ukprn
-                }, $"IX_{nameof(PublicDataDbContext.LocationOptionMetas)}_All")
+            builder.HasIndex(o => new
+            {
+                o.Type,
+                o.Label,
+                o.Code,
+                o.OldCode,
+                o.Urn,
+                o.LaEstab,
+                o.Ukprn
+            }, $"IX_{nameof(PublicDataDbContext.LocationOptionMetas)}_All")
                 .IsUnique()
                 .AreNullsDistinct(false);
         }
@@ -104,47 +105,47 @@ public abstract class LocationOptionMeta
 
 public class LocationCodedOptionMeta : LocationOptionMeta
 {
-     public const string TypeValue = "CODE";
+    public const string TypeValue = "CODE";
 
-     protected override string Type { get; set; } = TypeValue;
+    protected override string Type { get; set; } = TypeValue;
 
-     public new required string Code
-     {
-         get => base.Code ?? string.Empty;
-         set => base.Code = value;
-     }
+    public new required string Code
+    {
+        get => base.Code ?? string.Empty;
+        set => base.Code = value;
+    }
 }
 
 public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
 {
-     public const string TypeValue = "LA";
+    public const string TypeValue = "LA";
 
-     protected override string Type { get; set; } = TypeValue;
+    protected override string Type { get; set; } = TypeValue;
 
-     public new required string Code
-     {
-         get => base.Code ?? string.Empty;
-         set => base.Code = value;
-     }
+    public new required string Code
+    {
+        get => base.Code ?? string.Empty;
+        set => base.Code = value;
+    }
 
-     public new required string OldCode
-     {
-         get => base.OldCode ?? string.Empty;
-         set => base.OldCode = value;
-     }
+    public new required string OldCode
+    {
+        get => base.OldCode ?? string.Empty;
+        set => base.OldCode = value;
+    }
 }
 
 public class LocationProviderOptionMeta : LocationOptionMeta
 {
-     public const string TypeValue = "PROV";
+    public const string TypeValue = "PROV";
 
-     protected override string Type { get; set; } = TypeValue;
+    protected override string Type { get; set; } = TypeValue;
 
-     public new required string Ukprn
-     {
-         get => base.Ukprn ?? string.Empty;
-         set => base.Ukprn = value;
-     }
+    public new required string Ukprn
+    {
+        get => base.Ukprn ?? string.Empty;
+        set => base.Ukprn = value;
+    }
 }
 
 public class LocationRscRegionOptionMeta : LocationOptionMeta
@@ -156,19 +157,19 @@ public class LocationRscRegionOptionMeta : LocationOptionMeta
 
 public class LocationSchoolOptionMeta : LocationOptionMeta
 {
-     public const string TypeValue = "SCH";
+    public const string TypeValue = "SCH";
 
-     protected override string Type { get; set; } = TypeValue;
+    protected override string Type { get; set; } = TypeValue;
 
-     public new required string Urn
-     {
-         get => base.Urn ?? string.Empty;
-         set => base.Urn = value;
-     }
+    public new required string Urn
+    {
+        get => base.Urn ?? string.Empty;
+        set => base.Urn = value;
+    }
 
-     public new required string LaEstab
-     {
-         get => base.LaEstab ?? string.Empty;
-         set => base.LaEstab = value;
-     }
+    public new required string LaEstab
+    {
+        get => base.LaEstab ?? string.Empty;
+        set => base.LaEstab = value;
+    }
 }

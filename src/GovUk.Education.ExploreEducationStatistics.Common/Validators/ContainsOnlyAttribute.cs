@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators;
 
 [AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field| AttributeTargets.Parameter,
+    AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
     AllowMultiple = true)]
 public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAttribute
 {

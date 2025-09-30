@@ -15,7 +15,7 @@ public record FullTableQuery
     public IEnumerable<Guid> Filters
     {
         [Obsolete("Use GetFilterItemIds() or GetNonHierarchicalFilterItemIds")]
-        get; 
+        get;
         set;
     } = new List<Guid>();
 

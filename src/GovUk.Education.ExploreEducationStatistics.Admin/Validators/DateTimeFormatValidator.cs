@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -20,9 +20,10 @@ public class DateTimeFormatValidator : ValidationAttribute
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        var stringValue = (string) value;
+        var stringValue = (string)value;
 
-        if (stringValue == null || stringValue == "") {
+        if (stringValue == null || stringValue == "")
+        {
             return ValidationResult.Success;
         }
 

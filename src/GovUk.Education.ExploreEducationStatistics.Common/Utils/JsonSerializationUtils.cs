@@ -22,7 +22,7 @@ public static class JsonSerializationUtils
             DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
         };
         settings.Converters.Add(new StringEnumConverter());
-        
+
         return JsonConvert.SerializeObject(
             value: obj,
             formatting: formatting,
@@ -60,7 +60,7 @@ public static class JsonSerializationUtils
                 .ToList();
         }
     }
-    
+
     private class OrderedFieldsContractResolver : DefaultContractResolver
     {
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)

@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 public class Filter
 {
     public Guid Id { get; set; }
-    public string? Hint { get; set; } 
+    public string? Hint { get; set; }
     public string Label { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string? GroupCsvColumn { get; set; }
@@ -44,7 +44,7 @@ public class Filter
 
     public Filter Clone()
     {
-        return (Filter) MemberwiseClone();
+        return (Filter)MemberwiseClone();
     }
 
     private sealed class IdEqualityComparer : IEqualityComparer<Filter>

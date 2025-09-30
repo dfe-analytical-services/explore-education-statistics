@@ -27,7 +27,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             ReleaseTitle = "Academic year 2022",
             PublicationTitle = "Publication title"
         };
-        
+
         await TestApp.AddTestData<ContentDbContext>(context =>
             context.ReleasePublishingFeedback.Add(existingFeedback));
 
@@ -35,7 +35,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             EmailToken: existingFeedback.EmailToken,
             Response: ReleasePublishingFeedbackResponse.Satisfied,
             AdditionalFeedback: "Great publishing experience!");
-        
+
         // Arrange
         var client = TestApp.CreateClient();
 
@@ -51,7 +51,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         Assert.Equal(request.Response, updatedFeedback.Response);
         Assert.Equal(request.AdditionalFeedback, updatedFeedback.AdditionalFeedback);
         updatedFeedback.FeedbackReceived.AssertUtcNow();
-        
+
         // Assert that other fields were left untouched.
         Assert.Equal(existingFeedback.EmailToken, updatedFeedback.EmailToken);
         Assert.Equal(existingFeedback.Created, updatedFeedback.Created);
@@ -74,13 +74,13 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             ReleaseTitle = "Academic year 2022",
             PublicationTitle = "Publication title"
         };
-        
+
         await TestApp.AddTestData<ContentDbContext>(context =>
             context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: "",
-            Response: (ReleasePublishingFeedbackResponse) 20,
+            Response: (ReleasePublishingFeedbackResponse)20,
             AdditionalFeedback: new string('b', 2001));
 
         // Arrange
@@ -103,7 +103,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             nameof(ReleasePublishingFeedbackUpdateRequest.AdditionalFeedback)
                 .ToLowerFirst(), maxLength: 2000);
     }
-    
+
     [Fact]
     public async Task UpdateFeedback_UnknownToken_ReturnsNotFound()
     {
@@ -117,7 +117,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             ReleaseTitle = "Academic year 2022",
             PublicationTitle = "Publication title"
         };
-        
+
         await TestApp.AddTestData<ContentDbContext>(context =>
             context.ReleasePublishingFeedback.Add(existingFeedback));
 

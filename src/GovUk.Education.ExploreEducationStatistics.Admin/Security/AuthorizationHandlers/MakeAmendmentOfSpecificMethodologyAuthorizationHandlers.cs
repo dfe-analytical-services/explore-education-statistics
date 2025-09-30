@@ -50,7 +50,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandler
 
         var owningPublication =
             await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-        
+
         // If the user is a Publication Owner of the Publication that owns this Methodology, they can create 
         // an Amendment of this Methodology.
         if (await _authorizationHandlerService

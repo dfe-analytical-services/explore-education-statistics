@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Valid
 
 public class TimePeriodStringValidatorsTests
 {
-   public class TimePeriodStringTests : TimePeriodStringValidatorsTests
+    public class TimePeriodStringTests : TimePeriodStringValidatorsTests
     {
         private class TestClass
         {

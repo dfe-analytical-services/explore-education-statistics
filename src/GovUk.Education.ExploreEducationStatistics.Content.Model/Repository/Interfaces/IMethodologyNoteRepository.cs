@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 
 public interface IMethodologyNoteRepository

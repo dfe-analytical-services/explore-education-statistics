@@ -459,7 +459,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 releaseFileId: releaseFile.Id,
                 durableTaskClientMock.Object,
                 dataSetVersionToReplace: versionUnderTest.Id);
-            
+
             VerifyAllMocks(durableTaskClientMock);
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
@@ -534,7 +534,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             // Arrange
             var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
-            SetUpMockDurableTaskClient(durableTaskClientMock, (_, [UsedImplicitly] input, _, _) => 
+            SetUpMockDurableTaskClient(durableTaskClientMock, (_, [UsedImplicitly] input, _, _) =>
                 Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input));
 
             SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
@@ -566,14 +566,14 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
             }
         }
-        
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
         public async Task ReleaseFileInSameReleaseSeriesAsCurrentLiveVersion_SkipsValidationProblem(bool enableDataSetVersionReplacement)
         {
             SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
-            
+
             var (dataSet, liveDataSetVersion) = await AddDataSetAndLatestLiveVersion();
 
             var nextDataFile = await SetupDataFileBeingAmended(liveDataSetVersion);

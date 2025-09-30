@@ -13,7 +13,7 @@ public static class UserServiceExtensions
     {
         return userService.CheckPolicy(dataSet, PublicDataSecurityPolicies.CanViewDataSet);
     }
-    
+
     public static Task<Either<ActionResult, DataSetVersion>> CheckCanQueryDataSetVersion(
         this IUserService userService,
         DataSetVersion dataSetVersion)

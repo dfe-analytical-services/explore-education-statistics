@@ -65,9 +65,9 @@ public class ReleaseServiceTests
             Label = "subject 1 indicator group 1",
             Indicators = new List<Indicator>
             {
-                new Indicator { Label = "subject 1 indicator group 1 indicator 1" },
-                new Indicator { Label = "subject 1 indicator group 1 indicator 2" },
-                new Indicator { Label = "subject 1 indicator group 1 indicator 3" },
+                new() { Label = "subject 1 indicator group 1 indicator 1" },
+                new() { Label = "subject 1 indicator group 1 indicator 2" },
+                new() { Label = "subject 1 indicator group 1 indicator 3" },
             }
         };
 
@@ -77,8 +77,8 @@ public class ReleaseServiceTests
             Label = "subject 1 indicator group 2",
             Indicators = new List<Indicator>
             {
-                new Indicator { Label = "subject 1 indicator group 2 indicator 1" },
-                new Indicator { Label = "subject 1 indicator group 2 indicator 2" },
+                new() { Label = "subject 1 indicator group 2 indicator 1" },
+                new() { Label = "subject 1 indicator group 2 indicator 2" },
             }
         };
 
@@ -94,7 +94,7 @@ public class ReleaseServiceTests
             Label = "subject 2 indicator group 1",
             Indicators = new List<Indicator>
             {
-                new Indicator { Label = "subject 2 indicator group 1 indicator 1" },
+                new() { Label = "subject 2 indicator group 1 indicator 1" },
             }
         };
 

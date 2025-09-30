@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using Azure.Identity;
 using Azure.Messaging.EventGrid;
 using Microsoft.Extensions.Logging;

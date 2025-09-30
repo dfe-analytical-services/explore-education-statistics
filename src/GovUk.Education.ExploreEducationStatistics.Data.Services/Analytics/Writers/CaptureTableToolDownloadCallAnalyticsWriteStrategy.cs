@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
@@ -13,7 +13,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategy(
 
     private readonly IWorkflowActor<CaptureTableToolDownloadCall> _workflowActor =
         new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-    
+
     public Type RequestType => typeof(CaptureTableToolDownloadCall);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken = default)
@@ -21,12 +21,12 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategy(
         if (request is not CaptureTableToolDownloadCall captureRequest)
         {
             throw new ArgumentException(
-                $"Request must be of type {nameof(CaptureTableToolDownloadCall)}. It is {request.GetType().FullName}", 
+                $"Request must be of type {nameof(CaptureTableToolDownloadCall)}. It is {request.GetType().FullName}",
                 nameof(request));
         }
-        await workflow.Report(_workflowActor, captureRequest, cancellationToken);   
+        await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
-    
+
     private class WorkflowActor(string analyticsPath)
         : WorkflowActorBase<CaptureTableToolDownloadCall>(analyticsPath)
     {

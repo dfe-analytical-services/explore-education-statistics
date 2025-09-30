@@ -51,7 +51,7 @@ public static class FilterMappingPlanGeneratorExtensions
                 );
             });
 
-            filterMappingPlanGenerator.AddFilterMapping(sourceFilter.Column,filterMappingGenerator);
+            filterMappingPlanGenerator.AddFilterMapping(sourceFilter.Column, filterMappingGenerator);
         });
 
         targetFilters?.ForEach(targetFilter =>

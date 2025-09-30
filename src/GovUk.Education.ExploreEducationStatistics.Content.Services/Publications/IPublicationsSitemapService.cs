@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 

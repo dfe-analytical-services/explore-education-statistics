@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;

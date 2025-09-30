@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -183,7 +183,7 @@ public class BlobCacheServiceTests
         IBlobStorageService? blobStorageService = null,
         ILogger<BlobCacheService>? logger = null)
     {
-        return new (
+        return new(
             blobStorageService ?? Mock.Of<IBlobStorageService>(),
             logger ?? Mock.Of<ILogger<BlobCacheService>>()
         );

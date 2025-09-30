@@ -30,7 +30,8 @@ public abstract class SecureBlobDownloadControllerTests
 
             var fileStreamResult = new FileStreamResult(
                 fileStream: "test text".ToStream(),
-                originalToken.ContentType) { FileDownloadName = originalToken.Filename };
+                originalToken.ContentType)
+            { FileDownloadName = originalToken.Filename };
 
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 

@@ -27,23 +27,24 @@ public class HealthCheckFunctions(
         {
             return Task.FromResult<IActionResult>(new OkObjectResult(healthCheckResponse));
         }
-        
-        return Task.FromResult<IActionResult>(new ObjectResult(healthCheckResponse) {
+
+        return Task.FromResult<IActionResult>(new ObjectResult(healthCheckResponse)
+        {
             StatusCode = StatusCodes.Status500InternalServerError
         });
     }
-    
+
     private HealthCheckSummary CheckFileShareMountHealth()
     {
         logger.LogInformation("Attempting to read from file share");
-        
+
         try
         {
             if (Directory.Exists(pathResolver.GetBasePath()))
             {
                 return HealthCheckSummary.Healthy();
             }
-            
+
             return HealthCheckSummary.Unhealthy("File Share Mount folder does not exist");
         }
         catch (Exception e)

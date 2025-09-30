@@ -41,7 +41,7 @@ public static partial class TimePeriodStringValidators
             {
                 error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
                 error.PropertyName = context.PropertyPath;
-                
+
                 context.AddFailure(error);
             }
         });

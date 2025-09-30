@@ -509,7 +509,7 @@ public class IgnoresFilterRowsInMetaFileScenario(Guid? subjectId = null) : IProc
     private readonly Guid _subjectId = subjectId ?? Guid.NewGuid();
 
     public string GetFilenameUnderTest()
-    { 
+    {
         return "ignored-filter-rows.csv";
     }
 

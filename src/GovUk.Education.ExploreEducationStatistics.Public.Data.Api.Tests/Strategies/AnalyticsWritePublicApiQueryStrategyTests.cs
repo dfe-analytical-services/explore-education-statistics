@@ -15,7 +15,7 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
     public class ReportTests : AnalyticsWritePublicApiQueryStrategyTests
     {
         private const string SnapshotPrefix = $"{nameof(AnalyticsWritePublicApiQueryStrategyTests)}.{nameof(ReportTests)}";
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithCoreQueryDetails()
         {
@@ -39,15 +39,15 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths))
                 .Order()
                 .ToList();
-            
+
             var file = Assert.Single(files);
             var fileContents = await File.ReadAllTextAsync(file);
-            
+
             Snapshot.Match(
                 currentResult: fileContents,
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithCoreQueryDetails)}");
         }
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithPreviewTokenAndRequestedDataSetVersion()
         {
@@ -75,10 +75,10 @@ public abstract class AnalyticsWritePublicApiQueryStrategyTests
                 .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicApiQueryStrategy.OutputSubPaths))
                 .Order()
                 .ToList();
-            
+
             var file = Assert.Single(files);
             var fileContents = await File.ReadAllTextAsync(file);
-            
+
             Snapshot.Match(
                 currentResult: fileContents,
                 snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithPreviewTokenAndRequestedDataSetVersion)}");

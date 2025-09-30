@@ -19,7 +19,7 @@ public static class AllowedValueValidator
             .WithState((_, value) => GetAllowedDetail(value: value, allowed: allowed));
     }
 
-    private static AllowedErrorDetail<T> GetAllowedDetail<T>(T value , IEnumerable<T> allowed)
+    private static AllowedErrorDetail<T> GetAllowedDetail<T>(T value, IEnumerable<T> allowed)
     {
         return new AllowedErrorDetail<T>(
             Value: value,

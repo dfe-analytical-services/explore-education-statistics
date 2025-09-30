@@ -1175,7 +1175,7 @@ public class PreReleaseUserServiceTests
         await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
         {
             var service = SetupPreReleaseUserService(
-                contentDbContext: context, 
+                contentDbContext: context,
                 usersAndRolesDbContext: userAndRolesDbContext);
 
             var result = await service.RemovePreReleaseUser(releaseVersion.Id, "test@test.com");

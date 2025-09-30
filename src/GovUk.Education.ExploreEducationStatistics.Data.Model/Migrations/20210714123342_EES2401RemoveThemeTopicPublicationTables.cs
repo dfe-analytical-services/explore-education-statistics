@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
 public partial class EES2401RemoveThemeTopicPublicationTables : Migration
 {
     private const string PreviousRoutineUpsertMigrationId = "20210512112804";
-    
+
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
@@ -101,7 +101,7 @@ public partial class EES2401RemoveThemeTopicPublicationTables : Migration
             principalTable: "Publication",
             principalColumn: "Id",
             onDelete: ReferentialAction.Cascade);
-        
+
         migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousRoutineUpsertMigrationId}_Routine_UpsertPublication.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousRoutineUpsertMigrationId}_Routine_UpsertTheme.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousRoutineUpsertMigrationId}_Routine_UpsertTopic.sql");

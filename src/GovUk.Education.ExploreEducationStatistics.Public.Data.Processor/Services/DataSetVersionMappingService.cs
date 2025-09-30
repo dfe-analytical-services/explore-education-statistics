@@ -52,14 +52,14 @@ internal class DataSetVersionMappingService(
         var sourceVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
             ? nextVersion.DataSet.Versions.SingleOrDefault(v => v.Id == dataSetVersionToReplaceId)
             : nextVersion.DataSet.LatestLiveVersion;
-        
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-            && dataSetVersionToReplaceId is not null 
+
+        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            && dataSetVersionToReplaceId is not null
             && sourceVersion is null)
         {
             return VersionToReplaceNotFoundError();
         }
-        
+
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
             cancellationToken);
@@ -113,7 +113,7 @@ internal class DataSetVersionMappingService(
 
         Either<ActionResult, Unit> VersionToReplaceNotFoundError()
         {
-           return ValidationUtils.ValidationResult(new ErrorViewModel
+            return ValidationUtils.ValidationResult(new ErrorViewModel
             {
                 Code = ValidationMessages.NextDataSetVersionNotFound.Code,
                 Message = ValidationMessages.NextDataSetVersionNotFound.Message,
@@ -152,7 +152,7 @@ internal class DataSetVersionMappingService(
             .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
- 
+
         if (!isReplacement && IsMajorVersionUpdate(mapping))
         {
             mapping.TargetDataSetVersion.VersionMajor += 1;
@@ -190,7 +190,7 @@ internal class DataSetVersionMappingService(
             return true;
         }
 
-        var hasUnmappedLocationOptions =  mapping.LocationMappingPlan
+        var hasUnmappedLocationOptions = mapping.LocationMappingPlan
             .Levels
             .Any(level => level.Value.Mappings
                 .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type)));

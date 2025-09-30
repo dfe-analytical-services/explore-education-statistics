@@ -9,7 +9,7 @@ public class TestAnalyticsPathResolver : AnalyticsPathResolverBase, IDisposable
         "ExploreEducationStatistics",
         "Analytics",
         Guid.NewGuid().ToString());
-    
+
     public void Dispose()
     {
         if (Directory.Exists(_basePath))

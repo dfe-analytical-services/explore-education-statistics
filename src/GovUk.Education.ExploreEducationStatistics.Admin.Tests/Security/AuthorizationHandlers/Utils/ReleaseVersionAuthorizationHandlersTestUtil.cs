@@ -108,8 +108,7 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             // add a new UserReleaseRole for the current User and ReleaseRole under test
             var rolesList = new List<UserReleaseRole>
             {
-                new UserReleaseRole
-                {
+                new() {
                     ReleaseVersionId = releaseVersion.Id,
                     UserId = userId,
                     Role = role
@@ -210,8 +209,7 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             // add a new UserPublicationRole for the current User and PublicationRole under test
             var rolesList = new List<UserPublicationRole>
             {
-                new UserPublicationRole
-                {
+                new() {
                     PublicationId = releaseVersion.Publication.Id,
                     UserId = userId,
                     Role = role
@@ -322,11 +320,11 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
                     await handler.HandleAsync(authContext);
                     if (rolesExpectedToSucceed.Contains(role))
                     {
-                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role.ToString()}");
+                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role}");
                     }
                     else
                     {
-                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role.ToString()}");
+                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role}");
                     }
                 }
             });

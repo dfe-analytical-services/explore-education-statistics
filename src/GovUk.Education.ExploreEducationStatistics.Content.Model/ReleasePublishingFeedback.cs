@@ -9,7 +9,7 @@ public record ReleasePublishingFeedback : ICreatedTimestamp<DateTime>
     public Guid Id { get; set; }
 
     public required string EmailToken { get; set; }
-    
+
     public required Guid ReleaseVersionId { get; set; }
 
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
@@ -19,7 +19,7 @@ public record ReleasePublishingFeedback : ICreatedTimestamp<DateTime>
     public required string ReleaseTitle { get; set; }
 
     public required PublicationRole UserPublicationRole { get; set; }
-    
+
     public ReleasePublishingFeedbackResponse? Response { get; set; }
 
     public string? AdditionalFeedback { get; set; }

@@ -362,11 +362,11 @@ public abstract class DbContextTransactionExtensionsTests
         var dbContext1 = _testApp.Services.GetRequiredService<TestDbContext1>();
         var dbContext2 = _testApp.Services.GetRequiredService<TestDbContext2>();
         var dbContext3WithoutRetry = _testApp.Services.GetRequiredService<TestDbContext3WithoutRetry>();
-        await dbContext1.Entities.AddAsync(new TestEntity {Id = id});
+        await dbContext1.Entities.AddAsync(new TestEntity { Id = id });
         await dbContext1.SaveChangesAsync();
-        await dbContext2.Entities.AddAsync(new TestEntity {Id = id});
+        await dbContext2.Entities.AddAsync(new TestEntity { Id = id });
         await dbContext2.SaveChangesAsync();
-        await dbContext3WithoutRetry.Entities.AddAsync(new TestEntity {Id = id});
+        await dbContext3WithoutRetry.Entities.AddAsync(new TestEntity { Id = id });
         await dbContext3WithoutRetry.SaveChangesAsync();
     }
 

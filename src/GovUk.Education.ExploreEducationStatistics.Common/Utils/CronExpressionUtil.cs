@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Cronos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;

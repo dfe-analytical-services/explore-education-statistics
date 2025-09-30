@@ -118,17 +118,17 @@ public class AdminEventRaiserTests
             isPublicationArchived: false);
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
-    
+
     [Fact]
     public async Task GivenPublicationIsArchived_WhenOnPublicationChanged_ThenEventPublishedWithIsPublicationArchivedTrue()
     {
         // ARRANGE
         var supersedingPublication = new Publication
         {
-            Id = Guid.NewGuid(), 
+            Id = Guid.NewGuid(),
             LatestPublishedReleaseVersionId = Guid.NewGuid()
         };
-        
+
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
@@ -234,16 +234,17 @@ public class AdminEventRaiserTests
         // ARRANGE
         var supersedingPublication = new Publication
         {
-            Id = Guid.NewGuid(), LatestPublishedReleaseVersionId = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            LatestPublishedReleaseVersionId = Guid.NewGuid()
         };
-        
+
         var publication = new Publication
         {
             Id = Guid.NewGuid(),
             Title = "Publication title",
             Slug = "publication-slug",
             LatestPublishedReleaseVersionId = Guid.NewGuid(),
-            LatestPublishedReleaseVersion = new ReleaseVersion{ ReleaseId = Guid.NewGuid() },
+            LatestPublishedReleaseVersion = new ReleaseVersion { ReleaseId = Guid.NewGuid() },
             SupersededById = supersedingPublication.Id,
             SupersededBy = supersedingPublication,
         };

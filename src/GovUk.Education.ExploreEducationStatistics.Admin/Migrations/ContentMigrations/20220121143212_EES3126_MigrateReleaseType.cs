@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 // ReSharper disable once InconsistentNaming
 public partial class EES3126_MigrateReleaseType : Migration
 {
-    private static readonly Dictionary<ReleaseType, Guid> ReleaseTypeIds = new Dictionary<ReleaseType, Guid>
+    private static readonly Dictionary<ReleaseType, Guid> ReleaseTypeIds = new()
     {
         {ReleaseType.AdHocStatistics, new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0")},
         {ReleaseType.ExperimentalStatistics, new Guid("f5de8522-3150-435d-98d5-1d14763f8c54")},
@@ -83,7 +83,7 @@ public partial class EES3126_MigrateReleaseType : Migration
 
         migrationBuilder.InsertData(
             table: "ReleaseTypes",
-            columns: new[] {"Id", "Title"},
+            columns: new[] { "Id", "Title" },
             values: new object[,]
             {
                 {ReleaseTypeIds[ReleaseType.AdHocStatistics], "Ad Hoc Statistics"},

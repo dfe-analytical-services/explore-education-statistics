@@ -108,7 +108,7 @@ public record DataSetGetQueryRequest
 
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
-            
+
             RuleFor(request => request.PageSize)
                 .InclusiveBetween(1, 10000);
         }

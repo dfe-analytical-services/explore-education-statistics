@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;

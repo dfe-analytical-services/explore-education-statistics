@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -121,7 +121,7 @@ public class FiltersMetaViewModelBuilderTests
             }
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters);
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(filters);
 
         Assert.Equal(2, result.Count);
 
@@ -134,7 +134,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Null(filterA.AutoSelectFilterItemId);
 
         // Verify filter A's filter groups
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(2, filterAGroups.Count);
 
         // Verify filter group A
@@ -176,7 +176,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Null(filterB.AutoSelectFilterItemId);
 
         // Verify filter B's filter groups
-        var filterBGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterB.Options;
+        var filterBGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterB.Options;
         Assert.Equal(2, filterBGroups.Count);
 
         // Verify filter group C
@@ -243,7 +243,7 @@ public class FiltersMetaViewModelBuilderTests
             }
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(ListOf(filter));
 
         Assert.Single(result);
         var filterA = Assert.Contains("FilterA", result);
@@ -313,7 +313,7 @@ public class FiltersMetaViewModelBuilderTests
             }
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters);
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(filters);
 
         Assert.Equal(3, result.Count);
 
@@ -327,7 +327,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(2, filterC.Order);
 
         // Verify filter A's filter groups are sorted by label
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(3, filterAGroups.Count);
         var groupA = Assert.Contains("GroupA", filterAGroups);
         var groupB = Assert.Contains("GroupB", filterAGroups);
@@ -391,7 +391,7 @@ public class FiltersMetaViewModelBuilderTests
             }
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(ListOf(filter));
 
         Assert.Single(result);
 
@@ -399,7 +399,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(0, filterA.Order);
 
         // Verify the filter groups are sorted by label with the "Total" group first
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(3, filterAGroups.Count);
         var groupTotal = Assert.Contains("Total", filterAGroups);
         var groupA = Assert.Contains("GroupA", filterAGroups);
@@ -563,7 +563,7 @@ public class FiltersMetaViewModelBuilderTests
             )
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters, ordering);
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(filters, ordering);
 
         Assert.Equal(3, result.Count);
 
@@ -577,7 +577,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(2, filterB.Order);
 
         // Verify filter A's filter groups are sorted by the defined sequence
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(3, filterAGroups.Count);
         var groupA = Assert.Contains("GroupA", filterAGroups);
         var groupB = Assert.Contains("GroupB", filterAGroups);

@@ -13,7 +13,7 @@ public class TimeIdentifierJsonConverterTests
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? SampleField { get; init; }
-        
+
         public string StringFieldAfter { get; init; }
 
         protected bool Equals(SampleClass other)
@@ -26,7 +26,7 @@ public class TimeIdentifierJsonConverterTests
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((SampleClass) obj);
+            return Equals((SampleClass)obj);
         }
 
         public override int GetHashCode()
@@ -50,11 +50,11 @@ public class TimeIdentifierJsonConverterTests
             SampleField = TimeIdentifier.April,
             StringFieldAfter = "Goodbye",
         };
-        
+
         Assert.Equal("{\"StringFieldBefore\":\"Hello\",\"SampleField\":{\"value\":\"M4\",\"label\":\"April\"},\"StringFieldAfter\":\"Goodbye\"}", JsonConvert.SerializeObject(objectToSerialize));
     }
-    
-    
+
+
     [Fact]
     public void SerializeObjectNull()
     {
@@ -64,10 +64,10 @@ public class TimeIdentifierJsonConverterTests
             SampleField = null,
             StringFieldAfter = "Goodbye",
         };
-        
+
         Assert.Equal("{\"StringFieldBefore\":\"Hello\",\"SampleField\":null,\"StringFieldAfter\":\"Goodbye\"}", JsonConvert.SerializeObject(objectToSerialize));
     }
-    
+
     [Fact]
     public void DeserializeObject()
     {
@@ -83,7 +83,7 @@ public class TimeIdentifierJsonConverterTests
 
         Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
     }
-    
+
     [Fact]
     public void DeserializeObjectNull()
     {
@@ -99,7 +99,7 @@ public class TimeIdentifierJsonConverterTests
 
         Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
     }
-    
+
     [Fact]
     public void DeserializeObjectOutOfOrder()
     {

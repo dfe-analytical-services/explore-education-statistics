@@ -25,7 +25,7 @@ public class ReleasePublishingFeedbackFunction(
 {
     private readonly AppOptions _appOptions = appOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
-    
+
     [Function(nameof(SendReleasePublishingFeedbackEmail))]
     public async Task SendReleasePublishingFeedbackEmail(
         [QueueTrigger(NotifierQueueStorage.ReleasePublishingFeedbackQueue)] ReleasePublishingFeedbackMessage message,
@@ -44,7 +44,7 @@ public class ReleasePublishingFeedbackFunction(
                 .OnSuccessDo(feedback =>
                 {
                     var release = feedback.ReleaseVersion.Release;
-                    
+
                     var values = new Dictionary<string, dynamic>
                     {
                         { "publication_name", release.Publication.Title },
@@ -73,7 +73,7 @@ public class ReleasePublishingFeedbackFunction(
         {
             PublicationRole.Owner => "an owner",
             PublicationRole.Allower => "an approver",
-            
+
             // Note that this function should never be invoked for PublicationRole.Approver
             // or PublicationRole.Drafter currently, because Publisher is filtering
             // these out until the permissions simplification work has been completed.
@@ -83,7 +83,7 @@ public class ReleasePublishingFeedbackFunction(
             PublicationRole.Approver => throw new ArgumentException(
                 $"{nameof(ReleasePublishingFeedbackFunction)} should not " +
                 $"have been called for {nameof(PublicationRole.Approver)}"),
-            
+
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
         };
     }

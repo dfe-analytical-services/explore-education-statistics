@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public enum ValidationErrorMessages
 {

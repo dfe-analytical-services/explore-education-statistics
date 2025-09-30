@@ -28,7 +28,7 @@ public class FilterGroup
 
     public FilterGroup Clone()
     {
-        return (FilterGroup) MemberwiseClone();
+        return (FilterGroup)MemberwiseClone();
     }
 
     private sealed class IdEqualityComparer : IEqualityComparer<FilterGroup>

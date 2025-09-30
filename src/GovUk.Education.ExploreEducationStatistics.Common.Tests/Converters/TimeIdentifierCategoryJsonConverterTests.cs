@@ -27,7 +27,7 @@ public class TimeIdentifierCategoryJsonConverterTests
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((SampleClass) obj);
+            return Equals((SampleClass)obj);
         }
 
         public override int GetHashCode()
@@ -119,7 +119,7 @@ public class TimeIdentifierCategoryJsonConverterTests
 
         Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
     }
-    
+
     [Fact]
     public void SerializeDeserializeObject()
     {

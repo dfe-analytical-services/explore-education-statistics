@@ -1197,7 +1197,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Assert.Single(viewModel.MinorChanges.LocationOptions!);
             Assert.Single(viewModel.MinorChanges.TimePeriods!);
         }
-        
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -1244,9 +1244,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 includePatchHistory: includePatchHistory);
 
             var viewModel = response.AssertOk<DataSetVersionChangesViewModel>(useSystemJson: true);
-            
+
             Assert.NotNull(viewModel.PatchHistory);
-            
+
             if (!includePatchHistory)
             {
                 Assert.Empty(viewModel.PatchHistory);
@@ -1314,7 +1314,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     .ForIndex(2, s => s.SetLevel(GeographicLevel.OpportunityArea))
                     .GenerateList)
                 .WithGeographicLevelMeta();
-            
+
             await SetUpHistoryPatchData(firstDataSetVersion, oldDataSetVersion, dataSetVersion);
 
             var response = await GetDataSetVersionChanges(
@@ -1324,7 +1324,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
             response.AssertForbidden();
         }
-        
+
         private async Task SetUpHistoryPatchData(
             DataSetVersion firstDataSetVersion,
             DataSetVersion oldDataSetVersion,
@@ -1403,7 +1403,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithPreviousStateId(oldDataSetVersion.GeographicLevelMeta!.Id)
                 .WithCurrentStateId(dataSetVersion.GeographicLevelMeta!.Id)
                 .GenerateList(1));
-            
+
             var indicatorMetaChanges = DataFixture
                 .DefaultIndicatorMetaChange()
                 .WithDataSetVersionId(dataSetVersion.Id)
@@ -1428,7 +1428,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .ForIndex(1, s => s
                     .SetCurrentStateId(dataSetVersion.IndicatorMetas[0].Id))
                 .GenerateList());
-            
+
             var locationMetaChanges = DataFixture
                 .DefaultLocationMetaChange()
                 .WithDataSetVersionId(dataSetVersion.Id)
@@ -1453,7 +1453,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     .SetCurrentStateId(oldDataSetVersion.LocationMetas[1].Id))
                 .Generate()
             );
-            
+
             var locationOptionMetaChanges = DataFixture
                 .DefaultLocationOptionMetaChange()
                 .WithDataSetVersionId(dataSetVersion.Id)
@@ -1478,7 +1478,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .ForIndex(1, s => s
                     .SetCurrentState(dataSetVersion.LocationMetas[1].OptionLinks[0]))
                 .GenerateList());
-            
+
             var timePeriodMetaChanges = DataFixture
                 .DefaultTimePeriodMetaChange()
                 .WithDataSetVersionId(dataSetVersion.Id)
@@ -1503,7 +1503,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .ForIndex(1, s => s
                     .SetCurrentStateId(dataSetVersion.TimePeriodMetas[0].Id))
                 .GenerateList());
-            
+
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
                 context.FilterMetaChanges.AddRange(filterMetaChanges);
@@ -2396,7 +2396,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         public async Task WildCardSpecified_RequestedPublished_Returns200()
         {
             var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
-            
+
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
                 dataSetVersion: "2.*",
@@ -2411,7 +2411,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         public async Task WildCardSpecified_RequestedNonPublished_Returns404(DataSetVersionStatus dataSetVersionStatus)
         {
             var (dataSet, dataSetVersions) = await SetupDataSetWithSpecifiedVersionStatuses(dataSetVersionStatus);
-            
+
             var response = await GetDataSetVersionChanges(
                 dataSetId: dataSet.Id,
                 dataSetVersion: "2.*",

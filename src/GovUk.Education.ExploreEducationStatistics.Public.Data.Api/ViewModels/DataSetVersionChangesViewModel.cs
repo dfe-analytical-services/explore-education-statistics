@@ -103,7 +103,7 @@ public record LocationOptionChangesViewModel
     /// The geographic level the changes belong to.
     /// </summary>
     public required GeographicLevelViewModel Level { get; init; }
-    
+
     /// <summary>
     /// The list of location option changes.
     /// </summary>

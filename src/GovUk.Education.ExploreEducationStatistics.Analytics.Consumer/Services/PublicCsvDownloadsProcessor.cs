@@ -9,10 +9,10 @@ public class PublicCsvDownloadsProcessor(
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
     private static readonly string[] PublicCsvDownloadsSubPath = ["public", "csv-downloads"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicCsvDownloadsSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicCsvDownloadsSubPath);
-    
+
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(

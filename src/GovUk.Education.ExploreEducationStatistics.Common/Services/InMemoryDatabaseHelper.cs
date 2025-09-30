@@ -20,7 +20,7 @@ public class InMemoryDatabaseHelper : IDatabaseHelper
     {
         return _dbContextSupplier;
     }
-    
+
     public Task DoInTransaction<TDbContext>(TDbContext context, Func<TDbContext, Task> transactionalUnit) where TDbContext : DbContext
     {
         var ctxDelegate = GetDbContextSupplier().CreateDbContextDelegate<TDbContext>();
@@ -47,9 +47,9 @@ public class InMemoryDatabaseHelper : IDatabaseHelper
     }
 
     public Task ExecuteWithExclusiveLock<TDbContext>(
-        TDbContext dbContext, 
-        string lockName, 
-        Func<TDbContext, Task> action) 
+        TDbContext dbContext,
+        string lockName,
+        Func<TDbContext, Task> action)
         where TDbContext : DbContext
     {
         var ctxDelegate = GetDbContextSupplier().CreateDbContextDelegate<TDbContext>();

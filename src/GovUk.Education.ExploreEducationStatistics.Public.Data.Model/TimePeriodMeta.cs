@@ -30,7 +30,7 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
         {
             builder.Property(m => m.Period)
                 .HasMaxLength(9);
-            
+
             builder.Property(m => m.Code)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(10);

@@ -21,7 +21,7 @@ public class PublicApiDataSetCallsProcessor(
             reportsDirectory: ReportsDirectory));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : IWorkflowActor
     {
         public string GetSourceDirectory()
@@ -57,9 +57,9 @@ public class PublicApiDataSetCallsProcessor(
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            var reportFilePath = 
+            var reportFilePath =
                 $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-calls.parquet";
-        
+
             await connection.ExecuteNonQueryAsync($@"
                 COPY (
                     SELECT * EXCLUDE previewToken,

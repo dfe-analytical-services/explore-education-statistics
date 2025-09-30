@@ -7,7 +7,7 @@ public static class TimeIdentifierCategoryExtensions
 {
     public static TimeIdentifier[] GetTimeIdentifiers(this TimeIdentifierCategory category)
     {
-        var all = (TimeIdentifier[]) Enum.GetValues(typeof(TimeIdentifier));
+        var all = (TimeIdentifier[])Enum.GetValues(typeof(TimeIdentifier));
         return all.Where(i => i.GetEnumAttribute<TimeIdentifierMetaAttribute>().Category == category).ToArray();
     }
 }

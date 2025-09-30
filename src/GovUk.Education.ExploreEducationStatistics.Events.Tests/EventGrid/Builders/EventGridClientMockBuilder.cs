@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 using Moq;
@@ -44,13 +44,13 @@ public class EventGridClientMockBuilder
         _sendEventAsyncException = exception;
         return this;
     }
-    
+
     public Asserter Assert => new(_mock, _eventsPublished);
     public class Asserter(Mock<IEventGridClient> mock, List<EventGridEvent> eventsPublished)
     {
         public IEnumerable<EventGridEvent> EventsPublished => eventsPublished;
-        
-        public void NoEventsWerePublished() => mock.Verify(m => 
+
+        public void NoEventsWerePublished() => mock.Verify(m =>
             m.SendEventAsync(It.IsAny<EventGridEvent>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

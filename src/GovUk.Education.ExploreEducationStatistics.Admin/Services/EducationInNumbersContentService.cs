@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EducationInNumbersContentService(
-    ContentDbContext contentDbContext): IEducationInNumbersContentService
+    ContentDbContext contentDbContext) : IEducationInNumbersContentService
 {
     public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId)
     {

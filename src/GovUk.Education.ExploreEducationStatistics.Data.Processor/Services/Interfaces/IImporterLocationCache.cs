@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 public interface IImporterLocationCache
 {
     void LoadLocations(StatisticsDbContext context);
-    
+
     Location Get(Location locationFromCsv);
 
     Task<Location> GetOrCreateAndCache(Location locationFromCsv, Func<Task<Location>> locationProvider);

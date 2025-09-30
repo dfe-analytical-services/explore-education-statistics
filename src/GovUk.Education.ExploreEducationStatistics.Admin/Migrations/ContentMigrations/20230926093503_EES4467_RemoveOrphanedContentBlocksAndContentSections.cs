@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.MigrationConstants;
 
@@ -14,7 +14,7 @@ public partial class EES4467_RemoveOrphanedContentBlocksAndContentSections : Mig
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath, 
+            ContentMigrationsPath,
             $"{MigrationId}_{nameof(EES4467_RemoveOrphanedContentBlocksAndContentSections)}.sql");
     }
 

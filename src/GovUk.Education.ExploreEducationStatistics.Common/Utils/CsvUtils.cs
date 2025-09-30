@@ -52,8 +52,8 @@ public static class CsvUtils
         int startingRowIndex = 0)
     {
         return (await Select(
-            streamProvider, 
-            (cells, _, _) => cells, 
+            streamProvider,
+            (cells, _, _) => cells,
             startingRowIndex))
             .ToList();
     }

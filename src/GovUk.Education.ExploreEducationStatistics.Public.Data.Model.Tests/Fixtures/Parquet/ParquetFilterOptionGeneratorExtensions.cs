@@ -65,7 +65,7 @@ public static class ParquetFilterOptionGeneratorExtensions
         this InstanceSetters<ParquetFilterOption> setters,
         string filterId)
         => setters.Set(o => o.FilterId, filterId);
-    
+
     public static InstanceSetters<ParquetFilterOption> SetFilterColumn(
         this InstanceSetters<ParquetFilterOption> setters,
         string filterColumn)

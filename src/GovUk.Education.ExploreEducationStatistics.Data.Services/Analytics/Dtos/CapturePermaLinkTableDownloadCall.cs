@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;

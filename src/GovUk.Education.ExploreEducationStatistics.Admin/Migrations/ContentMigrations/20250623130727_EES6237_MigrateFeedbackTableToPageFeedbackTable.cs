@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -53,9 +53,9 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
                     Intent,
                     [Read]
                 FROM Feedback");
-        
+
         migrationBuilder.Sql("GRANT INSERT ON dbo.PageFeedback TO [content];");
-        
+
         migrationBuilder.DropTable(
             name: "Feedback");
     }
@@ -81,7 +81,7 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
             {
                 table.PrimaryKey("PK_Feedback", x => x.Id);
             });
-        
+
         migrationBuilder.Sql(@"
                 INSERT INTO Feedback(
                     Id,
@@ -105,9 +105,9 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
                     Intent,
                     [Read]
                 FROM PageFeedback");
-        
+
         migrationBuilder.Sql("GRANT INSERT ON dbo.Feedback TO [content];");
-        
+
         migrationBuilder.DropTable(
             name: "PageFeedback");
     }

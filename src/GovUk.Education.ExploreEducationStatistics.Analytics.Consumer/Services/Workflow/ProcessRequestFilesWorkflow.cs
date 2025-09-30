@@ -42,13 +42,13 @@ public class ProcessRequestFilesWorkflow(
     public async Task Process(IWorkflowActor actor)
     {
         var processorName = actor.GetType().FullName;
-        
+
         logger.LogInformation("{Processor} triggered", processorName);
 
         var sourceDirectory = actor.GetSourceDirectory();
         var reportsDirectory = actor.GetReportsDirectory();
         var baseProcessingDirectory = Path.Combine(sourceDirectory, "processing");
-        
+
         if (!fileAccessor.DirectoryExists(sourceDirectory))
         {
             logger.LogInformation("No requests for {Processor} to process", processorName);
@@ -74,7 +74,7 @@ public class ProcessRequestFilesWorkflow(
 
         await actor.InitialiseDuckDb(duckDbConnection);
 
-        var temporaryProcessingDirectoryName = 
+        var temporaryProcessingDirectoryName =
             temporaryProcessingFolderNameGenerator?.Invoke() ?? Guid.NewGuid().ToString();
 
         var temporaryProcessingDirectory = Path.Combine(
@@ -85,7 +85,7 @@ public class ProcessRequestFilesWorkflow(
             .Batch(batchSize)
             .Select(batch => batch.ToList())
             .ToList();
-        
+
         // For each batch of files to process, move them into their own folder
         // under an overarching temporary processing folder.
         fileBatches.ForEach((batchFilenames, index) =>
@@ -102,7 +102,7 @@ public class ProcessRequestFilesWorkflow(
                 targetDirectory: batchDirectory,
                 createTargetDirectory: true);
         });
-        
+
         var batchProcessingResults = Enumerable
             .Range(start: 1, count: fileBatches.Count)
             .SelectAsync(async batchNumber => await ProcessFileBatch(
@@ -128,9 +128,9 @@ public class ProcessRequestFilesWorkflow(
         {
             return;
         }
-        
+
         fileAccessor.CreateDirectory(reportsDirectory);
-        
+
         var reportFilePathAndFilenamePrefix = Path.Combine(
             reportsDirectory,
             dateTimeProvider.UtcNow.ToString("yyyyMMdd-HHmmss"));
@@ -163,14 +163,14 @@ public class ProcessRequestFilesWorkflow(
         catch (Exception e)
         {
             logger.LogError(e, "Failed to process request file batch");
-            
+
             var failuresDirectory = Path.Combine(
                 sourceDirectory,
                 "failures",
                 temporaryProcessingDirectoryName);
 
             fileAccessor.CreateDirectory(failuresDirectory);
-            
+
             MoveBadBatchDirectoryToFailuresDirectory(
                 batchDirectory: batchDirectory,
                 failuresDirectory: failuresDirectory,

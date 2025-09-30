@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Models;
@@ -53,10 +53,10 @@ public class VersionedEntityDeletionOrderUtilTests
             entity1Version8Id,
             entity1Version7Id,
             entity1Version6Id,
-            entity1Version5Id, 
-            entity1Version4Id, 
-            entity1Version3Id, 
-            entity1Version2Id, 
+            entity1Version5Id,
+            entity1Version4Id,
+            entity1Version3Id,
+            entity1Version2Id,
             entity1Version1Id,
             entity2Version3Id,
             entity2Version2Id,
@@ -65,7 +65,7 @@ public class VersionedEntityDeletionOrderUtilTests
             entity3Version1Id,
             entity4Version3Id,
             entity4Version6Id);
-        
+
         Assert.Equal(expectedVersionOrder, ordered);
     }
 }

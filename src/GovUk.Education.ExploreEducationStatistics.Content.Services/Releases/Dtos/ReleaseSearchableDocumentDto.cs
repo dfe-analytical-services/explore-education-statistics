@@ -24,21 +24,21 @@ public record ReleaseSearchableDocumentDto
     public static ReleaseSearchableDocumentDto FromModel(
         Publication publication,
         ReleaseCacheViewModel release) => new()
-    {
-        ReleaseId = release.ReleaseId,
-        ReleaseSlug = release.Slug,
-        ReleaseVersionId = release.Id,
-        PublicationId = publication.Id,
-        PublicationSlug = publication.Slug,
-        Summary = publication.Summary,
-        PublicationTitle = publication.Title,
-        Published = release.Published ?? throw new ArgumentException("Release must have a published date"),
-        ThemeId = publication.Theme.Id,
-        ThemeTitle = publication.Theme.Title,
-        Type = release.Type.ToString(),
-        TypeBoost = release.Type.ToSearchDocumentTypeBoost(),
-        HtmlContent = RenderSearchableHtmlContent(publication, release)
-    };
+        {
+            ReleaseId = release.ReleaseId,
+            ReleaseSlug = release.Slug,
+            ReleaseVersionId = release.Id,
+            PublicationId = publication.Id,
+            PublicationSlug = publication.Slug,
+            Summary = publication.Summary,
+            PublicationTitle = publication.Title,
+            Published = release.Published ?? throw new ArgumentException("Release must have a published date"),
+            ThemeId = publication.Theme.Id,
+            ThemeTitle = publication.Theme.Title,
+            Type = release.Type.ToString(),
+            TypeBoost = release.Type.ToSearchDocumentTypeBoost(),
+            HtmlContent = RenderSearchableHtmlContent(publication, release)
+        };
 
     private static string RenderSearchableHtmlContent(
         Publication publication,

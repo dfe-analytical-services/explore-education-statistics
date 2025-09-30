@@ -28,7 +28,7 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
     {
         return await releaseService
             .UpdateRelease(
-                releaseId: releaseId, 
+                releaseId: releaseId,
                 request: request,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();

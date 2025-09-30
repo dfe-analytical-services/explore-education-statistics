@@ -58,7 +58,7 @@ public abstract class DataSetVersionTests
 
             Assert.Equal(formattedVersion, dataSetVersion.PublicVersion);
         }
-        
+
         [Fact]
         public void DefaultNextVersion_IncrementsMinorDefaultsPatchToZero()
         {
@@ -70,7 +70,7 @@ public abstract class DataSetVersionTests
             Assert.Equal(2, semVersion.Minor);
             Assert.Equal(0, semVersion.Patch);
         }
-    
+
         [Fact]
         public void NextPatchVersion_IncrementsPatch()
         {
@@ -82,7 +82,7 @@ public abstract class DataSetVersionTests
             Assert.Equal(1, semVersion.Minor);
             Assert.Equal(1, semVersion.Patch);
         }
-    
+
         private static DataSetVersion CreateDataSetVersion(int major, int minor, int patch)
         {
             var version = new DataSetVersion

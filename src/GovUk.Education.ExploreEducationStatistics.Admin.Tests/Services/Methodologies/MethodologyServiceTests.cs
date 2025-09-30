@@ -924,7 +924,7 @@ public class MethodologyServiceTests
 
             Assert.Equal(owningPublication.Id, viewModel.OwningPublication.Id);
             Assert.Equal(owningPublication.Title, viewModel.OwningPublication.Title);
-            
+
             Assert.Equal(2, viewModel.OtherPublications.Count);
             Assert.Equal(adoptingPublication1.Id, viewModel.OtherPublications[0].Id);
             Assert.Equal(adoptingPublication1.Title, viewModel.OtherPublications[0].Title);
@@ -2552,11 +2552,11 @@ public class MethodologyServiceTests
             OwningPublicationTitle = "Pupil absence statistics: methodology",
             OwningPublicationSlug = "pupil-absence-statistics-methodology",
             Versions = ListOf(new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    PublishingStrategy = MethodologyPublishingStrategy.Immediately,
-                    Status = Draft
-                },
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = Draft
+            },
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),

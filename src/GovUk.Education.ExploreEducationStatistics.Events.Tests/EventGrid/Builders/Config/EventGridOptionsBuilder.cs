@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders.Config;
@@ -12,7 +12,7 @@ public class EventGridOptionsBuilder
 
     public EventGridOptionsBuilder AddTopicConfig(string topicKey, string topicEndpoint, string? topicAccessKey = null)
     {
-        _eventTopicOptions.Add(new EventTopicOptions{ Key = topicKey, TopicEndpoint = topicEndpoint, TopicAccessKey = topicAccessKey});
+        _eventTopicOptions.Add(new EventTopicOptions { Key = topicKey, TopicEndpoint = topicEndpoint, TopicAccessKey = topicAccessKey });
         return this;
     }
 

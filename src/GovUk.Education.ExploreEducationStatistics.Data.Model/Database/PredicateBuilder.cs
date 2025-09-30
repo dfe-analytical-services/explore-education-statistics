@@ -3,12 +3,12 @@ using System.Linq.Expressions;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 public static class PredicateBuilder
-{   
+{
     public static Expression<Func<T, R>> Expr<T, R>(Func<T, R> function)
     {
         return t => function(t);
     }
-    
+
     public static Expression<Func<T, bool>> True<T>()
     {
         return input => true;
@@ -42,7 +42,7 @@ public static class PredicateBuilder
     {
         return expression1.CombineWithAndAlso(expression2);
     }
-    
+
     private static Expression<Func<TInput, bool>> CombineWithAnd<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
     {
         return Expression.Lambda<Func<TInput, bool>>(
@@ -50,7 +50,7 @@ public static class PredicateBuilder
                 func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
             func1.Parameters);
     }
-    
+
     private static Expression<Func<TInput, bool>> CombineWithAndAlso<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
     {
         return Expression.Lambda<Func<TInput, bool>>(
@@ -66,7 +66,7 @@ public static class PredicateBuilder
                 func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
             func1.Parameters);
     }
-    
+
     private static Expression<Func<TInput, bool>> CombineWithOr<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
     {
         return Expression.Lambda<Func<TInput, bool>>(

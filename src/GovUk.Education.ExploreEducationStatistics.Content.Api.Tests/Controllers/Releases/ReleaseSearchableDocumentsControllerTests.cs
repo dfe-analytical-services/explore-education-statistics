@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;

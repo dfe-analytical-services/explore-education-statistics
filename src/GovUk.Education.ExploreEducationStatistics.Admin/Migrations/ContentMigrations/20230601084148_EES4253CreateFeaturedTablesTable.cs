@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;

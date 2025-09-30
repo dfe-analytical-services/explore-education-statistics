@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -18,7 +18,7 @@ public class ImporterLocationServiceTests
 {
     private readonly Country _england = new("E92000001", "England");
     private readonly Country _wales = new("W92000004", "Wales");
-    
+
     [Fact]
     public async Task Get()
     {
@@ -38,7 +38,7 @@ public class ImporterLocationServiceTests
         {
             statisticsDbContext.Add(location);
             await statisticsDbContext.SaveChangesAsync();
-            
+
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
@@ -49,7 +49,7 @@ public class ImporterLocationServiceTests
         Assert.NotNull(result);
         Assert.Equal(location.Id, result.Id);
     }
-    
+
     [Fact]
     public async Task Get_NonExistingLocation()
     {
@@ -69,7 +69,7 @@ public class ImporterLocationServiceTests
         {
             statisticsDbContext.Add(nonMatchingLocation);
             await statisticsDbContext.SaveChangesAsync();
-            
+
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
@@ -79,7 +79,7 @@ public class ImporterLocationServiceTests
             new Location
             {
                 GeographicLevel = GeographicLevel.Country, // different level
-                Country = nonMatchingLocation.Country   
+                Country = nonMatchingLocation.Country
             }));
     }
 
@@ -119,7 +119,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result.Country);
             Assert.Equal(_england.Code, result.Country!.Code);
             Assert.Equal(_england.Name, result.Country!.Name);
-            
+
             Assert.Same(result, importerLocationCache.Get(result));
         }
 
@@ -135,12 +135,12 @@ public class ImporterLocationServiceTests
             Assert.Equal(_england.Name, location.Country!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_MissingLocalAuthorityCode()
     {
         var locationId = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.Setup(mock => mock.NewGuid())
             .Returns(locationId);
@@ -150,24 +150,25 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             // Test creating a Local Authority with no code, e.g. Bedfordshire pre LGR 2009 only has an old code
             var result = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     LocalAuthority = new LocalAuthority(null, "820", "Bedfordshire")
                 });
-    
+
             MockUtils.VerifyAllMocks(guidGenerator);
-    
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(locationId, result.Id);
             Assert.Equal(GeographicLevel.LocalAuthority, result.GeographicLevel);
             Assert.NotNull(result.Country);
@@ -177,14 +178,14 @@ public class ImporterLocationServiceTests
             Assert.Null(result.LocalAuthority!.Code);
             Assert.Equal("820", result.LocalAuthority!.OldCode);
             Assert.Equal("Bedfordshire", result.LocalAuthority!.Name);
-            
+
             Assert.Same(result, importerLocationCache.Get(result));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var location = Assert.Single(statisticsDbContext.Location);
-    
+
             Assert.NotNull(location);
             Assert.Equal(locationId, location.Id);
             Assert.Equal(GeographicLevel.LocalAuthority, location.GeographicLevel);
@@ -197,13 +198,13 @@ public class ImporterLocationServiceTests
             Assert.Equal("Bedfordshire", location.LocalAuthority!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_UniqueByName()
     {
         var result1Id = Guid.NewGuid();
         var result2Id = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.SetupSequence(mock => mock.NewGuid())
             .Returns(result1Id)
@@ -214,32 +215,34 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             // Test creating two Regions with the same code but different names
             var result1 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = new Region("1", "North East")
                 });
-    
+
             var result2 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = new Region("1", "North West")
                 });
-    
+
             MockUtils.VerifyAllMocks(guidGenerator);
-    
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result1Id, result1.Id);
             Assert.Equal(GeographicLevel.Region, result1.GeographicLevel);
             Assert.NotNull(result1.Country);
@@ -248,7 +251,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result1.Region);
             Assert.Equal("1", result1.Region!.Code);
             Assert.Equal("North East", result1.Region!.Name);
-    
+
             Assert.Equal(result2Id, result2.Id);
             Assert.Equal(GeographicLevel.Region, result2.GeographicLevel);
             Assert.NotNull(result2.Country);
@@ -257,17 +260,17 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result2.Region);
             Assert.Equal("1", result2.Region!.Code);
             Assert.Equal("North West", result2.Region!.Name);
-            
+
             Assert.Same(result1, importerLocationCache.Get(result1));
             Assert.Same(result2, importerLocationCache.Get(result2));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var locations = await statisticsDbContext.Location.ToListAsync();
-    
+
             Assert.Equal(2, locations.Count);
-    
+
             Assert.Equal(result1Id, locations[0].Id);
             Assert.Equal(GeographicLevel.Region, locations[0].GeographicLevel);
             Assert.NotNull(locations[0].Country);
@@ -276,7 +279,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(locations[0].Region);
             Assert.Equal("1", locations[0].Region!.Code);
             Assert.Equal("North East", locations[0].Region!.Name);
-    
+
             Assert.Equal(result2Id, locations[1].Id);
             Assert.Equal(GeographicLevel.Region, locations[1].GeographicLevel);
             Assert.NotNull(locations[1].Country);
@@ -287,13 +290,13 @@ public class ImporterLocationServiceTests
             Assert.Equal("North West", locations[1].Region!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_UniqueByCode()
     {
         var result1Id = Guid.NewGuid();
         var result2Id = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.SetupSequence(mock => mock.NewGuid())
             .Returns(result1Id)
@@ -304,32 +307,34 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             // Test creating two Regions with the same name but different codes
             var result1 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = new Region("1", "North East")
                 });
-    
+
             var result2 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = new Region("2", "North East")
                 });
-    
+
             MockUtils.VerifyAllMocks(guidGenerator);
-    
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result1Id, result1.Id);
             Assert.Equal(GeographicLevel.Region, result1.GeographicLevel);
             Assert.NotNull(result1.Country);
@@ -338,7 +343,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result1.Region);
             Assert.Equal("1", result1.Region!.Code);
             Assert.Equal("North East", result1.Region!.Name);
-    
+
             Assert.Equal(result2Id, result2.Id);
             Assert.Equal(GeographicLevel.Region, result2.GeographicLevel);
             Assert.NotNull(result2.Country);
@@ -347,17 +352,17 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result2.Region);
             Assert.Equal("2", result2.Region!.Code);
             Assert.Equal("North East", result2.Region!.Name);
-            
+
             Assert.Same(result1, importerLocationCache.Get(result1));
             Assert.Same(result2, importerLocationCache.Get(result2));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var locations = await statisticsDbContext.Location.ToListAsync();
-    
+
             Assert.Equal(2, locations.Count);
-    
+
             Assert.Equal(result1Id, locations[0].Id);
             Assert.Equal(GeographicLevel.Region, locations[0].GeographicLevel);
             Assert.NotNull(locations[0].Country);
@@ -366,7 +371,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(locations[0].Region);
             Assert.Equal("1", locations[0].Region!.Code);
             Assert.Equal("North East", locations[0].Region!.Name);
-    
+
             Assert.Equal(result2Id, locations[1].Id);
             Assert.Equal(GeographicLevel.Region, locations[1].GeographicLevel);
             Assert.NotNull(locations[1].Country);
@@ -377,13 +382,13 @@ public class ImporterLocationServiceTests
             Assert.Equal("North East", locations[1].Region!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_UniqueByLocalAuthorityOldCode()
     {
         var result1Id = Guid.NewGuid();
         var result2Id = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.SetupSequence(mock => mock.NewGuid())
             .Returns(result1Id)
@@ -394,32 +399,34 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             // Test creating two Local Authorities which are identical except for different old codes
             var result1 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     LocalAuthority = new LocalAuthority("1", "100", "Westminster")
                 });
-    
+
             var result2 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     LocalAuthority = new LocalAuthority("1", "101", "Westminster")
                 });
-    
+
             MockUtils.VerifyAllMocks(guidGenerator);
-    
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result1Id, result1.Id);
             Assert.Equal(GeographicLevel.LocalAuthority, result1.GeographicLevel);
             Assert.NotNull(result1.Country);
@@ -429,7 +436,7 @@ public class ImporterLocationServiceTests
             Assert.Equal("1", result1.LocalAuthority!.Code);
             Assert.Equal("100", result1.LocalAuthority!.OldCode);
             Assert.Equal("Westminster", result1.LocalAuthority!.Name);
-    
+
             Assert.Equal(result2Id, result2.Id);
             Assert.Equal(GeographicLevel.LocalAuthority, result2.GeographicLevel);
             Assert.NotNull(result2.Country);
@@ -439,17 +446,17 @@ public class ImporterLocationServiceTests
             Assert.Equal("1", result2.LocalAuthority!.Code);
             Assert.Equal("101", result2.LocalAuthority!.OldCode);
             Assert.Equal("Westminster", result2.LocalAuthority!.Name);
-            
+
             Assert.Same(result1, importerLocationCache.Get(result1));
             Assert.Same(result2, importerLocationCache.Get(result2));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var locations = await statisticsDbContext.Location.ToListAsync();
-    
+
             Assert.Equal(2, locations.Count);
-    
+
             Assert.Equal(result1Id, locations[0].Id);
             Assert.Equal(GeographicLevel.LocalAuthority, locations[0].GeographicLevel);
             Assert.NotNull(locations[0].Country);
@@ -459,7 +466,7 @@ public class ImporterLocationServiceTests
             Assert.Equal("1", locations[0].LocalAuthority!.Code);
             Assert.Equal("100", locations[0].LocalAuthority!.OldCode);
             Assert.Equal("Westminster", locations[0].LocalAuthority!.Name);
-    
+
             Assert.Equal(result2Id, locations[1].Id);
             Assert.Equal(GeographicLevel.LocalAuthority, locations[1].GeographicLevel);
             Assert.NotNull(locations[1].Country);
@@ -471,13 +478,13 @@ public class ImporterLocationServiceTests
             Assert.Equal("Westminster", locations[1].LocalAuthority!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_UniqueByGeographicLevel()
     {
         var result1Id = Guid.NewGuid();
         var result2Id = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.SetupSequence(mock => mock.NewGuid())
             .Returns(result1Id)
@@ -488,12 +495,12 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         var localAuthority = new LocalAuthority("1", "100", "Westminster");
         var localAuthorityDistrict = new LocalAuthorityDistrict("2", "Westminster");
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             // Test creating two locations with identical attributes except for GeographicLevel.
@@ -501,26 +508,28 @@ public class ImporterLocationServiceTests
             // treated uniquely by geographic level.
             var result1 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     LocalAuthority = localAuthority,
                     LocalAuthorityDistrict = localAuthorityDistrict
                 });
-    
+
             var result2 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
                     Country = _england,
                     LocalAuthority = localAuthority,
                     LocalAuthorityDistrict = localAuthorityDistrict
                 });
-    
+
             MockUtils.VerifyAllMocks(guidGenerator);
-    
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result1Id, result1.Id);
             Assert.Equal(GeographicLevel.LocalAuthority, result1.GeographicLevel);
             Assert.NotNull(result1.Country);
@@ -532,7 +541,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result1.LocalAuthorityDistrict);
             Assert.Equal(localAuthorityDistrict.Code, result1.LocalAuthorityDistrict!.Code);
             Assert.Equal(localAuthorityDistrict.Name, result1.LocalAuthorityDistrict!.Name);
-    
+
             Assert.Equal(result2Id, result2.Id);
             Assert.Equal(GeographicLevel.LocalAuthorityDistrict, result2.GeographicLevel);
             Assert.NotNull(result2.Country);
@@ -544,17 +553,17 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result2.LocalAuthorityDistrict);
             Assert.Equal(localAuthorityDistrict.Code, result2.LocalAuthorityDistrict!.Code);
             Assert.Equal(localAuthorityDistrict.Name, result2.LocalAuthorityDistrict!.Name);
-            
+
             Assert.Same(result1, importerLocationCache.Get(result1));
             Assert.Same(result2, importerLocationCache.Get(result2));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var locations = await statisticsDbContext.Location.ToListAsync();
-    
+
             Assert.Equal(2, locations.Count);
-    
+
             Assert.Equal(result1Id, locations[0].Id);
             Assert.Equal(GeographicLevel.LocalAuthority, locations[0].GeographicLevel);
             Assert.NotNull(locations[0].Country);
@@ -566,7 +575,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(locations[0].LocalAuthorityDistrict);
             Assert.Equal(localAuthorityDistrict.Code, locations[0].LocalAuthorityDistrict!.Code);
             Assert.Equal(localAuthorityDistrict.Name, locations[0].LocalAuthorityDistrict!.Name);
-    
+
             Assert.Equal(result2Id, locations[1].Id);
             Assert.Equal(GeographicLevel.LocalAuthorityDistrict, locations[1].GeographicLevel);
             Assert.NotNull(locations[1].Country);
@@ -580,13 +589,13 @@ public class ImporterLocationServiceTests
             Assert.Equal(localAuthorityDistrict.Name, locations[1].LocalAuthorityDistrict!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_UniqueByAdditionalAttributes()
     {
         var result1Id = Guid.NewGuid();
         var result2Id = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.SetupSequence(mock => mock.NewGuid())
             .Returns(result1Id)
@@ -597,34 +606,36 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         var provider = new Provider("1", "Ace Teachers");
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             // Test creating two Providers that are unique by some other attribute e.g. Country
             var result1 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.Provider,
                     Country = _england,
                     Provider = provider
                 });
-    
+
             var result2 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.Provider,
                     Country = _wales,
                     Provider = provider
                 });
-    
+
             MockUtils.VerifyAllMocks(guidGenerator);
-    
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result1Id, result1.Id);
             Assert.Equal(GeographicLevel.Provider, result1.GeographicLevel);
             Assert.NotNull(result1.Country);
@@ -633,7 +644,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result1.Provider);
             Assert.Equal(provider.Code, result1.Provider!.Code);
             Assert.Equal(provider.Name, result1.Provider!.Name);
-    
+
             Assert.Equal(result2Id, result2.Id);
             Assert.Equal(GeographicLevel.Provider, result2.GeographicLevel);
             Assert.NotNull(result2.Country);
@@ -642,17 +653,17 @@ public class ImporterLocationServiceTests
             Assert.NotNull(result2.Provider);
             Assert.Equal(provider.Code, result2.Provider!.Code);
             Assert.Equal(provider.Name, result2.Provider!.Name);
-            
+
             Assert.Same(result1, importerLocationCache.Get(result1));
             Assert.Same(result2, importerLocationCache.Get(result2));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var locations = await statisticsDbContext.Location.ToListAsync();
-    
+
             Assert.Equal(2, locations.Count);
-    
+
             Assert.Equal(result1Id, locations[0].Id);
             Assert.Equal(GeographicLevel.Provider, locations[0].GeographicLevel);
             Assert.NotNull(locations[0].Country);
@@ -661,7 +672,7 @@ public class ImporterLocationServiceTests
             Assert.NotNull(locations[0].Provider);
             Assert.Equal(provider.Code, locations[0].Provider!.Code);
             Assert.Equal(provider.Name, locations[0].Provider!.Name);
-    
+
             Assert.Equal(result2Id, locations[1].Id);
             Assert.Equal(GeographicLevel.Provider, locations[1].GeographicLevel);
             Assert.NotNull(locations[1].Country);
@@ -672,13 +683,13 @@ public class ImporterLocationServiceTests
             Assert.Equal(provider.Name, locations[1].Provider!.Name);
         }
     }
-    
+
     [Fact]
     public async Task CreateAndCache_CaseSensitiveLocationName()
     {
         var result1Id = Guid.NewGuid();
         var result2Id = Guid.NewGuid();
-    
+
         var guidGenerator = new Mock<IGuidGenerator>();
         guidGenerator.SetupSequence(mock => mock.NewGuid())
             .Returns(result1Id)
@@ -689,59 +700,61 @@ public class ImporterLocationServiceTests
         var service = BuildService(
             guidGenerator.Object,
             importerLocationCache);
-    
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var result1 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.EnglishDevolvedArea,
                     Country = _england,
                     EnglishDevolvedArea = new EnglishDevolvedArea("1", "Sheffield City Region")
                 });
-            
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result1Id, result1.Id);
             Assert.Equal("Sheffield City Region", result1.EnglishDevolvedArea_Name);
-            
+
             Assert.Same(result1, importerLocationCache.Get(result1));
         }
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var result2 = await service.CreateIfNotExistsAndCache(
                 statisticsDbContext,
-                new Location {
+                new Location
+                {
                     GeographicLevel = GeographicLevel.EnglishDevolvedArea,
                     Country = _england,
                     EnglishDevolvedArea = new EnglishDevolvedArea("1", "SHEFFIELD CITY REGION")
                 });
-            
+
             await statisticsDbContext.SaveChangesAsync();
-    
+
             Assert.Equal(result2Id, result2.Id);
             // NOTE: The below assert doesn't actual catch the error fixed by EES-2427 because the
             // in-memory DB in the EF version we're currently using is case sensitive - while a
             // MsSQL DBs are case insensitive by default: https://github.com/dotnet/efcore/issues/6153
             Assert.Equal("SHEFFIELD CITY REGION", result2.EnglishDevolvedArea_Name);
-            
+
             Assert.Same(result2, importerLocationCache.Get(result2));
         }
-    
+
         MockUtils.VerifyAllMocks(guidGenerator);
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             var locations = await statisticsDbContext.Location.ToListAsync();
-    
+
             Assert.Equal(2, locations.Count);
-    
+
             Assert.Equal(result1Id, locations[0].Id);
             Assert.Equal("Sheffield City Region", locations[0].EnglishDevolvedArea!.Name);
-    
+
             Assert.Equal(result2Id, locations[1].Id);
             Assert.Equal("SHEFFIELD CITY REGION", locations[1].EnglishDevolvedArea!.Name);
         }

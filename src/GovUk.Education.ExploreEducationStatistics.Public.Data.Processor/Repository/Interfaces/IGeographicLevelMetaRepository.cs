@@ -9,7 +9,7 @@ public interface IGeographicLevelMetaRepository
         IDuckDbConnection duckDb,
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default);
-    
+
     Task<GeographicLevelMeta> CreateGeographicLevelMeta(
         IDuckDbConnection duckDb,
         DataSetVersion dataSetVersion,

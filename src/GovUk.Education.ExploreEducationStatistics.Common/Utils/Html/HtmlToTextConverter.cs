@@ -114,18 +114,18 @@ internal class HtmlToTextConverter
                 break;
 
             default:
-            {
-                if (element.HasChildNodes)
                 {
-                    ParseChildren(element);
-                }
-                else
-                {
-                    ParseEdgeNode(element);
-                }
+                    if (element.HasChildNodes)
+                    {
+                        ParseChildren(element);
+                    }
+                    else
+                    {
+                        ParseEdgeNode(element);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         AddSpacing(element);
@@ -293,8 +293,8 @@ internal class HtmlToTextConverter
 
         var table = new HtmlToTextTableRenderer();
 
-        headerRows.ForEach(row => table.AddHeaderRow(row));
-        bodyRows.ForEach(row => table.AddBodyRow(row));
+        headerRows.ForEach(table.AddHeaderRow);
+        bodyRows.ForEach(table.AddBodyRow);
 
         _builder.AppendLine(table.Render());
     }

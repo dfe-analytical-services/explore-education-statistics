@@ -248,7 +248,7 @@ public class DataSetQueryCriteriaAndValidatorTests
                 },
                 new DataSetQueryCriteriaNot
                 {
-                    Not =new DataSetQueryCriteriaFacets
+                    Not = new DataSetQueryCriteriaFacets
                     {
                         Locations = new DataSetQueryCriteriaLocations
                         {
@@ -297,7 +297,7 @@ public class DataSetQueryCriteriaAndValidatorTests
                 },
                 new DataSetQueryCriteriaNot
                 {
-                    Not =new DataSetQueryCriteriaFacets
+                    Not = new DataSetQueryCriteriaFacets
                     {
                         Locations = new DataSetQueryCriteriaLocations
                         {

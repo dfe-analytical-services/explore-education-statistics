@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
@@ -45,10 +45,10 @@ public class ArrayExtensionsTests
             { [1, 2, 3, 4, 5], 2, [[1, 3, 5], [2, 4]] },
             { [1,2,3,4,5,6,7,8,9,10],3,[[1,4,7,10],[2,5,8],[3,6,9]]}
         };
-        
+
         [Theory]
         [MemberData(nameof(SplitIntoGroupsData))]
-        public void SplitIntoGroups(int[] source, int numberOfGroups, int[][] expected) => 
+        public void SplitIntoGroups(int[] source, int numberOfGroups, int[][] expected) =>
             Assert.Equal(expected, source.DistributeIntoGroups(numberOfGroups));
     }
 }

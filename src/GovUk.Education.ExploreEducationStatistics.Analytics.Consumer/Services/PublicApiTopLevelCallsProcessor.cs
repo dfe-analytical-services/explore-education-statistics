@@ -9,10 +9,10 @@ public class PublicApiTopLevelCallsProcessor(
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
     private static readonly string[] PublicApiTopLevelSubPath = ["public-api", "top-level"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiTopLevelSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiTopLevelSubPath);
-    
+
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
@@ -20,7 +20,7 @@ public class PublicApiTopLevelCallsProcessor(
             reportsDirectory: ReportsDirectory));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : DirectJsonCopyWorkflowActorBase(
             sourceDirectory: sourceDirectory,
             reportsDirectory: reportsDirectory,

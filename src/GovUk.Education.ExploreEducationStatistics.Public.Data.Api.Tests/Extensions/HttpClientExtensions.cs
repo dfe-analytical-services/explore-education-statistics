@@ -11,14 +11,14 @@ public static class HttpClientExtensions
     {
         return client.WithOptionalHeader(RequestHeaderNames.PreviewToken, previewToken?.ToString());
     }
-    
+
     public static HttpClient WithRequestSourceHeader(
         this HttpClient client,
         string? requestSource)
     {
         return client.WithOptionalHeader(RequestHeaderNames.RequestSource, requestSource);
     }
-    
+
     private static HttpClient WithOptionalHeader(
         this HttpClient client,
         string headerName,

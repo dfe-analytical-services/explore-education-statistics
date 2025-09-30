@@ -58,7 +58,8 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
             var expectedReleaseSummary = new ReleaseSummaryViewModel(
                 publication.Releases[0].Versions[0],
-                latestPublishedRelease: true) { Publication = new PublicationSummaryViewModel(publication) };
+                latestPublishedRelease: true)
+            { Publication = new PublicationSummaryViewModel(publication) };
 
             Assert.Equal(releaseFiles[0].Id, viewModels[0].Id);
             Assert.Equal(releaseFiles[0].ToPublicFileInfo(), viewModels[0].File);
@@ -95,7 +96,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
             var request = new ReleaseFileListRequest
             {
-                Ids = [..releaseFiles.Select(rf => rf.Id)]
+                Ids = [.. releaseFiles.Select(rf => rf.Id)]
             };
 
             var response = await ListReleaseFiles(request);
@@ -149,7 +150,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
             var request = new ReleaseFileListRequest
             {
-                Ids = [..releaseFiles.Select(rf => rf.Id)]
+                Ids = [.. releaseFiles.Select(rf => rf.Id)]
             };
 
             var response = await ListReleaseFiles(request);

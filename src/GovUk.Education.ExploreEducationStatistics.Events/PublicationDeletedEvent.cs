@@ -1,4 +1,4 @@
-﻿using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Events;

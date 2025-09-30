@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 using Xunit;
@@ -13,10 +13,10 @@ public class RecordTableToolDownloadRequestBindingModelTests
     {
         // ARRANGE
         var validator = new RecordTableToolDownloadRequestBindingModel.Validator();
-        
+
         // ACT
         var result = validator.Validate(invalidModel);
-        
+
         // ASSERT
         Assert.NotNull(result);
         Assert.False(result.IsValid);
@@ -27,15 +27,15 @@ public class RecordTableToolDownloadRequestBindingModelTests
     {
         // ARRANGE
         var validator = new RecordTableToolDownloadRequestBindingModel.Validator();
-        
+
         // ACT
         var result = validator.Validate(FullyPopulatedModel());
-        
+
         // ASSERT
         Assert.NotNull(result);
         Assert.True(result.IsValid);
     }
-    
+
     [Fact]
     public void GivenValidBindingModel_WhenConvertedToModel_ThenResultIsCorrect()
     {
@@ -48,12 +48,12 @@ public class RecordTableToolDownloadRequestBindingModelTests
             ReleasePeriodAndLabel = "release period label",
             ReleaseVersionId = Guid.Parse("5c015e8a-772f-4450-9fe0-8e83f73808ee"),
             SubjectId = Guid.Parse("cbdb1ea4-9ff1-4f45-86be-c5918b28735c"),
-            Query =  new FullTableQueryRequestBuilder().Build()
+            Query = new FullTableQueryRequestBuilder().Build()
         };
-        
+
         // ACT
         var actual = bindingModel.ToModel();
-        
+
         // ASSERT
         var expected = new CaptureTableToolDownloadCall
         {
@@ -67,7 +67,7 @@ public class RecordTableToolDownloadRequestBindingModelTests
         };
         Assert.Equivalent(expected, actual);
     }
-    
+
     public static TheoryData<RecordTableToolDownloadRequestBindingModel> InvalidBindingModels() =>
         new(
             new RecordTableToolDownloadRequestBindingModel(),

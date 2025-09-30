@@ -126,7 +126,7 @@ public class ReleaseApprovalServiceTests
         contentService.Setup(mock =>
                 mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
-            
+
         releaseChecklistService
             .Setup(s =>
                 s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
@@ -137,7 +137,7 @@ public class ReleaseApprovalServiceTests
                     new(DataFileReplacementsMustBeCompleted)
                 }
             );
-        
+
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var releaseService = BuildService(
@@ -632,7 +632,7 @@ public class ReleaseApprovalServiceTests
                         PublishMethod = PublishMethod.Scheduled,
                     }
                 );
-            
+
             VerifyAllMocks(contentService);
 
             result.AssertBadRequest(PublishedReleaseCannotBeUnapproved);

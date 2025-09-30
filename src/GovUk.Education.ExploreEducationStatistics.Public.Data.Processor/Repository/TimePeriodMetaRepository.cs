@@ -17,11 +17,11 @@ public class TimePeriodMetaRepository(
     public Task<List<TimePeriodMeta>> ReadTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default)
     {
         return GetTimePeriodMetas(duckDbConnection, dataSetVersion, cancellationToken);
     }
-    
+
     public async Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
@@ -48,11 +48,11 @@ public class TimePeriodMetaRepository(
                  """
             ).QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: cancellationToken))
             .Select(tuple => new TimePeriodMeta
-                {
-                    DataSetVersionId = dataSetVersion.Id,
-                    Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
-                    Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
-                }
+            {
+                DataSetVersionId = dataSetVersion.Id,
+                Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
+                Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
+            }
             )
             .OrderBy(meta => meta.Period)
             .ThenBy(meta => meta.Code)

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;

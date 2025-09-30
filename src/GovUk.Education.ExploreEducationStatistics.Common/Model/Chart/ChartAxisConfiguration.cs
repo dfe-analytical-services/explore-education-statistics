@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -69,7 +69,7 @@ public class AxisReferenceLine
 {
     public string Label = null!;
     public string Position = null!;
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public AxisReferenceLineStyle? Style;
 

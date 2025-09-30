@@ -16,7 +16,7 @@ public static class TimePeriodMetaChangeGeneratorExtensions
         this Generator<TimePeriodMetaChange> generator,
         Func<DataSetVersion> dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
-    
+
     public static Generator<TimePeriodMetaChange> WithDataSetVersionId(
         this Generator<TimePeriodMetaChange> generator,
         Guid dataSetVersionId)

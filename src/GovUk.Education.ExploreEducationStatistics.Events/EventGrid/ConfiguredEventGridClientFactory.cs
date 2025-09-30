@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -22,15 +22,15 @@ public class ConfiguredEventGridClientFactory(
     /// <param name="configKey">The configuration section loaded into <see cref="EventGridOptions"/> has a collection of EventTopics configurations. This key specifies which one to use.</param>
     /// <param name="client">If the configuration for the specified key is found then a configured client will be returned.</param>
     /// <returns>True if the configuration was found and a client was successfully created.</returns>
-    public bool TryCreateClient(string configKey, [NotNullWhen(true)]out IEventGridClient? client)
+    public bool TryCreateClient(string configKey, [NotNullWhen(true)] out IEventGridClient? client)
     {
         var options = eventGridOptions.Value.EventTopics.SingleOrDefault(opt => opt.Key == configKey);
         if (options is null || string.IsNullOrEmpty(options.TopicEndpoint))
         {
             logger.LogWarning(
-                "No Event Topic is configured for key {EventTopicOptionsKey}. No events will be published.", 
+                "No Event Topic is configured for key {EventTopicOptionsKey}. No events will be published.",
                 configKey);
-            
+
             client = null;
             return false;
         }
@@ -43,10 +43,10 @@ public class ConfiguredEventGridClientFactory(
         {
             logger.LogError(
                 ex,
-                "An error occurred whilst trying to create Event Grid Client with topic endpoint {TopicEndpoint}. Please check configuration for Topic Options Key {EventTopicOptionsKey}", 
+                "An error occurred whilst trying to create Event Grid Client with topic endpoint {TopicEndpoint}. Please check configuration for Topic Options Key {EventTopicOptionsKey}",
                 options.TopicEndpoint,
                 configKey);
-            
+
             client = null;
             return false;
         }

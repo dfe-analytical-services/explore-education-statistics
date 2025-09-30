@@ -35,7 +35,7 @@ public class PreviewTokenService(
         {
             return false;
         }
-            
+
         var dataSet = await publicDataDbContext
             .DataSets
             .AsNoTracking()
@@ -56,7 +56,7 @@ public class PreviewTokenService(
             previewTokenId: previewTokenId.Value,
             cancellationToken: cancellationToken);
     }
-    
+
     public async Task<bool> ValidatePreviewTokenForDataSetVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
@@ -88,7 +88,7 @@ public class PreviewTokenService(
             .Where(pt => pt.Expiry > timestamp)
             .AnyAsync(cancellationToken: cancellationToken);
     }
-    
+
     private Guid? GetPreviewTokenIdFromRequest()
     {
         if (!httpContextAccessor
@@ -99,7 +99,7 @@ public class PreviewTokenService(
         {
             return null;
         }
-        
+
         if (!Guid.TryParse(previewTokenString, out var previewTokenId))
         {
             return null;

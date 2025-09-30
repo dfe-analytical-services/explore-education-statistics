@@ -73,19 +73,19 @@ public class DataSetVersionMappingService(
             .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
-    
+
     public async Task<MappingStatusViewModel?> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
         var locationOptionMappingTypes = await mappingTypesRepository.GetLocationOptionMappingTypes(
-            dataSetVersionId, 
+            dataSetVersionId,
             cancellationToken);
 
         var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
-            dataSetVersionId, 
+            dataSetVersionId,
             cancellationToken);
-        
-       var majorChangesStatus = await GetMajorChangesStatus(dataSetVersionId, locationOptionMappingTypes, filterAndOptionMappingTypes, cancellationToken);
-       
+
+        var majorChangesStatus = await GetMajorChangesStatus(dataSetVersionId, locationOptionMappingTypes, filterAndOptionMappingTypes, cancellationToken);
+
         return await publicDataDbContext
             .DataSetVersionMappings
             .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersionId)
@@ -156,11 +156,11 @@ public class DataSetVersionMappingService(
     private async Task UpdateMappingsCompleteAndVersion(Guid nextDataSetVersionId, CancellationToken cancellationToken)
     {
         var locationOptionMappingTypes = await mappingTypesRepository.GetLocationOptionMappingTypes(
-            nextDataSetVersionId, 
+            nextDataSetVersionId,
             cancellationToken);
 
         var filterAndOptionMappingTypes = await mappingTypesRepository.GetFilterOptionMappingTypes(
-            nextDataSetVersionId, 
+            nextDataSetVersionId,
             cancellationToken);
 
 
@@ -202,15 +202,15 @@ public class DataSetVersionMappingService(
             cancellationToken);
 
         var isReplacingApiDataFile = await publicDataDbContext.DataSetVersionImports
-            .AnyAsync(i => i.DataSetVersionToReplaceId != null 
+            .AnyAsync(i => i.DataSetVersionToReplaceId != null
                            && i.DataSetVersionToReplaceId == sourceDataSetVersion.Id,
                 cancellationToken);
 
         if (!isReplacingApiDataFile)
         {
             UpgradeToNewMajorOrMinorVersion(
-                majorChangesStatus.IsMajorVersionUpdate, 
-                targetDataSetVersion, 
+                majorChangesStatus.IsMajorVersionUpdate,
+                targetDataSetVersion,
                 sourceDataSetVersion);
             await publicDataDbContext.SaveChangesAsync(cancellationToken);
         }
@@ -246,7 +246,7 @@ public class DataSetVersionMappingService(
     }
 
     public async Task<MajorChangesStatus> GetMajorChangesStatus(
-        Guid dataSetVersionId, 
+        Guid dataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
         CancellationToken cancellationToken = default)
@@ -254,13 +254,13 @@ public class DataSetVersionMappingService(
         var majorChangesStatus = new MajorChangesStatus
         {
             FiltersHaveMajorChange = filterMappingTypes
-                .Any(types => NoMappingTypes.Contains(types.Filter) 
-                              ||  NoMappingTypes.Contains(types.FilterOption)),
+                .Any(types => NoMappingTypes.Contains(types.Filter)
+                              || NoMappingTypes.Contains(types.FilterOption)),
             LocationsHaveMajorChange = locationMappingTypes
-                .Any(types => NoMappingTypes.Contains(types.LocationLevel) 
+                .Any(types => NoMappingTypes.Contains(types.LocationLevel)
                               || NoMappingTypes.Contains(types.LocationOption)),
             HasDeletionChanges = await HasDeletionChanges(
-                dataSetVersionId, 
+                dataSetVersionId,
                 cancellationToken)
         };
         return majorChangesStatus;
@@ -273,7 +273,7 @@ public class DataSetVersionMappingService(
     /// <param name="cancellationToken">Optional cancellation token</param>
     /// <returns>True if there are any deletion-based major version changes, false otherwise</returns>
     public async Task<bool> HasDeletionChanges(
-        Guid targetDataSetVersionId, 
+        Guid targetDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.DataSetVersionMappings
@@ -316,7 +316,7 @@ public class DataSetVersionMappingService(
                     .SetProperty(mapping => mapping.FilterMappingsComplete, filterMappingsComplete),
                 cancellationToken: cancellationToken);
     }
-    
+
     /// <summary>
     /// Given a batch of Location mapping update requests, this method will validate that the chosen mapping candidates
     /// exist and return a list of either success or failure responses for each candidate.

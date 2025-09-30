@@ -294,7 +294,7 @@ public class MethodologyService : IMethodologyService
         var loadedMethodologyVersion = _context.AssertEntityLoaded(methodologyVersion);
         await _context.Entry(loadedMethodologyVersion)
             .Reference(m => m.Methodology)
-            .Query()               
+            .Query()
             .Include(m => m.Publications)
             .ThenInclude(p => p.Publication)
             .ThenInclude(p => p.Contact)

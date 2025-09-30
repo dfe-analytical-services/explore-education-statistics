@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
@@ -14,7 +14,7 @@ public class NotificationsServiceMockBuilder
         _mock
             .Setup(m => m.NotifySubscribersIfApplicable(It.IsAny<IReadOnlyList<Guid>>()))
             .Returns(Task.CompletedTask);
-        
+
         _mock
             .Setup(m => m.SendReleasePublishingFeedbackEmails(It.IsAny<IReadOnlyList<Guid>>()))
             .Returns(Task.CompletedTask);
@@ -31,7 +31,7 @@ public class NotificationsServiceMockBuilder
                                   actual.All(expectedReleaseVersionIds.Contains))),
                 Times.Once);
         }
-        
+
         public void SendReleasePublishingFeedbackEmailsCalled(params Guid[] expectedReleaseVersionIds)
         {
             mock.Verify(

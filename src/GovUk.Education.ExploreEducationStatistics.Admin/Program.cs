@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging.ApplicationInsights;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin;
 

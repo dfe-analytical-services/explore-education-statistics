@@ -32,8 +32,8 @@ public abstract class DataReplacementControllerTests
                         id: Guid.NewGuid(),
                         name: "my data block",
                         originalFilters: new Dictionary<Guid, FilterReplacementViewModel> {
-                            { 
-                                Guid.NewGuid(), 
+                            {
+                                Guid.NewGuid(),
                                 new FilterReplacementViewModel(
                                     id: Guid.NewGuid(), // original filterId
                                     target: Guid.NewGuid(), // replacement filterId
@@ -71,8 +71,8 @@ public abstract class DataReplacementControllerTests
 
             replacementPlanService
                 .Setup(s => s.GetReplacementPlan(
-                    releaseVersionId, 
-                    originalFileId, 
+                    releaseVersionId,
+                    originalFileId,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataReplacementPlan);
 

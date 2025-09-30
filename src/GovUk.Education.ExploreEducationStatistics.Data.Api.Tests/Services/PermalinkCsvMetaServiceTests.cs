@@ -89,7 +89,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+                .ReturnsAsync((ReleaseSubject?)null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -202,7 +202,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+                .ReturnsAsync((ReleaseSubject?)null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -296,7 +296,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+                .ReturnsAsync((ReleaseSubject?)null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,

@@ -108,8 +108,8 @@ public static class AssertExtensions
     /// </summary>
     /// <param name="expectedDateTimeOffset">the expected timestamp.</param>
     public static void AssertEqual(
-        this DateTimeOffset? dateTimeOffset, 
-        DateTimeOffset expectedDateTimeOffset, 
+        this DateTimeOffset? dateTimeOffset,
+        DateTimeOffset expectedDateTimeOffset,
         int withinMillis = TimeWithinMillis)
     {
         Assert.NotNull(dateTimeOffset);

@@ -180,7 +180,7 @@ public class Startup
         services.AddTransient<ILocationService, LocationService>();
         services.AddSingleton<DateTimeProvider>();
         services.AddAnalytics(Configuration);
-        
+
         services
             .AddAuthentication(options =>
             {

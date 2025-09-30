@@ -27,13 +27,13 @@ public static class EnumExtensions
     {
         return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
     }
-    
-    
-    public static List<EnumValue> GetValues<T>() where T: Enum
+
+
+    public static List<EnumValue> GetValues<T>() where T : Enum
     {
-        return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue {Name = Enum.GetName(typeof(T), itemType), Value = (int) itemType}).ToList();
+        return (from object itemType in Enum.GetValues(typeof(T)) select new EnumValue { Name = Enum.GetName(typeof(T), itemType), Value = (int)itemType }).ToList();
     }
-    
+
     public class EnumValue
     {
         public string Name { get; set; }

@@ -13,13 +13,13 @@ public class WorkflowActorMockBuilder
     {
         Assert = new Asserter(_mock);
     }
-    
+
     public IWorkflowActor Build()
     {
         _mock
             .Setup(s => s.GetSourceDirectory())
             .Returns("source");
-            
+
         _mock
             .Setup(s => s.GetReportsDirectory())
             .Returns("reports");
@@ -34,7 +34,7 @@ public class WorkflowActorMockBuilder
             .Returns(Task.CompletedTask);
         return this;
     }
-    
+
     public WorkflowActorMockBuilder WhereDuckDbInitialisedWithErrors()
     {
         _mock
@@ -64,7 +64,7 @@ public class WorkflowActorMockBuilder
             .ThrowsAsync(new ArgumentException($"Mock error processing batch folder {batchProcessingFolder}"));
         return this;
     }
-    
+
     public WorkflowActorMockBuilder WhereReportsAreCreatedSuccessfully(
         string reportsFolder,
         string reportsFilenamePrefix)
@@ -76,7 +76,7 @@ public class WorkflowActorMockBuilder
             .Returns(Task.CompletedTask);
         return this;
     }
-    
+
     public WorkflowActorMockBuilder WhereReportsAreGeneratedWithErrors(
         string reportsFolder,
         string reportsFilenamePrefix)
@@ -95,7 +95,7 @@ public class WorkflowActorMockBuilder
     {
         public Asserter InitialiseDuckDbCalled()
         {
-            mock.Verify(m => 
+            mock.Verify(m =>
                 m.InitialiseDuckDb(It.IsAny<DuckDbConnection>()),
                 Times.Once);
             return this;
@@ -111,12 +111,12 @@ public class WorkflowActorMockBuilder
                 Times.Once);
             return this;
         }
-        
+
         public Asserter CreateParquetReportsCalledFor(
             string reportsFolder,
             string reportsFilenamePrefix)
         {
-            mock.Verify(m => 
+            mock.Verify(m =>
                 m.CreateParquetReports(
                     Path.Combine(reportsFolder, reportsFilenamePrefix),
                     It.IsAny<DuckDbConnection>()),
@@ -127,6 +127,6 @@ public class WorkflowActorMockBuilder
 
     private static DuckDbConnection ItIsOpenDuckDbConnection()
     {
-        return It.Is<DuckDbConnection>(c => c.State == ConnectionState.Open);   
+        return It.Is<DuckDbConnection>(c => c.State == ConnectionState.Open);
     }
 }

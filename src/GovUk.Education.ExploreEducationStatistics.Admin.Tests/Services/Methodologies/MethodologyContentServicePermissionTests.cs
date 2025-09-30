@@ -44,7 +44,7 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     [Fact]
     public async Task GetContentBlocks()
     {
@@ -76,7 +76,8 @@ public class MethodologyContentServicePermissionTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -105,7 +106,7 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     [Fact]
     public async Task ReorderContentSections()
     {
@@ -167,7 +168,8 @@ public class MethodologyContentServicePermissionTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -204,7 +206,8 @@ public class MethodologyContentServicePermissionTests
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -234,13 +237,14 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     [Fact]
     public async Task ReorderContentBlocks()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -272,13 +276,14 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     [Fact]
     public async Task AddContentBlock()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -286,7 +291,7 @@ public class MethodologyContentServicePermissionTests
                         Id = Guid.NewGuid()
                     }
                 }
-            }   
+            }
         };
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -313,13 +318,14 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     [Fact]
     public async Task RemoveContentBlock()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -357,13 +363,14 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     [Fact]
     public async Task UpdateTextBasedContentBlock()
     {
         var methodologyVersion = new MethodologyVersion
         {
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Content = new List<ContentSection>
                 {
                     new()
@@ -402,7 +409,7 @@ public class MethodologyContentServicePermissionTests
                     });
         }
     }
-    
+
     private static MethodologyContentService SetupMethodologyContentService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,

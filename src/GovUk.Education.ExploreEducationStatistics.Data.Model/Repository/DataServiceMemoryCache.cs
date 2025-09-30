@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 
 public class DataServiceMemoryCache<TItem>
 {
-    private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+    private readonly MemoryCache _cache = new(new MemoryCacheOptions());
 
     public TItem GetOrCreate(object key, Func<ICacheEntry, TItem> factory)
     {

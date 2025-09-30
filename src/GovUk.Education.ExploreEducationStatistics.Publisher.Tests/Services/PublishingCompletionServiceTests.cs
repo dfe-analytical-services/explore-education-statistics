@@ -665,7 +665,7 @@ public class PublishingCompletionServiceTests
                     _releaseService.WherePublicationLatestPublishedReleaseVersionIs(PublicationId1, _releaseVersion1);
 
                     var sut = GetSut();
-                    
+
                     // ACT
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
@@ -789,8 +789,8 @@ public class PublishingCompletionServiceTests
                     // ASSERT
                     _publisherEventRaiser.Assert.PublicationArchivedEventWasNotRaised();
                 }
-                
-                
+
+
                 [Fact]
                 public async Task GivenASupersededPublication_WhenReleasePublished_ThenIsPublicationArchivedIsTrue()
                 {
@@ -800,7 +800,7 @@ public class PublishingCompletionServiceTests
                         .HasPublishedReleaseVersion()
                         .Build();
                     _contentDbContext.With(supersedingPublication);
-                    
+
                     var readyKeys = SetupHappyPath(
                         publication1 => publication1.SupersededBy(supersedingPublication));
 
@@ -810,7 +810,7 @@ public class PublishingCompletionServiceTests
                     await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
 
                     // ASSERT
-                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(info => 
+                    _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(info =>
                         info.PublicationId == _releaseVersion1.Release.PublicationId
                         && info.IsPublicationArchived);
                 }

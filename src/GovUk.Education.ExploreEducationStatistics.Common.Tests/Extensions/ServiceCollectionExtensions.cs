@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
             {
                 return services;
             }
-            
+
             throw new ArgumentNullException($"{nameof(TService)} service was not found to replace.");
         }
 

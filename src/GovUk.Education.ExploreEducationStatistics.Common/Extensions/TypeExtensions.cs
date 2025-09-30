@@ -36,7 +36,7 @@ public static class TypeExtensions
     /// </remarks>
     public static List<Type> GetUnboxedResultTypePath(this Type type)
     {
-        var path = new List<Type>{ type };
+        var path = new List<Type> { type };
 
         while (true)
         {

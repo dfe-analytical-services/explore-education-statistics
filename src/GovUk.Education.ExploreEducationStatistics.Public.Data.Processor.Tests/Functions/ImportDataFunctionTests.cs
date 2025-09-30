@@ -95,9 +95,9 @@ public abstract class ImportDataFunctionTests(
                 DataTable.Cols.Id,
                 DataTable.Cols.GeographicLevel,
                 DataTable.Cols.TimePeriodId,
-                ..testData.ExpectedGeographicLevels.Select(DataTable.Cols.LocationId),
-                ..testData.ExpectedFilters.Select(fm => DataTable.Cols.Filter(fm).Trim('"')),
-                ..testData.ExpectedIndicators.Select(im => DataTable.Cols.Indicator(im).Trim('"')),
+                .. testData.ExpectedGeographicLevels.Select(DataTable.Cols.LocationId),
+                .. testData.ExpectedFilters.Select(fm => DataTable.Cols.Filter(fm).Trim('"')),
+                .. testData.ExpectedIndicators.Select(im => DataTable.Cols.Indicator(im).Trim('"')),
             ];
 
             Assert.Equal(expectedColumns.Order(), actualColumns.Order());

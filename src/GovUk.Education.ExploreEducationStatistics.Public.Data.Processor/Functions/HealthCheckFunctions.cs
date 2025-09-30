@@ -42,12 +42,13 @@ public class HealthCheckFunctions(
         {
             return new OkObjectResult(healthCheckResponse);
         }
-        
-        return new ObjectResult(healthCheckResponse) {
+
+        return new ObjectResult(healthCheckResponse)
+        {
             StatusCode = StatusCodes.Status500InternalServerError
         };
     }
-    
+
     private async Task<HealthCheckSummary> CheckPsqlConnectionHealth()
     {
         logger.LogInformation("Attempting to test PSQL connection health");
@@ -63,18 +64,18 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-    
+
     private HealthCheckSummary CheckFileShareMountHealth()
     {
         logger.LogInformation("Attempting to read from file share");
-        
+
         try
         {
             if (Directory.Exists(dataSetVersionPathResolver.BasePath()))
             {
                 return HealthCheckSummary.Healthy();
             }
-            
+
             return HealthCheckSummary.Unhealthy("File Share Mount folder does not exist");
         }
         catch (Exception e)
@@ -83,7 +84,7 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-    
+
     private async Task<HealthCheckSummary> CheckCoreStorageConnectionHealth()
     {
         logger.LogInformation("Attempting to test Core Storage connection health");
@@ -103,7 +104,7 @@ public class HealthCheckFunctions(
             return HealthCheckSummary.Unhealthy(e.Message);
         }
     }
-    
+
     private async Task<HealthCheckSummary> CheckContentDbConnectionHealth()
     {
         logger.LogInformation("Attempting to test Content DB connection health");
@@ -126,8 +127,8 @@ public class HealthCheckFunctions(
         HealthCheckSummary CoreStorageConnection,
         HealthCheckSummary ContentDbConnection)
     {
-        public bool Healthy => 
-            PsqlConnection.IsHealthy 
+        public bool Healthy =>
+            PsqlConnection.IsHealthy
             && FileShareMount.IsHealthy
             && CoreStorageConnection.IsHealthy
             && ContentDbConnection.IsHealthy;

@@ -125,9 +125,9 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Verify(s => s.SetItem(
-                    cacheKey, 
-                    Capture.In(args), 
-                    ItIs.DeepEqualTo(expectedCacheConfiguration), 
+                    cacheKey,
+                    Capture.In(args),
+                    ItIs.DeepEqualTo(expectedCacheConfiguration),
                     null),
                 Times.Once);
     }

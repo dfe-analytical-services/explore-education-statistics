@@ -18,7 +18,7 @@ public record ReleasePublishingFeedbackUpdateRequest(
             RuleFor(request => request.EmailToken)
                 .NotEmpty()
                 .MaximumLength(55);
-            
+
             RuleFor(request => request.Response)
                 .IsInEnum();
 

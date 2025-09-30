@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -18,7 +18,7 @@ public class CaptureTableToolDownloadCallTests
         // ARRANGE
         var fullTableQuery = new FullTableQueryBuilder()
             .Build();
-        
+
         var sut = new CaptureTableToolDownloadCallBuilder()
             .WhereQueryIs(fullTableQuery)
             .Build();
@@ -58,7 +58,7 @@ public class CaptureTableToolDownloadCallTests
         {
             LocationIds = new List<Guid>
             {
-                Guid.Parse("4551768e-a997-4fae-8d9f-0d97b6b7dff0"), 
+                Guid.Parse("4551768e-a997-4fae-8d9f-0d97b6b7dff0"),
                 Guid.Parse("85fce0ab-2775-4300-ba4b-f62c0a7ea0cd")
             },
             TimePeriod = new TimePeriodQuery

@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class DictionaryExtensions
 {

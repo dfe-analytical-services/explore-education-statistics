@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -38,7 +38,7 @@ public abstract class IntegrationTestFixtureWithCommonTestDataSetup(TestApplicat
             {
                 dsv.SetStatus(versionStatus);
                 dsv.SetVersionNumber(2, 0);
-                
+
             })
             .ForIndex(4, dsv =>
             {

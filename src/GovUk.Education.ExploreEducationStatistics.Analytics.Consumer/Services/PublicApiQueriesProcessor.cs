@@ -9,10 +9,10 @@ public class PublicApiQueriesProcessor(
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
     private static readonly string[] PublicApiQueriesSubPath = ["public-api", "queries"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiQueriesSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiQueriesSubPath);
-    
+
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
@@ -20,7 +20,7 @@ public class PublicApiQueriesProcessor(
             reportsDirectory: ReportsDirectory));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : IWorkflowActor
     {
         public string GetSourceDirectory()
@@ -32,7 +32,7 @@ public class PublicApiQueriesProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
             await connection.ExecuteNonQueryAsync(@"
@@ -99,7 +99,7 @@ public class PublicApiQueriesProcessor(
                 FROM sourceTable
                 GROUP BY queryVersionHash
                 ORDER BY queryVersionHash");
-    
+
             await connection.ExecuteNonQueryAsync(@"
                 CREATE TABLE queryAccessReport AS 
                 SELECT 
@@ -117,14 +117,14 @@ public class PublicApiQueriesProcessor(
                 ORDER BY queryHash, startTime
             ");
 
-            var queryReportFilePath = 
+            var queryReportFilePath =
                 $"{reportsFolderPathAndFilenamePrefix}_public-api-queries.parquet";
-    
+
             await connection.ExecuteNonQueryAsync($@"
                 COPY (SELECT * FROM queryReport)
                 TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
 
-            var queryAccessReportFilePath = 
+            var queryAccessReportFilePath =
                 $"{reportsFolderPathAndFilenamePrefix}_public-api-query-access.parquet";
 
             await connection.ExecuteNonQueryAsync($@"

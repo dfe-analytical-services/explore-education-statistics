@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders;
 using GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders.Config;
 using Microsoft.Extensions.Logging;
@@ -29,12 +29,12 @@ public class ConfiguredEventGridClientFactoryTests
 
         // ACT
         var wasSuccessful = sut.TryCreateClient("MyTopicOptionsKey", out var client);
-            
+
         // ASSERT
         Assert.False(wasSuccessful);
         Assert.Null(client);
     }
-    
+
     [Fact]
     public void GivenConfigDefined_WhenClientRequested_ThenCreatesClientUsingEndpointAndAccessKey()
     {
@@ -48,14 +48,14 @@ public class ConfiguredEventGridClientFactoryTests
 
         // ACT
         var wasSuccessful = sut.TryCreateClient(topicConfigKey, out var client);
-            
+
         // ASSERT
         Assert.True(wasSuccessful);
         _eventGridClientFactory.Assert.ClientRequested(
             actualEndpoint => actualEndpoint == topicEndpoint,
-            actualAccessKey => actualAccessKey == accessKey);        
+            actualAccessKey => actualAccessKey == accessKey);
     }
-    
+
     [Fact]
     public void GivenConfigDefinedButBlank_WhenClientRequested_ThenReturnsNull()
     {
@@ -69,12 +69,12 @@ public class ConfiguredEventGridClientFactoryTests
 
         // ACT
         var wasSuccessful = sut.TryCreateClient(topicConfigKey, out var client);
-            
+
         // ASSERT
         Assert.False(wasSuccessful);
-        Assert.Null(client);        
+        Assert.Null(client);
     }
-    
+
     [Fact]
     public void GivenConfigDefinedButInvalid_WhenClientRequested_ThenReturnsNull()
     {
@@ -84,14 +84,14 @@ public class ConfiguredEventGridClientFactoryTests
         var accessKey = "invalid access key";
         _eventGridOptions.AddTopicConfig(topicConfigKey, topicEndpoint, accessKey);
         _eventGridClientFactory.WhereCreatingClientFails();
-        
+
         var sut = GetSut();
 
         // ACT
         var wasSuccessful = sut.TryCreateClient(topicConfigKey, out var client);
-            
+
         // ASSERT
         Assert.False(wasSuccessful);
-        Assert.Null(client);        
+        Assert.Null(client);
     }
 }

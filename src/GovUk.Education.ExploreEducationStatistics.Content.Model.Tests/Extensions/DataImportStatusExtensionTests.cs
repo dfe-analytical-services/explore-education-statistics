@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
 public class DataImportStatusExtensionTests
 {
-    private static readonly List<DataImportStatus> ExpectedFinishedStatuses = new List<DataImportStatus>
+    private static readonly List<DataImportStatus> ExpectedFinishedStatuses = new()
     {
         COMPLETE,
         FAILED,
@@ -14,7 +14,7 @@ public class DataImportStatusExtensionTests
         CANCELLED
     };
 
-    private static readonly List<DataImportStatus> ExpectedAbortingStatuses = new List<DataImportStatus>
+    private static readonly List<DataImportStatus> ExpectedAbortingStatuses = new()
     {
         CANCELLING
     };

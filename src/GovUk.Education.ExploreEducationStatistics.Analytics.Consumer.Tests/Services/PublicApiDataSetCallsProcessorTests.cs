@@ -30,18 +30,18 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
 
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
-            
+
             duckDbConnection.Open();
 
             var reportRows = await ReadReport(duckDbConnection, queryReportFile);
@@ -58,7 +58,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
                 expectedParameters: null);
         }
-        
+
         [Fact]
         public async Task WithPreviewTokens_CapturedInReport()
         {
@@ -70,7 +70,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
@@ -91,7 +91,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
                 expectedParameters: null);
         }
-        
+
         [Fact]
         public async Task WithParameters_CapturedInReport()
         {
@@ -103,7 +103,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
@@ -124,7 +124,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
                 expectedParameters: """{"page":1,"pageSize":10}""");
         }
-        
+
         [Fact]
         public async Task MultipleCalls_CapturedInReport()
         {
@@ -138,7 +138,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
@@ -150,21 +150,21 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             // Check that the 3 recorded queries have resulted in 3 lines in the query report
             // and the order is in ascending date order.
             Assert.Equal(3, reportRows.Count);
-            
+
             AssertReportRowOk(
                 reportRows[0],
                 expectedType: "GetDataSetSummary",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
                 expectedParameters: null);
-            
+
             AssertReportRowOk(
                 reportRows[1],
                 expectedType: "ListVersions",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
                 expectedParameters: """{"page":1,"pageSize":10}""");
-            
+
             AssertReportRowOk(
                 reportRows[2],
                 expectedType: "GetDataSetSummary",
@@ -182,7 +182,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 .ToList();
         }
     }
-    
+
     [UsedImplicitly]
     private static void AssertReportRowOk(
         QueryReportLine queryReportRow,

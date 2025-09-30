@@ -416,8 +416,8 @@ public class ReplacementServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
-                Indicators = new[] {originalIndicator.Id},
+                Filters = new[] { originalFilterItem1.Id, originalFilterItem2.Id },
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod,
             },
@@ -716,7 +716,7 @@ public class ReplacementServiceTests
 
         var (originalReleaseFile, replacementReleaseFile) = _fixture.DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
-            .ForIndex(0, rv => 
+            .ForIndex(0, rv =>
                 rv.SetFile(originalFile)
                 .SetPublicApiDataSetId(dataSet.Id)
                 .SetPublicApiDataSetVersion(dataSetVersion.SemVersion()))
@@ -746,7 +746,7 @@ public class ReplacementServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-        
+
         var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
         dataSetVersionMappingService.Setup(service => service.GetMappingStatus(
                 It.IsAny<Guid>(),
@@ -763,7 +763,7 @@ public class ReplacementServiceTests
         {
             EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
         });
-        
+
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         if (enableReplacementOfPublicApiDataSets)
         {
@@ -1040,8 +1040,8 @@ public class ReplacementServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
-                Indicators = new[] {originalIndicator.Id},
+                Filters = new[] { originalFilterItem1.Id, originalFilterItem2.Id },
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod,
                 FilterHierarchiesOptions = null, // it is null by default, but included to be visible to you, dear test reader
@@ -1474,7 +1474,7 @@ public class ReplacementServiceTests
             SubjectId = originalReleaseSubject.SubjectId,
             FilterHierarchies = [
                 new DataSetFileFilterHierarchy(
-                    FilterIds: [ originalFilter1Id, originalFilter2Id, ],
+                    FilterIds: [originalFilter1Id, originalFilter2Id,],
                     Tiers: [
                         new Dictionary<Guid, List<Guid>>
                         {
@@ -1661,7 +1661,7 @@ public class ReplacementServiceTests
             {
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = [],
-                Indicators = new[] {originalIndicator.Id},
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod,
                 FilterHierarchiesOptions = new List<FilterHierarchyOptions>
@@ -1853,7 +1853,7 @@ public class ReplacementServiceTests
             Assert.Equal(replacementFilter2.Id, hierarchyOptions.LeafFilterId);
             Assert.Equal([[
                     replacementFilter1.FilterGroups[0].FilterItems[0].Id,
-                    replacementFilter2.FilterGroups[0].FilterItems[0].Id
+                replacementFilter2.FilterGroups[0].FilterItems[0].Id
                 ]],
                 hierarchyOptions.Options);
         }
@@ -2066,8 +2066,8 @@ public class ReplacementServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
-                Indicators = new[] {originalIndicator.Id},
+                Filters = new[] { originalFilterItem1.Id, originalFilterItem2.Id },
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod
             },
@@ -2382,8 +2382,8 @@ public class ReplacementServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] {originalFilterItem1.Id},
-                Indicators = new[] {originalIndicator.Id},
+                Filters = new[] { originalFilterItem1.Id },
+                Indicators = new[] { originalIndicator.Id },
                 LocationIds = new List<Guid>(),
                 TimePeriod = timePeriod
             },

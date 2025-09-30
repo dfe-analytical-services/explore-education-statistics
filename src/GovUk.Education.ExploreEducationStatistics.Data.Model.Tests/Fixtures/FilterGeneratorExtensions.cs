@@ -120,9 +120,9 @@ public static class FilterGeneratorExtensions
 
     public static InstanceSetters<Filter> SetFilterGroups(
         this InstanceSetters<Filter> setters,
-        IEnumerable<FilterGroup> filterGroups) 
+        IEnumerable<FilterGroup> filterGroups)
         => setters.SetFilterGroups(_ => filterGroups);
-    
+
     private static InstanceSetters<Filter> SetFilterGroups(
         this InstanceSetters<Filter> setters,
         Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
@@ -34,7 +34,7 @@ public partial class EES2156_MigrateMethodologyTitleAndSlugToParentAndAddAlterna
                   AND PublicationMethodologies.Owner = 1 
                 JOIN Publications
                   ON Publications.Id = PublicationMethodologies.PublicationId");
-        
+
         // Explicitly set an alternative title for any Methodologies whose titles don't conform with those of their
         // owning Publications.
         migrationBuilder.Sql(@"
@@ -51,7 +51,7 @@ public partial class EES2156_MigrateMethodologyTitleAndSlugToParentAndAddAlterna
                 SET MethodologyParents.Slug = Methodologies.Slug
                 FROM MethodologyParents
                 JOIN Methodologies ON Methodologies.MethodologyParentId = MethodologyParents.Id");
-        
+
         migrationBuilder.DropColumn(
             name: "Slug",
             table: "Methodologies");

@@ -26,7 +26,7 @@ public class ReleasePermissionsController : ControllerBase
         Guid releaseVersionId)
     {
         return await _releasePermissionService
-            .ListReleaseRoles(releaseVersionId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
+            .ListReleaseRoles(releaseVersionId, new[] { ReleaseRole.Contributor, ReleaseRole.Approver })
             .HandleFailuresOrOk();
     }
 
@@ -35,7 +35,7 @@ public class ReleasePermissionsController : ControllerBase
         Guid releaseVersionId)
     {
         return await _releasePermissionService
-            .ListReleaseInvites(releaseVersionId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
+            .ListReleaseInvites(releaseVersionId, new[] { ReleaseRole.Contributor, ReleaseRole.Approver })
             .HandleFailuresOrOk();
     }
 

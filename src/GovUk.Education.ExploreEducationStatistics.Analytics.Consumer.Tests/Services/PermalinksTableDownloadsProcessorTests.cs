@@ -29,12 +29,12 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -52,7 +52,7 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
                 "Example1.json",
                 1);
         }
-        
+
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
@@ -64,12 +64,12 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -160,7 +160,7 @@ public abstract class PermalinksTableDownloadsProcessorTests : ProcessorTestsBas
         public required string PermalinkTitle { get; init; }
         public required TableDownloadFormat DownloadFormat { get; init; }
     }
-    
+
     public enum TableDownloadFormat { CSV, ODS }
 
     // ReSharper disable once ClassNeverInstantiated.Local

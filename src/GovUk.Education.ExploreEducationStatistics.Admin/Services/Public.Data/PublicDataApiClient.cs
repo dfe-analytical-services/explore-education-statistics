@@ -39,7 +39,7 @@ public class PublicDataApiClient(
         // Add an HTTP header to signal to the Public API that this call originates from the
         // EES service.
         httpClient.DefaultRequestHeaders.Add(RequestHeaderNames.RequestSource, "EES Admin");
-            
+
         var response = await requestFunction();
 
         if (!response.IsSuccessStatusCode)

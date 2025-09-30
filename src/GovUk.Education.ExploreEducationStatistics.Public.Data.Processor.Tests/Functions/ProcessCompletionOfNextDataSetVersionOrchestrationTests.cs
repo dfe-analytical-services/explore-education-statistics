@@ -60,7 +60,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
             mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
             mockOrchestrationContext.SetupGet(context => context.Entities)
                 .Returns(mockEntityFeature.Object);
-                
+
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>

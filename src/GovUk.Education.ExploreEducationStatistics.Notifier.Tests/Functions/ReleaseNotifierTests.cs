@@ -39,11 +39,11 @@ public class ReleaseNotifierTests
 
         var publication1Id = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publication1Id))
-            .ReturnsAsync([ "test@test.com" ]);
+            .ReturnsAsync(["test@test.com"]);
 
         var supersededPubId = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
-            .ReturnsAsync([ "superseded@test.com" ]);
+            .ReturnsAsync(["superseded@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -125,7 +125,7 @@ public class ReleaseNotifierTests
 
         var publicationId = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
-            .ReturnsAsync([ "test1@test.com", "test2@test.com", "test3@test.com" ]);
+            .ReturnsAsync(["test1@test.com", "test2@test.com", "test3@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -209,7 +209,7 @@ public class ReleaseNotifierTests
 
         var supersededPubId = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
-            .ReturnsAsync([ "superseded1@test.com", "superseded2@test.com", "superseded3@test.com" ]);
+            .ReturnsAsync(["superseded1@test.com", "superseded2@test.com", "superseded3@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -310,11 +310,11 @@ public class ReleaseNotifierTests
 
         var supersededPub1Id = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub1Id))
-            .ReturnsAsync([ "superseded1@test.com" ]);
+            .ReturnsAsync(["superseded1@test.com"]);
 
         var supersededPub2Id = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub2Id))
-            .ReturnsAsync([ "superseded2@test.com" ]);
+            .ReturnsAsync(["superseded2@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -404,11 +404,11 @@ public class ReleaseNotifierTests
 
         var publicationId = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
-            .ReturnsAsync([ "test@test.com" ]);
+            .ReturnsAsync(["test@test.com"]);
 
         var supersededPubId = Guid.NewGuid();
         subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
-            .ReturnsAsync([ "superseded@test.com" ]);
+            .ReturnsAsync(["superseded@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>

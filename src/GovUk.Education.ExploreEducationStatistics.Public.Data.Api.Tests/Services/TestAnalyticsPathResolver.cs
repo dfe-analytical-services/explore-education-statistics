@@ -18,5 +18,5 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver, IDisposable
         }
     }
 
-    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, ..subPaths]);
+    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, .. subPaths]);
 }

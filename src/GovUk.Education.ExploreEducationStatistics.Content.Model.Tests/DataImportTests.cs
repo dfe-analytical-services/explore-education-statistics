@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests;
 
 public class DataImportTests
 {
-    private static readonly List<DataImportStatus> StatusesWithZeroProgress = new List<DataImportStatus>
+    private static readonly List<DataImportStatus> StatusesWithZeroProgress = new()
     {
         CANCELLING,
         QUEUED,

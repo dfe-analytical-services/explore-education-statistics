@@ -44,7 +44,7 @@ public class LongRunningFunctions(ILogger<LongRunningFunctions> logger)
 
         return new OkResult();
     }
-    
+
     [Function(nameof(ProcessLongRunningOrchestration))]
     public static async Task ProcessLongRunningOrchestration(
         [OrchestrationTrigger] TaskOrchestrationContext context,
@@ -71,7 +71,7 @@ public class LongRunningFunctions(ILogger<LongRunningFunctions> logger)
             await context.CallActivity(ActivityNames.HandleProcessingFailure, logger, context.InstanceId);
         }
     }
-    
+
     [Function(nameof(LongRunningActivity))]
     public async Task LongRunningActivity(
         [ActivityTrigger] LongRunningOrchestrationContext input,

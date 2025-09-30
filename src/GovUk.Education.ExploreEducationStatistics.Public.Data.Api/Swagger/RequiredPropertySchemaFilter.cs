@@ -13,7 +13,7 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
         var nullabilityContext = new NullabilityInfoContext();
         var properties = context.Type.GetProperties();
 
-        foreach(var property in properties)
+        foreach (var property in properties)
         {
             if (property.HasAttribute<JsonIgnoreAttribute>()
                 || !property.HasAttribute<RequiredMemberAttribute>())

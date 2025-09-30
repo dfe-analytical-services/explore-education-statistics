@@ -36,8 +36,8 @@ public class EventGridClientFactoryMockBuilder
         {
             mock
                 .Verify(m => m.CreateClient(
-                    It.Is<string>(actualEndpoint => whereTopicEndpoint == null || whereTopicEndpoint(actualEndpoint)), 
-                    It.Is<string>(actualAccessKey => whereAccessKey == null || whereAccessKey(actualAccessKey)) 
+                    It.Is<string>(actualEndpoint => whereTopicEndpoint == null || whereTopicEndpoint(actualEndpoint)),
+                    It.Is<string>(actualAccessKey => whereAccessKey == null || whereAccessKey(actualAccessKey))
                     ), Times.Once);
         }
     }

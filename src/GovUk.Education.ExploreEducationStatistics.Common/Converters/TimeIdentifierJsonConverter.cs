@@ -24,7 +24,7 @@ public class TimeIdentifierJsonConverter : JsonConverter<TimeIdentifier?>
         if (reader.TokenType == JsonToken.Null) return null;
 
         var jsonValue = JObject.Load(reader).GetValue("value").Value<string>();
-        var timeIdentifiers = ((TimeIdentifier[]) Enum.GetValues(typeof(TimeIdentifier)));
+        var timeIdentifiers = ((TimeIdentifier[])Enum.GetValues(typeof(TimeIdentifier)));
         return timeIdentifiers.First(identifier => identifier.GetEnumValue() == jsonValue);
     }
 }

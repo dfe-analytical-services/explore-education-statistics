@@ -39,7 +39,7 @@ public static class EitherTaskExtensions
     {
         var prev = await task;
 
-        return prev.OnSuccess(result => 
+        return prev.OnSuccess(result =>
             result ?? new Either<ActionResult, TRight>(new NotFoundResult()));
     }
 

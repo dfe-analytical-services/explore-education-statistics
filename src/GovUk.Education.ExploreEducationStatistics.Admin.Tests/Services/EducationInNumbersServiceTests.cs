@@ -552,7 +552,7 @@ public class EducationInNumbersServiceTests
             Assert.Equal(originalSection2.Content.Count, amendmentSection2.Content.Count);
 
             var amendmentSection2Block1 = Assert.IsType<EinHtmlBlock>(amendmentSection2.Content[0]);
-            var originalSection2Block1 = (EinHtmlBlock) originalSection2.Content[0];
+            var originalSection2Block1 = (EinHtmlBlock)originalSection2.Content[0];
             Assert.NotEqual(originalSection2Block1.Id, amendmentSection2Block1.Id);
             Assert.Equal(amendmentSection2.Id, amendmentSection2Block1.EinContentSectionId);
             Assert.Equal(originalSection2Block1.Order, amendmentSection2Block1.Order);

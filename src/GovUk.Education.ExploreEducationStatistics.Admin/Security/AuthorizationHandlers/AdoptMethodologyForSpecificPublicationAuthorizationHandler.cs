@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +31,7 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
             context.Succeed(requirement);
             return;
         }
-        
+
         if (await _authorizationHandlerService
                 .HasRolesOnPublication(
                     context.User.GetUserId(),

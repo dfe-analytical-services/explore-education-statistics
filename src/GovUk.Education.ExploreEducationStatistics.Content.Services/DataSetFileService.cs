@@ -303,7 +303,7 @@ public class DataSetFileService(
         {
             return streamResult.Left;
         }
-        
+
         return new FileStreamResult(streamResult.Right, "text/csv")
         {
             FileDownloadName = releaseFile.File.Filename,

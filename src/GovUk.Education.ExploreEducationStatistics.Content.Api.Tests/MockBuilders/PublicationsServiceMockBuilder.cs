@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;

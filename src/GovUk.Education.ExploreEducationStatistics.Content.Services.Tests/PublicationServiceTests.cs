@@ -802,7 +802,7 @@ public abstract class PublicationServiceTests
         public async Task GivenPublishedPublications_WhenListPublicationInfos_ThenReturnsPublicationInfos()
         {
             // Arrange
-            var publishedPublications = 
+            var publishedPublications =
                     Enumerable
                     .Range(1, 3)
                     .Select(_ => GeneratePublishedPublication())
@@ -815,25 +815,25 @@ public abstract class PublicationServiceTests
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
             // Assert
             AssertPublicationInfosAsExpected(publishedPublications, results);
         }
-        
+
         [Fact]
         public async Task GivenPublishedAndUnpublishedPublications_WhenListPublicationInfos_ThenReturnsOnlyPublishedPublicationInfos()
         {
             // Arrange
-            var publishedPublications = 
+            var publishedPublications =
                     Enumerable
                     .Range(1, 3)
                     .Select(_ => GeneratePublishedPublication())
                     .ToArray();
-            
-            var unpublishedPublications = 
+
+            var unpublishedPublications =
                     Enumerable
                     .Range(1, 3)
                     .Select(_ => GenerateUnpublishedPublication())
@@ -846,7 +846,7 @@ public abstract class PublicationServiceTests
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
@@ -858,19 +858,19 @@ public abstract class PublicationServiceTests
         public async Task GivenPublishedPublicationsSomeOfWhichAreSuperseded_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfos()
         {
             // Arrange
-            var publishedPublications = 
+            var publishedPublications =
                     Enumerable
                     .Range(1, 3)
                     .Select(_ => GeneratePublishedPublication())
                     .ToArray();
-            
-            var publishedPublicationsWithUnpublishedSuperseded = 
+
+            var publishedPublicationsWithUnpublishedSuperseded =
                     Enumerable
                     .Range(1, 4)
                     .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
                     .ToArray();
-            
-            var supersededPublications = 
+
+            var supersededPublications =
                     Enumerable
                     .Range(1, 5)
                     .Select(_ => GeneratePublicationWithPublishedSuperseded())
@@ -883,7 +883,7 @@ public abstract class PublicationServiceTests
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
@@ -892,7 +892,7 @@ public abstract class PublicationServiceTests
                 .Concat(publishedPublicationsWithUnpublishedSuperseded)
                 .Concat(supersededPublications.Select(p => p.SupersededBy).OfType<Publication>())
                 .ToArray();
-            
+
             AssertPublicationInfosAsExpected(expectedPublications, results);
         }
 
@@ -900,13 +900,13 @@ public abstract class PublicationServiceTests
         public async Task GivenPublishedPublicationsSomeOfWhichAreSupersededByEachOther_WhenListPublicationInfos_ThenReturnsOnlyUnsupersededPublicationInfosOnce()
         {
             // Arrange
-            var publishedPublications = 
+            var publishedPublications =
                     Enumerable
                     .Range(1, 3)
                     .Select(_ => GeneratePublishedPublication())
                     .ToArray();
-            
-            var supersededPublications = 
+
+            var supersededPublications =
                     Enumerable
                     .Range(1, 3)
                     .Select(i => GeneratePublicationWithPublishedSuperseded(publishedPublications[i - 1]))
@@ -919,7 +919,7 @@ public abstract class PublicationServiceTests
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             var results = await ListPublicationInfos();
 
@@ -932,25 +932,25 @@ public abstract class PublicationServiceTests
         public async Task GivenAVarietyOfPublications_WhenListPublicationInfosByThemeIdIsCalled_ThenReturnsPublishedPublicationInfosInTheme()
         {
             // Arrange
-            var publishedPublications = 
+            var publishedPublications =
                 Enumerable
                     .Range(1, 6)
                     .Select(_ => GeneratePublishedPublication())
                     .ToArray();
-            
-            var unpublishedPublications = 
+
+            var unpublishedPublications =
                 Enumerable
                     .Range(1, 6)
                     .Select(_ => GenerateUnpublishedPublication())
                     .ToArray();
-            
-            var publishedPublicationsWithUnpublishedSuperseded = 
+
+            var publishedPublicationsWithUnpublishedSuperseded =
                 Enumerable
                     .Range(1, 6)
                     .Select(_ => GeneratePublicationWithUnpublishedSuperseded())
                     .ToArray();
-            
-            var supersededPublications = 
+
+            var supersededPublications =
                 Enumerable
                     .Range(1, 6)
                     .Select(_ => GeneratePublicationWithPublishedSuperseded())
@@ -972,7 +972,7 @@ public abstract class PublicationServiceTests
             };
 
             await AddToDatabase(themes);
-            
+
             // Act
             IList<PublicationInfoViewModel>[] resultsByTheme =
             [
@@ -986,21 +986,21 @@ public abstract class PublicationServiceTests
                 .Concat(publishedPublicationsWithUnpublishedSuperseded)
                 .Concat(supersededPublications.Select(p => p.SupersededBy).OfType<Publication>())
                 .ToArray();
-            
+
             IList<Publication>[] expectedPublicationsByTheme =
             [
                 expectedPublications.Intersect(allPublicationsSplitInto3Groups[0]).ToList(),
                 expectedPublications.Intersect(allPublicationsSplitInto3Groups[1]).ToList(),
                 expectedPublications.Intersect(allPublicationsSplitInto3Groups[2]).ToList()
             ];
-            
-            Assert.All([0,1,2],
+
+            Assert.All([0, 1, 2],
                 i =>
                 {
                     AssertPublicationInfosAsExpected(expectedPublicationsByTheme[i], resultsByTheme[i]);
                 });
         }
-        
+
         private void AssertPublicationInfosAsExpected(IList<Publication> expectedPublications, IList<PublicationInfoViewModel> actualPublicationInfoViewModels)
         {
             Assert.Equal(expectedPublications.Count, actualPublicationInfoViewModels.Count);
@@ -1016,7 +1016,7 @@ public abstract class PublicationServiceTests
                 });
         }
 
-        private Theme GenerateTheme(params IEnumerable<Publication>[] publications) => 
+        private Theme GenerateTheme(params IEnumerable<Publication>[] publications) =>
             _dataFixture
                 .DefaultTheme()
                 .WithPublications(publications.SelectMany(p => p))
@@ -1032,7 +1032,7 @@ public abstract class PublicationServiceTests
                             _dataFixture
                                 .DefaultRelease()))
                 .Generate();
-    
+
         private Publication GenerateUnpublishedPublication() =>
             _dataFixture
                 .DefaultPublication()
@@ -1049,7 +1049,7 @@ public abstract class PublicationServiceTests
                             _dataFixture
                                 .DefaultRelease()))
                 .Generate();
-    
+
         private Publication GeneratePublicationWithUnpublishedSuperseded() =>
             _dataFixture
                 .DefaultPublication()

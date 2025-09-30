@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Contr
 public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixtureWithCommonTestDataSetup(testApp)
 {
     private const string BaseUrl = "v1/data-sets";
-    
+
     public abstract class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         public class PublishedDataSetTests(TestApplicationFactory testApp) : GetDataSetTests(testApp)
@@ -157,7 +157,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
                 Assert.Null(content.LatestVersion);
             }
-            
+
             /// <summary>
             /// Despite the wrong Preview Token being used, the Data Set itself is available to the
             /// public, and so the auth succeeds.
@@ -202,7 +202,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertOk();
             }
-            
+
             [Fact]
             public async Task PreviewTokenIsExpired_Returns403()
             {
@@ -316,7 +316,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 response.AssertForbidden();
             }
         }
-        
+
         public class AnalyticsEnabledTests : GetDataSetTests, IDisposable
         {
             public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
@@ -355,7 +355,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             .WithLabel(expectedPreviewToken.Label)
                             .WithCreated(expectedPreviewToken.Created)
                             .WithExpiry(expectedPreviewToken.Expiry)
-                            .Generate(1) 
+                            .Generate(1)
                         : [])
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
@@ -364,7 +364,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     context.DataSetVersions.Add(dataSetVersion);
                     context.DataSets.Update(dataSet);
                 });
-                
+
                 var persistedPreviewToken = dataSetVersion
                     .PreviewTokens
                     .SingleOrDefault();
@@ -372,9 +372,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var response = await GetDataSet(
                     dataSetId: dataSet.Id,
                     previewTokenId: persistedPreviewToken?.Id);
-                
+
                 response.AssertOk();
-                
+
                 await AnalyticsTestAssertions.AssertDataSetAnalyticsCallCaptured(
                     dataSet: dataSet,
                     expectedType: DataSetCallType.GetSummary,
@@ -383,7 +383,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     expectedPreviewToken: expectedPreviewToken,
                     expectedPreviewTokenDataSetVersionId: persistedPreviewToken?.DataSetVersionId);
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
@@ -404,7 +404,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     context.DataSetVersions.Add(dataSetVersion);
                     context.DataSets.Update(dataSet);
                 });
-                
+
                 var persistedPreviewToken = dataSetVersion
                     .PreviewTokens
                     .SingleOrDefault();
@@ -430,7 +430,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 .CreateClient()
                 .WithPreviewTokenHeader(previewTokenId)
                 .WithRequestSourceHeader(requestSource);
-            
+
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
             return await client.GetAsync(uri);
@@ -878,24 +878,24 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertNotFound();
             }
-            
+
             [Theory]
             [MemberData(nameof(DataSetVersionStatusQueryTheoryData.NonPublishedStatus),
                 MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
             public async Task WildCardSpecified_RequestsNonPublishedVersion_Returns404(DataSetVersionStatus versionStatus)
             {
                 var (dataSet, _) = await SetupDataSetWithSpecifiedVersionStatuses(versionStatus);
-            
+
                 var response = await GetDataSetMeta(dataSetId: dataSet.Id, dataSetVersion: "2.*");
 
                 response.AssertNotFound();
             }
-        
+
             [Fact]
             public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
             {
                 var (dataSet, _) = await SetupDataSetWithSpecifiedVersionStatuses(DataSetVersionStatus.Published);
-            
+
                 var response = await GetDataSetMeta(dataSetId: dataSet.Id, dataSetVersion: "2.*");
 
                 var viewModel = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
@@ -1373,7 +1373,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithDataSetId(dataSet.Id)
                     .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-                
+
                 DataSetVersion draftDataSetVersion = DataFixture
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatus(DataSetVersionStatus.Draft)
@@ -1396,7 +1396,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertForbidden();
             }
-            
+
             [Fact]
             public async Task PreviewTokenIsExpired_Returns403()
             {
@@ -1478,7 +1478,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 response.AssertForbidden();
             }
         }
-        
+
         public class AnalyticsEnabledTests : GetDataSetMetaTests, IDisposable
         {
             public AnalyticsEnabledTests(TestApplicationFactory testApp) : base(testApp)
@@ -1494,7 +1494,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     Directory.Delete(queriesDirectory, recursive: true);
                 }
             }
-            
+
             public static readonly TheoryData<(AnalyticsTheoryData.PreviewTokenSummary?, string?, DataSetMetaType[]?)>
                 PreviewTokensRequestedDataSetVersionsAndTypes =
                 [
@@ -1514,7 +1514,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             {
                 var (expectedPreviewToken, requestedDataSetVersion, types)
                     = previewTokenRequestedDataSetVersionAndParameters;
-                
+
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
                     .WithStatusPublished();
@@ -1531,7 +1531,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             .WithLabel(expectedPreviewToken.Label)
                             .WithCreated(expectedPreviewToken.Created)
                             .WithExpiry(expectedPreviewToken.Expiry)
-                            .Generate(1) 
+                            .Generate(1)
                         : [])
                     .WithFilterMetas(() =>
                     [
@@ -1550,7 +1550,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var persistedPreviewToken = dataSetVersion
                     .PreviewTokens
                     .SingleOrDefault();
-                
+
                 var response = await GetDataSetMeta(
                     dataSetId: dataSet.Id,
                     dataSetVersion: requestedDataSetVersion,
@@ -1563,10 +1563,10 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 Assert.NotNull(content);
                 Assert.Equal("filter 1", content.Filters.Single().Label);
 
-                var expectedParameters = types != null 
-                    ? new GetMetadataAnalyticsParameters(Types: types.ToList()) 
+                var expectedParameters = types != null
+                    ? new GetMetadataAnalyticsParameters(Types: types.ToList())
                     : null;
-                
+
                 await AnalyticsTestAssertions.AssertDataSetVersionAnalyticsCallCaptured(
                     dataSet: dataSet,
                     dataSetVersion: dataSetVersion,
@@ -1576,7 +1576,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     expectedRequestedDataSetVersion: requestedDataSetVersion,
                     expectedPreviewToken: expectedPreviewToken);
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
@@ -1858,7 +1858,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertNotFound();
             }
-        
+
             [Fact]
             public async Task WildCardSpecified_RequestsPublishedVersion_Returns200()
             {
@@ -1897,7 +1897,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertOk();
             }
-            
+
             [Theory]
             [MemberData(nameof(DataSetVersionStatusViewTheoryData.NonPublishedStatus),
                 MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -1985,7 +1985,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 Assert.Equal(CsvData.Count, results.Count);
                 Assert.Equal(CsvData, results);
             }
-            
+
             [Fact]
             public async Task PreviewTokenIsActiveButForLiveVersion_DraftVersionTargeted_Returns403()
             {
@@ -2002,7 +2002,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithDataSet(dataSet)
                     .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
-                
+
                 DataSetVersion draftDataSetVersion = DataFixture
                     .DefaultDataSetVersion()
                     .WithStatus(DataSetVersionStatus.Draft)
@@ -2061,7 +2061,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
                 response.AssertForbidden();
             }
-            
+
             [Fact]
             public async Task PreviewTokenIsForWrongDataSet_Returns403()
             {
@@ -2074,7 +2074,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 {
                     context.DataSets.AddRange(dataSet1, dataSet2);
                 });
-            
+
                 var dataSet1Version = DataFixture
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatus(DataSetVersionStatus.Draft)
@@ -2082,7 +2082,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
                     .FinishWith(dsv => dataSet1.LatestDraftVersion = dsv)
                     .Generate();
-            
+
                 var dataSet2Version = DataFixture
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                     .WithStatus(DataSetVersionStatus.Draft)
@@ -2090,15 +2090,15 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
                     .FinishWith(dsv => dataSet2.LatestDraftVersion = dsv)
                     .Generate();
-            
+
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
                     context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version);
                     context.DataSets.UpdateRange(dataSet1, dataSet2);
                 });
-                
+
                 await CreateGZippedTestCsv(dataSet1Version, CsvData);
-            
+
                 // Firstly check that a correctly matched preview token will 
                 // produce a successful response
 
@@ -2106,19 +2106,19 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     dataSetId: dataSet1.Id,
                     dataSetVersion: dataSet1Version.PublicVersion,
                     previewTokenId: dataSet1Version.PreviewTokens[0].Id);
-                
+
                 successResponse.AssertOk();
-                
+
                 // Then check that a mismatched preview token will 
                 // produce a forbidden response.
                 var forbiddenResponse = await DownloadDataSet(
                     dataSetId: dataSet1.Id,
                     dataSetVersion: dataSet1Version.PublicVersion,
                     previewTokenId: dataSet2Version.PreviewTokens[0].Id);
-            
+
                 forbiddenResponse.AssertForbidden();
             }
-            
+
             [Theory]
             [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatusesExceptDraft),
                 MemberType = typeof(DataSetVersionStatusViewTheoryData))]
@@ -2178,7 +2178,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 (AnalyticsTheoryData.PreviewTokenSummary?, string?) previewTokenAndRequestedDataSetVersion)
             {
                 var (expectedPreviewToken, requestedDataSetVersion) = previewTokenAndRequestedDataSetVersion;
-                
+
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
                     .WithStatusPublished();
@@ -2195,7 +2195,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             .WithLabel(expectedPreviewToken.Label)
                             .WithCreated(expectedPreviewToken.Created)
                             .WithExpiry(expectedPreviewToken.Expiry)
-                            .Generate(1) 
+                            .Generate(1)
                         : [])
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
@@ -2210,17 +2210,17 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 var persistedPreviewToken = dataSetVersion
                     .PreviewTokens
                     .SingleOrDefault();
-                
+
                 var response = await DownloadDataSet(
                     dataSetId: dataSet.Id,
                     dataSetVersion: requestedDataSetVersion,
                     previewTokenId: persistedPreviewToken?.Id);
-                
+
                 response.AssertOk();
-                
+
                 var results = await DecompressGZippedCsv(response);
                 Assert.Equal(CsvData, results);
-                
+
                 await AnalyticsTestAssertions.AssertDataSetVersionAnalyticsCallCaptured(
                     dataSet: dataSet,
                     dataSetVersion: dataSetVersion,
@@ -2230,7 +2230,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     expectedRequestedDataSetVersion: requestedDataSetVersion,
                     expectedPreviewToken: expectedPreviewToken);
             }
-            
+
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
@@ -2264,7 +2264,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     GetAnalyticsPathResolver().BuildOutputDirectory(AnalyticsWriteDataSetVersionCallsStrategy.OutputSubPaths));
             }
         }
-            
+
         private async Task CreateGZippedTestCsv(DataSetVersion dataSetVersion, IReadOnlyList<TestClass> csvData)
         {
             var dataSetVersionPathResolver = BuildApp().Services.GetRequiredService<IDataSetVersionPathResolver>();

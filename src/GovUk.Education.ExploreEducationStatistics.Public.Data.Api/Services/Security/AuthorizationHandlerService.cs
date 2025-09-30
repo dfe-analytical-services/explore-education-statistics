@@ -19,7 +19,7 @@ public class AuthorizationHandlerService(
         {
             return true;
         }
-        
+
         var user = httpContextAccessor.HttpContext?.User;
 
         if (user is not null && user.IsInRole(Api.Security.SecurityConstants.AdminAccessAppRole))
@@ -29,7 +29,7 @@ public class AuthorizationHandlerService(
 
         return false;
     }
-    
+
     public async Task<bool> RequestHasValidPreviewToken(DataSet dataSet)
     {
         return await previewTokenService

@@ -31,7 +31,7 @@ public abstract class ReleaseFileControllerTests
                 Path: "a-path",
                 Filename: "a-filename.csv",
                 ContentType: MediaTypeNames.Text.Csv);
-            
+
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             releaseFileService
@@ -40,7 +40,7 @@ public abstract class ReleaseFileControllerTests
                     fileId,
                     default))
                 .ReturnsAsync(downloadToken);
-            
+
             var controller = BuildController(releaseFileService: releaseFileService.Object);
 
             var result = await controller.GetDownloadToken(
@@ -49,7 +49,7 @@ public abstract class ReleaseFileControllerTests
                 cancellationToken: default);
 
             var encodedToken = result.AssertOkResult();
-            
+
             var expectedEncodedToken = JsonSerializer.Serialize(downloadToken).ToBase64String();
             Assert.Equal(expectedEncodedToken, encodedToken);
         }

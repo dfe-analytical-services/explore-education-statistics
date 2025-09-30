@@ -15,7 +15,7 @@ public static class PrivateBlobStorageServiceExtensions
             .GetDownloadStream(PrivateReleaseFiles, import.File.Path()))
             .Right;
     }
-    
+
     public static Func<Task<Stream>> GetMetadataFileStreamProvider(
         this IPrivateBlobStorageService service,
         DataImport import)

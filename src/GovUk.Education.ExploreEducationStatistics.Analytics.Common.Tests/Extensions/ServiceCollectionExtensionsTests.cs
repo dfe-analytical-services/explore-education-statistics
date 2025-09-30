@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
@@ -59,8 +59,8 @@ public class ServiceCollectionExtensionsTests
 
     public static readonly TheoryData<string, bool> Configs = new()
     {
-        { AnalyticsEnabledConfig, true }, 
-        { AnalyticsDisabledConfig, false }, 
+        { AnalyticsEnabledConfig, true },
+        { AnalyticsDisabledConfig, false },
         { BlankConfig, false }
     };
 

@@ -15,26 +15,26 @@ public class ImporterLocationService
     private readonly ILogger<ImporterLocationCache> _logger;
 
     public ImporterLocationService(
-        IGuidGenerator guidGenerator, 
-        IImporterLocationCache importerLocationCache, 
+        IGuidGenerator guidGenerator,
+        IImporterLocationCache importerLocationCache,
         ILogger<ImporterLocationCache> logger)
     {
         _guidGenerator = guidGenerator;
         _importerLocationCache = importerLocationCache;
         _logger = logger;
     }
-    
+
     public Location Get(Location location)
     {
         return _importerLocationCache.Get(location);
     }
 
     public async Task<List<Location>> CreateIfNotExistsAndCache(
-        StatisticsDbContext context, 
+        StatisticsDbContext context,
         List<Location> locationsToCheck)
     {
         var newLocationsCount = 0;
-        
+
         var cachedLocations = await locationsToCheck
             .ToAsyncEnumerable()
             .SelectAwait(async location =>
@@ -57,7 +57,7 @@ public class ImporterLocationService
             await context.SaveChangesAsync();
             _logger.LogInformation($"Added {newLocationsCount} new Locations");
         }
-        
+
         return cachedLocations;
     }
 

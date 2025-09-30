@@ -2479,7 +2479,8 @@ public abstract class DataSetQueryParserTests
             },
             GeographicLevel.RscRegion => new DataSetQueryLocationId
             {
-                Level = option.Level, Id = option.PublicId,
+                Level = option.Level,
+                Id = option.PublicId,
             },
             GeographicLevel.School => option switch
             {

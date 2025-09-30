@@ -51,11 +51,11 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
             .HasForeignKey("CreatedById")
             .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<UserInvite>()
-            .Property(invite => invite.Created)
-            .HasConversion(
-                v => v,
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        modelBuilder.Entity<UserInvite>()
+        .Property(invite => invite.Created)
+        .HasConversion(
+            v => v,
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         // Note that this logic is also present in UserInvite.Expired.
         // It is implemented here as well because EF is not able to translate the "Expired" computed field for

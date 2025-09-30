@@ -51,7 +51,7 @@ internal class FilterFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    filterOptionIds: [..facets.Filters.In],
+                    filterOptionIds: [.. facets.Filters.In],
                     path: QueryUtils.Path(path, "filters.in")
                 )
             );
@@ -61,7 +61,7 @@ internal class FilterFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    filterOptionIds: [..facets.Filters.NotIn],
+                    filterOptionIds: [.. facets.Filters.NotIn],
                     path: QueryUtils.Path(path, "filters.notIn"),
                     negate: true
                 )

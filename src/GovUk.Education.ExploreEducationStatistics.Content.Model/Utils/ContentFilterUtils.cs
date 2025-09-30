@@ -18,7 +18,7 @@ public static class ContentFilterUtils
     {
         // Markers are created by CKEditor and have characteristic start and end elements
         return elements
-            .Select(el =>  $@"<\s*{el}-(start|end)[^>]*(>[^>]*<\/\s*{el}-(start|end)[^>]*>|\/>)")
+            .Select(el => $@"<\s*{el}-(start|end)[^>]*(>[^>]*<\/\s*{el}-(start|end)[^>]*>|\/>)")
             .JoinToString('|');
     }
 }

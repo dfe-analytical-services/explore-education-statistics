@@ -27,12 +27,12 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
@@ -77,9 +77,9 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow.EndTime);
             Assert.Equal(140, queryAccessReportRow.DurationMillis);
-            
+
             Assert.Null(queryAccessReportRow.RequestedDataSetVersion);
-            
+
             Assert.Null(queryAccessReportRow.PreviewTokenLabel);
             Assert.Null(queryAccessReportRow.PreviewTokenCreated);
             Assert.Null(queryAccessReportRow.PreviewTokenExpiry);
@@ -337,7 +337,7 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.Equal(DateTime.Parse("2025-02-25T03:07:44.850Z"), queryAccessReportRow2.EndTime);
             Assert.Equal(140, queryAccessReportRow2.DurationMillis);
         }
-        
+
         [Fact]
         public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
@@ -349,7 +349,7 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
@@ -394,9 +394,9 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow.EndTime);
             Assert.Equal(140, queryAccessReportRow.DurationMillis);
-            
+
             Assert.Equal("1.*", queryAccessReportRow.RequestedDataSetVersion);
-            
+
             Assert.Equal("Preview token content", queryAccessReportRow.PreviewTokenLabel);
             Assert.Equal(DateTime.Parse("2025-02-23T11:02:44.850Z"), queryAccessReportRow.PreviewTokenCreated);
             Assert.Equal(DateTime.Parse("2025-02-24T11:02:44.850Z"), queryAccessReportRow.PreviewTokenExpiry);
@@ -413,7 +413,7 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             return queryReportRows;
         }
     }
-    
+
     private PublicApiQueriesProcessor BuildService()
     {
         return new PublicApiQueriesProcessor(
@@ -425,47 +425,47 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
     private record QueryReportLine
     {
         public string QueryVersionHash { get; init; } = string.Empty;
-        
+
         public string QueryHash { get; init; } = string.Empty;
-        
+
         public Guid DataSetId { get; init; }
-        
+
         public Guid DataSetVersionId { get; init; }
-        
+
         public string DataSetVersion { get; init; } = string.Empty;
-        
+
         public string DataSetTitle { get; init; } = string.Empty;
-        
+
         public int ResultsCount { get; init; }
-        
+
         public int TotalRowsCount { get; init; }
-        
+
         public string Query { get; init; } = string.Empty;
-        
+
         public int QueryExecutions { get; init; }
     }
-    
+
     // ReSharper disable once ClassNeverInstantiated.Local
     private record QueryAccessReportLine
     {
         public string QueryVersionHash { get; init; } = string.Empty;
 
         public Guid DataSetVersionId { get; init; }
-        
+
         public DateTime StartTime { get; init; }
-        
+
         public DateTime EndTime { get; init; }
-    
+
         public int DurationMillis { get; init; }
 
         public string? RequestedDataSetVersion { get; init; }
-        
+
         public string? PreviewTokenLabel { get; init; }
-        
+
         public Guid? PreviewTokenDataSetVersionId { get; init; }
-        
+
         public DateTime? PreviewTokenCreated { get; init; }
-        
+
         public DateTime? PreviewTokenExpiry { get; init; }
     }
 }

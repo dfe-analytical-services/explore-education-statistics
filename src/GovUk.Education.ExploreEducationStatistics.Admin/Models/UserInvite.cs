@@ -29,6 +29,7 @@ public class UserInvite
     /// It is implemented there as well as EF is not able to translate this computed field for use in
     /// a QueryFilter.
     /// </remarks>
-    [NotMapped] public bool Expired => !Accepted &&
+    [NotMapped]
+    public bool Expired => !Accepted &&
                                        Created < DateTime.UtcNow.AddDays(-InviteExpiryDurationDays);
 }

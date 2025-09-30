@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -88,7 +88,7 @@ public static class MockBlobClientExtensions
                     sourceStream.CopyToAsync(destinationStream, token))
             .ReturnsAsync(new Mock<Response>().Object);
     }
-    
+
     public static IReturnsResult<BlobClient> SetupCanGenerateSasUri(
         this Mock<BlobClient> blobClient,
         bool canGenerate)
@@ -97,7 +97,7 @@ public static class MockBlobClientExtensions
             .Setup(c => c.CanGenerateSasUri)
             .Returns(canGenerate);
     }
-    
+
     public static IReturnsResult<BlobClient> SetupGenerateReadonlySasUri(
         this Mock<BlobClient> blobClient,
         DateTimeOffset expectedExpiry,
@@ -106,14 +106,14 @@ public static class MockBlobClientExtensions
     {
         return blobClient
             .Setup(c => c.GenerateSasUri(
-                It.Is<BlobSasBuilder>(builder => 
+                It.Is<BlobSasBuilder>(builder =>
                     builder.BlobContainerName == expectedContainerName &&
                     builder.Permissions == "r" &&
                     builder.Resource == "c" &&
                     builder.ExpiresOn == expectedExpiry)))
             .Returns(new Uri(uriToReturn));
     }
-    
+
     public static IReturnsResult<BlobClient> SetupGetDownloadStreamAsync(
         this Mock<BlobClient> blobClient,
         string content,

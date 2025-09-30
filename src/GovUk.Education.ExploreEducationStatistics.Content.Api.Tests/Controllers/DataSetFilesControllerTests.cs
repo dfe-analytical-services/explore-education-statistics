@@ -1606,7 +1606,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
                 Assert.NotNull(originalMeta);
-                
+
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
                     From = TimePeriodLabelFormatter.Format(
@@ -2037,8 +2037,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             Assert.Equal([
                     GeographicLevel.Country.GetEnumLabel(),
-                    GeographicLevel.LocalAuthority.GetEnumLabel(),
-                    GeographicLevel.LocalAuthorityDistrict.GetEnumLabel()
+                GeographicLevel.LocalAuthority.GetEnumLabel(),
+                GeographicLevel.LocalAuthorityDistrict.GetEnumLabel()
                 ],
                 viewModel.File.Meta.GeographicLevels);
 

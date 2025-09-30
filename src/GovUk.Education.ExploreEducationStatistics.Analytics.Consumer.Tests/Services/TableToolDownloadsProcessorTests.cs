@@ -31,12 +31,12 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -53,9 +53,9 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                 captureTableToolDownloadLine,
                 "Example1.json",
                 1,
-                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
+                expectedHash: "a9e223bcda0b5a3832bcec68025d7bd8");
         }
-        
+
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
@@ -67,12 +67,12 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -89,13 +89,13 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                 csvDownloadReportRows[0],
                 "Example1.json",
                 1,
-                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
+                expectedHash: "a9e223bcda0b5a3832bcec68025d7bd8");
 
             await AssertReportRow(
                 csvDownloadReportRows[1],
                 "Example2.json",
                 1,
-                expectedHash:"93d5d86bf80c7ba877c6c9a5f5f3bac5");
+                expectedHash: "93d5d86bf80c7ba877c6c9a5f5f3bac5");
         }
 
         [Fact]
@@ -123,7 +123,7 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                 csvDownloadReportRow,
                 "Example1.json",
                 2,
-                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
+                expectedHash: "a9e223bcda0b5a3832bcec68025d7bd8");
         }
 
         private static async Task<List<CaptureTableToolDownloadLine>> ReadReport(DuckDbConnection duckDbConnection,
@@ -183,7 +183,7 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
         {
             ContractResolver = new CustomContractResolver(),
         });
-        
+
         private class CustomContractResolver : CamelCasePropertyNamesContractResolver
         {
             protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization) =>
@@ -193,9 +193,9 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                     .OrderBy(p => p.Order ?? int.MaxValue)
                     .ThenBy(p => p.PropertyName)
                     .ToList();
-        } 
+        }
     }
-    
+
     public enum TableDownloadFormat { CSV, ODS }
 
     // ReSharper disable once ClassNeverInstantiated.Local

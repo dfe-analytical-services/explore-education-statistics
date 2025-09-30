@@ -765,7 +765,7 @@ public class ReleaseFileServiceTests : IDisposable
                 path: releaseFile1.PublicPath(),
                 content: "Test ancillary blob",
                 cancellationToken: tokenSource.Token);
-        
+
         // After the first file has completed, we cancel the request
         // to prevent the next file from being fetched.
         publicBlobStorageService
@@ -1016,7 +1016,7 @@ public class ReleaseFileServiceTests : IDisposable
             );
 
             result.AssertRight();
-            
+
             await stream.DisposeAsync();
             await using var zip = File.OpenRead(path);
             Assert.Equal("Test cached all files zip", zip.ReadToEnd());

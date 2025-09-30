@@ -349,7 +349,7 @@ public class ManageContentPageServiceTests
             .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
             .WithTheme(_dataFixture.DefaultTheme());
 
-        var releaseVersion = publication.Releases.Single().Versions.Single(); 
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         var previousMethodologyVersion = new MethodologyVersion
         {
@@ -489,7 +489,7 @@ public class ManageContentPageServiceTests
             .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
             .WithTheme(_dataFixture.DefaultTheme());
 
-        var releaseVersion = publication.Releases.Single().Versions.Single(); 
+        var releaseVersion = publication.Releases.Single().Versions.Single();
 
         var summaryContentSection = new ContentSection
         {

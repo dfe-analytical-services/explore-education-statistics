@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 public class LocationOptionMetaLink
 {
     public required string PublicId { get; set; }
-    
+
     public required int MetaId { get; set; }
 
     public LocationMeta Meta { get; set; } = null!;

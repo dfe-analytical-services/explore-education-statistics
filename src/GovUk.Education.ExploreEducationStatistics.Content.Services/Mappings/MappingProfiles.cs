@@ -35,7 +35,7 @@ public class MappingProfiles : CommonMappingProfile
                     methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
         CreateMap<Publication, PublicationSummaryViewModel>();
-        
+
         CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
         CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
         CreateMap<KeyStatistic, KeyStatisticViewModel>()

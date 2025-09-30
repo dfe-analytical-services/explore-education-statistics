@@ -251,7 +251,7 @@ public class MethodologyControllerTests
         {
             Id = Guid.NewGuid()
         });
-        
+
         var userService = new Mock<IUserService>(Strict);
         var methodologyService = new Mock<IMethodologyService>(Strict);
 

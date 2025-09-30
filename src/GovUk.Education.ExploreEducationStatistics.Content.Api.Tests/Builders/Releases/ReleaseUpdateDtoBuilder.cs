@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
 

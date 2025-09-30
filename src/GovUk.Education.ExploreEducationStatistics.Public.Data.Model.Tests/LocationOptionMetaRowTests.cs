@@ -38,7 +38,7 @@ public abstract class LocationOptionMetaRowTests
             Assert.Equal(expectedProperties, properties);
         }
     }
-    
+
     public class GetRowKeyPrettyTests
     {
         [Fact]
@@ -73,7 +73,7 @@ public abstract class LocationOptionMetaRowTests
             Assert.Equal(expectedProperties, properties);
         }
     }
-    
+
     [Fact]
     public void OmitsNullProperties()
     {

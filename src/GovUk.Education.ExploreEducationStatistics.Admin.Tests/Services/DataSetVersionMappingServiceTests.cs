@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -28,9 +28,9 @@ public class DataSetVersionMappingServiceTests
     [InlineData(false, "AutoMapped", "ManualNone", "ManualNone", "ManualNone", true)]
     [InlineData(false, "AutoMapped", "AutoMapped", "ManualNone", "ManualNone", true)]
     public async Task IsMajorVersionUpdate(
-        bool majorCausedByDeletion, 
-        string locationMappingTypesLevel, 
-        string locationMappingTypesOption, 
+        bool majorCausedByDeletion,
+        string locationMappingTypesLevel,
+        string locationMappingTypesOption,
         string filterMappingTypesLevel,
         string filterMappingTypesOption,
         bool expectedMajorVersion)
@@ -45,8 +45,8 @@ public class DataSetVersionMappingServiceTests
                 LocationLevelRaw = locationMappingTypesLevel,
                 LocationOptionRaw = locationMappingTypesOption
             }
-        }; 
-        
+        };
+
         var filterMappingTypes = new List<FilterMappingTypes>
         {
             new()
@@ -55,25 +55,25 @@ public class DataSetVersionMappingServiceTests
                 FilterOptionRaw = filterMappingTypesOption
             }
         };
-        
+
         SetupDbContext(
-            targetDataSetVersionId, 
-            majorCausedByDeletion, 
-            majorCausedByDeletion, 
+            targetDataSetVersionId,
+            majorCausedByDeletion,
+            majorCausedByDeletion,
             majorCausedByDeletion);
 
         var mockMappingTypesRepository = SetupMockMappingTypes(
-            locationMappingTypesLevel, 
-            locationMappingTypesOption, 
-            filterMappingTypesLevel, 
-            filterMappingTypesOption, 
+            locationMappingTypesLevel,
+            locationMappingTypesOption,
+            filterMappingTypesLevel,
+            filterMappingTypesOption,
             targetDataSetVersionId);
 
         var contextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-        
+
         var service = CreateService(
-            publicDataDbContext: _publicDataDbContextMock.Object, 
+            publicDataDbContext: _publicDataDbContextMock.Object,
             contentDbContext: contentDbContext,
             mockMappingTypesRepository: mockMappingTypesRepository.Object);
 
@@ -87,7 +87,7 @@ public class DataSetVersionMappingServiceTests
         // Assert
         Assert.Equal(expectedMajorVersion, result.IsMajorVersionUpdate);
     }
-    
+
     [Theory]
     [InlineData("AutoNone", "AutoNone", "AutoNone", "AutoNone", true, true)]
     [InlineData("AutoMapped", "AutoNone", "AutoNone", "AutoNone", true, true)]
@@ -96,12 +96,12 @@ public class DataSetVersionMappingServiceTests
     [InlineData("ManualNone", "ManualNone", "ManualNone", "ManualNone", true, true)]
     [InlineData("AutoMapped", "ManualNone", "ManualNone", "ManualNone", true, true)]
     [InlineData("AutoMapped", "AutoMapped", "ManualNone", "ManualNone", false, true)]
-    [InlineData("ManualNone", "ManualNone", "AutoMapped", "AutoMapped",  true, false)]
-    
+    [InlineData("ManualNone", "ManualNone", "AutoMapped", "AutoMapped", true, false)]
+
     public async Task GetMappingStatus(
-        string locationMappingTypesOption, 
+        string locationMappingTypesOption,
         string locationMappingTypesLevel,
-        string filterMappingTypesOption, 
+        string filterMappingTypesOption,
         string filterMappingTypesLevel,
         bool majorVersionInLocations,
         bool majorVersionInFilters)
@@ -113,26 +113,26 @@ public class DataSetVersionMappingServiceTests
 
         var contextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-        
+
         var mockMappingTypesRepository = SetupMockMappingTypes(locationMappingTypesLevel, locationMappingTypesOption, filterMappingTypesLevel,
             filterMappingTypesOption, targetDataSetVersionId);
-        
+
         var service = CreateService(
-            publicDataDbContext: _publicDataDbContextMock.Object, 
+            publicDataDbContext: _publicDataDbContextMock.Object,
             contentDbContext: contentDbContext,
             mockMappingTypesRepository: mockMappingTypesRepository.Object);
 
         // Act
 
         var result = await service.GetMappingStatus(targetDataSetVersionId);
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(majorVersionInLocations, result.LocationsHaveMajorChange);
         Assert.Equal(majorVersionInFilters, result.FiltersHaveMajorChange);
     }
 
-    
+
     [Theory]
     [InlineData(false, false, false, false)]
     [InlineData(true, false, false, true)]
@@ -144,25 +144,25 @@ public class DataSetVersionMappingServiceTests
         // Arrange
         var targetDataSetVersionId = Guid.NewGuid();
         SetupDbContext(
-            targetDataSetVersionId, 
+            targetDataSetVersionId,
             deletedIndicators,
             deletedGeographicLevels,
             deletedTimePeriods);
-        
+
         var contextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contextId);
-        
+
         var service = CreateService(
-            publicDataDbContext: _publicDataDbContextMock.Object, 
+            publicDataDbContext: _publicDataDbContextMock.Object,
             contentDbContext: contentDbContext);
-        
+
         // Act
         var result = await service.HasDeletionChanges(targetDataSetVersionId);
 
         // Assert
         Assert.Equal(expected, result);
     }
-    
+
     private void SetupDbContext(
         Guid targetDataSetVersionId,
         bool hasDeletedIndicators = false,
@@ -179,9 +179,9 @@ public class DataSetVersionMappingServiceTests
                 HasDeletedTimePeriods = hasDeletedTimePeriods,
                 SourceDataSetVersionId = Guid.NewGuid()
             }
-            
+
         };
-        
+
         _publicDataDbContextMock
             .Setup(db => db.DataSetVersionMappings)
             .ReturnsDbSet(data);
@@ -195,7 +195,7 @@ public class DataSetVersionMappingServiceTests
         Guid targetDataSetVersionId)
     {
         var mockMappingTypesRepository = new Mock<IMappingTypesRepository>();
-        
+
         mockMappingTypesRepository
             .Setup(m => m.GetLocationOptionMappingTypes(targetDataSetVersionId, It.IsAny<CancellationToken>())
             ).ReturnsAsync(new List<LocationMappingTypes>
@@ -205,8 +205,8 @@ public class DataSetVersionMappingServiceTests
                     LocationLevelRaw = locationMappingTypesLevel,
                     LocationOptionRaw = locationMappingTypesOption
                 }
-            }); 
-        
+            });
+
         mockMappingTypesRepository
             .Setup(m => m.GetFilterOptionMappingTypes(targetDataSetVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<FilterMappingTypes>
@@ -220,7 +220,7 @@ public class DataSetVersionMappingServiceTests
 
         return mockMappingTypesRepository;
     }
-    
+
     private DataSetVersionMappingService CreateService(
         PublicDataDbContext publicDataDbContext,
         ContentDbContext contentDbContext,

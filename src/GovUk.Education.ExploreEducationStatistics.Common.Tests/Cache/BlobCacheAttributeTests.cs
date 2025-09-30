@@ -110,7 +110,7 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
         Assert.Equal(expectedResult, result);
 
         _blobCacheService.Verify(
-            s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
+            s => s.GetItemAsync(cacheKey, typeof(TestValue)),
             Times.Once);
     }
 
@@ -163,11 +163,11 @@ public class BlobCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposa
         Assert.Equal(args[0], result);
 
         _blobCacheService.Verify(
-            s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
+            s => s.GetItemAsync(cacheKey, typeof(TestValue)),
             Times.Once);
 
         _blobCacheService.Verify(
-            s => s.SetItemAsync(cacheKey, Capture.In(args)), 
+            s => s.SetItemAsync(cacheKey, Capture.In(args)),
             Times.Once);
     }
 

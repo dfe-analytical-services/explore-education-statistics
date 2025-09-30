@@ -31,7 +31,7 @@ public class CreateNextDataSetVersionMappingsFunction(
     {
         // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
-        
+
         return await requestValidator.Validate(request, cancellationToken)
             .OnSuccess(() =>
                  dataSetVersionService.CreateNextVersion(

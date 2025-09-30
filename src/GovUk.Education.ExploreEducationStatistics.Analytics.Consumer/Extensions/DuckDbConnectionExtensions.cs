@@ -26,7 +26,7 @@ public static class DuckDbConnectionExtensions
              )
         ");
     }
-    
+
     /// <summary>
     /// Copy the contents of a DuckDb table directly into a Parquet file with no
     /// additional transformations or logic.

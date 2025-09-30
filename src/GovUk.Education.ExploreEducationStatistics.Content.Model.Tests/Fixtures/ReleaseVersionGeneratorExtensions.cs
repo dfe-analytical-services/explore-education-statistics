@@ -198,7 +198,9 @@ public static class ReleaseVersionGeneratorExtensions
             .SetDefault(p => p.PreReleaseAccessList)
             .Set(p => p.NextReleaseDate, (_, _, context) => new PartialDate
             {
-                Day = "1", Month = "1", Year = $"{2000 + context.Index}"
+                Day = "1",
+                Month = "1",
+                Year = $"{2000 + context.Index}"
             });
 
     public static InstanceSetters<ReleaseVersion> SetId(

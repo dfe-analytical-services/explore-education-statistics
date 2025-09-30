@@ -32,7 +32,7 @@ public static class ProcessorHostBuilder
             .ConfigureServices((builder, services) =>
             {
                 var configuration = builder.Configuration;
-                
+
                 services.AddOptions<AnalyticsOptions>()
                     .Bind(configuration.GetRequiredSection(AnalyticsOptions.Section));
 

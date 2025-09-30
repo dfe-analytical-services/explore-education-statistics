@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -83,7 +83,7 @@ public class MethodologyApprovalServicePermissionTests
                 }
             );
     }
-    
+
     private MethodologyApprovalService SetupService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
@@ -113,7 +113,7 @@ public class MethodologyApprovalServicePermissionTests
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
 
     }
-    
+
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
         var mock = MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);

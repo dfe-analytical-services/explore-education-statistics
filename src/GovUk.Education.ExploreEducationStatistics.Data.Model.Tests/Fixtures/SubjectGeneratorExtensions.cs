@@ -13,7 +13,7 @@ public static class SubjectGeneratorExtensions
 
     public static Generator<Subject> WithFilters(this Generator<Subject> generator, IEnumerable<Filter> filters)
         => generator.ForInstance(s => s.SetFilters(filters));
-    
+
     public static Generator<Subject> WithFilters(this Generator<Subject> generator, Func<SetterContext, IEnumerable<Filter>> filters)
         => generator.ForInstance(s => s.SetFilters(filters));
 
@@ -26,17 +26,17 @@ public static class SubjectGeneratorExtensions
         this Generator<Subject> generator,
         Func<SetterContext, IEnumerable<IndicatorGroup>> indicatorGroups)
         => generator.ForInstance(s => s.SetIndicatorGroups(indicatorGroups));
-    
+
     public static Generator<Subject> WithObservations(
         this Generator<Subject> generator,
         IEnumerable<Observation> observations)
         => generator.ForInstance(s => s.SetObservations(observations));
-    
+
     public static Generator<Subject> WithFootnotes(
         this Generator<Subject> generator,
         IEnumerable<Footnote> footnotes)
         => generator.ForInstance(s => s.SetFootnotes(footnotes));
-    
+
     public static InstanceSetters<Subject> SetDefaults(this InstanceSetters<Subject> setters)
         => setters.SetDefault(s => s.Id);
 

@@ -17,19 +17,19 @@ public static class ConnectionUtils
         return GetConnectionString(name,
             $"{ConnectionTypeValues[ConnectionTypes.AZURE_STORAGE]}");
     }
-    
+
     public static string GetAzureSqlConnectionString(string name)
     {
         return GetConnectionString(name,
             $"{ConnectionTypeValues[ConnectionTypes.AZURE_SQL]}");
     }
-    
+
     public static string GetPostgreSqlConnectionString(string name)
     {
         return GetConnectionString(name,
             $"{ConnectionTypeValues[ConnectionTypes.AZURE_POSTGRESQL]}");
     }
-    
+
     private static string GetConnectionString(string name, string connectionTypeValue)
     {
         // Attempt to get a connection string defined using the double-underscore syntax as used by Azure to
@@ -44,7 +44,7 @@ public static class ConnectionUtils
             connectionString =
                 Environment.GetEnvironmentVariable($"ConnectionStrings:{name}", EnvironmentVariableTarget.Process);
         }
-        
+
         if (connectionString.IsNullOrEmpty())
         {
             // Get the connection string from the Azure Functions App using the naming convention for type SQLAzure.
@@ -54,9 +54,9 @@ public static class ConnectionUtils
         return connectionString;
     }
 
-    
+
     private static readonly Dictionary<ConnectionTypes, string> ConnectionTypeValues =
-        new Dictionary<ConnectionTypes, string>
+        new()
         {
             {
                 ConnectionTypes.AZURE_STORAGE, "CUSTOMCONNSTR"
@@ -67,5 +67,5 @@ public static class ConnectionUtils
             {
                 ConnectionTypes.AZURE_POSTGRESQL, "POSTGRESQLCONNSTR"
             }
-        }; 
+        };
 }

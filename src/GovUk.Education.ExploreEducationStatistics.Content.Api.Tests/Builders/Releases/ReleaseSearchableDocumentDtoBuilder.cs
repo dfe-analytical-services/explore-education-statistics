@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels.Extensions;
 

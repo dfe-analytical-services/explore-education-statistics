@@ -55,7 +55,7 @@ public static class LocationOptionViewModelsTests
                 nonLabelProperties,
                 property =>
                 {
-                    var otherOption = option with {};
+                    var otherOption = option with { };
 
                     Assert.NotNull(otherOption);
 

@@ -793,7 +793,7 @@ public class SubjectMetaServiceTests
                 Id = releaseSubject.ReleaseVersion.Id,
                 Published = DateTime.UtcNow,
             },
-            File =  new File
+            File = new File
             {
                 SubjectId = releaseSubject.SubjectId,
                 Type = FileType.Data,
@@ -1351,7 +1351,7 @@ public class SubjectMetaServiceTests
         var subject = new Subject { Id = Guid.NewGuid(), };
         var releaseSubject = new ReleaseSubject
         {
-            ReleaseVersion = new ReleaseVersion{ Id = Guid.NewGuid(), },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
             SubjectId = subject.Id,
         };
 

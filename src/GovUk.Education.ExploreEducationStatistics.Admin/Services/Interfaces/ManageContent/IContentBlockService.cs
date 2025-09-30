@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 
 public interface IContentBlockService

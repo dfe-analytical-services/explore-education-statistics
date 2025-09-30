@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
+using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Events;
 

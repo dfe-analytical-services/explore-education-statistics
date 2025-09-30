@@ -21,7 +21,7 @@ public class HttpContextHubFilter : IHubFilter
         Func<HubInvocationContext, ValueTask<object?>> next)
     {
         var contextSet = false;
-        
+
         try
         {
             if (_httpContextAccessor.HttpContext is null)
@@ -29,7 +29,7 @@ public class HttpContextHubFilter : IHubFilter
                 _httpContextAccessor.HttpContext = invocationContext.Context.GetHttpContext();
                 contextSet = true;
             }
-        
+
             return await next(invocationContext);
         }
         finally

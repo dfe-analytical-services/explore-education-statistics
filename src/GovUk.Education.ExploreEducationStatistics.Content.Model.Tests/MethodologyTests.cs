@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -104,7 +104,7 @@ public class MethodologyTests
             Versions = new List<MethodologyVersion>()
         };
 
-        Assert.Throws<ArgumentException>(() => methodology.LatestVersion());
+        Assert.Throws<ArgumentException>(methodology.LatestVersion);
     }
 
     [Fact]

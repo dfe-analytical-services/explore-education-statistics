@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore.Migrations;
 

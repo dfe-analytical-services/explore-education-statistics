@@ -23,9 +23,9 @@ public class MemoryCacheAttribute : CacheAttribute
     private static CrontabSchedule? _overrideExpirySchedule;
 
     protected override Type BaseKey => typeof(IMemoryCacheKey);
-    
+
     private int DurationInSeconds { get; }
-    
+
     private CrontabSchedule? ExpirySchedule { get; }
 
     /// <summary>
@@ -35,8 +35,8 @@ public class MemoryCacheAttribute : CacheAttribute
     public string? ServiceName { get; set; }
 
     public MemoryCacheAttribute(
-        Type key, 
-        int durationInSeconds, 
+        Type key,
+        int durationInSeconds,
         string? expiryScheduleCron = null,
         bool forceUpdate = false
     ) : base(key, forceUpdate)

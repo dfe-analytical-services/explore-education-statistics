@@ -64,6 +64,6 @@ public class PersistenceHelper<TDbContext> : IPersistenceHelper<TDbContext>
     {
         return id.HasValue
             ? await CheckEntityExists(id.Value, hydrateEntityFn)
-            : (TEntity) null;
+            : (TEntity)null;
     }
 }

@@ -153,7 +153,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
+            return (TimeIdentifier)TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -163,13 +163,7 @@ public class FixedInformationDataFileReader
 
     public int GetYear(IReadOnlyList<string> rowValues)
     {
-        var year = rowValues[_yearColumnIndex];
-
-        if (year == null)
-        {
-            throw new InvalidTimePeriodException(null);
-        }
-
+        var year = rowValues[_yearColumnIndex] ?? throw new InvalidTimePeriodException(null);
         return int.Parse(year.Substring(0, 4));
     }
 
@@ -179,7 +173,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (GeographicLevel) GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
+            return (GeographicLevel)GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {

@@ -168,12 +168,18 @@ public class SeedDataCommand : ICommand
 
         await Cli.Wrap("pg_dump")
             .WithArguments([
-                "--dbname", "public_data",
-                "--file", sqlFilePath,
-                "--schema", "public",
-                "--username", "postgres",
-                "--host", "db",
-                "--port", "5432",
+                "--dbname",
+                "public_data",
+                "--file",
+                sqlFilePath,
+                "--schema",
+                "public",
+                "--username",
+                "postgres",
+                "--host",
+                "db",
+                "--port",
+                "5432",
                 "--clean",
                 "--if-exists",
             ])
@@ -478,8 +484,8 @@ public class SeedDataCommand : ICommand
                     .Merge()
                     .Using(options)
                     .On(
-                        o =>  o.Label,
-                        o =>  o.Label
+                        o => o.Label,
+                        o => o.Label
                     )
                     .InsertWhenNotMatched()
                     .MergeAsync(_cancellationToken);
@@ -802,9 +808,9 @@ public class SeedDataCommand : ICommand
                 $"{DataTable.Cols.Id} UINTEGER NOT NULL PRIMARY KEY",
                 $"{DataTable.Cols.TimePeriodId} INTEGER NOT NULL",
                 $"{DataTable.Cols.GeographicLevel} VARCHAR NOT NULL",
-                ..version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"),
-                ..version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
-                ..version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
+                .. version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"),
+                .. version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
+                .. version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
             ];
 
             await _duckDbConnection.SqlBuilder(
@@ -819,23 +825,23 @@ public class SeedDataCommand : ICommand
                 "nextval('data_seq') AS id",
                 $"{TimePeriodsTable.Ref().Id} AS {DataTable.Cols.TimePeriodId}",
                 DataSourceTable.Ref.GeographicLevel,
-                ..version.LocationMetas.Select(location =>
+                .. version.LocationMetas.Select(location =>
                     $"COALESCE({LocationOptionsTable.Ref(location).Id}, 0) AS {DataTable.Cols.LocationId(location)}"),
-                ..version.FilterMetas.Select(filter =>
+                .. version.FilterMetas.Select(filter =>
                     $"COALESCE({FilterOptionsTable.Ref(filter).Id}, 0) AS {DataTable.Cols.Filter(filter)}"),
-                ..version.IndicatorMetas.Select(DataTable.Cols.Indicator),
+                .. version.IndicatorMetas.Select(DataTable.Cols.Indicator),
             ];
 
             string[] insertJoins =
             [
-                ..version.LocationMetas.Select(
+                .. version.LocationMetas.Select(
                     location =>
                     {
                         var codeColumns = GetParquetLocationCodeColumns(location.Level);
 
                         string[] conditions =
                         [
-                            ..codeColumns.Select(col =>
+                            .. codeColumns.Select(col =>
                                 $"{LocationOptionsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"),
                             $"{LocationOptionsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}"
                         ];
@@ -846,7 +852,7 @@ public class SeedDataCommand : ICommand
                                 """;
                     }
                 ),
-                ..version.FilterMetas.Select(
+                .. version.FilterMetas.Select(
                     filter => $"""
                                LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
                                ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -47,7 +47,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_Hourly()
     {
@@ -65,7 +65,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_Hourly_LastHourOfDay()
     {
@@ -84,7 +84,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeNotTruncated_HalfHourly()
     {
@@ -102,7 +102,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_HalfHourly()
     {
@@ -120,7 +120,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_HalfHourly_LastHalfHourOfDay()
     {
@@ -139,7 +139,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeNotTruncated_NoExpirySchedule()
     {
@@ -156,7 +156,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExceptionHandledGracefullyWhenCachingItem()
     {
@@ -179,7 +179,7 @@ public class MemoryCacheServiceTests
         object entity = new SampleClass();
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
+
         memoryCache.Set(_cacheKey, entity);
 
         var service = SetupService(memoryCache);
@@ -195,7 +195,7 @@ public class MemoryCacheServiceTests
         object entity = new SampleClassSubtype();
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
+
         memoryCache.Set(_cacheKey, entity);
 
         var service = SetupService(memoryCache);
@@ -209,9 +209,9 @@ public class MemoryCacheServiceTests
     public void GetItem_NullIfLessSpecificSupertype()
     {
         object entity = new SampleClassSuperclass();
-        
+
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
+
         memoryCache.Set(_cacheKey, entity);
 
         var service = SetupService(memoryCache);
@@ -289,7 +289,7 @@ public class MemoryCacheServiceTests
         var service = SetupService(memoryCache.Object);
         service.SetItem(_cacheKey, valueToCache, cacheConfiguration, now);
         VerifyAllMocks(memoryCache);
-        
+
         Assert.Equal($"\"{valueToCache}\"".Length, cacheEntry.Size);
         Assert.Equal(new DateTimeOffset(expectedCacheExpiry), cacheEntry.AbsoluteExpiration);
     }
@@ -320,4 +320,4 @@ public class MemoryCacheServiceTests
         {
         }
     }
- }
+}

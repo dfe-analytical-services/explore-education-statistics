@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
 public interface IProcessRequestFilesWorkflow
 {

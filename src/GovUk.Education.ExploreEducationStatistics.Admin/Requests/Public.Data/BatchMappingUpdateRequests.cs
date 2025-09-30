@@ -93,7 +93,7 @@ public abstract record MappingUpdateRequest
                 .When(request => request.Type is not null && request.Type.Value == MappingType.ManualMapped)
                 .WithErrorCode(ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Code)
                 .WithMessage(ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Message);
-            
+
             RuleFor(request => request.CandidateKey)
                 .Empty()
                 .When(request => request.Type is not null && request.Type.Value == MappingType.ManualNone)

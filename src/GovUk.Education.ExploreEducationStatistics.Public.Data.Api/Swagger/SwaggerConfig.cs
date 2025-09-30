@@ -32,7 +32,7 @@ public class SwaggerConfig(
         options.SchemaFilter<TimeIdentifierSchemaFilter>();
 
         Directory
-            .GetFiles(AppContext.BaseDirectory,"*.xml", SearchOption.TopDirectoryOnly)
+            .GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly)
             .ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
 
         options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);

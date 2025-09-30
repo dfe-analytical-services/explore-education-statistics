@@ -127,7 +127,7 @@ public class PaginatedListViewModelTests
     [Fact]
     public void Paginate_PageDoesNotExist()
     {
-        var allResults = new List<int>{ 1, 2, 3 };
+        var allResults = new List<int> { 1, 2, 3 };
 
         const int page = 2;
         const int pageSize = 10;

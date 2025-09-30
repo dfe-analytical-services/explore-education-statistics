@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;

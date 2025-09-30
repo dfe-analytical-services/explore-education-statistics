@@ -22,8 +22,8 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
     private readonly HashSet<Type> _typesToIgnore =
     [
          typeof(GeographicLevel),
-         typeof(IndicatorUnit),
-         typeof(TimeIdentifier),
+        typeof(IndicatorUnit),
+        typeof(TimeIdentifier),
     ];
 
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)

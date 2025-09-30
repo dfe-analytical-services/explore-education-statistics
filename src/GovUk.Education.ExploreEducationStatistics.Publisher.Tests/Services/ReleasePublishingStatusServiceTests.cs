@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;

@@ -83,11 +83,11 @@ public class TimePeriodServiceTests
     [Fact]
     public async Task GetTimePeriods_Observations_CorrectlyOrderWeeklyTimeIdentifiers()
     {
-        var obs1 = new Observation {Year = 2001, TimeIdentifier = Week1};
-        var obs2 = new Observation {Year = 2000, TimeIdentifier = Week20};
-        var obs3 = new Observation {Year = 2000, TimeIdentifier = Week2};
-        var obs4 = new Observation {Year = 2000, TimeIdentifier = Week1};
-        var obs5 = new Observation {Year = 2000, TimeIdentifier = Week10};
+        var obs1 = new Observation { Year = 2001, TimeIdentifier = Week1 };
+        var obs2 = new Observation { Year = 2000, TimeIdentifier = Week20 };
+        var obs3 = new Observation { Year = 2000, TimeIdentifier = Week2 };
+        var obs4 = new Observation { Year = 2000, TimeIdentifier = Week1 };
+        var obs5 = new Observation { Year = 2000, TimeIdentifier = Week10 };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))

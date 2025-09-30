@@ -27,8 +27,8 @@ public class ProcessNextDataSetVersionMappingsFunctions(
         var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
         await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.AutoMapping, cancellationToken);
         await mappingService.ApplyAutoMappings(
-            dataSetVersionImport.DataSetVersionId, 
-            dataSetVersionImport.DataSetVersionToReplaceId is not null, 
+            dataSetVersionImport.DataSetVersionId,
+            dataSetVersionImport.DataSetVersionToReplaceId is not null,
             cancellationToken);
     }
 

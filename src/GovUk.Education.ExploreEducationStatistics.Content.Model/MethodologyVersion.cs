@@ -20,7 +20,7 @@ public enum MethodologyPublishingStrategy
 
 public class MethodologyVersion : ICreatedTimestamp<DateTime?>
 {
-    [Key] [Required] public Guid Id { get; set; }
+    [Key][Required] public Guid Id { get; set; }
 
     public string Title => AlternativeTitle ?? Methodology.OwningPublicationTitle;
 

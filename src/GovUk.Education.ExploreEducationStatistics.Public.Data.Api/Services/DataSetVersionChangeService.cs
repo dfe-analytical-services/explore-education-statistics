@@ -39,9 +39,9 @@ public class DataSetVersionChangeService(
                 cancellationToken: cancellationToken))
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))
             .OnSuccess(MapChanges)
-            .OnSuccessCombineWith(changes => 
-                includePatchHistory 
-                    ? GetPreviousChanges(dataSetId, changes!.VersionNumber, cancellationToken) 
+            .OnSuccessCombineWith(changes =>
+                includePatchHistory
+                    ? GetPreviousChanges(dataSetId, changes!.VersionNumber, cancellationToken)
                     : Task.FromResult(new Either<ActionResult, List<DataSetVersionChangeSet>>([]))
                 )
             .OnSuccess(tuple =>
@@ -245,14 +245,14 @@ public class DataSetVersionChangeService(
 
         List<GeographicLevelChangeViewModel> changes =
         [
-            ..currentLevels
+            .. currentLevels
                 .Where(level => !previousLevels.Contains(level))
                 .OrderBy(level => level.GetEnumLabel())
                 .Select(level => new GeographicLevelChangeViewModel
                 {
                     CurrentState = GeographicLevelViewModel.Create(level),
                 }),
-            ..previousLevels
+            .. previousLevels
                 .Where(level => !currentLevels.Contains(level))
                 .OrderBy(level => level.GetEnumLabel())
                 .Select(level => new GeographicLevelChangeViewModel

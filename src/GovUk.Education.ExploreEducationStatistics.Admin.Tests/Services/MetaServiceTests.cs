@@ -13,7 +13,7 @@ public class MetaServiceTests
         var service = new MetaService();
 
         var timeIdentifiersRetrieved = service.GetTimeIdentifiersByCategory();
-        foreach (var category in (TimeIdentifierCategory[]) Enum.GetValues(typeof(TimeIdentifierCategory)))
+        foreach (var category in (TimeIdentifierCategory[])Enum.GetValues(typeof(TimeIdentifierCategory)))
         {
             // Check each Category is accounted for
             Assert.True(timeIdentifiersRetrieved.Exists(ti => ti.Category == category));

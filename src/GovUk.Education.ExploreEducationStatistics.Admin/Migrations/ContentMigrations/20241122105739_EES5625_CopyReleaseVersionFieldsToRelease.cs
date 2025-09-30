@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;

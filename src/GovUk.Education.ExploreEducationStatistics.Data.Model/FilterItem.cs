@@ -38,7 +38,7 @@ public class FilterItem : IEquatable<FilterItem>
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((FilterItem) obj);
+        return Equals((FilterItem)obj);
     }
 
     public override int GetHashCode()

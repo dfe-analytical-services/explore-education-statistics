@@ -176,12 +176,12 @@ public class DbContextUtilsTests
                 Assert.True(DateTime.UtcNow > saved.Created);
             }
         }
-        
+
         [Fact]
         public async Task CreatedTimestamp_DateTime_AlreadySet()
         {
             var entityCreated = DateTime.UtcNow.AddDays(-10);
-            
+
             var entity = new CreatedDateTimeEntity
             {
                 Created = entityCreated

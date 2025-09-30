@@ -230,19 +230,19 @@ public class ReleaseFileService : IReleaseFileService
                 containerName: PrivateReleaseFiles,
                 path: releaseFile.Path(),
                 cancellationToken: cancellationToken);
-            
+
             // Stop immediately if we receive a cancellation request
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
-            
+
             // Ignore files where we cannot successfully get their blob download streams.
             if (streamResult.IsLeft)
             {
                 continue;
             }
-            
+
             await using var blobStream = streamResult.Right;
 
             var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -45,9 +45,9 @@ public class UserInviteRepositoryTests
     {
         var originalCreatedDate = DateTime.UtcNow.AddDays(-1);
         var newCreatedDate = DateTime.UtcNow;
-        
+
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-        
+
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             await usersAndRolesDbContext.AddAsync(new UserInvite
@@ -64,9 +64,9 @@ public class UserInviteRepositoryTests
         {
             var repository = new UserInviteRepository(usersAndRolesDbContext);
             var userInvite = await repository.CreateOrUpdate(
-                "test@test.com", 
-                Role.Analyst, 
-                CreatedById, 
+                "test@test.com",
+                Role.Analyst,
+                CreatedById,
                 createdDate: newCreatedDate);
 
             Assert.Equal("test@test.com", userInvite.Email);

@@ -27,9 +27,9 @@ public class UserTests
     [Theory]
     [MemberData(nameof(ExpiryData))]
     public void ShouldExpire(
-        bool active, 
-        DateTime? softDeletedDate, 
-        DateTimeOffset createdDate, 
+        bool active,
+        DateTime? softDeletedDate,
+        DateTimeOffset createdDate,
         bool expectShouldExpire)
     {
         var user = _dataFixture.DefaultUser()

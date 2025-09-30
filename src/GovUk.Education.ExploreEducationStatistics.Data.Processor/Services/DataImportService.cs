@@ -28,15 +28,15 @@ public class DataImportService : IDataImportService
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        
+
         var import = await contentDbContext.DataImports.SingleAsync(d => d.Id == id);
-        
+
         if (import.Status != COMPLETE && import.Status != FAILED)
         {
             contentDbContext.Update(import);
             import.Status = FAILED;
-            import.Errors.AddRange(errors);                    
-            
+            import.Errors.AddRange(errors);
+
             await contentDbContext.SaveChangesAsync();
         }
     }
@@ -99,7 +99,7 @@ public class DataImportService : IDataImportService
     public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
     {
         await using var context = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        
+
         var import = await context.DataImports
             .Include(i => i.File)
             .SingleAsync(i => i.Id == id);
@@ -107,7 +107,7 @@ public class DataImportService : IDataImportService
         var filename = import.File.Filename;
 
         var percentageCompleteBefore = import.StagePercentageComplete;
-        var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
+        var percentageCompleteAfter = (int)Math.Clamp(percentageComplete, 0, 100);
 
         // Ignore updating if already finished, or in the process of aborting and this status update isn't a
         // finishing status update. 
@@ -123,7 +123,7 @@ public class DataImportService : IDataImportService
                 newStatus,
                 percentageCompleteAfter,
                 import.Status);
-            
+
             return;
         }
 

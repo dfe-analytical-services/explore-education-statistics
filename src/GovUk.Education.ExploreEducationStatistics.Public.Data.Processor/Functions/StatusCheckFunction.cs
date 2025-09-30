@@ -28,7 +28,7 @@ public class StatusCheckFunction
         var activeOrchestrations = await client
             .GetAllInstancesAsync(filter: ActiveOrchestrationsQuery)
             .CountAsync();
-        
+
         return new OkObjectResult(new { ActiveOrchestrations = activeOrchestrations });
     }
 }

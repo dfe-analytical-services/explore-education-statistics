@@ -411,7 +411,7 @@ public static class ValidationProblemViewModelTestExtensions
 
         return validationProblem.Errors.First(new Func<ErrorViewModel, bool>(predicate));
     }
-    
+
     public static void AssertDoesNotHaveError(
         this ValidationProblemViewModel validationProblem,
         string? expectedPath,
@@ -452,16 +452,16 @@ public static class ValidationProblemViewModelTestExtensions
         var matchedErrors = errors
             .Where(error => expectedNotToContain.Any(expected => ErrorsMatch(error, expected)))
             .ToArray();
-    
+
         if (matchedErrors.Length == 0)
         {
             return;
         }
-    
+
         var matchedErrorMessages = matchedErrors
             .Select(e => e.Message)
             .JoinToString('\n');
-    
+
         Assert.Fail($"""
             Error message(s) found in expectedMissingErrors that should not be present:
             {matchedErrorMessages}
@@ -472,7 +472,7 @@ public static class ValidationProblemViewModelTestExtensions
             current.Code == expected.Code &&
             current.Path == expected.Path;
     }
-    
+
     public static void AssertHasErrors(
         List<ErrorViewModel> errors,
         List<ErrorViewModel> expectedErrors)

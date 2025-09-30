@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api;

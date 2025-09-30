@@ -26,12 +26,12 @@ public static class IndicatorGroupGeneratorExtensions
 
     public static Generator<IndicatorGroup> WithLabel(this Generator<IndicatorGroup> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
-    
+
     public static InstanceSetters<IndicatorGroup> SetDefaults(this InstanceSetters<IndicatorGroup> setters)
         => setters
             .SetDefault(ig => ig.Id)
             .Set(
-                ig => ig.Label, 
+                ig => ig.Label,
                 (_, _, ctx) => ctx.Index == 0 ? "Default" : $"Indicator group {ctx.Index + 1}");
 
     public static InstanceSetters<IndicatorGroup> SetSubject(
@@ -62,7 +62,7 @@ public static class IndicatorGroupGeneratorExtensions
                 return list;
             }
         );
-    
+
     public static InstanceSetters<IndicatorGroup> SetLabel(
         this InstanceSetters<IndicatorGroup> setters,
         string label)

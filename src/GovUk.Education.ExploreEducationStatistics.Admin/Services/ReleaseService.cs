@@ -157,7 +157,7 @@ public partial class ReleaseService(
                     if (releaseData.releaseIsLive && releaseData.slugHasChanged)
                     {
                         await adminEventRaiser.OnReleaseSlugChanged(
-                            releaseId, 
+                            releaseId,
                             releaseData.releaseAndSlugs.newReleaseSlug,
                             releaseData.releaseAndSlugs.release.PublicationId,
                             releaseData.releaseAndSlugs.release.Publication.Slug,
@@ -220,8 +220,8 @@ public partial class ReleaseService(
         var oldReleaseSlug = release.Slug;
 
         return await releaseSlugValidator.ValidateNewSlug(
-                newReleaseSlug: newReleaseSlug, 
-                publicationId: release.PublicationId, 
+                newReleaseSlug: newReleaseSlug,
+                publicationId: release.PublicationId,
                 releaseId: release.Id,
                 cancellationToken: cancellationToken)
             .OnSuccess(async _ => await ValidateReleaseIsNotUndergoingPublishing(release.Id, cancellationToken))

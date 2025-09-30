@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
 /// <summary>
 /// This interface represents a component that interacts with a file store
@@ -10,12 +10,12 @@
 public interface IFileAccessor
 {
     bool DirectoryExists(string directory);
-    
+
     void CreateDirectory(string directory);
-    
+
     void DeleteDirectory(string directory);
-    
+
     IList<string> ListFiles(string directory);
-    
+
     void Move(string sourcePath, string destinationPath);
 }

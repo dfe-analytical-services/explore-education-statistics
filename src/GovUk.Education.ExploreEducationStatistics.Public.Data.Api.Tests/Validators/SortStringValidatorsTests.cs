@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Valid
 
 public class SortStringValidatorsTests
 {
-     public class SortStringTests : SortStringValidatorsTests
+    public class SortStringTests : SortStringValidatorsTests
     {
         private class TestClass
         {

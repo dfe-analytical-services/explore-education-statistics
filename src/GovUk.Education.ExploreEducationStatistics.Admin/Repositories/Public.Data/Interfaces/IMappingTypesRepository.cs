@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 

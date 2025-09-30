@@ -88,7 +88,7 @@ public class ReleasePublishingFeedbackFunctionTests
                         feedback.EmailToken)
                 )), Times.Once);
     }
-    
+
     [Theory]
     [InlineData(PublicationRole.Drafter)]
     [InlineData(PublicationRole.Approver)]

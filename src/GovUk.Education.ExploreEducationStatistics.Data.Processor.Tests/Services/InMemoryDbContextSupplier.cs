@@ -17,7 +17,7 @@ public class InMemoryDbContextSupplier : IDbContextSupplier
     private readonly string _statisticsDbContextId;
 
     public InMemoryDbContextSupplier(
-        string? contentDbContextId = null, 
+        string? contentDbContextId = null,
         string? statisticsDbContextId = null)
     {
         _contentDbContextId = contentDbContextId ?? Guid.NewGuid().ToString();
@@ -30,7 +30,7 @@ public class InMemoryDbContextSupplier : IDbContextSupplier
         {
             nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
             nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
-            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " + 
+            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " +
                                                        typeof(TDbContext).Name)
         })!;
     }

@@ -1,4 +1,4 @@
-﻿using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Events.Tests.EventGrid.Builders;
 
@@ -8,7 +8,7 @@ public class EventRaiserTests
 {
     private readonly ConfiguredEventGridClientFactoryMockBuilder _eventGridClientFactoryMockBuilder = new();
 
-    private IEventRaiser GetSut() => 
+    private IEventRaiser GetSut() =>
         new EventRaiser(_eventGridClientFactoryMockBuilder.Build());
 
     private class TestEvent : IEvent
@@ -20,7 +20,7 @@ public class EventRaiserTests
         public static string EventTopicOptionsKey => "TestEventTopicOptionsKey";
         public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);
     }
-    
+
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
 
@@ -30,26 +30,26 @@ public class EventRaiserTests
         // ARRANGE
         _eventGridClientFactoryMockBuilder.WhereNoTopicConfigFound();
         var sut = GetSut();
-        
+
         // ACT
         await sut.RaiseEvent(new TestEvent());
-        
+
         // ASSERT
         _eventGridClientFactoryMockBuilder
             .Client
             .Assert.NoEventsWerePublished();
     }
-    
+
     [Fact]
     public async Task GivenTopicConfigured_WhenTestEventRaised_ThenEventPublished()
     {
         // ARRANGE
         var sut = GetSut();
-        
+
         // ACT
         var testEvent = new TestEvent();
         await sut.RaiseEvent(testEvent);
-        
+
         // ASSERT
         var actualEvent = Assert.Single(
             _eventGridClientFactoryMockBuilder
@@ -58,7 +58,7 @@ public class EventRaiserTests
 
         var expectedEvent = testEvent;
         var expectedPayload = testEvent.Payload;
-        
+
         Assert.Equal(expectedEvent.Subject, actualEvent.Subject);
         Assert.Equal(expectedEvent.EventType, actualEvent.EventType);
         Assert.Equal(expectedEvent.DataVersion, actualEvent.DataVersion);

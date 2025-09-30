@@ -55,7 +55,7 @@ internal class DataSetService(
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
-                dataSetVersionId: dsv.Id, 
+                dataSetVersionId: dsv.Id,
                 type: DataSetVersionCallType.DownloadCsv,
                 requestedDataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken))
@@ -103,7 +103,7 @@ internal class DataSetService(
             type: PublicationCallType.GetDataSets,
             parameters: new PaginationParameters(Page: page, PageSize: pageSize),
             cancellationToken: cancellationToken);
-        
+
         return new DataSetPaginatedListViewModel
         {
             Results = dataSets,
@@ -150,15 +150,15 @@ internal class DataSetService(
                 cancellationToken: cancellationToken))
             .OnSuccess(async dataSet =>
             {
-               var includeDraftVersion = await authorizationHandlerService
-                   .RequestHasValidPreviewToken(dataSet);
+                var includeDraftVersion = await authorizationHandlerService
+                    .RequestHasValidPreviewToken(dataSet);
 
-               return await ListPaginatedVersions(
-                    dataSet: dataSet,
-                    page: page,
-                    pageSize: pageSize,
-                    includeDraftVersion: includeDraftVersion,
-                    cancellationToken: cancellationToken);
+                return await ListPaginatedVersions(
+                     dataSet: dataSet,
+                     page: page,
+                     pageSize: pageSize,
+                     includeDraftVersion: includeDraftVersion,
+                     cancellationToken: cancellationToken);
             });
     }
 
@@ -174,10 +174,10 @@ internal class DataSetService(
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccessDo(dsv => analyticsService.CaptureDataSetVersionCall(
-                dataSetVersionId: dsv.Id, 
+                dataSetVersionId: dsv.Id,
                 type: DataSetVersionCallType.GetMetadata,
                 requestedDataSetVersion: dataSetVersion,
-                parameters: types != null 
+                parameters: types != null
                     ? new GetMetadataAnalyticsParameters(types)
                     : null,
                 cancellationToken: cancellationToken))

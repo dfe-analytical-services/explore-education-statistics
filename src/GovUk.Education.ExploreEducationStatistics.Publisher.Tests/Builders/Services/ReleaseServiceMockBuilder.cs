@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 
@@ -23,7 +23,7 @@ public class ReleaseServiceMockBuilder
         _mock
             .Setup(m => m.Get(releaseVersion.Id))
             .ReturnsAsync(releaseVersion);
-        
+
         return this;
     }
 
@@ -34,10 +34,10 @@ public class ReleaseServiceMockBuilder
         _mock
             .Setup(m => m.GetLatestPublishedReleaseVersion(publicationId, It.IsAny<IReadOnlyList<Guid>?>()))
             .ReturnsAsync(() => latestPublishedReleaseVersion);
-        
+
         return this;
     }
-    
+
     public ReleaseVersion Get(Guid releaseVersionId) => _mock.Object.Get(releaseVersionId).Result;
 
     public class Asserter(Mock<IReleaseService> mock)

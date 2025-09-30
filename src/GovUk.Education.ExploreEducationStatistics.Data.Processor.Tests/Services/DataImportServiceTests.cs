@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -165,7 +165,7 @@ public class DataImportServiceTests
             Assert.Contains(GeographicLevel.Region, updated.GeographicLevels);
         }
     }
-    
+
     [Fact]
     public async Task Update_Partial()
     {

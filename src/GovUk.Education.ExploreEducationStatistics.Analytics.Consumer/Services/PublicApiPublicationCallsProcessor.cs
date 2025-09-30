@@ -9,10 +9,10 @@ public class PublicApiPublicationCallsProcessor(
     IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
 {
     private static readonly string[] PublicApiPublicationSubPath = ["public-api", "publications"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiPublicationSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiPublicationSubPath);
-    
+
     public Task Process()
     {
         return workflow.Process(new WorkflowActor(
@@ -20,7 +20,7 @@ public class PublicApiPublicationCallsProcessor(
             reportsDirectory: ReportsDirectory));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
         : DirectJsonCopyWorkflowActorBase(
             sourceDirectory: sourceDirectory,
             reportsDirectory: reportsDirectory,

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 
 public class MethodologyNoteViewModel

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;

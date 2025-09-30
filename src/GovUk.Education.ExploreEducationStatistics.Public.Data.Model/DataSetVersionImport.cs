@@ -24,9 +24,9 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
     public DateTimeOffset? Updated { get; set; }
 
     public Guid? DataSetVersionToReplaceId { get; init; }
-    
+
     public DataSetVersion? DataSetVersionToReplace { get; init; }
-    
+
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
         public void Configure(EntityTypeBuilder<DataSetVersionImport> builder)

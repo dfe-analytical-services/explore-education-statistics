@@ -108,7 +108,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
             // Assert
             actualResult.AssertNotFound();
         }
-        
+
         [Theory]
         [MemberData(nameof(NonPublishedStatusWithVersionStringTheoryData))]
         public async Task SpecifyWildCard_SkipsNonPublishedVersionAndReturnsPublishedVersion(
@@ -140,7 +140,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
                 {
                     dsv.SetStatus(nonPublishedStatus);
                     dsv.SetVersionNumber(2, 1);
-                })                
+                })
                 .GenerateList();
 
             var publicDataDbContextMock = new Mock<PublicDataDbContext>();
@@ -153,7 +153,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
 
             // Assert
             actualResult.AssertRight();
-            
+
             Assert.Equal(1, actualResult.Right.VersionMajor);
             Assert.Equal(2, actualResult.Right.VersionMinor);
             Assert.Equal(0, actualResult.Right.VersionPatch);
@@ -189,7 +189,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
             publicDataDbContextMock.Setup(dbContext => dbContext.DataSetVersions).ReturnsDbSet(dataSetVersions);
 
             var queryable = publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
-            
+
             // Act 
             var result = await queryable.GetPreviousPatchVersions(dataSet.Id, "3.2.3", CancellationToken.None);
 
@@ -197,20 +197,20 @@ public abstract class DataSetVersionQueryableExtensionsTests
             var actualResult = result.AssertRight();
             Assert.NotNull(actualResult);
             Assert.Equal(3, actualResult.Length);
-            
+
             Assert.Equal(3, actualResult[0].VersionMajor);
             Assert.Equal(2, actualResult[0].VersionMinor);
             Assert.Equal(0, actualResult[0].VersionPatch);
-            
+
             Assert.Equal(3, actualResult[1].VersionMajor);
             Assert.Equal(2, actualResult[1].VersionMinor);
             Assert.Equal(1, actualResult[1].VersionPatch);
-            
+
             Assert.Equal(3, actualResult[2].VersionMajor);
             Assert.Equal(2, actualResult[2].VersionMinor);
             Assert.Equal(2, actualResult[2].VersionPatch);
         }
-        
+
         private IQueryable<DataSetVersion> SetupDataSetVersions(out Guid dataSetGuid)
         {
             DataSet dataSet = _dataFixture
@@ -298,7 +298,7 @@ public abstract class DataSetVersionQueryableExtensionsTests
             {"v2.*.*", 2, 1, 4},
             {"v*", 5, 0, 0}
         };
-        
+
         public static TheoryData<DataSetVersionStatus, string> NonPublishedStatusWithVersionStringTheoryData =>
             new TheoryData<DataSetVersionStatus, string>()
                 .Cross(

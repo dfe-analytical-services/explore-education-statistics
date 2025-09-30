@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests;
 

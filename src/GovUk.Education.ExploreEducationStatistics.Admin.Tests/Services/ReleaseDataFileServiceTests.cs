@@ -1636,7 +1636,7 @@ public class ReleaseDataFileServiceTests
             Assert.Null(files[1].PublicApiDataSetVersion);
         }
     }
-    
+
     [Fact]
     public async Task ListAll_WithReplacementInProgressOnNewerReleaseVersion_ReplacedByDataFileIsNull()
     {
@@ -1761,7 +1761,7 @@ public class ReleaseDataFileServiceTests
             Assert.Null(files[0].ReplacedByDataFile);
         }
     }
-    
+
     [Fact]
     public async Task ListAll_WithReplacement()
     {

@@ -63,15 +63,15 @@ public class ReleaseVersionsControllerUnitTests
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var response = await controller.UploadDataSet(
-                new()
-                {
-                    ReleaseVersionId = _releaseVersionId,
-                    Title = "Data set title",
-                    DataFile = dataFile,
-                    MetaFile = metaFile,
-                },
-                cancellationToken: default);
+        var response = await controller.UploadDataSet(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                DataFile = dataFile,
+                MetaFile = metaFile,
+            },
+            cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -100,16 +100,16 @@ public class ReleaseVersionsControllerUnitTests
 
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            // Act
-            var result = await controller.UploadDataSet(
-                new()
-                {
-                    ReleaseVersionId = _releaseVersionId,
-                    Title = "Data set title",
-                    DataFile = dataFile,
-                    MetaFile = metaFile,
-                },
-                cancellationToken: default);
+        // Act
+        var result = await controller.UploadDataSet(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                DataFile = dataFile,
+                MetaFile = metaFile,
+            },
+            cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -137,14 +137,14 @@ public class ReleaseVersionsControllerUnitTests
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var response = await controller.UploadDataSetAsZip(
-                new()
-                {
-                    ReleaseVersionId = _releaseVersionId,
-                    Title = "Data set title",
-                    ZipFile = dataSetZipFile,
-                },
-                cancellationToken: default);
+        var response = await controller.UploadDataSetAsZip(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                ZipFile = dataSetZipFile,
+            },
+            cancellationToken: default);
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -653,7 +653,7 @@ public class ReleaseVersionsControllerUnitTests
         {
             stream = "test content".ToStream();
         }
-        
+
         fileMock.Setup(formFile => formFile.OpenReadStream()).Returns(stream);
         fileMock.Setup(formFile => formFile.FileName).Returns(fileName);
         fileMock.Setup(formFile => formFile.Name).Returns(fileName);

@@ -32,7 +32,7 @@ public static class EitherTestExtensions
     public static void AssertStatusCodeResult<T>(this Either<ActionResult, T> result, HttpStatusCode statusCode)
     {
         var statusCodeResult = result.AssertActionResultOfType<StatusCodeResult, T>();
-        Assert.Equal((int) statusCode, statusCodeResult.StatusCode);
+        Assert.Equal((int)statusCode, statusCodeResult.StatusCode);
     }
 
     public static TRight AssertRight<TLeft, TRight>(this Either<TLeft, TRight> either, string message = null)
@@ -79,7 +79,7 @@ public static class EitherTestExtensions
         badRequest.AssertValidationProblem(expectedValidationErrors);
         return either.Left;
     }
-    
+
     public static ActionResult AssertBadRequestWithErrorViewModels<TRight>(this Either<ActionResult, TRight> either,
         List<ErrorViewModel> expectedErrorViewModels)
     {
@@ -90,7 +90,7 @@ public static class EitherTestExtensions
 
     public static ValidationProblemViewModel AssertBadRequestWithValidationProblem<TRight>(this Either<ActionResult, TRight> either)
     {
-        var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>(); 
+        var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
         return Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
     }
 

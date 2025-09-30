@@ -239,9 +239,9 @@ public class PublicationService : IPublicationService
         await _contentDbContext.Publications
             .Include(p => p.LatestPublishedReleaseVersion)
             .ThenInclude(rv => rv!.Release)
-            .Where(p => 
+            .Where(p =>
                 // Is published
-                p.LatestPublishedReleaseVersionId.HasValue 
+                p.LatestPublishedReleaseVersionId.HasValue
                 // Is not superseded/archived
                 && (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
             .If(!themeId.IsBlank())

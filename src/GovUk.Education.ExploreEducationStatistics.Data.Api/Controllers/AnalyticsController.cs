@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 [Route("api")]
 [ApiController]
 public class AnalyticsController(
-    IAnalyticsManager analyticsManager) 
+    IAnalyticsManager analyticsManager)
     : ControllerBase
 {
     /// <summary>
@@ -30,7 +30,7 @@ public class AnalyticsController(
         await analyticsManager.Add(callCapture, cancellationToken);
         return new AcceptedResult();
     }
-    
+
     /// <summary>
     /// A user can download the data in the table on a permaLink page.
     /// This action is implemented entirely in the front end.

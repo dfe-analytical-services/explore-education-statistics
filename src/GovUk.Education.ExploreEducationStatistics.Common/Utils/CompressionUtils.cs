@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.IO.Compression;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -78,17 +78,17 @@ public static class CompressionUtils
         switch (contentEncoding)
         {
             case ContentEncodings.Gzip:
-            {
-                await using var decompressor = new GZipStream(stream, CompressionMode.Decompress);
-                await decompressor.CopyToAsync(targetStream, cancellationToken);
-                break;
-            }
+                {
+                    await using var decompressor = new GZipStream(stream, CompressionMode.Decompress);
+                    await decompressor.CopyToAsync(targetStream, cancellationToken);
+                    break;
+                }
             case ContentEncodings.Zstd:
-            {
-                await using var decompressor = new DecompressionStream(stream);
-                await decompressor.CopyToAsync(targetStream, cancellationToken);
-                break;
-            }
+                {
+                    await using var decompressor = new DecompressionStream(stream);
+                    await decompressor.CopyToAsync(targetStream, cancellationToken);
+                    break;
+                }
             default:
                 throw new NotSupportedException($"Content encoding {contentEncoding} is not supported");
         }
@@ -104,17 +104,17 @@ public static class CompressionUtils
         switch (contentEncoding)
         {
             case ContentEncodings.Gzip:
-            {
-                await using var stream = new MemoryStream(bytes);
-                await using var targetStream = new MemoryStream();
-                await DecompressToStream(stream, targetStream, contentEncoding, cancellationToken);
-                return targetStream.ReadToEnd();
-            }
+                {
+                    await using var stream = new MemoryStream(bytes);
+                    await using var targetStream = new MemoryStream();
+                    await DecompressToStream(stream, targetStream, contentEncoding, cancellationToken);
+                    return targetStream.ReadToEnd();
+                }
             case ContentEncodings.Zstd:
-            {
-                using var decompressor = new Decompressor();
-                return Encoding.UTF8.GetString(decompressor.Unwrap(bytes));
-            }
+                {
+                    using var decompressor = new Decompressor();
+                    return Encoding.UTF8.GetString(decompressor.Unwrap(bytes));
+                }
             default:
                 throw new NotSupportedException($"Content encoding {contentEncoding} is not supported");
         }

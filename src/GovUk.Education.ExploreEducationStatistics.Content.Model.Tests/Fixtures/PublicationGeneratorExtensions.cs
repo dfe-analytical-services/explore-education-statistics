@@ -311,7 +311,7 @@ public static class PublicationGeneratorExtensions
 
     public static ConditionalGeneratorDeclaration If(this Generator<Publication> generator, bool condition) =>
         new(condition, generator);
-        
+
 
     public class ConditionalGeneratorDeclaration(bool condition, Generator<Publication> generator)
     {

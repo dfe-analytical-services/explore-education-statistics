@@ -34,8 +34,7 @@ public class ThemeControllerTests
     {
         var themes = new List<ThemeViewModel>
         {
-            new ThemeViewModel
-            {
+            new() {
                 Title = "Theme A",
             }
         };

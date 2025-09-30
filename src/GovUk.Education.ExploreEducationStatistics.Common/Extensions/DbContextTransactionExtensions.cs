@@ -106,7 +106,7 @@ public static class DbContextTransactionExtensions
     {
         return new(
             scopeOption: transactionScopeOption,
-            transactionOptions: new TransactionOptions {IsolationLevel = isolationLevel},
+            transactionOptions: new TransactionOptions { IsolationLevel = isolationLevel },
             asyncFlowOption: TransactionScopeAsyncFlowOption.Enabled);
     }
 }

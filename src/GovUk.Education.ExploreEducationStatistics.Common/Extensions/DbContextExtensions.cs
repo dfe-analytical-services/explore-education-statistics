@@ -87,7 +87,7 @@ public static class DbContextExtensions
     public static DbSet<TEntity> TempTableSet<TEntity>(this DbContext dbContext) where TEntity : class
     {
         return dbContext.Set<TEntity>(EntityNameProvider.GetTempTableName(typeof(TEntity)));
-    } 
+    }
 
     private static string GetDisplayString(this DbContext context, object entity)
     {

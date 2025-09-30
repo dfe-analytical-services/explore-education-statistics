@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 

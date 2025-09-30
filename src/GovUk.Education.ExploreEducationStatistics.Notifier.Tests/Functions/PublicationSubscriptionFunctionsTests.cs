@@ -405,9 +405,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionConfirmationEmail()
     {
-                var notifierTableStorageService = new NotifierTableStorageService(
-            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
-        );
+        var notifierTableStorageService = new NotifierTableStorageService(
+    new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+);
 
         // Arrange (data)
         var publicationId = Guid.NewGuid();

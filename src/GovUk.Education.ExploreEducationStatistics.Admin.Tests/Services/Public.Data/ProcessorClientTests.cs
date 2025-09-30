@@ -23,7 +23,7 @@ public class ProcessorClientTests
     {
         _mockHttp = new MockHttpMessageHandler();
     }
-    
+
     public class AuthenticationTests : ProcessorClientTests
     {
         private static readonly Uri Uri = new(BaseUri, "api/CreateDataSet");
@@ -48,13 +48,13 @@ public class ProcessorClientTests
                 .Setup(m =>
                     m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            
+
             var processorClient = BuildService(
                 azureAuthenticationManager: authenticationManager.Object);
-            
+
             var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
-            authenticationManager.Verify(m => 
+            authenticationManager.Verify(m =>
                 m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()), Times.Once);
 
             response.AssertRight();
@@ -79,7 +79,7 @@ public class ProcessorClientTests
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseBody));
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -100,14 +100,15 @@ public class ProcessorClientTests
                     {
                         Errors =
                         [
-                            new() {
-                               Code = Errors.Error1.ToString()
+                            new()
+                            {
+                                Code = Errors.Error1.ToString()
                             }
                         ]
                     }));
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -133,7 +134,7 @@ public class ProcessorClientTests
                 .Respond(responseStatusCode);
 
             var processorClient = BuildService();
-            
+
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await processorClient.CreateDataSet(releaseFileId: Guid.NewGuid());
@@ -156,7 +157,7 @@ public class ProcessorClientTests
                 .Respond(HttpStatusCode.NoContent);
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -176,14 +177,15 @@ public class ProcessorClientTests
                     {
                         Errors =
                         [
-                            new() {
-                               Code = Errors.Error1.ToString()
+                            new()
+                            {
+                                Code = Errors.Error1.ToString()
                             }
                         ]
                     }));
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -191,7 +193,7 @@ public class ProcessorClientTests
             var left = response.AssertLeft();
             left.AssertValidationProblem(Errors.Error1);
         }
-        
+
         [Fact]
         public async Task HttpClientNotFound_ReturnsNotFound()
         {
@@ -201,7 +203,7 @@ public class ProcessorClientTests
                 .Respond(HttpStatusCode.NotFound);
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.DeleteDataSetVersion(dataSetVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -228,7 +230,7 @@ public class ProcessorClientTests
                 .Respond(responseStatusCode);
 
             var processorClient = BuildService();
-            
+
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await processorClient.DeleteDataSetVersion(dataSetVersionId);
@@ -251,7 +253,7 @@ public class ProcessorClientTests
                 .Respond(HttpStatusCode.NoContent);
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -271,14 +273,15 @@ public class ProcessorClientTests
                     {
                         Errors =
                         [
-                            new() {
-                               Code = Errors.Error1.ToString()
+                            new()
+                            {
+                                Code = Errors.Error1.ToString()
                             }
                         ]
                     }));
 
             var processorClient = BuildService();
-            
+
             var response = await processorClient.BulkDeleteDataSetVersions(releaseVersionId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
@@ -306,7 +309,7 @@ public class ProcessorClientTests
                 .Respond(responseStatusCode);
 
             var processorClient = BuildService();
-            
+
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await processorClient.BulkDeleteDataSetVersions(releaseVersionId);

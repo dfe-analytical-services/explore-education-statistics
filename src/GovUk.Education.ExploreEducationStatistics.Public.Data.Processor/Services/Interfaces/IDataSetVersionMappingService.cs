@@ -11,7 +11,7 @@ public interface IDataSetVersionMappingService
         Guid nextDataSetVersionId,
         Guid? dataSetVersionToReplace,
         CancellationToken cancellationToken = default);
-    
+
     Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(
         NextDataSetVersionCompleteImportRequest request,
         CancellationToken cancellationToken = default);

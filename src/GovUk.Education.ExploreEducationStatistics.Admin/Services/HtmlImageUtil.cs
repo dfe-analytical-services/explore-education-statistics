@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using HtmlAgilityPack;
 
@@ -50,7 +50,7 @@ public static class HtmlImageUtil
     private static List<Guid> ParseIdsAsGuids(IEnumerable<string> ids)
     {
         return ids
-            .Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?) null)
+            .Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?)null)
             .Where(id => id.HasValue)
             .Select(id => id.Value)
             .ToList();

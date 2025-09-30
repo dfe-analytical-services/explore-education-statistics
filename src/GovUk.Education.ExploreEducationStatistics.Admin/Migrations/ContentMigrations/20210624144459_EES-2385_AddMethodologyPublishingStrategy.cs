@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
@@ -15,7 +15,7 @@ public partial class EES2385_AddMethodologyPublishingStrategy : Migration
             defaultValue: "");
 
         // Set all existing Methodologies to have Immediately as their publishing strategy
-        migrationBuilder.Sql($"Update Methodologies SET PublishingStrategy='{Immediately.ToString()}'");
+        migrationBuilder.Sql($"Update Methodologies SET PublishingStrategy='{Immediately}'");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

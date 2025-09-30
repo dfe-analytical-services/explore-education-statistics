@@ -29,7 +29,7 @@ public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> whe
         {
             throw new ArgumentOutOfRangeException($"{nameof(label)} cannot be null");
         }
-        
+
         if (Lookup.TryGetValue(label.ToLower(), out var enumValue))
         {
             return enumValue;

@@ -53,7 +53,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
                 dataSet.LatestDraftVersionId = dataSetVersion.Id;
             });
-            
+
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
             Directory.CreateDirectory(draftFolderPath);
@@ -80,7 +80,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             // Data set should be published at the same time as the latest live version
             Assert.Equal(publishedDataSet.LatestLiveVersion.Published, publishedDataSet.Published);
-            
+
             // The Public API folder for the data set version should be updated to reflect its
             // version number at the time of publishing.
             var versionedFolderPath = dataSetVersionPathResolver.DirectoryPath(publishedDataSet.LatestLiveVersion);
@@ -127,7 +127,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 dataSet.LatestLiveVersionId = dataSetVersions[0].Id;
                 dataSet.LatestDraftVersionId = dataSetVersions[1].Id;
             });
-            
+
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersions[1]);
             Directory.CreateDirectory(draftFolderPath);
@@ -159,7 +159,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.Equal(2, publishedDataSet.Versions.Count);
             publishedDataSet.Versions.ForEach(version =>
                 Assert.Equal(DataSetVersionStatus.Published, version.Status));
-            
+
             // The Public API folder for the data set version should be updated to reflect its
             // version number at the time of publishing.
             var versionedFolderPath = dataSetVersionPathResolver.DirectoryPath(publishedDataSet.LatestLiveVersion);
@@ -352,11 +352,11 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(newReleaseDataFile.Id))
                 .WithVersionNumber(
-                    major: amendmentResultedInPatchReplacement ? 1 : 2, 
-                    minor: 0, 
+                    major: amendmentResultedInPatchReplacement ? 1 : 2,
+                    minor: 0,
                     patch: amendmentResultedInPatchReplacement ? 1 : 0)
                 .WithStatusDraft();
-            
+
             await AddTestData<ContentDbContext>(context =>
                 context.ReleaseFiles.AddRange(originalReleaseDataFile, amendmentReleaseDataFile, newReleaseDataFile));
 
@@ -371,7 +371,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 dataSet.LatestLiveVersionId = dataSetVersion1.Id;
                 dataSet.LatestDraftVersionId = dataSetVersion2.Id;
             });
-            
+
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion2);
             Directory.CreateDirectory(draftFolderPath);

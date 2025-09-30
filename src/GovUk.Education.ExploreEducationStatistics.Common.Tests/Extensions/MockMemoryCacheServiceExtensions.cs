@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -25,7 +25,7 @@ public static class MockMemoryCacheServiceExtensions
     {
         return service
             .Setup(s => s.GetItem(It.IsAny<TCacheKey>(), typeof(TItem)))
-            .Returns((object?) null);
+            .Returns((object?)null);
     }
 
     public static ISetup<IMemoryCacheService> SetupSetItemForAnyKey<TCacheKey, TItem>(

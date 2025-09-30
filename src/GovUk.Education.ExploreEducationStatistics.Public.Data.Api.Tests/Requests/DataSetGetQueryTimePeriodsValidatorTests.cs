@@ -114,7 +114,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods
             {
-                In = [..timePeriods.Select(t => t.ToTimePeriodString())]
+                In = [.. timePeriods.Select(t => t.ToTimePeriodString())]
             };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
@@ -150,7 +150,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         {
             var query = new DataSetGetQueryTimePeriods
             {
-                In = [..timePeriods.Select(t => t.ToTimePeriodString())]
+                In = [.. timePeriods.Select(t => t.ToTimePeriodString())]
             };
 
             var result = _validator.TestValidate(query);
@@ -167,7 +167,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
         [MemberData(nameof(ValidTimePeriodQueriesMultiple))]
         public void Success(DataSetQueryTimePeriod[] timePeriods)
         {
-            var query = new DataSetGetQueryTimePeriods { NotIn = [..timePeriods.Select(t => t.ToTimePeriodString())] };
+            var query = new DataSetGetQueryTimePeriods { NotIn = [.. timePeriods.Select(t => t.ToTimePeriodString())] };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
@@ -195,12 +195,12 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
 
             timePeriods.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"NotIn[{index}]"));
         }
-        
+
         [Theory]
         [MemberData(nameof(InvalidTimePeriodQueriesMultiple))]
         public void Failure_InvalidQueries(DataSetQueryTimePeriod[] timePeriods)
         {
-            var query = new DataSetGetQueryTimePeriods { NotIn = [..timePeriods.Select(t => t.ToTimePeriodString())] };
+            var query = new DataSetGetQueryTimePeriods { NotIn = [.. timePeriods.Select(t => t.ToTimePeriodString())] };
 
             var result = _validator.TestValidate(query);
 

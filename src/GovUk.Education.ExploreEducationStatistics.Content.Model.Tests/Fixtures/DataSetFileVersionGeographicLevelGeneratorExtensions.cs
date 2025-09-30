@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;

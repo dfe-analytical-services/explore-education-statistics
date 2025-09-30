@@ -207,10 +207,10 @@ public class SubjectCsvMetaServiceTests
             var viewModelLocations = viewModel.Locations;
 
             Assert.Equal(4, viewModelLocations.Count);
-            Assert.Equal(locations[0].GetCsvValues(),viewModelLocations[locations[0].Id]);
-            Assert.Equal(locations[1].GetCsvValues(),viewModelLocations[locations[1].Id]);
-            Assert.Equal(locations[2].GetCsvValues(),viewModelLocations[locations[2].Id]);
-            Assert.Equal(locations[3].GetCsvValues(),viewModelLocations[locations[3].Id]);
+            Assert.Equal(locations[0].GetCsvValues(), viewModelLocations[locations[0].Id]);
+            Assert.Equal(locations[1].GetCsvValues(), viewModelLocations[locations[1].Id]);
+            Assert.Equal(locations[2].GetCsvValues(), viewModelLocations[locations[2].Id]);
+            Assert.Equal(locations[3].GetCsvValues(), viewModelLocations[locations[3].Id]);
         }
     }
 

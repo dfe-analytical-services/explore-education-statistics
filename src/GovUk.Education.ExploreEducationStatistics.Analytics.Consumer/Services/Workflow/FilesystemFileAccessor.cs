@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
+namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
 
 /// <summary>
 /// This default implementation of <see cref="IFileAccessor"/> interacts
@@ -28,7 +28,7 @@ internal class FilesystemFileAccessor : IFileAccessor
             .GetFiles(directory)
             .Select(Path.GetFileName)
             .OfType<string>()
-            .ToList(); 
+            .ToList();
     }
 
     public void Move(string sourcePath, string destinationPath)

@@ -1,4 +1,4 @@
-﻿using CliFx;
+using CliFx;
 
 await new CliApplicationBuilder()
     .AddCommandsFromThisAssembly()

@@ -45,7 +45,7 @@ public class DeleteSpecificMethodologyAuthorizationHandler
 
         var owningPublication =
             await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-        
+
         if (await _authorizationHandlerService
                 .HasRolesOnPublication(
                     context.User.GetUserId(),

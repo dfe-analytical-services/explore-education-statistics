@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Se
 
 public class ContentDbContextMockBuilder
 {
-    private readonly string _dbContextId = Guid.NewGuid().ToString(); 
+    private readonly string _dbContextId = Guid.NewGuid().ToString();
     private ContentDbContext _inMemoryContentDbContext;
 
     public ContentDbContextMockBuilder()
@@ -16,7 +16,7 @@ public class ContentDbContextMockBuilder
         _inMemoryContentDbContext = ContentDbUtils.InMemoryContentDbContext(_dbContextId);
     }
     public Asserter Assert => new(_inMemoryContentDbContext);
-    
+
     /// <summary>
     /// Note: It is intended that this method is called during the creation of the SUT, at the last moment
     /// before the ACT phase. This is because the in-memory db context that was created for the ARRANGE phase
@@ -28,7 +28,7 @@ public class ContentDbContextMockBuilder
     {
         // Dispose of the ARRANGE db context
         _inMemoryContentDbContext.Dispose();
-        
+
         // Create a new db context for the ACT and ASSERT phase.
         _inMemoryContentDbContext = ContentDbUtils.InMemoryContentDbContext(_dbContextId);
         return _inMemoryContentDbContext;
@@ -67,12 +67,12 @@ public class ContentDbContextMockBuilder
         var publication = _inMemoryContentDbContext.Publications.SingleOrDefault(p => p.Id == publicationId);
         if (publication == null)
             Xunit.Assert.Fail($"No publication was found with id {publicationId}");
-        
+
         modifier(publication);
         _inMemoryContentDbContext.SaveChanges();
         return this;
     }
-    
+
     public class Asserter(ContentDbContext contentDbContext)
     {
         public void PublicationsLatestPublishedReleaseVersionIdIs(Guid publicationId, Guid expectedLatestPublishedReleaseVersionId)
@@ -80,7 +80,7 @@ public class ContentDbContextMockBuilder
             var publication = contentDbContext.Publications.SingleOrDefault(p => p.Id == publicationId);
             if (publication == null)
                 Xunit.Assert.Fail($"No publication was found with id {publicationId}");
-            
+
             Xunit.Assert.Equal(expectedLatestPublishedReleaseVersionId, publication.LatestPublishedReleaseVersionId);
         }
     }

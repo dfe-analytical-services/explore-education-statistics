@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
 public enum DataSetsListRequestSortBy
 {

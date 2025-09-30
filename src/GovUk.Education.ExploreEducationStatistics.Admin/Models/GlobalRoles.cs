@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -15,14 +15,14 @@ public static class GlobalRoles
         [EnumLabelValue(RoleNames.PrereleaseUser, "17e634f4-7a2b-4a23-8636-b079877b4232")]
         PrereleaseUser
     }
-    
+
     public static class RoleNames
     {
         public const string Analyst = "Analyst";
         public const string BauUser = "BAU User";
         public const string PrereleaseUser = "Prerelease User";
     }
-    
+
     public static List<string> GlobalRolePrecedenceOrder = new()
     {
         RoleNames.PrereleaseUser,

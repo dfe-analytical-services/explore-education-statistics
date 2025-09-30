@@ -137,10 +137,7 @@ public static class MockUtils
                 // VerifyNoOtherCalls() method on it, so we need to look it up with reflection.
                 var verifyNoOtherCallsMethod = mock.GetType().GetMethod("VerifyNoOtherCalls", Type.EmptyTypes);
 
-                if (verifyNoOtherCallsMethod != null)
-                {
-                    verifyNoOtherCallsMethod.Invoke(mock, null);
-                }
+                verifyNoOtherCallsMethod?.Invoke(mock, null);
             });
     }
 

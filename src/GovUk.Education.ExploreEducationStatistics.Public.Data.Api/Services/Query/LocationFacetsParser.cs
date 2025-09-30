@@ -61,7 +61,7 @@ internal class LocationFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    locations: [..facets.Locations.In],
+                    locations: [.. facets.Locations.In],
                     path: QueryUtils.Path(path, "locations.in")
                 )
             );
@@ -71,7 +71,7 @@ internal class LocationFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    locations: [..facets.Locations.NotIn],
+                    locations: [.. facets.Locations.NotIn],
                     path: QueryUtils.Path(path, "locations.notIn"),
                     negate: true
                 )
@@ -125,7 +125,7 @@ internal class LocationFacetsParser : IFacetsParser
 
             notFoundLocations.Add(location);
         }
-        
+
         if (notFoundLocations.Count != 0)
         {
             _queryState.Warnings.Add(CreateNotFoundWarning(notFoundLocations, path));

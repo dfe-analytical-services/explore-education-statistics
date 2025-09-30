@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 public class ChartLegend
 {
     public ChartLegendPosition? Position;
-    public List<ChartLegendItem> Items = new List<ChartLegendItem>();
+    public List<ChartLegendItem> Items = new();
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]

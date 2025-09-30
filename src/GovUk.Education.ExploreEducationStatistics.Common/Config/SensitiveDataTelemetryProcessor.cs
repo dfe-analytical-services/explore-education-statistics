@@ -53,26 +53,26 @@ public class SensitiveDataTelemetryProcessor : ITelemetryProcessor
         switch (item)
         {
             case RequestTelemetry telemetry:
-            {
-                telemetry.Url = FilterUrl(telemetry.Url);
-                break;
-            }
-            case PageViewTelemetry telemetry:
-            {
-                telemetry.Url = FilterUrl(telemetry.Url);
-
-                if (telemetry.Properties.ContainsKey("refUri"))
                 {
-                    telemetry.Properties["refUri"] = FilterUriQuery(telemetry.Properties["refUri"]);
+                    telemetry.Url = FilterUrl(telemetry.Url);
+                    break;
                 }
+            case PageViewTelemetry telemetry:
+                {
+                    telemetry.Url = FilterUrl(telemetry.Url);
 
-                break;
-            }
+                    if (telemetry.Properties.ContainsKey("refUri"))
+                    {
+                        telemetry.Properties["refUri"] = FilterUriQuery(telemetry.Properties["refUri"]);
+                    }
+
+                    break;
+                }
             case DependencyTelemetry telemetry:
-            {
-                HandleDependencyTelemetry(telemetry);
-                break;
-            }
+                {
+                    HandleDependencyTelemetry(telemetry);
+                    break;
+                }
         }
 
         Next.Process(item);

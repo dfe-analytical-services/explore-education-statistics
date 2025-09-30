@@ -56,7 +56,7 @@ public class FrontendService : IFrontendService
 
         _logger.LogError(
             "Frontend responded with error status code {StatusCode}. Body: {Body}",
-            (int) response.StatusCode,
+            (int)response.StatusCode,
             await response.Content.ReadAsStringAsync(cancellationToken));
 
         // To avoid potentially leaking the frontend endpoint's implementation details to the client,

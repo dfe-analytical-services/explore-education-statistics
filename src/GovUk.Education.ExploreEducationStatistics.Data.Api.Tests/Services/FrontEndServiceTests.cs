@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Net;
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;

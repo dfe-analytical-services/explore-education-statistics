@@ -45,16 +45,16 @@ public class EinContentSectionViewModel
 
     public static EinContentSectionViewModel FromModel(EinContentSection section)
     {
-            return new EinContentSectionViewModel
-            {
-                Id = section.Id,
-                Order = section.Order,
-                Heading = section.Heading,
-                Content = section.Content
-                    .Select(EinContentBlockViewModel.FromModel)
-                    .OrderBy(block => block.Order)
-                    .ToList(),
-            };
+        return new EinContentSectionViewModel
+        {
+            Id = section.Id,
+            Order = section.Order,
+            Heading = section.Heading,
+            Content = section.Content
+                .Select(EinContentBlockViewModel.FromModel)
+                .OrderBy(block => block.Order)
+                .ToList(),
+        };
     }
 }
 
@@ -123,7 +123,7 @@ public class EinTileViewModel
 
     [JsonConverter(typeof(StringEnumConverter))]
     public EinTileType Type { get; set; }
-    
+
     public static EinTileViewModel FromModel(EinTile tile)
     {
         return tile switch
@@ -146,14 +146,14 @@ public class EinFreeTextStatTileViewModel : EinTileViewModel
     {
         return new EinFreeTextStatTileViewModel
         {
-                Id = statTile.Id,
-                Order = statTile.Order,
-                Type = EinTileType.FreeTextStatTile,
-                Title = statTile.Title,
-                Statistic = statTile.Statistic,
-                Trend = statTile.Trend,
-                LinkUrl = statTile.LinkUrl,
-                LinkText = statTile.LinkText,
+            Id = statTile.Id,
+            Order = statTile.Order,
+            Type = EinTileType.FreeTextStatTile,
+            Title = statTile.Title,
+            Statistic = statTile.Statistic,
+            Trend = statTile.Trend,
+            LinkUrl = statTile.LinkUrl,
+            LinkText = statTile.LinkText,
         };
     }
 }

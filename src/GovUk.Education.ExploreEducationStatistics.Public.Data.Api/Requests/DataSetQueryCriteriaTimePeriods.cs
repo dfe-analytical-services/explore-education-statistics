@@ -61,8 +61,8 @@ public record DataSetQueryCriteriaTimePeriods
             Gte,
             Lt,
             Lte,
-            ..In ?? [],
-            ..NotIn ?? []
+            .. In ?? [],
+            .. NotIn ?? []
         ];
 
         return timePeriods

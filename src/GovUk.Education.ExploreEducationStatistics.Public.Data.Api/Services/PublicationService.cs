@@ -27,9 +27,9 @@ internal class PublicationService(
             GetPublishedDataSetPublicationIds(cancellationToken)
             .OnSuccess(async publicationIds =>
                 await contentApiClient.ListPublications(
-                    page: page, 
-                    pageSize: pageSize, 
-                    search:search, 
+                    page: page,
+                    pageSize: pageSize,
+                    search: search,
                     publicationIds: publicationIds,
                     cancellationToken: cancellationToken))
             .OnSuccess(paginatedPublications =>
@@ -63,7 +63,7 @@ internal class PublicationService(
             .OnSuccess(async _ => await contentApiClient.GetPublication(publicationId, cancellationToken))
             .OnSuccess(publication => new PublicationSummaryViewModel
             {
-                Id  = publication.Id,
+                Id = publication.Id,
                 Title = publication.Title,
                 Slug = publication.Slug,
                 Summary = publication.Summary,

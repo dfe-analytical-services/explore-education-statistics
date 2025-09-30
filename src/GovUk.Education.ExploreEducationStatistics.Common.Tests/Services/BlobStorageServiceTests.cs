@@ -174,21 +174,21 @@ public class BlobStorageServiceTests
 
         result.AssertNotFound();
     }
-    
+
     [Fact]
     public async Task GetBlobDownloadToken_Success()
     {
         const string filename = "test.pdf";
         const string path = "path/to/test.pdf";
         var container = PublicReleaseFiles;
-        
+
         var tokenCreated = new BlobDownloadToken(
             Token: "a-token",
             ContainerName: container.Name,
             Path: path,
             Filename: filename,
             ContentType: MediaTypeNames.Text.Csv);
-        
+
         var blobServiceClient = MockBlobServiceClient();
 
         var blobSasService = new Mock<IBlobSasService>(Strict);
@@ -202,7 +202,7 @@ public class BlobStorageServiceTests
                 TimeSpan.FromMinutes(5),
                 default))
             .ReturnsAsync(tokenCreated);
-        
+
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
             blobSasService: blobSasService.Object);
@@ -214,12 +214,12 @@ public class BlobStorageServiceTests
             cancellationToken: default);
 
         var tokenReturned = result.AssertRight();
-        
+
         blobSasService.Verify();
-     
+
         Assert.Same(tokenCreated, tokenReturned);
     }
-    
+
     [Fact]
     public async Task StreamWithToken_Success()
     {
@@ -247,9 +247,9 @@ public class BlobStorageServiceTests
                 blobServiceClient.Object,
                 token))
             .ReturnsAsync(secureClient.Object);
-        
+
         secureClient.SetupGetDownloadStreamAsync(content: "Test content");
-        
+
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
             blobSasService: blobSasService.Object);
@@ -259,12 +259,12 @@ public class BlobStorageServiceTests
             cancellationToken: default);
 
         var fileStreamResult = result.AssertRight();
-        
+
         Assert.Equal("Test content", fileStreamResult.FileStream.ReadToEnd());
         Assert.Equal(token.Filename, fileStreamResult.FileDownloadName);
         Assert.Equal(token.ContentType, fileStreamResult.ContentType);
     }
-    
+
     [Fact]
     public async Task GetDeserializedJson()
     {

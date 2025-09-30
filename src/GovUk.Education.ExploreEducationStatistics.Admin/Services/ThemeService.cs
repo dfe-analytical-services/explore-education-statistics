@@ -119,7 +119,7 @@ public class ThemeService : IThemeService
                     await _publishingService.TaxonomyChanged();
 
                     await InvalidatePublicationsCacheByTheme(theme.Id);
-                    
+
                     await _eventRaiser.OnThemeUpdated(theme);
 
                     return await GetTheme(theme.Id);
@@ -133,7 +133,7 @@ public class ThemeService : IThemeService
             .Where(p => p.ThemeId == themeId)
             .Select(p => p.Slug)
             .ToListAsync();
-            
+
         await themePublicationsSlugs
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(InvalidatePublicationCacheSafe);

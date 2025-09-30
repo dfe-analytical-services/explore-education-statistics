@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -14,11 +14,11 @@ public class ReleaseCacheServiceMockBuilder
         _mock
             .Setup(m => m.UpdateRelease(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string?>()))
             .ReturnsAsync((Guid releaseVersionId, string _, string _) => new ReleaseCacheViewModel(releaseVersionId));
-        
+
         _mock
             .Setup(m => m.RemoveRelease(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(() => Unit.Instance);
-        
+
         return _mock.Object;
     }
 }

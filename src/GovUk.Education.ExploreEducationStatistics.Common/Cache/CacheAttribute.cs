@@ -44,7 +44,7 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
     /// </para>
     /// </summary>
     public Type Key { get; }
-    
+
     /// <summary>
     /// Flag signifying that this caching attribute forces a cache update.
     /// When an attribute with this flag set is invoked, it will retrieve a fresh
@@ -333,7 +333,7 @@ public abstract class CacheAttribute : BaseUniversalWrapperAttribute
     {
         return MatchConstructorToParams(
             constructorParams,
-            constructorParam =>  cacheKeyParams
+            constructorParam => cacheKeyParams
                 .Where(param => constructorParam.ParameterType.IsAssignableFrom(param.Info.ParameterType))
                 .Select(param => ScoreCacheKeyParam(param, constructorParam))
                 .OrderByDescending(param => param.Score)

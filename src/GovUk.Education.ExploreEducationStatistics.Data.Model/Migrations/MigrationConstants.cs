@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
 
 internal static class MigrationConstants
 {

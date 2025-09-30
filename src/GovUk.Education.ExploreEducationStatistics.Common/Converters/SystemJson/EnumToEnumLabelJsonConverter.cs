@@ -10,13 +10,7 @@ public class EnumToEnumLabelJsonConverter<TEnum> : JsonConverter<TEnum> where TE
 {
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var label = reader.GetString();
-
-        if (label is null)
-        {
-            throw new NullReferenceException("Enum label cannot be null");
-        }
-
+        var label = reader.GetString() ?? throw new NullReferenceException("Enum label cannot be null");
         return EnumUtil.GetFromEnumLabel<TEnum>(label);
     }
 

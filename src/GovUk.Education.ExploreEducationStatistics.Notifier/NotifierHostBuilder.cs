@@ -70,7 +70,7 @@ public static class NotifierHostBuilder
                     .AddTransient<ISubscriptionRepository, SubscriptionRepository>()
                     .AddTransient<IApiSubscriptionService, ApiSubscriptionService>()
                     .AddTransient<ITokenService, TokenService>();
-                
+
                 if (appOptions.GetValue<bool>(nameof(AppOptions.EmailEnabled)))
                 {
                     services.AddTransient<IEmailService, EmailService>();

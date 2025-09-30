@@ -20,7 +20,7 @@ public class PublicDataApiClientTests
     {
         _mockHttp = new MockHttpMessageHandler();
     }
-    
+
     public class AuthenticationTests : PublicDataApiClientTests
     {
         [Fact]
@@ -30,9 +30,9 @@ public class PublicDataApiClientTests
 
             var dataSetId = Guid.NewGuid();
             var dataSetVersion = "1.1";
-            
+
             var uri = new Uri(BaseUri, $"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes");
-            
+
             _mockHttp
                 .Expect(HttpMethod.Get, uri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonConvert.SerializeObject(responseMessage));
@@ -44,15 +44,15 @@ public class PublicDataApiClientTests
                 .Setup(m =>
                     m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            
+
             var publicDataApiClient = BuildService(
                 azureAuthenticationManager: authenticationManager.Object);
-            
+
             await publicDataApiClient.GetDataSetVersionChanges(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion);
 
-            authenticationManager.Verify(m => 
+            authenticationManager.Verify(m =>
                 m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
@@ -64,23 +64,23 @@ public class PublicDataApiClientTests
         {
             var dataSetId = Guid.NewGuid();
             var dataSetVersion = "1.1";
-            
+
             var uri = new Uri(BaseUri, $"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes");
-            
+
             _mockHttp
                 .Expect(HttpMethod.Get, uri.AbsoluteUri)
                 .Respond(HttpStatusCode.OK, "application/json", "Response text");
 
             var publicDataApiClient = BuildService();
-            
+
             var response = await publicDataApiClient.GetDataSetVersionChanges(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion);
-            
+
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var result = response.AssertRight();
-            
+
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Equal("Response text", await result.Content.ReadAsStringAsync());
         }

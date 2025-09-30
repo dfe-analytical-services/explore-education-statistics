@@ -8,7 +8,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class ManagePublicationReleaseSeriesRequirement : IAuthorizationRequirement
-{}
+{ }
 
 public class ManagePublicationReleaseSeriesAuthorizationHandler
     : AuthorizationHandler<ManagePublicationReleaseSeriesRequirement, Publication>

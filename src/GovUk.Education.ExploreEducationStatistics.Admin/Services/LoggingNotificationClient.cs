@@ -22,7 +22,7 @@ public class LoggingNotificationClient : INotificationClient
     {
         return new EmailNotificationResponse();
     }
-    
+
     public Task<string> GET(string url)
     {
         throw new NotImplementedException();

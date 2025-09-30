@@ -2148,7 +2148,7 @@ public class ReleaseFileServiceTests : IDisposable
                 path: releaseFile1.Path(),
                 content: "Test ancillary blob",
                 cancellationToken: tokenSource.Token);
-        
+
         // After the first file has completed, we cancel the request
         // to prevent the next file from being fetched.
         privateBlobStorageService

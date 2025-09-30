@@ -65,12 +65,13 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
                 filter: null, // overload disambiguation
                 select: new List<string>() { nameof(TableEntity.PartitionKey), nameof(TableEntity.RowKey) });
 
-            await entities.AsPages().ForEachAwaitAsync(async page => {
+            await entities.AsPages().ForEachAwaitAsync(async page =>
+            {
                 // Since we don't know how many rows the table has and the results are ordered by PartitonKey+RowKey
                 // we'll delete each page immediately and not cache the whole table in memory
                 await dataTableStorageService.BatchManipulateEntities(
-                    tableName: table.Name, 
-                    entities: page.Values, 
+                    tableName: table.Name,
+                    entities: page.Values,
                     tableTransactionActionType: TableTransactionActionType.Delete);
             });
         }

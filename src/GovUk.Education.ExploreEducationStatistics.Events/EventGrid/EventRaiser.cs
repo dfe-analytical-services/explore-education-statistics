@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
+namespace GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
 /// <summary>
 /// IEventRaiser responsibility is to request the client appropriately configured to the event being raised
@@ -16,7 +16,7 @@ public class EventRaiser(IConfiguredEventGridClientFactory eventGridClientFactor
         {
             return;
         }
-        
+
         await client.SendEventAsync(eventBuilder.ToEventGridEvent(), cancellationToken);
     }
 

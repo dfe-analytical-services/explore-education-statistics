@@ -80,11 +80,11 @@ public class LocationTests
     {
         // Test a scenario where hierarchies are defined but none are relevant to the Subject data
         var locations = ListOf(new Location
-            {
-                Id = Guid.NewGuid(),
-                Country = _england,
-                GeographicLevel = GeographicLevel.Country
-            },
+        {
+            Id = Guid.NewGuid(),
+            Country = _england,
+            GeographicLevel = GeographicLevel.Country
+        },
             new Location
             {
                 Id = Guid.NewGuid(),
@@ -249,7 +249,7 @@ public class LocationTests
         Assert.Single(localAuthorities[0].Children);
 
         // Region attribute at depth 2 is empty as not defined for any of the LA data
-        Assert.Equal(new Region( null, null), localAuthorities[0].Children[0].Attribute);
+        Assert.Equal(new Region(null, null), localAuthorities[0].Children[0].Attribute);
         Assert.Null(localAuthorities[0].Children[0].LocationId);
         Assert.Equal(2, localAuthorities[0].Children[0].Children.Count);
 

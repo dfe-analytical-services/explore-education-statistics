@@ -55,18 +55,18 @@ public class CommonAnalyticsWriteStrategyWorkflow<TAnalyticsRequest>(
     }
 }
 
-public interface IWorkflowActor<TAnalyticsRequest> 
+public interface IWorkflowActor<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     string GetAnalyticsPath();
-    
+
     string GetFilenamePart(TAnalyticsRequest request);
-    
+
     TAnalyticsRequest PrepareForSerialisation(TAnalyticsRequest originalRequest);
 }
 
-public abstract class WorkflowActorBase<TAnalyticsRequest>(string analyticsPath) 
-    : IWorkflowActor<TAnalyticsRequest> 
+public abstract class WorkflowActorBase<TAnalyticsRequest>(string analyticsPath)
+    : IWorkflowActor<TAnalyticsRequest>
     where TAnalyticsRequest : IAnalyticsCaptureRequest
 {
     public string GetAnalyticsPath()

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Writers;
 using Microsoft.Extensions.Configuration;
