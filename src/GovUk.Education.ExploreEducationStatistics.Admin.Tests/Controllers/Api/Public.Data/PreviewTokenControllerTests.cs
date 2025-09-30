@@ -308,7 +308,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 Status = PreviewTokenStatus.Active,
                 Created = previewToken.Created,
                 CreatedByEmail = CreatedByBauUser.Email,
-                Expiry = previewToken.Expiry,
+                Expiry = previewToken.Expires,
                 Updated = previewToken.Updated
             };
 

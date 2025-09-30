@@ -78,7 +78,7 @@ public static class PreviewTokenGeneratorExtensions
     public static InstanceSetters<PreviewToken> SetExpiry(
         this InstanceSetters<PreviewToken> instanceSetter,
         DateTimeOffset expiry)
-        => instanceSetter.Set(pt => pt.Expiry, expiry);
+        => instanceSetter.Set(pt => pt.Expires, expiry);
 
     public static InstanceSetters<PreviewToken> SetLabel(
         this InstanceSetters<PreviewToken> instanceSetter,
