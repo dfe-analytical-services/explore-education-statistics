@@ -49,7 +49,7 @@ public static class UserGeneratorExtensions
             .SetDefault(p => p.Id)
             .SetDefault(p => p.FirstName)
             .SetDefault(p => p.LastName)
-            .SetDefault(p => p.Email)
+            .Set(p => p.Email, f => f.Internet.Email())
             .Set(p => p.Active, true)
             .SetDefault(p => p.RoleId)
             .Set(u => u.Created, f => f.Date.Past())
