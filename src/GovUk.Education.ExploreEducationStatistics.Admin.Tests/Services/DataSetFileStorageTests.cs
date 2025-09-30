@@ -39,11 +39,9 @@ public class DataSetFileStorageTests
 {
     private readonly DataFixture _fixture = new();
 
-    private readonly User _user = new()
-    {
-        Id = Guid.NewGuid(),
-        Email = "test@test.com"
-    };
+    private readonly User _user = new DataFixture()
+        .DefaultUser()
+        .WithId(Guid.NewGuid());
 
     [Fact]
     public async Task UploadDataSet_ReturnsUploadSummary()
@@ -190,7 +188,7 @@ public class DataSetFileStorageTests
             Assert.Equal(123, uploadSummary.Rows);
             Assert.Equal("466 Kb", uploadSummary.Size);
             uploadSummary.Created.AssertUtcNow();
-            Assert.Equal("test@test.com", uploadSummary.UserName);
+            Assert.Equal(_user.Email, uploadSummary.UserName);
             Assert.Equal(QUEUED, uploadSummary.Status);
             Assert.Null(uploadSummary.PublicApiDataSetId);
             Assert.Null(uploadSummary.PublicApiDataSetVersion);
@@ -254,7 +252,7 @@ public class DataSetFileStorageTests
         Assert.Equal("test-data.meta.csv", uploadDetails.MetaFileName);
         Assert.Equal(157, uploadDetails.MetaFileSizeInBytes);
         Assert.Equal(DataSetUploadStatus.SCREENING, uploadDetails.Status);
-        Assert.Equal(_user.Email, uploadDetails.UploadedBy);
+        Assert.Equal(_user.Email.ToLower(), uploadDetails.UploadedBy);
         Assert.Null(uploadDetails.ReplacingFileId);
     }
 
@@ -994,7 +992,7 @@ public class DataSetFileStorageTests
     }
 
     [UsedImplicitly]
-    private static void AssertUploadSummary(
+    private void AssertUploadSummary(
         DataFileInfo uploadSummary,
         string dataSetName,
         string dataFileName,
@@ -1009,7 +1007,7 @@ public class DataSetFileStorageTests
         Assert.Equal(123, uploadSummary.Rows);
         Assert.Equal("466 Kb", uploadSummary.Size);
         uploadSummary.Created.AssertUtcNow();
-        Assert.Equal("test@test.com", uploadSummary.UserName);
+        Assert.Equal(_user.Email, uploadSummary.UserName);
         Assert.Equal(QUEUED, uploadSummary.Status);
     }
 

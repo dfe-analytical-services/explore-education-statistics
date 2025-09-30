@@ -1,4 +1,6 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
@@ -6,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
 public class ReleaseFileExtensionTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public void Path()
     {
@@ -44,6 +48,9 @@ public class ReleaseFileExtensionTests
     [Fact]
     public void ToFileInfo()
     {
+        var createdByUser = _dataFixture.DefaultUser()
+            .Generate();
+
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion(),
@@ -57,10 +64,7 @@ public class ReleaseFileExtensionTests
                 ContentLength = 10240,
                 Type = Ancillary,
                 Created = new DateTime(),
-                CreatedBy = new User
-                {
-                    Email = "test@test.com"
-                }
+                CreatedBy = createdByUser
             }
         };
 
@@ -74,7 +78,7 @@ public class ReleaseFileExtensionTests
         Assert.Equal("10 Kb", info.Size);
         Assert.Equal(Ancillary, info.Type);
         Assert.Equal(releaseFile.File.Created, info.Created);
-        Assert.Equal("test@test.com", info.UserName);
+        Assert.Equal(createdByUser.Email, info.UserName);
     }
 
     [Fact]

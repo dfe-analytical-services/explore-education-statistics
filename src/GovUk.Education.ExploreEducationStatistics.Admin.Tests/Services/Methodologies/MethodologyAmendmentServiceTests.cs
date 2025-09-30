@@ -4,9 +4,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -20,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyAmendmentServiceTests
 {
+    private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
 
     [Fact]
@@ -34,7 +37,7 @@ public class MethodologyAmendmentServiceTests
 
             // creation and update fields
             Created = DateTime.Today.AddDays(-2),
-            CreatedBy = new User(),
+            CreatedBy = _dataFixture.DefaultUser(),
             CreatedById = Guid.NewGuid(),
             Updated = DateTime.Today.AddDays(-10),
 
@@ -159,7 +162,7 @@ public class MethodologyAmendmentServiceTests
                                     Created = DateTime.Today.AddDays(-4),
                                     CreatedById = Guid.NewGuid(),
                                     Updated = DateTime.Today.AddDays(-3),
-                                    CreatedBy = new User()
+                                    CreatedBy = _dataFixture.DefaultUser()
                                 }
                             }
                         })
@@ -240,7 +243,7 @@ public class MethodologyAmendmentServiceTests
                                     Created = DateTime.Today.AddDays(-4),
                                     CreatedById = Guid.NewGuid(),
                                     Updated = DateTime.Today.AddDays(-3),
-                                    CreatedBy = new User()
+                                    CreatedBy = _dataFixture.DefaultUser()
                                 }
                             }
                         })
@@ -345,10 +348,10 @@ public class MethodologyAmendmentServiceTests
                 MethodologyVersion = originalVersion,
                 MethodologyVersionId = originalVersion.Id,
                 Created = DateTime.Today.AddDays(-6).ToUniversalTime(),
-                CreatedBy = new User(),
+                CreatedBy = _dataFixture.DefaultUser(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-5).ToUniversalTime(),
-                UpdatedBy = new User(),
+                UpdatedBy = _dataFixture.DefaultUser(),
                 UpdatedById = Guid.NewGuid()
             },
             new()
@@ -359,10 +362,10 @@ public class MethodologyAmendmentServiceTests
                 MethodologyVersion = originalVersion,
                 MethodologyVersionId = originalVersion.Id,
                 Created = DateTime.Today.AddDays(-4).ToUniversalTime(),
-                CreatedBy = new User(),
+                CreatedBy = _dataFixture.DefaultUser(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-3).ToUniversalTime(),
-                UpdatedBy = new User(),
+                UpdatedBy = _dataFixture.DefaultUser(),
                 UpdatedById = Guid.NewGuid()
             },
             new()
@@ -373,10 +376,10 @@ public class MethodologyAmendmentServiceTests
                 MethodologyVersion = originalVersion,
                 MethodologyVersionId = originalVersion.Id,
                 Created = DateTime.Today.AddDays(-2).ToUniversalTime(),
-                CreatedBy = new User(),
+                CreatedBy = _dataFixture.DefaultUser(),
                 CreatedById = Guid.NewGuid(),
                 Updated = DateTime.Today.AddDays(-1).ToUniversalTime(),
-                UpdatedBy = new User(),
+                UpdatedBy = _dataFixture.DefaultUser(),
                 UpdatedById = Guid.NewGuid()
             }
         };

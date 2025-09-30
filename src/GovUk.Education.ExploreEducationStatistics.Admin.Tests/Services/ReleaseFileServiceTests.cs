@@ -45,11 +45,9 @@ public class ReleaseFileServiceTests : IDisposable
         _filePaths.ForEach(System.IO.File.Delete);
     }
 
-    private readonly User _user = new()
-    {
-        Id = Guid.NewGuid(),
-        Email = "test@test.com"
-    };
+    private readonly User _user = new DataFixture()
+        .DefaultUser()
+        .WithId(Guid.NewGuid());
 
     [Fact]
     public async Task Delete()
@@ -1042,10 +1040,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "ancillary_1.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = new User
-                {
-                    Email = "ancillary1@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("ancillary1@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1060,10 +1056,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "Ancillary 2.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = new User
-                {
-                    Email = "ancillary2@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("ancillary2@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1077,10 +1071,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "chart.png",
                 ContentLength = 20480,
                 Type = Chart,
-                CreatedBy = new User
-                {
-                    Email = "chart@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("chart@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1094,10 +1086,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
-                CreatedBy = new User
-                {
-                    Email = "dataFile@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("dataFile@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1111,10 +1101,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "image.png",
                 ContentLength = 30720,
                 Type = Image,
-                CreatedBy = new User
-                {
-                    Email = "image@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("image@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1185,10 +1173,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "ancillary_1.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = new User
-                {
-                    Email = "ancillary1@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("ancillary1@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1203,10 +1189,8 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "Ancillary 2.pdf",
                 ContentLength = 10240,
                 Type = Ancillary,
-                CreatedBy = new User
-                {
-                    Email = "ancillary2@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("ancillary2@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1219,10 +1203,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
                 Type = Chart,
-                CreatedBy = new User
-                {
-                    Email = "chart@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("chart@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1235,10 +1217,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
-                CreatedBy = new User
-                {
-                    Email = "dataFile@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("dataFile@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -1251,10 +1231,8 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
                 Type = Image,
-                CreatedBy = new User
-                {
-                    Email = "image@test.com"
-                },
+                CreatedBy = _dataFixture.DefaultUser()
+                    .WithEmail("image@test.com"),
                 Created = DateTime.UtcNow
             }
         };
@@ -2225,10 +2203,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "test.csv",
                 Type = FileType.Data,
                 Created = new DateTime(),
-                CreatedBy = new User
-                {
-                    Email = "test@test.com"
-                }
+                CreatedBy = _dataFixture.DefaultUser(),
             }
         };
 
@@ -2466,7 +2441,7 @@ public class ReleaseFileServiceTests : IDisposable
             Assert.Equal("Test summary", fileInfo.Summary);
             Assert.Equal("10 Kb", fileInfo.Size);
             Assert.Equal(Ancillary, fileInfo.Type);
-            Assert.Equal("test@test.com", fileInfo.UserName);
+            Assert.Equal(_user.Email, fileInfo.UserName);
             Assert.InRange(DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
         }
 
@@ -2580,7 +2555,7 @@ public class ReleaseFileServiceTests : IDisposable
             Assert.Equal("New ancillary summary", fileInfo.Summary);
             Assert.Equal("10 Kb", fileInfo.Size);
             Assert.Equal(Ancillary, fileInfo.Type);
-            Assert.Equal("test@test.com", fileInfo.UserName);
+            Assert.Equal(_user.Email, fileInfo.UserName);
             Assert.InRange(DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
         }
 

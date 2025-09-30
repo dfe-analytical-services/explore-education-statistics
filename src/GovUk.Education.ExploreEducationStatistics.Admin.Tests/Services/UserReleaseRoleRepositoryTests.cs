@@ -23,9 +23,11 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task Create()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
 
-            var createdByUser = new User();
+            var createdByUser = _fixture.DefaultUser()
+                .Generate();
 
             var releaseVersion = new ReleaseVersion();
 
@@ -174,7 +176,8 @@ public abstract class UserReleaseRoleRepositoryTests
         {
             var releaseVersion = new ReleaseVersion();
 
-            var user1 = new User();
+            var user1 = _fixture.DefaultUser()
+                .Generate();
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 ReleaseVersion = releaseVersion,
@@ -184,11 +187,15 @@ public abstract class UserReleaseRoleRepositoryTests
                 Created = new DateTime(2000, 12, 25),
             };
 
-            var user2 = new User();
-            var user3 = new User();
-            var user4 = new User();
+            var user2 = _fixture.DefaultUser()
+                .Generate();
+            var user3 = _fixture.DefaultUser()
+                .Generate();
+            var user4 = _fixture.DefaultUser()
+                .Generate();
 
-            var createdByUser = new User();
+            var createdByUser = _fixture.DefaultUser()
+                .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -250,8 +257,10 @@ public abstract class UserReleaseRoleRepositoryTests
         {
             var release1 = new ReleaseVersion();
 
-            var user = new User();
-            var createdByUser = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
+            var createdByUser = _fixture.DefaultUser()
+                .Generate();
 
             var userRelease1Role = new UserReleaseRole
             {
@@ -329,7 +338,8 @@ public abstract class UserReleaseRoleRepositoryTests
         public async Task CreateMany_NoUsersToAdd()
         {
             var releaseVersion = new ReleaseVersion();
-            var createdByUser = new User();
+            var createdByUser = _fixture.DefaultUser()
+                .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -362,7 +372,8 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task GetAllRolesByUserAndReleaseVersion()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
             var releaseVersion = new ReleaseVersion();
 
             var userReleaseRoles = new List<UserReleaseRole>
@@ -393,7 +404,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 // Role for different user
                 new()
                 {
-                    User = new User(),
+                    User = _fixture.DefaultUser(),
                     ReleaseVersion = releaseVersion,
                     Role = ReleaseRole.Approver
                 }
@@ -429,7 +440,8 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task GetAllRolesByUserAndPublication()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
             var publication = new Publication();
 
             var userReleaseRolesForPublication = new List<UserReleaseRole>
@@ -467,7 +479,7 @@ public abstract class UserReleaseRoleRepositoryTests
                             .WithPublication(otherPublication))),                
                 // Role for same Publication but different user
                _fixture.DefaultUserReleaseRole()
-                    .WithUser(new User())
+                    .WithUser(_fixture.DefaultUser())
                     .WithRole(ReleaseRole.PrereleaseViewer)
                     .WithReleaseVersion(_fixture.DefaultReleaseVersion()
                         .WithRelease(_fixture.DefaultRelease()
@@ -502,7 +514,8 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task GetDistinctRolesByUser()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
             var release1 = new ReleaseVersion();
             var release2 = new ReleaseVersion();
 
@@ -546,7 +559,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 // Role for different user
                 new()
                 {
-                    User = new User(),
+                    User = _fixture.DefaultUser(),
                     ReleaseVersion = release1,
                     Role = ReleaseRole.Approver
                 }
@@ -582,7 +595,7 @@ public abstract class UserReleaseRoleRepositoryTests
         {
             var userReleaseRole = new UserReleaseRole
             {
-                User = new User(),
+                User = _fixture.DefaultUser(),
                 ReleaseVersion = new ReleaseVersion(),
                 Role = ReleaseRole.Contributor
             };
@@ -614,7 +627,8 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task GetUserReleaseRole_NullIfNotExists()
         {
-            var user = new User();
+            var user = _fixture.DefaultUser()
+                .Generate();
             var releaseVersion = new ReleaseVersion();
 
             // Setup a role but for a different release to make sure it has no influence
@@ -664,13 +678,8 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var email = "test@test.com";
-
             var userReleaseRole = _fixture.DefaultUserReleaseRole()
-                .WithUser(new User
-                {
-                    Email = email
-                })
+                .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(_fixture.DefaultReleaseVersion()
                     .WithRelease(_fixture.DefaultRelease()
                         .WithPublication(_fixture.DefaultPublication())))
@@ -710,7 +719,9 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user1 = new User { Email = "test1@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
             var releaseVersion1 = _fixture.DefaultReleaseVersion()
                     .WithRelease(_fixture.DefaultRelease()
                         .WithPublication(_fixture.DefaultPublication()))
@@ -726,7 +737,9 @@ public abstract class UserReleaseRoleRepositoryTests
                 .WithRole(ReleaseRole.Contributor)
                 .Generate();
 
-            var user2 = new User { Email = "test2@test.com" };
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var releaseVersion2 = _fixture.DefaultReleaseVersion()
                     .WithRelease(_fixture.DefaultRelease()
                         .WithPublication(_fixture.DefaultPublication()))
@@ -742,7 +755,9 @@ public abstract class UserReleaseRoleRepositoryTests
                 .WithRole(ReleaseRole.PrereleaseViewer)
                 .Generate();
 
-            var user3 = new User { Email = "test3@test.com" };
+            var user3 = _fixture.DefaultUser()
+                .WithEmail("test3@test.com")
+                .Generate();
             var releaseVersion3 = _fixture.DefaultReleaseVersion()
                     .WithRelease(_fixture.DefaultRelease()
                         .WithPublication(_fixture.DefaultPublication()))
@@ -789,14 +804,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetPublicationHasRoles_RemovesTargetRoles()
         {
-            var user1 = new User
-            {
-                Email = "test1@test.com"
-            };
-            var user2 = new User
-            {
-                Email = "test2@test.com"
-            };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var targetPublication = _fixture.DefaultPublication()
                 .Generate();
@@ -903,8 +916,12 @@ public abstract class UserReleaseRoleRepositoryTests
         public async Task TargetPublicationAndRolesCombinationHasRoles_RemovesTargetRoles(
             ReleaseRole[] targetRolesToInclude)
         {
-            var user1 = new User { Email = "test1@test.com" };
-            var user2 = new User { Email = "test2@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
                 .Except(targetRolesToInclude);
             var targetPublication = _fixture.DefaultPublication()
@@ -1046,8 +1063,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetPublicationHasNoRoles_DoesNothing()
         {
-            var user1 = new User { Email = "test1@test.com" };
-            var user2 = new User { Email = "test2@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var otherPublication = _fixture.DefaultPublication()
                .Generate();
@@ -1105,14 +1126,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetPublicationAndUserCombinationHasRoles_RemovesTargetRoles()
         {
-            var targetUser = new User
-            {
-                Email = "test1@test.com"
-            };
-            var otherUser = new User
-            {
-                Email = "test2@test.com"
-            };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var targetPublication = _fixture.DefaultPublication()
                 .Generate();
@@ -1223,8 +1242,12 @@ public abstract class UserReleaseRoleRepositoryTests
         public async Task TargetPublicationAndUserAndRolesCombinationHasRoles_RemovesTargetRoles(
             ReleaseRole[] targetRolesToInclude)
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
                 .Except(targetRolesToInclude);
             var targetPublication = _fixture.DefaultPublication()
@@ -1359,8 +1382,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetPublicationAndUserHasNoRoles_DoesNothing()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var otherPublication = _fixture.DefaultPublication()
                .Generate();
@@ -1430,8 +1457,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetReleaseVersionHasRoles_RemovesTargetRoles()
         {
-            var user1 = new User { Email = "test1@test.com" };
-            var user2 = new User { Email = "test2@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var targetReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
@@ -1520,8 +1551,12 @@ public abstract class UserReleaseRoleRepositoryTests
         public async Task TargetReleaseVersionAndRolesCombinationHasRoles_RemovesTargetRoles(
             ReleaseRole[] targetRolesToInclude)
         {
-            var user1 = new User { Email = "test1@test.com" };
-            var user2 = new User { Email = "test2@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
                 .Except(targetRolesToInclude);
             var targetReleaseVersion = _fixture.DefaultReleaseVersion()
@@ -1635,8 +1670,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetReleaseVersionHasNoRoles_DoesNothing()
         {
-            var user1 = new User { Email = "test1@test.com" };
-            var user2 = new User { Email = "test2@test.com" };
+            var user1 = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var user2 = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var otherReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
@@ -1692,8 +1731,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetReleaseVersionAndUserCombinationHasRoles_RemovesTargetRoles()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var targetReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
@@ -1786,8 +1829,12 @@ public abstract class UserReleaseRoleRepositoryTests
         public async Task TargetReleaseVersionAndUserAndRolesCombinationHasRoles_RemovesTargetRoles(
             ReleaseRole[] targetRolesToInclude)
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
                 .Except(targetRolesToInclude);
             var targetReleaseVersion = _fixture.DefaultReleaseVersion()
@@ -1894,8 +1941,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetReleaseVersionAndUserHasNoRoles_DoesNothing()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
             var otherReleaseVersion = _fixture.DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease()
@@ -1963,8 +2014,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var role1 = ReleaseRole.Approver;
             var role2 = ReleaseRole.Contributor;
             var releaseVersion1 = _fixture.DefaultReleaseVersion()
@@ -2029,8 +2084,12 @@ public abstract class UserReleaseRoleRepositoryTests
         [Fact]
         public async Task TargetUserHasNoRoles_DoesNothing()
         {
-            var targetUser = new User { Email = "test1@test.com" };
-            var otherUser = new User { Email = "test2@test.com" };
+            var targetUser = _fixture.DefaultUser()
+                .WithEmail("test1@test.com")
+                .Generate();
+            var otherUser = _fixture.DefaultUser()
+                .WithEmail("test2@test.com")
+                .Generate();
             var role1 = ReleaseRole.Approver;
             var role2 = ReleaseRole.Contributor;
             var releaseVersion1 = _fixture.DefaultReleaseVersion()

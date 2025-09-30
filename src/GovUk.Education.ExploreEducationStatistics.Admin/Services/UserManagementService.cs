@@ -374,6 +374,7 @@ public class UserManagementService(
                     {
                         tuple.internalUser.SoftDeleted = DateTime.UtcNow;
                         tuple.internalUser.DeletedById = userService.GetUserId();
+                        tuple.internalUser.Active = false;
                     }
 
                     await contentDbContext.SaveChangesAsync();

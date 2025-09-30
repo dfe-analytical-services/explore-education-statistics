@@ -31,10 +31,9 @@ public class MethodologyServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    private static readonly User User = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly User User = new DataFixture()
+        .DefaultUser()
+        .WithId(Guid.NewGuid());
 
     private static readonly Contact MockContact = new()
     {
@@ -2758,18 +2757,12 @@ public class MethodologyServiceTests
             }
         };
 
-        var user = new User
-        {
-            Id = User.Id,
-            Email = "test@test.com",
-        };
-
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             await context.Methodologies.AddRangeAsync(methodology, unrelatedMethodology);
             await context.MethodologyStatus.AddRangeAsync(methodologyStatuses);
-            await context.Users.AddAsync(user);
+            await context.Users.AddAsync(User);
             await context.SaveChangesAsync();
         }
 
@@ -2789,14 +2782,14 @@ public class MethodologyServiceTests
             Assert.Equal(methodologyStatuses[1].InternalReleaseNote, statuses[0].InternalReleaseNote);
             Assert.Equal(methodologyStatuses[1].ApprovalStatus, statuses[0].ApprovalStatus);
             Assert.Equal(methodologyStatuses[1].Created, statuses[0].Created);
-            Assert.Equal("test@test.com", statuses[0].CreatedByEmail);
+            Assert.Equal(User.Email, statuses[0].CreatedByEmail);
 
             Assert.Equal(methodologyStatuses[0].Id, statuses[1].MethodologyStatusId);
             Assert.Equal(0, statuses[1].MethodologyVersion);
             Assert.Equal(methodologyStatuses[0].InternalReleaseNote, statuses[1].InternalReleaseNote);
             Assert.Equal(methodologyStatuses[0].ApprovalStatus, statuses[1].ApprovalStatus);
             Assert.Equal(methodologyStatuses[0].Created, statuses[1].Created);
-            Assert.Equal("test@test.com", statuses[1].CreatedByEmail);
+            Assert.Equal(User.Email, statuses[1].CreatedByEmail);
         }
     }
 
@@ -3074,7 +3067,8 @@ public class MethodologyServiceTests
         public async Task DifferentUserIsApproverOnOwningPublication_NotIncluded()
         {
             // Set up a different User as the Approver for the owning Publication.
-            var otherUser = new User();
+            var otherUser = _fixture.DefaultUser()
+                .Generate();
 
             var publication = _fixture
                 .DefaultPublication()
@@ -3357,7 +3351,8 @@ public class MethodologyServiceTests
         public async Task DifferentUserIsApproverOnOwningPublicationRelease_NotIncluded()
         {
             // Set up a different User as the Approver for the owning Publication.
-            var otherUser = new User();
+            var otherUser = _fixture.DefaultUser()
+                .Generate();
 
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 

@@ -31,7 +31,7 @@ public abstract class ReleaseServiceTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
-    private static readonly User User = new() { Id = Guid.NewGuid() };
+    private static readonly Guid UserId = Guid.NewGuid();
 
     public class CreateReleaseTests : ReleaseServiceTests
     {
@@ -701,7 +701,7 @@ public abstract class ReleaseServiceTests
 
         userService
             .Setup(s => s.GetUserId())
-            .Returns(User.Id);
+            .Returns(UserId);
 
         return new ReleaseService(
             context: contentDbContext,

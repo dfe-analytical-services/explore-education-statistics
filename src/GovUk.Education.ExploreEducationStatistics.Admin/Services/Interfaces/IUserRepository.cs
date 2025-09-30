@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User?> FindById(Guid userId, CancellationToken cancellationToken = default);
-    Task<User?> FindByEmail(string email);
+    Task<User?> FindByEmail(string email, CancellationToken cancellationToken = default);
+    Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,11 +5,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 using Semver;
+using System.Linq.Expressions;
+using System.Text.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 // ReSharper disable StringLiteralTypo
@@ -700,7 +701,22 @@ public class ContentDbContext : DbContext
 
     private static void ConfigureUser(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>();
+        // Map IdentityRole to the existing table, but exclude it from migrations for this DbContext
+        modelBuilder.Entity<IdentityRole>(entity =>
+        {
+            entity.ToTable("AspNetRoles");
+            entity.Metadata.SetIsTableExcludedFromMigrations(true);
+        });
+
+        modelBuilder.Entity<User>()
+            .HasOne(c => c.CreatedBy)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>()
+            .HasOne(e => e.Role)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)

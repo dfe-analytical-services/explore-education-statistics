@@ -1,20 +1,22 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class UserRepositoryTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public async Task FindByEmail()
     {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
+        var user = _dataFixture.DefaultUser()
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -27,7 +29,7 @@ public class UserRepositoryTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var repository = SetupUserRepository(contentDbContext);
-            var result = await repository.FindByEmail("test@test.com");
+            var result = await repository.FindByEmail(user.Email);
             Assert.NotNull(result);
             Assert.Equal(user.Id, result.Id);
         }
@@ -36,10 +38,9 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindByEmail_DifferentCase()
     {
-        var user = new User
-        {
-            Email = "test@test.com"
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail("test@test.com")
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -75,13 +76,14 @@ public class UserRepositoryTests
     }
 
     [Fact]
-    public async Task FindByEmail_SoftDeletedUser()
+    public async Task FindDeletedUserPlaceholder()
     {
-        var user = new User
-        {
-            Email = "test@test.com",
-            SoftDeleted = DateTime.UtcNow,
-        };
+        var user = _dataFixture.DefaultUser()
+            .WithEmail(User.DeletedUserPlaceholderEmail)
+            .WithActive(false)
+            .WithSoftDeleted(DateTime.UtcNow)
+            .WithCreated(DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1))
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -94,9 +96,23 @@ public class UserRepositoryTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var repository = SetupUserRepository(contentDbContext);
-            var result = await repository.FindByEmail("test@test.com");
-            Assert.Null(result);
+
+            var result = await repository.FindDeletedUserPlaceholder();
+
+            Assert.NotNull(result);
+            Assert.Equal(user.Id, result.Id);
+            Assert.Equal(User.DeletedUserPlaceholderEmail, result.Email);
         }
+    }
+
+    [Fact]
+    public async Task FindDeletedUserPlaceholder_DeletedUserDoesNotExist_Throws()
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        var repository = SetupUserRepository(contentDbContext);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.FindDeletedUserPlaceholder());
     }
 
     private static UserRepository SetupUserRepository(

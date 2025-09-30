@@ -6,9 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -23,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class UserManagementServicePermissionTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public async Task ListAllUsers()
     {
@@ -121,29 +124,27 @@ public class UserManagementServicePermissionTests
             );
     }
 
-    public class DeleteUserTests
+    [Fact]
+    public async Task Delete_User_Success()
     {
-        [Fact]
-        public async Task Success()
-        {
-            await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
-            contentDbContext.Users.Add(new User { Email = "ees-test.user@education.gov.uk" });
-            await contentDbContext.SaveChangesAsync();
+        await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
+        contentDbContext.Users.Add(_dataFixture.DefaultUser()
+               .WithEmail("ees-test.user@education.gov.uk"));
+        await contentDbContext.SaveChangesAsync();
 
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupCheck(CanManageUsersOnSystem)
-                .AssertSuccess(async userService =>
-                    {
-                        userService.Setup(mock => mock.GetUserId())
-                            .Returns(Guid.NewGuid());
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupCheck(CanManageUsersOnSystem)
+            .AssertSuccess(async userService =>
+                {
+                    userService.Setup(mock => mock.GetUserId())
+                        .Returns(Guid.NewGuid());
 
-                        var service = SetupUserManagementService(
-                            contentDbContext: contentDbContext,
-                            userService: userService.Object);
-                        return await service.DeleteUser("ees-test.user@education.gov.uk");
-                    }
-                );
-        }
+                    var service = SetupUserManagementService(
+                        contentDbContext: contentDbContext,
+                        userService: userService.Object);
+                    return await service.DeleteUser("ees-test.user@education.gov.uk");
+                }
+            );
     }
 
     private static UserManagementService SetupUserManagementService(
