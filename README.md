@@ -620,51 +620,52 @@ buildable state (rather than be completely broken).
 
 ### Code Style & Formatting
 
-.NET code style and formatting rules are imposed by [dotnet format](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format) because it is IDE and platform agnostic, and natively included in the .NET SDK. Rule are dictated by an [.editorconfig file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options).
+We use CSharpier for automatic code formatting.
 
-The warnings and errors about violations of these rules are surfaced at build time by enabling [Enforce Code Style In Build (<EnforceCodeStyleInBuild>)](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#enforcecodestyleinbuild) in each `.csproj` file.
+#### Installing CSharpier
 
-To that end - regardless of your IDE of choice - if your solution builds without warnings then your changes should not have caused any style violations. 
-
-*NOTE* We currently have a large number of warnings, many of which we're present before introducing an `.editorconfig` file, and many more of which have been created by imposing style rules we previously weren't. Once the work has been done to resolve these warnings, we can turn on `TreatWarningsAsErrors` to make the build itself fail if there are style violations. 
-
-#### How do I configure my IDE? 
-
-Because the `.editorconfig` file is attached to the solution, both Rider and Visual Studio should automatically use its rules in place of their own defaults.
-
-- on Visual Studio, you may need to visit `Analyze -> Code Cleanup -> Configure Code Cleanup`, then change your default profile to include only the `Fix all warnings and errors set in EditorConfig` step.
-- on Rider, you may need to visit `Settings -> Editor -> Inspection Settings` then ensure `Read settings from editorconfig, project settings and rule sets` is ticked.
-
-#### How do I format only one file?
-
-The easiest way is probably through an IDE, configured as per the step above. Most IDEs can format single files if you right-click it in the explorer.
-Failing that, the faffier harder way is to pass an `--include <PATH>` argument to `dotnet format` on the command line, providing it the files you want it to format.
-
-#### How do I run the formatter manually?
-
-You can perform the same check as the pre-commit hooks / GitHubs actions do and receive a report by running the following command from the repository root:
-
-```bash
-dotnet format src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --report dotnet-format-report.json
+It can be installed - alongside other dotnet tools via `.config/dotnet-tools.json` - by running
+```sh
+cd explore-education-statistics
+dotnet tool restore
 ```
 
-This will create a report named `dotnet-format-report.json` in the repository root. This has been added to the `.gitignore` file so should not cause a tracked change.
+#### With Rider
 
-The `--verify-no-changes` argument tells `format` to make no changes. If you want it to automatically apply fixes, simply remove this argument:
+Install the CSharpier plugin, found in the Marketplace.
 
-```bash
-dotnet format src/GovUk.Education.ExploreEducationStatistics.sln
+After first installing, there may be a popup in the bottom right to install CSharpier
+
+Then in Settings -> Tools -> CSharpier, check the `Run on Save` checkbox.
+
+#### With VSCode
+
+Install the CSharpier plugin.
+
+Then in your user `settings.json`, add
+```json
+    "[csharp]": {
+        "editor.defaultFormatter": "csharpier.csharpier-vscode",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4,
+    },
 ```
 
-If you want to run it against one or more specific directories in the solution (or indeed exclude one or more), these can be specified through the `--include <PATH>` and `--exclude <PATH>` arguments. 
+#### With Visual Studio
 
-If you want to see only errors, or include suggestions, pass a new value to the severity argument (accepted values are `error`, `warn`, and `info`):
+The plugin can be found here: https://marketplace.visualstudio.com/items?itemName=csharpier.CSharpier
 
-```bash
-dotnet format src/GovUk.Education.ExploreEducationStatistics.sln --severity <SEVERITY>
+Instructions are on that page.
+
+#### Manually formatting
+
+You can manually format the entire codebase with
+
+```sh
+cd explore-education-statistics
+dotnet csharpier format .
 ```
 
-See the [docs](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format) for more on this.
 
 ### Migrations
 
