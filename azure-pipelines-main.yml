@@ -12,7 +12,7 @@ variables:
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   DotNetVersion: '8.0.x'
-  NodeVersion: '20.19.2'
+  NodeVersion: '20.19.5'
   RubyVersion: '3.2'
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
   PublicApiDir: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
