@@ -15,7 +15,7 @@ jobs:
     environment: ${{ parameters.environment }}
     variables:
       docsPath: $(Pipeline.Workspace)/MainBuild/public-api-docs
-      nodeVersion: '20.19.2'
+      nodeVersion: '20.19.5'
       rubyVersion: '3.2'
     strategy:
       runOnce:
