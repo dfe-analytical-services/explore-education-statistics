@@ -28,7 +28,7 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public PreviewTokenStatus Status => GetPreviewTokenStatus();
 
-    private PreviewTokenStatus GetPreviewTokenStatus(DateTimeOffset? now = null)
+    public PreviewTokenStatus GetPreviewTokenStatus(DateTimeOffset? now = null)
     {
         now??= DateTimeOffset.UtcNow;
         return now >= Expires ? PreviewTokenStatus.Expired :
