@@ -1,4 +1,4 @@
-import { isSameDay, isBefore, isPast } from 'date-fns';
+import { isSameDay, isBefore, isPast, isToday } from 'date-fns';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -42,6 +42,7 @@ const presetOptions: RadioOption[] = [
   { label: '6 days', value: '6' },
   { label: '7 days', value: '7' },
 ];
+
 export default function ApiDataSetPreviewTokenCreateForm({
   onCancel,
   onSubmit,
@@ -50,19 +51,10 @@ export default function ApiDataSetPreviewTokenCreateForm({
     startDate: Date,
     endDate: Date,
   ) => {
-    const startMidnight = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate(),
-    );
-    const endMidnight = new Date(
-      endDate.getFullYear(),
-      endDate.getMonth(),
-      endDate.getDate(),
-    );
-    return startMidnight <= endMidnight;
+    return isBefore(startDate, endDate) || isSameDay(startDate, endDate);
   };
   const { user } = useAuthContext();
+
   const isBau = user?.permissions.isBauUser;
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
@@ -95,7 +87,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
               message: 'Activates date must not be in the past',
               test(value) {
                 if (value == null) return false;
-                return isPast(value);
+                return isToday(value) || !isPast(value);
               },
             })
             .test({
@@ -106,7 +98,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 const now = new Date();
                 const maxDate = new Date();
                 maxDate.setDate(now.getDate() + 7);
-                return isSameDay(value, maxDate) || isBefore(value, maxDate);
+                return endDateIsLaterThanOrEqualToStartDate(value, maxDate);
               },
             }),
       }),

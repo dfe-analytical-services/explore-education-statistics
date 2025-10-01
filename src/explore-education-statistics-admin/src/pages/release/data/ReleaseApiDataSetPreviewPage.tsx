@@ -35,7 +35,7 @@ export default function ReleaseApiDataSetPreviewPage() {
     const fromDate = new Date();
     fromDate.setHours(0, 0, 1);
 
-    if (Number.isInteger(days) && days > 0 && days < 8) {
+    if (!(Number.isInteger(days) && days > 0 && days < 8)) {
       throw new Error(
         `The number of days (${days}) selected is not allowed, please select between 1 to 7 days.`,
       );
@@ -61,10 +61,12 @@ export default function ReleaseApiDataSetPreviewPage() {
       startDate = new Date();
       endDate = getPresetSpanEndDate(datePresetSpan);
     } else if (activates && expires) {
-      activates.setHours(0, 0, 1);
-      expires.setHours(23, 59, 59);
       startDate = activates;
       endDate = expires;
+    } else {
+      startDate = new Date();
+      endDate = new Date();
+      endDate.setDate(endDate.getDate() + 1);
     }
 
     const token = await previewTokenService.createPreviewToken({

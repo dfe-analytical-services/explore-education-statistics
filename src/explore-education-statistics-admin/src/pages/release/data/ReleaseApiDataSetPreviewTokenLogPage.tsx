@@ -36,7 +36,20 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
     ...previewTokenQueries.list(dataSet?.draftVersion?.id ?? ''),
     enabled: !!dataSet?.draftVersion,
   });
-
+  const getPreviewTokenTagColour = (
+    status: string,
+  ): 'green' | 'yellow' | 'grey' => {
+    switch (status) {
+      case 'Active':
+        return 'green';
+      case 'Pending':
+        return 'yellow';
+      case 'Expired':
+        return 'grey';
+      default:
+        return 'grey';
+    }
+  };
   const handleRevoke = async (id: string) => {
     await previewTokenService.revokePreviewToken(id);
     refetchTokens();
@@ -97,7 +110,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                       </FormattedDate>
                     </td>
                     <td>
-                      <Tag colour={getTokenStatusColour(token.status)}>
+                      <Tag colour={getPreviewTokenTagColour(token.status)}>
                         {token.status}
                       </Tag>
                     </td>
@@ -166,16 +179,4 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
       </LoadingSpinner>
     </>
   );
-}
-function getTokenStatusColour(status: string) {
-  switch (status) {
-    case 'Active':
-      return 'green';
-    case 'Pending':
-      return 'yellow';
-    case 'Expired':
-      return 'grey';
-    default:
-      return 'grey';
-  }
 }
