@@ -439,6 +439,7 @@ public class SignInServiceTests
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
                 .WithSoftDeleted(DateTime.UtcNow.AddDays(-1))
+                .WithDeletedBy(createdByInternalUser)
                 .WithActive(false)
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .Generate();
@@ -569,6 +570,7 @@ public class SignInServiceTests
                 Assert.Equal(updatedFirstName, newUser.FirstName); // Updated to the new FirstName from the invite
                 Assert.Equal(updatedLastName, newUser.LastName); // Updated to the new LastName from the invite
                 Assert.Null(newUser.SoftDeleted); // Reset back to active state
+                Assert.Null(newUser.DeletedById); // Reset back to active state
                 Assert.True(newUser.Active); // Reset back to active state
                 Assert.Equal(userInvite.RoleId, newUser.RoleId); // Updated to the new Role from the invite
                 newUser.Created.AssertUtcNow(); // Updated to now

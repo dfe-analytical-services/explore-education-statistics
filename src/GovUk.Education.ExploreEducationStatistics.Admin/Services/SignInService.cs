@@ -115,6 +115,7 @@ public class SignInService(
             existingInternalUser.FirstName = newAspNetUser.FirstName;
             existingInternalUser.LastName = newAspNetUser.LastName;
             existingInternalUser.SoftDeleted = null;
+            existingInternalUser.DeletedById = null;
             existingInternalUser.Active = true;
             existingInternalUser.RoleId = inviteToSystem.RoleId;
             existingInternalUser.Created = DateTimeOffset.UtcNow;
