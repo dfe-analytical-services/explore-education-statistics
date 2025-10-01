@@ -6,25 +6,20 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     /// <inheritdoc />
-    public partial class EES6080_RenameExpiryAndAddActivatesInPreviewTokensTable : Migration
+    public partial class EES6080_AddActivatesInPreviewTokensTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Expiry",
-                table: "PreviewTokens",
-                newName: "Expires");
-
             migrationBuilder.AddColumn<DateTimeOffset>(
                 name: "Activates",
                 table: "PreviewTokens",
                 type: "timestamp with time zone",
                 nullable: true);
-            
+
             migrationBuilder.Sql(
                 @"UPDATE ""PreviewTokens"" SET ""Activates"" = ""Created"";");
-            
+
             migrationBuilder.AlterColumn<DateTimeOffset>(
                 name: "Activates",
                 table: "PreviewTokens",
@@ -37,11 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             migrationBuilder.DropColumn(
                 name: "Activates",
                 table: "PreviewTokens");
-
-            migrationBuilder.RenameColumn(
-                name: "Expires",
-                table: "PreviewTokens",
-                newName: "Expiry");
         }
     }
 }

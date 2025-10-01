@@ -49,7 +49,7 @@ public static class PreviewTokenGeneratorExtensions
             .SetDefault(pt => pt.Label)
             .SetDefault(pt => pt.DataSetVersionId)
             .SetDefault(pt => pt.CreatedByUserId)
-            .Set(pt => pt.Expires, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1))
+            .Set(pt => pt.Expiry, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1))
             .Set(pt => pt.Activates, activated ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1)); 
     
 
@@ -78,7 +78,7 @@ public static class PreviewTokenGeneratorExtensions
     public static InstanceSetters<PreviewToken> SetExpiry(
         this InstanceSetters<PreviewToken> instanceSetter,
         DateTimeOffset expiry)
-        => instanceSetter.Set(pt => pt.Expires, expiry);
+        => instanceSetter.Set(pt => pt.Expiry, expiry);
 
     public static InstanceSetters<PreviewToken> SetLabel(
         this InstanceSetters<PreviewToken> instanceSetter,

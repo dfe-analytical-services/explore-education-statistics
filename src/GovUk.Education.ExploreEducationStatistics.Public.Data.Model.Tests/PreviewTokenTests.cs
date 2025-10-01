@@ -10,7 +10,7 @@ public abstract class PreviewTokenTests
         [InlineData(PreviewTokenStatus.Active, true, false)]
         [InlineData(PreviewTokenStatus.Pending, false, false)]
         [InlineData(PreviewTokenStatus.Expired, true, true)]
-        public void Status_ReturnsCorrectStatusBasedOnActivatesAndExpires(PreviewTokenStatus expectedStatus, bool activated, bool expired)
+        public void Status_ReturnsCorrectStatusBasedOnActivatesAndExpiry(PreviewTokenStatus expectedStatus, bool activated, bool expired)
         {
             var past = DateTimeOffset.UtcNow.AddDays(-1);
             var future = DateTimeOffset.UtcNow.AddDays(1);
@@ -20,7 +20,7 @@ public abstract class PreviewTokenTests
                 DataSetVersionId = Guid.Empty,
                 CreatedByUserId = Guid.Empty,
                 Activates = activated ? past : future,
-                Expires = expired ? past : future
+                Expiry = expired ? past : future
             };
             Assert.Equal(expectedStatus, previewToken.Status);
         }
@@ -38,7 +38,7 @@ public abstract class PreviewTokenTests
                 DataSetVersionId = Guid.Empty,
                 CreatedByUserId = Guid.Empty,
                 Activates = DateTimeOffset.Parse(activated),
-                Expires = DateTimeOffset.Parse(expired)
+                Expiry = DateTimeOffset.Parse(expired)
             };
             var status = previewToken.GetPreviewTokenStatus(currentTime);
             Assert.Equal(status, expectedStatus);

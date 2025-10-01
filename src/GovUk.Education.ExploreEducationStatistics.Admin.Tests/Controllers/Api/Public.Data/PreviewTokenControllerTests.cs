@@ -131,7 +131,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => actualPreviewToken.Activates.AssertEqual(activatesProvided
                     ? twoDaysFromNow
                     : actualPreviewToken.Created),
-                () => actualPreviewToken.Expires.AssertEqual(expires ?? (activatesProvided
+                () => actualPreviewToken.Expiry.AssertEqual(expires ?? (activatesProvided
                     ? nineDaysFromNow
                     : sevenDaysFromNow)),
                 () => Assert.Null(actualPreviewToken.Updated)
@@ -293,7 +293,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 Activates = previewToken.Activates,
                 Created = previewToken.Created,
                 CreatedByEmail = CreatedByBauUser.Email,
-                Expiry = previewToken.Expires,
+                Expiry = previewToken.Expiry,
                 Updated = previewToken.Updated
             };
 
@@ -382,7 +382,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                     Activates = pt.Activates,
                     Created = pt.Created,
                     CreatedByEmail = CreatedByBauUser.Email,
-                    Expiry = pt.Expires,
+                    Expiry = pt.Expiry,
                     Updated = pt.Updated
                 })
                 .ToList();
@@ -589,7 +589,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 
             Assert.Multiple(
                 () => Assert.Equal(PreviewTokenStatus.Expired, actualPreviewToken.Status),
-                () => actualPreviewToken.Expires.AssertUtcNow(),
+                () => actualPreviewToken.Expiry.AssertUtcNow(),
                 () => actualPreviewToken.Updated.AssertUtcNow()
             );
         }

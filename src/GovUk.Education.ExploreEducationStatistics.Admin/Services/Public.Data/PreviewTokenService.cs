@@ -43,7 +43,7 @@ public class PreviewTokenService(
                     Label = label,
                     Created = DateTimeOffset.UtcNow,
                     Activates = activates.Value,
-                    Expires = expiry ?? activates.Value.AddDays(7),
+                    Expiry = expiry ?? activates.Value.AddDays(7),
                     CreatedByUserId = userService.GetUserId()
                 });
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -81,7 +81,7 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidatePreviewToken)
             .OnSuccess(async previewToken =>
             {
-                previewToken.Expires = DateTimeOffset.UtcNow;
+                previewToken.Expiry = DateTimeOffset.UtcNow;
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
                 return await MapPreviewToken(previewToken);
             });
@@ -154,7 +154,7 @@ public class PreviewTokenService(
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
             Activates = previewToken.Activates,
-            Expiry = previewToken.Expires,
+            Expiry = previewToken.Expiry,
             Updated = previewToken.Updated
         };
     }
