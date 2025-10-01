@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -88,10 +90,10 @@ public class ObservationServiceTests
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
-        var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>();
+        var tempTableCreator = new Mock<ITemporaryTableCreator>();
         tempTableCreator
-            .Setup(s => s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
-            .Returns(Task.CompletedTask);
+            .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+            .ReturnsAsync(Mock.Of<ITempTableReference>());
         
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
@@ -130,10 +132,10 @@ public class ObservationServiceTests
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
-        var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>();
+        var tempTableCreator = new Mock<ITemporaryTableCreator>();
         tempTableCreator
-            .Setup(s => s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
-            .Returns(Task.CompletedTask);
+            .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+            .ReturnsAsync(Mock.Of<ITempTableReference>());
         
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
@@ -186,11 +188,11 @@ public class ObservationServiceTests
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
-        var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>();
+        var tempTableCreator = new Mock<ITemporaryTableCreator>();
         
         tempTableCreator
-            .Setup(s => s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
-            .Returns(Task.CompletedTask);
+            .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+            .ReturnsAsync(Mock.Of<ITempTableReference>());
         
         var locationIdsTempTableReference = new Mock<ITempTableQuery<IdTempTable>>();
         locationIdsTempTableReference
@@ -199,7 +201,7 @@ public class ObservationServiceTests
         
         tempTableCreator
             .Setup(s => s
-                .CreateTemporaryTableAndPopulate(
+                .CreateAnonymousTemporaryTableAndPopulate(
                     context, 
                     locationIdsTempTableEntries, 
                     cancellationToken))
@@ -286,8 +288,8 @@ public class ObservationServiceTests
             
             await context.SaveChangesAsync();
         }
-        
-        var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>(Strict);
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
         
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
@@ -342,9 +344,9 @@ public class ObservationServiceTests
                 .ToList();
 
             tempTableCreator
-                .Setup(s => 
-                    s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
-                .Returns(Task.CompletedTask);
+                .Setup(s =>
+                    s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+                .ReturnsAsync(Mock.Of<ITempTableReference>());
 
             var selectedFilterItemsByFilter = ListOf(
                 selectedFilter1FilterItemIds,
@@ -374,7 +376,7 @@ public class ObservationServiceTests
 
                         tempTableCreator
                             .Setup(s =>
-                                s.CreateTemporaryTableAndPopulate(
+                                s.CreateAnonymousTemporaryTableAndPopulate(
                                     context,
                                     ItIs.ListSequenceEqualTo(orderedIds),
                                     cancellationToken))
@@ -450,8 +452,8 @@ public class ObservationServiceTests
             await context.AddAsync(filter);
             await context.SaveChangesAsync();
         }
-        
-        var tempTableCreator = new Mock<MatchingObservationsQueryGenerator.ITemporaryTableCreator>(Strict);
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
         
         var queryGenerator = new MatchingObservationsQueryGenerator
         {
@@ -469,9 +471,9 @@ public class ObservationServiceTests
                 filter.FilterGroups.ToList()[1].FilterItems.ToList()[1].Id);
             
             tempTableCreator
-                .Setup(s => 
-                    s.CreateTemporaryTable<MatchedObservation>(context, cancellationToken))
-                .Returns(Task.CompletedTask);
+                .Setup(s =>
+                    s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+                .ReturnsAsync(Mock.Of<ITempTableReference>());
 
             var selectedLocationIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
             
@@ -486,7 +488,7 @@ public class ObservationServiceTests
             
             tempTableCreator
                 .Setup(s =>
-                    s.CreateTemporaryTableAndPopulate(
+                    s.CreateAnonymousTemporaryTableAndPopulate(
                         context,
                         ItIs.EnumerableSequenceEqualTo(selectedLocationIdTempTableEntries),
                         cancellationToken))
@@ -499,7 +501,7 @@ public class ObservationServiceTests
 
             tempTableCreator
                 .Setup(s =>
-                    s.CreateTemporaryTableAndPopulate(
+                    s.CreateAnonymousTemporaryTableAndPopulate(
                         context,
                         ItIs.ListSequenceEqualTo(
                             selectedFilterItemIds

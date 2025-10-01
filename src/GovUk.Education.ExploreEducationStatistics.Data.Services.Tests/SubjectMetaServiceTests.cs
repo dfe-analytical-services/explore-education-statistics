@@ -879,7 +879,7 @@ public class SubjectMetaServiceTests
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
                     // ReSharper disable once AccessToDisposedClosure
-                    releaseSubject.SubjectId, statisticsDbContext.MatchedObservations))
+                    releaseSubject.SubjectId, statisticsDbContext.MatchedObservations, default))
                 .ReturnsAsync(allFilterItems);
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);

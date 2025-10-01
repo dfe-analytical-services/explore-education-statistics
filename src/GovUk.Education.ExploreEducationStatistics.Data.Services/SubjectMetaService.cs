@@ -210,7 +210,8 @@ public class SubjectMetaService(
                 stopwatch.Restart();
 
                 var filterItems = await
-                    filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations);
+                    filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations,
+                        cancellationToken);
                 var filters =
                     FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                         filterItems, releaseFile.FilterSequence);

@@ -22,7 +22,8 @@ public interface IFilterItemRepository
     /// <see cref="Filter" />s</returns>
     Task<IEnumerable<FilterItem>> GetFilterItemsFromMatchedObservationIds(
         Guid subjectId,
-        IQueryable<MatchedObservation> matchedObservations);
+        IQueryable<MatchedObservation> matchedObservations,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Method to retrieve a set of <see cref="FilterItem" />s, their <see cref="FilterGroup" />s and

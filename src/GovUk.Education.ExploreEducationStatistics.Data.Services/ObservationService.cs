@@ -1,14 +1,15 @@
 #nullable enable
 using System.Diagnostics;
-using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Thinktecture;
 using Thinktecture.EntityFrameworkCore.TempTables;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -47,7 +48,12 @@ public class ObservationService : IObservationService
 
         try
         {
-            await SqlExecutor.ExecuteSqlRaw(_context, sql, sqlParameters, cancellationToken);
+            // Execute the query to find matching Observation Ids.
+            await SqlExecutor.ExecuteSqlRaw(
+                context: _context,
+                sql: sql,
+                parameters: sqlParameters,
+                cancellationToken: cancellationToken);
 
             var matchedObservations = _context
                 .MatchedObservations
@@ -88,7 +94,6 @@ public class ObservationService : IObservationService
     public class MatchingObservationsQueryGenerator : IMatchingObservationsQueryGenerator
     {
         public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
-        private readonly Regex _safeTempTableNames = new("^#[a-zA-Z0-9]+[_0-9]*$", RegexOptions.Compiled);
 
         public async Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
             StatisticsDbContext context,
@@ -98,24 +103,53 @@ public class ObservationService : IObservationService
             TimePeriodQuery? timePeriodQuery,
             CancellationToken cancellationToken)
         {
-            await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
+            // Generate a keyless temp table to allow quick inserting of
+            // matching Observation Ids into a heap in parallel.
+            await TempTableCreator.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(
+                context: context,
+                cancellationToken: cancellationToken);
 
+            // Generate a "WHERE" clause to limit matched Observations to selected
+            // Time Periods, if any.
+            var timePeriodsClause = timePeriodQuery != null
+                ? GetTimePeriodsClause(timePeriodQuery)
+                : default;
+
+            // Generate a "WHERE" clause to limit matched Observations to selected
+            // Locations, if any.
             var (locationIdsClause, locationIdsTempTable) = locationIds.Count > 0
                 ? await GetLocationsClause(context, locationIds, cancellationToken)
                 : default;
 
+            // Generate a "WHERE" clause to limit matched Observations to selected
+            // Filter Items, if any.
             var (filterItemIdsClause, filterItemIdTempTables) = filterItemIds.Count > 0
                 ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds, cancellationToken)
                 : default;
 
-            var sql = @$"
-                    INSERT INTO #{nameof(MatchedObservation)} 
+            // Insert matching Observation Ids into the heap.
+            // Use TABLOCK to allow fast and safe parallel inserts into the table
+            // and with less logging.
+            // Use MAXDOP to prevent too many workers executing in parallel at once,
+            // which can negatively impact performance.
+            // Use RECOMPILE to tell the execution plan engine to alter its plan based
+            // on fresh statistics.
+            var matchingObservationSql = $@"
+                    INSERT INTO #{nameof(MatchedObservation)} WITH (TABLOCK)
                     SELECT o.id FROM Observation o
                     WHERE o.SubjectId = @subjectId " +
-                (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
-                (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
-                (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "") +
-                "ORDER BY o.Id;";
+                     (timePeriodsClause != null ? $"AND ({timePeriodsClause}) " : "") +
+                     (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
+                     (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "") +
+                     "OPTION(RECOMPILE, MAXDOP 4);";
+
+            // Add a unique clustered index *after* the heap insert for better performance,
+            // as adding before the insert forces a more complex execution plan that orders
+            // the inserts and disables parallelism.
+            var indexSql = $@"
+                CREATE UNIQUE CLUSTERED INDEX [IX_MatchedObservation_Id_{Guid.NewGuid()}]
+                ON #MatchedObservation(Id)
+                WITH (MAXDOP = 4);";
 
             var parameters = ListOf(new SqlParameter("subjectId", subjectId));
             
@@ -130,7 +164,7 @@ public class ObservationService : IObservationService
                 tableReferences.AddRange(filterItemIdTempTables);
             }
 
-            return (sql, parameters, tableReferences);
+            return ($"{matchingObservationSql}\n\n{indexSql}", parameters, tableReferences);
         }
         
         private async Task<(string, List<ITempTableQuery<IdTempTable>>)> GetSelectedFilterItemIdsClause(
@@ -169,15 +203,16 @@ public class ObservationService : IObservationService
                             .OrderBy(id => id)
                             .Select(id => new IdTempTable(id))
                             .ToList();
-                        
-                        return TempTableCreator.CreateTemporaryTableAndPopulate(context, ids, cancellationToken).Result;
+
+                        return TempTableCreator
+                            .CreateAnonymousTemporaryTableAndPopulate(context, ids, cancellationToken).Result;
                     });
 
             var clauses = filterItemIdTempTablesPerFilter
                 .Select(filterItemIdTempTableForFilter =>
                 {
-                    var filterItemIdsTempTableName = 
-                        SanitizeTempTableName(filterItemIdTempTableForFilter.Value.Name);
+                    var filterItemIdsTempTableName =
+                        filterItemIdTempTableForFilter.Value.Name;
                     
                     return $"EXISTS (" +
                            $"    SELECT 1 FROM ObservationFilterItem ofi WHERE ofi.ObservationId = o.id " +
@@ -222,19 +257,10 @@ public class ObservationService : IObservationService
             IList<Guid> locationIds,
             CancellationToken cancellationToken)
         {
-            var locationsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
+            var locationsTempTable = await TempTableCreator.CreateAnonymousTemporaryTableAndPopulate(
                 context, locationIds.Select(id => new IdTempTable(id)), cancellationToken);
 
-            return ($"o.LocationId IN (SELECT Id FROM {SanitizeTempTableName(locationsTempTable.Name)})", locationsTempTable);
-        }
-
-        private string SanitizeTempTableName(string tempTableName)
-        {
-            if (!_safeTempTableNames.IsMatch(tempTableName))
-            {
-                throw new ArgumentException($"{tempTableName} is not a valid temporary table name");
-            }
-            return tempTableName;
+            return ($"o.LocationId IN (SELECT Id FROM {locationsTempTable.Name})", locationsTempTable);
         }
 
         private static string GetTimePeriodsClause(TimePeriodQuery timePeriodQuery)
@@ -243,66 +269,6 @@ public class ObservationService : IObservationService
             var timePeriodClauses = timePeriods.Select(timePeriod =>
                 $"(o.TimeIdentifier = '{timePeriod.TimeIdentifier.GetEnumValue()}' AND o.Year = {timePeriod.Year})");
             return timePeriodClauses.JoinToString(" OR ");
-        }
-
-        public interface ITemporaryTableCreator
-        {
-            Task CreateTemporaryTable<TEntity>(
-                StatisticsDbContext context,
-                CancellationToken cancellationToken) where TEntity : class;
-        
-            Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(
-                StatisticsDbContext context,
-                IEnumerable<TEntity> values,
-                CancellationToken cancellationToken) where TEntity : class;
-        }
-        
-        public class TemporaryTableCreator : ITemporaryTableCreator
-        {
-            public async Task CreateTemporaryTable<TEntity>(
-                StatisticsDbContext context, 
-                CancellationToken cancellationToken) where TEntity : class
-            {
-                var options = new TempTableCreationOptions
-                {
-                   TableNameProvider = new DefaultTempTableNameProvider(),
-                };
-
-                await context.CreateTempTableAsync<TEntity>(
-                    options,
-                    cancellationToken);
-            }
-
-            public async Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(
-                StatisticsDbContext context, 
-                IEnumerable<TEntity> values,
-                CancellationToken cancellationToken) where TEntity : class
-            {
-                return await context.BulkInsertIntoTempTableAsync(values, cancellationToken: cancellationToken);
-            }
-        }
-    }
-
-    public interface IRawSqlExecutor
-    {
-        Task ExecuteSqlRaw(
-            StatisticsDbContext context,
-            string sql,
-            IList<SqlParameter> parameters,
-            CancellationToken cancellationToken);
-    }
-
-    public class RawSqlExecutor : IRawSqlExecutor
-    {
-        public async Task ExecuteSqlRaw(
-            StatisticsDbContext context, 
-            string sql, 
-            IList<SqlParameter> parameters, 
-            CancellationToken cancellationToken)
-        {
-            await context
-                .Database
-                .ExecuteSqlRawAsync(sql, parameters, cancellationToken);
         }
     }
 }
