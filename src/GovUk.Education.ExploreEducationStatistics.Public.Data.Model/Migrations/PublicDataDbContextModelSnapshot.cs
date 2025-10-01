@@ -680,7 +680,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("Expires")
+                    b.Property<DateTimeOffset>("Expiry")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Label")
