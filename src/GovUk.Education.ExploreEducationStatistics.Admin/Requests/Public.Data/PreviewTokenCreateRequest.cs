@@ -20,20 +20,33 @@ public record PreviewTokenCreateRequest
             var utcNow = DateTimeOffset.UtcNow;
 
             RuleFor(request => request.Activates!.Value)
-                .Must(created => IsLessThanOrEqualEndDate(utcNow, created)
-                                 && created <= utcNow.AddDays(7))
-                .WithMessage("Created date must be within the next 7 days.");
+                .Must(activates => IsLessThanOrEqualToEndDate(activates, utcNow.AddDays(7)))
+                .When(request => request.Activates.HasValue)
+                .WithMessage("Activates date must be within the next 7 days.");
+
+            RuleFor(request => request.Activates!.Value)
+                .Must(activates => IsLessThanOrEqualToEndDate(utcNow, activates) )
+                .When(request => request.Activates.HasValue)
+                .WithMessage("Activates date must not be in the past.");
+
             RuleFor(request => request.Expires!.Value)
                 .Must((request, expires) =>
                 {
-                    var activates = request.Activates!.Value;
+                    var activates = request.Activates ?? utcNow;
                     var sevenDaysFromCreated = activates.AddDays(7);
-
-                    var expiresIsWithin7DaysFromCreated = IsLessThanOrEqualEndDate(expires, sevenDaysFromCreated);
-                    var createdIsBeforeExpires = IsLessThanOrEqualEndDate(activates, expires);
-                    return expiresIsWithin7DaysFromCreated && createdIsBeforeExpires;
+                    return IsLessThanOrEqualToEndDate(expires, sevenDaysFromCreated);
                 })
-                .WithMessage("Expires date must be no more than 7 days after the created date.");
+                .When(request => request.Expires.HasValue)
+                .WithMessage("Expires date must be no more than 7 days after the activates date.");
+
+            RuleFor(request => request.Expires!.Value)
+                .Must((request, expires) =>
+                {
+                    var activates = request.Activates ?? utcNow;
+                    return IsLessThanOrEqualToEndDate(activates, expires);
+                })
+                .When(request => request.Expires.HasValue)
+                .WithMessage("Activates date must be before or equal to the expires date.");
 
             RuleFor(request => request.DataSetVersionId)
                 .NotEmpty();
@@ -43,10 +56,12 @@ public record PreviewTokenCreateRequest
                 .MaximumLength(100);
             return;
 
-            static bool IsLessThanOrEqualEndDate(DateTimeOffset startDate, DateTimeOffset endDate)
+            static bool IsLessThanOrEqualToEndDate(DateTimeOffset startDate, DateTimeOffset endDate)
             {
-                return (startDate.Month < endDate.Month && startDate.Year <= endDate.Year) ||
-                       (startDate.Day <= endDate.Day && startDate.Month <= endDate.Month && startDate.Year <= endDate.Year);
+                var startUtc = startDate.ToUniversalTime();
+                var endUtc = endDate.ToUniversalTime();
+
+                return startUtc.Date <= endUtc.Date;
             }
         }
     }

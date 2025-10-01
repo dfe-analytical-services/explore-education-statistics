@@ -19,6 +19,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiDataSetQuickStart';
+import { isToday } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
@@ -63,23 +64,11 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     history.push(tokenLogPagePath);
   };
 
-  const dateIsToday = (stringDate?: string): boolean => {
-    if (stringDate === undefined) return true;
-    const getYMD = (date: Date) => {
-      return {
-        y: date.getUTCFullYear(),
-        m: date.getUTCMonth(), // 0-based (0 = Jan, 11 = Dec)
-        d: date.getUTCDate(),
-      };
-    };
-    const d1 = getYMD(new Date());
-    const d2 = getYMD(new Date(stringDate));
-    return d1.y === d2.y && d1.m === d2.m && d1.d === d2.d;
-  };
   const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;
-  const activatesToday = dateIsToday(
-    previewToken ? previewToken.activates : undefined,
-  );
+
+  const displayActivatedDate = previewToken
+    ? isToday(new Date(previewToken.activates))
+    : false;
 
   return (
     <>
@@ -116,20 +105,21 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   label="Preview token"
                   text={previewToken.id}
                 />
-
-                {!activatesToday && (
-                  <>
-                    The token is active from:{' '}
-                    <strong>
-                      <FormattedDate>{previewToken.activates}</FormattedDate>{' '}
-                      (local time){' '}
-                    </strong>
-                  </>
-                )}
                 <p>
-                  {activatesToday ? 'The token' : 'and'} expires:{' '}
+                  {displayActivatedDate ? (
+                    'The token expires:'
+                  ) : (
+                    <>
+                      The token is active from:{' '}
+                      <strong>
+                        <FormattedDate>{previewToken.activates}</FormattedDate>{' '}
+                        (local time){' '}
+                      </strong>
+                      and expires:
+                    </>
+                  )}{' '}
                   <strong>
-                    <FormattedDate formatRelativeToNow={activatesToday}>
+                    <FormattedDate formatRelativeToNow={displayActivatedDate}>
                       {previewToken.expiry}
                     </FormattedDate>{' '}
                     (local time)

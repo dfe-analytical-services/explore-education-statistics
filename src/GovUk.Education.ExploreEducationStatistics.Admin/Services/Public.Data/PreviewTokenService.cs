@@ -36,13 +36,14 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
+                activates ??= DateTimeOffset.UtcNow;
                 var previewToken = publicDataDbContext.PreviewTokens.Add(new PreviewToken
                 {
                     DataSetVersionId = dataSetVersionId,
                     Label = label,
                     Created = DateTimeOffset.UtcNow,
-                    Activates = activates ?? DateTimeOffset.UtcNow,
-                    Expiry = expiry ?? DateTimeOffset.UtcNow.AddDays(1),
+                    Activates = activates.Value,
+                    Expires = expiry ?? activates.Value.AddDays(7),
                     CreatedByUserId = userService.GetUserId()
                 });
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -80,7 +81,7 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidatePreviewToken)
             .OnSuccess(async previewToken =>
             {
-                previewToken.Expiry = DateTimeOffset.UtcNow;
+                previewToken.Expires = DateTimeOffset.UtcNow;
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
                 return await MapPreviewToken(previewToken);
             });
@@ -153,7 +154,7 @@ public class PreviewTokenService(
             CreatedByEmail = createdByEmail,
             Created = previewToken.Created,
             Activates = previewToken.Activates,
-            Expiry = previewToken.Expiry,
+            Expiry = previewToken.Expires,
             Updated = previewToken.Updated
         };
     }

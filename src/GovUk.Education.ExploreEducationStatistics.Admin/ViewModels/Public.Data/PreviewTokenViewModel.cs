@@ -23,5 +23,5 @@ public record PreviewTokenViewModel
 
     public required DateTimeOffset? Updated { get; set; }
     
-    public DateTimeOffset? Activates { get; set; }
+    public required DateTimeOffset Activates { get; set; }
 }

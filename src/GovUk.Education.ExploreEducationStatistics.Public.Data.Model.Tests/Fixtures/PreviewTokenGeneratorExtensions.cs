@@ -49,7 +49,7 @@ public static class PreviewTokenGeneratorExtensions
             .SetDefault(pt => pt.Label)
             .SetDefault(pt => pt.DataSetVersionId)
             .SetDefault(pt => pt.CreatedByUserId)
-            .Set(pt => pt.Expiry, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1))
+            .Set(pt => pt.Expires, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1))
             .Set(pt => pt.Activates, activated ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1)); 
     
 
