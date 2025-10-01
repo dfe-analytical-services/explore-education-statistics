@@ -10,7 +10,7 @@ public abstract class PreviewTokenTests
         [InlineData(PreviewTokenStatus.Active, true, false)]
         [InlineData(PreviewTokenStatus.Pending, false, false)]
         [InlineData(PreviewTokenStatus.Expired, true, true)]
-        public void ContainsCorrectStatusBasedOnActivatesAndExpires(PreviewTokenStatus status, bool activated, bool expired)
+        public void Status_ReturnsCorrectStatusBasedOnActivatesAndExpires(PreviewTokenStatus expectedStatus, bool activated, bool expired)
         {
             var past = DateTimeOffset.UtcNow.AddDays(-1);
             var future = DateTimeOffset.UtcNow.AddDays(1);
@@ -22,7 +22,26 @@ public abstract class PreviewTokenTests
                 Activates = activated ? past : future,
                 Expires = expired ? past : future
             };
-            Assert.Equal(status, previewToken.Status);
+            Assert.Equal(expectedStatus, previewToken.Status);
+        }
+
+        [Theory]
+        [InlineData(PreviewTokenStatus.Active, "2025-09-29T00:00:00 +00:00", "2025-10-05T00:00:00 +00:00")]
+        [InlineData(PreviewTokenStatus.Pending,"2025-10-11T00:00:00 +00:00", "2025-10-15T00:00:00 +00:00")]
+        [InlineData(PreviewTokenStatus.Expired,"2025-08-01T00:00:00 +00:00", "2025-08-05T00:00:00 +00:00")]
+        public void GetPreviewTokenStatus_ReturnsCorrectStatusBasedOnDate(PreviewTokenStatus expectedStatus, string activated, string expired)
+        {
+            var currentTime = DateTimeOffset.Parse("2025-10-01T00:00:00 +00:00");
+            PreviewToken previewToken = new()
+            {
+                Label = "Test",
+                DataSetVersionId = Guid.Empty,
+                CreatedByUserId = Guid.Empty,
+                Activates = DateTimeOffset.Parse(activated),
+                Expires = DateTimeOffset.Parse(expired)
+            };
+            var status = previewToken.GetPreviewTokenStatus(currentTime);
+            Assert.Equal(status, expectedStatus);
         }
     }
 }

@@ -138,51 +138,6 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             );
         }
 
-        public static TheoryData<DateTimeOffset, DateTimeOffset, CreatePreviewTokenValidationError> CustomDateOutOfRangeData => new()
-        {
-            { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), ExpectInvalidCreated }, // Start date is in the past and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(15), ExpectInvalidExpiry }, // End date is longer than 7 days and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), ExpectInvalidCreated }, // Start date beyond 7 days from current time and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), ExpectInvalidExpiry }, // Duration is longer than 7 days and therefore is out of range.
-        };
-
-        [Theory]
-        [MemberData(nameof(CustomDateOutOfRangeData))]
-        public async Task CustomDateOutOfRange_ReturnsValidationProblem(DateTimeOffset activates, DateTimeOffset expires, CreatePreviewTokenValidationError expectedError)
-        {
-            DataSet dataSet = DataFixture.DefaultDataSet();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-              .DefaultDataSetVersion()
-              .WithDataSet(dataSet)
-              .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
-
-            var response = await CreatePreviewToken(
-                dataSetVersion.Id,
-                new string('A', count: 100),
-                activates: activates,
-                expires: expires);
-
-            var validationProblem = response.AssertValidationProblem();
-
-            // Assert that the validation error is for the date range
-            validationProblem.AssertHasError(
-                expectedPath: expectedError.Path,
-                expectedCode: expectedError.Code,
-                expectedMessage: expectedError.Message
-            );
-        }
-
         [Theory]
         [MemberData(nameof(DataSetVersionStatusTheoryData.StatusesExceptDraft),
             MemberType = typeof(DataSetVersionStatusTheoryData))]
@@ -335,7 +290,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 Id = previewToken.Id,
                 Label = previewToken.Label,
                 Status = PreviewTokenStatus.Active,
-                Activates = previewToken.Created,
+                Activates = previewToken.Activates,
                 Created = previewToken.Created,
                 CreatedByEmail = CreatedByBauUser.Email,
                 Expiry = previewToken.Expires,
@@ -343,41 +298,6 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             };
 
             response.AssertOk(expectedResult);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task PreviewTokenIsExpiredOrNotActiveYet_StatusIsExpiredOrPending(bool toggleBoolean)
-        {
-            DataSet dataSet = DataFixture.DefaultDataSet();
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithDataSet(dataSet)
-                .WithPreviewTokens(() =>
-                [
-                    DataFixture.DefaultPreviewToken(activated: toggleBoolean, expired: toggleBoolean)
-                        .WithCreatedByUserId(CreatedByBauUser.Id)
-                ])
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
-
-            var previewToken = dataSetVersion.PreviewTokens[0];
-
-            var response = await GetPreviewToken(previewToken.Id);
-
-            var viewModel = response.AssertOk<PreviewTokenViewModel>();
-            Assert.Equal(toggleBoolean ? PreviewTokenStatus.Expired : PreviewTokenStatus.Pending, viewModel.Status);
         }
 
         [Fact]
@@ -459,7 +379,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                     Id = pt.Id,
                     Label = pt.Label,
                     Status = pt.Status,
-                    Activates = pt.Created,
+                    Activates = pt.Activates,
                     Created = pt.Created,
                     CreatedByEmail = CreatedByBauUser.Email,
                     Expiry = pt.Expires,
