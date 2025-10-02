@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -34,7 +33,7 @@ public class UserInvitesController : ControllerBase
     }
 
     [HttpPost("user-management/invites")]
-    public async Task<ActionResult<UserInvite>> InviteUser(UserInviteCreateRequest request)
+    public async Task<ActionResult<User>> InviteUser(UserInviteCreateRequest request)
     {
         return await _userManagementService.InviteUser(request).HandleFailuresOrOk();
     }

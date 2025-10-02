@@ -11,9 +11,9 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public Guid Id { get; set; }
 
-    public required string FirstName { get; set; }
+    public string FirstName { get; set; } = null!;
 
-    public required string LastName { get; set; }
+    public string LastName { get; set; } = null!;
 
     public required string Email { get; set; }
 
@@ -35,8 +35,10 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public required Guid CreatedById { get; set; }
 
-    public string DisplayName => $"{FirstName} {LastName}";
+    public string DisplayName => $"{FirstName} {LastName}".Trim();
 
-    public bool ShouldExpire =>
-        !Active && !SoftDeleted.HasValue && Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
+    public bool IsPendingInvite => !Active && !SoftDeleted.HasValue;
+
+    public bool ShouldBeExpired => IsPendingInvite &&
+                                Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
 }
