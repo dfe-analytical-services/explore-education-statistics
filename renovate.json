@@ -37,8 +37,13 @@
     },
     {
       "matchDatasources": ["nuget"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchDatasources": ["nuget"],
       "groupName": "Backend packages (minor)",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": ["minor"],
       "schedule": ["every month"]
     },
     {
