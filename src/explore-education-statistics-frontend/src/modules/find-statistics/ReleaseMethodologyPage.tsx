@@ -11,7 +11,6 @@ import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import Link from '@frontend/components/Link';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
-import ReleasePageTabNav from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
@@ -38,13 +37,10 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
 
   return (
     <ReleasePageShell
+      activePage="methodology"
       publicationSummary={publicationSummary}
       releaseVersionSummary={releaseVersionSummary}
     >
-      <ReleasePageTabNav
-        activePage="methodology"
-        releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
-      />
       <ReleasePageLayout>
         {hasMethodologies && (
           <>

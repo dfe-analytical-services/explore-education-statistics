@@ -38,7 +38,7 @@ const publicationQueries = {
     releaseSlug: string,
   ): UseQueryOptions<ReleaseVersionSummary> {
     return {
-      queryKey: ['releaseVersionSummary', publicationSlug],
+      queryKey: ['releaseVersionSummary', publicationSlug, releaseSlug],
       queryFn: () =>
         publicationService.getReleaseVersionSummary(
           publicationSlug,

@@ -5,7 +5,6 @@ import {
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
-import ReleasePageTabNav from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import { NextPage } from 'next';
 import React from 'react';
 
@@ -20,13 +19,10 @@ const PublicationReleasePage: NextPage<Props> = ({
 }) => {
   return (
     <ReleasePageShell
+      activePage="home"
       publicationSummary={publicationSummary}
       releaseVersionSummary={releaseVersionSummary}
     >
-      <ReleasePageTabNav
-        activePage="home"
-        releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
-      />
       <ReleasePageLayout>
         <h2>TODO EES-6443- render release content</h2>
         <ContactUsSection

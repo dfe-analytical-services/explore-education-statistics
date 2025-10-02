@@ -4,17 +4,22 @@ import {
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
+import ReleasePageTabNav, {
+  ReleasePageKey,
+} from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import { NextPage } from 'next';
 import React, { ReactNode } from 'react';
 
 interface Props {
+  activePage: ReleasePageKey;
   publicationSummary: PublicationSummaryRedesign;
   releaseVersionSummary: ReleaseVersionSummary;
   children: ReactNode;
 }
 
 const ReleasePageShell: NextPage<Props> = ({
+  activePage,
   publicationSummary,
   releaseVersionSummary,
   children,
@@ -37,6 +42,10 @@ const ReleasePageShell: NextPage<Props> = ({
       <ReleasePageIntro
         publicationSummary={publicationSummary}
         releaseVersionSummary={releaseVersionSummary}
+      />
+      <ReleasePageTabNav
+        activePage={activePage}
+        releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
       />
       {children}
     </Page>
