@@ -10,7 +10,7 @@ public class UserTests
 
     public static TheoryData<bool, DateTime?, DateTimeOffset, bool> ExpiryData => new()
     {
-        // active, softDeletedDate, createdDate, expectShouldExpire
+        // active, softDeletedDate, createdDate, expectShouldBeExpired
 
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), true },
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
@@ -26,11 +26,11 @@ public class UserTests
 
     [Theory]
     [MemberData(nameof(ExpiryData))]
-    public void ShouldExpire(
+    public void ShouldBeExpired(
         bool active, 
         DateTime? softDeletedDate, 
         DateTimeOffset createdDate, 
-        bool expectShouldExpire)
+        bool expectShouldBeExpired)
     {
         var user = _dataFixture.DefaultUser()
             .WithActive(active)
@@ -38,6 +38,6 @@ public class UserTests
             .WithCreated(createdDate)
             .Generate();
 
-        Assert.Equal(expectShouldExpire, user.ShouldExpire);
+        Assert.Equal(expectShouldBeExpired, user.ShouldBeExpired);
     }
 }

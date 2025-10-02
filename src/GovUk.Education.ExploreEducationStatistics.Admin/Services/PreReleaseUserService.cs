@@ -1,6 +1,5 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -22,8 +21,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 
-public class PreReleaseUserService(ContentDbContext context,
-    UsersAndRolesDbContext usersAndRolesDbContext,
+public class PreReleaseUserService(
+    ContentDbContext context,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
     IOptions<NotifyOptions> notifyOptions,
@@ -31,7 +30,6 @@ public class PreReleaseUserService(ContentDbContext context,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IUserRepository userRepository,
-    IUserInviteRepository userInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository) : IPreReleaseUserService
 {
@@ -162,31 +160,6 @@ public class PreReleaseUserService(ContentDbContext context,
                         email: email,
                         releaseVersionId: releaseVersionId,
                         rolesToInclude: ReleaseRole.PrereleaseViewer);
-
-                    // NOTE: UserInvites only stores whether a user has a particular role - not which release
-                    // that role may be against. So we only wanted to remove the user's prerelease role from
-                    // UserInvites if they no longer have any PrereleaseView roles.
-                    var remainingReleaseInvites = await context
-                        .UserReleaseInvites
-                        .Where(i =>
-                            i.Email.ToLower().Equals(email.ToLower())
-                            && i.Role == ReleaseRole.PrereleaseViewer
-                        )
-                        .CountAsync();
-
-                    if (remainingReleaseInvites == 0)
-                    {
-                        usersAndRolesDbContext.UserInvites.RemoveRange(
-                            usersAndRolesDbContext.UserInvites
-                                .Where(i =>
-                                    i.Email.ToLower().Equals(email.ToLower())
-                                    && i.RoleId == Role.PrereleaseUser.GetEnumValue()
-                                    && !i.Accepted
-                                )
-                            );
-
-                        await usersAndRolesDbContext.SaveChangesAsync();
-                    }
                 }
             );
     }
@@ -206,18 +179,22 @@ public class PreReleaseUserService(ContentDbContext context,
     {
         var user = await userRepository.FindByEmail(email);
 
-        if (user == null)
+        if (user is not null)
         {
-            return await CreateUserReleaseInvite(releaseVersion, email)
-            .OnSuccessDo(() => userInviteRepository.CreateOrUpdate(
-                email: email,
-                role: Role.PrereleaseUser,
-                createdById: userService.GetUserId()))
-            .OnSuccess(_ => new PreReleaseUserViewModel(email));
+            return await CreateExistingUserReleaseInvite(releaseVersion, email, user)
+                .OnSuccess(_ => new PreReleaseUserViewModel(email));
         }
 
-        return await CreateExistingUserReleaseInvite(releaseVersion, email, user)
-            .OnSuccess(_ => new PreReleaseUserViewModel(email));
+        return await context.RequireTransaction(async () =>
+        {
+            var user = await userRepository.CreateOrUpdate(
+                email: email,
+                role: Role.PrereleaseUser,
+                createdById: userService.GetUserId());
+
+            return await CreateUserReleaseInvite(releaseVersion, email)
+                .OnSuccess(_ => new PreReleaseUserViewModel(email));
+        });
     }
 
     private async Task<Either<ActionResult, Unit>> CreateUserReleaseInvite(ReleaseVersion releaseVersion,

@@ -623,7 +623,6 @@ public class Startup(
         services.AddTransient<IUserManagementService, UserManagementService>();
         services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
         services.AddTransient<IUserRepository, UserRepository>();
-        services.AddTransient<IUserInviteRepository, UserInviteRepository>();
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
