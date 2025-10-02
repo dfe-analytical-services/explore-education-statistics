@@ -36,7 +36,7 @@ export default function DataSetFilePageSection({
 
           {isMobileMedia && (
             <p className="govuk-!-margin-top-8">
-              <a className="govuk-link--no-visited-state" href="#main-content">
+              <a className="govuk-link--no-visited-state" href="#top">
                 Back to top
               </a>
             </p>

@@ -30,6 +30,8 @@ const Page = ({
 }: PageProps) => {
   return (
     <>
+      {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
+      <a id="top" />
       <Helmet>
         <title>
           {title
@@ -37,9 +39,7 @@ const Page = ({
             : 'Explore education statistics - GOV.UK'}
         </title>
       </Helmet>
-
       <PageHeader wide={wide} />
-
       <div
         className={classNames('govuk-width-container', {
           'dfe-width-container--wide': wide,
@@ -67,7 +67,6 @@ const Page = ({
           {children}
         </main>
       </div>
-
       <PageFooter wide={wide} />
     </>
   );
