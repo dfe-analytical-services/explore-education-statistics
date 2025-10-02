@@ -16,8 +16,8 @@ public class FilterItemRepository(
     StatisticsDbContext context,
     ILogger<FilterItemRepository> logger) : IFilterItemRepository
 {
-    public IMatchingFilterItemsQueryGenerator QueryGenerator =
-        new MatchingFilterItemsQueryGenerator();
+    public IMatchedFilterItemsQueryGenerator QueryGenerator =
+        new MatchedFilterItemsQueryGenerator();
 
     public IRawSqlExecutor SqlExecutor = new RawSqlExecutor();
 
@@ -43,19 +43,19 @@ public class FilterItemRepository(
             .ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
     }
 
-    public interface IMatchingFilterItemsQueryGenerator
+    public interface IMatchedFilterItemsQueryGenerator
     {
-        Task<string> GetMatchingFilterItemsQuery(
+        Task<string> GetMatchedFilterItemsQuery(
             StatisticsDbContext context,
             ITempTableReference matchedObservationsTableReference,
             CancellationToken cancellationToken);
     }
 
-    public class MatchingFilterItemsQueryGenerator : IMatchingFilterItemsQueryGenerator
+    public class MatchedFilterItemsQueryGenerator : IMatchedFilterItemsQueryGenerator
     {
         public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
 
-        public async Task<string> GetMatchingFilterItemsQuery(
+        public async Task<string> GetMatchedFilterItemsQuery(
             StatisticsDbContext context,
             ITempTableReference matchedObservationsTableReference,
             CancellationToken cancellationToken)
@@ -74,7 +74,7 @@ public class FilterItemRepository(
             // which can negatively impact performance.
             // Use RECOMPILE to tell the execution plan engine to alter its plan based
             // on fresh statistics.
-            var matchingFilterItemsSql = $@"
+            var matchedFilterItemsSql = $@"
                 INSERT INTO {matchedFilterItemsTempTable.Name} WITH (TABLOCK)
                 SELECT DISTINCT o.FilterItemId
                 FROM {matchedObservationsTableReference.Name} AS mo
@@ -89,7 +89,7 @@ public class FilterItemRepository(
                 CREATE UNIQUE CLUSTERED INDEX [IX_{matchedFilterItemsTempTable.Name}_{nameof(MatchedFilterItem.Id)}_{Guid.NewGuid()}]
                 ON {matchedFilterItemsTempTable.Name}({nameof(MatchedFilterItem.Id)}) WITH (MAXDOP = 4);";
 
-            return $"{matchingFilterItemsSql}\n\n{indexSql}";
+            return $"{matchedFilterItemsSql}\n\n{indexSql}";
         }
     }
 
@@ -100,13 +100,13 @@ public class FilterItemRepository(
     {
         var sw = Stopwatch.StartNew();
 
-        var sql = await QueryGenerator.GetMatchingFilterItemsQuery(
+        var sql = await QueryGenerator.GetMatchedFilterItemsQuery(
             context: context,
             matchedObservationsTableReference,
             cancellationToken: cancellationToken);
 
         // Execute the query to find matching FilterItem Ids and insert them into
-        // the #MatchingFilterItems temp table.
+        // the #MatchedFilterItem temp table.
         await SqlExecutor.ExecuteSqlRaw(
             sql: sql,
             context: context,
@@ -130,7 +130,7 @@ public class FilterItemRepository(
             .Include(fi => fi.FilterGroup)
             .ThenInclude(fg => fg.Filter)
             .Join(
-                // This is the contents of the #MatchedFilterItems temp table.
+                // This is the contents of the #MatchedFilterItem temp table.
                 inner: context.MatchedFilterItems,
                 outerKeySelector: filterItem => filterItem.Id,
                 innerKeySelector: matchedFilterItem => matchedFilterItem.Id,

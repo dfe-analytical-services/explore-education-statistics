@@ -24,7 +24,7 @@ public class FilterItemRepositoryTests
     private static DataFixture Fixture = new();
         
     [Fact]
-    public async Task GetMatchingFilterItems_QueryGeneratedAndExecuted()
+    public async Task GetMatchedFilterItems_QueryGeneratedAndExecuted()
     {
         var subjectId = Guid.NewGuid();
         
@@ -32,21 +32,21 @@ public class FilterItemRepositoryTests
         
         const string sql = "Some SQL here";
 
-        var queryGenerator = new Mock<IMatchingFilterItemsQueryGenerator>(Strict);
+        var queryGenerator = new Mock<IMatchedFilterItemsQueryGenerator>(Strict);
 
         var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
         matchingObservationsTable
             .SetupGet(t => t.Name)
             .Returns("#MatchedObservation");
         
-        var matchingFilterItemsTable = new Mock<ITempTableReference>(Strict);
-        matchingFilterItemsTable
+        var matchedFilterItemsTable = new Mock<ITempTableReference>(Strict);
+        matchedFilterItemsTable
             .SetupGet(t => t.Name)
-            .Returns("#MatchingFilterItems");
+            .Returns("#MatchedFilterItem");
 
         queryGenerator
             .Setup(s => s
-                .GetMatchingFilterItemsQuery(
+                .GetMatchedFilterItemsQuery(
                     context,
                     matchingObservationsTable.Object,
                     default))
@@ -72,7 +72,7 @@ public class FilterItemRepositoryTests
     }
     
     [Fact]
-    public async Task GetMatchingFilterItems_MatchingFilterItemsUsedToReturnFilterItems()
+    public async Task GetMatchedFilterItems_MatchedFilterItemsUsedToReturnFilterItems()
     {
         // Create 4 filters for this Subject.
         var filters = Fixture
@@ -108,14 +108,14 @@ public class FilterItemRepositoryTests
         ];
         
         // Fake populating the temporary table with results from executing the generated
-        // query from the MatchingFilterItemsQueryGenerator. 
+        // query from the MatchedFilterItemsQueryGenerator. 
         context.MatchedFilterItems.AddRange(
             expectedMatchedFilterItems.Select(fi => new MatchedFilterItem(fi.Id)));
         await context.SaveChangesAsync();
         
         var matchingObservationsTable = new Mock<ITempTableReference>(Loose);
         var sqlExecutor = new Mock<IRawSqlExecutor>(Loose);
-        var queryGenerator = new Mock<IMatchingFilterItemsQueryGenerator>(Loose);
+        var queryGenerator = new Mock<IMatchedFilterItemsQueryGenerator>(Loose);
 
         var service = BuildFilterItemRepository(
             context: context,
@@ -133,7 +133,7 @@ public class FilterItemRepositoryTests
     }
     
     [Fact]
-    public async Task MatchingFilterItemsQueryGenerator()
+    public async Task MatchedFilterItemsQueryGenerator()
     {
         await using var context = InMemoryStatisticsDbContext();
         
@@ -144,24 +144,24 @@ public class FilterItemRepositoryTests
             .SetupGet(t => t.Name)
             .Returns("#MatchedObservation");
 
-        var matchingFilterItemsTable = new Mock<ITempTableReference>(Strict);
-        matchingFilterItemsTable
+        var matchedFilterItemsTable = new Mock<ITempTableReference>(Strict);
+        matchedFilterItemsTable
             .SetupGet(t => t.Name)
-            .Returns("#MatchingFilterItems");
+            .Returns("#MatchedFilterItem");
 
         tempTableCreator
             .Setup(s =>
                 s.CreateTemporaryTable<MatchedFilterItem, StatisticsDbContext>(context, default))
-            .ReturnsAsync(matchingFilterItemsTable.Object);
+            .ReturnsAsync(matchedFilterItemsTable.Object);
         
-        var queryGenerator = new MatchingFilterItemsQueryGenerator
+        var queryGenerator = new MatchedFilterItemsQueryGenerator
         {
             TempTableCreator = tempTableCreator.Object
         };
 
         var sql = 
             await queryGenerator
-                .GetMatchingFilterItemsQuery(
+                .GetMatchedFilterItemsQuery(
                     context,
                     matchingObservationsTable.Object,
                     default);
@@ -169,14 +169,14 @@ public class FilterItemRepositoryTests
         VerifyAllMocks(tempTableCreator);
         
         var expectedSql = $@"
-            INSERT INTO {matchingFilterItemsTable.Object.Name} WITH (TABLOCK)
+            INSERT INTO {matchedFilterItemsTable.Object.Name} WITH (TABLOCK)
             SELECT DISTINCT o.FilterItemId
             FROM {matchingObservationsTable.Object.Name} AS mo
             JOIN ObservationFilterItem AS o
               ON o.ObservationId = mo.Id
             OPTION(RECOMPILE, MAXDOP 4);";
 
-        AssertInsertIntoMatchingFilterItemsCorrect(sql, expectedSql);
+        AssertInsertIntoMatchedFilterItemsCorrect(sql, expectedSql);
     }
     
     [Fact]
@@ -340,16 +340,16 @@ public class FilterItemRepositoryTests
     private static FilterItemRepository BuildFilterItemRepository(
         StatisticsDbContext context,
         IRawSqlExecutor? sqlExecutor = null,
-        IMatchingFilterItemsQueryGenerator? queryGenerator = null)
+        IMatchedFilterItemsQueryGenerator? queryGenerator = null)
     {
         return new(context, Mock.Of<ILogger<FilterItemRepository>>())
         {
             SqlExecutor = sqlExecutor ?? Mock.Of<IRawSqlExecutor>(Strict),
-            QueryGenerator = queryGenerator ?? Mock.Of<IMatchingFilterItemsQueryGenerator>(Strict)
+            QueryGenerator = queryGenerator ?? Mock.Of<IMatchedFilterItemsQueryGenerator>(Strict)
         };
     }
     
-    private static void AssertInsertIntoMatchingFilterItemsCorrect(string sql, string expectedSql)
+    private static void AssertInsertIntoMatchedFilterItemsCorrect(string sql, string expectedSql)
     {
         // Check the expected query is present to insert matching Observation Ids into
         // the temp table.
@@ -359,8 +359,8 @@ public class FilterItemRepositoryTests
         // Check the expected index is applied to the temp table after the insert.
         var restOfSql = actualSql.Split(FormatSql(expectedSql))[1].TrimStart();
         var indexSqlPattern = new Regex(
-            @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchingFilterItems_Id_.{36}\].* " +
-            @"ON #MatchingFilterItems\(Id\) WITH \(MAXDOP = 4\);");
+            @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedFilterItem_Id_.{36}\].* " +
+            @"ON #MatchedFilterItem\(Id\) WITH \(MAXDOP = 4\);");
         Assert.Matches(indexSqlPattern, restOfSql);
     }
     
