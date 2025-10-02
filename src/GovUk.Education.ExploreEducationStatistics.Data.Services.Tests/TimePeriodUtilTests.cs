@@ -1,16 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
 public class TimePeriodUtilTests
 {
-    private readonly IEnumerable<TimeIdentifier> _allTimeIdentifiers =
-        Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>().ToList();
+    private readonly IEnumerable<TimeIdentifier> _allTimeIdentifiers = Enum.GetValues(typeof(TimeIdentifier))
+        .Cast<TimeIdentifier>();
 
     [Fact]
     public void RangeFailsWithoutYears()
@@ -192,81 +190,55 @@ public class TimePeriodUtilTests
     [Fact]
     public void RangeIsGeneratedForAcademicYearQuery()
     {
-        var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-        {
-            (2018, AcademicYear),
-            (2019, AcademicYear)
-        };
-
-        CollectionAssert.AreEquivalent(expected,
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYear, 2019, AcademicYear)).ToList());
+        Assert.Equal(
+            [(2018, AcademicYear), (2019, AcademicYear)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYear, 2019, AcademicYear))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForCalendarYearQuery()
     {
-        var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-        {
-            (2018, CalendarYear),
-            (2019, CalendarYear)
-        };
-
-        CollectionAssert.AreEquivalent(expected,
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, CalendarYear)).ToList());
+        Assert.Equal(
+            [(2018, CalendarYear), (2019, CalendarYear)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, CalendarYear))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForFinancialYearQuery()
     {
-        var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-        {
-            (2018, FinancialYear),
-            (2019, FinancialYear)
-        };
-
-        CollectionAssert.AreEquivalent(expected,
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYear, 2019, FinancialYear)).ToList());
+        Assert.Equal(
+            [(2018, FinancialYear), (2019, FinancialYear)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYear, 2019, FinancialYear))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForTaxYearQuery()
     {
-        var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-        {
-            (2018, TaxYear),
-            (2019, TaxYear)
-        };
-
-        CollectionAssert.AreEquivalent(expected,
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear)).ToList());
+        Assert.Equal(
+            [(2018, TaxYear), (2019, TaxYear)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForReportingYearQuery()
     {
-        var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
-        {
-            (2018, ReportingYear),
-            (2019, ReportingYear)
-        };
-
-        CollectionAssert.AreEquivalent(expected,
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, ReportingYear, 2019, ReportingYear)).ToList());
+        Assert.Equal(
+            [(2018, TaxYear), (2019, TaxYear)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForMonthQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, February)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, February, 2019, February)).ToList());
+        Assert.Equal([(2019, February)], TimePeriodUtil.Range(new TimePeriodQuery(2019, February, 2019, February)));
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2019, January),
                 (2019, February),
                 (2019, March),
@@ -279,12 +251,12 @@ public class TimePeriodUtilTests
                 (2019, October),
                 (2019, November),
                 (2019, December)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, January, 2019, December)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, January, 2019, December))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2019, March),
                 (2019, April),
                 (2019, May),
@@ -293,12 +265,12 @@ public class TimePeriodUtilTests
                 (2019, August),
                 (2019, September),
                 (2019, October)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, March, 2019, October)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, March, 2019, October))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2018, April),
                 (2018, May),
                 (2018, June),
@@ -323,23 +295,18 @@ public class TimePeriodUtilTests
                 (2020, January),
                 (2020, February),
                 (2020, March)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, April, 2020, March)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, April, 2020, March))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForWeekQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2020, Week17)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week17)).ToList());
+        Assert.Equal([(2020, Week17)], TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week17)));
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2020, Week1),
                 (2020, Week2),
                 (2020, Week3),
@@ -392,51 +359,36 @@ public class TimePeriodUtilTests
                 (2020, Week50),
                 (2020, Week51),
                 (2020, Week52)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week1, 2020, Week52)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week1, 2020, Week52))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2020, Week17),
-                (2020, Week18),
-                (2020, Week19),
-                (2020, Week20)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week20)).ToList());
+        Assert.Equal(
+            [(2020, Week17), (2020, Week18), (2020, Week19), (2020, Week20)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week20))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, Week51),
-                (2019, Week52),
-                (2020, Week1),
-                (2020, Week2)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, Week51, 2020, Week2)).ToList());
+        Assert.Equal(
+            [(2019, Week51), (2019, Week52), (2020, Week1), (2020, Week2)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, Week51, 2020, Week2))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForAcademicQuarterQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, AcademicYearQ3)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ3)).ToList());
+        Assert.Equal(
+            [(2019, AcademicYearQ3)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ3))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, AcademicYearQ3),
-                (2019, AcademicYearQ4)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ4)).ToList());
+        Assert.Equal(
+            [(2019, AcademicYearQ3), (2019, AcademicYearQ4)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ4))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2018, AcademicYearQ4),
                 (2019, AcademicYearQ1),
                 (2019, AcademicYearQ2),
@@ -444,31 +396,26 @@ public class TimePeriodUtilTests
                 (2019, AcademicYearQ4),
                 (2020, AcademicYearQ1),
                 (2020, AcademicYearQ2)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYearQ4, 2020, AcademicYearQ2)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYearQ4, 2020, AcademicYearQ2))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForCalendarQuarterQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, CalendarYearQ3)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ3)).ToList());
+        Assert.Equal(
+            [(2019, CalendarYearQ3)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ3))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, CalendarYearQ3),
-                (2019, CalendarYearQ4)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ4)).ToList());
+        Assert.Equal(
+            [(2019, CalendarYearQ3), (2019, CalendarYearQ4)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ4))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2018, CalendarYearQ4),
                 (2019, CalendarYearQ1),
                 (2019, CalendarYearQ2),
@@ -476,31 +423,26 @@ public class TimePeriodUtilTests
                 (2019, CalendarYearQ4),
                 (2020, CalendarYearQ1),
                 (2020, CalendarYearQ2)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ4, 2020, CalendarYearQ2)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ4, 2020, CalendarYearQ2))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForFinancialQuarterQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, FinancialYearQ3)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ3)).ToList());
+        Assert.Equal(
+            [(2019, FinancialYearQ3)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ3))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, FinancialYearQ3),
-                (2019, FinancialYearQ4)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ4)).ToList());
+        Assert.Equal(
+            [(2019, FinancialYearQ3), (2019, FinancialYearQ4)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ4))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2018, FinancialYearQ4),
                 (2019, FinancialYearQ1),
                 (2019, FinancialYearQ2),
@@ -508,31 +450,23 @@ public class TimePeriodUtilTests
                 (2019, FinancialYearQ4),
                 (2020, FinancialYearQ1),
                 (2020, FinancialYearQ2)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearQ4, 2020, FinancialYearQ2)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearQ4, 2020, FinancialYearQ2))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForTaxQuarterQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, TaxYearQ3)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ3)).ToList());
+        Assert.Equal([(2019, TaxYearQ3)], TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ3)));
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, TaxYearQ3),
-                (2019, TaxYearQ4)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ4)).ToList());
+        Assert.Equal(
+            [(2019, TaxYearQ3), (2019, TaxYearQ4)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ4))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2018, TaxYearQ4),
                 (2019, TaxYearQ1),
                 (2019, TaxYearQ2),
@@ -540,33 +474,26 @@ public class TimePeriodUtilTests
                 (2019, TaxYearQ4),
                 (2020, TaxYearQ1),
                 (2020, TaxYearQ2)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForTermQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, AutumnTerm)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, AutumnTerm)).ToList());
+        Assert.Equal(
+            [(2019, AutumnTerm)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, AutumnTerm))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2019, AutumnTerm),
-                (2019, SpringTerm),
-                (2019, AutumnSpringTerm),
-                (2019, SummerTerm)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, SummerTerm)).ToList());
+        Assert.Equal(
+            [(2019, AutumnTerm), (2019, SpringTerm), (2019, AutumnSpringTerm), (2019, SummerTerm)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, SummerTerm))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
+        Assert.Equal(
+            [
                 (2018, AutumnSpringTerm),
                 (2018, SummerTerm),
                 (2019, AutumnTerm),
@@ -574,35 +501,27 @@ public class TimePeriodUtilTests
                 (2019, AutumnSpringTerm),
                 (2019, SummerTerm),
                 (2020, AutumnTerm)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnSpringTerm, 2020, AutumnTerm)).ToList());
+            ],
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnSpringTerm, 2020, AutumnTerm))
+        );
     }
 
     [Fact]
     public void RangeIsGeneratedForFinancialYearPartQuery()
     {
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2021, FinancialYearPart1)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart1)).ToList());
+        Assert.Equal(
+            [(2021, FinancialYearPart1)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart1))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2021, FinancialYearPart1),
-                (2021, FinancialYearPart2)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart2)).ToList());
+        Assert.Equal(
+            [(2021, FinancialYearPart1), (2021, FinancialYearPart2)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart2))
+        );
 
-        CollectionAssert.AreEquivalent(
-            new List<(int Year, TimeIdentifier TimeIdentifier)>
-            {
-                (2020, FinancialYearPart1),
-                (2020, FinancialYearPart2),
-                (2021, FinancialYearPart1)
-            },
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, FinancialYearPart1, 2021, FinancialYearPart1)).ToList());
+        Assert.Equal(
+            [(2020, FinancialYearPart1), (2020, FinancialYearPart2), (2021, FinancialYearPart1)],
+            TimePeriodUtil.Range(new TimePeriodQuery(2020, FinancialYearPart1, 2021, FinancialYearPart1))
+        );
     }
 }
