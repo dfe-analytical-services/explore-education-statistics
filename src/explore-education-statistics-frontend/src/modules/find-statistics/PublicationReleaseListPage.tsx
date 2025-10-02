@@ -1,6 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
-import publicationService, {
+import {
   PublicationReleaseSeriesItem,
   PublicationSummaryRedesign,
 } from '@common/services/publicationService';
@@ -9,8 +9,10 @@ import { formatPartialDate } from '@common/utils/date/partialDate';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
+import publicationQueries from '@frontend/queries/publicationQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { Dictionary } from '@frontend/types';
+import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 
@@ -150,21 +152,30 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     };
   }
 
-  const publicationSummary =
-    await publicationService.getPublicationSummaryRedesign(publicationSlug);
+  const queryClient = new QueryClient();
 
-  const releases = await publicationService.getPublicationReleaseList(
-    publicationSlug,
-    {
-      page: page ? Number(page) : undefined,
-      pageSize: pageSize ? Number(pageSize) : undefined,
-    },
-  );
+  try {
+    const [publicationSummary, releases] = await Promise.all([
+      queryClient.fetchQuery(
+        publicationQueries.getPublicationSummaryRedesign(publicationSlug),
+      ),
+      queryClient.fetchQuery(
+        publicationQueries.getPublicationReleaseList(publicationSlug, {
+          page: page ? Number(page) : undefined,
+          pageSize: pageSize ? Number(pageSize) : undefined,
+        }),
+      ),
+    ]);
 
-  return {
-    props: {
-      publicationSummary,
-      releases,
-    },
-  };
+    return {
+      props: {
+        publicationSummary,
+        releases,
+      },
+    };
+  } catch (error) {
+    return {
+      notFound: true,
+    };
+  }
 };

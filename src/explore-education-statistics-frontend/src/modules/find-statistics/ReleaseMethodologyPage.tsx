@@ -1,7 +1,7 @@
 import SectionBreak from '@common/components/SectionBreak';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
-import publicationService, {
+import {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
   ReleaseVersionSummary,
@@ -12,6 +12,8 @@ import Link from '@frontend/components/Link';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
 import ReleasePageTabNav from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
+import publicationQueries from '@frontend/queries/publicationQueries';
+import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
@@ -103,23 +105,38 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
         notFound: true,
       };
     }
-    const [publicationSummary, releaseVersionSummary, methodologiesSummary] =
-      await Promise.all([
-        publicationService.getPublicationSummaryRedesign(publicationSlug),
-        publicationService.getReleaseVersionSummary(
-          publicationSlug,
-          releaseSlug,
-        ),
-        publicationService.getPublicationMethodologies(publicationSlug),
-      ]);
 
-    return {
-      props: {
-        publicationSummary,
-        releaseVersionSummary,
-        methodologiesSummary,
-      },
-    };
+    const queryClient = new QueryClient();
+
+    try {
+      const [publicationSummary, releaseVersionSummary, methodologiesSummary] =
+        await Promise.all([
+          queryClient.fetchQuery(
+            publicationQueries.getPublicationSummaryRedesign(publicationSlug),
+          ),
+          queryClient.fetchQuery(
+            publicationQueries.getReleaseVersionSummary(
+              publicationSlug,
+              releaseSlug,
+            ),
+          ),
+          queryClient.fetchQuery(
+            publicationQueries.getPublicationMethodologies(publicationSlug),
+          ),
+        ]);
+
+      return {
+        props: {
+          publicationSummary,
+          releaseVersionSummary,
+          methodologiesSummary,
+        },
+      };
+    } catch (error) {
+      return {
+        notFound: true,
+      };
+    }
   },
 );
 
