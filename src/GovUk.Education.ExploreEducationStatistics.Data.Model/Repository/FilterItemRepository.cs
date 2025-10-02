@@ -80,14 +80,14 @@ public class FilterItemRepository(
                 FROM {matchedObservationsTableReference.Name} AS mo
                 JOIN ObservationFilterItem AS o
                   ON o.ObservationId = mo.Id
-                OPTION(RECOMPILE, MAXDOP 4)";
+                OPTION(RECOMPILE, MAXDOP 4);";
 
             // Add a unique clustered index *after* the heap insert for better performance,
             // as adding before the insert forces a more complex execution plan that orders
             // the inserts and disables parallelism.
             var indexSql = $@"
-                CREATE UNIQUE CLUSTERED INDEX [IX_MatchedFilterItem_FilterItemId_{Guid.NewGuid()}]
-                ON #MatchedFilterItem(Id) WITH (MAXDOP = 4);";
+                CREATE UNIQUE CLUSTERED INDEX [IX_{matchedFilterItemsTempTable.Name}_{nameof(MatchedFilterItem.Id)}_{Guid.NewGuid()}]
+                ON {matchedFilterItemsTempTable.Name}({nameof(MatchedFilterItem.Id)}) WITH (MAXDOP = 4);";
 
             return $"{matchingFilterItemsSql}\n\n{indexSql}";
         }
@@ -105,7 +105,8 @@ public class FilterItemRepository(
             matchedObservationsTableReference,
             cancellationToken: cancellationToken);
 
-        // Execute the query to find matching FilterItem Ids.
+        // Execute the query to find matching FilterItem Ids and insert them into
+        // the #MatchingFilterItems temp table.
         await SqlExecutor.ExecuteSqlRaw(
             sql: sql,
             context: context,
@@ -129,6 +130,7 @@ public class FilterItemRepository(
             .Include(fi => fi.FilterGroup)
             .ThenInclude(fg => fg.Filter)
             .Join(
+                // This is the contents of the #MatchedFilterItems temp table.
                 inner: context.MatchedFilterItems,
                 outerKeySelector: filterItem => filterItem.Id,
                 innerKeySelector: matchedFilterItem => matchedFilterItem.Id,

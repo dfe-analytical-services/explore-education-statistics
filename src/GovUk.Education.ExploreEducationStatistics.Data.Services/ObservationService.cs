@@ -133,8 +133,8 @@ public class ObservationService : IObservationService
             // as adding before the insert forces a more complex execution plan that orders
             // the inserts and disables parallelism.
             var indexSql = $@"
-                CREATE UNIQUE CLUSTERED INDEX [IX_MatchedObservation_Id_{Guid.NewGuid()}]
-                ON #MatchedObservation(Id)
+                CREATE UNIQUE CLUSTERED INDEX [IX_{matchingObservationTable.Name}_{nameof(MatchedObservation.Id)}_{Guid.NewGuid()}]
+                ON {matchingObservationTable.Name}({nameof(MatchedObservation.Id)})
                 WITH (MAXDOP = 4);";
 
             var parameters = ListOf(new SqlParameter("subjectId", subjectId));

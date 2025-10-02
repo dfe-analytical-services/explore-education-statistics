@@ -626,7 +626,7 @@ public class ObservationServiceTests
         // Check the expected index is applied to the temp table after the insert.
         var restOfSql = actualSql.Split(FormatSql(expectedSql))[1].TrimStart();
         var indexSqlPattern = new Regex(
-            @"CREATE UNIQUE CLUSTERED INDEX \[IX_MatchedObservation_Id_.{36}\].* " +
+            @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedObservation_Id_.{36}\].* " +
             @"ON #MatchedObservation\(Id\) WITH \(MAXDOP = 4\);");
         Assert.Matches(indexSqlPattern, restOfSql);
     }
