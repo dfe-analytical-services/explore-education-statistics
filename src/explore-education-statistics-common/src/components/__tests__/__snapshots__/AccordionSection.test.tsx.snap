@@ -11,6 +11,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     >
       <button aria-controls="accordionSection-content"
               aria-expanded="false"
+              aria-label="Test heading, show this section"
               class="govuk-accordion__section-button"
               id="accordionSection-heading"
               type="button"
@@ -21,6 +22,9 @@ exports[`AccordionSection renders correctly with required props 1`] = `
           >
             Test heading
           </span>
+        </span>
+        <span class="govuk-visually-hidden govuk-accordion__section-heading-divider">
+          ,
         </span>
         <span class="govuk-accordion__section-toggle">
           <span class="govuk-accordion__section-toggle-focus">
@@ -62,6 +66,7 @@ exports[`AccordionSection renders with caption 1`] = `
     >
       <button aria-controls="accordionSection-content"
               aria-expanded="false"
+              aria-label="Test heading, show this section"
               class="govuk-accordion__section-button"
               id="accordionSection-heading"
               type="button"
@@ -77,6 +82,9 @@ exports[`AccordionSection renders with caption 1`] = `
           <span class="govuk-accordion__section-summary-focus">
             Some caption text
           </span>
+        </span>
+        <span class="govuk-visually-hidden govuk-accordion__section-heading-divider">
+          ,
         </span>
         <span class="govuk-accordion__section-toggle">
           <span class="govuk-accordion__section-toggle-focus">
@@ -118,6 +126,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
     >
       <button aria-controls="accordionSection-content"
               aria-expanded="false"
+              aria-label="Test heading, show this section"
               class="govuk-accordion__section-button"
               id="accordionSection-heading"
               type="button"
@@ -128,6 +137,9 @@ exports[`AccordionSection renders with different heading size 1`] = `
           >
             Test heading
           </span>
+        </span>
+        <span class="govuk-visually-hidden govuk-accordion__section-heading-divider">
+          ,
         </span>
         <span class="govuk-accordion__section-toggle">
           <span class="govuk-accordion__section-toggle-focus">
