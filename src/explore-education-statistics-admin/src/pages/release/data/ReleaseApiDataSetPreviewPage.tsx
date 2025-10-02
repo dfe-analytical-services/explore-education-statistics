@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
 import { PreviewTokenFormProps } from '@admin/pages/release/data/types/PreviewTokenFormProps';
+import { isToday } from 'date-fns';
 
 export default function ReleaseApiDataSetPreviewPage() {
   const history = useHistory();
@@ -33,7 +34,6 @@ export default function ReleaseApiDataSetPreviewPage() {
 
   function getPresetSpanEndDate(days: number) {
     const fromDate = new Date();
-    fromDate.setHours(0, 0, 1);
 
     if (!(Number.isInteger(days) && days > 0 && days < 8)) {
       throw new Error(
@@ -61,7 +61,11 @@ export default function ReleaseApiDataSetPreviewPage() {
       startDate = new Date();
       endDate = getPresetSpanEndDate(datePresetSpan);
     } else if (activates && expires) {
-      startDate = activates;
+      if (isToday(activates)) {
+        startDate = new Date(); // set activates to the current time
+      } else {
+        startDate = activates;
+      }
       endDate = expires;
     } else {
       startDate = new Date();

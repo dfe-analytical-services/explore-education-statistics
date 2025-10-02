@@ -36,14 +36,14 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
-                activates ??= DateTimeOffset.UtcNow;
+                activates = activates?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
                 var previewToken = publicDataDbContext.PreviewTokens.Add(new PreviewToken
                 {
                     DataSetVersionId = dataSetVersionId,
                     Label = label,
                     Created = DateTimeOffset.UtcNow,
-                    Activates = activates.Value,
-                    Expiry = expiry ?? activates.Value.AddDays(7),
+                    Activates = activates.Value.ToUniversalTime(),
+                    Expiry = expiry?.ToUniversalTime() ?? activates.Value.AddDays(7),
                     CreatedByUserId = userService.GetUserId()
                 });
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
