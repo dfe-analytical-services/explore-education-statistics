@@ -19,8 +19,10 @@ public class ManageContentPageController : ControllerBase
     }
 
     [HttpGet("release/{releaseVersionId:guid}/content")]
-    public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseVersionId,
-        [FromQuery] bool isPrerelease = false)
+    public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(
+        Guid releaseVersionId,
+        [FromQuery] bool isPrerelease = false
+    )
     {
         return await _manageContentPageService
             .GetManageContentPageViewModel(releaseVersionId, isPrerelease)

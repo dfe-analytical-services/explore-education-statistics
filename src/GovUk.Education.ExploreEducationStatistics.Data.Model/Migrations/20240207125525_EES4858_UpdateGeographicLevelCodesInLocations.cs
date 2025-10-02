@@ -27,7 +27,8 @@ public partial class EES4858_UpdateGeographicLevelCodesInLocations : Migration
                 keyColumn: "GeographicLevel",
                 keyValue: update.OldCode,
                 column: "GeographicLevel",
-                value: update.NewCode);
+                value: update.NewCode
+            );
         }
     }
 
@@ -40,7 +41,8 @@ public partial class EES4858_UpdateGeographicLevelCodesInLocations : Migration
                 keyColumn: "GeographicLevel",
                 keyValue: update.NewCode,
                 column: "GeographicLevel",
-                value: update.OldCode);
+                value: update.OldCode
+            );
         }
     }
 }

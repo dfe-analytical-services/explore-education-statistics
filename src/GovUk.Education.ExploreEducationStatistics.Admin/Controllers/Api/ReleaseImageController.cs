@@ -23,9 +23,7 @@ public class ReleaseImageController : ControllerBase
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<ActionResult<ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile file)
     {
-        return await _releaseImageService
-            .Upload(releaseVersionId, file)
-            .HandleFailuresOrOk();
+        return await _releaseImageService.Upload(releaseVersionId, file).HandleFailuresOrOk();
     }
 
     /// <summary>
@@ -41,8 +39,6 @@ public class ReleaseImageController : ControllerBase
     [HttpGet("releases/{releaseVersionId:guid}/images/{fileId:guid}")]
     public async Task<ActionResult> Stream(Guid releaseVersionId, Guid fileId)
     {
-        return await _releaseImageService
-            .Stream(releaseVersionId: releaseVersionId, fileId: fileId)
-            .HandleFailures();
+        return await _releaseImageService.Stream(releaseVersionId: releaseVersionId, fileId: fileId).HandleFailures();
     }
 }

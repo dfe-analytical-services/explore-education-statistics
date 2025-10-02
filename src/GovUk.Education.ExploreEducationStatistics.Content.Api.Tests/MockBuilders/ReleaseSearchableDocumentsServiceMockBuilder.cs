@@ -14,22 +14,23 @@ public class ReleaseSearchableDocumentsServiceMockBuilder
 
     private ReleaseSearchableDocumentDto? _searchableDocument;
 
-    private static readonly Expression<Func<IReleaseSearchableDocumentsService,
-        Task<Either<ActionResult, ReleaseSearchableDocumentDto>>>> GetLatestReleaseAsSearchableDocument =
-        m => m.GetLatestReleaseAsSearchableDocument(
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IReleaseSearchableDocumentsService, Task<Either<ActionResult, ReleaseSearchableDocumentDto>>>
+    > GetLatestReleaseAsSearchableDocument = m =>
+        m.GetLatestReleaseAsSearchableDocument(It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public ReleaseSearchableDocumentsServiceMockBuilder()
     {
-        _mock.Setup(GetLatestReleaseAsSearchableDocument)
+        _mock
+            .Setup(GetLatestReleaseAsSearchableDocument)
             .ReturnsAsync(() => _searchableDocument ?? new ReleaseSearchableDocumentDtoBuilder().Build());
     }
 
     public IReleaseSearchableDocumentsService Build() => _mock.Object;
 
     public ReleaseSearchableDocumentsServiceMockBuilder WhereHasSearchableDocument(
-        ReleaseSearchableDocumentDto searchableDocument)
+        ReleaseSearchableDocumentDto searchableDocument
+    )
     {
         _searchableDocument = searchableDocument;
         return this;
@@ -37,9 +38,8 @@ public class ReleaseSearchableDocumentsServiceMockBuilder
 
     public ReleaseSearchableDocumentsServiceMockBuilder WhereGetLatestReleaseAsSearchableDocumentReturnsNotFound()
     {
-        _mock.Setup(m => m.GetLatestReleaseAsSearchableDocument(
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m => m.GetLatestReleaseAsSearchableDocument(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -51,10 +51,14 @@ public class ReleaseSearchableDocumentsServiceMockBuilder
     {
         public void GetLatestReleaseAsSearchableDocumentWasCalled(string? publicationSlug = null)
         {
-            mock.Verify(m => m.GetLatestReleaseAsSearchableDocument(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetLatestReleaseAsSearchableDocument(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

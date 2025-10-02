@@ -23,16 +23,21 @@ public partial class EES2540_RemoveObservationRowAndObservationRowFilterItem : M
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationsPath,
-            $"{MigrationId}_TableTypes.sql");
+        migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_TableTypes.sql");
 
-        migrationBuilder.SqlFromFile(MigrationsPath,
-            $"{PreviousRoutinesMigrationId}_Routine_FilteredObservationRows.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousRoutinesMigrationId}_Routine_FilteredObservationRows.sql"
+        );
 
-        migrationBuilder.SqlFromFile(MigrationsPath,
-            $"{PreviousRoutinesMigrationId}_Routine_GetFilteredObservations.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousRoutinesMigrationId}_Routine_GetFilteredObservations.sql"
+        );
 
-        migrationBuilder.SqlFromFile(MigrationsPath,
-            $"{PreviousRoutinesMigrationId}_Routine_InsertObservationRows.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousRoutinesMigrationId}_Routine_InsertObservationRows.sql"
+        );
     }
 }

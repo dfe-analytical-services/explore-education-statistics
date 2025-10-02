@@ -16,12 +16,12 @@ public partial class EES5091_AddPublicDataProcessorContainedDatabaseUser : Migra
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_EES5091_AddPublicDataProcessorContainedDatabaseUser.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.ContentMigrationsPath,
+            $"{MigrationId}_EES5091_AddPublicDataProcessorContainedDatabaseUser.sql"
+        );
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

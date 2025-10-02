@@ -12,33 +12,30 @@ public partial class EES3149AddSupersededByToPublication : Migration
             name: "SupersededById",
             table: "Publications",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Publications_SupersededById",
             table: "Publications",
-            column: "SupersededById");
+            column: "SupersededById"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Publications_Publications_SupersededById",
             table: "Publications",
             column: "SupersededById",
             principalTable: "Publications",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_Publications_Publications_SupersededById",
-            table: "Publications");
+        migrationBuilder.DropForeignKey(name: "FK_Publications_Publications_SupersededById", table: "Publications");
 
-        migrationBuilder.DropIndex(
-            name: "IX_Publications_SupersededById",
-            table: "Publications");
+        migrationBuilder.DropIndex(name: "IX_Publications_SupersededById", table: "Publications");
 
-        migrationBuilder.DropColumn(
-            name: "SupersededById",
-            table: "Publications");
+        migrationBuilder.DropColumn(name: "SupersededById", table: "Publications");
     }
 }

@@ -14,6 +14,6 @@ public class OrganisationsController(IOrganisationService organisationService) :
     [HttpGet("organisations")]
     public async Task<OrganisationViewModel[]> GetAllOrganisations(CancellationToken cancellationToken = default) =>
         (await organisationService.GetAllOrganisations(cancellationToken))
-        .Select(OrganisationViewModel.FromOrganisation)
-        .ToArray();
+            .Select(OrganisationViewModel.FromOrganisation)
+            .ToArray();
 }

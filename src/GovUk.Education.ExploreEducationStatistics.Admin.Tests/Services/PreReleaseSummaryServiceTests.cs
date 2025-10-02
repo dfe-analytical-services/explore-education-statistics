@@ -19,9 +19,9 @@ public class PreReleaseSummaryServiceTests
     [Fact]
     public async Task GetPreReleaseSummaryViewModel()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -49,7 +49,8 @@ public class PreReleaseSummaryServiceTests
 
     private static PreReleaseSummaryService BuildService(
         ContentDbContext? contentDbContext = null,
-        UserService? userService = null)
+        UserService? userService = null
+    )
     {
         return new PreReleaseSummaryService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

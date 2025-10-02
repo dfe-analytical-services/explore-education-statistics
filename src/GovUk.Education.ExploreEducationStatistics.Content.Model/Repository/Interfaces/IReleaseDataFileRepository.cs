@@ -15,7 +15,8 @@ public interface IReleaseDataFileRepository
         string? name = null,
         File? replacingDataFile = null,
         File? source = null,
-        int order = 0);
+        int order = 0
+    );
 
     public Task<IList<File>> ListDataFiles(Guid releaseVersionId);
 
@@ -23,6 +24,5 @@ public interface IReleaseDataFileRepository
 
     public Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId);
 
-    public Task<ReleaseFile> GetBySubject(Guid releaseVersionId,
-        Guid subjectId);
+    public Task<ReleaseFile> GetBySubject(Guid releaseVersionId, Guid subjectId);
 }

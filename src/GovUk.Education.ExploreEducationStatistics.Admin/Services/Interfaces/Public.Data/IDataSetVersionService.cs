@@ -16,47 +16,57 @@ public interface IDataSetVersionService
         Guid dataSetId,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
         Guid dataSetId,
         SemVersion version,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,
         Guid? dataSetVersionToReplaceId = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
         Guid dataSetVersionId,
         DataSetVersionUpdateRequest updateRequest,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task UpdateVersionsForReleaseVersion(
         Guid releaseVersionId,
         string releaseSlug,
         string releaseTitle,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

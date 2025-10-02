@@ -13,17 +13,15 @@ public record FilterCsvMetaViewModel
     public IReadOnlyDictionary<Guid, FilterItemCsvMetaViewModel> Items { get; init; } =
         new Dictionary<Guid, FilterItemCsvMetaViewModel>();
 
-    public FilterCsvMetaViewModel()
-    {
-    }
+    public FilterCsvMetaViewModel() { }
 
     public FilterCsvMetaViewModel(Filter filter)
     {
         Id = filter.Id;
         Name = filter.Name;
         GroupCsvColumn = filter.GroupCsvColumn;
-        Items = filter.FilterGroups
-            .SelectMany(filterGroup => filterGroup.FilterItems)
+        Items = filter
+            .FilterGroups.SelectMany(filterGroup => filterGroup.FilterItems)
             .Select(filterItem => new FilterItemCsvMetaViewModel(filterItem))
             .ToDictionary(filterItem => filterItem.Id);
     }
@@ -33,12 +31,14 @@ public record FilterCsvMetaViewModel
         Id = filter.Id;
         Name = filter.Name;
         GroupCsvColumn = filter.GroupCsvColumn;
-        Items = filter.Options
-            .SelectMany(kvp =>
+        Items = filter
+            .Options.SelectMany(kvp =>
             {
                 var (_, filterGroup) = kvp;
-                return filterGroup.Options
-                    .Select(filterItem => new FilterItemCsvMetaViewModel(filterItem, filterGroup.Label));
+                return filterGroup.Options.Select(filterItem => new FilterItemCsvMetaViewModel(
+                    filterItem,
+                    filterGroup.Label
+                ));
             })
             .ToDictionary(filterItem => filterItem.Id);
     }
@@ -52,9 +52,7 @@ public record FilterItemCsvMetaViewModel
 
     public string Label { get; init; } = string.Empty;
 
-    public FilterItemCsvMetaViewModel()
-    {
-    }
+    public FilterItemCsvMetaViewModel() { }
 
     public FilterItemCsvMetaViewModel(FilterItem filterItem)
     {

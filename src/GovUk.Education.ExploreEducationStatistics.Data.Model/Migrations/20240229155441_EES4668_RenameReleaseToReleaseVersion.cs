@@ -17,29 +17,17 @@ public partial class EES4668_RenameReleaseToReleaseVersion : Migration
         // - ReleaseSubject.ReleaseId
 
         // Drop the 2 foreign key constraints
-        migrationBuilder.DropForeignKey(
-            name: "FK_ReleaseFootnote_Release_ReleaseId",
-            table: "ReleaseFootnote");
+        migrationBuilder.DropForeignKey(name: "FK_ReleaseFootnote_Release_ReleaseId", table: "ReleaseFootnote");
 
-        migrationBuilder.DropForeignKey(
-            name: "FK_ReleaseSubject_Release_ReleaseId",
-            table: "ReleaseSubject");
+        migrationBuilder.DropForeignKey(name: "FK_ReleaseSubject_Release_ReleaseId", table: "ReleaseSubject");
 
         // Rename the Release table to ReleaseVersion
-        migrationBuilder.RenameTable(
-            name: "Release",
-            newName: "ReleaseVersion");
+        migrationBuilder.RenameTable(name: "Release", newName: "ReleaseVersion");
 
         // Rename the ReleaseId column to ReleaseVersionId in the 2 foreign key columns
-        migrationBuilder.RenameColumn(
-            name: "ReleaseId",
-            newName: "ReleaseVersionId",
-            table: "ReleaseFootnote");
+        migrationBuilder.RenameColumn(name: "ReleaseId", newName: "ReleaseVersionId", table: "ReleaseFootnote");
 
-        migrationBuilder.RenameColumn(
-            name: "ReleaseId",
-            newName: "ReleaseVersionId",
-            table: "ReleaseSubject");
+        migrationBuilder.RenameColumn(name: "ReleaseId", newName: "ReleaseVersionId", table: "ReleaseSubject");
 
         // Note, there's no indexes IX_ReleaseFootnote_ReleaseId or IX_ReleaseSubject_ReleaseId
         // so there's no renaming of any indexes here.
@@ -51,7 +39,8 @@ public partial class EES4668_RenameReleaseToReleaseVersion : Migration
             column: "ReleaseVersionId",
             principalTable: "ReleaseVersion",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_ReleaseSubject_ReleaseVersion_ReleaseVersionId",
@@ -59,10 +48,9 @@ public partial class EES4668_RenameReleaseToReleaseVersion : Migration
             column: "ReleaseVersionId",
             principalTable: "ReleaseVersion",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

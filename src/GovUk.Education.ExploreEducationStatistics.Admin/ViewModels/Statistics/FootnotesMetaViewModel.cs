@@ -19,14 +19,9 @@ public class FootnotesSubjectMetaViewModel
     public string SubjectName { get; set; }
 }
 
-public class FootnotesFilterMetaViewModel : LegendOptionsMetaValueModel<Dictionary<Guid, FootnotesFilterGroupsMetaViewModel>>
-{
-}
+public class FootnotesFilterMetaViewModel
+    : LegendOptionsMetaValueModel<Dictionary<Guid, FootnotesFilterGroupsMetaViewModel>> { }
 
-public class FootnotesFilterGroupsMetaViewModel : LabelOptionsMetaValueModel<List<LabelValue>>
-{
-}
+public class FootnotesFilterGroupsMetaViewModel : LabelOptionsMetaValueModel<List<LabelValue>> { }
 
-public class FootnotesIndicatorsMetaViewModel : LabelOptionsMetaValueModel<IList<IndicatorMetaViewModel>>
-{
-}
+public class FootnotesIndicatorsMetaViewModel : LabelOptionsMetaValueModel<IList<IndicatorMetaViewModel>> { }

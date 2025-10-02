@@ -11,19 +11,23 @@ public interface IParquetLocationRepository
     Task<IList<ParquetLocationOption>> ListOptions(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<IList<ParquetLocationOption>> ListOptions(
         DataSetVersion dataSetVersion,
         IEnumerable<IDataSetQueryLocation> locations,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<IList<IdPublicIdPair>> ListOptionPublicIds(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<ISet<GeographicLevel>> ListLevels(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

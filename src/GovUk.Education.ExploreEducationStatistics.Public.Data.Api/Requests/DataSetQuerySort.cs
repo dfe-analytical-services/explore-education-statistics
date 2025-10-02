@@ -46,25 +46,23 @@ public record DataSetQuerySort
         return new DataSetQuerySort
         {
             Field = sort[..directionDelimiter],
-            Direction = sort[(directionDelimiter + 1)..]
+            Direction = sort[(directionDelimiter + 1)..],
         };
     }
 
     public class Validator : AbstractValidator<DataSetQuerySort>
     {
-        private static readonly HashSet<string> AllowedDirections = [
+        private static readonly HashSet<string> AllowedDirections =
+        [
             SortDirection.Asc.ToString(),
-            SortDirection.Desc.ToString()
+            SortDirection.Desc.ToString(),
         ];
 
         public Validator()
         {
-            RuleFor(t => t.Field)
-                .NotEmpty()
-                .MaximumLength(40);
+            RuleFor(t => t.Field).NotEmpty().MaximumLength(40);
 
-            RuleFor(t => t.Direction)
-                .AllowedValue(AllowedDirections);
+            RuleFor(t => t.Direction).AllowedValue(AllowedDirections);
         }
     }
 }

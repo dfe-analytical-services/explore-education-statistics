@@ -27,12 +27,9 @@ public record PublicationListRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Search)
-                .MinimumLength(3);
-            RuleFor(request => request.Page)
-                .GreaterThanOrEqualTo(1);
-            RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 40);
+            RuleFor(request => request.Search).MinimumLength(3);
+            RuleFor(request => request.Page).GreaterThanOrEqualTo(1);
+            RuleFor(request => request.PageSize).InclusiveBetween(1, 40);
         }
     }
 }

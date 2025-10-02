@@ -23,15 +23,15 @@ public class DataGuidanceController : ControllerBase
     [HttpGet("release/{releaseVersionId:guid}/data-guidance")]
     public async Task<ActionResult<DataGuidanceViewModel>> GetReleaseDataGuidance(Guid releaseVersionId)
     {
-        return await _dataGuidanceService.GetDataGuidance(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _dataGuidanceService.GetDataGuidance(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpPatch("release/{releaseVersionId:guid}/data-guidance")]
-    public async Task<ActionResult<DataGuidanceViewModel>> UpdateReleaseDataGuidance(Guid releaseVersionId,
-        DataGuidanceUpdateRequest request)
+    public async Task<ActionResult<DataGuidanceViewModel>> UpdateReleaseDataGuidance(
+        Guid releaseVersionId,
+        DataGuidanceUpdateRequest request
+    )
     {
-        return await _dataGuidanceService.UpdateDataGuidance(releaseVersionId, request)
-            .HandleFailuresOrOk();
+        return await _dataGuidanceService.UpdateDataGuidance(releaseVersionId, request).HandleFailuresOrOk();
     }
 }

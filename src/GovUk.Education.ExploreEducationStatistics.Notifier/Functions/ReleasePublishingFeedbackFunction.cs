@@ -21,49 +21,62 @@ public class ReleasePublishingFeedbackFunction(
     IOptions<AppOptions> appOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     IEmailService emailService,
-    ILogger<ReleasePublishingFeedbackFunction> logger)
+    ILogger<ReleasePublishingFeedbackFunction> logger
+)
 {
     private readonly AppOptions _appOptions = appOptions.Value;
-    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
-    
+    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions
+        .Value
+        .EmailTemplates;
+
     [Function(nameof(SendReleasePublishingFeedbackEmail))]
     public async Task SendReleasePublishingFeedbackEmail(
         [QueueTrigger(NotifierQueueStorage.ReleasePublishingFeedbackQueue)] ReleasePublishingFeedbackMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
             await contentDbContext
-                .ReleasePublishingFeedback
-                .Include(feedback => feedback.ReleaseVersion)
+                .ReleasePublishingFeedback.Include(feedback => feedback.ReleaseVersion)
                 .ThenInclude(releaseVersion => releaseVersion.Release)
                 .ThenInclude(release => release.Publication)
                 .SingleOrNotFoundAsync(
                     feedback => feedback.Id == message.ReleasePublishingFeedbackId,
-                    cancellationToken)
+                    cancellationToken
+                )
                 .OnSuccessDo(feedback =>
                 {
                     var release = feedback.ReleaseVersion.Release;
-                    
+
                     var values = new Dictionary<string, dynamic>
                     {
                         { "publication_name", release.Publication.Title },
                         { "release_name", release.Title },
                         { "role_description", GetRoleDescription(feedback.UserPublicationRole) },
-                        { "feedback_url", $"{_appOptions.PublicAppUrl}/release-publishing-feedback?token={feedback.EmailToken}" }
+                        {
+                            "feedback_url",
+                            $"{_appOptions.PublicAppUrl}/release-publishing-feedback?token={feedback.EmailToken}"
+                        },
                     };
 
                     emailService.SendEmail(
                         email: message.EmailAddress,
                         templateId: _emailTemplateOptions.ReleasePublishingFeedbackId,
-                        values);
+                        values
+                    );
                 })
-                .OrThrow(_ => new Exception("Unable to send release publishing feedback " +
-                                            $"for {message.ReleasePublishingFeedbackId}"));
+                .OrThrow(_ => new Exception(
+                    "Unable to send release publishing feedback " + $"for {message.ReleasePublishingFeedbackId}"
+                ));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Exception occured while executing '{FunctionName}'", nameof(SendReleasePublishingFeedbackEmail));
+            logger.LogError(
+                ex,
+                "Exception occured while executing '{FunctionName}'",
+                nameof(SendReleasePublishingFeedbackEmail)
+            );
         }
     }
 
@@ -73,18 +86,20 @@ public class ReleasePublishingFeedbackFunction(
         {
             PublicationRole.Owner => "an owner",
             PublicationRole.Allower => "an approver",
-            
+
             // Note that this function should never be invoked for PublicationRole.Approver
             // or PublicationRole.Drafter currently, because Publisher is filtering
             // these out until the permissions simplification work has been completed.
             PublicationRole.Drafter => throw new ArgumentException(
-                $"{nameof(ReleasePublishingFeedbackFunction)} should not " +
-                $"have been called for {nameof(PublicationRole.Drafter)}"),
+                $"{nameof(ReleasePublishingFeedbackFunction)} should not "
+                    + $"have been called for {nameof(PublicationRole.Drafter)}"
+            ),
             PublicationRole.Approver => throw new ArgumentException(
-                $"{nameof(ReleasePublishingFeedbackFunction)} should not " +
-                $"have been called for {nameof(PublicationRole.Approver)}"),
-            
-            _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+                $"{nameof(ReleasePublishingFeedbackFunction)} should not "
+                    + $"have been called for {nameof(PublicationRole.Approver)}"
+            ),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(role), role, null),
         };
     }
 }

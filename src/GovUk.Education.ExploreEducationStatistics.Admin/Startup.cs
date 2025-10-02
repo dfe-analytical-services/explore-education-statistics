@@ -89,30 +89,22 @@ using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Ser
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
-using IContentMethodologyService =
-    GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
-using IContentPublicationService =
-    GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
-using IDataSetService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
+using IDataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
-using IMethodologyImageService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
-using IMethodologyService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
-using IPublicationRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
-using MethodologyImageService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
+using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
@@ -125,9 +117,7 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin;
 
-public class Startup(
-    IConfiguration configuration,
-    IHostEnvironment hostEnvironment)
+public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
     // This method gets called by the runtime. Use this method to add services to the container.
     public virtual void ConfigureServices(IServiceCollection services)
@@ -141,7 +131,8 @@ public class Startup(
          * Logging
          */
 
-        services.AddApplicationInsightsTelemetry()
+        services
+            .AddApplicationInsightsTelemetry()
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
         /*
@@ -156,7 +147,8 @@ public class Startup(
             options.Secure = CookieSecurePolicy.Always;
         });
 
-        services.AddControllers(options =>
+        services
+            .AddControllers(options =>
             {
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
@@ -167,12 +159,15 @@ public class Startup(
 
         services.AddFluentValidation();
 
-        services.AddValidatorsFromAssemblies([
-            typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
-                typeof(FullTableQueryRequest.Validator).Assembly // Adds *all* validators from Common
-        ]);
+        services.AddValidatorsFromAssemblies(
+            [
+                typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
+                typeof(FullTableQueryRequest.Validator).Assembly, // Adds *all* validators from Common
+            ]
+        );
 
-        services.AddMvc(options =>
+        services
+            .AddMvc(options =>
             {
                 options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
                 options.Filters.Add(new OperationCancelledExceptionFilter());
@@ -187,10 +182,16 @@ public class Startup(
             });
 
         // Adds Brotli and Gzip compressing
-        services.AddResponseCompression(options => { options.EnableForHttps = true; });
+        services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+        });
 
         // In production, the React files will be served from this directory
-        services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot"; });
+        services.AddSpaStaticFiles(config =>
+        {
+            config.RootPath = "wwwroot";
+        });
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
         /*
@@ -200,7 +201,8 @@ public class Startup(
         // TODO EES-4869 - review if we need to retain these tables.
         services.AddDbContext<UsersAndRolesDbContext>(options =>
             options
-                .UseSqlServer(configuration.GetConnectionString("ContentDb"),
+                .UseSqlServer(
+                    configuration.GetConnectionString("ContentDb"),
                     providerOptions =>
                         providerOptions
                             .MigrationsAssembly(typeof(Startup).Assembly.FullName)
@@ -211,7 +213,8 @@ public class Startup(
 
         services.AddDbContext<ContentDbContext>(options =>
             options
-                .UseSqlServer(configuration.GetConnectionString("ContentDb"),
+                .UseSqlServer(
+                    configuration.GetConnectionString("ContentDb"),
                     providerOptions =>
                         providerOptions
                             .MigrationsAssembly(typeof(Startup).Assembly.FullName)
@@ -222,7 +225,8 @@ public class Startup(
 
         services.AddDbContext<StatisticsDbContext>(options =>
             options
-                .UseSqlServer(configuration.GetConnectionString("StatisticsDb"),
+                .UseSqlServer(
+                    configuration.GetConnectionString("StatisticsDb"),
                     providerOptions =>
                         providerOptions
                             .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
@@ -330,7 +334,8 @@ public class Startup(
                             context.Token = context.Request.Query["access_token"];
                         }
                     };
-                });
+                }
+            );
         }
 
         /*
@@ -338,12 +343,10 @@ public class Startup(
          */
 
         var signalRBuilder = services
-            .AddSignalR(
-                options =>
-                {
-                    options.AddFilter<HttpContextHubFilter>();
-                }
-            )
+            .AddSignalR(options =>
+            {
+                options.AddFilter<HttpContextHubFilter>();
+            })
             .AddNewtonsoftJsonProtocol();
 
         var azureSignalRConnectionString = configuration.GetValue<string>("Azure:SignalR:ConnectionString");
@@ -357,33 +360,26 @@ public class Startup(
          * Configuration options
          */
 
-        services.Configure<AppOptions>(
-            configuration.GetRequiredSection(AppOptions.Section));
-        services.Configure<AppInsightsOptions>(
-            configuration.GetSection(AppInsightsOptions.Section));
-        services.Configure<NotifyOptions>(
-            configuration.GetSection(NotifyOptions.Section));
-        services.Configure<PublicAppOptions>(
-            configuration.GetRequiredSection(PublicAppOptions.Section));
+        services.Configure<AppOptions>(configuration.GetRequiredSection(AppOptions.Section));
+        services.Configure<AppInsightsOptions>(configuration.GetSection(AppInsightsOptions.Section));
+        services.Configure<NotifyOptions>(configuration.GetSection(NotifyOptions.Section));
+        services.Configure<PublicAppOptions>(configuration.GetRequiredSection(PublicAppOptions.Section));
         services.Configure<PublicDataProcessorOptions>(
-            configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
-        services.Configure<PublicDataApiOptions>(
-            configuration.GetRequiredSection(PublicDataApiOptions.Section));
-        services.Configure<PreReleaseAccessOptions>(
-            configuration.GetRequiredSection(PreReleaseAccessOptions.Section));
-        services.Configure<LocationsOptions>(
-            configuration.GetRequiredSection(LocationsOptions.Section));
-        services.Configure<ReleaseApprovalOptions>(
-            configuration.GetRequiredSection(ReleaseApprovalOptions.Section));
-        services.Configure<TableBuilderOptions>(
-            configuration.GetRequiredSection(TableBuilderOptions.Section));
+            configuration.GetRequiredSection(PublicDataProcessorOptions.Section)
+        );
+        services.Configure<PublicDataApiOptions>(configuration.GetRequiredSection(PublicDataApiOptions.Section));
+        services.Configure<PreReleaseAccessOptions>(configuration.GetRequiredSection(PreReleaseAccessOptions.Section));
+        services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Section));
+        services.Configure<ReleaseApprovalOptions>(configuration.GetRequiredSection(ReleaseApprovalOptions.Section));
+        services.Configure<TableBuilderOptions>(configuration.GetRequiredSection(TableBuilderOptions.Section));
         services.Configure<OpenIdConnectSpaClientOptions>(
-            configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
-        services.Configure<FeatureFlagsOptions>(
-            configuration.GetSection(FeatureFlagsOptions.Section));
+            configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
+        );
+        services.Configure<FeatureFlagsOptions>(configuration.GetSection(FeatureFlagsOptions.Section));
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
         services.Configure<DataScreenerClientOptions>(
-            configuration.GetRequiredSection(DataScreenerClientOptions.Section));
+            configuration.GetRequiredSection(DataScreenerClientOptions.Section)
+        );
 
         StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -455,7 +451,10 @@ public class Startup(
         services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
         services.AddTransient<IPreReleaseService, PreReleaseService>();
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
-        services.AddTransient<Admin.Services.Interfaces.IEducationInNumbersService, Admin.Services.EducationInNumbersService>();
+        services.AddTransient<
+            Admin.Services.Interfaces.IEducationInNumbersService,
+            Admin.Services.EducationInNumbersService
+        >();
         services.AddTransient<IEducationInNumbersContentService, EducationInNumbersContentService>();
 
         services.AddTransient<IManageContentPageService, ManageContentPageService>();
@@ -492,37 +491,44 @@ public class Startup(
         {
             services.AddScoped(
                 typeof(IHttpClientAzureAuthenticationManager<>),
-                typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>));
+                typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>)
+            );
         }
         else
         {
             services.AddScoped(
                 typeof(IHttpClientAzureAuthenticationManager<>),
-                typeof(HttpHeaderHttpClientAuthenticationManager<>));
+                typeof(HttpHeaderHttpClientAuthenticationManager<>)
+            );
         }
-
 
         services.AddEventGridClient(configuration);
 
-        services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>((provider, httpClient) =>
-        {
-            var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
-            httpClient.BaseAddress = new Uri(options.Value.Url);
-        });
+        services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>(
+            (provider, httpClient) =>
+            {
+                var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
+                httpClient.BaseAddress = new Uri(options.Value.Url);
+            }
+        );
 
         if (publicDataDbExists)
         {
-            services.AddHttpClient<IProcessorClient, ProcessorClient>((provider, httpClient) =>
-            {
-                var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
-                httpClient.BaseAddress = new Uri(options.Value.Url);
-            });
+            services.AddHttpClient<IProcessorClient, ProcessorClient>(
+                (provider, httpClient) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<PublicDataProcessorOptions>>();
+                    httpClient.BaseAddress = new Uri(options.Value.Url);
+                }
+            );
 
-            services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
-            {
-                var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
-                httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
-            });
+            services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>(
+                (provider, httpClient) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
+                    httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
+                }
+            );
 
             services.AddTransient<IDataSetService, DataSetService>();
             services.AddTransient<IDataSetVersionService, DataSetVersionService>();
@@ -537,12 +543,13 @@ public class Startup(
 
             // TODO EES-5073 Remove this once PublicDataDbContext is configured in ALL Azure environments.
             // This is allowing for the PublicDataDbContext to be null.
-            services.AddTransient<IDataSetService, DataSetService>(provider =>
-                new DataSetService(provider.GetRequiredService<ContentDbContext>(),
-                    provider.GetService<PublicDataDbContext>()!,
-                    provider.GetRequiredService<IProcessorClient>(),
-                    provider.GetRequiredService<IDataSetVersionMappingService>(),
-                    provider.GetRequiredService<IUserService>()));
+            services.AddTransient<IDataSetService, DataSetService>(provider => new DataSetService(
+                provider.GetRequiredService<ContentDbContext>(),
+                provider.GetService<PublicDataDbContext>()!,
+                provider.GetRequiredService<IProcessorClient>(),
+                provider.GetRequiredService<IDataSetVersionMappingService>(),
+                provider.GetRequiredService<IUserService>()
+            ));
 
             services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
             services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
@@ -593,29 +600,32 @@ public class Startup(
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
         services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
         services.AddTransient<IReleaseRepository, ReleaseRepository>();
-        services.AddTransient<Content.Model.Repository.Interfaces.IReleaseVersionRepository,
-            Content.Model.Repository.ReleaseVersionRepository>();
-        services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
-            Content.Model.Repository.PublicationRepository>();
+        services.AddTransient<
+            Content.Model.Repository.Interfaces.IReleaseVersionRepository,
+            Content.Model.Repository.ReleaseVersionRepository
+        >();
+        services.AddTransient<
+            Content.Model.Repository.Interfaces.IPublicationRepository,
+            Content.Model.Repository.PublicationRepository
+        >();
         services.AddTransient<ISubjectRepository, SubjectRepository>();
         services.AddTransient<ITimePeriodService, TimePeriodService>();
         services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-        services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider =>
-            new SubjectMetaService(
-                statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
-                contentDbContext: provider.GetRequiredService<ContentDbContext>(),
-                cacheService: provider.GetRequiredService<IPrivateBlobCacheService>(),
-                releaseSubjectService: provider.GetRequiredService<IReleaseSubjectService>(),
-                filterRepository: provider.GetRequiredService<IFilterRepository>(),
-                filterItemRepository: provider.GetRequiredService<IFilterItemRepository>(),
-                indicatorGroupRepository: provider.GetRequiredService<IIndicatorGroupRepository>(),
-                locationRepository: provider.GetRequiredService<ILocationRepository>(),
-                logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
-                observationService: provider.GetRequiredService<IObservationService>(),
-                timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
-                userService: provider.GetRequiredService<IUserService>(),
-                locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
-            ));
+        services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => new SubjectMetaService(
+            statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
+            contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+            cacheService: provider.GetRequiredService<IPrivateBlobCacheService>(),
+            releaseSubjectService: provider.GetRequiredService<IReleaseSubjectService>(),
+            filterRepository: provider.GetRequiredService<IFilterRepository>(),
+            filterItemRepository: provider.GetRequiredService<IFilterItemRepository>(),
+            indicatorGroupRepository: provider.GetRequiredService<IIndicatorGroupRepository>(),
+            locationRepository: provider.GetRequiredService<ILocationRepository>(),
+            logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
+            observationService: provider.GetRequiredService<IObservationService>(),
+            timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
+            userService: provider.GetRequiredService<IUserService>(),
+            locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
+        ));
         services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
         services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
         services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
@@ -628,16 +638,23 @@ public class Startup(
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
-        services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
-            new PrivateBlobStorageService(configuration.GetRequiredValue("CoreStorage"),
+        services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(
+            provider => new PrivateBlobStorageService(
+                configuration.GetRequiredValue("CoreStorage"),
                 provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                sasService: provider.GetRequiredService<IBlobSasService>()));
-        services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
-            new PublicBlobStorageService(configuration.GetRequiredValue("PublicStorage"),
+                sasService: provider.GetRequiredService<IBlobSasService>()
+            )
+        );
+        services.AddTransient<IPublicBlobStorageService, PublicBlobStorageService>(
+            provider => new PublicBlobStorageService(
+                configuration.GetRequiredValue("PublicStorage"),
                 provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                sasService: provider.GetRequiredService<IBlobSasService>()));
-        services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
-            new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage")));
+                sasService: provider.GetRequiredService<IBlobSasService>()
+            )
+        );
+        services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
+            _ => new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage"))
+        );
         services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
         AddPersistenceHelper<ContentDbContext>(services);
         AddPersistenceHelper<StatisticsDbContext>(services);
@@ -657,10 +674,12 @@ public class Startup(
         services.AddSingleton<IFileTypeService, FileTypeService>();
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
-        services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
-            new DataProcessorClient(configuration.GetRequiredValue("CoreStorage")));
-        services.AddSingleton<IPublisherClient, PublisherClient>(_ =>
-            new PublisherClient(configuration.GetRequiredValue("PublisherStorage")));
+        services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ => new DataProcessorClient(
+            configuration.GetRequiredValue("CoreStorage")
+        ));
+        services.AddSingleton<IPublisherClient, PublisherClient>(_ => new PublisherClient(
+            configuration.GetRequiredValue("PublisherStorage")
+        ));
 
         /*
          * Swagger
@@ -669,36 +688,34 @@ public class Startup(
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1",
-                    new OpenApiInfo
-                    {
-                        Title = "Explore education statistics - Admin API",
-                        Version = "v1"
-                    });
+                c.SwaggerDoc(
+                    "v1",
+                    new OpenApiInfo { Title = "Explore education statistics - Admin API", Version = "v1" }
+                );
                 c.CustomSchemaIds((type) => type.FullName);
-                c.AddSecurityDefinition("Bearer",
+                c.AddSecurityDefinition(
+                    "Bearer",
                     new OpenApiSecurityScheme
                     {
                         Description =
                             "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
                         Name = "Authorization",
                         In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.ApiKey
-                    });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+                        Type = SecuritySchemeType.ApiKey,
+                    }
+                );
+                c.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement
+                    {
                         {
                             new OpenApiSecurityScheme
                             {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = "Bearer"
-                                }
+                                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
                             },
                             [string.Empty]
-                        }
-                });
+                        },
+                    }
+                );
             });
         }
     }
@@ -758,28 +775,24 @@ public class Startup(
         app.UseXXssProtection(opts => opts.EnabledWithBlockMode());
         app.UseXfo(opts => opts.SameOrigin());
         app.UseReferrerPolicy(opts => opts.NoReferrerWhenDowngrade());
-        app.UseCsp(opts => opts
-            .BlockAllMixedContent()
-            .StyleSources(s => s.Self())
-            .StyleSources(s => s
-                .CustomSources(" https://cdnjs.cloudflare.com")
-                .UnsafeInline())
-            .FontSources(s => s.Self())
-            .FormActions(s =>
-            {
-                var loginAuthorityUrl = configuration
-                    .GetRequiredSection("OpenIdConnectIdentityFramework")
-                    .GetRequiredValue("Authority");
-                var loginAuthorityUri = new Uri(loginAuthorityUrl);
-                s
-                    .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
-                    .Self();
-            })
-            .FrameAncestors(s => s.Self())
-            .ImageSources(s => s.Self())
-            .ImageSources(s => s.CustomSources("data:"))
-            .ScriptSources(s => s.Self())
-            .ScriptSources(s => s.UnsafeInline())
+        app.UseCsp(opts =>
+            opts.BlockAllMixedContent()
+                .StyleSources(s => s.Self())
+                .StyleSources(s => s.CustomSources(" https://cdnjs.cloudflare.com").UnsafeInline())
+                .FontSources(s => s.Self())
+                .FormActions(s =>
+                {
+                    var loginAuthorityUrl = configuration
+                        .GetRequiredSection("OpenIdConnectIdentityFramework")
+                        .GetRequiredValue("Authority");
+                    var loginAuthorityUri = new Uri(loginAuthorityUrl);
+                    s.CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority)).Self();
+                })
+                .FrameAncestors(s => s.Self())
+                .ImageSources(s => s.Self())
+                .ImageSources(s => s.CustomSources("data:"))
+                .ScriptSources(s => s.Self())
+                .ScriptSources(s => s.UnsafeInline())
         );
 
         app.UseHttpsRedirection();
@@ -793,10 +806,9 @@ public class Startup(
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
-            }
-        );
+        {
+            endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+        });
 
         app.UseMvc();
 
@@ -813,14 +825,12 @@ public class Startup(
         }
 
         app.ServerFeatures.Get<IServerAddressesFeature>()
-            ?.Addresses
-            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+            ?.Addresses.ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
     }
 
     private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                   .CreateScope())
+        using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
             using (var context = serviceScope.ServiceProvider.GetRequiredService<StatisticsDbContext>())
             {
@@ -848,20 +858,15 @@ public class Startup(
 
         if (env.IsDevelopment())
         {
-            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                .CreateScope();
+            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
-            serviceScope.ServiceProvider
-                .GetRequiredService<BootstrapUsersService>()
-                .AddBootstrapUsers();
+            serviceScope.ServiceProvider.GetRequiredService<BootstrapUsersService>().AddBootstrapUsers();
         }
     }
 
     private static void ApplyCustomMigrations(IApplicationBuilder app)
     {
-        using var serviceScope = app.ApplicationServices
-            .GetRequiredService<IServiceScopeFactory>()
-            .CreateScope();
+        using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
 
@@ -876,29 +881,34 @@ internal class NoOpProcessorClient : IProcessorClient
 {
     public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateDataSet(
         Guid releaseFileId,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CreateNextDataSetVersionMappings(
         Guid dataSetId,
         Guid releaseFileId,
         Guid? dataSetVersionToReplaceId = null,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, ProcessDataSetVersionResponseViewModel>> CompleteNextDataSetVersionImport(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
         Guid releaseVersionId,
         bool forceDeleteAll,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
     }
 
     public Task<Either<ActionResult, Unit>> DeleteDataSetVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
     }
@@ -910,15 +920,20 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
         Guid dataSetId,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return Task.FromResult(new Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>(
-            PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10)));
+        return Task.FromResult(
+            new Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>(
+                PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10)
+            )
+        );
     }
 
     public Task<Either<ActionResult, DataSetVersionInfoViewModel>> GetDataSetVersion(
         Guid dataSetVersionIdId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new Either<ActionResult, DataSetVersionInfoViewModel>(new NotFoundResult()));
     }
@@ -926,14 +941,16 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
     public Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
         Guid dataSetId,
         SemVersion version,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new Either<ActionResult, DataSetVersion>(new NotFoundResult()));
     }
 
     public Task<List<DataSetVersionStatusSummary>> GetStatusesForReleaseVersion(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new List<DataSetVersionStatusSummary>());
     }
@@ -942,28 +959,32 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
         Guid releaseFileId,
         Guid dataSetId,
         Guid? dataSetVersionToReplaceId = null,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
     }
 
     public Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, DataSetDraftVersionViewModel>> UpdateVersion(
         Guid dataSetVersionId,
         DataSetVersionUpdateRequest updateRequest,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.FromResult(new Either<ActionResult, DataSetDraftVersionViewModel>(new NotFoundResult()));
     }
@@ -972,7 +993,8 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
         Guid releaseVersionId,
         string releaseSlug,
         string releaseTitle,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return Task.CompletedTask;
     }
@@ -982,28 +1004,32 @@ internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService
 {
     public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
         Guid nextDataSetVersionId,
-        CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
-    public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>>
-        ApplyBatchLocationMappingUpdates(
-            Guid nextDataSetVersionId,
-            BatchLocationMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchLocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
         Guid nextDataSetVersionId,
-        CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
-    public Task<Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>>
-        ApplyBatchFilterOptionMappingUpdates(Guid nextDataSetVersionId,
-            BatchFilterOptionMappingUpdatesRequest request,
-            CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public Task<
+        Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>
+    > ApplyBatchFilterOptionMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchFilterOptionMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
-    public Task<MappingStatusViewModel> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public Task<MappingStatusViewModel> GetMappingStatus(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 }
 
 internal class NoOpPreviewTokenService : IPreviewTokenService
@@ -1011,23 +1037,23 @@ internal class NoOpPreviewTokenService : IPreviewTokenService
     public Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
-        CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 }
 
 internal class NoOpDataSetVersionRepository : IDataSetVersionRepository
@@ -1040,7 +1066,13 @@ internal class NoOpDataSetVersionRepository : IDataSetVersionRepository
 
 internal class NoOpMappingTypesRepository : IMappingTypesRepository
 {
-    public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(
+        Guid targetDataSetVersionId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 
-    public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(Guid targetDataSetVersionId, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(
+        Guid targetDataSetVersionId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 }

@@ -8,10 +8,12 @@ public interface ITimePeriodMetaRepository
     Task<List<TimePeriodMeta>> ReadTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

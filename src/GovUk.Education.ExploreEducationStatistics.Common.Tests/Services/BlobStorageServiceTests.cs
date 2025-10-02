@@ -35,9 +35,7 @@ public class BlobStorageServiceTests
     {
         const string path = "path/to/test.pdf";
 
-        var blobClient = MockBlobClient(
-            name: path,
-            exists: true);
+        var blobClient = MockBlobClient(name: path, exists: true);
 
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -52,9 +50,7 @@ public class BlobStorageServiceTests
     {
         const string path = "path/to/test.pdf";
 
-        var blobClient = MockBlobClient(
-            name: path,
-            exists: false);
+        var blobClient = MockBlobClient(name: path, exists: false);
 
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -84,9 +80,7 @@ public class BlobStorageServiceTests
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-        var result = await service.DownloadBlobText(
-            containerName: PublicReleaseFiles,
-            path: path);
+        var result = await service.DownloadBlobText(containerName: PublicReleaseFiles, path: path);
 
         result.AssertRight("Test content");
     }
@@ -111,9 +105,7 @@ public class BlobStorageServiceTests
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-        var result = await service.DownloadBlobText(
-            containerName: PublicReleaseFiles,
-            path: path);
+        var result = await service.DownloadBlobText(containerName: PublicReleaseFiles, path: path);
 
         result.AssertNotFound();
     }
@@ -139,10 +131,7 @@ public class BlobStorageServiceTests
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
         await using var targetStream = new MemoryStream();
-        await service.DownloadToStream(
-            containerName: PublicReleaseFiles,
-            path: path,
-            targetStream: targetStream);
+        await service.DownloadToStream(containerName: PublicReleaseFiles, path: path, targetStream: targetStream);
 
         Assert.Equal(0, targetStream.Position);
         Assert.Equal("Test content", targetStream.ReadToEnd());
@@ -167,59 +156,62 @@ public class BlobStorageServiceTests
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-        var result = await service.DownloadToStream(
-            containerName: PublicReleaseFiles,
-            path: path,
-            new MemoryStream());
+        var result = await service.DownloadToStream(containerName: PublicReleaseFiles, path: path, new MemoryStream());
 
         result.AssertNotFound();
     }
-    
+
     [Fact]
     public async Task GetBlobDownloadToken_Success()
     {
         const string filename = "test.pdf";
         const string path = "path/to/test.pdf";
         var container = PublicReleaseFiles;
-        
+
         var tokenCreated = new BlobDownloadToken(
             Token: "a-token",
             ContainerName: container.Name,
             Path: path,
             Filename: filename,
-            ContentType: MediaTypeNames.Text.Csv);
-        
+            ContentType: MediaTypeNames.Text.Csv
+        );
+
         var blobServiceClient = MockBlobServiceClient();
 
         var blobSasService = new Mock<IBlobSasService>(Strict);
 
         blobSasService
-            .Setup(s => s.CreateBlobDownloadToken(
-                blobServiceClient.Object,
-                PublicReleaseFiles,
-                filename,
-                path,
-                TimeSpan.FromMinutes(5),
-                default))
+            .Setup(s =>
+                s.CreateBlobDownloadToken(
+                    blobServiceClient.Object,
+                    PublicReleaseFiles,
+                    filename,
+                    path,
+                    TimeSpan.FromMinutes(5),
+                    default
+                )
+            )
             .ReturnsAsync(tokenCreated);
-        
+
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
-            blobSasService: blobSasService.Object);
+            blobSasService: blobSasService.Object
+        );
 
         var result = await service.GetBlobDownloadToken(
             container: PublicReleaseFiles,
             filename: filename,
             path: path,
-            cancellationToken: default);
+            cancellationToken: default
+        );
 
         var tokenReturned = result.AssertRight();
-        
+
         blobSasService.Verify();
-     
+
         Assert.Same(tokenCreated, tokenReturned);
     }
-    
+
     [Fact]
     public async Task StreamWithToken_Success()
     {
@@ -228,7 +220,8 @@ public class BlobStorageServiceTests
             ContainerName: "a-container",
             Path: "a-path",
             Filename: "a-filename.csv",
-            ContentType: MediaTypeNames.Text.Csv);
+            ContentType: MediaTypeNames.Text.Csv
+        );
 
         var secureClient = MockBlobClient(
             name: token.Path,
@@ -243,28 +236,25 @@ public class BlobStorageServiceTests
         var blobSasService = new Mock<IBlobSasService>(Strict);
 
         blobSasService
-            .Setup(s => s.CreateSecureBlobClient(
-                blobServiceClient.Object,
-                token))
+            .Setup(s => s.CreateSecureBlobClient(blobServiceClient.Object, token))
             .ReturnsAsync(secureClient.Object);
-        
+
         secureClient.SetupGetDownloadStreamAsync(content: "Test content");
-        
+
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
-            blobSasService: blobSasService.Object);
+            blobSasService: blobSasService.Object
+        );
 
-        var result = await service.StreamWithToken(
-            token: token,
-            cancellationToken: default);
+        var result = await service.StreamWithToken(token: token, cancellationToken: default);
 
         var fileStreamResult = result.AssertRight();
-        
+
         Assert.Equal("Test content", fileStreamResult.FileStream.ReadToEnd());
         Assert.Equal(token.Filename, fileStreamResult.FileDownloadName);
         Assert.Equal(token.ContentType, fileStreamResult.ContentType);
     }
-    
+
     [Fact]
     public async Task GetDeserializedJson()
     {
@@ -360,9 +350,8 @@ public class BlobStorageServiceTests
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-        var exception = await Assert.ThrowsAsync<JsonException>(
-            () =>
-                service.GetDeserializedJson(PublicReleaseFiles, path, typeof(TestClass))
+        var exception = await Assert.ThrowsAsync<JsonException>(() =>
+            service.GetDeserializedJson(PublicReleaseFiles, path, typeof(TestClass))
         );
 
         Assert.Equal($"Found empty file when trying to deserialize JSON for path: {path}", exception.Message);
@@ -375,31 +364,18 @@ public class BlobStorageServiceTests
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
         var pages = CreatePages(
-            new List<BlobItem>
-            {
-                BlobItem("directory/item-1"),
-                BlobItem("directory/item-2"),
-            },
-            new List<BlobItem>
-            {
-                BlobItem("directory/item-3"),
-            }
+            new List<BlobItem> { BlobItem("directory/item-1"), BlobItem("directory/item-2") },
+            new List<BlobItem> { BlobItem("directory/item-3") }
         );
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.GetBlobsAsync(default, default, "directory/", default)
-            )
+            .Setup(s => s.GetBlobsAsync(default, default, "directory/", default))
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -407,7 +383,6 @@ public class BlobStorageServiceTests
         await service.DeleteBlobs(PublicReleaseFiles, "directory");
 
         MockUtils.VerifyAllMocks(blobContainerClient);
-
 
         Assert.Equal(3, deletedBlobs.Count);
         Assert.Equal("directory/item-1", deletedBlobs[0]);
@@ -422,15 +397,8 @@ public class BlobStorageServiceTests
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
         var pages = CreatePages(
-            new List<BlobItem>
-            {
-                BlobItem("item-1"),
-                BlobItem("directory/item-2"),
-            },
-            new List<BlobItem>
-            {
-                BlobItem("nested/directory/item-3"),
-            }
+            new List<BlobItem> { BlobItem("item-1"), BlobItem("directory/item-2") },
+            new List<BlobItem> { BlobItem("nested/directory/item-3") }
         );
 
         blobContainerClient
@@ -440,10 +408,7 @@ public class BlobStorageServiceTests
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -465,15 +430,8 @@ public class BlobStorageServiceTests
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
         var pages = CreatePages(
-            new List<BlobItem>
-            {
-                BlobItem("item-1"),
-                BlobItem("directory/item-2"),
-            },
-            new List<BlobItem>
-            {
-                BlobItem("nested/directory/item-3"),
-            }
+            new List<BlobItem> { BlobItem("item-1"), BlobItem("directory/item-2") },
+            new List<BlobItem> { BlobItem("nested/directory/item-3") }
         );
 
         blobContainerClient
@@ -483,20 +441,14 @@ public class BlobStorageServiceTests
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
         await service.DeleteBlobs(
             PublicReleaseFiles,
-            options: new DeleteBlobsOptions
-            {
-                ExcludeRegex = new Regex("directory/")
-            }
+            options: new DeleteBlobsOptions { ExcludeRegex = new Regex("directory/") }
         );
 
         MockUtils.VerifyAllMocks(blobContainerClient);
@@ -512,15 +464,8 @@ public class BlobStorageServiceTests
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
         var pages = CreatePages(
-            new List<BlobItem>
-            {
-                BlobItem("item-1"),
-                BlobItem("directory/item-2"),
-            },
-            new List<BlobItem>
-            {
-                BlobItem("nested/directory/item-3"),
-            }
+            new List<BlobItem> { BlobItem("item-1"), BlobItem("directory/item-2") },
+            new List<BlobItem> { BlobItem("nested/directory/item-3") }
         );
 
         blobContainerClient
@@ -530,20 +475,14 @@ public class BlobStorageServiceTests
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
         await service.DeleteBlobs(
             PublicReleaseFiles,
-            options: new DeleteBlobsOptions
-            {
-                IncludeRegex = new Regex("item-3")
-            }
+            options: new DeleteBlobsOptions { IncludeRegex = new Regex("item-3") }
         );
 
         MockUtils.VerifyAllMocks(blobContainerClient);
@@ -559,15 +498,8 @@ public class BlobStorageServiceTests
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
         var pages = CreatePages(
-            new List<BlobItem>
-            {
-                BlobItem("item-1"),
-                BlobItem("directory/item-2"),
-            },
-            new List<BlobItem>
-            {
-                BlobItem("nested/directory/item-3"),
-            }
+            new List<BlobItem> { BlobItem("item-1"), BlobItem("directory/item-2") },
+            new List<BlobItem> { BlobItem("nested/directory/item-3") }
         );
 
         blobContainerClient
@@ -577,10 +509,7 @@ public class BlobStorageServiceTests
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -590,7 +519,7 @@ public class BlobStorageServiceTests
             options: new DeleteBlobsOptions
             {
                 IncludeRegex = new Regex("directory/"),
-                ExcludeRegex = new Regex("item-2")
+                ExcludeRegex = new Regex("item-2"),
             }
         );
 
@@ -623,20 +552,14 @@ public class BlobStorageServiceTests
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
         await service.DeleteBlobs(
             PublicReleaseFiles,
-            options: new DeleteBlobsOptions
-            {
-                IncludeRegex = new Regex("^publications/.*/releases/.*/data-blocks")
-            }
+            options: new DeleteBlobsOptions { IncludeRegex = new Regex("^publications/.*/releases/.*/data-blocks") }
         );
 
         MockUtils.VerifyAllMocks(blobContainerClient);
@@ -644,7 +567,6 @@ public class BlobStorageServiceTests
         Assert.Single(deletedBlobs);
         Assert.Equal("publications/pupil-absence/releases/2020/data-blocks/item-1", deletedBlobs[0]);
     }
-
 
     [Fact]
     public async Task DeleteBlobs_NestedReleaseBlobs_ExcludeRegex()
@@ -669,20 +591,14 @@ public class BlobStorageServiceTests
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(
-                s =>
-                    s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
-            )
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
         await service.DeleteBlobs(
             PublicReleaseFiles,
-            options: new DeleteBlobsOptions
-            {
-                ExcludeRegex = new Regex("^publications/.*/releases/.*/data-blocks")
-            }
+            options: new DeleteBlobsOptions { ExcludeRegex = new Regex("^publications/.*/releases/.*/data-blocks") }
         );
 
         MockUtils.VerifyAllMocks(blobContainerClient);
@@ -704,9 +620,7 @@ public class BlobStorageServiceTests
 
         var sourceBlobContainerClient = MockBlobContainerClient(PrivateReleaseTempFiles.Name, sourceBlobClient);
 
-        sourceBlobContainerClient
-            .Setup(client => client.GetBlobClient(sourcePath))
-            .Returns(sourceBlobClient.Object);
+        sourceBlobContainerClient.Setup(client => client.GetBlobClient(sourcePath)).Returns(sourceBlobClient.Object);
 
         var blobServiceClient = MockBlobServiceClient(sourceBlobContainerClient);
 
@@ -729,11 +643,13 @@ public class BlobStorageServiceTests
         var sourceBlobClient = MockBlobClient(name: sourcePath, exists: true);
         var destinationBlobClient = MockBlobClient(name: destinationPath, exists: true);
 
-        var blobContainerClient = MockBlobContainerClient(PrivateReleaseTempFiles.Name, sourceBlobClient, destinationBlobClient);
+        var blobContainerClient = MockBlobContainerClient(
+            PrivateReleaseTempFiles.Name,
+            sourceBlobClient,
+            destinationBlobClient
+        );
 
-        blobContainerClient
-            .Setup(client => client.GetBlobClient(sourcePath))
-            .Returns(sourceBlobClient.Object);
+        blobContainerClient.Setup(client => client.GetBlobClient(sourcePath)).Returns(sourceBlobClient.Object);
 
         blobContainerClient
             .Setup(client => client.GetBlobClient(destinationPath))
@@ -752,14 +668,16 @@ public class BlobStorageServiceTests
 
     private static TestBlobStorageService SetupTestBlobStorageService(
         BlobServiceClient? blobServiceClient = null,
-        IBlobSasService? blobSasService = null)
+        IBlobSasService? blobSasService = null
+    )
     {
         return new TestBlobStorageService(
             connectionString: "",
             blobServiceClient ?? Mock.Of<BlobServiceClient>(),
             Mock.Of<ILogger<BlobStorageService>>(),
             Mock.Of<IStorageInstanceCreationUtil>(),
-            blobSasService ?? Mock.Of<IBlobSasService>(Strict));
+            blobSasService ?? Mock.Of<IBlobSasService>(Strict)
+        );
     }
 
     private class TestBlobStorageService(
@@ -767,24 +685,16 @@ public class BlobStorageServiceTests
         BlobServiceClient client,
         ILogger<IBlobStorageService> logger,
         IStorageInstanceCreationUtil storageInstanceCreationUtil,
-        IBlobSasService blobSasService)
-        : BlobStorageService(
-            connectionString,
-            client,
-            logger,
-            storageInstanceCreationUtil,
-            blobSasService);
+        IBlobSasService blobSasService
+    ) : BlobStorageService(connectionString, client, logger, storageInstanceCreationUtil, blobSasService);
 
     private IEnumerable<Page<T>> CreatePages<T>(params List<T>[] pages)
     {
-        return pages.Select(
-            page => Page<T>.FromValues(
-                ImmutableList.Create(page.ToArray()), "", null!
-            )
-        );
+        return pages.Select(page => Page<T>.FromValues(ImmutableList.Create(page.ToArray()), "", null!));
     }
 
-    private class TestAsyncPageable<T> : AsyncPageable<T> where T : notnull
+    private class TestAsyncPageable<T> : AsyncPageable<T>
+        where T : notnull
     {
         private readonly IEnumerable<Page<T>> _pages;
 
@@ -795,7 +705,8 @@ public class BlobStorageServiceTests
 
         public override async IAsyncEnumerable<Page<T>> AsPages(
             string? continuationToken = null,
-            int? pageSizeHint = null)
+            int? pageSizeHint = null
+        )
         {
             foreach (var page in _pages)
             {

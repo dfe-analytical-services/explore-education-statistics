@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 public interface IWorkflowActor
 {
     string GetSourceDirectory();
-    
+
     string GetReportsDirectory();
 
     /// <summary>

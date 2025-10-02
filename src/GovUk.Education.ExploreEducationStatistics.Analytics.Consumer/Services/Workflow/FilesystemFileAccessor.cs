@@ -24,11 +24,7 @@ internal class FilesystemFileAccessor : IFileAccessor
 
     public IList<string> ListFiles(string directory)
     {
-        return Directory
-            .GetFiles(directory)
-            .Select(Path.GetFileName)
-            .OfType<string>()
-            .ToList(); 
+        return Directory.GetFiles(directory).Select(Path.GetFileName).OfType<string>().ToList();
     }
 
     public void Move(string sourcePath, string destinationPath)

@@ -13,41 +13,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class WebHostBuilderExtensions
 {
-    public static IWebHostBuilder ResetDbContext<TDbContext>(this IWebHostBuilder builder) where TDbContext : DbContext
+    public static IWebHostBuilder ResetDbContext<TDbContext>(this IWebHostBuilder builder)
+        where TDbContext : DbContext
     {
-        return builder.ConfigureServices(
-            services =>
-            {
-                var provider = services.BuildServiceProvider();
+        return builder.ConfigureServices(services =>
+        {
+            var provider = services.BuildServiceProvider();
 
-                using var scope = provider.CreateScope();
-                using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
+            using var scope = provider.CreateScope();
+            using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-            }
-        );
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+        });
     }
 
-    public static IWebHostBuilder AddTestData<TDbContext>(
-        this IWebHostBuilder builder,
-        Action<TDbContext> testData) where TDbContext : DbContext
+    public static IWebHostBuilder AddTestData<TDbContext>(this IWebHostBuilder builder, Action<TDbContext> testData)
+        where TDbContext : DbContext
     {
-        return builder.ConfigureServices(
-            services =>
-            {
-                var provider = services.BuildServiceProvider();
+        return builder.ConfigureServices(services =>
+        {
+            var provider = services.BuildServiceProvider();
 
-                using var scope = provider.CreateScope();
-                using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
+            using var scope = provider.CreateScope();
+            using var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-                db.Database.EnsureCreated();
+            db.Database.EnsureCreated();
 
-                testData(db);
+            testData(db);
 
-                db.SaveChanges();
-            }
-        );
+            db.SaveChanges();
+        });
     }
 
     /// <summary>
@@ -58,24 +54,24 @@ public static class WebHostBuilderExtensions
     /// </summary>
     public static IWebHostBuilder WithAdditionalControllers(this IWebHostBuilder builder, params Type[] controllers)
     {
-        return builder.ConfigureTestServices(
-            services =>
-            {
-                var partManager = GetApplicationPartManager(services);
+        return builder.ConfigureTestServices(services =>
+        {
+            var partManager = GetApplicationPartManager(services);
 
-                // Register each controller with MVC.
-                partManager.FeatureProviders.Add(new ExternalControllersFeatureProvider(controllers));
+            // Register each controller with MVC.
+            partManager.FeatureProviders.Add(new ExternalControllersFeatureProvider(controllers));
 
-                // Register each controller with DI.
-                controllers.ForEach(controller => services.TryAddTransient(controller, controller));
-            });
+            // Register each controller with DI.
+            controllers.ForEach(controller => services.TryAddTransient(controller, controller));
+        });
     }
 
     private static ApplicationPartManager GetApplicationPartManager(IServiceCollection services)
     {
-        return (ApplicationPartManager)services
-            .Last(descriptor => descriptor.ServiceType == typeof(ApplicationPartManager))
-            .ImplementationInstance!;
+        return (ApplicationPartManager)
+            services
+                .Last(descriptor => descriptor.ServiceType == typeof(ApplicationPartManager))
+                .ImplementationInstance!;
     }
 
     private class ExternalControllersFeatureProvider : IApplicationFeatureProvider<ControllerFeature>

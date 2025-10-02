@@ -24,7 +24,8 @@ public class SignInController : ControllerBase
         ILogger<SignInController> logger,
         IHttpContextAccessor httpContextAccessor,
         ISignInService signInService,
-        IUserService userService)
+        IUserService userService
+    )
     {
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
@@ -45,16 +46,13 @@ public class SignInController : ControllerBase
             return new ForbidResult();
         }
 
-        var remoteUserId = _httpContextAccessor
-            .HttpContext!
-            .User
-            .FindFirstValue(ClaimConstants.NameIdentifierId);
+        var remoteUserId = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimConstants.NameIdentifierId);
 
         return await _signInService
             .RegisterOrSignIn()
             .OnFailureDo(_ =>
-                _logger.LogWarning("User with remote Id \"{UserId}\" " +
-                                   "failed to sign in or register", remoteUserId))
+                _logger.LogWarning("User with remote Id \"{UserId}\" " + "failed to sign in or register", remoteUserId)
+            )
             .HandleFailuresOr(signInResponse =>
             {
                 switch (signInResponse.LoginResult)

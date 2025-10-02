@@ -21,25 +21,28 @@ public class TestStartup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddMvcCore(options => { options.EnableEndpointRouting = false; })
-            .AddNewtonsoftJson(
-                options => { options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; }
-            );
+        services
+            .AddMvcCore(options =>
+            {
+                options.EnableEndpointRouting = false;
+            })
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
 
         services.AddControllers(options =>
-            {
-                options.Filters.Add(new ProblemDetailsResultFilter());
+        {
+            options.Filters.Add(new ProblemDetailsResultFilter());
 
-                options.AddCommaSeparatedQueryModelBinderProvider();
-                options.AddTrimStringBinderProvider();
-            }
-        );
+            options.AddCommaSeparatedQueryModelBinderProvider();
+            options.AddTrimStringBinderProvider();
+        });
     }
 
     public void Configure(IApplicationBuilder app)
     {
-        app.UseRewriter(new RewriteOptions()
-            .Add(new LowercasePathRule()));
+        app.UseRewriter(new RewriteOptions().Add(new LowercasePathRule()));
         app.UseMvc();
     }
 }

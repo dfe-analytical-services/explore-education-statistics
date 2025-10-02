@@ -34,14 +34,13 @@ public abstract class UserReleaseInviteRepositoryTests
                     email: "test@test.com",
                     releaseRole: ReleaseRole.Contributor,
                     emailSent: true,
-                    createdById: createdById);
+                    createdById: createdById
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseInvite = await contentDbContext.UserReleaseInvites
-                    .AsQueryable()
-                    .SingleOrDefaultAsync();
+                var userReleaseInvite = await contentDbContext.UserReleaseInvites.AsQueryable().SingleOrDefaultAsync();
 
                 Assert.NotNull(userReleaseInvite);
                 Assert.Equal(releaseVersionId, userReleaseInvite.ReleaseVersionId);
@@ -85,18 +84,18 @@ public abstract class UserReleaseInviteRepositoryTests
                     releaseVersionIds: ListOf(
                         releaseVersionId1,
                         releaseVersionId2,
-                        existingReleaseInvite.ReleaseVersionId),
+                        existingReleaseInvite.ReleaseVersionId
+                    ),
                     email: "test@test.com",
                     releaseRole: ReleaseRole.Contributor,
                     emailSent: false,
-                    createdById: createdById);
+                    createdById: createdById
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseInvites = await contentDbContext.UserReleaseInvites
-                    .AsQueryable()
-                    .ToListAsync();
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites.AsQueryable().ToListAsync();
 
                 Assert.Equal(3, userReleaseInvites.Count);
 
@@ -194,7 +193,8 @@ public abstract class UserReleaseInviteRepositoryTests
                 var result = await repository.UserHasInvites(
                     ListOf(invite1.ReleaseVersionId, invite2.ReleaseVersionId),
                     "test@test.com",
-                    ReleaseRole.Contributor);
+                    ReleaseRole.Contributor
+                );
                 Assert.True(result);
             }
         }
@@ -229,7 +229,8 @@ public abstract class UserReleaseInviteRepositoryTests
                 var result = await repository.UserHasInvites(
                     ListOf(invite1.ReleaseVersionId, invite2.ReleaseVersionId, Guid.NewGuid()),
                     "test@test.com",
-                    ReleaseRole.Contributor);
+                    ReleaseRole.Contributor
+                );
                 Assert.False(result);
             }
         }
@@ -244,18 +245,17 @@ public abstract class UserReleaseInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var targetRole = ReleaseRole.Approver;
             var otherRole = ReleaseRole.Contributor;
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
-            var userReleaseInvites = _fixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _fixture
+                .DefaultUserReleaseInvite()
                 // This invite should be removed
                 .ForIndex(0, s => s.SetReleaseVersion(targetReleaseVersion))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
@@ -289,13 +289,13 @@ public abstract class UserReleaseInviteRepositoryTests
                 await repository.Remove(
                     releaseVersionId: targetReleaseVersion.Id,
                     email: targetEmail,
-                    role: targetRole);
+                    role: targetRole
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(3, remainingInvites.Count);
 
@@ -325,13 +325,13 @@ public abstract class UserReleaseInviteRepositoryTests
                 await repository.Remove(
                     releaseVersionId: Guid.NewGuid(),
                     email: "test1@test.com",
-                    role: ReleaseRole.Approver);
+                    role: ReleaseRole.Approver
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 Assert.Empty(remainingInvites);
             }
@@ -347,18 +347,17 @@ public abstract class UserReleaseInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var targetRole = ReleaseRole.Approver;
             var otherRole = ReleaseRole.Contributor;
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
-            var userReleaseInvites = _fixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _fixture
+                .DefaultUserReleaseInvite()
                 // These 2 invites should be removed
                 .ForIndex(0, s => s.SetReleaseVersion(targetReleaseVersion))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
@@ -380,7 +379,7 @@ public abstract class UserReleaseInviteRepositoryTests
                 .ForIndex(4, s => s.SetRole(otherRole))
                 .GenerateList(5);
 
-            var userReleaseInvitesToRemove = new[] { userReleaseInvites[0], userReleaseInvites[1], };
+            var userReleaseInvitesToRemove = new[] { userReleaseInvites[0], userReleaseInvites[1] };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -399,8 +398,7 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(3, remainingInvites.Count);
 
@@ -421,22 +419,24 @@ public abstract class UserReleaseInviteRepositoryTests
         [Fact]
         public async Task TargetInviteDoesNotExist_ThrowsException()
         {
-            var existingUserReleaseInvite = _fixture.DefaultUserReleaseInvite()
+            var existingUserReleaseInvite = _fixture
+                .DefaultUserReleaseInvite()
                 .WithReleaseVersion(
-                    _fixture.DefaultReleaseVersion()
-                        .WithRelease(
-                            _fixture.DefaultRelease()
-                                .WithPublication(_fixture.DefaultPublication())))
+                    _fixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
                 .WithEmail("test@test.com")
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
 
-            var targetUserReleaseInvite = _fixture.DefaultUserReleaseInvite()
+            var targetUserReleaseInvite = _fixture
+                .DefaultUserReleaseInvite()
                 .WithReleaseVersion(
-                    _fixture.DefaultReleaseVersion()
-                        .WithRelease(
-                            _fixture.DefaultRelease()
-                                .WithPublication(_fixture.DefaultPublication())))
+                    _fixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
                 .WithEmail("test@test.com")
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
@@ -454,19 +454,21 @@ public abstract class UserReleaseInviteRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
-                    await repository.RemoveMany([targetUserReleaseInvite]));
+                    await repository.RemoveMany([targetUserReleaseInvite])
+                );
             }
         }
 
         [Fact]
         public async Task EmptyList_DoesNothing()
         {
-            var existingUserReleaseInvite = _fixture.DefaultUserReleaseInvite()
+            var existingUserReleaseInvite = _fixture
+                .DefaultUserReleaseInvite()
                 .WithReleaseVersion(
-                    _fixture.DefaultReleaseVersion()
-                        .WithRelease(
-                            _fixture.DefaultRelease()
-                                .WithPublication(_fixture.DefaultPublication())))
+                    _fixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
                 .WithEmail("test@test.com")
                 .WithRole(ReleaseRole.Approver)
                 .Generate();
@@ -488,8 +490,7 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var remainingInvite = Assert.Single(remainingInvites);
 
@@ -508,24 +509,19 @@ public abstract class UserReleaseInviteRepositoryTests
             var email1 = "test1@test.com";
             var email2 = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetPublication = _fixture.DefaultPublication()
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
+            var targetReleaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var otherPublication = _fixture.DefaultPublication()
+            var targetReleaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(otherPublication))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(otherPublication))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -536,45 +532,52 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for EACH ROLE for each TARGET release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion1)
                         .WithEmail(email1)
                         .WithRole(role)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion1)
                         .WithEmail(email2)
                         .WithRole(role)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion2)
                         .WithEmail(email1)
                         .WithRole(role)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion2)
                         .WithEmail(email2)
                         .WithRole(role)
-                        .Generate()
+                        .Generate(),
                 };
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(role)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(role)
-                        .Generate(),
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(role)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -594,18 +597,21 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = allRoles.Count * 4; // 2 release versions + 2 emails
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -616,30 +622,25 @@ public abstract class UserReleaseInviteRepositoryTests
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor })]
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer })]
         public async Task TargetPublicationAndRolesCombinationHasInvites_RemovesTargetInvites(
-            ReleaseRole[] targetRolesToInclude)
+            ReleaseRole[] targetRolesToInclude
+        )
         {
             var email1 = "test1@test.com";
             var email2 = "test2@test.com";
-            var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
-                .Except(targetRolesToInclude);
-            var targetPublication = _fixture.DefaultPublication()
+            var otherRoles = EnumUtil.GetEnums<ReleaseRole>().Except(targetRolesToInclude);
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
+            var targetReleaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var otherPublication = _fixture.DefaultPublication()
+            var targetReleaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(otherPublication))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(otherPublication))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -650,84 +651,98 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for each TARGET role for each TARGET release version and EACH email
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion1)
                         .WithEmail(email1)
                         .WithRole(targetRole)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion1)
                         .WithEmail(email2)
                         .WithRole(targetRole)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion2)
                         .WithEmail(email1)
                         .WithRole(targetRole)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion2)
                         .WithEmail(email2)
                         .WithRole(targetRole)
-                        .Generate()
+                        .Generate(),
                 };
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for each TARGET role for the OTHER release version and EACH email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(targetRole)
-                        .Generate(),
-                        _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(targetRole)
-                        .Generate()
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for each TARGET role for the OTHER release version and EACH email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(targetRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(targetRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             foreach (var otherRole in otherRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for each OTHER role for each TARGET release version and EACH email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion1)
-                        .WithEmail(email1)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion1)
-                        .WithEmail(email2)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion2)
-                        .WithEmail(email1)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion2)
-                        .WithEmail(email2)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the OTHER release version and EACH email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(otherRole)
-                        .Generate()
-                ]);
+                    [
+                        // Create a user release invite for each OTHER role for each TARGET release version and EACH email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion1)
+                            .WithEmail(email1)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion1)
+                            .WithEmail(email2)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion2)
+                            .WithEmail(email1)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion2)
+                            .WithEmail(email2)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the OTHER release version and EACH email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(otherRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -744,23 +759,27 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 await repository.RemoveByPublication(
                     publicationId: targetPublication.Id,
-                    rolesToInclude: targetRolesToInclude);
+                    rolesToInclude: targetRolesToInclude
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 4; // 2 release versions + 2 emails
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -770,24 +789,19 @@ public abstract class UserReleaseInviteRepositoryTests
             var email1 = "test1@test.com";
             var email2 = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetPublication = _fixture.DefaultPublication()
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
+            var targetReleaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var otherPublication = _fixture.DefaultPublication()
+            var targetReleaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(otherPublication))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(otherPublication))
                 .Generate();
 
             var allUserReleaseInvites = new List<UserReleaseInvite>();
@@ -795,19 +809,22 @@ public abstract class UserReleaseInviteRepositoryTests
             foreach (var role in allRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(role)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(role)
-                        .Generate(),
-                ]);
+                    [
+                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(role)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -827,8 +844,7 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
             }
@@ -843,24 +859,19 @@ public abstract class UserReleaseInviteRepositoryTests
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetPublication = _fixture.DefaultPublication()
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
+            var targetReleaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var otherPublication = _fixture.DefaultPublication()
+            var targetReleaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(otherPublication))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(otherPublication))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -871,47 +882,54 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for EACH ROLE for each TARGET release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion1)
                         .WithEmail(targetEmail)
                         .WithRole(role)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion2)
                         .WithEmail(targetEmail)
                         .WithRole(role)
-                        .Generate()
+                        .Generate(),
                 };
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for EACH ROLE for each TARGET release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion1)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion2)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate(),
-                    // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(targetEmail)
-                        .WithRole(role)
-                        .Generate(),
-                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate()
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for EACH ROLE for each TARGET release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion1)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion2)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                        // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(targetEmail)
+                            .WithRole(role)
+                            .Generate(),
+                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -926,25 +944,26 @@ public abstract class UserReleaseInviteRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                await repository.RemoveByPublicationAndEmail(
-                    publicationId: targetPublication.Id,
-                    email: targetEmail);
+                await repository.RemoveByPublicationAndEmail(publicationId: targetPublication.Id, email: targetEmail);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = allRoles.Count * 2; // 2 release versions
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -955,30 +974,25 @@ public abstract class UserReleaseInviteRepositoryTests
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor })]
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer })]
         public async Task TargetPublicationAndEmailAndRolesCombinationHasInvites_RemovesTargetInvites(
-            ReleaseRole[] targetRolesToInclude)
+            ReleaseRole[] targetRolesToInclude
+        )
         {
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
-            var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
-                .Except(targetRolesToInclude);
-            var targetPublication = _fixture.DefaultPublication()
+            var otherRoles = EnumUtil.GetEnums<ReleaseRole>().Except(targetRolesToInclude);
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
+            var targetReleaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var otherPublication = _fixture.DefaultPublication()
+            var targetReleaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(otherPublication))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(otherPublication))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -989,82 +1003,95 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for each TARGET role for each TARGET release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion1)
                         .WithEmail(targetEmail)
                         .WithRole(targetRole)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion2)
                         .WithEmail(targetEmail)
                         .WithRole(targetRole)
-                        .Generate()
+                        .Generate(),
                 };
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for each TARGET role for each TARGET release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion1)
-                        .WithEmail(otherEmail)
-                        .WithRole(targetRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion2)
-                        .WithEmail(otherEmail)
-                        .WithRole(targetRole)
-                        .Generate(),
-                    // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(targetRole)
-                        .Generate()
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for each TARGET role for each TARGET release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion1)
+                            .WithEmail(otherEmail)
+                            .WithRole(targetRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion2)
+                            .WithEmail(otherEmail)
+                            .WithRole(targetRole)
+                            .Generate(),
+                        // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(targetRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             foreach (var otherRole in otherRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for each OTHER role for each TARGET release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion1)
-                        .WithEmail(targetEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion2)
-                        .WithEmail(targetEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for each TARGET release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion1)
-                        .WithEmail(otherEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion2)
-                        .WithEmail(otherEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(targetEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(otherRole)
-                        .Generate()
-                ]);
+                    [
+                        // Create a user release invite for each OTHER role for each TARGET release version and TARGET email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion1)
+                            .WithEmail(targetEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion2)
+                            .WithEmail(targetEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for each TARGET release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion1)
+                            .WithEmail(otherEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion2)
+                            .WithEmail(otherEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(targetEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1082,23 +1109,27 @@ public abstract class UserReleaseInviteRepositoryTests
                 await repository.RemoveByPublicationAndEmail(
                     publicationId: targetPublication.Id,
                     email: targetEmail,
-                    rolesToInclude: targetRolesToInclude);
+                    rolesToInclude: targetRolesToInclude
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 2; // 2 release versions
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -1108,24 +1139,19 @@ public abstract class UserReleaseInviteRepositoryTests
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetPublication = _fixture.DefaultPublication()
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
+            var targetReleaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var otherPublication = _fixture.DefaultPublication()
+            var targetReleaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(targetPublication))
                 .Generate();
-            var targetReleaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var targetReleaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(targetPublication))
-                .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(otherPublication))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(otherPublication))
                 .Generate();
 
             var allUserReleaseInvites = new List<UserReleaseInvite>();
@@ -1133,14 +1159,16 @@ public abstract class UserReleaseInviteRepositoryTests
             foreach (var role in allRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate()
-                ]);
+                    [
+                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1155,15 +1183,12 @@ public abstract class UserReleaseInviteRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                await repository.RemoveByPublicationAndEmail(
-                    publicationId: targetPublication.Id,
-                    email: targetEmail);
+                await repository.RemoveByPublicationAndEmail(publicationId: targetPublication.Id, email: targetEmail);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
             }
@@ -1176,10 +1201,9 @@ public abstract class UserReleaseInviteRepositoryTests
 
             var repository = CreateRepository(contentDbContext);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await repository.RemoveByPublicationAndEmail(
-                    publicationId: Guid.NewGuid(),
-                    email: null!));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await repository.RemoveByPublicationAndEmail(publicationId: Guid.NewGuid(), email: null!)
+            );
         }
     }
 
@@ -1191,15 +1215,13 @@ public abstract class UserReleaseInviteRepositoryTests
             var email1 = "test1@test.com";
             var email2 = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -1210,35 +1232,40 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for EACH ROLE for the TARGET release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion)
                         .WithEmail(email1)
                         .WithRole(role)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion)
                         .WithEmail(email2)
                         .WithRole(role)
-                        .Generate()
+                        .Generate(),
                 };
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(role)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(role)
-                        .Generate(),
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(role)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1258,18 +1285,21 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = allRoles.Count * 2; // 2 emails
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -1280,21 +1310,19 @@ public abstract class UserReleaseInviteRepositoryTests
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor })]
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer })]
         public async Task TargetReleaseVersionAndRolesCombinationHasInvites_RemovesTargetInvites(
-            ReleaseRole[] targetRolesToInclude)
+            ReleaseRole[] targetRolesToInclude
+        )
         {
             var email1 = "test1@test.com";
             var email2 = "test2@test.com";
-            var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
-                .Except(targetRolesToInclude);
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherRoles = EnumUtil.GetEnums<ReleaseRole>().Except(targetRolesToInclude);
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -1305,12 +1333,14 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for each TARGET role for the TARGET release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion)
                         .WithEmail(email1)
                         .WithRole(targetRole)
                         .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion)
                         .WithEmail(email2)
                         .WithRole(targetRole)
@@ -1320,49 +1350,57 @@ public abstract class UserReleaseInviteRepositoryTests
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for each TARGET role for the OTHER release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(targetRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(targetRole)
-                        .Generate()
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for each TARGET role for the OTHER release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(targetRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(targetRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             foreach (var otherRole in otherRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for each OTHER role for the TARGET release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the OTHER release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(otherRole)
-                        .Generate()
-                ]);
+                    [
+                        // Create a user release invite for each OTHER role for the TARGET release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the OTHER release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(otherRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1379,23 +1417,27 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 await repository.RemoveByReleaseVersion(
                     releaseVersionId: targetReleaseVersion.Id,
-                    rolesToInclude: targetRolesToInclude);
+                    rolesToInclude: targetRolesToInclude
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length * 2; // 2 emails
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -1405,15 +1447,13 @@ public abstract class UserReleaseInviteRepositoryTests
             var email1 = "test1@test.com";
             var email2 = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
             var allUserReleaseInvites = new List<UserReleaseInvite>();
@@ -1421,19 +1461,22 @@ public abstract class UserReleaseInviteRepositoryTests
             foreach (var role in allRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email1)
-                        .WithRole(role)
-                        .Generate(),
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(email2)
-                        .WithRole(role)
-                        .Generate(),
-                ]);
+                    [
+                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email1)
+                            .WithRole(role)
+                            .Generate(),
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(email2)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1453,8 +1496,7 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
             }
@@ -1469,15 +1511,13 @@ public abstract class UserReleaseInviteRepositoryTests
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -1488,37 +1528,42 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for EACH ROLE for the TARGET release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion)
                         .WithEmail(targetEmail)
                         .WithRole(role)
-                        .Generate()
+                        .Generate(),
                 };
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for EACH ROLE for the TARGET release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate(),
-                    // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(targetEmail)
-                        .WithRole(role)
-                        .Generate(),
-                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate()
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for EACH ROLE for the TARGET release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                        // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(targetEmail)
+                            .WithRole(role)
+                            .Generate(),
+                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1535,23 +1580,27 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 await repository.RemoveByReleaseVersionAndEmail(
                     releaseVersionId: targetReleaseVersion.Id,
-                    email: targetEmail);
+                    email: targetEmail
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = allRoles.Count;
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -1562,21 +1611,19 @@ public abstract class UserReleaseInviteRepositoryTests
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor })]
         [InlineData(new[] { ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer })]
         public async Task TargetReleaseVersionAndEmailAndRolesCombinationHasInvites_RemovesTargetInvites(
-            ReleaseRole[] targetRolesToInclude)
+            ReleaseRole[] targetRolesToInclude
+        )
         {
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
-            var otherRoles = EnumUtil.GetEnums<ReleaseRole>()
-                .Except(targetRolesToInclude);
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherRoles = EnumUtil.GetEnums<ReleaseRole>().Except(targetRolesToInclude);
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
             var expectedUserReleaseInvitesToRemove = new List<UserReleaseInvite>();
@@ -1587,7 +1634,8 @@ public abstract class UserReleaseInviteRepositoryTests
                 var targetedUserReleaseInvites = new[]
                 {
                     // Create a user release invite for each TARGET role for the TARGET release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
+                    _fixture
+                        .DefaultUserReleaseInvite()
                         .WithReleaseVersion(targetReleaseVersion)
                         .WithEmail(targetEmail)
                         .WithRole(targetRole)
@@ -1597,52 +1645,60 @@ public abstract class UserReleaseInviteRepositoryTests
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
                 allUserReleaseInvites.AddRange(
-                [
-                    .. targetedUserReleaseInvites,
-                    // Create a user release invite for each TARGET role for the TARGET release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(targetRole)
-                        .Generate(),
-                    // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(targetRole)
-                        .Generate()
-                ]);
+                    [
+                        .. targetedUserReleaseInvites,
+                        // Create a user release invite for each TARGET role for the TARGET release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(targetRole)
+                            .Generate(),
+                        // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(targetRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             foreach (var otherRole in otherRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for each OTHER role for the TARGET release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(targetEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the TARGET release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(targetReleaseVersion)
-                        .WithEmail(targetEmail)
-                        .WithRole(otherRole)
-                        .Generate(),
-                    // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(otherRole)
-                        .Generate()
-                ]);
+                    [
+                        // Create a user release invite for each OTHER role for the TARGET release version and TARGET email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(targetEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the TARGET release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(targetReleaseVersion)
+                            .WithEmail(targetEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                        // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(otherRole)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1660,23 +1716,27 @@ public abstract class UserReleaseInviteRepositoryTests
                 await repository.RemoveByReleaseVersionAndEmail(
                     releaseVersionId: targetReleaseVersion.Id,
                     email: targetEmail,
-                    rolesToInclude: targetRolesToInclude);
+                    rolesToInclude: targetRolesToInclude
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 var expectedNumberOfInvitesToRemove = targetRolesToInclude.Length;
                 var expectedNumberOfRemainingInvites = allUserReleaseInvites.Count - expectedNumberOfInvitesToRemove;
                 Assert.Equal(expectedNumberOfRemainingInvites, remainingInvites.Count);
 
-                Assert.DoesNotContain(remainingInvites, invite =>
-                    expectedUserReleaseInvitesToRemove.Any(i =>
-                        invite.ReleaseVersionId == i.ReleaseVersionId &&
-                        invite.Email == i.Email &&
-                        invite.Role == i.Role));
+                Assert.DoesNotContain(
+                    remainingInvites,
+                    invite =>
+                        expectedUserReleaseInvitesToRemove.Any(i =>
+                            invite.ReleaseVersionId == i.ReleaseVersionId
+                            && invite.Email == i.Email
+                            && invite.Role == i.Role
+                        )
+                );
             }
         }
 
@@ -1686,15 +1746,13 @@ public abstract class UserReleaseInviteRepositoryTests
             var targetEmail = "test1@test.com";
             var otherEmail = "test2@test.com";
             var allRoles = EnumUtil.GetEnums<ReleaseRole>();
-            var targetReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var targetReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var otherReleaseVersion = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var otherReleaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
             var allUserReleaseInvites = new List<UserReleaseInvite>();
@@ -1702,14 +1760,16 @@ public abstract class UserReleaseInviteRepositoryTests
             foreach (var role in allRoles)
             {
                 allUserReleaseInvites.AddRange(
-                [
-                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
-                    _fixture.DefaultUserReleaseInvite()
-                        .WithReleaseVersion(otherReleaseVersion)
-                        .WithEmail(otherEmail)
-                        .WithRole(role)
-                        .Generate()
-                ]);
+                    [
+                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
+                        _fixture
+                            .DefaultUserReleaseInvite()
+                            .WithReleaseVersion(otherReleaseVersion)
+                            .WithEmail(otherEmail)
+                            .WithRole(role)
+                            .Generate(),
+                    ]
+                );
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1726,13 +1786,13 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 await repository.RemoveByReleaseVersionAndEmail(
                     releaseVersionId: targetReleaseVersion.Id,
-                    email: targetEmail);
+                    email: targetEmail
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(allUserReleaseInvites.Count, remainingInvites.Count);
             }
@@ -1745,10 +1805,9 @@ public abstract class UserReleaseInviteRepositoryTests
 
             var repository = CreateRepository(contentDbContext);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await repository.RemoveByReleaseVersionAndEmail(
-                    releaseVersionId: Guid.NewGuid(),
-                    email: null!));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await repository.RemoveByReleaseVersionAndEmail(releaseVersionId: Guid.NewGuid(), email: null!)
+            );
         }
     }
 
@@ -1761,18 +1820,17 @@ public abstract class UserReleaseInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var role1 = ReleaseRole.Approver;
             var role2 = ReleaseRole.Contributor;
-            var releaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var releaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var releaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var releaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
-            var userReleaseInvites = _fixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _fixture
+                .DefaultUserReleaseInvite()
                 // These 2 invites should be removed
                 .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
@@ -1806,8 +1864,7 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(2, remainingInvites.Count);
 
@@ -1828,18 +1885,17 @@ public abstract class UserReleaseInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var role1 = ReleaseRole.Approver;
             var role2 = ReleaseRole.Contributor;
-            var releaseVersion1 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var releaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
-            var releaseVersion2 = _fixture.DefaultReleaseVersion()
-                .WithRelease(
-                    _fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication()))
+            var releaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
                 .Generate();
 
-            var userReleaseInvites = _fixture.DefaultUserReleaseInvite()
+            var userReleaseInvites = _fixture
+                .DefaultUserReleaseInvite()
                 // These invites are for a different email and should not be removed
                 .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1))
                 .ForIndex(0, s => s.SetEmail(otherEmail))
@@ -1866,8 +1922,7 @@ public abstract class UserReleaseInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
 
                 Assert.Equal(2, remainingInvites.Count);
 
@@ -1886,6 +1941,7 @@ public abstract class UserReleaseInviteRepositoryTests
     {
         return new UserReleaseInviteRepository(
             contentDbContext: contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>());
+            logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()
+        );
     }
 }

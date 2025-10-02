@@ -4,24 +4,22 @@ using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class PublicCsvDownloadsProcessor(
-    IAnalyticsPathResolver pathResolver,
-    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
+public class PublicCsvDownloadsProcessor(IAnalyticsPathResolver pathResolver, IProcessRequestFilesWorkflow workflow)
+    : IRequestFileProcessor
 {
     private static readonly string[] PublicCsvDownloadsSubPath = ["public", "csv-downloads"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicCsvDownloadsSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicCsvDownloadsSubPath);
-    
+
     public Task Process()
     {
-        return workflow.Process(new WorkflowActor(
-            sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));
+        return workflow.Process(
+            new WorkflowActor(sourceDirectory: SourceDirectory, reportsDirectory: ReportsDirectory)
+        );
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory)
-        : IWorkflowActor
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) : IWorkflowActor
     {
         public string GetSourceDirectory()
         {
@@ -35,7 +33,8 @@ public class PublicCsvDownloadsProcessor(
 
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE sourceTable (
                     csvDownloadHash VARCHAR,
                     publicationName VARCHAR,
@@ -45,12 +44,14 @@ public class PublicCsvDownloadsProcessor(
                     subjectId UUID,
                     dataSetTitle VARCHAR
                 )
-            ");
+            "
+            );
         }
 
         public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(subjectId, releaseVersionId)) AS csvDownloadHash,
@@ -67,12 +68,14 @@ public class PublicCsvDownloadsProcessor(
                         }}
                     )
                  )
-            ");
+            "
+            );
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE csvDownloadsReport AS 
                 SELECT 
                     csvDownloadHash,
@@ -86,14 +89,16 @@ public class PublicCsvDownloadsProcessor(
                 FROM sourceTable
                 GROUP BY csvDownloadHash
                 ORDER BY csvDownloadHash
-            ");
+            "
+            );
 
-            var reportFilePath =
-                $"{reportsFolderPathAndFilenamePrefix}_public-csv-downloads.parquet";
+            var reportFilePath = $"{reportsFolderPathAndFilenamePrefix}_public-csv-downloads.parquet";
 
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 COPY (SELECT * FROM csvDownloadsReport)
-                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
+                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')"
+            );
         }
     }
 }

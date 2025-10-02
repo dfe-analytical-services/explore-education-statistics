@@ -12,7 +12,8 @@ public class OnPublicationRestoredFunction(IEventGridEventHandler eventGridEvent
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnPublicationRestored(
         [QueueTrigger("%PublicationRestoredQueueName%")] EventGridEvent eventDto,
-        FunctionContext context) =>
+        FunctionContext context
+    ) =>
         await eventGridEventHandler.Handle<PublicationRestoredEventDto, RefreshSearchableDocumentMessageDto[]>(
             context,
             eventDto,
@@ -20,5 +21,7 @@ public class OnPublicationRestoredFunction(IEventGridEventHandler eventGridEvent
                 Task.FromResult<RefreshSearchableDocumentMessageDto[]>(
                     string.IsNullOrEmpty(payload.PublicationSlug)
                         ? []
-                        : [new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug }]));
+                        : [new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug }]
+                )
+        );
 }

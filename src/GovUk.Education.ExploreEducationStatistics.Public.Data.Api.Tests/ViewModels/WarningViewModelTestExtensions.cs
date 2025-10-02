@@ -5,7 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewM
 
 public static class WarningViewModelTestExtensions
 {
-    public static T GetDetail<T>(this WarningViewModel error) where T : notnull
+    public static T GetDetail<T>(this WarningViewModel error)
+        where T : notnull
     {
         var detailJson = Assert.IsType<JsonElement>(error.Detail);
         var detail = detailJson.Deserialize<T>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

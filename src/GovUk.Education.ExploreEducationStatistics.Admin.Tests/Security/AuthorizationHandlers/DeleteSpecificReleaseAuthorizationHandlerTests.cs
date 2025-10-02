@@ -26,7 +26,8 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             // Assert that no users can delete the first version of a release
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 0 });
+                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 0 }
+            );
         }
 
         [Fact]
@@ -35,7 +36,8 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             // Assert that no users can delete an amendment release version that is approved
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Approved, Version = 1 });
+                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Approved, Version = 1 }
+            );
         }
 
         [Fact]
@@ -45,7 +47,8 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
                 new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 1 },
-                DeleteAllReleaseAmendments);
+                DeleteAllReleaseAmendments
+            );
         }
     }
 
@@ -58,13 +61,14 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             {
                 Publication = new Publication { Id = Guid.NewGuid() },
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Version = 0
+                Version = 0,
             };
 
             // Assert that no User Publication roles will allow deleting the first version of a release
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -74,13 +78,14 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             {
                 Publication = new Publication { Id = Guid.NewGuid() },
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
-                Version = 1
+                Version = 1,
             };
 
             // Assert that no User Publication roles will allow deleting an amendment release version when it is Approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                releaseVersion);
+                releaseVersion
+            );
         }
 
         [Fact]
@@ -90,7 +95,7 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
             {
                 Publication = new Publication { Id = Guid.NewGuid() },
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Version = 1
+                Version = 1,
             };
 
             // Assert that users with the Publication Owner role on an amendment release version can delete if it is not yet approved
@@ -103,7 +108,8 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                     return CreateHandler(contentDbContext);
                 },
                 releaseVersion,
-                Owner);
+                Owner
+            );
         }
     }
 
@@ -119,8 +125,9 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                 {
                     Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    Version = 0
-                });
+                    Version = 0,
+                }
+            );
         }
 
         [Fact]
@@ -133,8 +140,9 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                 {
                     Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    Version = 1
-                });
+                    Version = 1,
+                }
+            );
         }
 
         [Fact]
@@ -147,8 +155,9 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
                 {
                     Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    Version = 1
-                });
+                    Version = 1,
+                }
+            );
         }
     }
 
@@ -156,16 +165,18 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
     {
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+        );
 
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext);
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
         return new DeleteSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: userReleaseRoleRepository,
                 userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

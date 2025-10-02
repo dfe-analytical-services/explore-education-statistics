@@ -14,13 +14,7 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
         [Fact]
         public void Success()
         {
-            var facets = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetGetQueryFilters
-                {
-                    Eq = "abc"
-                },
-            };
+            var facets = new DataSetQueryCriteriaFacets { Filters = new DataSetGetQueryFilters { Eq = "abc" } };
 
             _validator.TestValidate(facets).ShouldNotHaveAnyValidationErrors();
         }
@@ -28,15 +22,10 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
         [Fact]
         public void Failure()
         {
-            var facets = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetGetQueryFilters
-                {
-                    Eq = ""
-                },
-            };
+            var facets = new DataSetQueryCriteriaFacets { Filters = new DataSetGetQueryFilters { Eq = "" } };
 
-            _validator.TestValidate(facets)
+            _validator
+                .TestValidate(facets)
                 .ShouldHaveValidationErrorFor(f => f.Filters!.Eq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
@@ -49,10 +38,7 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
         {
             var facets = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = new DataSetGetQueryGeographicLevels
-                {
-                    Eq = "NAT"
-                },
+                GeographicLevels = new DataSetGetQueryGeographicLevels { Eq = "NAT" },
             };
 
             _validator.TestValidate(facets).ShouldNotHaveAnyValidationErrors();
@@ -63,13 +49,11 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
         {
             var facets = new DataSetQueryCriteriaFacets
             {
-                GeographicLevels = new DataSetGetQueryGeographicLevels
-                {
-                    Eq = "Invalid"
-                },
+                GeographicLevels = new DataSetGetQueryGeographicLevels { Eq = "Invalid" },
             };
 
-            _validator.TestValidate(facets)
+            _validator
+                .TestValidate(facets)
                 .ShouldHaveValidationErrorFor(f => f.GeographicLevels!.Eq)
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
         }
@@ -102,7 +86,8 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
                 },
             };
 
-            _validator.TestValidate(facets)
+            _validator
+                .TestValidate(facets)
                 .ShouldHaveValidationErrorFor(f => f.Locations!.Eq!.Level)
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
         }
@@ -131,11 +116,12 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
             {
                 TimePeriods = new DataSetQueryCriteriaTimePeriods
                 {
-                    Eq = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "Invalid" }
+                    Eq = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "Invalid" },
                 },
             };
 
-            _validator.TestValidate(facets)
+            _validator
+                .TestValidate(facets)
                 .ShouldHaveValidationErrorFor(f => f.TimePeriods!.Eq!.Code)
                 .WithErrorCode(ValidationMessages.TimePeriodAllowedCode.Code);
         }
@@ -148,18 +134,12 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
         {
             var facets = new DataSetQueryCriteriaFacets
             {
-                Filters = new DataSetGetQueryFilters
-                {
-                    Eq = "abc"
-                },
+                Filters = new DataSetGetQueryFilters { Eq = "abc" },
                 Locations = new DataSetQueryCriteriaLocations
                 {
                     Eq = new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
                 },
-                GeographicLevels = new DataSetGetQueryGeographicLevels
-                {
-                    Eq = "NAT"
-                },
+                GeographicLevels = new DataSetGetQueryGeographicLevels { Eq = "NAT" },
                 TimePeriods = new DataSetQueryCriteriaTimePeriods
                 {
                     Eq = new DataSetQueryTimePeriod { Period = "2020/2021", Code = "AY" },
@@ -174,14 +154,8 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
         {
             var facets = new DataSetQueryCriteriaFacets
             {
-                Filters = new DataSetGetQueryFilters
-                {
-                    Eq = ""
-                },
-                GeographicLevels = new DataSetGetQueryGeographicLevels
-                {
-                    Eq = "Invalid"
-                },
+                Filters = new DataSetGetQueryFilters { Eq = "" },
+                GeographicLevels = new DataSetGetQueryGeographicLevels { Eq = "Invalid" },
                 Locations = new DataSetQueryCriteriaLocations
                 {
                     Eq = new DataSetQueryLocationId { Level = "REG", Id = new string('x', 11) },
@@ -194,16 +168,20 @@ public abstract class DataSetQueryCriteriaFacetsValidatorTests
 
             var result = _validator.TestValidate(facets);
 
-            result.ShouldHaveValidationErrorFor(f => f.Filters!.Eq)
+            result
+                .ShouldHaveValidationErrorFor(f => f.Filters!.Eq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor(f => f.GeographicLevels!.Eq)
+            result
+                .ShouldHaveValidationErrorFor(f => f.GeographicLevels!.Eq)
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
 
-            result.ShouldHaveValidationErrorFor("Locations.Eq.Id")
+            result
+                .ShouldHaveValidationErrorFor("Locations.Eq.Id")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
-            result.ShouldHaveValidationErrorFor(f => f.TimePeriods!.Eq!.Period)
+            result
+                .ShouldHaveValidationErrorFor(f => f.TimePeriods!.Eq!.Period)
                 .WithErrorCode(ValidationMessages.TimePeriodInvalidYearRange.Code);
         }
     }

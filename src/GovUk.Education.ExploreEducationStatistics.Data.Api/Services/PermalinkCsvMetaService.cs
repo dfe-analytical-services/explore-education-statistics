@@ -31,7 +31,8 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IReleaseSubjectService releaseSubjectService,
-        IReleaseFileBlobService releaseFileBlobService)
+        IReleaseFileBlobService releaseFileBlobService
+    )
     {
         _logger = logger;
         _contentDbContext = contentDbContext;
@@ -43,14 +44,12 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     public async Task<Either<ActionResult, PermalinkCsvMetaViewModel>> GetCsvMeta(
         Guid subjectId,
         SubjectResultMetaViewModel tableResultMeta,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var releaseSubject = await _releaseSubjectService
-            .FindForLatestPublishedVersion(subjectId: subjectId);
+        var releaseSubject = await _releaseSubjectService.FindForLatestPublishedVersion(subjectId: subjectId);
 
-        var csvStream = releaseSubject is not null
-            ? await GetCsvStream(releaseSubject, cancellationToken)
-            : null;
+        var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
 
         var locations = await GetLocations(tableResultMeta.Locations);
 
@@ -74,18 +73,19 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             Locations = locations,
             Filters = csvFilters,
             Indicators = csvIndicators,
-            Headers = headers
+            Headers = headers,
         };
     }
 
     private async Task<Stream?> GetCsvStream(
         ReleaseSubject releaseSubject,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            var releaseFile = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
+            var releaseFile = await _contentDbContext
+                .ReleaseFiles.Include(rf => rf.File)
                 .SingleAsync(
                     predicate: rf =>
                         rf.File.SubjectId == releaseSubject.SubjectId
@@ -94,17 +94,18 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
                     cancellationToken: cancellationToken
                 );
 
-            return (await _releaseFileBlobService
-                .GetDownloadStream(releaseFile, cancellationToken: cancellationToken))
-                .Right;
+            return (
+                await _releaseFileBlobService.GetDownloadStream(releaseFile, cancellationToken: cancellationToken)
+            ).Right;
         }
         catch (Exception exception)
         {
             _logger.LogError(
                 exception,
-                message:
-                "Could not get file for release subject (ReleaseVersionId = {ReleaseVersionId}, SubjectId = {SubjectId})",
-                releaseSubject.ReleaseVersionId, releaseSubject.SubjectId);
+                message: "Could not get file for release subject (ReleaseVersionId = {ReleaseVersionId}, SubjectId = {SubjectId})",
+                releaseSubject.ReleaseVersionId,
+                releaseSubject.SubjectId
+            );
 
             return null;
         }
@@ -113,14 +114,10 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     private static List<string> ListCsvHeaders(
         IDictionary<string, FilterCsvMetaViewModel> filters,
         IDictionary<string, IndicatorCsvMetaViewModel> indicators,
-        IDictionary<Guid, Dictionary<string, string>> locations)
+        IDictionary<Guid, Dictionary<string, string>> locations
+    )
     {
-        var filteredHeaders = new List<string>
-        {
-            "time_period",
-            "time_identifier",
-            "geographic_level"
-        };
+        var filteredHeaders = new List<string> { "time_period", "time_identifier", "geographic_level" };
 
         var allLocationCols = LocationCsvUtils.AllCsvColumns();
 
@@ -131,10 +128,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             .Select(attribute => attribute.Key)
             .ToHashSet();
 
-        var filterGroupCsvColumns = filters
-            .Select(kvp => kvp.Value.GroupCsvColumn)
-            .WhereNotNull()
-            .ToList();
+        var filterGroupCsvColumns = filters.Select(kvp => kvp.Value.GroupCsvColumn).WhereNotNull().ToList();
 
         filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
         filteredHeaders.AddRange(filterGroupCsvColumns);
@@ -147,23 +141,16 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     private static async Task<List<string>> ListCsvHeaders(
         Stream csvStream,
         IDictionary<string, FilterCsvMetaViewModel> filters,
-        IDictionary<string, IndicatorCsvMetaViewModel> indicators)
+        IDictionary<string, IndicatorCsvMetaViewModel> indicators
+    )
     {
-        var filteredHeaders = new List<string>
-        {
-            "time_period",
-            "time_identifier",
-            "geographic_level"
-        };
+        var filteredHeaders = new List<string> { "time_period", "time_identifier", "geographic_level" };
 
         var headers = await CsvUtils.GetCsvHeaders(csvStream);
 
         var locationCols = LocationCsvUtils.AllCsvColumns().ToHashSet();
 
-        var filterGroupCsvColumns = filters
-            .Select(kvp => kvp.Value.GroupCsvColumn)
-            .WhereNotNull()
-            .ToList();
+        var filterGroupCsvColumns = filters.Select(kvp => kvp.Value.GroupCsvColumn).WhereNotNull().ToList();
 
         filteredHeaders.AddRange(headers.Where(locationCols.Contains));
         filteredHeaders.AddRange(headers.Where(filterGroupCsvColumns.Contains));
@@ -174,65 +161,62 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     }
 
     private async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
-        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy)
+        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy
+    )
     {
         var locationAttributePaths = locationsHierarchy
-            .SelectMany(pair => GetLocationAttributePaths(
-                attributes: pair.Value,
-                rootLevel: Enum.Parse<GeographicLevel>(pair.Key, ignoreCase: true)
-            ))
+            .SelectMany(pair =>
+                GetLocationAttributePaths(
+                    attributes: pair.Value,
+                    rootLevel: Enum.Parse<GeographicLevel>(pair.Key, ignoreCase: true)
+                )
+            )
             .ToList();
 
-        var locationIds = locationAttributePaths
-            .Select(location => location.Id)
-            .ToHashSet();
+        var locationIds = locationAttributePaths.Select(location => location.Id).ToHashSet();
 
         // If possible, use the locations from the database as these contain
         // all the attributes from when it was originally created.
         // Locations in the database are immutable, but they may have been deleted
         // if they have been orphaned from any subject for too long.
-        var locations = await _statisticsDbContext.Location
-            .Where(location => locationIds.Contains(location.Id))
+        var locations = await _statisticsDbContext
+            .Location.Where(location => locationIds.Contains(location.Id))
             .ToDictionaryAsync(location => location.Id);
 
         // For any locations that no longer exist in the database, fallback to using the
         // permalink's location hierarchy metadata. It should be noted that this meta
         // doesn't provide the full set of location attributes so the location will
         // most likely be missing columns that existed in the original CSV.
-        return locationAttributePaths
-            .ToDictionary(
-                location => location.Id,
-                location => locations.ContainsKey(location.Id)
+        return locationAttributePaths.ToDictionary(
+            location => location.Id,
+            location =>
+                locations.ContainsKey(location.Id)
                     ? locations[location.Id].GetCsvValues()
-                    : location.Path
-                        .SelectMany(node => ParseLocationAttribute(node).CsvValues)
+                    : location
+                        .Path.SelectMany(node => ParseLocationAttribute(node).CsvValues)
                         .ToDictionary(colValue => colValue.Key, colValue => colValue.Value)
-            );
+        );
     }
 
     private static List<LocationAttributePath> GetLocationAttributePaths(
         List<LocationAttributeViewModel> attributes,
         GeographicLevel rootLevel,
         List<LocationAttributePath>? leafPaths = null,
-        ImmutableList<LocationAttributeViewModel>? currentPath = null)
+        ImmutableList<LocationAttributeViewModel>? currentPath = null
+    )
     {
         leafPaths ??= new List<LocationAttributePath>();
         currentPath ??= new List<LocationAttributeViewModel>().ToImmutableList();
 
         foreach (var attribute in attributes)
         {
-            var nextPath = currentPath.Add(attribute with
-            {
-                Level = attribute.Level ?? rootLevel
-            });
+            var nextPath = currentPath.Add(attribute with { Level = attribute.Level ?? rootLevel });
 
             if (attribute.Options is null)
             {
                 if (!attribute.Id.HasValue)
                 {
-                    throw new Exception(
-                        $"Leaf attribute has missing property {nameof(attribute.Id)}"
-                    );
+                    throw new Exception($"Leaf attribute has missing property {nameof(attribute.Id)}");
                 }
 
                 // This is a leaf node, so we can terminate the path.
@@ -250,43 +234,34 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     {
         return viewModel.Level switch
         {
-            GeographicLevel.Country =>
-                new Country(viewModel.Value, viewModel.Label),
-            GeographicLevel.EnglishDevolvedArea =>
-                new EnglishDevolvedArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalAuthority =>
-                new LocalAuthority(viewModel.Value, null, viewModel.Label),
-            GeographicLevel.LocalAuthorityDistrict =>
-                new LocalAuthorityDistrict(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalEnterprisePartnership =>
-                new LocalEnterprisePartnership(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalSkillsImprovementPlanArea =>
-                new LocalSkillsImprovementPlanArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.Institution =>
-                new Institution(viewModel.Value, viewModel.Label),
-            GeographicLevel.MayoralCombinedAuthority =>
-                new MayoralCombinedAuthority(viewModel.Value, viewModel.Label),
-            GeographicLevel.MultiAcademyTrust =>
-                new MultiAcademyTrust(viewModel.Value, viewModel.Label),
-            GeographicLevel.OpportunityArea =>
-                new OpportunityArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.ParliamentaryConstituency =>
-                new ParliamentaryConstituency(viewModel.Value, viewModel.Label),
-            GeographicLevel.PlanningArea =>
-                new PlanningArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.Provider =>
-                new Provider(viewModel.Value, viewModel.Label),
-            GeographicLevel.Region =>
-                new Region(viewModel.Value, viewModel.Label),
-            GeographicLevel.RscRegion =>
-                new RscRegion(viewModel.Value),
-            GeographicLevel.School =>
-                new School(viewModel.Value, viewModel.Label),
-            GeographicLevel.Sponsor =>
-                new Sponsor(viewModel.Value, viewModel.Label),
-            GeographicLevel.Ward =>
-                new Ward(viewModel.Value, viewModel.Label),
-            _ => throw new ArgumentOutOfRangeException()
+            GeographicLevel.Country => new Country(viewModel.Value, viewModel.Label),
+            GeographicLevel.EnglishDevolvedArea => new EnglishDevolvedArea(viewModel.Value, viewModel.Label),
+            GeographicLevel.LocalAuthority => new LocalAuthority(viewModel.Value, null, viewModel.Label),
+            GeographicLevel.LocalAuthorityDistrict => new LocalAuthorityDistrict(viewModel.Value, viewModel.Label),
+            GeographicLevel.LocalEnterprisePartnership => new LocalEnterprisePartnership(
+                viewModel.Value,
+                viewModel.Label
+            ),
+            GeographicLevel.LocalSkillsImprovementPlanArea => new LocalSkillsImprovementPlanArea(
+                viewModel.Value,
+                viewModel.Label
+            ),
+            GeographicLevel.Institution => new Institution(viewModel.Value, viewModel.Label),
+            GeographicLevel.MayoralCombinedAuthority => new MayoralCombinedAuthority(viewModel.Value, viewModel.Label),
+            GeographicLevel.MultiAcademyTrust => new MultiAcademyTrust(viewModel.Value, viewModel.Label),
+            GeographicLevel.OpportunityArea => new OpportunityArea(viewModel.Value, viewModel.Label),
+            GeographicLevel.ParliamentaryConstituency => new ParliamentaryConstituency(
+                viewModel.Value,
+                viewModel.Label
+            ),
+            GeographicLevel.PlanningArea => new PlanningArea(viewModel.Value, viewModel.Label),
+            GeographicLevel.Provider => new Provider(viewModel.Value, viewModel.Label),
+            GeographicLevel.Region => new Region(viewModel.Value, viewModel.Label),
+            GeographicLevel.RscRegion => new RscRegion(viewModel.Value),
+            GeographicLevel.School => new School(viewModel.Value, viewModel.Label),
+            GeographicLevel.Sponsor => new Sponsor(viewModel.Value, viewModel.Label),
+            GeographicLevel.Ward => new Ward(viewModel.Value, viewModel.Label),
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
 

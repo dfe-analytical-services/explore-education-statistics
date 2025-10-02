@@ -39,23 +39,27 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .WithCharts(ListOf<IChart>(new LineChart
-                {
-                    Title = "Test chart",
-                    Height = 400,
-                    Width = 500,
-                }))
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new LineChart
+                            {
+                                Title = "Test chart",
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -69,8 +73,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var featuredTable = new FeaturedTable
@@ -119,17 +123,17 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -142,8 +146,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -174,19 +178,19 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                // Set the name to null
-                .WithName(null)
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    // Set the name to null
+                    .WithName(null)
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -199,8 +203,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -229,23 +233,27 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .WithCharts(ListOf<IChart>(new LineChart
-                {
-                    // No title
-                    Height = 400,
-                    Width = 500,
-                }))
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new LineChart
+                            {
+                                // No title
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -259,8 +267,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -290,17 +298,17 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .Generate()
+            )
             .Generate();
 
         var releaseFile = new ReleaseFile
@@ -312,8 +320,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -353,10 +361,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task Get_WrongRelease()
     {
-        var dataBlock = new DataBlock
-        {
-            Name = "Test name",
-        };
+        var dataBlock = new DataBlock { Name = "Test name" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -390,14 +395,8 @@ public class DataBlockServiceTests
             ContentSectionId = Guid.NewGuid(),
             Query = new FullTableQuery
             {
-                Filters = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
-                Indicators = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
+                Filters = new List<Guid> { Guid.NewGuid() },
+                Indicators = new List<Guid> { Guid.NewGuid() },
             },
             Table = new TableBuilderConfiguration
             {
@@ -405,13 +404,13 @@ public class DataBlockServiceTests
                 {
                     Rows = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator),
                     },
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                    }
-                }
+                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter),
+                    },
+                },
             },
             Charts = new List<IChart>
             {
@@ -420,9 +419,9 @@ public class DataBlockServiceTests
                     Title = "Test chart 1",
                     Height = 400,
                     Width = 500,
-                }
+                },
             },
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var featuredTable1 = new FeaturedTable
         {
@@ -441,14 +440,8 @@ public class DataBlockServiceTests
             Created = new DateTime(2001, 2, 2),
             Query = new FullTableQuery
             {
-                Filters = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
-                Indicators = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
+                Filters = new List<Guid> { Guid.NewGuid() },
+                Indicators = new List<Guid> { Guid.NewGuid() },
             },
             Table = new TableBuilderConfiguration
             {
@@ -456,23 +449,23 @@ public class DataBlockServiceTests
                 {
                     Rows = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator),
                     },
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                    }
-                }
+                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter),
+                    },
+                },
             },
             Charts = new List<IChart>(),
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var featuredTable2 = new FeaturedTable
         {
             Name = "Test highlight name 2",
             Description = "Test highlight description 2",
             DataBlock = dataBlock2,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -518,17 +511,9 @@ public class DataBlockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var dataBlock = new DataBlock
-        {
-            ContentSectionId = null,
-            ReleaseVersion = releaseVersion
-        };
+        var dataBlock = new DataBlock { ContentSectionId = null, ReleaseVersion = releaseVersion };
 
-        var keyStatistic = new KeyStatisticDataBlock
-        {
-            ReleaseVersion = releaseVersion,
-            DataBlock = dataBlock,
-        };
+        var keyStatistic = new KeyStatisticDataBlock { ReleaseVersion = releaseVersion, DataBlock = dataBlock };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -568,14 +553,8 @@ public class DataBlockServiceTests
             ContentSectionId = Guid.NewGuid(),
             Query = new FullTableQuery
             {
-                Filters = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
-                Indicators = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
+                Filters = new List<Guid> { Guid.NewGuid() },
+                Indicators = new List<Guid> { Guid.NewGuid() },
             },
             Table = new TableBuilderConfiguration
             {
@@ -583,13 +562,13 @@ public class DataBlockServiceTests
                 {
                     Rows = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator),
                     },
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                    }
-                }
+                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter),
+                    },
+                },
             },
             Charts = new List<IChart>
             {
@@ -598,9 +577,9 @@ public class DataBlockServiceTests
                     Title = "Test chart 1",
                     Height = 400,
                     Width = 500,
-                }
+                },
             },
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
         var featuredTable1 = new FeaturedTable
         {
@@ -613,7 +592,7 @@ public class DataBlockServiceTests
         {
             Name = "Test name 2",
             // This Data Block is attached to a different Release
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -648,23 +627,27 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithCharts(ListOf<IChart>(new InfographicChart
-                {
-                    Title = "Test chart",
-                    FileId = fileId.ToString(),
-                    Height = 400,
-                    Width = 500,
-                }))
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new InfographicChart
+                            {
+                                Title = "Test chart",
+                                FileId = fileId.ToString(),
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -674,11 +657,7 @@ public class DataBlockServiceTests
             .WithContentBlocks(ListOf<ContentBlock>(dataBlockVersion.ContentBlock))
             .GenerateList(1);
 
-        var file = new File
-        {
-            Id = fileId,
-            Filename = "test-infographic.jpg"
-        };
+        var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -718,24 +697,18 @@ public class DataBlockServiceTests
     [Fact]
     public async Task GetDeletePlan_DependentDataBlockIsKeyStatistic()
     {
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
-        var keyStatistic = new KeyStatisticDataBlock
-        {
-            DataBlock = dataBlockVersion.ContentBlock,
-        };
+        var keyStatistic = new KeyStatisticDataBlock { DataBlock = dataBlockVersion.ContentBlock };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -768,16 +741,13 @@ public class DataBlockServiceTests
     [Fact]
     public async Task GetDeletePlan_DependentDataBlockIncludesFeaturedTableDetails()
     {
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -857,19 +827,12 @@ public class DataBlockServiceTests
                     FileId = fileId.ToString(),
                     Height = 400,
                     Width = 500,
-                }
+                },
             },
-            ContentSection = new ContentSection
-            {
-                Heading = "Test heading"
-            },
-            ReleaseVersion = new ReleaseVersion()
+            ContentSection = new ContentSection { Heading = "Test heading" },
+            ReleaseVersion = new ReleaseVersion(),
         };
-        var file = new File
-        {
-            Id = fileId,
-            Filename = "test-infographic.jpg"
-        };
+        var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -894,46 +857,39 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestDraftVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithCharts(ListOf<IChart>(
-                    new InfographicChart
-                    {
-                        Title = "Test chart",
-                        FileId = fileId.ToString(),
-                        Height = 400,
-                        Width = 500,
-                    }))
-                .WithReleaseVersion(releaseVersion)
-                .Generate())
+            .WithLatestDraftVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new InfographicChart
+                            {
+                                Title = "Test chart",
+                                FileId = fileId.ToString(),
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .WithReleaseVersion(releaseVersion)
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestDraftVersion!;
 
         releaseVersion.KeyStatistics = new List<KeyStatistic>
         {
-            new KeyStatisticDataBlock
-            {
-                DataBlockId = dataBlockVersion.Id
-            },
+            new KeyStatisticDataBlock { DataBlockId = dataBlockVersion.Id },
         };
 
-        releaseVersion.FeaturedTables = ListOf(new FeaturedTable
-        {
-            DataBlockId = dataBlockVersion.Id
-        });
+        releaseVersion.FeaturedTables = ListOf(new FeaturedTable { DataBlockId = dataBlockVersion.Id });
 
-        var file = new File
-        {
-            Id = fileId,
-            Filename = "test-infographic.jpg"
-        };
+        var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -958,10 +914,7 @@ public class DataBlockServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             releaseFileService
-                .Setup(
-                    s =>
-                        s.Delete(releaseVersion.Id, new List<Guid> {fileId}, false)
-                )
+                .Setup(s => s.Delete(releaseVersion.Id, new List<Guid> { fileId }, false))
                 .ReturnsAsync(Unit.Instance);
 
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
@@ -974,15 +927,14 @@ public class DataBlockServiceTests
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService
-                .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
-                .Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
                 releaseFileService: releaseFileService.Object,
                 cacheKeyService: cacheKeyService.Object,
-                privateCacheService: privateCacheService.Object);
+                privateCacheService: privateCacheService.Object
+            );
 
             var result = await service.Delete(releaseVersion.Id, dataBlockVersion.Id);
 
@@ -1006,29 +958,30 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestDraftVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithCharts(ListOf<IChart>(
-                    new InfographicChart
-                    {
-                        Title = "Test chart",
-                        FileId = fileId.ToString(),
-                        Height = 400,
-                        Width = 500,
-                    }))
-                .WithReleaseVersion(releaseVersion)
-                .Generate())
+            .WithLatestDraftVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new InfographicChart
+                            {
+                                Title = "Test chart",
+                                FileId = fileId.ToString(),
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .WithReleaseVersion(releaseVersion)
+                    .Generate()
+            )
             // In this test, the DataBlockParent also has an already-published DataBlockVersion which cannot be
             // deleted, and thus the parent will also not be deleted.
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestPublishedVersion(_fixture.DefaultDataBlockVersion().Generate())
             .Generate();
 
         var draftDataBlockVersion = dataBlockParent.LatestDraftVersion!;
@@ -1036,32 +989,16 @@ public class DataBlockServiceTests
 
         releaseVersion.KeyStatistics = new List<KeyStatistic>
         {
-            new KeyStatisticDataBlock
-            {
-                DataBlockId = draftDataBlockVersion.Id
-            },
-            new KeyStatisticDataBlock
-            {
-                DataBlockId = publishedDataBlockVersion.Id
-            }
+            new KeyStatisticDataBlock { DataBlockId = draftDataBlockVersion.Id },
+            new KeyStatisticDataBlock { DataBlockId = publishedDataBlockVersion.Id },
         };
 
         releaseVersion.FeaturedTables = ListOf(
-            new FeaturedTable
-            {
-                DataBlockId = draftDataBlockVersion.Id
-            },
-            new FeaturedTable
-            {
-                DataBlockId = publishedDataBlockVersion.Id
-            }
+            new FeaturedTable { DataBlockId = draftDataBlockVersion.Id },
+            new FeaturedTable { DataBlockId = publishedDataBlockVersion.Id }
         );
 
-        var file = new File
-        {
-            Id = fileId,
-            Filename = "test-infographic.jpg"
-        };
+        var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -1086,10 +1023,7 @@ public class DataBlockServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             releaseFileService
-                .Setup(
-                    s =>
-                        s.Delete(releaseVersion.Id, new List<Guid> { fileId }, false)
-                )
+                .Setup(s => s.Delete(releaseVersion.Id, new List<Guid> { fileId }, false))
                 .ReturnsAsync(Unit.Instance);
 
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
@@ -1102,15 +1036,14 @@ public class DataBlockServiceTests
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService
-                .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
-                .Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
                 releaseFileService: releaseFileService.Object,
                 cacheKeyService: cacheKeyService.Object,
-                privateCacheService: privateCacheService.Object);
+                privateCacheService: privateCacheService.Object
+            );
 
             var result = await service.Delete(releaseVersion.Id, draftDataBlockVersion.Id);
 
@@ -1141,7 +1074,9 @@ public class DataBlockServiceTests
             var remainingFeaturedTable = Assert.Single(context.FeaturedTables.ToList());
             Assert.Equal(publishedDataBlockVersion.Id, remainingFeaturedTable.DataBlockId);
 
-            var remainingKeyStatistic = Assert.IsType<KeyStatisticDataBlock>(Assert.Single(context.KeyStatistics.ToList()));
+            var remainingKeyStatistic = Assert.IsType<KeyStatisticDataBlock>(
+                Assert.Single(context.KeyStatistics.ToList())
+            );
             Assert.Equal(publishedDataBlockVersion.Id, remainingKeyStatistic.DataBlockId);
         }
     }
@@ -1206,8 +1141,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1226,28 +1161,16 @@ public class DataBlockServiceTests
             Query = new FullTableQueryRequest
             {
                 SubjectId = subjectId,
-                Filters = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
-                Indicators = new List<Guid>
-                {
-                    Guid.NewGuid(),
-                },
+                Filters = new List<Guid> { Guid.NewGuid() },
+                Indicators = new List<Guid> { Guid.NewGuid() },
             },
             Table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new List<TableHeader>
-                    {
-                        new (Guid.NewGuid().ToString(), TableHeaderType.Indicator)
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new (Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                    }
-                }
+                    Rows = new List<TableHeader> { new(Guid.NewGuid().ToString(), TableHeaderType.Indicator) },
+                    Columns = new List<TableHeader> { new(Guid.NewGuid().ToString(), TableHeaderType.Filter) },
+                },
             },
             Charts = new List<IChart>
             {
@@ -1256,7 +1179,7 @@ public class DataBlockServiceTests
                     Title = "Test chart",
                     Height = 600,
                     Width = 700,
-                }
+                },
             },
         };
 
@@ -1271,8 +1194,7 @@ public class DataBlockServiceTests
             Assert.Equal(createRequest.Name, viewModel.Name);
             Assert.Equal(createRequest.Source, viewModel.Source);
 
-            createRequest.Query.AsFullTableQuery()
-                .AssertDeepEqualTo(viewModel.Query);
+            createRequest.Query.AsFullTableQuery().AssertDeepEqualTo(viewModel.Query);
             Assert.Equal(createRequest.Table, viewModel.Table);
             Assert.Equal(createRequest.Charts, viewModel.Charts);
 
@@ -1319,18 +1241,14 @@ public class DataBlockServiceTests
             Assert.Equal(createRequest.Name, dataBlock.Name);
             Assert.Equal(createRequest.Source, dataBlock.Source);
 
-            createRequest.Query.AsFullTableQuery()
-                .AssertDeepEqualTo(dataBlock.Query);
+            createRequest.Query.AsFullTableQuery().AssertDeepEqualTo(dataBlock.Query);
             createRequest.Table.AssertDeepEqualTo(dataBlock.Table);
             createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
 
-            var savedRelease = await context
-                .ReleaseVersions
-                .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
+            var savedRelease = await context.ReleaseVersions.FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
             var savedDataBlocks = context
-                .ContentBlocks
-                .Where(block => block.ReleaseVersionId == releaseVersion.Id)
+                .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersion.Id)
                 .ToList();
 
             Assert.NotNull(savedRelease);
@@ -1355,8 +1273,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1371,10 +1289,7 @@ public class DataBlockServiceTests
         {
             Heading = "Test heading",
             Name = "Test name",
-            Query = new FullTableQueryRequest
-            {
-                SubjectId = subjectId
-            },
+            Query = new FullTableQueryRequest { SubjectId = subjectId },
             Charts = new List<IChart>
             {
                 new LineChart
@@ -1382,7 +1297,7 @@ public class DataBlockServiceTests
                     // No title
                     Height = 600,
                     Width = 700,
-                }
+                },
             },
         };
 
@@ -1421,11 +1336,7 @@ public class DataBlockServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
 
-        var createRequest = new DataBlockCreateRequest
-        {
-            Heading = "Heading 1",
-            Name = "Name 1",
-        };
+        var createRequest = new DataBlockCreateRequest { Heading = "Heading 1", Name = "Name 1" };
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -1448,24 +1359,27 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .WithCharts(ListOf<IChart>(
-                    new LineChart
-                    {
-                        Title = "Old chart",
-                        Height = 400,
-                        Width = 500,
-                    }))
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new LineChart
+                            {
+                                Title = "Old chart",
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -1479,8 +1393,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1496,10 +1410,7 @@ public class DataBlockServiceTests
             Heading = "New heading",
             Name = "New name",
             Source = "New source",
-            Query = new FullTableQueryRequest
-            {
-                SubjectId = subjectId
-            },
+            Query = new FullTableQueryRequest { SubjectId = subjectId },
             Charts = new List<IChart>
             {
                 new LineChart
@@ -1507,8 +1418,8 @@ public class DataBlockServiceTests
                     Title = "New chart",
                     Height = 600,
                     Width = 700,
-                }
-            }
+                },
+            },
         };
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -1523,14 +1434,13 @@ public class DataBlockServiceTests
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService
-                .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
-                .Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
                 cacheKeyService: cacheKeyService.Object,
-                privateCacheService: privateCacheService.Object);
+                privateCacheService: privateCacheService.Object
+            );
 
             var result = await service.Update(dataBlockVersion.Id, updateRequest);
 
@@ -1546,8 +1456,7 @@ public class DataBlockServiceTests
             Assert.Equal(subjectId, updateResult.DataSetId);
             Assert.Equal("test file", updateResult.DataSetName);
 
-            updateRequest.Query.AsFullTableQuery()
-                .AssertDeepEqualTo(updateResult.Query);
+            updateRequest.Query.AsFullTableQuery().AssertDeepEqualTo(updateResult.Query);
             Assert.Equal(updateRequest.Table, updateResult.Table);
             Assert.Equal(updateRequest.Charts, updateResult.Charts);
         }
@@ -1561,8 +1470,7 @@ public class DataBlockServiceTests
             Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
             Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
-            updateRequest.Query.AsFullTableQuery()
-                .AssertDeepEqualTo(updatedDataBlock.Query);
+            updateRequest.Query.AsFullTableQuery().AssertDeepEqualTo(updatedDataBlock.Query);
             updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
             updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
         }
@@ -1573,24 +1481,27 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .WithCharts(ListOf<IChart>(
-                    new LineChart
-                    {
-                        // No title
-                        Height = 400,
-                        Width = 500,
-                    }))
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new LineChart
+                            {
+                                // No title
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -1603,8 +1514,8 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1618,10 +1529,7 @@ public class DataBlockServiceTests
         {
             Heading = "New heading",
             Name = "New name",
-            Query = new FullTableQueryRequest
-            {
-                SubjectId = subjectId
-            },
+            Query = new FullTableQueryRequest { SubjectId = subjectId },
             Charts = new List<IChart>
             {
                 new LineChart
@@ -1629,7 +1537,7 @@ public class DataBlockServiceTests
                     // No title
                     Height = 600,
                     Width = 700,
-                }
+                },
             },
         };
 
@@ -1645,14 +1553,13 @@ public class DataBlockServiceTests
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService
-                .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
-                .Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
                 cacheKeyService: cacheKeyService.Object,
-                privateCacheService: privateCacheService.Object);
+                privateCacheService: privateCacheService.Object
+            );
 
             var result = await service.Update(dataBlockVersion.Id, updateRequest);
 
@@ -1688,12 +1595,10 @@ public class DataBlockServiceTests
         await using var context = InMemoryContentDbContext(contextId);
 
         var service = BuildDataBlockService(context);
-        var result = await service.Update(Guid.NewGuid(),
-            new DataBlockUpdateRequest
-            {
-                Heading = "Heading 1",
-                Name = "Name 1",
-            });
+        var result = await service.Update(
+            Guid.NewGuid(),
+            new DataBlockUpdateRequest { Heading = "Heading 1", Name = "Name 1" }
+        );
 
         result.AssertNotFound();
     }
@@ -1704,25 +1609,28 @@ public class DataBlockServiceTests
         var subjectId = Guid.NewGuid();
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .WithCharts(ListOf<IChart>(
-                    new InfographicChart
-                    {
-                        Title = "Old chart",
-                        FileId = fileId.ToString(),
-                        Height = 400,
-                        Width = 500,
-                    }))
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(
+                        ListOf<IChart>(
+                            new InfographicChart
+                            {
+                                Title = "Old chart",
+                                FileId = fileId.ToString(),
+                                Height = 400,
+                                Width = 500,
+                            }
+                        )
+                    )
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -1735,15 +1643,11 @@ public class DataBlockServiceTests
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 Filename = "test filename",
-                Type = FileType.Data
-            }
+                Type = FileType.Data,
+            },
         };
 
-        var file = new File
-        {
-            Id = fileId,
-            Filename = "test-infographic.jpg"
-        };
+        var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -1757,10 +1661,7 @@ public class DataBlockServiceTests
         {
             Heading = "Test heading",
             Name = "Test name",
-            Query = new FullTableQueryRequest
-            {
-                SubjectId = subjectId
-            },
+            Query = new FullTableQueryRequest { SubjectId = subjectId },
             Charts = new List<IChart>
             {
                 new LineChart
@@ -1768,7 +1669,7 @@ public class DataBlockServiceTests
                     Title = "New chart",
                     Height = 600,
                     Width = 700,
-                }
+                },
             },
         };
 
@@ -1776,9 +1677,7 @@ public class DataBlockServiceTests
         {
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
-            releaseFileService
-                .Setup(s => s.Delete(releaseVersion.Id, fileId, false))
-                .ReturnsAsync(Unit.Instance);
+            releaseFileService.Setup(s => s.Delete(releaseVersion.Id, fileId, false)).ReturnsAsync(Unit.Instance);
 
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
@@ -1790,15 +1689,14 @@ public class DataBlockServiceTests
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService
-                .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
-                .Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
                 releaseFileService: releaseFileService.Object,
                 cacheKeyService: cacheKeyService.Object,
-                privateCacheService: privateCacheService.Object);
+                privateCacheService: privateCacheService.Object
+            );
 
             var result = await service.Update(dataBlockVersion.Id, updateRequest);
 
@@ -1813,16 +1711,13 @@ public class DataBlockServiceTests
     [Fact]
     public async Task GetUnattachedDataBlocks()
     {
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .Generate())
+            .WithLatestPublishedVersion(() =>
+                _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
+            )
             .GenerateList(4);
 
         var unattachedDataBlockVersion1 = dataBlockParents[0].LatestPublishedVersion!;
@@ -1839,23 +1734,27 @@ public class DataBlockServiceTests
 
         releaseVersion.Content = _fixture
             .DefaultContentSection()
-            .WithContentBlocks(ListOf<ContentBlock>(
-                // This Data Block is "attached" because it's used within Release Content.
-                attachedDataBlockVersion2.ContentBlock,
-                new HtmlBlock()
-            ))
+            .WithContentBlocks(
+                ListOf<ContentBlock>(
+                    // This Data Block is "attached" because it's used within Release Content.
+                    attachedDataBlockVersion2.ContentBlock,
+                    new HtmlBlock()
+                )
+            )
             .GenerateList(1);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             // Add an unrelated Data Block.
-            await contentDbContext.ContentBlocks.AddRangeAsync(new DataBlock
-            {
-                Name = "Unattached for different Release",
-                ContentSection = null,
-                ReleaseVersion = new ReleaseVersion()
-            });
+            await contentDbContext.ContentBlocks.AddRangeAsync(
+                new DataBlock
+                {
+                    Name = "Unattached for different Release",
+                    ContentSection = null,
+                    ReleaseVersion = new ReleaseVersion(),
+                }
+            );
             await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParents);
             await contentDbContext.KeyStatisticsDataBlock.AddRangeAsync(keyStat);
             await contentDbContext.SaveChangesAsync();
@@ -1864,8 +1763,7 @@ public class DataBlockServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = BuildDataBlockService(contentDbContext: contentDbContext);
-            var result = await service.GetUnattachedDataBlocks(
-                releaseVersion.Id);
+            var result = await service.GetUnattachedDataBlocks(releaseVersion.Id);
 
             var unattachedDataBlocks = result.AssertRight();
 
@@ -1884,8 +1782,7 @@ public class DataBlockServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
         var service = BuildDataBlockService(contentDbContext: contentDbContext);
-        var result = await service.GetUnattachedDataBlocks(
-            Guid.NewGuid());
+        var result = await service.GetUnattachedDataBlocks(Guid.NewGuid());
 
         result.AssertNotFound();
     }
@@ -1896,7 +1793,8 @@ public class DataBlockServiceTests
         IReleaseFileService? releaseFileService = null,
         IUserService? userService = null,
         IPrivateBlobCacheService? privateCacheService = null,
-        ICacheKeyService? cacheKeyService = null)
+        ICacheKeyService? cacheKeyService = null
+    )
     {
         var service = new DataBlockService(
             contentDbContext,

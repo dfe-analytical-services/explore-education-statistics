@@ -9,29 +9,17 @@ public partial class EES3763_DropUnusedColumnsFromStatisticsRelease : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropIndex(
-            name: "IX_Release_PreviousVersionId",
-            table: "Release");
+        migrationBuilder.DropIndex(name: "IX_Release_PreviousVersionId", table: "Release");
 
-        migrationBuilder.DropColumn(
-            name: "PreviousVersionId",
-            table: "Release");
+        migrationBuilder.DropColumn(name: "PreviousVersionId", table: "Release");
 
-        migrationBuilder.DropColumn(
-            name: "Published",
-            table: "Release");
+        migrationBuilder.DropColumn(name: "Published", table: "Release");
 
-        migrationBuilder.DropColumn(
-            name: "Slug",
-            table: "Release");
+        migrationBuilder.DropColumn(name: "Slug", table: "Release");
 
-        migrationBuilder.DropColumn(
-            name: "TimeIdentifier",
-            table: "Release");
+        migrationBuilder.DropColumn(name: "TimeIdentifier", table: "Release");
 
-        migrationBuilder.DropColumn(
-            name: "Year",
-            table: "Release");
+        migrationBuilder.DropColumn(name: "Year", table: "Release");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -40,19 +28,12 @@ public partial class EES3763_DropUnusedColumnsFromStatisticsRelease : Migration
             name: "PreviousVersionId",
             table: "Release",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
-        migrationBuilder.AddColumn<DateTime>(
-            name: "Published",
-            table: "Release",
-            type: "datetime2",
-            nullable: true);
+        migrationBuilder.AddColumn<DateTime>(name: "Published", table: "Release", type: "datetime2", nullable: true);
 
-        migrationBuilder.AddColumn<string>(
-            name: "Slug",
-            table: "Release",
-            type: "nvarchar(max)",
-            nullable: true);
+        migrationBuilder.AddColumn<string>(name: "Slug", table: "Release", type: "nvarchar(max)", nullable: true);
 
         migrationBuilder.AddColumn<string>(
             name: "TimeIdentifier",
@@ -60,18 +41,15 @@ public partial class EES3763_DropUnusedColumnsFromStatisticsRelease : Migration
             type: "nvarchar(6)",
             maxLength: 6,
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
 
-        migrationBuilder.AddColumn<int>(
-            name: "Year",
-            table: "Release",
-            type: "int",
-            nullable: false,
-            defaultValue: 0);
+        migrationBuilder.AddColumn<int>(name: "Year", table: "Release", type: "int", nullable: false, defaultValue: 0);
 
         migrationBuilder.CreateIndex(
             name: "IX_Release_PreviousVersionId",
             table: "Release",
-            column: "PreviousVersionId");
+            column: "PreviousVersionId"
+        );
     }
 }

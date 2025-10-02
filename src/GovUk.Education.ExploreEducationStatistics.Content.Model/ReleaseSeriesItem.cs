@@ -29,7 +29,7 @@ public record ReleaseSeriesItem
             {
                 Id = Id,
                 Title = LegacyLinkDescription ?? string.Empty,
-                Url = LegacyLinkUrl ?? string.Empty
+                Url = LegacyLinkUrl ?? string.Empty,
             }
             : new PublicationReleaseEntry { ReleaseId = ReleaseId!.Value };
     }

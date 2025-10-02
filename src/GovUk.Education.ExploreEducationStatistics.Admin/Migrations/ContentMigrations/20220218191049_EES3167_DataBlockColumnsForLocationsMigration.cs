@@ -13,44 +13,40 @@ public partial class EES3167_DataBlockColumnsForLocationsMigration : Migration
             name: "DataBlock_ChartsMigrated",
             table: "ContentBlock",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<bool>(
             name: "DataBlock_LocationsMigrated",
             table: "ContentBlock",
             type: "bit",
             nullable: true,
-            defaultValue: false);
+            defaultValue: false
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "DataBlock_QueryMigrated",
             table: "ContentBlock",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "DataBlock_TableMigrated",
             table: "ContentBlock",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataBlock_ChartsMigrated",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "DataBlock_ChartsMigrated", table: "ContentBlock");
 
-        migrationBuilder.DropColumn(
-            name: "DataBlock_LocationsMigrated",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "DataBlock_LocationsMigrated", table: "ContentBlock");
 
-        migrationBuilder.DropColumn(
-            name: "DataBlock_QueryMigrated",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "DataBlock_QueryMigrated", table: "ContentBlock");
 
-        migrationBuilder.DropColumn(
-            name: "DataBlock_TableMigrated",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "DataBlock_TableMigrated", table: "ContentBlock");
     }
 }

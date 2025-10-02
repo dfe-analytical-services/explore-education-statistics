@@ -12,12 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
 {
-    protected override string ResourcesPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "DataApi",
-        "TableToolDownloads",
-        "FromTableToolBuilderPage");
+    protected override string ResourcesPath =>
+        Path.Combine(
+            Assembly.GetExecutingAssembly().GetDirectoryPath(),
+            "Resources",
+            "DataApi",
+            "TableToolDownloads",
+            "FromTableToolBuilderPage"
+        );
 
     public class ProcessTests : TableToolDownloadsProcessorTests
     {
@@ -31,12 +33,12 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -53,9 +55,10 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                 captureTableToolDownloadLine,
                 "Example1.json",
                 1,
-                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
+                expectedHash: "a9e223bcda0b5a3832bcec68025d7bd8"
+            );
         }
-        
+
         [Fact]
         public async Task TwoDifferentSourceQueries_ProduceTwoDistinctReportRows()
         {
@@ -67,12 +70,12 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var parquetFile = Assert.Single(reports);
 
@@ -89,13 +92,15 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                 csvDownloadReportRows[0],
                 "Example1.json",
                 1,
-                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
+                expectedHash: "a9e223bcda0b5a3832bcec68025d7bd8"
+            );
 
             await AssertReportRow(
                 csvDownloadReportRows[1],
                 "Example2.json",
                 1,
-                expectedHash:"93d5d86bf80c7ba877c6c9a5f5f3bac5");
+                expectedHash: "93d5d86bf80c7ba877c6c9a5f5f3bac5"
+            );
         }
 
         [Fact]
@@ -123,32 +128,36 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
                 csvDownloadReportRow,
                 "Example1.json",
                 2,
-                expectedHash:"a9e223bcda0b5a3832bcec68025d7bd8");
+                expectedHash: "a9e223bcda0b5a3832bcec68025d7bd8"
+            );
         }
 
-        private static async Task<List<CaptureTableToolDownloadLine>> ReadReport(DuckDbConnection duckDbConnection,
-            string reportFile)
+        private static async Task<List<CaptureTableToolDownloadLine>> ReadReport(
+            DuckDbConnection duckDbConnection,
+            string reportFile
+        )
         {
-            return (await duckDbConnection
+            return (
+                await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{reportFile:raw}')")
-                    .QueryAsync<CaptureTableToolDownloadLine>())
-                    .OrderBy(row => row.DataSetName)
+                    .QueryAsync<CaptureTableToolDownloadLine>()
+            )
+                .OrderBy(row => row.DataSetName)
                 .ToList();
         }
     }
 
     private TableToolDownloadsProcessor BuildService()
     {
-        return new TableToolDownloadsProcessor(
-            pathResolver: PathResolver,
-            workflow: Workflow);
+        return new TableToolDownloadsProcessor(pathResolver: PathResolver, workflow: Workflow);
     }
 
     private async Task AssertReportRow(
         CaptureTableToolDownloadLine row,
         string jsonFileName,
         int numRequests,
-        string? expectedHash = null)
+        string? expectedHash = null
+    )
     {
         var jsonText = await File.ReadAllTextAsync(Path.Combine(ResourcesPath, jsonFileName));
 
@@ -179,24 +188,32 @@ public abstract class TableToolDownloadsProcessorTests : ProcessorTestsBase
         public required string DataSetName { get; init; }
         public required TableDownloadFormat DownloadFormat { get; init; }
         public required FullTableQuery Query { get; init; }
-        public string QueryToString => JsonConvert.SerializeObject(Query, new JsonSerializerSettings()
-        {
-            ContractResolver = new CustomContractResolver(),
-        });
-        
+        public string QueryToString =>
+            JsonConvert.SerializeObject(
+                Query,
+                new JsonSerializerSettings() { ContractResolver = new CustomContractResolver() }
+            );
+
         private class CustomContractResolver : CamelCasePropertyNamesContractResolver
         {
-            protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization) =>
+            protected override IList<JsonProperty> CreateProperties(
+                Type type,
+                MemberSerialization memberSerialization
+            ) =>
                 base
                     // Yield the properties to be serialised in alphabetical order
                     .CreateProperties(type, memberSerialization)
                     .OrderBy(p => p.Order ?? int.MaxValue)
                     .ThenBy(p => p.PropertyName)
                     .ToList();
-        } 
+        }
     }
-    
-    public enum TableDownloadFormat { CSV, ODS }
+
+    public enum TableDownloadFormat
+    {
+        CSV,
+        ODS,
+    }
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record CaptureTableToolDownloadLine

@@ -24,7 +24,7 @@ public static class DataSetVersionNumberTest
             int? major,
             int? minor,
             int? patch
-            )
+        )
         {
             Assert.True(DataSetVersionNumber.TryParse(versionString, out var wildcardVersion));
 
@@ -73,7 +73,8 @@ public static class DataSetVersionNumberTest
             string versionString,
             int expectedMajor,
             int expectedMinor = 0,
-            int expectedPatch = 0)
+            int expectedPatch = 0
+        )
         {
             Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
 
@@ -90,7 +91,8 @@ public static class DataSetVersionNumberTest
             string versionString,
             int expectedMajor,
             int expectedMinor = 0,
-            int expectedPatch = 0)
+            int expectedPatch = 0
+        )
         {
             Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
 
@@ -114,7 +116,6 @@ public static class DataSetVersionNumberTest
         [InlineData("v")]
         [InlineData(".")]
         [InlineData("..")]
-
         public void InvalidVersion_FailsToParse(string versionString)
         {
             Assert.False(DataSetVersionNumber.TryParse(versionString, out _));

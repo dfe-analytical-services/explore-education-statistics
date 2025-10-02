@@ -7,9 +7,11 @@ public class EducationInNumbersPage
 {
     public Guid Id { get; set; }
 
-    [MaxLength(255)] public string Title { get; set; } = string.Empty;
+    [MaxLength(255)]
+    public string Title { get; set; } = string.Empty;
 
-    [MaxLength(255)] public string? Slug { get; set; } = null;
+    [MaxLength(255)]
+    public string? Slug { get; set; } = null;
 
     [MaxLength(2047)]
     public string Description { get; set; } = string.Empty;

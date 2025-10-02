@@ -35,15 +35,20 @@ public class Update : ICreatedTimestamp<DateTime?>
             // Reapply a DateTimeKind when reading from database results to avoid values with DateTimeKind.Unspecified,
             // which are ambiguous in API responses due to being serialised to JSON without an offset.
             // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
-            builder.Property(u => u.On)
+            builder
+                .Property(u => u.On)
                 .HasConversion(
                     v => v,
-                    v => DateTime.SpecifyKind(v,
-                        // Updates are created by ReleaseNoteService in local time using DateTime.Now,
-                        // so reapply DateTimeKind.Local here rather than DateTimeKind.Utc.
-                        // It's different to the rest of the service where new date values use DateTime.UtcNow,
-                        // where the kind would be reapplied with DateTimeKind.Utc here.
-                        DateTimeKind.Local));
+                    v =>
+                        DateTime.SpecifyKind(
+                            v,
+                            // Updates are created by ReleaseNoteService in local time using DateTime.Now,
+                            // so reapply DateTimeKind.Local here rather than DateTimeKind.Utc.
+                            // It's different to the rest of the service where new date values use DateTime.UtcNow,
+                            // where the kind would be reapplied with DateTimeKind.Utc here.
+                            DateTimeKind.Local
+                        )
+                );
         }
     }
 }

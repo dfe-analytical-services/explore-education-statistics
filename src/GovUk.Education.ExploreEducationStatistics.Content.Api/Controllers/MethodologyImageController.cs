@@ -18,8 +18,10 @@ public class MethodologyImageController : ControllerBase
     [HttpGet("methodologies/{methodologyVersionId}/images/{fileId}")]
     public async Task<ActionResult> Stream(string methodologyVersionId, string fileId)
     {
-        if (Guid.TryParse(methodologyVersionId, out var methodologyVersionIdAsGuid) &&
-            Guid.TryParse(fileId, out var fileIdAsGuid))
+        if (
+            Guid.TryParse(methodologyVersionId, out var methodologyVersionIdAsGuid)
+            && Guid.TryParse(fileId, out var fileIdAsGuid)
+        )
         {
             return await _methodologyImageService
                 .Stream(methodologyVersionId: methodologyVersionIdAsGuid, fileId: fileIdAsGuid)

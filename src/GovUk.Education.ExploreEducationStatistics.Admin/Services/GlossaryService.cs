@@ -21,18 +21,14 @@ public class GlossaryService : IGlossaryService
 
     public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
     {
-        var glossaryEntries = await _contentDbContext.GlossaryEntries
-            .ToListAsync();
+        var glossaryEntries = await _contentDbContext.GlossaryEntries.ToListAsync();
         return GlossaryUtils.BuildGlossary(glossaryEntries);
     }
 
     public async Task<Either<ActionResult, GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
     {
-        return await _contentDbContext.GlossaryEntries
-            .SingleOrNotFoundAsync(e => e.Slug == slug)
-            .OnSuccess(e => new GlossaryEntryViewModel(
-                Title: e.Title,
-                Slug: e.Slug,
-                Body: e.Body));
+        return await _contentDbContext
+            .GlossaryEntries.SingleOrNotFoundAsync(e => e.Slug == slug)
+            .OnSuccess(e => new GlossaryEntryViewModel(Title: e.Title, Slug: e.Slug, Body: e.Body));
     }
 }

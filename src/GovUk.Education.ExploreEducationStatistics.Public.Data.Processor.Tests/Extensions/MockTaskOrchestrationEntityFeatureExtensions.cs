@@ -9,10 +9,12 @@ internal static class MockTaskOrchestrationEntityFeatureExtensions
 {
     internal static IReturnsResult<TaskOrchestrationEntityFeature> SetupLockForActivity(
         this Mock<TaskOrchestrationEntityFeature> mock,
-        string name)
+        string name
+    )
     {
-        return mock.Setup(entityFeature => entityFeature.LockEntitiesAsync(
-                new EntityInstanceId(nameof(ActivityLock), name)))
+        return mock.Setup(entityFeature =>
+                entityFeature.LockEntitiesAsync(new EntityInstanceId(nameof(ActivityLock), name))
+            )
             .ReturnsAsync(new NoOpAsyncDisposable());
     }
 

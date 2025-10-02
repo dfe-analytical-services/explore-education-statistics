@@ -13,13 +13,9 @@ public partial class EES6604_RemoveCaptionColumns : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Caption",
-            table: "EinContentSections");
+        migrationBuilder.DropColumn(name: "Caption", table: "EinContentSections");
 
-        migrationBuilder.DropColumn(
-            name: "Caption",
-            table: "ContentSections");
+        migrationBuilder.DropColumn(name: "Caption", table: "ContentSections");
     }
 
     /// <inheritdoc />
@@ -30,12 +26,14 @@ public partial class EES6604_RemoveCaptionColumns : Migration
             table: "EinContentSections",
             type: "nvarchar(2048)",
             maxLength: 2048,
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "Caption",
             table: "ContentSections",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

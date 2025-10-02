@@ -25,15 +25,15 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
             Id = Guid.NewGuid(),
             Slug = "slug1",
             Title = "title1",
-            Summary = "summary1"
+            Summary = "summary1",
         },
         new()
         {
             Id = Guid.NewGuid(),
             Slug = "slug2",
             Title = "title2",
-            Summary = "summary2"
-        }
+            Summary = "summary2",
+        },
     ];
 
     [Fact]
@@ -42,24 +42,19 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
         var themeService = new Mock<IThemeService>(Strict);
 
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                new ListThemesCacheKey(),
-                typeof(IList<ThemeViewModel>)))
+            .Setup(s => s.GetItem(new ListThemesCacheKey(), typeof(IList<ThemeViewModel>)))
             .Returns((object?)null);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
+            10,
+            CrontabSchedule.Parse(HalfHourlyExpirySchedule)
+        );
 
-        MemoryCacheService
-            .Setup(s => s.SetItem<object>(
-                new ListThemesCacheKey(),
-                _themes,
-                ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null));
+        MemoryCacheService.Setup(s =>
+            s.SetItem<object>(new ListThemesCacheKey(), _themes, ItIs.DeepEqualTo(expectedCacheConfiguration), null)
+        );
 
-        themeService
-            .Setup(s => s.ListThemes())
-            .ReturnsAsync(_themes);
+        themeService.Setup(s => s.ListThemes()).ReturnsAsync(_themes);
 
         var controller = BuildController(themeService.Object);
 
@@ -74,9 +69,7 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
     public async Task ListThemes_CachedEntryExists()
     {
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                new ListThemesCacheKey(),
-                typeof(IList<ThemeViewModel>)))
+            .Setup(s => s.GetItem(new ListThemesCacheKey(), typeof(IList<ThemeViewModel>)))
             .Returns(_themes);
 
         var controller = BuildController();
@@ -97,9 +90,6 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
 
     private static ThemeController BuildController(IThemeService? themeService = null)
     {
-        return new(
-            Mock.Of<IMethodologyCacheService>(),
-            themeService ?? Mock.Of<IThemeService>(Strict)
-        );
+        return new(Mock.Of<IMethodologyCacheService>(), themeService ?? Mock.Of<IThemeService>(Strict));
     }
 }

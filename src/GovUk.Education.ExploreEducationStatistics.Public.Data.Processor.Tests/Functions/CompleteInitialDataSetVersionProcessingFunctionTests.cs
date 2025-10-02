@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
 public abstract class CompleteInitialDataSetVersionProcessingFunctionTests(
-    ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+    ProcessorFunctionsIntegrationTestFixture fixture
+) : ProcessorFunctionsIntegrationTest(fixture)
 {
     private static readonly string[] AllDataSetVersionFiles =
     [
@@ -23,12 +23,12 @@ public abstract class CompleteInitialDataSetVersionProcessingFunctionTests(
         FilterOptionsTable.ParquetFile,
         IndicatorsTable.ParquetFile,
         LocationOptionsTable.ParquetFile,
-        TimePeriodsTable.ParquetFile
+        TimePeriodsTable.ParquetFile,
     ];
 
     public class CompleteInitialDataSetVersionProcessingProcessingTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
-        : CompleteInitialDataSetVersionProcessingFunctionTests(fixture)
+        ProcessorFunctionsIntegrationTestFixture fixture
+    ) : CompleteInitialDataSetVersionProcessingFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
 
@@ -44,8 +44,8 @@ public abstract class CompleteInitialDataSetVersionProcessingFunctionTests(
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(i => i.DataSetVersion)
+            var savedImport = await publicDataDbContext
+                .DataSetVersionImports.Include(i => i.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
@@ -71,10 +71,10 @@ public abstract class CompleteInitialDataSetVersionProcessingFunctionTests(
             await CompleteInitialDataSetVersionProcessing(instanceId);
 
             // Ensure the duck db database file is the only file that was deleted
-            AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion,
-                AllDataSetVersionFiles
-                    .Where(file => file != DataSetFilenames.DuckDbDatabaseFile)
-                    .ToArray());
+            AssertDataSetVersionDirectoryContainsOnlyFiles(
+                dataSetVersion,
+                AllDataSetVersionFiles.Where(file => file != DataSetFilenames.DuckDbDatabaseFile).ToArray()
+            );
         }
 
         private async Task CompleteInitialDataSetVersionProcessing(Guid instanceId)

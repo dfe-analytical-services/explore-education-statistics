@@ -21,7 +21,8 @@ public class DataSetStatusSchemaFilter : ISchemaFilter
         {
             schema.Type = "string";
 
-            schema.Enum = EnumUtil.GetEnums<DataSetStatus>()
+            schema.Enum = EnumUtil
+                .GetEnums<DataSetStatus>()
                 .Where(_publicStatuses.Contains)
                 .Select(e => new OpenApiString(e.ToString()))
                 .ToList<IOpenApiAny>();

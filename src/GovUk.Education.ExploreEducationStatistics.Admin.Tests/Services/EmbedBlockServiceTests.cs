@@ -19,10 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class EmbedBlockServiceTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid(),
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task Create()
@@ -32,24 +29,24 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ContentSections.AddRangeAsync(new ContentSection
-            {
-                Id = contentSectionId,
-                ReleaseVersion = _releaseVersion
-            });
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection { Id = contentSectionId, ReleaseVersion = _releaseVersion }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Create(_releaseVersion.Id,
+            var result = await service.Create(
+                _releaseVersion.Id,
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
                     Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
-                });
+                }
+            );
 
             var viewModel = result.AssertRight();
 
@@ -86,24 +83,24 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ContentSections.AddRangeAsync(new ContentSection
-            {
-                Id = contentSectionId,
-                ReleaseVersion = _releaseVersion
-            });
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection { Id = contentSectionId, ReleaseVersion = _releaseVersion }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Create(_releaseVersion.Id,
+            var result = await service.Create(
+                _releaseVersion.Id,
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
                     Url = "http://www.invalid.com/test-page",
                     ContentSectionId = contentSectionId,
-                });
+                }
+            );
 
             result.AssertBadRequest(EmbedBlockUrlDomainNotPermitted);
             Assert.Empty(context.EmbedBlockLinks);
@@ -128,21 +125,24 @@ public class EmbedBlockServiceTests
                         new HtmlBlock { Order = 2 },
                         new HtmlBlock { Order = 3 },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Create(_releaseVersion.Id,
+            var result = await service.Create(
+                _releaseVersion.Id,
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
                     Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
-                });
+                }
+            );
 
             var viewModel = result.AssertRight();
 
@@ -185,24 +185,23 @@ public class EmbedBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.ContentSections.AddRangeAsync(
-                new ContentSection
-                {
-                    Id = contentSectionId,
-                    ReleaseVersion = _releaseVersion
-                });
+                new ContentSection { Id = contentSectionId, ReleaseVersion = _releaseVersion }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Create(Guid.NewGuid(),
+            var result = await service.Create(
+                Guid.NewGuid(),
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
                     Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -217,24 +216,23 @@ public class EmbedBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.ContentSections.AddRangeAsync(
-                new ContentSection
-                {
-                    Id = contentSectionId,
-                    ReleaseVersion = _releaseVersion
-                });
+                new ContentSection { Id = contentSectionId, ReleaseVersion = _releaseVersion }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Create(_releaseVersion.Id,
+            var result = await service.Create(
+                _releaseVersion.Id,
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
                     Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = Guid.NewGuid(),
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -244,14 +242,8 @@ public class EmbedBlockServiceTests
     public async Task Create_ContentSectionBelongsToDifferentRelease()
     {
         var otherReleaseVersion = new ReleaseVersion();
-        var relatedContentSection = new ContentSection
-        {
-            ReleaseVersion = _releaseVersion
-        };
-        var unrelatedContentSection = new ContentSection
-        {
-            ReleaseVersion = otherReleaseVersion
-        };
+        var relatedContentSection = new ContentSection { ReleaseVersion = _releaseVersion };
+        var unrelatedContentSection = new ContentSection { ReleaseVersion = otherReleaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -263,13 +255,15 @@ public class EmbedBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Create(_releaseVersion.Id,
+            var result = await service.Create(
+                _releaseVersion.Id,
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
                     Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = unrelatedContentSection.Id,
-                });
+                }
+            );
 
             result.AssertBadRequest(ContentSectionNotAttachedToRelease);
         }
@@ -296,30 +290,35 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                            ReleaseVersion = _releaseVersion
-                        }
+                            ReleaseVersion = _releaseVersion,
+                        },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Update(releaseVersionId: _releaseVersion.Id,
+            var result = await service.Update(
+                releaseVersionId: _releaseVersion.Id,
                 contentBlockId: contentBlockId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title updated",
                     Url = "https://department-for-education.shinyapps.io/updated-test-page",
-                });
+                }
+            );
 
             var viewModel = result.AssertRight();
 
@@ -370,30 +369,35 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                            ReleaseVersion = _releaseVersion
+                            ReleaseVersion = _releaseVersion,
                         },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Update(releaseVersionId: _releaseVersion.Id,
+            var result = await service.Update(
+                releaseVersionId: _releaseVersion.Id,
                 contentBlockId: contentBlockId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title updated",
                     Url = "http://www.invalid.com/updated-test-page",
-                });
+                }
+            );
 
             result.AssertBadRequest(EmbedBlockUrlDomainNotPermitted);
         }
@@ -437,29 +441,34 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                        }
+                        },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Update(releaseVersionId: Guid.NewGuid(),
+            var result = await service.Update(
+                releaseVersionId: Guid.NewGuid(),
                 contentBlockId: contentBlockId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
                     Url = "https://department-for-education.shinyapps.io/updated-test-page",
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -488,27 +497,32 @@ public class EmbedBlockServiceTests
                             EmbedBlockId = embedBlockId,
                         },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Update(_releaseVersion.Id,
+            var result = await service.Update(
+                _releaseVersion.Id,
                 contentBlockId: Guid.NewGuid(),
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
                     Url = "https://department-for-education.shinyapps.io/updated-test-page",
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -529,38 +543,39 @@ public class EmbedBlockServiceTests
                     Id = embedBlockLinkId,
                     Order = 93,
                     EmbedBlockId = embedBlockId,
-                }
+                },
             },
-            ReleaseVersion = otherReleaseVersion
+            ReleaseVersion = otherReleaseVersion,
         };
-        var relatedContentSection = new ContentSection
-        {
-            ReleaseVersion = _releaseVersion
-        };
+        var relatedContentSection = new ContentSection { ReleaseVersion = _releaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.ContentSections.AddRangeAsync(unrelatedContentSection, relatedContentSection);
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Update(_releaseVersion.Id,
+            var result = await service.Update(
+                _releaseVersion.Id,
                 embedBlockLinkId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
                     Url = "https://department-for-education.shinyapps.io/updated-test-page",
-                });
+                }
+            );
 
             result.AssertBadRequest(ContentSectionNotAttachedToRelease);
         }
@@ -589,22 +604,24 @@ public class EmbedBlockServiceTests
                             EmbedBlockId = embedBlockId,
                         },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Delete(releaseVersionId: _releaseVersion.Id,
-                contentBlockId: contentBlockId);
+            var result = await service.Delete(releaseVersionId: _releaseVersion.Id, contentBlockId: contentBlockId);
 
             result.AssertRight();
         }
@@ -642,22 +659,24 @@ public class EmbedBlockServiceTests
                             EmbedBlockId = embedBlockId,
                         },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Delete(releaseVersionId: Guid.NewGuid(),
-                contentBlockId: contentBlockId);
+            var result = await service.Delete(releaseVersionId: Guid.NewGuid(), contentBlockId: contentBlockId);
 
             result.AssertNotFound();
         }
@@ -684,24 +703,26 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                        }
+                        },
                     },
-                    ReleaseVersion = _releaseVersion
-                });
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+                    ReleaseVersion = _releaseVersion,
+                }
+            );
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Delete(releaseVersionId: _releaseVersion.Id,
-                contentBlockId: Guid.NewGuid());
+            var result = await service.Delete(releaseVersionId: _releaseVersion.Id, contentBlockId: Guid.NewGuid());
 
             result.AssertNotFound();
         }
@@ -721,34 +742,32 @@ public class EmbedBlockServiceTests
                 {
                     Id = embedBlockLinkId,
                     Order = 93,
-                    EmbedBlockId = embedBlockId
-                }
+                    EmbedBlockId = embedBlockId,
+                },
             },
-            ReleaseVersion = otherReleaseVersion
+            ReleaseVersion = otherReleaseVersion,
         };
-        var relatedContentSection = new ContentSection
-        {
-            ReleaseVersion = _releaseVersion
-        };
+        var relatedContentSection = new ContentSection { ReleaseVersion = _releaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.ContentSections.AddRangeAsync(unrelatedContentSection, relatedContentSection);
-            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
-            {
-                Id = embedBlockId,
-                Title = "Test title",
-                Url = "https://department-for-education.shinyapps.io/test-page",
-            });
+            await context.EmbedBlocks.AddRangeAsync(
+                new EmbedBlock
+                {
+                    Id = embedBlockId,
+                    Title = "Test title",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
+                }
+            );
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Delete(releaseVersionId: _releaseVersion.Id,
-                contentBlockId: embedBlockLinkId);
+            var result = await service.Delete(releaseVersionId: _releaseVersion.Id, contentBlockId: embedBlockLinkId);
 
             result.AssertBadRequest(ContentBlockNotAttachedToRelease);
         }
@@ -758,7 +777,8 @@ public class EmbedBlockServiceTests
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IContentBlockService? contentBlockService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         var context = contentDbContext ?? Mock.Of<ContentDbContext>(Strict);
         return new EmbedBlockService(
@@ -766,6 +786,7 @@ public class EmbedBlockServiceTests
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
             contentBlockService ?? new ContentBlockService(context),
             userService ?? AlwaysTrueUserService().Object,
-            AdminMapper());
+            AdminMapper()
+        );
     }
 }

@@ -8,13 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class CsvUtils
 {
-    public static Task<List<string>> GetCsvHeaders(Stream stream,
-        bool leaveOpen = false)
-        => GetCsvHeaders(() => Task.FromResult(stream), leaveOpen);
+    public static Task<List<string>> GetCsvHeaders(Stream stream, bool leaveOpen = false) =>
+        GetCsvHeaders(() => Task.FromResult(stream), leaveOpen);
 
-    public static Task<List<string>> GetCsvHeaders(Task<Stream> stream,
-        bool leaveOpen = false)
-        => GetCsvHeaders(() => stream, leaveOpen);
+    public static Task<List<string>> GetCsvHeaders(Task<Stream> stream, bool leaveOpen = false) =>
+        GetCsvHeaders(() => stream, leaveOpen);
 
     /// <summary>
     /// Gets the header values of the first line of the provided CSV.
@@ -22,8 +20,7 @@ public static class CsvUtils
     /// <remarks>
     /// This method uses and closes the provided stream, unless leaveOpen is true.
     /// </remarks>
-    public static async Task<List<string>> GetCsvHeaders(Func<Task<Stream>> streamProvider,
-        bool leaveOpen = false)
+    public static async Task<List<string>> GetCsvHeaders(Func<Task<Stream>> streamProvider, bool leaveOpen = false)
     {
         var stream = await streamProvider.Invoke();
         stream.SeekToBeginning();
@@ -35,9 +32,8 @@ public static class CsvUtils
         return csvReader.HeaderRecord?.ToList() ?? new List<string>();
     }
 
-    public static Task<List<List<string>>> GetCsvRows(Stream stream,
-        int startingRowIndex = 0)
-        => GetCsvRows(() => Task.FromResult(stream), startingRowIndex);
+    public static Task<List<List<string>>> GetCsvRows(Stream stream, int startingRowIndex = 0) =>
+        GetCsvRows(() => Task.FromResult(stream), startingRowIndex);
 
     /// <summary>
     /// Gets the lines of the provided CSV as lists of cell values.
@@ -47,15 +43,9 @@ public static class CsvUtils
     /// could be large, as this will load the entire contents into memory.
     /// This method uses and closes the provided Stream.
     /// </remarks>
-    public static async Task<List<List<string>>> GetCsvRows(
-        Func<Task<Stream>> streamProvider,
-        int startingRowIndex = 0)
+    public static async Task<List<List<string>>> GetCsvRows(Func<Task<Stream>> streamProvider, int startingRowIndex = 0)
     {
-        return (await Select(
-            streamProvider, 
-            (cells, _, _) => cells, 
-            startingRowIndex))
-            .ToList();
+        return (await Select(streamProvider, (cells, _, _) => cells, startingRowIndex)).ToList();
     }
 
     /// <summary>
@@ -66,9 +56,7 @@ public static class CsvUtils
     /// </remarks>
     /// <param name="streamProvider">The Stream of the CSV.</param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the count.</param>
-    public static async Task<int> GetTotalRows(
-        Func<Task<Stream>> streamProvider,
-        bool skipHeaderRow = true)
+    public static async Task<int> GetTotalRows(Func<Task<Stream>> streamProvider, bool skipHeaderRow = true)
     {
         using var streamReader = new StreamReader(await streamProvider.Invoke());
 
@@ -102,7 +90,8 @@ public static class CsvUtils
     public static async Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool, Task<bool>> func,
-        int startingRowIndex = 0)
+        int startingRowIndex = 0
+    )
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture);
 
@@ -127,10 +116,7 @@ public static class CsvUtils
 
             var cellCount = csvDataReader.FieldCount;
 
-            var cells = Enumerable
-                .Range(0, cellCount)
-                .Select(csvReader.GetField<string>)
-                .ToList();
+            var cells = Enumerable.Range(0, cellCount).Select(csvReader.GetField<string>).ToList();
 
             lastLine = !await csvReader.ReadAsync();
 
@@ -151,13 +137,13 @@ public static class CsvUtils
     /// <param name="streamProvider">The Stream of the CSV.</param>
     /// <param name="batchSize">The number of rows in each batch.</param>
     /// <param name="func">
-    /// The function to execute against each batch of CSV rows. The function takes the rows 
+    /// The function to execute against each batch of CSV rows. The function takes the rows
     /// the index of the current batch, and returns "true" to continue iterating, or "false" to finish looping early.
     /// The index is a zero-based index. Therefore the first batch of rows will have the index of "0".
     ///
     /// Note that if using "startingBatchIndex", this will be included in the index provided to the function. For
     /// example, if "startingBatchIndex" is "10", the first batch of rows provided to the first function execution will
-    /// be the 11th batch of rows from the CSV, and the index provided to the first function execution will be "10".  
+    /// be the 11th batch of rows from the CSV, and the index provided to the first function execution will be "10".
     /// </param>
     /// <param name="startingBatchIndex">Optional parameter to skip a number of batches to be processed by the function.
     /// For instance, if this is set to 0, the first batch being presented to the function will be the 1st X number
@@ -167,7 +153,8 @@ public static class CsvUtils
         Func<Task<Stream>> streamProvider,
         int batchSize,
         Func<List<List<string>>, int, Task<bool>> func,
-        int startingBatchIndex = 0)
+        int startingBatchIndex = 0
+    )
     {
         var linesInBatch = new List<List<string>>();
         var batchIndex = 0;
@@ -195,7 +182,8 @@ public static class CsvUtils
 
                 return true;
             },
-            startingRowIndex: startingBatchIndex * batchSize);
+            startingRowIndex: startingBatchIndex * batchSize
+        );
     }
 
     /// <summary>
@@ -216,7 +204,8 @@ public static class CsvUtils
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool, Task> func,
-        int startingRowIndex = 0)
+        int startingRowIndex = 0
+    )
     {
         return ForEachRow(
             streamProvider,
@@ -247,7 +236,8 @@ public static class CsvUtils
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool, bool> action,
-        int startingRowIndex = 0)
+        int startingRowIndex = 0
+    )
     {
         return ForEachRow(
             streamProvider,
@@ -278,7 +268,8 @@ public static class CsvUtils
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Action<List<string>, int, bool> action,
-        int startingRowIndex = 0)
+        int startingRowIndex = 0
+    )
     {
         return ForEachRow(
             streamProvider,
@@ -310,7 +301,8 @@ public static class CsvUtils
     public static async Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool, Task<TResult>> func,
-        int startingRowIndex = 0)
+        int startingRowIndex = 0
+    )
     {
         var list = new List<TResult>();
 
@@ -345,7 +337,8 @@ public static class CsvUtils
     public static Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool, TResult> func,
-        int startingRowIndex = 0)
+        int startingRowIndex = 0
+    )
     {
         return Select(
             streamProvider,

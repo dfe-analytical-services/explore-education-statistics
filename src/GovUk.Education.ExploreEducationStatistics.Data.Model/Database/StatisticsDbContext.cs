@@ -37,9 +37,12 @@ public class IdTempTable
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (ReferenceEquals(null, obj))
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+        if (obj.GetType() != this.GetType())
+            return false;
         return Equals((IdTempTable)obj);
     }
 
@@ -59,14 +62,15 @@ public class StatisticsDbContext : DbContext
         // scenarios.
     }
 
-    public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, timeout: 300)
-    {
-    }
+    public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options)
+        : this(options, timeout: 300) { }
 
     public StatisticsDbContext(
         DbContextOptions<StatisticsDbContext> options,
         int? timeout,
-        bool updateTimestamps = true) : base(options)
+        bool updateTimestamps = true
+    )
+        : base(options)
     {
         Configure(timeout, updateTimestamps);
     }
@@ -78,10 +82,8 @@ public class StatisticsDbContext : DbContext
     /// level and this doesn't really work with the DI container (unless
     /// we created an abstract base class with a type parameter).
     /// </summary>
-    protected StatisticsDbContext(
-        DbContextOptions options,
-        int? timeout,
-        bool updateTimestamps = true) : base(options)
+    protected StatisticsDbContext(DbContextOptions options, int? timeout, bool updateTimestamps = true)
+        : base(options)
     {
         Configure(timeout, updateTimestamps);
     }
@@ -152,118 +154,94 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureBoundaryData(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BoundaryData>()
-            .Property(boundaryData => boundaryData.Code)
-            .HasMaxLength(9);
+        modelBuilder.Entity<BoundaryData>().Property(boundaryData => boundaryData.Code).HasMaxLength(9);
 
-        modelBuilder.Entity<BoundaryData>()
-            .Property(boundaryData => boundaryData.Name)
-            .HasMaxLength(100);
+        modelBuilder.Entity<BoundaryData>().Property(boundaryData => boundaryData.Name).HasMaxLength(100);
 
-        modelBuilder.Entity<BoundaryData>()
-            .HasOne(boundaryData => boundaryData.BoundaryLevel)
-            .WithMany();
+        modelBuilder.Entity<BoundaryData>().HasOne(boundaryData => boundaryData.BoundaryLevel).WithMany();
 
-        modelBuilder.Entity<BoundaryData>()
+        modelBuilder
+            .Entity<BoundaryData>()
             .Property(boundaryData => boundaryData.GeoJson)
             .HasConversion(
                 feature => JsonConvert.SerializeObject(feature),
-                feature => JsonConvert.DeserializeObject<Feature>(feature));
+                feature => JsonConvert.DeserializeObject<Feature>(feature)
+            );
 
-        modelBuilder.Entity<BoundaryData>()
-            .HasIndex(boundaryData => boundaryData.Code);
+        modelBuilder.Entity<BoundaryData>().HasIndex(boundaryData => boundaryData.Code);
     }
 
     private void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BoundaryLevel>()
+        modelBuilder
+            .Entity<BoundaryLevel>()
             .Property(boundaryLevel => boundaryLevel.Level)
             .HasConversion(_geographicLevelConverter);
 
-        modelBuilder.Entity<BoundaryLevel>()
+        modelBuilder
+            .Entity<BoundaryLevel>()
             .Property(block => block.Created)
-            .HasConversion(
-                v => v,
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-        modelBuilder.Entity<BoundaryLevel>()
+        modelBuilder
+            .Entity<BoundaryLevel>()
             .Property(block => block.Published)
-            .HasConversion(
-                v => v,
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
     }
 
     private void ConfigureLocation(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Location>()
+        modelBuilder
+            .Entity<Location>()
             .Property(location => location.GeographicLevel)
             .HasConversion(_geographicLevelConverter)
             .HasMaxLength(6);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.GeographicLevel);
+        modelBuilder.Entity<Location>().HasIndex(location => location.GeographicLevel);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.Country_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.Country_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.EnglishDevolvedArea_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.EnglishDevolvedArea_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.Institution_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.Institution_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.LocalAuthority_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.LocalAuthority_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.LocalAuthority_OldCode);
+        modelBuilder.Entity<Location>().HasIndex(location => location.LocalAuthority_OldCode);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.LocalAuthorityDistrict_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.LocalAuthorityDistrict_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.LocalEnterprisePartnership_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.LocalEnterprisePartnership_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.LocalSkillsImprovementPlanArea_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.LocalSkillsImprovementPlanArea_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.MultiAcademyTrust_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.MultiAcademyTrust_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.MayoralCombinedAuthority_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.MayoralCombinedAuthority_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.OpportunityArea_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.OpportunityArea_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.ParliamentaryConstituency_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.ParliamentaryConstituency_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.Provider_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.Provider_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.PlanningArea_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.PlanningArea_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.Region_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.Region_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.RscRegion_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.RscRegion_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.School_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.School_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.Sponsor_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.Sponsor_Code);
 
-        modelBuilder.Entity<Location>()
-            .HasIndex(location => location.Ward_Code);
+        modelBuilder.Entity<Location>().HasIndex(location => location.Ward_Code);
     }
 
     private static void ConfigureObservation(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Observation>()
+        modelBuilder
+            .Entity<Observation>()
             .HasOne(observation => observation.Location)
             .WithMany()
             .HasForeignKey(observation => observation.LocationId)
@@ -272,21 +250,23 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ObservationFilterItem>()
-            .HasKey(item => new { item.ObservationId, item.FilterItemId });
+        modelBuilder.Entity<ObservationFilterItem>().HasKey(item => new { item.ObservationId, item.FilterItemId });
 
-        modelBuilder.Entity<ObservationFilterItem>()
+        modelBuilder
+            .Entity<ObservationFilterItem>()
             .HasOne(observationFilterItem => observationFilterItem.Observation)
             .WithMany(observation => observation.FilterItems)
             .HasForeignKey(observationFilterItem => observationFilterItem.ObservationId);
 
-        modelBuilder.Entity<ObservationFilterItem>()
+        modelBuilder
+            .Entity<ObservationFilterItem>()
             .HasOne(observationFilterItem => observationFilterItem.FilterItem)
             .WithMany()
             .HasForeignKey(observationFilterItem => observationFilterItem.FilterItemId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<ObservationFilterItem>()
+        modelBuilder
+            .Entity<ObservationFilterItem>()
             .HasOne(observationFilterItem => observationFilterItem.Filter)
             .WithMany()
             .HasForeignKey(observationFilterItem => observationFilterItem.FilterId)
@@ -295,54 +275,51 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureObservationRowResultTempTable(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .ConfigureTempTableEntity<MatchedObservation>(isKeyless: false,
-                builder => builder
-                    .HasKey(matchedObservation => matchedObservation.Id));
+        modelBuilder.ConfigureTempTableEntity<MatchedObservation>(
+            isKeyless: false,
+            builder => builder.HasKey(matchedObservation => matchedObservation.Id)
+        );
     }
 
     private static void ConfigureUnit(ModelBuilder modelBuilder)
     {
         var unitConverter = new EnumToEnumValueConverter<IndicatorUnit>();
 
-        modelBuilder.Entity<Indicator>()
-            .Property(indicator => indicator.Unit)
-            .HasConversion(unitConverter);
+        modelBuilder.Entity<Indicator>().Property(indicator => indicator.Unit).HasConversion(unitConverter);
     }
 
     private static void ConfigurePublication(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ReleaseVersion>()
-            .HasIndex(rv => rv.PublicationId);
+        modelBuilder.Entity<ReleaseVersion>().HasIndex(rv => rv.PublicationId);
     }
 
     private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ReleaseSubject>()
-            .HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.SubjectId });
+        modelBuilder.Entity<ReleaseSubject>().HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.SubjectId });
 
-        modelBuilder.Entity<ReleaseSubject>()
+        modelBuilder
+            .Entity<ReleaseSubject>()
             .HasOne(rs => rs.ReleaseVersion)
             .WithMany()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<ReleaseSubject>()
-            .HasOne(rs => rs.Subject)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseSubject>().HasOne(rs => rs.Subject).WithMany().OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ReleaseFootnote>()
+        modelBuilder
+            .Entity<ReleaseFootnote>()
             .HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.FootnoteId });
 
-        modelBuilder.Entity<ReleaseFootnote>()
+        modelBuilder
+            .Entity<ReleaseFootnote>()
             .HasOne(rf => rf.ReleaseVersion)
             .WithMany()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<ReleaseFootnote>()
+        modelBuilder
+            .Entity<ReleaseFootnote>()
             .HasOne(rf => rf.Footnote)
             .WithMany(footnote => footnote.Releases)
             .HasForeignKey(releaseFootnote => releaseFootnote.FootnoteId)
@@ -351,51 +328,51 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureMeasures(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Observation>()
+        modelBuilder
+            .Entity<Observation>()
             .Property(data => data.Measures)
             .HasConversion(
                 v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<Dictionary<Guid, string>>(v)!);
+                v => JsonConvert.DeserializeObject<Dictionary<Guid, string>>(v)!
+            );
     }
 
     private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Observation>()
+        modelBuilder
+            .Entity<Observation>()
             .Property(observation => observation.TimeIdentifier)
             .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
             .HasMaxLength(6);
 
-        modelBuilder.Entity<Observation>()
-            .HasIndex(observation => observation.Year);
+        modelBuilder.Entity<Observation>().HasIndex(observation => observation.Year);
 
-        modelBuilder.Entity<Observation>()
-            .HasIndex(observation => observation.TimeIdentifier);
+        modelBuilder.Entity<Observation>().HasIndex(observation => observation.TimeIdentifier);
     }
 
     private static void ConfigureIndicator(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Indicator>()
-            .HasIndex(indicator => indicator.Name);
+        modelBuilder.Entity<Indicator>().HasIndex(indicator => indicator.Name);
     }
 
     private static void ConfigureFilter(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Filter>()
-            .HasIndex(filter => filter.Name);
+        modelBuilder.Entity<Filter>().HasIndex(filter => filter.Name);
     }
 
     private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FilterFootnote>()
-            .HasKey(item => new { item.FilterId, item.FootnoteId });
+        modelBuilder.Entity<FilterFootnote>().HasKey(item => new { item.FilterId, item.FootnoteId });
 
-        modelBuilder.Entity<FilterFootnote>()
+        modelBuilder
+            .Entity<FilterFootnote>()
             .HasOne(filterFootnote => filterFootnote.Filter)
             .WithMany(filter => filter.Footnotes)
             .HasForeignKey(filterFootnote => filterFootnote.FilterId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<FilterFootnote>()
+        modelBuilder
+            .Entity<FilterFootnote>()
             .HasOne(filterFootnote => filterFootnote.Footnote)
             .WithMany(footnote => footnote.Filters)
             .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
@@ -404,16 +381,17 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureFilterGroupFootnote(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FilterGroupFootnote>()
-            .HasKey(item => new { item.FilterGroupId, item.FootnoteId });
+        modelBuilder.Entity<FilterGroupFootnote>().HasKey(item => new { item.FilterGroupId, item.FootnoteId });
 
-        modelBuilder.Entity<FilterGroupFootnote>()
+        modelBuilder
+            .Entity<FilterGroupFootnote>()
             .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .WithMany(filterGroup => filterGroup.Footnotes)
             .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<FilterGroupFootnote>()
+        modelBuilder
+            .Entity<FilterGroupFootnote>()
             .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
             .WithMany(footnote => footnote.FilterGroups)
             .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
@@ -422,16 +400,17 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FilterItemFootnote>()
-            .HasKey(item => new { item.FilterItemId, item.FootnoteId });
+        modelBuilder.Entity<FilterItemFootnote>().HasKey(item => new { item.FilterItemId, item.FootnoteId });
 
-        modelBuilder.Entity<FilterItemFootnote>()
+        modelBuilder
+            .Entity<FilterItemFootnote>()
             .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
             .WithMany(filterItem => filterItem.Footnotes)
             .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<FilterItemFootnote>()
+        modelBuilder
+            .Entity<FilterItemFootnote>()
             .HasOne(filterItemFootnote => filterItemFootnote.Footnote)
             .WithMany(footnote => footnote.FilterItems)
             .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
@@ -440,23 +419,25 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureIdTempTable(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .ConfigureTempTableEntity<IdTempTable>(isKeyless: false,
-                builder => builder.HasKey(idTempTable => idTempTable.Id));
+        modelBuilder.ConfigureTempTableEntity<IdTempTable>(
+            isKeyless: false,
+            builder => builder.HasKey(idTempTable => idTempTable.Id)
+        );
     }
 
     private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<IndicatorFootnote>()
-            .HasKey(item => new { item.IndicatorId, item.FootnoteId });
+        modelBuilder.Entity<IndicatorFootnote>().HasKey(item => new { item.IndicatorId, item.FootnoteId });
 
-        modelBuilder.Entity<IndicatorFootnote>()
+        modelBuilder
+            .Entity<IndicatorFootnote>()
             .HasOne(indicatorFootnote => indicatorFootnote.Indicator)
             .WithMany(indicator => indicator.Footnotes)
             .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<IndicatorFootnote>()
+        modelBuilder
+            .Entity<IndicatorFootnote>()
             .HasOne(indicatorFootnote => indicatorFootnote.Footnote)
             .WithMany(footnote => footnote.Indicators)
             .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
@@ -465,16 +446,17 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SubjectFootnote>()
-            .HasKey(item => new { item.SubjectId, item.FootnoteId });
+        modelBuilder.Entity<SubjectFootnote>().HasKey(item => new { item.SubjectId, item.FootnoteId });
 
-        modelBuilder.Entity<SubjectFootnote>()
+        modelBuilder
+            .Entity<SubjectFootnote>()
             .HasOne(subjectFootnote => subjectFootnote.Subject)
             .WithMany(subject => subject.Footnotes)
             .HasForeignKey(subjectFootnote => subjectFootnote.SubjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<SubjectFootnote>()
+        modelBuilder
+            .Entity<SubjectFootnote>()
             .HasOne(subjectFootnote => subjectFootnote.Footnote)
             .WithMany(footnote => footnote.Subjects)
             .HasForeignKey(subjectFootnote => subjectFootnote.FootnoteId)
@@ -483,7 +465,6 @@ public class StatisticsDbContext : DbContext
 
     private static void ConfigureSubject(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Subject>()
-            .HasQueryFilter(s => !s.SoftDeleted);
+        modelBuilder.Entity<Subject>().HasQueryFilter(s => !s.SoftDeleted);
     }
 }

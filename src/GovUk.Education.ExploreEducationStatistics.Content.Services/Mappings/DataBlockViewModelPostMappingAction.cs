@@ -35,8 +35,7 @@ public class DataBlockViewModelPostMappingAction : IMappingAction<DataBlock, Dat
     public void Process(DataBlock source, DataBlockViewModel destination, ResolutionContext context)
     {
         var dataBlockParentId = _context
-            .DataBlockVersions
-            .First(dataBlockVersion => dataBlockVersion.Id == destination.Id)
+            .DataBlockVersions.First(dataBlockVersion => dataBlockVersion.Id == destination.Id)
             .DataBlockParentId;
 
         destination.DataBlockParentId = dataBlockParentId;

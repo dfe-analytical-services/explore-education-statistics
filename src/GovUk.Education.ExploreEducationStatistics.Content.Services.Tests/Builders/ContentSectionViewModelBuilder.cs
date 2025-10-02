@@ -7,11 +7,7 @@ public class ContentSectionViewModelBuilder
     private string _heading = "content section heading";
     private readonly List<IContentBlockViewModel> _contentBlocks = [];
 
-    public ContentSectionViewModel Build() => new()
-    {
-        Heading = _heading,
-        Content = _contentBlocks
-    };
+    public ContentSectionViewModel Build() => new() { Heading = _heading, Content = _contentBlocks };
 
     public ContentSectionViewModelBuilder WithHeading(string heading)
     {

@@ -25,5 +25,6 @@ public class ContentSection
 
     public Guid ReleaseVersionId { get; set; }
 
-    [JsonIgnore] public ContentSectionType Type { get; set; }
+    [JsonIgnore]
+    public ContentSectionType Type { get; set; }
 }

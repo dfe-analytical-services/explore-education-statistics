@@ -13,26 +13,20 @@ public class ReleaseFileRepositoryTests
     private readonly DataFixture _fixture = new();
 
     [Fact]
-    public async Task
-        CheckLinkedOriginalAndReplacementReleaseFilesExist_Success()
+    public async Task CheckLinkedOriginalAndReplacementReleaseFilesExist_Success()
     {
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var originalReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
-            .WithFile(_fixture
-                .DefaultFile()
-                .WithType(FileType.Data))
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data))
             .Generate();
 
         var replacementReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
-            .WithFile(_fixture
-                .DefaultFile()
-                .WithType(FileType.Data)
-                .WithReplacing(originalReleaseFile.File))
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithReplacing(originalReleaseFile.File))
             .Generate();
 
         originalReleaseFile.File.ReplacedById = replacementReleaseFile.FileId;
@@ -49,7 +43,9 @@ public class ReleaseFileRepositoryTests
         {
             var releaseFileRepository = new ReleaseFileRepository(contentDbContext);
             var either = await releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
-                releaseVersion.Id, originalReleaseFile.FileId);
+                releaseVersion.Id,
+                originalReleaseFile.FileId
+            );
 
             var releaseFiles = either.AssertRight();
 
@@ -65,8 +61,7 @@ public class ReleaseFileRepositoryTests
     }
 
     [Fact]
-    public async Task
-        CheckLinkedOriginalAndReplacementReleaseFilesExist_OriginalFileDoesNotExist()
+    public async Task CheckLinkedOriginalAndReplacementReleaseFilesExist_OriginalFileDoesNotExist()
     {
         var releaseVersionId = Guid.NewGuid();
 
@@ -74,23 +69,22 @@ public class ReleaseFileRepositoryTests
         await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId);
         var releaseFileRepository = new ReleaseFileRepository(contentDbContext);
         var either = await releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
-            releaseVersionId, Guid.NewGuid());
+            releaseVersionId,
+            Guid.NewGuid()
+        );
 
         either.AssertNotFound();
     }
 
     [Fact]
-    public async Task
-        CheckLinkedOriginalAndReplacementReleaseFilesExist_ReplacementFileDoesNotExist()
+    public async Task CheckLinkedOriginalAndReplacementReleaseFilesExist_ReplacementFileDoesNotExist()
     {
         var releaseVersionId = Guid.NewGuid();
 
         var originalReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersionId(releaseVersionId)
-            .WithFile(_fixture
-                .DefaultFile()
-                .WithType(FileType.Data))
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data))
             .Generate();
 
         originalReleaseFile.File.ReplacedById = Guid.NewGuid();
@@ -105,33 +99,29 @@ public class ReleaseFileRepositoryTests
         {
             var releaseFileRepository = new ReleaseFileRepository(contentDbContext);
             var either = await releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
-                releaseVersionId, originalReleaseFile.FileId);
+                releaseVersionId,
+                originalReleaseFile.FileId
+            );
 
             either.AssertNotFound();
         }
     }
 
     [Fact]
-    public async Task
-        CheckLinkedOriginalAndReplacementReleaseFilesExist_ReplacementFileWrongType()
+    public async Task CheckLinkedOriginalAndReplacementReleaseFilesExist_ReplacementFileWrongType()
     {
         var releaseVersionId = Guid.NewGuid();
 
         var originalReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersionId(releaseVersionId)
-            .WithFile(_fixture
-                .DefaultFile()
-                .WithType(FileType.Data))
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data))
             .Generate();
 
         var replacementReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersionId(releaseVersionId)
-            .WithFile(_fixture
-                .DefaultFile()
-                .WithType(FileType.Ancillary)
-                .WithReplacing(originalReleaseFile.File))
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Ancillary).WithReplacing(originalReleaseFile.File))
             .Generate();
 
         originalReleaseFile.File.ReplacedById = replacementReleaseFile.FileId;
@@ -146,33 +136,34 @@ public class ReleaseFileRepositoryTests
         {
             var releaseFileRepository = new ReleaseFileRepository(contentDbContext);
             var either = await releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
-                releaseVersionId, originalReleaseFile.FileId);
+                releaseVersionId,
+                originalReleaseFile.FileId
+            );
 
             either.AssertNotFound();
         }
     }
 
     [Fact]
-    public async Task
-        CheckLinkedOriginalAndReplacementReleaseFilesExist_ReplacementFileNullReplacingId()
+    public async Task CheckLinkedOriginalAndReplacementReleaseFilesExist_ReplacementFileNullReplacingId()
     {
         var releaseVersionId = Guid.NewGuid();
 
         var originalReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersionId(releaseVersionId)
-            .WithFile(_fixture
-                .DefaultFile()
-                .WithType(FileType.Data))
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data))
             .Generate();
 
         var replacementReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersionId(releaseVersionId)
-            .WithFile(_fixture
-                .DefaultFile()
-                // No Replacing set
-                .WithType(FileType.Data))
+            .WithFile(
+                _fixture
+                    .DefaultFile()
+                    // No Replacing set
+                    .WithType(FileType.Data)
+            )
             .Generate();
 
         originalReleaseFile.File.ReplacedById = replacementReleaseFile.FileId;
@@ -187,7 +178,9 @@ public class ReleaseFileRepositoryTests
         {
             var releaseFileRepository = new ReleaseFileRepository(contentDbContext);
             var either = await releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
-                releaseVersionId, originalReleaseFile.FileId);
+                releaseVersionId,
+                originalReleaseFile.FileId
+            );
 
             either.AssertNotFound();
         }

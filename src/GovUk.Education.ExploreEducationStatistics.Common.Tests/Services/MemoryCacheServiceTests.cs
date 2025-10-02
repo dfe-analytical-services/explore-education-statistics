@@ -33,7 +33,7 @@ public class MemoryCacheServiceTests
     [Fact]
     public void SetItem()
     {
-        // The requested ExpirySchedule is hourly, meaning that cached items will have their 
+        // The requested ExpirySchedule is hourly, meaning that cached items will have their
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(45, _hourlyExpirySchedule);
@@ -47,11 +47,11 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_Hourly()
     {
-        // The requested ExpirySchedule is hourly, meaning that cached items will have their 
+        // The requested ExpirySchedule is hourly, meaning that cached items will have their
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(45, _hourlyExpirySchedule);
@@ -65,11 +65,11 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_Hourly_LastHourOfDay()
     {
-        // The requested ExpirySchedule is hourly, meaning that cached items will have their 
+        // The requested ExpirySchedule is hourly, meaning that cached items will have their
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(45, _hourlyExpirySchedule);
@@ -84,7 +84,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeNotTruncated_HalfHourly()
     {
@@ -102,11 +102,11 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_HalfHourly()
     {
-        // The requested ExpirySchedule is hourly, meaning that cached items will have their 
+        // The requested ExpirySchedule is hourly, meaning that cached items will have their
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(45, _halfHourlyExpirySchedule);
@@ -120,11 +120,11 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeTruncated_HalfHourly_LastHalfHourOfDay()
     {
-        // The requested ExpirySchedule is hourly, meaning that cached items will have their 
+        // The requested ExpirySchedule is hourly, meaning that cached items will have their
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(45, _halfHourlyExpirySchedule);
@@ -139,11 +139,11 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExpiryTimeNotTruncated_NoExpirySchedule()
     {
-        // The requested ExpirySchedule is hourly, meaning that cached items will have their 
+        // The requested ExpirySchedule is hourly, meaning that cached items will have their
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(6000);
@@ -156,7 +156,7 @@ public class MemoryCacheServiceTests
 
         SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
-        
+
     [Fact]
     public void SetItem_ExceptionHandledGracefullyWhenCachingItem()
     {
@@ -179,7 +179,7 @@ public class MemoryCacheServiceTests
         object entity = new SampleClass();
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
+
         memoryCache.Set(_cacheKey, entity);
 
         var service = SetupService(memoryCache);
@@ -195,7 +195,7 @@ public class MemoryCacheServiceTests
         object entity = new SampleClassSubtype();
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
+
         memoryCache.Set(_cacheKey, entity);
 
         var service = SetupService(memoryCache);
@@ -209,9 +209,9 @@ public class MemoryCacheServiceTests
     public void GetItem_NullIfLessSpecificSupertype()
     {
         object entity = new SampleClassSuperclass();
-        
+
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
+
         memoryCache.Set(_cacheKey, entity);
 
         var service = SetupService(memoryCache);
@@ -239,9 +239,7 @@ public class MemoryCacheServiceTests
         var memoryCache = new Mock<IMemoryCache>(Strict);
 
         object? entity;
-        memoryCache
-            .Setup(mock => mock.TryGetValue(key, out entity))
-            .Throws(new Exception("Something went wrong"));
+        memoryCache.Setup(mock => mock.TryGetValue(key, out entity)).Throws(new Exception("Something went wrong"));
 
         var service = SetupService(memoryCache.Object);
 
@@ -260,9 +258,7 @@ public class MemoryCacheServiceTests
 
         var memoryCache = new Mock<IMemoryCache>(Strict);
 
-        memoryCache
-            .Setup(mock => mock.TryGetValue(key, out entityOfIncorrectType))
-            .Returns(true);
+        memoryCache.Setup(mock => mock.TryGetValue(key, out entityOfIncorrectType)).Returns(true);
 
         var service = SetupService(memoryCache.Object);
 
@@ -275,28 +271,28 @@ public class MemoryCacheServiceTests
     private void SetItemAndAssertExpiryTime(
         DateTime now,
         MemoryCacheConfiguration cacheConfiguration,
-        DateTime expectedCacheExpiry)
+        DateTime expectedCacheExpiry
+    )
     {
         const string valueToCache = "test item";
 
         var memoryCache = new Mock<IMemoryCache>(Strict);
         var cacheEntry = new TestCacheEntry();
 
-        memoryCache
-            .Setup(mock => mock.CreateEntry(_cacheKey))
-            .Returns(cacheEntry);
+        memoryCache.Setup(mock => mock.CreateEntry(_cacheKey)).Returns(cacheEntry);
 
         var service = SetupService(memoryCache.Object);
         service.SetItem(_cacheKey, valueToCache, cacheConfiguration, now);
         VerifyAllMocks(memoryCache);
-        
+
         Assert.Equal($"\"{valueToCache}\"".Length, cacheEntry.Size);
         Assert.Equal(new DateTimeOffset(expectedCacheExpiry), cacheEntry.AbsoluteExpiration);
     }
 
     private static MemoryCacheService SetupService(
         IMemoryCache? memoryCache = null,
-        ILogger<MemoryCacheService>? logger = null)
+        ILogger<MemoryCacheService>? logger = null
+    )
     {
         return new MemoryCacheService(
             memoryCache ?? new MemoryCache(new MemoryCacheOptions()),
@@ -316,8 +312,6 @@ public class MemoryCacheServiceTests
         public TimeSpan? SlidingExpiration { get; set; }
         public object? Value { get; set; } = null;
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
- }
+}

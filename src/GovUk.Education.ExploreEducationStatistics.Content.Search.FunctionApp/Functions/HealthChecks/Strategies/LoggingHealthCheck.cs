@@ -4,12 +4,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 internal class LoggingHealthCheck(ILogger<LoggingHealthCheck> logger) : IHealthCheckStrategy
 {
-    public string Description => "Logging health check"; 
+    public string Description => "Logging health check";
+
     public Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
         logger.LogDebug("Logging health check test at Debug level");
         logger.LogInformation("Logging health check test at Information level");
-        logger.LogWarning("Logging health check test at Warning level with structured logging test of {@TestObject}", new TestObject());
+        logger.LogWarning(
+            "Logging health check test at Warning level with structured logging test of {@TestObject}",
+            new TestObject()
+        );
 
         try
         {
@@ -17,7 +21,7 @@ internal class LoggingHealthCheck(ILogger<LoggingHealthCheck> logger) : IHealthC
         }
         catch (Exception e)
         {
-            logger.LogError(e,"Logging health check test at Error level - with a test exception");
+            logger.LogError(e, "Logging health check test at Error level - with a test exception");
         }
 
         return Task.FromResult(new HealthCheckResult(this, true, "Statements have been logged."));

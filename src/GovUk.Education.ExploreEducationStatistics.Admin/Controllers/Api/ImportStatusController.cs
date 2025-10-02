@@ -21,8 +21,6 @@ public class ImportStatusController : ControllerBase
     [HttpGet("imports/incomplete")]
     public async Task<ActionResult<List<ImportStatusBauViewModel>>> GetAllIncompleteImports()
     {
-        return await _importStatusBauService
-            .GetAllIncompleteImports()
-            .HandleFailuresOrOk();
+        return await _importStatusBauService.GetAllIncompleteImports().HandleFailuresOrOk();
     }
 }

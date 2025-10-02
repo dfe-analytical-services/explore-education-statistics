@@ -8,11 +8,13 @@ public interface IPublicationService
 {
     Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
-        int pageSize, 
+        int pageSize,
         string? search = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(
         Guid publicationId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

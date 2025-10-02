@@ -9,7 +9,10 @@ public interface IBlobNameLister
     Task<IList<string>> ListBlobsInContainer(CancellationToken cancellationToken = default);
 }
 
-public class BlobNameLister(Func<IAzureBlobStorageClient> azureBlobStorageClientFactory, IOptions<AppOptions> appOptions) : IBlobNameLister
+public class BlobNameLister(
+    Func<IAzureBlobStorageClient> azureBlobStorageClientFactory,
+    IOptions<AppOptions> appOptions
+) : IBlobNameLister
 {
     public async Task<IList<string>> ListBlobsInContainer(CancellationToken cancellationToken = default)
     {
@@ -17,7 +20,8 @@ public class BlobNameLister(Func<IAzureBlobStorageClient> azureBlobStorageClient
         var blobStorageClient = azureBlobStorageClientFactory();
         var blobNames = await blobStorageClient.ListBlobsInContainer(
             appOptions.Value.SearchableDocumentsContainerName,
-            cancellationToken:cancellationToken);
+            cancellationToken: cancellationToken
+        );
         return blobNames;
     }
 }

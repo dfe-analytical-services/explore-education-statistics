@@ -7,7 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 public class AnalyticsConsumer(
     IAnalyticsManager analyticsManager,
     IAnalyticsWriter analyticsWriter,
-    ILogger<AnalyticsConsumer> logger) : BackgroundService
+    ILogger<AnalyticsConsumer> logger
+) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

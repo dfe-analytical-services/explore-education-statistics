@@ -21,54 +21,56 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     public ReleaseControllerTests()
     {
         MemoryCacheService
-            .Setup(s => s.GetItem(
-                It.IsAny<IMemoryCacheKey>(), typeof(ReleaseViewModel)))
+            .Setup(s => s.GetItem(It.IsAny<IMemoryCacheKey>(), typeof(ReleaseViewModel)))
             .Returns((object?)null);
 
-        MemoryCacheService
-            .Setup(s => s.SetItem<object>(
+        MemoryCacheService.Setup(s =>
+            s.SetItem<object>(
                 It.IsAny<IMemoryCacheKey>(),
                 It.IsAny<ReleaseViewModel>(),
                 It.IsAny<MemoryCacheConfiguration>(),
-                null));
+                null
+            )
+        );
     }
 
     [Fact]
     public async Task GetLatestRelease()
     {
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
-        var publicationCacheViewModel = new PublicationCacheViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var publicationCacheViewModel = new PublicationCacheViewModel { Id = Guid.NewGuid() };
         var releaseCacheViewModel = BuildReleaseCacheViewModel();
 
         var methodologyCacheService = new Mock<IMethodologyCacheService>(MockBehavior.Strict);
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
             .ReturnsAsync(methodologySummaries);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null))
-            .ReturnsAsync(releaseCacheViewModel);
+        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null)).ReturnsAsync(releaseCacheViewModel);
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
 
         var result = await controller.GetLatestRelease(PublicationSlug);
 
-        MockUtils.VerifyAllMocks(methodologyCacheService,
-            publicationCacheService,
-            releaseCacheService);
+        MockUtils.VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService);
 
-        result.AssertOkResult(new ReleaseViewModel(releaseCacheViewModel,
-            new PublicationViewModel(publicationCacheViewModel, methodologySummaries)));
+        result.AssertOkResult(
+            new ReleaseViewModel(
+                releaseCacheViewModel,
+                new PublicationViewModel(publicationCacheViewModel, methodologySummaries)
+            )
+        );
     }
 
     [Fact]
@@ -76,8 +78,7 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
-            .ReturnsAsync(new NotFoundResult());
+        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug)).ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(publicationCacheService: publicationCacheService.Object);
 
@@ -92,34 +93,31 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     public async Task GetLatestRelease_ReleaseNotFound()
     {
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
-        var publicationCacheViewModel = new PublicationCacheViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var publicationCacheViewModel = new PublicationCacheViewModel { Id = Guid.NewGuid() };
 
         var methodologyCacheService = new Mock<IMethodologyCacheService>(MockBehavior.Strict);
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
             .ReturnsAsync(methodologySummaries);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null))
-            .ReturnsAsync(new NotFoundResult());
+        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null)).ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
 
         var result = await controller.GetLatestRelease(PublicationSlug);
 
-        MockUtils.VerifyAllMocks(methodologyCacheService,
-            publicationCacheService,
-            releaseCacheService);
+        MockUtils.VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService);
 
         result.AssertNotFoundResult();
     }
@@ -128,38 +126,41 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     public async Task GetRelease()
     {
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
-        var publicationCacheViewModel = new PublicationCacheViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var publicationCacheViewModel = new PublicationCacheViewModel { Id = Guid.NewGuid() };
         var releaseCacheViewModel = BuildReleaseCacheViewModel();
 
         var methodologyCacheService = new Mock<IMethodologyCacheService>(MockBehavior.Strict);
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
             .ReturnsAsync(methodologySummaries);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
+        releaseCacheService
+            .Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(releaseCacheViewModel);
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
 
         var result = await controller.GetRelease(PublicationSlug, ReleaseSlug);
 
-        MockUtils.VerifyAllMocks(methodologyCacheService,
-            publicationCacheService,
-            releaseCacheService);
+        MockUtils.VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService);
 
-        result.AssertOkResult(new ReleaseViewModel(releaseCacheViewModel,
-            new PublicationViewModel(publicationCacheViewModel, methodologySummaries)));
+        result.AssertOkResult(
+            new ReleaseViewModel(
+                releaseCacheViewModel,
+                new PublicationViewModel(publicationCacheViewModel, methodologySummaries)
+            )
+        );
     }
 
     [Fact]
@@ -167,8 +168,7 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
-            .ReturnsAsync(new NotFoundResult());
+        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug)).ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(publicationCacheService: publicationCacheService.Object);
 
@@ -183,34 +183,33 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     public async Task GetRelease_ReleaseNotFound()
     {
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
-        var publicationCacheViewModel = new PublicationCacheViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var publicationCacheViewModel = new PublicationCacheViewModel { Id = Guid.NewGuid() };
 
         var methodologyCacheService = new Mock<IMethodologyCacheService>(MockBehavior.Strict);
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
+        methodologyCacheService
+            .Setup(mock => mock.GetSummariesByPublication(publicationCacheViewModel.Id))
             .ReturnsAsync(methodologySummaries);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
+        releaseCacheService
+            .Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
 
         var result = await controller.GetRelease(PublicationSlug, ReleaseSlug);
 
-        MockUtils.VerifyAllMocks(methodologyCacheService,
-            publicationCacheService,
-            releaseCacheService);
+        MockUtils.VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService);
 
         result.AssertNotFoundResult();
     }
@@ -224,23 +223,21 @@ public class ReleaseControllerTests : CacheServiceTestFixture
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(
-                PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(
-                PublicationSlug, null))
-            .ReturnsAsync(releaseCacheViewModel);
+        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null)).ReturnsAsync(releaseCacheViewModel);
 
         var controller = BuildReleaseController(
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
         var result = await controller.GetLatestReleaseSummary(PublicationSlug);
 
         MockUtils.VerifyAllMocks(publicationCacheService, releaseCacheService);
 
-        result.AssertOkResult(new ReleaseSummaryViewModel(
-            releaseCacheViewModel, publicationCacheViewModel));
+        result.AssertOkResult(new ReleaseSummaryViewModel(releaseCacheViewModel, publicationCacheViewModel));
     }
 
     [Fact]
@@ -248,9 +245,7 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(
-                PublicationSlug))
-            .ReturnsAsync(new NotFoundResult());
+        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug)).ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(publicationCacheService: publicationCacheService.Object);
         var result = await controller.GetLatestReleaseSummary(PublicationSlug);
@@ -268,17 +263,16 @@ public class ReleaseControllerTests : CacheServiceTestFixture
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(
-                PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(
-                PublicationSlug, null))
-            .ReturnsAsync(new NotFoundResult());
+        releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null)).ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
         var result = await controller.GetLatestReleaseSummary(PublicationSlug);
 
         MockUtils.VerifyAllMocks(publicationCacheService, releaseCacheService);
@@ -295,23 +289,23 @@ public class ReleaseControllerTests : CacheServiceTestFixture
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(
-                PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(
-                PublicationSlug, ReleaseSlug))
+        releaseCacheService
+            .Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(releaseCacheViewModel);
 
         var controller = BuildReleaseController(
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
         var result = await controller.GetReleaseSummary(PublicationSlug, ReleaseSlug);
 
         MockUtils.VerifyAllMocks(publicationCacheService, releaseCacheService);
 
-        result.AssertOkResult(new ReleaseSummaryViewModel(
-            releaseCacheViewModel, publicationCacheViewModel));
+        result.AssertOkResult(new ReleaseSummaryViewModel(releaseCacheViewModel, publicationCacheViewModel));
     }
 
     [Fact]
@@ -319,9 +313,7 @@ public class ReleaseControllerTests : CacheServiceTestFixture
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(
-                PublicationSlug))
-            .ReturnsAsync(new NotFoundResult());
+        publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug)).ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(publicationCacheService: publicationCacheService.Object);
         var result = await controller.GetReleaseSummary(PublicationSlug, ReleaseSlug);
@@ -339,17 +331,18 @@ public class ReleaseControllerTests : CacheServiceTestFixture
         var publicationCacheService = new Mock<IPublicationCacheService>(MockBehavior.Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(MockBehavior.Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication(
-                PublicationSlug))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
 
-        releaseCacheService.Setup(mock => mock.GetRelease(
-                PublicationSlug, ReleaseSlug))
+        releaseCacheService
+            .Setup(mock => mock.GetRelease(PublicationSlug, ReleaseSlug))
             .ReturnsAsync(new NotFoundResult());
 
         var controller = BuildReleaseController(
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object);
+            releaseCacheService: releaseCacheService.Object
+        );
         var result = await controller.GetReleaseSummary(PublicationSlug, ReleaseSlug);
 
         MockUtils.VerifyAllMocks(publicationCacheService, releaseCacheService);

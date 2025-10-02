@@ -13,11 +13,9 @@ public record BoundaryLevelUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Id)
-                .GreaterThan(0);
+            RuleFor(request => request.Id).GreaterThan(0);
 
-            RuleFor(request => request.Label)
-                .NotEmpty();
+            RuleFor(request => request.Label).NotEmpty();
         }
     }
 }

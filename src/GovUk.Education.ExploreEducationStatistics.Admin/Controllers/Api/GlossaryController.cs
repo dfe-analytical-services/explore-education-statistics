@@ -11,8 +11,7 @@ public class GlossaryController : ControllerBase
 {
     private readonly IGlossaryService _glossaryService;
 
-    public GlossaryController(
-        IGlossaryService glossaryService)
+    public GlossaryController(IGlossaryService glossaryService)
     {
         _glossaryService = glossaryService;
     }
@@ -26,7 +25,6 @@ public class GlossaryController : ControllerBase
     [HttpGet("glossary-entries/{slug}")]
     public async Task<ActionResult<GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
     {
-        return await _glossaryService.GetGlossaryEntry(slug)
-            .HandleFailuresOrOk();
+        return await _glossaryService.GetGlossaryEntry(slug).HandleFailuresOrOk();
     }
 }

@@ -19,15 +19,12 @@ public class MetaDataFileReader
 
     public MetaDataFileReader(List<string> metaCsvHeaders)
     {
-        _metaColumnIndexes = EnumUtil.GetEnums<MetaColumns>()
-            .ToDictionary(
-                column => column,
-                column => metaCsvHeaders.FindIndex(h => h.Equals(column.ToString()))
-            );
+        _metaColumnIndexes = EnumUtil
+            .GetEnums<MetaColumns>()
+            .ToDictionary(column => column, column => metaCsvHeaders.FindIndex(h => h.Equals(column.ToString())));
     }
 
-    public List<MetaRow> GetMetaRows(List<List<string>> metaRowValues) =>
-        metaRowValues.Select(GetMetaRow).ToList();
+    public List<MetaRow> GetMetaRows(List<List<string>> metaRowValues) => metaRowValues.Select(GetMetaRow).ToList();
 
     public MetaRow GetMetaRow(IReadOnlyList<string> rowValues)
     {
@@ -46,33 +43,36 @@ public class MetaDataFileReader
             AutoSelectFilterItemLabel = ReadMetaColumnValue(MetaColumns.filter_default, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
             IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(indicatorUnit.DefaultsTo("")),
-            DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp) : null
+            DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp) : null,
         };
     }
 
-    public List<(Filter Filter, string Column)> ReadFiltersFromCsv(
-        IEnumerable<MetaRow> metaRows,
-        Subject subject)
+    public List<(Filter Filter, string Column)> ReadFiltersFromCsv(IEnumerable<MetaRow> metaRows, Subject subject)
     {
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
-            .Select(filterMetaRow => (
-                filter: new Filter(
-                    hint: filterMetaRow.FilterHint,
-                    label: filterMetaRow.Label,
-                    name: filterMetaRow.ColumnName,
-                    groupCsvColumn: filterMetaRow.FilterGroupingColumn,
-                    parentFilter: filterMetaRow.ParentFilter,
-                    autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
-                    // NOTE: AutoSelectFilterItemId is set later, after filter items are created
-                    subjectId: subject.Id),
-                column: filterMetaRow.ColumnName))
+            .Select(filterMetaRow =>
+                (
+                    filter: new Filter(
+                        hint: filterMetaRow.FilterHint,
+                        label: filterMetaRow.Label,
+                        name: filterMetaRow.ColumnName,
+                        groupCsvColumn: filterMetaRow.FilterGroupingColumn,
+                        parentFilter: filterMetaRow.ParentFilter,
+                        autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
+                        // NOTE: AutoSelectFilterItemId is set later, after filter items are created
+                        subjectId: subject.Id
+                    ),
+                    column: filterMetaRow.ColumnName
+                )
+            )
             .ToList();
     }
 
     public List<(Indicator Indicator, string Column)> ReadIndicatorsFromCsv(
         IEnumerable<MetaRow> metaRows,
-        Subject subject)
+        Subject subject
+    )
     {
         var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
 
@@ -86,9 +86,7 @@ public class MetaDataFileReader
 
         var indicatorGroups = indicatorRows
             .GroupBy(row => row.IndicatorGrouping!)
-            .ToDictionary(
-                rows => rows.Key,
-                rows => new IndicatorGroup(rows.Key, subject.Id));
+            .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subject.Id));
 
         return indicatorRows
             .Select(row =>
@@ -96,14 +94,13 @@ public class MetaDataFileReader
                 var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
 
                 return (
-                    indicator:
-                    new Indicator
+                    indicator: new Indicator
                     {
                         IndicatorGroup = indicatorGroup,
                         Label = row.Label,
                         Name = row.ColumnName,
                         Unit = row.IndicatorUnit,
-                        DecimalPlaces = row.DecimalPlaces
+                        DecimalPlaces = row.DecimalPlaces,
                     },
                     column: row.ColumnName
                 );

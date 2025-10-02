@@ -35,10 +35,7 @@ public record DataFileInfo : FileInfo
     public DataFileInfo() { }
 
     [SetsRequiredMembers]
-    public DataFileInfo(
-        ReleaseFile releaseFile,
-        DataImport dataImport,
-        DataFilePermissions permissions)
+    public DataFileInfo(ReleaseFile releaseFile, DataImport dataImport, DataFilePermissions permissions)
     {
         Id = releaseFile.FileId;
         FileName = releaseFile.File.Filename;
@@ -67,7 +64,9 @@ public record ReplacementDataFileInfo : DataFileInfo
         ReleaseFile releaseFile,
         DataImport dataImport,
         DataFilePermissions permissions,
-        bool hasValidReplacementPlan) : base(releaseFile, dataImport, permissions)
+        bool hasValidReplacementPlan
+    )
+        : base(releaseFile, dataImport, permissions)
     {
         HasValidReplacementPlan = hasValidReplacementPlan;
     }

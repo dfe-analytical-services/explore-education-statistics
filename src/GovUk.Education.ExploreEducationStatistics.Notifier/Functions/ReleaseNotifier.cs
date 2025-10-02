@@ -22,10 +22,13 @@ public class ReleaseNotifier(
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
-    ISubscriptionRepository subscriptionRepository)
+    ISubscriptionRepository subscriptionRepository
+)
 {
     private readonly AppOptions _appOptions = appOptions.Value;
-    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
+    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions
+        .Value
+        .EmailTemplates;
 
     private static class FunctionNames
     {
@@ -36,7 +39,8 @@ public class ReleaseNotifier(
     [Function(FunctionNames.NotifySubscribers)]
     public async Task NotifySubscribers(
         [QueueTrigger(NotifierQueueStorage.ReleaseNotificationQueue)] ReleaseNotificationMessage msg,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
@@ -53,19 +57,17 @@ public class ReleaseNotifier(
             }
         }
 
-        logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers",
-            sentEmails.Count);
+        logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers", sentEmails.Count);
 
         // Then send emails to subscribers of any associated superseded publication
-        var supersededPublicationList = await contentDbContext.Publications
-            .Where(p => p.SupersededById == msg.PublicationId)
+        var supersededPublicationList = await contentDbContext
+            .Publications.Where(p => p.SupersededById == msg.PublicationId)
             .ToListAsync();
 
         var numSupersededSubscriberEmailsSent = 0;
         foreach (var supersededPublication in supersededPublicationList)
         {
-            var supersededPubSubEmails = await subscriptionRepository.GetSubscriberEmails(
-                supersededPublication.Id);
+            var supersededPubSubEmails = await subscriptionRepository.GetSubscriberEmails(supersededPublication.Id);
 
             foreach (var email in supersededPubSubEmails)
             {
@@ -74,25 +76,21 @@ public class ReleaseNotifier(
                     continue;
                 }
 
-                SendSupersededSubscriberEmail(email,
-                    supersededPublication,
-                    msg);
+                SendSupersededSubscriberEmail(email, supersededPublication, msg);
                 sentEmails.Add(email);
                 numSupersededSubscriberEmailsSent++;
             }
 
             logger.LogInformation(
                 "Emailed {NumSupersededPublicationEmailsSent} subscribers from a superseded publication",
-                numSupersededSubscriberEmailsSent);
+                numSupersededSubscriberEmailsSent
+            );
         }
 
-        logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers",
-            sentEmails.Count);
+        logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers", sentEmails.Count);
     }
 
-    private void SendSubscriberEmail(
-        string email,
-        ReleaseNotificationMessage msg)
+    private void SendSubscriberEmail(string email, ReleaseNotificationMessage msg)
     {
         var unsubscribeToken = tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
@@ -100,14 +98,11 @@ public class ReleaseNotifier(
         {
             { "publication_name", msg.PublicationName },
             { "release_name", msg.ReleaseName },
-            {
-                "release_link",
-                $"{_appOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
-            },
+            { "release_link", $"{_appOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}" },
             {
                 "unsubscribe_link",
                 $"{_appOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
-            }
+            },
         };
 
         if (msg.Amendment)
@@ -119,16 +114,14 @@ public class ReleaseNotifier(
             ? _emailTemplateOptions.ReleaseAmendmentPublishedId
             : _emailTemplateOptions.ReleasePublishedId;
 
-        emailService.SendEmail(
-            email: email,
-            templateId: releaseTemplateId,
-            values);
+        emailService.SendEmail(email: email, templateId: releaseTemplateId, values);
     }
 
     private void SendSupersededSubscriberEmail(
         string email,
         Publication supersededPublication,
-        ReleaseNotificationMessage msg)
+        ReleaseNotificationMessage msg
+    )
     {
         var unsubscribeToken = tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
@@ -136,15 +129,12 @@ public class ReleaseNotifier(
         {
             { "publication_name", msg.PublicationName },
             { "release_name", msg.ReleaseName },
-            {
-                "release_link",
-                $"{_appOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
-            },
+            { "release_link", $"{_appOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}" },
             {
                 "unsubscribe_link",
                 $"{_appOptions.PublicAppUrl}/subscriptions/{supersededPublication.Slug}/confirm-unsubscription/{unsubscribeToken}"
             },
-            { "superseded_publication_title", supersededPublication.Title }
+            { "superseded_publication_title", supersededPublication.Title },
         };
 
         if (msg.Amendment)
@@ -156,9 +146,6 @@ public class ReleaseNotifier(
             ? _emailTemplateOptions.ReleaseAmendmentPublishedSupersededSubscribersId
             : _emailTemplateOptions.ReleasePublishedSupersededSubscribersId;
 
-        emailService.SendEmail(
-            email: email,
-            templateId: releaseSupersededSubscribersEmailTemplateId,
-            values);
+        emailService.SendEmail(email: email, templateId: releaseSupersededSubscribersEmailTemplateId, values);
     }
 }

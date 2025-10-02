@@ -32,7 +32,8 @@ public class AuthorizationHandlerServiceTests
                 .ReturnsAsync([publicationRole]);
 
             var authorizationHandlerService = CreateService(
-                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object);
+                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object
+            );
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, user);
 
@@ -54,7 +55,8 @@ public class AuthorizationHandlerServiceTests
                 .ReturnsAsync([publicationRole]);
 
             var authorizationHandlerService = CreateService(
-                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object);
+                userPublicationRoleRepository: userPublicationRoleAndInviteManagerMock.Object
+            );
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, user);
 
@@ -66,7 +68,8 @@ public class AuthorizationHandlerServiceTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IPreReleaseService? preReleaseService = null)
+        IPreReleaseService? preReleaseService = null
+    )
     {
         var releaseVersionRepositoryMock = new Mock<IReleaseVersionRepository>();
         releaseVersionRepositoryMock
@@ -89,15 +92,13 @@ public class AuthorizationHandlerServiceTests
         var preReleaseServiceMock = new Mock<IPreReleaseService>();
         preReleaseServiceMock
             .Setup(rvr => rvr.GetPreReleaseWindowStatus(It.IsAny<ReleaseVersion>(), It.IsAny<DateTime>()))
-            .Returns(new PreReleaseWindowStatus
-            {
-                Access = PreReleaseAccess.NoneSet,
-            });
+            .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.NoneSet });
 
         return new AuthorizationHandlerService(
             releaseVersionRepository ?? releaseVersionRepositoryMock.Object,
             userReleaseRoleRepository ?? userReleaseRoleAndInviteManagerMock.Object,
             userPublicationRoleRepository ?? userPublicationRoleAndInviteManagerMock.Object,
-            preReleaseService ?? preReleaseServiceMock.Object);
+            preReleaseService ?? preReleaseServiceMock.Object
+        );
     }
 }

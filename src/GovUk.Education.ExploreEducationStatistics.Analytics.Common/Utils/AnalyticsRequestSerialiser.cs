@@ -10,5 +10,6 @@ public static class AnalyticsRequestSerialiser
             obj: requestToSerialise,
             formatting: Formatting.Indented,
             orderedProperties: true,
-            camelCase: true);
+            camelCase: true
+        );
 }

@@ -41,9 +41,7 @@ public class FileValidatorServiceTests
 
         var (service, fileTypeService) = BuildService();
 
-        fileTypeService
-            .Setup(s => s.HasMatchingMimeType(file, AllowedAncillaryFileTypes))
-            .ReturnsAsync(() => true);
+        fileTypeService.Setup(s => s.HasMatchingMimeType(file, AllowedAncillaryFileTypes)).ReturnsAsync(() => true);
 
         var result = await service.ValidateFileForUpload(file, Ancillary);
         VerifyAllMocks(fileTypeService);
@@ -58,9 +56,7 @@ public class FileValidatorServiceTests
 
         var (service, fileTypeService) = BuildService();
 
-        fileTypeService
-            .Setup(s => s.HasMatchingMimeType(file, AllowedAncillaryFileTypes))
-            .ReturnsAsync(() => false);
+        fileTypeService.Setup(s => s.HasMatchingMimeType(file, AllowedAncillaryFileTypes)).ReturnsAsync(() => false);
 
         var result = await service.ValidateFileForUpload(file, Ancillary);
         VerifyAllMocks(fileTypeService);
@@ -68,10 +64,9 @@ public class FileValidatorServiceTests
         result.AssertBadRequest(FileTypeInvalid);
     }
 
-    private static (
-        FileValidatorService,
-        Mock<IFileTypeService> fileTypeService)
-        BuildService(Mock<IFileTypeService>? fileTypeService = null)
+    private static (FileValidatorService, Mock<IFileTypeService> fileTypeService) BuildService(
+        Mock<IFileTypeService>? fileTypeService = null
+    )
     {
         fileTypeService ??= new Mock<IFileTypeService>(Strict);
         var service = new FileValidatorService(fileTypeService.Object);

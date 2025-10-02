@@ -8,15 +8,31 @@ public interface IBlobContainer
 
 public static class BlobContainers
 {
-    public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer(Constants.ContainerNames.PrivateReleaseFiles);
-    public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer(Constants.ContainerNames.PrivateReleaseTempFiles);
-    public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer(Constants.ContainerNames.PublicReleaseFiles);
-    public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer(Constants.ContainerNames.PrivateContent);
-    public static readonly IBlobContainer PublicContent = new PublicBlobContainer(Constants.ContainerNames.PublicContent);
-    public static readonly IBlobContainer PermalinkSnapshots = new BlobContainer(Constants.ContainerNames.PermalinkSnapshots);
+    public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer(
+        Constants.ContainerNames.PrivateReleaseFiles
+    );
+    public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer(
+        Constants.ContainerNames.PrivateReleaseTempFiles
+    );
+    public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer(
+        Constants.ContainerNames.PublicReleaseFiles
+    );
+    public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer(
+        Constants.ContainerNames.PrivateContent
+    );
+    public static readonly IBlobContainer PublicContent = new PublicBlobContainer(
+        Constants.ContainerNames.PublicContent
+    );
+    public static readonly IBlobContainer PermalinkSnapshots = new BlobContainer(
+        Constants.ContainerNames.PermalinkSnapshots
+    );
     public static readonly IBlobContainer PublisherLeases = new BlobContainer(Constants.ContainerNames.PublisherLeases);
-    public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer(Constants.ContainerNames.PrivateMethodologyFiles);
-    public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer(Constants.ContainerNames.PublicMethodologyFiles);
+    public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer(
+        Constants.ContainerNames.PrivateMethodologyFiles
+    );
+    public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer(
+        Constants.ContainerNames.PublicMethodologyFiles
+    );
 }
 
 /// <summary>

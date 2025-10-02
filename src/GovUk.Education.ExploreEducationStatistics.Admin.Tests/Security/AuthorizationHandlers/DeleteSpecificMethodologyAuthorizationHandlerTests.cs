@@ -13,8 +13,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
@@ -30,14 +30,14 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
     {
         Id = Guid.NewGuid(),
         MethodologyId = Guid.NewGuid(),
-        Status = Draft
+        Status = Draft,
     };
 
     private static readonly MethodologyVersion ApprovedFirstVersion = new()
     {
         Id = Guid.NewGuid(),
         MethodologyId = Guid.NewGuid(),
-        Status = Approved
+        Status = Approved,
     };
 
     private static readonly MethodologyVersion DraftAmendmentVersion = new()
@@ -46,7 +46,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         MethodologyId = Guid.NewGuid(),
         Status = Draft,
         PreviousVersionId = new Guid(),
-        Version = 0
+        Version = 0,
     };
 
     private static readonly MethodologyVersion ApprovedAmendmentVersion = new()
@@ -55,7 +55,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         MethodologyId = Guid.NewGuid(),
         Status = Approved,
         PreviousVersionId = new Guid(),
-        Version = 1
+        Version = 1,
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -71,18 +71,14 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
             {
                 var expectClaimToSucceed = claim == DeleteAllMethodologies;
 
-                var (
-                    handler,
-                    methodologyRepository,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                var (handler, methodologyRepository, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
                 // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
                 // the user's Publication Roles.
                 if (!expectClaimToSucceed)
                 {
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(DraftFirstVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -90,9 +86,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, DraftFirstVersion);
 
@@ -109,15 +103,9 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var (
-                    handler,
-                    _,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                var (handler, _, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, ApprovedFirstVersion);
 
@@ -137,18 +125,14 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
             {
                 var expectClaimToSucceed = claim == DeleteAllMethodologies;
 
-                var (
-                    handler,
-                    methodologyRepository,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                var (handler, methodologyRepository, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
                 // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
                 // the user's Publication Roles.
                 if (!expectClaimToSucceed)
                 {
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -156,9 +140,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, DraftAmendmentVersion);
 
@@ -175,15 +157,9 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var (
-                    handler,
-                    _,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                var (handler, _, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, ApprovedAmendmentVersion);
 
@@ -206,14 +182,11 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async role =>
                 {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                    var (handler, methodologyRepository, userPublicationRoleRepository) =
+                        CreateHandlerAndDependencies();
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(DraftFirstVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -235,14 +208,10 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task UserWithNoPublicationRolesCannotDeleteDraftMethodology()
         {
-            var (
-                handler,
-                methodologyRepository,
-                userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
+            var (handler, methodologyRepository, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(DraftFirstVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -262,11 +231,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodology()
         {
-            var (
-                handler,
-                _,
-                userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
+            var (handler, _, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
             var authContext = CreateAuthContext(user, ApprovedFirstVersion);
@@ -286,14 +251,11 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async role =>
                 {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                    var (handler, methodologyRepository, userPublicationRoleRepository) =
+                        CreateHandlerAndDependencies();
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -315,11 +277,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task UserWithPublicationOwnerRoleCannotDeleteApprovedMethodologyAmendment()
         {
-            var (
-                handler,
-                _,
-                userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
+            var (handler, _, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
             var authContext = CreateAuthContext(user, ApprovedAmendmentVersion);
@@ -333,18 +291,22 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user,
-        MethodologyVersion methodologyVersion)
+    private static AuthorizationHandlerContext CreateAuthContext(
+        ClaimsPrincipal user,
+        MethodologyVersion methodologyVersion
+    )
     {
-        return CreateAuthorizationHandlerContext<DeleteSpecificMethodologyRequirement, MethodologyVersion>
-            (user, methodologyVersion);
+        return CreateAuthorizationHandlerContext<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
+            user,
+            methodologyVersion
+        );
     }
 
     private static (
         DeleteSpecificMethodologyAuthorizationHandler,
         Mock<IMethodologyRepository>,
-        Mock<IUserPublicationRoleRepository>)
-        CreateHandlerAndDependencies()
+        Mock<IUserPublicationRoleRepository>
+    ) CreateHandlerAndDependencies()
     {
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
@@ -355,7 +317,9 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
 
         return (handler, methodologyRepository, userPublicationRoleRepository);
     }

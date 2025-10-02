@@ -8,5 +8,6 @@ public interface IEventGridEventHandler
     Task<TResponse> Handle<TPayload, TResponse>(
         FunctionContext context,
         EventGridEvent eventGridEvent,
-        Func<TPayload, CancellationToken, Task<TResponse>> handler);
+        Func<TPayload, CancellationToken, Task<TResponse>> handler
+    );
 }

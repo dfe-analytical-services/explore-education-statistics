@@ -20,14 +20,17 @@ public enum GeographicLevel
     [EnumLabelValue("Local skills improvement plan area", "LSIP")]
     LocalSkillsImprovementPlanArea,
 
-    [EnumLabelValue("Institution", "INST")] Institution,
+    [EnumLabelValue("Institution", "INST")]
+    Institution,
 
     [EnumLabelValue("Mayoral combined authority", "MCA")]
     MayoralCombinedAuthority,
 
-    [EnumLabelValue("MAT", "MAT")] MultiAcademyTrust,
+    [EnumLabelValue("MAT", "MAT")]
+    MultiAcademyTrust,
 
-    [EnumLabelValue("National", "NAT")] Country,
+    [EnumLabelValue("National", "NAT")]
+    Country,
 
     [EnumLabelValue("Opportunity area", "OA")]
     OpportunityArea,
@@ -35,18 +38,25 @@ public enum GeographicLevel
     [EnumLabelValue("Parliamentary constituency", "PCON")]
     ParliamentaryConstituency,
 
-    [EnumLabelValue("Provider", "PROV")] Provider,
+    [EnumLabelValue("Provider", "PROV")]
+    Provider,
 
-    [EnumLabelValue("Regional", "REG")] Region,
+    [EnumLabelValue("Regional", "REG")]
+    Region,
 
     // Regional School Commissioner Region
-    [EnumLabelValue("RSC region", "RSC")] RscRegion,
+    [EnumLabelValue("RSC region", "RSC")]
+    RscRegion,
 
-    [EnumLabelValue("School", "SCH")] School,
+    [EnumLabelValue("School", "SCH")]
+    School,
 
-    [EnumLabelValue("Sponsor", "SPON")] Sponsor,
+    [EnumLabelValue("Sponsor", "SPON")]
+    Sponsor,
 
-    [EnumLabelValue("Ward", "WARD")] Ward,
+    [EnumLabelValue("Ward", "WARD")]
+    Ward,
 
-    [EnumLabelValue("Planning area", "PA")] PlanningArea
+    [EnumLabelValue("Planning area", "PA")]
+    PlanningArea,
 }

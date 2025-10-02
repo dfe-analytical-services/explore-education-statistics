@@ -9,9 +9,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class DeleteSpecificMethodologyRequirement : IAuthorizationRequirement
-{
-}
+public class DeleteSpecificMethodologyRequirement : IAuthorizationRequirement { }
 
 public class DeleteSpecificMethodologyAuthorizationHandler
     : AuthorizationHandler<DeleteSpecificMethodologyRequirement, MethodologyVersion>
@@ -21,7 +19,8 @@ public class DeleteSpecificMethodologyAuthorizationHandler
 
     public DeleteSpecificMethodologyAuthorizationHandler(
         IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _methodologyRepository = methodologyRepository;
         _authorizationHandlerService = authorizationHandlerService;
@@ -30,7 +29,8 @@ public class DeleteSpecificMethodologyAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DeleteSpecificMethodologyRequirement requirement,
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         if (methodologyVersion.Status == Approved)
         {
@@ -43,14 +43,15 @@ public class DeleteSpecificMethodologyAuthorizationHandler
             return;
         }
 
-        var owningPublication =
-            await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-        
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    owningPublication.Id,
-                    Owner))
+        var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+
+        if (
+            await _authorizationHandlerService.HasRolesOnPublication(
+                context.User.GetUserId(),
+                owningPublication.Id,
+                Owner
+            )
+        )
         {
             context.Succeed(requirement);
         }

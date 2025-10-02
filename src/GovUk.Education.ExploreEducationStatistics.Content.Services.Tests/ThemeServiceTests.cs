@@ -17,40 +17,22 @@ public class ThemeServiceTests
                 Slug = "theme-c",
                 Title = "Theme C",
                 Summary = "Theme C summary",
-                Publications =
-                [
-                    new()
-                    {
-                        LatestPublishedReleaseVersionId = Guid.NewGuid()
-                    }
-                ]
+                Publications = [new() { LatestPublishedReleaseVersionId = Guid.NewGuid() }],
             },
             new()
             {
                 Slug = "theme-a",
                 Title = "Theme A",
                 Summary = "Theme A summary",
-                Publications =
-                [
-                    new()
-                    {
-                        LatestPublishedReleaseVersionId = Guid.NewGuid()
-                    }
-                ]
+                Publications = [new() { LatestPublishedReleaseVersionId = Guid.NewGuid() }],
             },
             new()
             {
                 Slug = "theme-b",
                 Title = "Theme B",
                 Summary = "Theme B summary",
-                Publications =
-                [
-                    new()
-                    {
-                        LatestPublishedReleaseVersionId = Guid.NewGuid()
-                    }
-                ]
-            }
+                Publications = [new() { LatestPublishedReleaseVersionId = Guid.NewGuid() }],
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -88,40 +70,28 @@ public class ThemeServiceTests
     [Fact]
     public async Task ListThemes_ExcludesThemesWithNoPublishedReleases()
     {
-        var themeWithoutPublication = new Theme
-        {
-            Title = "Theme A",
-            Publications = []
-        };
+        var themeWithoutPublication = new Theme { Title = "Theme A", Publications = [] };
 
         var themeWithoutPublishedPublication = new Theme
         {
             Title = "Theme B",
-            Publications =
-            [
-                new()
-                {
-                    LatestPublishedReleaseVersionId = null
-                }
-            ]
+            Publications = [new() { LatestPublishedReleaseVersionId = null }],
         };
 
         var themeWithPublishedReleases = new Theme
         {
             Title = "Theme C",
-            Publications =
-            [
-                new()
-                {
-                    LatestPublishedReleaseVersionId = Guid.NewGuid()
-                }
-            ]
+            Publications = [new() { LatestPublishedReleaseVersionId = Guid.NewGuid() }],
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Themes.AddRangeAsync(themeWithoutPublication, themeWithoutPublishedPublication, themeWithPublishedReleases);
+            await context.Themes.AddRangeAsync(
+                themeWithoutPublication,
+                themeWithoutPublishedPublication,
+                themeWithPublishedReleases
+            );
             await context.SaveChangesAsync();
         }
 
@@ -148,12 +118,9 @@ public class ThemeServiceTests
                 new()
                 {
                     LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                    SupersededBy = new Publication
-                    {
-                        LatestPublishedReleaseVersionId = Guid.NewGuid()
-                    }
-                }
-            ]
+                    SupersededBy = new Publication { LatestPublishedReleaseVersionId = Guid.NewGuid() },
+                },
+            ],
         };
 
         var themeWithUnpublishedSupersededPublication = new Theme
@@ -164,30 +131,25 @@ public class ThemeServiceTests
                 new()
                 {
                     LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                    SupersededBy = new Publication
-                    {
-                        LatestPublishedReleaseVersionId = null
-                    }
-                }
-            ]
+                    SupersededBy = new Publication { LatestPublishedReleaseVersionId = null },
+                },
+            ],
         };
 
         var themeWithNonSupersededPublication = new Theme
         {
             Title = "Theme C",
-            Publications =
-            [
-                new()
-                {
-                    LatestPublishedReleaseVersionId = Guid.NewGuid()
-                }
-            ]
+            Publications = [new() { LatestPublishedReleaseVersionId = Guid.NewGuid() }],
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Themes.AddRangeAsync(themeWithPublishedSupersededPublication, themeWithUnpublishedSupersededPublication, themeWithNonSupersededPublication);
+            await context.Themes.AddRangeAsync(
+                themeWithPublishedSupersededPublication,
+                themeWithUnpublishedSupersededPublication,
+                themeWithNonSupersededPublication
+            );
             await context.SaveChangesAsync();
         }
 
@@ -207,8 +169,7 @@ public class ThemeServiceTests
         }
     }
 
-    private static ThemeService BuildThemeService(
-        ContentDbContext contentDbContext)
+    private static ThemeService BuildThemeService(ContentDbContext contentDbContext)
     {
         return new ThemeService(contentDbContext: contentDbContext);
     }

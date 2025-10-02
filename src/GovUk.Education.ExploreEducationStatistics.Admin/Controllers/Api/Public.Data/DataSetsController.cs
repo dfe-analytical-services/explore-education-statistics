@@ -18,27 +18,25 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
     [Produces("application/json")]
     public async Task<ActionResult<PaginatedListViewModel<DataSetSummaryViewModel>>> ListDataSets(
         [FromQuery] DataSetListRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
             .ListDataSets(
                 page: request.Page,
                 pageSize: request.PageSize,
                 publicationId: request.PublicationId,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
     [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
-    public async Task<ActionResult<DataSetViewModel>> GetDataSet(
-        Guid dataSetId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<DataSetViewModel>> GetDataSet(Guid dataSetId, CancellationToken cancellationToken)
     {
         return await dataSetService
-            .GetDataSet(
-                dataSetId: dataSetId,
-                cancellationToken: cancellationToken)
+            .GetDataSet(dataSetId: dataSetId, cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -46,12 +44,11 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
     [Produces("application/json")]
     public async Task<ActionResult<DataSetViewModel>> CreateDataSet(
         [FromBody] DataSetCreateRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetService
-            .CreateDataSet(
-                releaseFileId: request.ReleaseFileId,
-                cancellationToken: cancellationToken)
+            .CreateDataSet(releaseFileId: request.ReleaseFileId, cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 }

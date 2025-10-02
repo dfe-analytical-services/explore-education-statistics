@@ -20,38 +20,37 @@ public class PreReleaseSummaryServicePermissionTests
     [Fact]
     public async Task GetPreReleaseSummaryViewModel()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
                 rv => rv.Id == releaseVersion.Id,
-                CanViewSpecificPreReleaseSummary)
+                CanViewSpecificPreReleaseSummary
+            )
             .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-                    {
-                        contentDbContext.ReleaseVersions.Add(releaseVersion);
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-                    {
-                        var service = BuildService(
-                            contentDbContext: contentDbContext,
-                            userService: userService.Object);
-
-                        return await service.GetPreReleaseSummaryViewModel(releaseVersion.Id, CancellationToken.None);
-                    }
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
+                    await contentDbContext.SaveChangesAsync();
                 }
-            );
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = BuildService(contentDbContext: contentDbContext, userService: userService.Object);
+
+                    return await service.GetPreReleaseSummaryViewModel(releaseVersion.Id, CancellationToken.None);
+                }
+            });
     }
 
     private static PreReleaseSummaryService BuildService(
         ContentDbContext? contentDbContext = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new PreReleaseSummaryService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

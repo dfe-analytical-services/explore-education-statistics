@@ -9,13 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public abstract class SearchIndexerClientTests
 {
-    private AzureSearchOptions AzureSearchOptions => new()
-    {
-        SearchServiceEndpoint = _searchServiceEndpoint,
-        SearchServiceAccessKey = _searchServiceAccessKey,
-        IndexerName = _indexerName
-    };
-
+    private AzureSearchOptions AzureSearchOptions =>
+        new()
+        {
+            SearchServiceEndpoint = _searchServiceEndpoint,
+            SearchServiceAccessKey = _searchServiceAccessKey,
+            IndexerName = _indexerName,
+        };
 
     private string _searchServiceEndpoint = "https://example.search.windows.net/";
     private string? _searchServiceAccessKey = "my-access-key";
@@ -24,10 +24,10 @@ public abstract class SearchIndexerClientTests
     protected virtual ISearchIndexerClient GetSut(ILogger<SearchIndexerClient>? logger = null)
     {
         return new SearchIndexerClient(
-            new AzureSearchIndexerClientFactory(
-                Microsoft.Extensions.Options.Options.Create(AzureSearchOptions)),
+            new AzureSearchIndexerClientFactory(Microsoft.Extensions.Options.Options.Create(AzureSearchOptions)),
             Microsoft.Extensions.Options.Options.Create(AzureSearchOptions),
-            logger ?? new NullLogger<SearchIndexerClient>());
+            logger ?? new NullLogger<SearchIndexerClient>()
+        );
     }
 
     public class BasicTests : SearchIndexerClientTests
@@ -52,9 +52,7 @@ public abstract class SearchIndexerClientTests
         }
 
         protected override ISearchIndexerClient GetSut(ILogger<SearchIndexerClient>? logger = null) =>
-            base.GetSut(new LoggerMockBuilder<SearchIndexerClient>()
-                .WithLogAction(s => _output.WriteLine(s))
-                .Build());
+            base.GetSut(new LoggerMockBuilder<SearchIndexerClient>().WithLogAction(s => _output.WriteLine(s)).Build());
 
         [Fact(Skip = "Integration test is disabled")]
         public async Task Can_ping_indexer()
@@ -65,7 +63,7 @@ public abstract class SearchIndexerClientTests
             // ACT
             Assert.True(await sut.IndexerExists());
         }
-        
+
         [Fact(Skip = "Integration test is disabled")]
         public async Task Can_not_ping_unknown_indexer()
         {
@@ -83,7 +81,7 @@ public abstract class SearchIndexerClientTests
             var sut = GetSut();
             await sut.RunIndexer();
         }
-        
+
         [Fact(Skip = "Integration test is disabled")]
         public async Task Reset_indexer()
         {
@@ -111,7 +109,7 @@ public abstract class SearchIndexerClientTests
             var isIndexerRunning = await sut.IsIndexerRunning(_indexerName);
             Print($"Is indexer {_indexerName} running: {isIndexerRunning}");
         }
-        
+
         private void Print(string message) => _output.WriteLine(message);
     }
 }

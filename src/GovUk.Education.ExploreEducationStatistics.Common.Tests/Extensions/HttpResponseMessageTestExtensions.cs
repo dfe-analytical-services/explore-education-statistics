@@ -39,7 +39,8 @@ public static class HttpResponseMessageTestExtensions
     public static (T body, string createdEntityId) AssertCreated<T>(
         this HttpResponseMessage message,
         string expectedLocationPrefix,
-        bool useSystemJson = false)
+        bool useSystemJson = false
+    )
     {
         Assert.Equal(Created, message.StatusCode);
         Assert.NotNull(message.Headers.Location);
@@ -58,7 +59,8 @@ public static class HttpResponseMessageTestExtensions
         this HttpResponseMessage message,
         T expectedBody,
         string expectedLocation,
-        bool useSystemJson = false)
+        bool useSystemJson = false
+    )
     {
         Assert.Equal(Created, message.StatusCode);
         Assert.Equal(new Uri(expectedLocation), message.Headers.Location);
@@ -171,7 +173,8 @@ public static class HttpResponseMessageTestExtensions
         return useSystemJson
             ? JsonSerializer.Deserialize<T>(
                 message.Content.ReadAsStream().ReadToEnd(),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            )
             : message.Content.ReadFromJson<T>();
     }
 }

@@ -9,5 +9,6 @@ public interface IDataSetCandidateService
 {
     Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> ListCandidates(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

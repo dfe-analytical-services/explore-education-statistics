@@ -11,7 +11,7 @@ public class DataImportError
     public DateTime Created { get; set; }
 
     public string Message { get; set; }
-    
+
     public DataImportError(string message)
     {
         Created = DateTime.UtcNow;

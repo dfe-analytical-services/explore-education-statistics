@@ -2,8 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
@@ -183,8 +183,14 @@ public class TimePeriodLabelFormatterTests
         Assert.Equal($"Reporting year {Year}", Format(Year, ReportingYear, FullLabelBeforeYear));
         Assert.Equal($"January {Year}", Format(Year, January, FullLabelBeforeYear));
         Assert.Equal($"Autumn term {FormattedAcademicYear}", Format(Year, AutumnTerm, FullLabelBeforeYear));
-        Assert.Equal($"Part 1 (April to September) {FormattedFiscalYear}", Format(Year, FinancialYearPart1, FullLabelBeforeYear));
-        Assert.Equal($"Part 2 (October to March) {FormattedFiscalYear}", Format(Year, FinancialYearPart2, FullLabelBeforeYear));
+        Assert.Equal(
+            $"Part 1 (April to September) {FormattedFiscalYear}",
+            Format(Year, FinancialYearPart1, FullLabelBeforeYear)
+        );
+        Assert.Equal(
+            $"Part 2 (October to March) {FormattedFiscalYear}",
+            Format(Year, FinancialYearPart2, FullLabelBeforeYear)
+        );
     }
 
     [Fact]

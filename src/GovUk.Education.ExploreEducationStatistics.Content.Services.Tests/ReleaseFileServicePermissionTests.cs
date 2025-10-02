@@ -23,67 +23,54 @@ public class ReleaseFileServicePermissionTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    private static readonly ReleaseVersion ReleaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly ReleaseVersion ReleaseVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly ReleaseFile ReleaseFile = new()
-    {
-        ReleaseVersion = ReleaseVersion,
-        File = new File(),
-    };
+    private static readonly ReleaseFile ReleaseFile = new() { ReleaseVersion = ReleaseVersion, File = new File() };
 
     [Fact]
     public async Task StreamFile()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var persistenceHelper =
-                        MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
+            .AssertForbidden(userService =>
+            {
+                var persistenceHelper = MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
 
-                    var service = BuildService(
-                        userService: userService.Object,
-                        persistenceHelper: persistenceHelper.Object
-                    );
-                    return service.StreamFile(releaseVersionId: ReleaseFile.ReleaseVersionId,
-                        fileId: ReleaseFile.FileId);
-                }
-            );
+                var service = BuildService(
+                    userService: userService.Object,
+                    persistenceHelper: persistenceHelper.Object
+                );
+                return service.StreamFile(releaseVersionId: ReleaseFile.ReleaseVersionId, fileId: ReleaseFile.FileId);
+            });
     }
 
     [Fact]
     public async Task ZipFilesToStream()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryContentDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryContentDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.ZipFilesToStream(
-                        releaseVersionId: releaseVersion.Id,
-                        outputStream: Stream.Null,
-                        fromPage: AnalyticsFromPage.DataCatalogue,
-                        fileIds: [Guid.NewGuid()]
-                    );
-                }
-            );
+                return await service.ZipFilesToStream(
+                    releaseVersionId: releaseVersion.Id,
+                    outputStream: Stream.Null,
+                    fromPage: AnalyticsFromPage.DataCatalogue,
+                    fileIds: [Guid.NewGuid()]
+                );
+            });
     }
 
     private ReleaseFileService BuildService(
@@ -93,7 +80,8 @@ public class ReleaseFileServicePermissionTests
         IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
         IUserService? userService = null,
         IAnalyticsManager? analyticsManager = null,
-        ILogger<ReleaseFileService>? logger = null)
+        ILogger<ReleaseFileService>? logger = null
+    )
     {
         return new(
             contentDbContext ?? Mock.Of<ContentDbContext>(),

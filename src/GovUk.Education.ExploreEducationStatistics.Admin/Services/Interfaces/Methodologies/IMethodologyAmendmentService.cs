@@ -7,5 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 public interface IMethodologyAmendmentService
 {
     Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodologyAmendment(
-        Guid originalMethodologyVersionId);
+        Guid originalMethodologyVersionId
+    );
 }

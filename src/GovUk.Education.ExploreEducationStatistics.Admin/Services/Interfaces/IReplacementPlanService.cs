@@ -11,15 +11,18 @@ public interface IReplacementPlanService
     Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
         Guid releaseVersionId,
         Guid originalFileId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataReplacementPlanViewModel>> GenerateReplacementPlan(
         ReleaseFile originalReleaseFile,
         ReleaseFile replacementReleaseFile,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<bool> HasValidReplacementPlan(
         ReleaseFile originalReleaseFile,
         ReleaseFile replacementReleaseFile,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

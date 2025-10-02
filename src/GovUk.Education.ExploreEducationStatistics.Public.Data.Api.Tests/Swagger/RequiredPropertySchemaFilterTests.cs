@@ -15,12 +15,11 @@ public class RequiredPropertySchemaFilterTests
         {
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new RequiredPropertySchemaFilter()],
-            SupportNonNullableReferenceTypes = true
+            SupportNonNullableReferenceTypes = true,
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");

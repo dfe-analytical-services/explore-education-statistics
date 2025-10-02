@@ -16,7 +16,8 @@ public partial class EES4483_AddMissingIndexes : Migration
             maxLength: 25,
             nullable: false,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Type",
@@ -25,7 +26,8 @@ public partial class EES4483_AddMissingIndexes : Migration
             maxLength: 25,
             nullable: false,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Type",
@@ -34,37 +36,23 @@ public partial class EES4483_AddMissingIndexes : Migration
             maxLength: 25,
             nullable: false,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Files_Type",
-            table: "Files",
-            column: "Type");
+        migrationBuilder.CreateIndex(name: "IX_Files_Type", table: "Files", column: "Type");
 
-        migrationBuilder.CreateIndex(
-            name: "IX_ContentSections_Type",
-            table: "ContentSections",
-            column: "Type");
+        migrationBuilder.CreateIndex(name: "IX_ContentSections_Type", table: "ContentSections", column: "Type");
 
-        migrationBuilder.CreateIndex(
-            name: "IX_ContentBlock_Type",
-            table: "ContentBlock",
-            column: "Type");
+        migrationBuilder.CreateIndex(name: "IX_ContentBlock_Type", table: "ContentBlock", column: "Type");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropIndex(
-            name: "IX_Files_Type",
-            table: "Files");
+        migrationBuilder.DropIndex(name: "IX_Files_Type", table: "Files");
 
-        migrationBuilder.DropIndex(
-            name: "IX_ContentSections_Type",
-            table: "ContentSections");
+        migrationBuilder.DropIndex(name: "IX_ContentSections_Type", table: "ContentSections");
 
-        migrationBuilder.DropIndex(
-            name: "IX_ContentBlock_Type",
-            table: "ContentBlock");
+        migrationBuilder.DropIndex(name: "IX_ContentBlock_Type", table: "ContentBlock");
 
         migrationBuilder.AlterColumn<string>(
             name: "Type",
@@ -73,7 +61,8 @@ public partial class EES4483_AddMissingIndexes : Migration
             nullable: false,
             oldClrType: typeof(string),
             oldType: "nvarchar(25)",
-            oldMaxLength: 25);
+            oldMaxLength: 25
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Type",
@@ -82,7 +71,8 @@ public partial class EES4483_AddMissingIndexes : Migration
             nullable: false,
             oldClrType: typeof(string),
             oldType: "nvarchar(25)",
-            oldMaxLength: 25);
+            oldMaxLength: 25
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Type",
@@ -91,6 +81,7 @@ public partial class EES4483_AddMissingIndexes : Migration
             nullable: false,
             oldClrType: typeof(string),
             oldType: "nvarchar(25)",
-            oldMaxLength: 25);
+            oldMaxLength: 25
+        );
     }
 }

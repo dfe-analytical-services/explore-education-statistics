@@ -13,8 +13,7 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using ReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -27,23 +26,19 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task ListReleaseRoles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        UserReleaseRole user1ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(_dataFixture.DefaultUser()
-                .WithFirstName("User1")
-                .WithLastName("One")
-                .WithEmail("user1@test.com"))
+        UserReleaseRole user1ReleaseRole = _dataFixture
+            .DefaultUserReleaseRole()
+            .WithUser(_dataFixture.DefaultUser().WithFirstName("User1").WithLastName("One").WithEmail("user1@test.com"))
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
-        UserReleaseRole user2ReleaseRole = _dataFixture.DefaultUserReleaseRole()
-            .WithUser(_dataFixture.DefaultUser()
-                .WithFirstName("User2")
-                .WithLastName("Two")
-                .WithEmail("user2@test.com"))
+        UserReleaseRole user2ReleaseRole = _dataFixture
+            .DefaultUserReleaseRole()
+            .WithUser(_dataFixture.DefaultUser().WithFirstName("User2").WithLastName("Two").WithEmail("user2@test.com"))
             .WithReleaseVersion(releaseVersion)
             .WithRole(PrereleaseViewer);
 
@@ -65,7 +60,8 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
 
             var result = await service.ListReleaseRoles(releaseVersion.Id);
             var viewModel = result.AssertRight();
@@ -93,9 +89,9 @@ public class ReleasePermissionServiceTests
     [InlineData(Contributor, PrereleaseViewer)]
     public async Task ListReleaseRoles_SpecifiedRolesToInclude(params ReleaseRole[] rolesToInclude)
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -115,7 +111,8 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
 
             var result = await service.ListReleaseRoles(releaseVersion.Id, rolesToInclude);
             var viewModel = result.AssertRight();
@@ -137,27 +134,33 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task ListReleaseInvites()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var (userReleaseInvite1, userReleaseInvite2) = _dataFixture.DefaultUserReleaseInvite()
+        var (userReleaseInvite1, userReleaseInvite2) = _dataFixture
+            .DefaultUserReleaseInvite()
             .WithReleaseVersion(releaseVersion)
             .WithRoles([Contributor, Approver])
             .GenerateTuple2();
 
-        UserReleaseInvite userReleaseInviteIgnored = _dataFixture.DefaultUserReleaseInvite()
-            .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication())))
+        UserReleaseInvite userReleaseInviteIgnored = _dataFixture
+            .DefaultUserReleaseInvite()
+            .WithReleaseVersion(
+                _dataFixture
+                    .DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            )
             .WithRole(Contributor);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvite1,
+            contentDbContext.UserReleaseInvites.AddRange(
+                userReleaseInvite1,
                 userReleaseInvite2,
-                userReleaseInviteIgnored);
+                userReleaseInviteIgnored
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -181,27 +184,33 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task ListReleaseInvites_ContributorsOnly()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var (userReleaseInvite1, userReleaseInvite2) = _dataFixture.DefaultUserReleaseInvite()
+        var (userReleaseInvite1, userReleaseInvite2) = _dataFixture
+            .DefaultUserReleaseInvite()
             .WithReleaseVersion(releaseVersion)
             .WithRoles([Contributor, Approver])
             .GenerateTuple2();
 
-        UserReleaseInvite userReleaseInviteIgnored = _dataFixture.DefaultUserReleaseInvite()
-            .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication())))
+        UserReleaseInvite userReleaseInviteIgnored = _dataFixture
+            .DefaultUserReleaseInvite()
+            .WithReleaseVersion(
+                _dataFixture
+                    .DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            )
             .WithRole(Contributor);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.UserReleaseInvites.AddRange(userReleaseInvite1,
+            contentDbContext.UserReleaseInvites.AddRange(
+                userReleaseInvite1,
                 userReleaseInvite2,
-                userReleaseInviteIgnored);
+                userReleaseInviteIgnored
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -242,9 +251,9 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task ListReleaseInvites_NoUserReleaseInvites()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -267,17 +276,14 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task ListPublicationContributors()
     {
-        Release release1 = _dataFixture
-            .DefaultRelease(publishedVersions: 1);
+        Release release1 = _dataFixture.DefaultRelease(publishedVersions: 1);
 
-        Release release2 = _dataFixture
-            .DefaultRelease(publishedVersions: 1, draftVersion: true);
+        Release release2 = _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true);
 
-        Publication publication = _dataFixture
-            .DefaultPublication()
-            .WithReleases(ListOf(release1, release2));
+        Publication publication = _dataFixture.DefaultPublication().WithReleases(ListOf(release1, release2));
 
-        var user1 = _dataFixture.DefaultUser()
+        var user1 = _dataFixture
+            .DefaultUser()
             .WithFirstName("User1")
             .WithLastName("One")
             .WithEmail("user1@test.com")
@@ -289,7 +295,8 @@ public class ReleasePermissionServiceTests
             Role = Contributor,
         };
 
-        var user2 = _dataFixture.DefaultUser()
+        var user2 = _dataFixture
+            .DefaultUser()
             .WithFirstName("User2")
             .WithLastName("Two")
             .WithEmail("user2@test.com")
@@ -302,8 +309,7 @@ public class ReleasePermissionServiceTests
             Role = Contributor,
         };
 
-        var user3 = _dataFixture.DefaultUser()
-            .Generate();
+        var user3 = _dataFixture.DefaultUser().Generate();
         var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
         {
             User = user3,
@@ -332,7 +338,8 @@ public class ReleasePermissionServiceTests
                 user2ReleaseRole1,
                 user3ReleaseRoleIgnored1,
                 user3ReleaseRoleIgnored2,
-                user3ReleaseRoleIgnored3);
+                user3ReleaseRoleIgnored3
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -340,8 +347,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(contentDbContext);
 
-            var result =
-                await service.ListPublicationContributors(publication.Id);
+            var result = await service.ListPublicationContributors(publication.Id);
             var viewModel = result.AssertRight();
 
             Assert.Equal(2, viewModel.Count);
@@ -365,7 +371,6 @@ public class ReleasePermissionServiceTests
         var result = await service.ListPublicationContributors(publicationId: Guid.NewGuid());
         result.AssertNotFound();
     }
-
 
     [Fact]
     public async Task ListPublicationContributors_NoReleaseVersion()
@@ -393,9 +398,9 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task ListPublicationContributors_NoUserReleaseRoles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -408,8 +413,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(contentDbContext);
 
-            var result =
-                await service.ListPublicationContributors(publicationId: releaseVersion.Release.PublicationId);
+            var result = await service.ListPublicationContributors(publicationId: releaseVersion.Release.PublicationId);
             var viewModel = result.AssertRight();
 
             Assert.Empty(viewModel);
@@ -419,22 +423,23 @@ public class ReleasePermissionServiceTests
     [Fact]
     public async Task UpdateReleaseContributors()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        UserReleaseRole user1ReleaseRole = _dataFixture.DefaultUserReleaseRole()
+        UserReleaseRole user1ReleaseRole = _dataFixture
+            .DefaultUserReleaseRole()
             .WithUser(_dataFixture.DefaultUser())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
-        UserReleaseRole user2ReleaseRole = _dataFixture.DefaultUserReleaseRole()
+        UserReleaseRole user2ReleaseRole = _dataFixture
+            .DefaultUserReleaseRole()
             .WithUser(_dataFixture.DefaultUser())
             .WithReleaseVersion(releaseVersion)
             .WithRole(Contributor);
 
-        var user3 = _dataFixture.DefaultUser()
-            .Generate();
+        var user3 = _dataFixture.DefaultUser().Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -448,18 +453,19 @@ public class ReleasePermissionServiceTests
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
         // User 2's role should be removed
         userReleaseRoleRepository
-            .Setup(m => m.RemoveMany(
-                It.Is<List<UserReleaseRole>>(l => l.Single().Id == user2ReleaseRole.Id),
-                default))
+            .Setup(m => m.RemoveMany(It.Is<List<UserReleaseRole>>(l => l.Single().Id == user2ReleaseRole.Id), default))
             .Returns(Task.CompletedTask)
             .Verifiable();
         // User 3's role should be created
         userReleaseRoleRepository
-            .Setup(m => m.CreateManyIfNotExists(
-                It.Is<List<Guid>>(l => l.Single() == user3.Id),
-                releaseVersion.Id,
-                Contributor,
-                UserId))
+            .Setup(m =>
+                m.CreateManyIfNotExists(
+                    It.Is<List<Guid>>(l => l.Single() == user3.Id),
+                    releaseVersion.Id,
+                    Contributor,
+                    UserId
+                )
+            )
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -467,11 +473,13 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
 
-            var result =
-                await service.UpdateReleaseContributors(releaseVersion.Id,
-                    userIds: [user1ReleaseRole.UserId, user3.Id]);
+            var result = await service.UpdateReleaseContributors(
+                releaseVersion.Id,
+                userIds: [user1ReleaseRole.UserId, user3.Id]
+            );
             result.AssertRight();
         }
 
@@ -495,11 +503,7 @@ public class ReleasePermissionServiceTests
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
         userReleaseRoleRepository
-            .Setup(m => m.RemoveForPublicationAndUser(
-                publication.Id,
-                userId,
-                default,
-                Contributor))
+            .Setup(m => m.RemoveForPublicationAndUser(publication.Id, userId, default, Contributor))
             .Returns(Task.CompletedTask)
             .Verifiable();
 
@@ -507,11 +511,13 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object);
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
 
             var result = await service.RemoveAllUserContributorPermissionsForPublication(
                 publicationId: publication.Id,
-                userId: userId);
+                userId: userId
+            );
 
             result.AssertRight();
         }
@@ -522,13 +528,15 @@ public class ReleasePermissionServiceTests
     private static ReleasePermissionService SetupReleasePermissionService(
         ContentDbContext contentDbContext,
         IUserService? userService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null)
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+    )
     {
         return new(
             contentDbContext: contentDbContext,
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
             releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-            userReleaseRoleRepository: userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
+            userReleaseRoleRepository: userReleaseRoleRepository
+                ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
             userService: userService ?? MockUtils.AlwaysTrueUserService(UserId).Object
         );
     }

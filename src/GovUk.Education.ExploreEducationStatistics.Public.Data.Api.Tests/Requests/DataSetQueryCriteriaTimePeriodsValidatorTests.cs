@@ -102,8 +102,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("Eq", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("Eq", error.PropertyName));
         }
     }
 
@@ -128,8 +127,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("NotEq", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("NotEq", error.PropertyName));
         }
     }
 
@@ -154,8 +152,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("In", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("In", error.PropertyName));
         }
 
         [Fact]
@@ -165,8 +162,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.In)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.In).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
 
@@ -191,8 +187,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.Equal(timePeriods.Length, result.Errors.Count);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("NotIn", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("NotIn", error.PropertyName));
         }
 
         [Fact]
@@ -202,8 +197,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             var result = _validator.TestValidate(query);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotIn).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
 
@@ -228,8 +222,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("Gt", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("Gt", error.PropertyName));
         }
     }
 
@@ -254,8 +247,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("Gte", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("Gte", error.PropertyName));
         }
     }
 
@@ -280,8 +272,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("Lt", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("Lt", error.PropertyName));
         }
     }
 
@@ -306,8 +297,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
 
             Assert.NotEmpty(result.Errors);
 
-            Assert.All(result.Errors, error =>
-                Assert.StartsWith("Lte", error.PropertyName));
+            Assert.All(result.Errors, error => Assert.StartsWith("Lte", error.PropertyName));
         }
     }
 
@@ -335,7 +325,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
                 Gt = new DataSetQueryTimePeriod { Period = "2019", Code = "M4" },
                 Gte = null,
                 Lt = null,
-                Lte = new DataSetQueryTimePeriod { Period = "2030", Code = "M7" }
+                Lte = new DataSetQueryTimePeriod { Period = "2030", Code = "M7" },
             };
 
             var result = _validator.TestValidate(query);
@@ -350,8 +340,7 @@ public class DataSetQueryCriteriaTimePeriodsValidatorTests
             result.ShouldNotHaveValidationErrorFor(q => q.Lt);
             result.ShouldNotHaveValidationErrorFor(q => q.Lte);
 
-            result.ShouldHaveValidationErrorFor(q => q.NotIn)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+            result.ShouldHaveValidationErrorFor(q => q.NotIn).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
 }

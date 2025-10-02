@@ -27,37 +27,28 @@ public class CommentServicePermissionTests
             new ContentSection
             {
                 Id = ContentSectionId,
-                Content = new List<ContentBlock>
-                {
-                    new DataBlock
-                    {
-                        Id = ContentBlockId
-                    }
-                }
-            })
+                Content = new List<ContentBlock> { new DataBlock { Id = ContentBlockId } },
+            }
+        ),
     };
 
-    private readonly Comment _comment = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly Comment _comment = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task AddComment()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupCommentService(userService: userService.Object);
-                    return service.AddComment(
-                        _releaseVersion.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        new CommentSaveRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupCommentService(userService: userService.Object);
+                return service.AddComment(
+                    _releaseVersion.Id,
+                    ContentSectionId,
+                    ContentBlockId,
+                    new CommentSaveRequest()
+                );
+            });
     }
 
     [Fact]
@@ -65,14 +56,11 @@ public class CommentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_comment, CanDeleteSpecificComment)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupCommentService(userService: userService.Object);
-                    return service.DeleteComment(
-                        _comment.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupCommentService(userService: userService.Object);
+                return service.DeleteComment(_comment.Id);
+            });
     }
 
     [Fact]
@@ -80,15 +68,11 @@ public class CommentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_comment, CanResolveSpecificComment)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupCommentService(userService: userService.Object);
-                    return service.SetResolved(
-                        _comment.Id,
-                        true);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupCommentService(userService: userService.Object);
+                return service.SetResolved(_comment.Id, true);
+            });
     }
 
     [Fact]
@@ -96,20 +80,18 @@ public class CommentServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_comment, CanUpdateSpecificComment)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupCommentService(userService: userService.Object);
-                    return service.UpdateComment(
-                        _comment.Id,
-                        new CommentSaveRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupCommentService(userService: userService.Object);
+                return service.UpdateComment(_comment.Id, new CommentSaveRequest());
+            });
     }
+
     private CommentService SetupCommentService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new CommentService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,

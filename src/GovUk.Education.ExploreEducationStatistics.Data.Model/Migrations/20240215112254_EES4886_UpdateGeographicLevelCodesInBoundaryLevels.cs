@@ -26,7 +26,8 @@ public partial class EES4886_UpdateGeographicLevelCodesInBoundaryLevels : Migrat
                 keyColumn: "Level",
                 keyValue: update.OldCode,
                 column: "Level",
-                value: update.NewCode);
+                value: update.NewCode
+            );
         }
     }
 
@@ -39,7 +40,8 @@ public partial class EES4886_UpdateGeographicLevelCodesInBoundaryLevels : Migrat
                 keyColumn: "Level",
                 keyValue: update.NewCode,
                 column: "Level",
-                value: update.OldCode);
+                value: update.OldCode
+            );
         }
     }
 }

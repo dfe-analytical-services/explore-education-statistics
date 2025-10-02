@@ -11,6 +11,6 @@ public record OnPublicationLatestPublishedReleaseReorderedOutput
 
     [QueueOutput("%RemoveSearchableDocumentQueueName%")]
     public RemoveSearchableDocumentDto[] RemoveSearchableDocuments { get; init; } = [];
-    
+
     public static OnPublicationLatestPublishedReleaseReorderedOutput Empty => new();
 }

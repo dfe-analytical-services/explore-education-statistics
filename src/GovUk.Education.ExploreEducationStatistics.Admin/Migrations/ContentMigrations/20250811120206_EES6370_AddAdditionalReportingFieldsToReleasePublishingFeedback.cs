@@ -19,25 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "PublicationTitle",
                 table: "ReleasePublishingFeedback",
                 type: "nvarchar(max)",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "ReleaseTitle",
                 table: "ReleasePublishingFeedback",
                 type: "nvarchar(max)",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "PublicationTitle",
-                table: "ReleasePublishingFeedback");
+            migrationBuilder.DropColumn(name: "PublicationTitle", table: "ReleasePublishingFeedback");
 
-            migrationBuilder.DropColumn(
-                name: "ReleaseTitle",
-                table: "ReleasePublishingFeedback");
+            migrationBuilder.DropColumn(name: "ReleaseTitle", table: "ReleasePublishingFeedback");
         }
     }
 }

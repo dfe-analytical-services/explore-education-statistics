@@ -67,5 +67,5 @@ public enum SecurityClaimTypes
     SubmitAllMethodologiesToHigherReview,
     ApproveAllMethodologies,
     MakeAmendmentsOfAllMethodologies,
-    DeleteAllMethodologies
+    DeleteAllMethodologies,
 }

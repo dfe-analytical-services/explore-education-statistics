@@ -9,11 +9,13 @@ public interface IFilterMetaRepository
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task CreateFilterMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

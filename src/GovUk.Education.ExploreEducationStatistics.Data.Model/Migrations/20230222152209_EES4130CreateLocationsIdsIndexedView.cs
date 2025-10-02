@@ -14,8 +14,10 @@ public partial class EES4130CreateLocationsIdsIndexedView : Migration
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{MigrationId}_View_ObservationSubjectIdLocationId.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{MigrationId}_View_ObservationSubjectIdLocationId.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

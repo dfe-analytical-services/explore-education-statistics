@@ -16,12 +16,10 @@ public partial class EES6429_RemovingAcceptedPublicationAndReleaseInvites : Migr
         // Delete all Accepted UserPublicationInvites and UserReleaseInvites
         migrationBuilder.SqlFromFile(
             MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES6429_RemovingAcceptedPublicationAndReleaseInvites)}.sql");
+            $"{MigrationId}_{nameof(EES6429_RemovingAcceptedPublicationAndReleaseInvites)}.sql"
+        );
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

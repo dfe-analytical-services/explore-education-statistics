@@ -24,15 +24,11 @@ public record DataBlockCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Heading)
-                .NotEmpty()
-                .MaximumLength(220);
+            RuleFor(request => request.Heading).NotEmpty().MaximumLength(220);
 
-            RuleFor(request => request.Name)
-                .NotEmpty();
+            RuleFor(request => request.Name).NotEmpty();
 
-            RuleFor(request => request.Query)
-                .SetValidator(new FullTableQueryRequest.Validator());
+            RuleFor(request => request.Query).SetValidator(new FullTableQueryRequest.Validator());
         }
     }
 }
@@ -55,26 +51,19 @@ public record DataBlockUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Heading)
-                .NotEmpty()
-                .MaximumLength(220);
+            RuleFor(request => request.Heading).NotEmpty().MaximumLength(220);
 
-            RuleFor(request => request.Name)
-                .NotEmpty();
+            RuleFor(request => request.Name).NotEmpty();
 
-            RuleFor(request => request.Query)
-                .SetValidator(new FullTableQueryRequest.Validator());
+            RuleFor(request => request.Query).SetValidator(new FullTableQueryRequest.Validator());
 
-            RuleForEach(x => x.Charts).ChildRules(chart =>
-            {
-                chart
-                    .RuleFor(request => request.Title)
-                    .Length(1, 220);
+            RuleForEach(x => x.Charts)
+                .ChildRules(chart =>
+                {
+                    chart.RuleFor(request => request.Title).Length(1, 220);
 
-                chart.RuleFor(request => request.Alt)
-                    .NotEmpty()
-                    .MaximumLength(220);
-            });
+                    chart.RuleFor(request => request.Alt).NotEmpty().MaximumLength(220);
+                });
         }
     }
 }

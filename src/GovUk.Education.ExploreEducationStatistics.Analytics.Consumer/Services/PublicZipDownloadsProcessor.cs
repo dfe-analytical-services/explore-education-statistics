@@ -4,24 +4,22 @@ using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class PublicZipDownloadsProcessor(
-    IAnalyticsPathResolver pathResolver,
-    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
+public class PublicZipDownloadsProcessor(IAnalyticsPathResolver pathResolver, IProcessRequestFilesWorkflow workflow)
+    : IRequestFileProcessor
 {
     private static readonly string[] PublicZipDownloadsSubPath = ["public", "zip-downloads"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicZipDownloadsSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicZipDownloadsSubPath);
-    
+
     public Task Process()
     {
-        return workflow.Process(new WorkflowActor(
-            sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));
+        return workflow.Process(
+            new WorkflowActor(sourceDirectory: SourceDirectory, reportsDirectory: ReportsDirectory)
+        );
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
-        : IWorkflowActor
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) : IWorkflowActor
     {
         public string GetSourceDirectory()
         {
@@ -32,10 +30,11 @@ public class PublicZipDownloadsProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE sourceTable (
                     zipDownloadHash VARCHAR,
                     publicationName VARCHAR,
@@ -46,12 +45,14 @@ public class PublicZipDownloadsProcessor(
                     dataSetTitle VARCHAR,
                     fromPage VARCHAR
                 )
-            ");
+            "
+            );
         }
 
         public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(subjectId, releaseVersionId, fromPage)) AS zipDownloadHash,
@@ -69,12 +70,14 @@ public class PublicZipDownloadsProcessor(
                         }}
                     )
                  )
-            ");
+            "
+            );
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE zipDownloadsReport AS 
                 SELECT 
                     zipDownloadHash,
@@ -89,14 +92,16 @@ public class PublicZipDownloadsProcessor(
                 FROM sourceTable
                 GROUP BY zipDownloadHash
                 ORDER BY zipDownloadHash
-            ");
+            "
+            );
 
-            var reportFilePath = 
-                $"{reportsFolderPathAndFilenamePrefix}_public-zip-downloads.parquet";
+            var reportFilePath = $"{reportsFolderPathAndFilenamePrefix}_public-zip-downloads.parquet";
 
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 COPY (SELECT * FROM zipDownloadsReport)
-                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
+                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')"
+            );
         }
     }
 }

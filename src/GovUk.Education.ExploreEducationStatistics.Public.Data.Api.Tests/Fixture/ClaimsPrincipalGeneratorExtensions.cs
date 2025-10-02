@@ -8,15 +8,11 @@ public static class ClaimsPrincipalGeneratorExtensions
 {
     public static Generator<ClaimsPrincipal> AdminAccessUser(this DataFixture fixture)
     {
-        return fixture
-            .Generator<ClaimsPrincipal>()
-            .WithRole(SecurityConstants.AdminAccessAppRole);
+        return fixture.Generator<ClaimsPrincipal>().WithRole(SecurityConstants.AdminAccessAppRole);
     }
 
     public static Generator<ClaimsPrincipal> UnsupportedRoleUser(this DataFixture fixture)
     {
-        return fixture
-            .Generator<ClaimsPrincipal>()
-            .WithRole("Unsupported Role");
+        return fixture.Generator<ClaimsPrincipal>().WithRole("Unsupported Role");
     }
 }

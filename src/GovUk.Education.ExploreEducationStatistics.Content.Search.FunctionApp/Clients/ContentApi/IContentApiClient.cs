@@ -14,7 +14,8 @@ public interface IContentApiClient
     /// <exception cref="UnableToGetPublicationLatestReleaseSearchViewModelException">Thrown if the call to the API was unsuccessful</exception>
     Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocument(
         string publicationSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// A simple call to check whether the Content API is available
@@ -40,7 +41,8 @@ public interface IContentApiClient
     /// <exception cref="UnableToGetReleasesForPublicationException">Thrown if the call to the API was unsuccessful</exception>
     Task<ReleaseInfo[]> GetReleasesForPublication(
         string publicationSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves a small amount of information for all live publications e.g. the publication id and slug
@@ -56,5 +58,6 @@ public interface IContentApiClient
     Task<ReleaseSummary> GetReleaseSummary(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

@@ -7,6 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.C
 
 public interface ICacheKeyService
 {
-    Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(Guid releaseVersionId,
-        Guid dataBlockId);
+    Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
+        Guid releaseVersionId,
+        Guid dataBlockId
+    );
 }

@@ -31,15 +31,14 @@ public class DataSetDtoValidatorTests
     public async Task DataSetDto_ReleaseVersionMissing_ReturnsExpectedError()
     {
         // Arrange
-        var dto = await new DataSetDtoBuilder()
-            .WhereReleaseVersionIdIsEmpty()
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereReleaseVersionIdIsEmpty().Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.ReleaseVersionId)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.ReleaseVersionId)
             .WithErrorMessage("'Release Version Id' must not be empty.")
             .WithErrorCode("NotEmptyValidator");
     }
@@ -48,15 +47,14 @@ public class DataSetDtoValidatorTests
     public async Task DataSetDto_TitleMissing_ReturnsExpectedError()
     {
         // Arrange
-        var dto = await new DataSetDtoBuilder()
-            .WhereTitleIs("")
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereTitleIs("").Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.Title)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.Title)
             .WithErrorMessage("Data set title cannot be empty")
             .WithErrorCode("DataSetTitleCannotBeEmpty");
     }
@@ -67,15 +65,14 @@ public class DataSetDtoValidatorTests
         // Arrange
         var title = new string('a', 121);
 
-        var dto = await new DataSetDtoBuilder()
-            .WhereTitleIs(title)
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereTitleIs(title).Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.Title)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.Title)
             .WithErrorMessage($"Title '{title}' must be 120 characters or fewer")
             .WithErrorCode("DataSetTitleTooLong");
     }
@@ -88,18 +85,17 @@ public class DataSetDtoValidatorTests
         {
             FileName = "data.csv",
             FileSize = 0,
-            FileStreamProvider = () => new MemoryStream()
+            FileStreamProvider = () => new MemoryStream(),
         };
 
-        var dto = await new DataSetDtoBuilder()
-            .WhereDataFileIs(file)
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereDataFileIs(file).Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.DataFile)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.DataFile)
             .WithErrorMessage($"File 'data.csv' either empty or not found.")
             .WithErrorCode("FileSizeMustNotBeZero");
     }
@@ -112,18 +108,17 @@ public class DataSetDtoValidatorTests
         {
             FileName = "data.jpg",
             FileSize = 4,
-            FileStreamProvider = () => new MemoryStream(Encoding.UTF8.GetBytes("test"))
+            FileStreamProvider = () => new MemoryStream(Encoding.UTF8.GetBytes("test")),
         };
 
-        var dto = await new DataSetDtoBuilder()
-            .WhereDataFileIs(file)
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereDataFileIs(file).Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.DataFile)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.DataFile)
             .WithErrorMessage("File name 'data.jpg' must end in '.csv'.")
             .WithErrorCode("FileNameMustEndDotCsv");
     }
@@ -136,18 +131,17 @@ public class DataSetDtoValidatorTests
         {
             FileName = "data.meta.csv",
             FileSize = 0,
-            FileStreamProvider = () => new MemoryStream()
+            FileStreamProvider = () => new MemoryStream(),
         };
 
-        var dto = await new DataSetDtoBuilder()
-            .WhereDataFileIs(file)
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereDataFileIs(file).Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.DataFile)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.DataFile)
             .WithErrorMessage($"File 'data.meta.csv' either empty or not found.")
             .WithErrorCode("FileSizeMustNotBeZero");
     }
@@ -160,18 +154,17 @@ public class DataSetDtoValidatorTests
         {
             FileName = "data.meta.jpg",
             FileSize = 4,
-            FileStreamProvider = () => new MemoryStream(Encoding.UTF8.GetBytes("test"))
+            FileStreamProvider = () => new MemoryStream(Encoding.UTF8.GetBytes("test")),
         };
 
-        var dto = await new DataSetDtoBuilder()
-            .WhereMetaFileIs(file)
-            .Build();
+        var dto = await new DataSetDtoBuilder().WhereMetaFileIs(file).Build();
 
         // Act
         var result = await _validator.TestValidateAsync(dto);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(dto => dto.MetaFile)
+        result
+            .ShouldHaveValidationErrorFor(dto => dto.MetaFile)
             .WithErrorMessage("Meta file 'data.meta.jpg' must end in '.meta.csv'.")
             .WithErrorCode("MetaFileNameMustEndDotMetaDotCsv");
     }

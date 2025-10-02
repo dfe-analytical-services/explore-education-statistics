@@ -13,71 +13,76 @@ public static partial class SortStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> SortString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.NotEmpty().Custom((value, context) =>
-        {
-            if (value.IsNullOrWhitespace())
-            {
-                return;
-            }
-
-            if (!HasValidFormat(value))
-            {
-                context.AddFailure(
-                    message: ValidationMessages.SortFormat,
-                    detail: new FormatErrorDetail(value, ExpectedFormat: ExpectedFormat)
-                );
-
-                return;
-            }
-
-            var sort = DataSetQuerySort.Parse(value);
-
-
-            var validator = new DataSetQuerySort.Validator();
-            var result = validator.Validate(sort);
-
-            if (result.IsValid)
-            {
-                return;
-            }
-
-            foreach (var error in result.Errors)
-            {
-                switch (error.PropertyName.ToUpperFirst())
+        return rule.NotEmpty()
+            .Custom(
+                (value, context) =>
                 {
-                    case nameof(DataSetQuerySort.Field)
-                        when error.ErrorCode == FluentValidationKeys.NotEmptyValidator:
+                    if (value.IsNullOrWhitespace())
+                    {
+                        return;
+                    }
 
-                        error.ErrorCode = ValidationMessages.SortFieldNotEmpty.Code;
-                        error.ErrorMessage = ValidationMessages.SortFieldNotEmpty.Message;
+                    if (!HasValidFormat(value))
+                    {
+                        context.AddFailure(
+                            message: ValidationMessages.SortFormat,
+                            detail: new FormatErrorDetail(value, ExpectedFormat: ExpectedFormat)
+                        );
 
-                        break;
+                        return;
+                    }
 
-                    case nameof(DataSetQuerySort.Field)
-                        when error.ErrorCode == FluentValidationKeys.MaximumLengthValidator:
+                    var sort = DataSetQuerySort.Parse(value);
 
-                        error.ErrorCode = ValidationMessages.SortFieldMaxLength.Code;
-                        error.ErrorMessage = context.MessageFormatter
-                            .AppendArgument("MaxLength", error.FormattedMessagePlaceholderValues["MaxLength"])
-                            .BuildMessage(ValidationMessages.SortFieldMaxLength.Message);
+                    var validator = new DataSetQuerySort.Validator();
+                    var result = validator.Validate(sort);
 
-                        break;
+                    if (result.IsValid)
+                    {
+                        return;
+                    }
 
-                    case nameof(DataSetQuerySort.Direction)
-                        when error.ErrorCode == Common.Validators.ValidationMessages.AllowedValue.Code:
+                    foreach (var error in result.Errors)
+                    {
+                        switch (error.PropertyName.ToUpperFirst())
+                        {
+                            case nameof(DataSetQuerySort.Field)
+                                when error.ErrorCode == FluentValidationKeys.NotEmptyValidator:
 
-                        error.ErrorCode = ValidationMessages.SortDirection.Code;
-                        error.ErrorMessage = ValidationMessages.SortDirection.Message;
+                                error.ErrorCode = ValidationMessages.SortFieldNotEmpty.Code;
+                                error.ErrorMessage = ValidationMessages.SortFieldNotEmpty.Message;
 
-                        break;
+                                break;
+
+                            case nameof(DataSetQuerySort.Field)
+                                when error.ErrorCode == FluentValidationKeys.MaximumLengthValidator:
+
+                                error.ErrorCode = ValidationMessages.SortFieldMaxLength.Code;
+                                error.ErrorMessage = context
+                                    .MessageFormatter.AppendArgument(
+                                        "MaxLength",
+                                        error.FormattedMessagePlaceholderValues["MaxLength"]
+                                    )
+                                    .BuildMessage(ValidationMessages.SortFieldMaxLength.Message);
+
+                                break;
+
+                            case nameof(DataSetQuerySort.Direction)
+                                when error.ErrorCode == Common.Validators.ValidationMessages.AllowedValue.Code:
+
+                                error.ErrorCode = ValidationMessages.SortDirection.Code;
+                                error.ErrorMessage = ValidationMessages.SortDirection.Message;
+
+                                break;
+                        }
+
+                        error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
+                        error.PropertyName = context.PropertyPath;
+
+                        context.AddFailure(error);
+                    }
                 }
-
-                error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
-                error.PropertyName = context.PropertyPath;
-
-                context.AddFailure(error);
-            }
-        });
+            );
     }
 
     // Note this regex only does basic checks on delimiters to allow other

@@ -14,7 +14,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasIndicatorsNotFoundError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        IEnumerable<string> notFoundItems)
+        IEnumerable<string> notFoundItems
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -28,10 +29,11 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
-        public static ErrorViewModel AssertHasLocationFormatError(
+    public static ErrorViewModel AssertHasLocationFormatError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string value)
+        string value
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -48,7 +50,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasLocationAllowedLevelError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string level)
+        string level
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -66,7 +69,8 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         string property,
-        IEnumerable<string> allowedProperties)
+        IEnumerable<string> allowedProperties
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -84,7 +88,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasLocationValueNotEmptyError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string property)
+        string property
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -102,7 +107,8 @@ public static class ValidationProblemViewModelTestExtensions
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         string property,
-        int maxLength)
+        int maxLength
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -120,7 +126,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasSortFormatError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string? value)
+        string? value
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -136,7 +143,8 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasSortFieldNotEmptyError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
+        string expectedPath
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -149,12 +157,13 @@ public static class ValidationProblemViewModelTestExtensions
 
         return error;
     }
-    
+
     public static ErrorViewModel AssertHasSortFieldMaxLengthError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
         string field,
-        int maxLength = 40)
+        int maxLength = 40
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -173,7 +182,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasSortDirectionError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string direction)
+        string direction
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -190,7 +200,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasSortFieldsNotFoundError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        IEnumerable<string> notFoundItems)
+        IEnumerable<string> notFoundItems
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -207,7 +218,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasSortFieldsNotFoundError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        IEnumerable<DataSetQuerySort> notFoundItems)
+        IEnumerable<DataSetQuerySort> notFoundItems
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -224,7 +236,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasTimePeriodFormatError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string value)
+        string value
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -241,7 +254,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasTimePeriodInvalidYearError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string period)
+        string period
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -258,7 +272,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasTimePeriodYearRangeError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string period)
+        string period
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
@@ -275,7 +290,8 @@ public static class ValidationProblemViewModelTestExtensions
     public static ErrorViewModel AssertHasTimePeriodAllowedCodeError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string code)
+        string code
+    )
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,

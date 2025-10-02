@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
+
 public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     [Fact]
@@ -33,12 +34,11 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
                     Label = "Boundary Level 2",
                     Level = GeographicLevel.Region,
                     Published = DateTime.Now,
-                });
+                }
+            );
         });
 
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
         var response = await client.GetAsync("api/boundary-level");
 
@@ -67,21 +67,17 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
                     Label = "Boundary Level 1",
                     Level = GeographicLevel.Country,
                     Published = DateTime.Now,
-                });
+                }
+            );
         });
 
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
         var response = await client.GetAsync("api/boundary-level/1");
 
         var result = response.AssertOk<BoundaryLevelViewModel>();
 
-        Assert.Multiple(
-            () => Assert.Equal(1, result.Id),
-            () => Assert.Equal("Boundary Level 1", result.Label)
-        );
+        Assert.Multiple(() => Assert.Equal(1, result.Id), () => Assert.Equal("Boundary Level 1", result.Label));
     }
 
     [Fact]
@@ -97,18 +93,13 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
                     Label = "Boundary Level 1",
                     Level = GeographicLevel.Country,
                     Published = DateTime.Now,
-                });
+                }
+            );
         });
 
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
-        var request = new BoundaryLevelUpdateRequest
-        {
-            Id = 1,
-            Label = "Updated Boundary Level 1",
-        };
+        var request = new BoundaryLevelUpdateRequest { Id = 1, Label = "Updated Boundary Level 1" };
 
         var response = await client.PatchAsync("api/boundary-level", JsonContent.Create(request));
 
@@ -128,11 +119,12 @@ public class BoundaryLevelControllerTests(TestApplicationFactory testApp) : Inte
     [Fact]
     public async Task CreateBoundaryLevel_Success()
     {
-        var client = TestApp
-            .SetUser(DataFixture.BauUser())
-            .CreateClient();
+        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
 
-        var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Resources/REG - Regions England BUC 202212.geojson");
+        var path = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources/REG - Regions England BUC 202212.geojson"
+        );
         var content = new MultipartFormDataContent
         {
             { new StringContent("Region"), "level" },

@@ -9,16 +9,16 @@ public class DataSetQueryLocationValidatorTests
 {
     public static readonly TheoryData<IDataSetQueryLocation> ValidLocations = new()
     {
-        new DataSetQueryLocationId { Level = "NAT", Id = "12345"},
-        new DataSetQueryLocationCode { Level = "NAT", Code = "12345"},
-        new DataSetQueryLocationId { Level = "REG", Id = "12345"},
-        new DataSetQueryLocationCode { Level = "REG", Code = "12345"},
-        new DataSetQueryLocationId { Level = "LA", Id = "12345"},
-        new DataSetQueryLocationLocalAuthorityCode { Code = "12345"},
-        new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019"},
-        new DataSetQueryLocationLocalAuthorityCode { Code = "E09000021 / E09000027"},
-        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "373"},
-        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "314 / 318"},
+        new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
+        new DataSetQueryLocationCode { Level = "NAT", Code = "12345" },
+        new DataSetQueryLocationId { Level = "REG", Id = "12345" },
+        new DataSetQueryLocationCode { Level = "REG", Code = "12345" },
+        new DataSetQueryLocationId { Level = "LA", Id = "12345" },
+        new DataSetQueryLocationLocalAuthorityCode { Code = "12345" },
+        new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" },
+        new DataSetQueryLocationLocalAuthorityCode { Code = "E09000021 / E09000027" },
+        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "373" },
+        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "314 / 318" },
         new DataSetQueryLocationId { Level = "LA", Id = "12345" },
         new DataSetQueryLocationSchoolUrn { Urn = "107029" },
         new DataSetQueryLocationSchoolLaEstab { LaEstab = "3732060" },
@@ -43,7 +43,7 @@ public class DataSetQueryLocationValidatorTests
         new DataSetQueryLocationCode { Level = "NA", Code = "12345" },
         new DataSetQueryLocationId { Level = "NT", Id = "12345" },
         new DataSetQueryLocationCode { Level = "LAA", Code = "12345" },
-        new DataSetQueryLocationCode { Level = "LADD", Code = "12345" }
+        new DataSetQueryLocationCode { Level = "LADD", Code = "12345" },
     };
 
     [Theory]

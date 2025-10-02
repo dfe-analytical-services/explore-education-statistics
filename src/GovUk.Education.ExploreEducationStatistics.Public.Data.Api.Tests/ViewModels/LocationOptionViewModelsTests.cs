@@ -11,9 +11,7 @@ public static class LocationOptionViewModelsTests
         {
             public LocationOptionViewModelTypeTheoryData()
             {
-                typeof(LocationOptionViewModel)
-                    .GetSubclasses()
-                    .ForEach(Add);
+                typeof(LocationOptionViewModel).GetSubclasses().ForEach(Add);
             }
         }
 
@@ -29,10 +27,7 @@ public static class LocationOptionViewModelsTests
 
             type.GetProperty(nameof(LocationOptionViewModel.Label))?.SetValue(option, "label");
 
-            var otherOption = option with
-            {
-                Label = "updated label"
-            };
+            var otherOption = option with { Label = "updated label" };
 
             Assert.False(option.HasMajorChange(otherOption));
         }
@@ -55,7 +50,7 @@ public static class LocationOptionViewModelsTests
                 nonLabelProperties,
                 property =>
                 {
-                    var otherOption = option with {};
+                    var otherOption = option with { };
 
                     Assert.NotNull(otherOption);
 

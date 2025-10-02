@@ -24,7 +24,10 @@ public partial class EES2778_QueryObservationsByLocationId : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousFilteredObservationsMigrationId}_Routine_FilteredObservations.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousFilteredObservationsMigrationId}_Routine_FilteredObservations.sql"
+        );
         migrationBuilder.Sql("DROP PROCEDURE dbo.SelectObservations");
         migrationBuilder.Sql("DROP PROCEDURE dbo.SelectObservationsByLocationCodes");
     }

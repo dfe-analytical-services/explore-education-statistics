@@ -9,8 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class MockMemoryCacheServiceExtensions
 {
-    public static void SetupNotFoundForAnyKey<TCacheKey, TItem>(
-        this Mock<IMemoryCacheService> service)
+    public static void SetupNotFoundForAnyKey<TCacheKey, TItem>(this Mock<IMemoryCacheService> service)
         where TCacheKey : IMemoryCacheKey
         where TItem : class
     {
@@ -19,25 +18,22 @@ public static class MockMemoryCacheServiceExtensions
     }
 
     public static IReturnsResult<IMemoryCacheService> SetupGetItemForAnyKeyReturnsNotFound<TCacheKey, TItem>(
-        this Mock<IMemoryCacheService> service)
+        this Mock<IMemoryCacheService> service
+    )
         where TCacheKey : IMemoryCacheKey
         where TItem : class
     {
-        return service
-            .Setup(s => s.GetItem(It.IsAny<TCacheKey>(), typeof(TItem)))
-            .Returns((object?) null);
+        return service.Setup(s => s.GetItem(It.IsAny<TCacheKey>(), typeof(TItem))).Returns((object?)null);
     }
 
     public static ISetup<IMemoryCacheService> SetupSetItemForAnyKey<TCacheKey, TItem>(
-        this Mock<IMemoryCacheService> service)
+        this Mock<IMemoryCacheService> service
+    )
         where TCacheKey : IMemoryCacheKey
         where TItem : class
     {
-        return service
-            .Setup(s => s.SetItem<object>(
-                It.IsAny<TCacheKey>(),
-                It.IsAny<TItem>(),
-                It.IsAny<MemoryCacheConfiguration>(),
-                null));
+        return service.Setup(s =>
+            s.SetItem<object>(It.IsAny<TCacheKey>(), It.IsAny<TItem>(), It.IsAny<MemoryCacheConfiguration>(), null)
+        );
     }
 }

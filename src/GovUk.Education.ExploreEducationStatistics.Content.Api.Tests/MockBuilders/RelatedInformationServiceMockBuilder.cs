@@ -13,12 +13,10 @@ public class RelatedInformationServiceMockBuilder
 
     private RelatedInformationDto[]? _relatedInformation;
 
-    private static readonly Expression<Func<IRelatedInformationService,
-        Task<Either<ActionResult, RelatedInformationDto[]>>>> GetRelatedInformationForRelease =
-        m => m.GetRelatedInformationForRelease(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IRelatedInformationService, Task<Either<ActionResult, RelatedInformationDto[]>>>
+    > GetRelatedInformationForRelease = m =>
+        m.GetRelatedInformationForRelease(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public RelatedInformationServiceMockBuilder()
     {
@@ -35,12 +33,11 @@ public class RelatedInformationServiceMockBuilder
 
     public RelatedInformationServiceMockBuilder WhereGetRelatedInformationForReleaseReturnsNotFound(
         string publicationSlug,
-        string releaseSlug)
+        string releaseSlug
+    )
     {
-        _mock.Setup(m => m.GetRelatedInformationForRelease(
-                publicationSlug,
-                releaseSlug,
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m => m.GetRelatedInformationForRelease(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -50,15 +47,17 @@ public class RelatedInformationServiceMockBuilder
 
     public class Asserter(Mock<IRelatedInformationService> mock)
     {
-        public void GetRelatedInformationForReleaseWasCalled(
-            string? publicationSlug = null,
-            string? releaseSlug = null)
+        public void GetRelatedInformationForReleaseWasCalled(string? publicationSlug = null, string? releaseSlug = null)
         {
-            mock.Verify(m => m.GetRelatedInformationForRelease(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetRelatedInformationForRelease(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                        It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

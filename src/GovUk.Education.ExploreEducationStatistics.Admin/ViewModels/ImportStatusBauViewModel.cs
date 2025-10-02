@@ -15,6 +15,7 @@ public class ImportStatusBauViewModel
     public Guid FileId { get; set; }
     public string DataFileName { get; set; }
     public int? TotalRows { get; set; }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public DataImportStatus Status { get; set; }
     public int StagePercentageComplete { get; set; }

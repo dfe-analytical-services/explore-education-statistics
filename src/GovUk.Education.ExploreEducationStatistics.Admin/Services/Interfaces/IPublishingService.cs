@@ -8,14 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 public interface IPublishingService
 {
     Task<Either<ActionResult, Unit>> RetryReleasePublishing(
-        Guid releaseVersionId, CancellationToken cancellationToken = default);
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Unit>> ReleaseChanged(
-        ReleasePublishingKey releasePublishingKey, bool immediate = false,
-        CancellationToken cancellationToken = default);
+        ReleasePublishingKey releasePublishingKey,
+        bool immediate = false,
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Unit>> PublishMethodologyFiles(
-        Guid methodologyVersionId, CancellationToken cancellationToken = default);
+        Guid methodologyVersionId,
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, Unit>> TaxonomyChanged(CancellationToken cancellationToken = default);
 }

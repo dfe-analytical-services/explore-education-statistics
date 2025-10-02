@@ -14,7 +14,7 @@ public static class TableBuilderUtils
     /// </p>
     /// <p>
     /// The number of ways of observing each indicator is the product of the counts of the items in each of
-    /// the sets of locations, time periods, and filters. This is multiplied by the count of indicators 
+    /// the sets of locations, time periods, and filters. This is multiplied by the count of indicators
     /// to get the maximum possible count of table cells.
     /// </p>
     /// <p>
@@ -31,7 +31,7 @@ public static class TableBuilderUtils
     /// <p>
     /// There can be up to one observation for each combination of requested location, time period and other filter
     /// values where such combinations of data have been provided. Every observation contains a measurement of the
-    /// requested indicators. 
+    /// requested indicators.
     /// </p>
     /// </remarks>
     /// <param name="countOfIndicators"></param>
@@ -43,7 +43,8 @@ public static class TableBuilderUtils
         int countOfIndicators,
         int countOfLocations,
         int countOfTimePeriods,
-        IEnumerable<int>? countsOfFilterItemsByFilter = null)
+        IEnumerable<int>? countsOfFilterItemsByFilter = null
+    )
     {
         var result = countOfIndicators * countOfLocations * countOfTimePeriods;
         if (countsOfFilterItemsByFilter != null)

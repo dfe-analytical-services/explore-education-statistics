@@ -17,31 +17,35 @@ public abstract class PublicationArchiveStatusTransitionResolverTests
             return new Publication { LatestPublishedReleaseVersionId = live ? Guid.NewGuid() : null };
         }
 
-        public static readonly TheoryData<Publication?, Publication?,
-                PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition>
-            GetTransitionTestCases = new()
-            {
-                { null, null, NotArchivedToNotArchived },
-                { null, NotLivePublication, NotArchivedToNotArchived },
-                { null, LivePublication, NotArchivedToArchived },
-                { NotLivePublication, null, NotArchivedToNotArchived },
-                { NotLivePublication, NotLivePublication, NotArchivedToNotArchived },
-                { NotLivePublication, LivePublication, NotArchivedToArchived },
-                { LivePublication, null, ArchivedToNotArchived },
-                { LivePublication, NotLivePublication, ArchivedToNotArchived },
-                { LivePublication, LivePublication, ArchivedToArchived }
-            };
+        public static readonly TheoryData<
+            Publication?,
+            Publication?,
+            PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition
+        > GetTransitionTestCases = new()
+        {
+            { null, null, NotArchivedToNotArchived },
+            { null, NotLivePublication, NotArchivedToNotArchived },
+            { null, LivePublication, NotArchivedToArchived },
+            { NotLivePublication, null, NotArchivedToNotArchived },
+            { NotLivePublication, NotLivePublication, NotArchivedToNotArchived },
+            { NotLivePublication, LivePublication, NotArchivedToArchived },
+            { LivePublication, null, ArchivedToNotArchived },
+            { LivePublication, NotLivePublication, ArchivedToNotArchived },
+            { LivePublication, LivePublication, ArchivedToArchived },
+        };
 
         [Theory]
         [MemberData(nameof(GetTransitionTestCases))]
         public void GetTransition_ReturnsExpectedTransition(
             Publication? beforeSupersededBy,
             Publication? afterSupersededBy,
-            PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition expected)
+            PublicationArchiveStatusTransitionResolver.PublicationArchiveStatusTransition expected
+        )
         {
             var result = PublicationArchiveStatusTransitionResolver.GetTransition(
                 beforeSupersededBy,
-                afterSupersededBy);
+                afterSupersededBy
+            );
 
             Assert.Equal(expected, result);
         }

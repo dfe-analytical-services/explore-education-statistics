@@ -14,8 +14,7 @@ public record LocationMappingUpdateRequest : MappingUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Level)
-                .NotNull();
+            RuleFor(request => request.Level).NotNull();
         }
     }
 }
@@ -28,8 +27,7 @@ public record FilterOptionMappingUpdateRequest : MappingUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.FilterKey)
-                .NotEmpty();
+            RuleFor(request => request.FilterKey).NotEmpty();
         }
     }
 }
@@ -40,8 +38,7 @@ public record BatchLocationMappingUpdatesRequest : BatchMappingUpdatesRequest<Lo
     {
         public Validator()
         {
-            RuleForEach(request => request.Updates)
-                .SetValidator(new LocationMappingUpdateRequest.Validator());
+            RuleForEach(request => request.Updates).SetValidator(new LocationMappingUpdateRequest.Validator());
         }
     }
 }
@@ -52,19 +49,14 @@ public record BatchFilterOptionMappingUpdatesRequest : BatchMappingUpdatesReques
     {
         public Validator()
         {
-            RuleForEach(request => request.Updates)
-                .SetValidator(new FilterOptionMappingUpdateRequest.Validator());
+            RuleForEach(request => request.Updates).SetValidator(new FilterOptionMappingUpdateRequest.Validator());
         }
     }
 }
 
 public abstract record MappingUpdateRequest
 {
-    private static readonly MappingType[] ManualMappingTypes =
-    [
-        MappingType.ManualNone,
-        MappingType.ManualMapped
-    ];
+    private static readonly MappingType[] ManualMappingTypes = [MappingType.ManualNone, MappingType.ManualMapped];
 
     public string SourceKey { get; init; } = string.Empty;
 
@@ -78,8 +70,7 @@ public abstract record MappingUpdateRequest
     {
         public MappingUpdateRequestValidator()
         {
-            RuleFor(request => request.SourceKey)
-                .NotEmpty();
+            RuleFor(request => request.SourceKey).NotEmpty();
 
             RuleFor(request => request.Type)
                 .Cascade(CascadeMode.Stop)
@@ -93,7 +84,7 @@ public abstract record MappingUpdateRequest
                 .When(request => request.Type is not null && request.Type.Value == MappingType.ManualMapped)
                 .WithErrorCode(ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Code)
                 .WithMessage(ValidationMessages.CandidateKeyMustBeSpecifiedWithMappedMappingType.Message);
-            
+
             RuleFor(request => request.CandidateKey)
                 .Empty()
                 .When(request => request.Type is not null && request.Type.Value == MappingType.ManualNone)

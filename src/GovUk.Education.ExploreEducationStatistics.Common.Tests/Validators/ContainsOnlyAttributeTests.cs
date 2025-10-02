@@ -92,10 +92,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_Empty()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            AllowedValues = new List<string>(),
-        };
+        var model = new AllowedValuesProviderModel { AllowedValues = new List<string>() };
 
         Assert.True(ValidateModelValues(model, new List<string>()));
         Assert.True(ValidateModelValues(model, ListOf("a")));
@@ -105,10 +102,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_InvalidValuesTypeThrows()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            AllowedValues = ListOf("a")
-        };
+        var model = new AllowedValuesProviderModel { AllowedValues = ListOf("a") };
 
         Assert.Throws<ArgumentException>(() => ValidateModelValues(model, 1));
         Assert.Throws<ArgumentException>(() => ValidateModelValues(model, new { }));
@@ -118,10 +112,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_InvalidAllowedValuesTypeThrows()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            Values = ListOf("a")
-        };
+        var model = new AllowedValuesProviderModel { Values = ListOf("a") };
 
         Assert.Throws<ArgumentException>(() => ValidateModelAllowedValues(model, "not allowed"));
         Assert.Throws<ArgumentException>(() => ValidateModelAllowedValues(model, 1));
@@ -132,10 +123,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_Single()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            AllowedValues = ListOf("a")
-        };
+        var model = new AllowedValuesProviderModel { AllowedValues = ListOf("a") };
 
         Assert.True(ValidateModelValues(model, ListOf("a")));
         Assert.True(ValidateModelValues(model, ListOf("a", "a")));
@@ -144,10 +132,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_Single_Invalid()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            AllowedValues = ListOf("a")
-        };
+        var model = new AllowedValuesProviderModel { AllowedValues = ListOf("a") };
 
         Assert.False(ValidateModelValues(model, ListOf("A")));
         Assert.False(ValidateModelValues(model, ListOf("A", "a")));
@@ -158,10 +143,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_Multiple()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            AllowedValues = ListOf("a", "b", "c")
-        };
+        var model = new AllowedValuesProviderModel { AllowedValues = ListOf("a", "b", "c") };
 
         Assert.True(ValidateModelValues(model, ListOf<string>()));
         Assert.True(ValidateModelValues(model, ListOf("a")));
@@ -178,10 +160,7 @@ public class ContainsOnlyAttributeTests
     [Fact]
     public void AllowedValuesProvider_Multiple_Invalid()
     {
-        var model = new AllowedValuesProviderModel
-        {
-            AllowedValues = ListOf("a", "b", "c")
-        };
+        var model = new AllowedValuesProviderModel { AllowedValues = ListOf("a", "b", "c") };
 
         Assert.False(ValidateModelValues(model, ListOf("A")));
         Assert.False(ValidateModelValues(model, ListOf("A", "a")));
@@ -269,10 +248,7 @@ public class ContainsOnlyAttributeTests
     {
         model.Values = values;
 
-        var context = new ValidationContext(model)
-        {
-            MemberName = nameof(model.Values)
-        };
+        var context = new ValidationContext(model) { MemberName = nameof(model.Values) };
 
         return Validator.TryValidateProperty(model.Values, context, new List<ValidationResult>());
     }
@@ -281,23 +257,16 @@ public class ContainsOnlyAttributeTests
     {
         model.Values = values;
 
-        var context = new ValidationContext(model)
-        {
-            MemberName = nameof(model.Values)
-        };
+        var context = new ValidationContext(model) { MemberName = nameof(model.Values) };
 
         return Validator.TryValidateProperty(model.Values, context, new List<ValidationResult>());
     }
-
 
     private bool ValidateModelValues(CombinedAllowedValuesProviderModel model, object values)
     {
         model.Values = values;
 
-        var context = new ValidationContext(model)
-        {
-            MemberName = nameof(model.Values)
-        };
+        var context = new ValidationContext(model) { MemberName = nameof(model.Values) };
 
         return Validator.TryValidateProperty(model.Values, context, new List<ValidationResult>());
     }
@@ -306,10 +275,7 @@ public class ContainsOnlyAttributeTests
     {
         model.AllowedValues = allowedValues;
 
-        var context = new ValidationContext(model)
-        {
-            MemberName = nameof(model.Values)
-        };
+        var context = new ValidationContext(model) { MemberName = nameof(model.Values) };
 
         return Validator.TryValidateProperty(model.Values, context, new List<ValidationResult>());
     }

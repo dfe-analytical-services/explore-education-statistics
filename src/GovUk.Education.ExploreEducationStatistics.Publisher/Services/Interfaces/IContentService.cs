@@ -8,8 +8,7 @@ public interface IContentService
 
     Task UpdateContent(Guid releaseVersionId);
 
-    Task UpdateContentStaged(DateTime expectedPublishDate,
-        params Guid[] releaseVersionIds);
+    Task UpdateContentStaged(DateTime expectedPublishDate, params Guid[] releaseVersionIds);
 
     Task UpdateCachedTaxonomyBlobs();
 }

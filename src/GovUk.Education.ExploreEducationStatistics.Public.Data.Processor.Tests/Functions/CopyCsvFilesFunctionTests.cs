@@ -29,16 +29,21 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
         {
             var subjectId = Guid.NewGuid();
 
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
                 .WithRelease(DataFixture.DefaultRelease());
 
-            var (releaseDataFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
+            var (releaseDataFile, releaseMetaFile) = DataFixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
-                .WithFiles(DataFixture.DefaultFile()
-                    .WithSubjectId(subjectId)
-                    .ForIndex(0, s => s.SetType(FileType.Data))
-                    .ForIndex(1, s => s.SetType(FileType.Metadata))
-                    .GenerateList())
+                .WithFiles(
+                    DataFixture
+                        .DefaultFile()
+                        .WithSubjectId(subjectId)
+                        .ForIndex(0, s => s.SetType(FileType.Data))
+                        .ForIndex(1, s => s.SetType(FileType.Metadata))
+                        .GenerateList()
+                )
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
@@ -47,8 +52,10 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 context.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
             });
 
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage(),
-                releaseFileId: releaseDataFile.Id);
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(
+                Stage.PreviousStage(),
+                releaseFileId: releaseDataFile.Id
+            );
 
             var blobStorageService = GetRequiredService<IPrivateBlobStorageService>();
 
@@ -62,7 +69,8 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                     BlobContainers.PrivateReleaseFiles,
                     releaseDataFile.Path(),
                     contentStream,
-                    ContentTypes.Csv);
+                    ContentTypes.Csv
+                );
             }
 
             var sourceMetadataFileContent = await File.ReadAllTextAsync(testData.CsvMetadataFilePath);
@@ -73,7 +81,8 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                     BlobContainers.PrivateReleaseFiles,
                     releaseMetaFile.Path(),
                     contentStream,
-                    ContentTypes.Csv);
+                    ContentTypes.Csv
+                );
             }
 
             var function = GetRequiredService<CopyCsvFilesFunction>();
@@ -81,8 +90,8 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
+            var savedImport = await publicDataDbContext
+                .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
@@ -91,7 +100,8 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
 
             Assert.True(Directory.Exists(dataSetVersionPathResolver.DirectoryPath(dataSetVersion)));
-            var actualDataSetVersionFiles = Directory.GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
+            var actualDataSetVersionFiles = Directory
+                .GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
                 .Select(Path.GetFullPath)
                 .ToArray();
 

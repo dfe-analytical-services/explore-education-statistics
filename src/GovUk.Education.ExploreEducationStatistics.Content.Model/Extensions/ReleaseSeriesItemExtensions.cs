@@ -23,7 +23,5 @@ public static class ReleaseSeriesItemExtensions
         SelectReleaseIds(releaseSeriesItems).ToList();
 
     private static IEnumerable<Guid> SelectReleaseIds(List<ReleaseSeriesItem> releaseSeriesItems) =>
-        releaseSeriesItems
-            .Where(rsi => !rsi.IsLegacyLink)
-            .Select(rs => rs.ReleaseId!.Value);
+        releaseSeriesItems.Where(rsi => !rsi.IsLegacyLink).Select(rs => rs.ReleaseId!.Value);
 }

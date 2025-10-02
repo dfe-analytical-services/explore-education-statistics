@@ -8,5 +8,5 @@ public enum TimePeriodLabelFormat
     FullLabel,
     FullLabelBeforeYear,
     NoLabel,
-    ShortLabel
+    ShortLabel,
 }

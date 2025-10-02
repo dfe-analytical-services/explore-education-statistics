@@ -16,10 +16,12 @@ public static class ReleaseVersionPredicates
     /// <param name="publishedOnly">Flag to only include published release versions.</param>
     /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> that contains elements from the input
     /// sequence filtered to only include the latest versions of each release.</returns>
-    public static IQueryable<ReleaseVersion> LatestReleaseVersions(this IQueryable<ReleaseVersion> releaseVersions,
+    public static IQueryable<ReleaseVersion> LatestReleaseVersions(
+        this IQueryable<ReleaseVersion> releaseVersions,
         Guid? publicationId = null,
         string? releaseSlug = null,
-        bool publishedOnly = false)
+        bool publishedOnly = false
+    )
     {
         if (releaseSlug != null && publicationId == null)
         {
@@ -31,18 +33,18 @@ public static class ReleaseVersionPredicates
             .Where(releaseVersion => releaseSlug == null || releaseVersion.Release.Slug == releaseSlug)
             .Where(releaseVersion => !publishedOnly || releaseVersion.Published.HasValue)
             .GroupBy(releaseVersion => releaseVersion.ReleaseId)
-            .Select(groupedVersions =>
-                new
-                {
-                    ReleaseId = groupedVersions.Key,
-                    Version = groupedVersions.Max(releaseVersion => releaseVersion.Version)
-                });
+            .Select(groupedVersions => new
+            {
+                ReleaseId = groupedVersions.Key,
+                Version = groupedVersions.Max(releaseVersion => releaseVersion.Version),
+            });
 
-        return releaseVersions
-            .Join(maxVersionsQueryable,
-                releaseVersion => new { releaseVersion.ReleaseId, releaseVersion.Version },
-                maxVersion => maxVersion,
-                (releaseVersion, _) => releaseVersion);
+        return releaseVersions.Join(
+            maxVersionsQueryable,
+            releaseVersion => new { releaseVersion.ReleaseId, releaseVersion.Version },
+            maxVersion => maxVersion,
+            (releaseVersion, _) => releaseVersion
+        );
     }
 
     /// <summary>
@@ -60,19 +62,25 @@ public static class ReleaseVersionPredicates
         this IQueryable<ReleaseVersion> releaseVersions,
         Guid releaseId,
         bool publishedOnly = false,
-        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null)
+        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
+    )
     {
         return releaseVersions
             .Where(releaseVersion => releaseVersion.ReleaseId == releaseId)
-            .Where(releaseVersion => releaseVersion.Version == releaseVersions
-                .Where(latestVersion => latestVersion.ReleaseId == releaseId)
-                .Where(latestVersion => !publishedOnly ||
-                                        latestVersion.Published.HasValue ||
-                                        (
-                                            includeUnpublishedVersionIds != null &&
-                                            includeUnpublishedVersionIds.Contains(latestVersion.Id)
-                                        ))
-                .Select(latestVersion => (int?)latestVersion.Version)
-                .Max());
+            .Where(releaseVersion =>
+                releaseVersion.Version
+                == releaseVersions
+                    .Where(latestVersion => latestVersion.ReleaseId == releaseId)
+                    .Where(latestVersion =>
+                        !publishedOnly
+                        || latestVersion.Published.HasValue
+                        || (
+                            includeUnpublishedVersionIds != null
+                            && includeUnpublishedVersionIds.Contains(latestVersion.Id)
+                        )
+                    )
+                    .Select(latestVersion => (int?)latestVersion.Version)
+                    .Max()
+            );
     }
 }

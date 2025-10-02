@@ -16,6 +16,6 @@ public record OrganisationViewModel
         {
             Id = organisation.Id,
             Title = organisation.Title,
-            Url = organisation.Url
+            Url = organisation.Url,
         };
 }

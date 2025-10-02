@@ -27,7 +27,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
     private static readonly Publication PublicationArchived = new()
     {
         Id = Guid.NewGuid(),
-        SupersededById = Guid.NewGuid()
+        SupersededById = Guid.NewGuid(),
     };
 
     private static readonly DataFixture DataFixture = new();
@@ -39,12 +39,9 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         {
             await AuthorizationHandlersTestUtil.ForEachSecurityClaimAsync(async claim =>
             {
-                var (handler,
-                    userPublicationRoleRepository) = CreateHandlerAndDependencies();
+                var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, Publication);
 
@@ -72,9 +69,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             {
                 var (handler, _) = CreateHandlerAndDependencies();
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, PublicationArchived);
 
@@ -132,18 +127,18 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         }
     }
 
-    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user,
-        Publication publication)
+    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Publication publication)
     {
         return AuthorizationHandlersTestUtil.CreateAuthorizationHandlerContext<
-                CreateReleaseForSpecificPublicationRequirement, Publication>
-            (user, publication);
+            CreateReleaseForSpecificPublicationRequirement,
+            Publication
+        >(user, publication);
     }
 
-    private static
-        (CreateReleaseForSpecificPublicationAuthorizationHandler,
-        Mock<IUserPublicationRoleRepository>)
-        CreateHandlerAndDependencies()
+    private static (
+        CreateReleaseForSpecificPublicationAuthorizationHandler,
+        Mock<IUserPublicationRoleRepository>
+    ) CreateHandlerAndDependencies()
     {
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -153,7 +148,8 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 userReleaseRoleRepository.Object,
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict))
+                Mock.Of<IPreReleaseService>(Strict)
+            )
         );
 
         return (handler, userPublicationRoleRepository);

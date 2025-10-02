@@ -19,22 +19,23 @@ public class ReleaseSearchableDocumentDtoBuilder
     private ReleaseType _type = ReleaseType.OfficialStatistics;
     private string _htmlContent = "HTML content";
 
-    public ReleaseSearchableDocumentDto Build() => new()
-    {
-        ReleaseId = _releaseId,
-        ReleaseSlug = _releaseSlug,
-        ReleaseVersionId = _releaseVersionId,
-        PublicationId = _publicationId,
-        PublicationSlug = _publicationSlug,
-        Summary = _publicationSummary,
-        PublicationTitle = _publicationTitle,
-        Published = _published,
-        ThemeId = _themeId,
-        ThemeTitle = _themeTitle,
-        Type = _type.ToString(),
-        TypeBoost = _type.ToSearchDocumentTypeBoost(),
-        HtmlContent = _htmlContent
-    };
+    public ReleaseSearchableDocumentDto Build() =>
+        new()
+        {
+            ReleaseId = _releaseId,
+            ReleaseSlug = _releaseSlug,
+            ReleaseVersionId = _releaseVersionId,
+            PublicationId = _publicationId,
+            PublicationSlug = _publicationSlug,
+            Summary = _publicationSummary,
+            PublicationTitle = _publicationTitle,
+            Published = _published,
+            ThemeId = _themeId,
+            ThemeTitle = _themeTitle,
+            Type = _type.ToString(),
+            TypeBoost = _type.ToSearchDocumentTypeBoost(),
+            HtmlContent = _htmlContent,
+        };
 
     public ReleaseSearchableDocumentDtoBuilder WithReleaseId(Guid releaseId)
     {

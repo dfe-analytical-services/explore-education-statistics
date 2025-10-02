@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore.Migrations;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,7 +19,9 @@ public partial class EES167_RemoveRoutineFilteredFootnotes : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{PreviousRoutineFilteredFootnotesMigrationId}_Routine_FilteredFootnotes.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{PreviousRoutineFilteredFootnotesMigrationId}_Routine_FilteredFootnotes.sql"
+        );
     }
 }

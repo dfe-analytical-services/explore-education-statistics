@@ -8,19 +8,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
 public interface IRelatedInformationService
 {
-    Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(
-        Guid releaseVersionId);
+    Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId);
 
     Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(
         Guid releaseVersionId,
-        CreateUpdateLinkRequest request);
+        CreateUpdateLinkRequest request
+    );
 
     Task<Either<ActionResult, List<Link>>> UpdateRelatedInformation(
         Guid releaseVersionId,
         List<CreateUpdateLinkRequest> updatedLinkRequests,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(
         Guid releaseVersionId,
-        Guid relatedInformationId);
+        Guid relatedInformationId
+    );
 }

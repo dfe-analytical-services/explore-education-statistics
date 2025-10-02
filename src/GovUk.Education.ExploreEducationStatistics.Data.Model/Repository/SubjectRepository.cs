@@ -14,12 +14,11 @@ public class SubjectRepository : ISubjectRepository
         _context = context;
     }
 
-    public async Task<Guid?> FindPublicationIdForSubject(Guid subjectId,
-        CancellationToken cancellationToken = default)
+    public async Task<Guid?> FindPublicationIdForSubject(Guid subjectId, CancellationToken cancellationToken = default)
     {
-        return await _context.ReleaseSubject
-            .Where(rs => rs.SubjectId == subjectId)
-            .Select(rs => (Guid?) rs.ReleaseVersion.PublicationId)
+        return await _context
+            .ReleaseSubject.Where(rs => rs.SubjectId == subjectId)
+            .Select(rs => (Guid?)rs.ReleaseVersion.PublicationId)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 }

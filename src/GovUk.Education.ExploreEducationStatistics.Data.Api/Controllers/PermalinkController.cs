@@ -23,26 +23,22 @@ public class PermalinkController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("application/json", "text/csv")]
-    public async Task<ActionResult> GetPermalink(Guid permalinkId,
-        CancellationToken cancellationToken = default)
+    public async Task<ActionResult> GetPermalink(Guid permalinkId, CancellationToken cancellationToken = default)
     {
         if (Request.AcceptsCsv(exact: true))
         {
             return await _permalinkService
                 .GetCsvDownloadStream( // TODO EES-5976 analytics
                     permalinkId: permalinkId,
-                    cancellationToken: cancellationToken)
-                .HandleFailuresOr(stream => new FileStreamResult(
-                    fileStream: stream,
-                    contentType: ContentTypes.Csv)
+                    cancellationToken: cancellationToken
+                )
+                .HandleFailuresOr(stream => new FileStreamResult(fileStream: stream, contentType: ContentTypes.Csv)
                 {
-                    FileDownloadName = $"permalink-{permalinkId}.csv"
+                    FileDownloadName = $"permalink-{permalinkId}.csv",
                 });
         }
 
-        return await _permalinkService
-            .GetPermalink(permalinkId, cancellationToken)
-            .HandleFailuresOr(Ok);
+        return await _permalinkService.GetPermalink(permalinkId, cancellationToken).HandleFailuresOr(Ok);
     }
 
     [HttpPost("permalink")]
@@ -50,13 +46,13 @@ public class PermalinkController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
         [FromBody] PermalinkCreateRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await _permalinkService
             .CreatePermalink(request, cancellationToken)
-            .HandleFailuresOr(permalink => CreatedAtAction(nameof(GetPermalink), new
-            {
-                permalinkId = permalink.Id
-            }, permalink));
+            .HandleFailuresOr(permalink =>
+                CreatedAtAction(nameof(GetPermalink), new { permalinkId = permalink.Id }, permalink)
+            );
     }
 }

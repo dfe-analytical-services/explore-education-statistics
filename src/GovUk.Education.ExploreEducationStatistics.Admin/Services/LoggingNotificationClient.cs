@@ -13,16 +13,18 @@ public class LoggingNotificationClient : INotificationClient
         _logger = logger;
     }
 
-    public EmailNotificationResponse SendEmail(string emailAddress,
+    public EmailNotificationResponse SendEmail(
+        string emailAddress,
         string templateId,
         Dictionary<string, dynamic> personalisation = null,
         string clientReference = null,
         string emailReplyToId = null,
-        string oneClickUnsubscribeURL = null)
+        string oneClickUnsubscribeURL = null
+    )
     {
         return new EmailNotificationResponse();
     }
-    
+
     public Task<string> GET(string url)
     {
         throw new NotImplementedException();
@@ -53,7 +55,10 @@ public class LoggingNotificationClient : INotificationClient
         throw new NotImplementedException();
     }
 
-    public TemplatePreviewResponse GenerateTemplatePreview(string templateId, Dictionary<string, dynamic> personalisation = null)
+    public TemplatePreviewResponse GenerateTemplatePreview(
+        string templateId,
+        Dictionary<string, dynamic> personalisation = null
+    )
     {
         throw new NotImplementedException();
     }
@@ -68,14 +73,23 @@ public class LoggingNotificationClient : INotificationClient
         throw new NotImplementedException();
     }
 
-    public NotificationList GetNotifications(string templateType = "", string status = "", string reference = "",
-        string olderThanId = "", bool includeSpreadsheetUploads = false)
+    public NotificationList GetNotifications(
+        string templateType = "",
+        string status = "",
+        string reference = "",
+        string olderThanId = "",
+        bool includeSpreadsheetUploads = false
+    )
     {
         throw new NotImplementedException();
     }
 
-    public NotificationList GetNotifications(string templateType = "", string status = "", string reference = "",
-        string olderThanId = "")
+    public NotificationList GetNotifications(
+        string templateType = "",
+        string status = "",
+        string reference = "",
+        string olderThanId = ""
+    )
     {
         throw new NotImplementedException();
     }
@@ -95,18 +109,31 @@ public class LoggingNotificationClient : INotificationClient
         throw new NotImplementedException();
     }
 
-    public SmsNotificationResponse SendSms(string mobileNumber, string templateId, Dictionary<string, dynamic> personalisation = null,
-        string clientReference = null, string smsSenderId = null)
+    public SmsNotificationResponse SendSms(
+        string mobileNumber,
+        string templateId,
+        Dictionary<string, dynamic> personalisation = null,
+        string clientReference = null,
+        string smsSenderId = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public LetterNotificationResponse SendLetter(string templateId, Dictionary<string, dynamic> personalisation, string clientReference = null)
+    public LetterNotificationResponse SendLetter(
+        string templateId,
+        Dictionary<string, dynamic> personalisation,
+        string clientReference = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public LetterNotificationResponse SendPrecompiledLetter(string clientReference, byte[] pdfContents, string postage = null)
+    public LetterNotificationResponse SendPrecompiledLetter(
+        string clientReference,
+        byte[] pdfContents,
+        string postage = null
+    )
     {
         throw new NotImplementedException();
     }

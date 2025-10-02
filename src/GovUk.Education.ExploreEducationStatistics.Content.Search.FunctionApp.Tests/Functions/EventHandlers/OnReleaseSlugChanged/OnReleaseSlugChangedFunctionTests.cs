@@ -9,60 +9,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnReleaseSlugChangedFunctionTests
 {
-    private OnReleaseSlugChangedFunction GetSut() => new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+    private OnReleaseSlugChangedFunction GetSut() =>
+        new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ThenRefreshSearchableDocumentMessageDtoReturned(bool? isPublicationArchived)
+    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ThenRefreshSearchableDocumentMessageDtoReturned(
+        bool? isPublicationArchived
+    )
     {
         // ARRANGE
         var payload = new ReleaseSlugChangedEventDto
         {
             PublicationSlug = "this-is-a-publication-slug",
-            IsPublicationArchived = isPublicationArchived
+            IsPublicationArchived = isPublicationArchived,
         };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnReleaseSlugChangedEvent(eventGridEvent, new FunctionContextMockBuilder().Build());
-        
+
         // ASSERT
         var actual = Assert.Single(response);
         Assert.NotNull(actual);
         Assert.Equal(payload.PublicationSlug, actual.PublicationSlug);
     }
-    
+
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task GivenEvent_WhenPayloadDoesNotContainPublicationSlug_ThenNothingIsReturned(string? blankPublicationSlug)
+    public async Task GivenEvent_WhenPayloadDoesNotContainPublicationSlug_ThenNothingIsReturned(
+        string? blankPublicationSlug
+    )
     {
         // ARRANGE
-        var payload = new ReleaseSlugChangedEventDto
-        {
-            PublicationSlug = blankPublicationSlug,
-        };
+        var payload = new ReleaseSlugChangedEventDto { PublicationSlug = blankPublicationSlug };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnReleaseSlugChangedEvent(eventGridEvent, new FunctionContextMockBuilder().Build());
-        
+
         // ASSERT
         Assert.Empty(response);
     }
-   
+
     [Fact]
     public async Task GivenEvent_WhenPublicationIsArchived_ThenNothingIsReturned()
     {
@@ -70,18 +68,16 @@ public class OnReleaseSlugChangedFunctionTests
         var payload = new ReleaseSlugChangedEventDto
         {
             PublicationSlug = "this-is-a-publication-slug",
-            IsPublicationArchived = true
+            IsPublicationArchived = true,
         };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnReleaseSlugChangedEvent(eventGridEvent, new FunctionContextMockBuilder().Build());
-        
+
         // ASSERT
         Assert.Empty(response);
     }

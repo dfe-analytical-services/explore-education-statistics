@@ -23,9 +23,7 @@ public record PublicationDto
 
     public required PublicationThemeDto Theme { get; init; }
 
-    public static PublicationDto FromPublication(
-        Publication publication,
-        Publication? supersededByPublication) =>
+    public static PublicationDto FromPublication(Publication publication, Publication? supersededByPublication) =>
         new()
         {
             Id = publication.Id,
@@ -37,11 +35,12 @@ public record PublicationDto
             NextReleaseDate = publication.LatestPublishedReleaseVersion!.NextReleaseDate is null
                 ? null
                 : PublicationNextReleaseDateDto.FromPartialDate(
-                    publication.LatestPublishedReleaseVersion.NextReleaseDate),
+                    publication.LatestPublishedReleaseVersion.NextReleaseDate
+                ),
             SupersededByPublication = supersededByPublication is null
                 ? null
                 : PublicationSupersededByPublicationDto.FromPublication(supersededByPublication),
-            Theme = PublicationThemeDto.FromTheme(publication.Theme)
+            Theme = PublicationThemeDto.FromTheme(publication.Theme),
         };
 }
 
@@ -64,7 +63,7 @@ public record PublicationContactDto
             ContactName = contact.ContactName,
             ContactTelNo = contact.ContactTelNo,
             TeamEmail = contact.TeamEmail,
-            TeamName = contact.TeamName
+            TeamName = contact.TeamName,
         };
 }
 
@@ -83,7 +82,7 @@ public record PublicationNextReleaseDateDto
             {
                 Year = int.Parse(partialDate.Year),
                 Month = string.IsNullOrWhiteSpace(partialDate.Month) ? null : int.Parse(partialDate.Month),
-                Day = string.IsNullOrWhiteSpace(partialDate.Day) ? null : int.Parse(partialDate.Day)
+                Day = string.IsNullOrWhiteSpace(partialDate.Day) ? null : int.Parse(partialDate.Day),
             };
 }
 
@@ -100,7 +99,7 @@ public record PublicationLatestReleaseDto
         {
             Id = release.Id,
             Slug = release.Slug,
-            Title = release.Title
+            Title = release.Title,
         };
 }
 
@@ -117,7 +116,7 @@ public record PublicationSupersededByPublicationDto
         {
             Id = publication.Id,
             Slug = publication.Slug,
-            Title = publication.Title
+            Title = publication.Title,
         };
 }
 
@@ -134,6 +133,6 @@ public record PublicationThemeDto
         {
             Id = theme.Id,
             Summary = theme.Summary,
-            Title = theme.Title
+            Title = theme.Title,
         };
 }

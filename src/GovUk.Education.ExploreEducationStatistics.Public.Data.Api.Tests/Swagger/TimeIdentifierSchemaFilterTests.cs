@@ -16,10 +16,9 @@ public class TimeIdentifierSchemaFilterTests
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new TimeIdentifierSchemaFilter()],
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");
@@ -34,11 +33,14 @@ public class TimeIdentifierSchemaFilterTests
         Assert.Equal("string", schema.Type);
         Assert.Equal(codes.Count, schema.Enum.Count);
 
-        Assert.All(schema.Enum, e =>
-        {
-            var enumString = Assert.IsType<OpenApiString>(e);
-            Assert.Contains(enumString.Value, codes);
-        });
+        Assert.All(
+            schema.Enum,
+            e =>
+            {
+                var enumString = Assert.IsType<OpenApiString>(e);
+                Assert.Contains(enumString.Value, codes);
+            }
+        );
     }
 
     private OpenApiSchema GenerateSchema()

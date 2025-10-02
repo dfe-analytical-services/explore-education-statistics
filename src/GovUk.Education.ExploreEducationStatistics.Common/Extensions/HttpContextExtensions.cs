@@ -9,7 +9,8 @@ public static class HttpContextExtensions
     public static bool TryGetRequestHeader(
         this HttpContext? httpContext,
         string headerName,
-        out StringValues headerValues)
+        out StringValues headerValues
+    )
     {
         if (httpContext == null)
         {

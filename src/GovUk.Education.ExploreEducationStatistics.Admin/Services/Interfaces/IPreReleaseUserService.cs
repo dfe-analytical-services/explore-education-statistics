@@ -12,19 +12,17 @@ public interface IPreReleaseUserService
 
     Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
-        List<string> emails);
+        List<string> emails
+    );
 
     Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
         Guid releaseVersionId,
-        List<string> emails);
+        List<string> emails
+    );
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId,
-        string email);
+    Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId, string email);
 
-    Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
-        Guid releaseVersionId,
-        string email,
-        bool isNewUser);
+    Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(Guid releaseVersionId, string email, bool isNewUser);
 
     Task MarkInviteEmailAsSent(UserReleaseInvite invite);
 }

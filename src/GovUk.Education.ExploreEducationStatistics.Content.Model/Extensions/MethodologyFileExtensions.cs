@@ -18,8 +18,7 @@ public static class MethodologyFileExtensions
             FileName = methodologyFile.File.Filename,
             Name = string.Empty,
             Size = methodologyFile.File.DisplaySize(),
-            Type = methodologyFile.File.Type
+            Type = methodologyFile.File.Type,
         };
     }
-
 }

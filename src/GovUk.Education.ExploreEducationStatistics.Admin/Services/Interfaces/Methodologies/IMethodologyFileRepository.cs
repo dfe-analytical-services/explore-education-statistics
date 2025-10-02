@@ -14,11 +14,14 @@ public interface IMethodologyFileRepository
         long contentLength,
         string contentType,
         FileType type,
-        Guid createdById);
+        Guid createdById
+    );
 
-    public Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyVersionId,
+    public Task<Either<ActionResult, File>> CheckFileExists(
+        Guid methodologyVersionId,
         Guid fileId,
-        params FileType[] allowedFileTypes);
+        params FileType[] allowedFileTypes
+    );
 
     public Task Delete(Guid methodologyVersionId, Guid fileId);
 

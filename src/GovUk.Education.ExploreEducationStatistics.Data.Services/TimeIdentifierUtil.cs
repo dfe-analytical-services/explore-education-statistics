@@ -24,7 +24,7 @@ public static class TimeIdentifierUtil
             TimeIdentifier.CalendarYear,
             TimeIdentifier.FinancialYear,
             TimeIdentifier.TaxYear,
-            TimeIdentifier.ReportingYear
+            TimeIdentifier.ReportingYear,
         };
     }
 
@@ -45,7 +45,7 @@ public static class TimeIdentifierUtil
             TimeIdentifier.AcademicYearQ1,
             TimeIdentifier.AcademicYearQ2,
             TimeIdentifier.AcademicYearQ3,
-            TimeIdentifier.AcademicYearQ4
+            TimeIdentifier.AcademicYearQ4,
         };
     }
 
@@ -56,7 +56,7 @@ public static class TimeIdentifierUtil
             TimeIdentifier.CalendarYearQ1,
             TimeIdentifier.CalendarYearQ2,
             TimeIdentifier.CalendarYearQ3,
-            TimeIdentifier.CalendarYearQ4
+            TimeIdentifier.CalendarYearQ4,
         };
     }
 
@@ -67,7 +67,7 @@ public static class TimeIdentifierUtil
             TimeIdentifier.FinancialYearQ1,
             TimeIdentifier.FinancialYearQ2,
             TimeIdentifier.FinancialYearQ3,
-            TimeIdentifier.FinancialYearQ4
+            TimeIdentifier.FinancialYearQ4,
         };
     }
 
@@ -78,7 +78,7 @@ public static class TimeIdentifierUtil
             TimeIdentifier.TaxYearQ1,
             TimeIdentifier.TaxYearQ2,
             TimeIdentifier.TaxYearQ3,
-            TimeIdentifier.TaxYearQ4
+            TimeIdentifier.TaxYearQ4,
         };
     }
 }

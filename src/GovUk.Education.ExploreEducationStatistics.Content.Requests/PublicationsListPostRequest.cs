@@ -12,18 +12,16 @@ public record PublicationsListPostRequest(
     SortDirection? SortDirection = null,
     int Page = 1,
     int PageSize = 10,
-    IEnumerable<Guid>? PublicationIds = null)
+    IEnumerable<Guid>? PublicationIds = null
+)
 {
     public class Validator : AbstractValidator<PublicationsListPostRequest>
     {
         public Validator()
         {
-            RuleFor(request => request.Search)
-                .MinimumLength(3);
-            RuleFor(request => request.Page)
-                .InclusiveBetween(1, 9999);
-            RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 40);
+            RuleFor(request => request.Search).MinimumLength(3);
+            RuleFor(request => request.Page).InclusiveBetween(1, 9999);
+            RuleFor(request => request.PageSize).InclusiveBetween(1, 40);
         }
     }
 }

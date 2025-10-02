@@ -8,17 +8,15 @@ public class HealthCheckStrategyMockBuilder
     private readonly Mock<IHealthCheckStrategy> _mock = new(MockBehavior.Strict);
     private bool _healthCheckIsSuccessful = true;
     private string _healthCheckMessage = string.Empty;
-    
+
     public IHealthCheckStrategy Build()
     {
-        _mock
-            .Setup(m => m.Description)
-            .Returns(() => "Mock Health Check Strategy");
-        
+        _mock.Setup(m => m.Description).Returns(() => "Mock Health Check Strategy");
+
         _mock
             .Setup(m => m.Run(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new HealthCheckResult(_mock.Object, _healthCheckIsSuccessful, _healthCheckMessage));
-        
+
         return _mock.Object;
     }
 

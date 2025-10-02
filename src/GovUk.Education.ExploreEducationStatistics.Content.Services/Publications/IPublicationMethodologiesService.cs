@@ -8,5 +8,6 @@ public interface IPublicationMethodologiesService
 {
     Task<Either<ActionResult, PublicationMethodologiesDto>> GetPublicationMethodologies(
         string publicationSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

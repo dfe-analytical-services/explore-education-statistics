@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 public record DataSetViewModel
 {
     /// <summary>
-    /// The ID of the data set. 
+    /// The ID of the data set.
     /// </summary>
     /// <example>7588c2d6-9e8a-4d84-8f19-6b8d52a01fbd</example>
     public required Guid Id { get; init; }
@@ -51,4 +51,3 @@ public record DataSetViewModel
 /// A paginated list of data sets.
 /// </summary>
 public record DataSetPaginatedListViewModel : PaginatedListViewModel<DataSetViewModel>;
-

@@ -51,8 +51,7 @@ public abstract class OrganisationsValidatorTests
         public async Task WhenOrganisationIdsExist_ReturnsOrganisations()
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             var organisationIds = GetOrganisationIds(organisations);
 
             var contextId = Guid.NewGuid().ToString();
@@ -80,8 +79,7 @@ public abstract class OrganisationsValidatorTests
         public async Task WhenOrganisationIdsDoNotExist_ReturnsValidationErrors()
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             Guid[] organisationIdsNotExisting = [Guid.NewGuid(), Guid.NewGuid()];
             const string errorPath = "testPath";
 
@@ -99,20 +97,24 @@ public abstract class OrganisationsValidatorTests
                 // Act
                 var result = await sut.ValidateOrganisations(
                     organisationIds: organisationIdsNotExisting,
-                    path: errorPath);
+                    path: errorPath
+                );
 
                 // Assert
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
                 Assert.Equal(organisationIdsNotExisting.Length, validationProblem.Errors.Count);
-                Assert.All(organisationIdsNotExisting,
+                Assert.All(
+                    organisationIdsNotExisting,
                     organisationId =>
                     {
                         validationProblem.AssertHasError(
                             expectedCode: ValidationMessages.OrganisationNotFound.Code,
                             expectedMessage: ValidationMessages.OrganisationNotFound.Message,
                             expectedPath: errorPath,
-                            expectedDetail: new InvalidErrorDetail<Guid>(organisationId));
-                    });
+                            expectedDetail: new InvalidErrorDetail<Guid>(organisationId)
+                        );
+                    }
+                );
             }
         }
 
@@ -120,8 +122,7 @@ public abstract class OrganisationsValidatorTests
         public async Task WhenOrganisationIdsPartiallyExist_ReturnsValidationErrors()
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             var organisationIds = GetOrganisationIds(organisations);
             var organisationIdNotExisting = Guid.NewGuid();
             const string errorPath = "testPath";
@@ -140,7 +141,8 @@ public abstract class OrganisationsValidatorTests
                 // Act
                 var result = await sut.ValidateOrganisations(
                     organisationIds: [.. organisationIds, organisationIdNotExisting],
-                    path: errorPath);
+                    path: errorPath
+                );
 
                 // Assert
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
@@ -149,7 +151,8 @@ public abstract class OrganisationsValidatorTests
                     expectedCode: ValidationMessages.OrganisationNotFound.Code,
                     expectedMessage: ValidationMessages.OrganisationNotFound.Message,
                     expectedPath: errorPath,
-                    expectedDetail: new InvalidErrorDetail<Guid>(organisationIdNotExisting));
+                    expectedDetail: new InvalidErrorDetail<Guid>(organisationIdNotExisting)
+                );
             }
         }
 
@@ -157,8 +160,7 @@ public abstract class OrganisationsValidatorTests
         public async Task WhenOrganisationIdsHasDuplicates_ReturnsUniqueOrganisations()
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             var organisationIds = GetOrganisationIds(organisations);
             Guid[] organisationIdsWithDuplicates = [.. organisationIds, .. organisationIds];
 
@@ -184,13 +186,10 @@ public abstract class OrganisationsValidatorTests
         }
     }
 
-    private static Guid[] GetOrganisationIds(Organisation[] organisations) =>
-        organisations.Select(o => o.Id).ToArray();
+    private static Guid[] GetOrganisationIds(Organisation[] organisations) => organisations.Select(o => o.Id).ToArray();
 
     private static OrganisationsValidator BuildService(ContentDbContext? context = null)
     {
-        return new OrganisationsValidator(
-            context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict)
-        );
+        return new OrganisationsValidator(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
     }
 }
