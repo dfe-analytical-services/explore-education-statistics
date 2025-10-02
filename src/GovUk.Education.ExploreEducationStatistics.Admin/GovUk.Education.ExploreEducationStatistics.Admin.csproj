@@ -40,10 +40,10 @@
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.20" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.2" />
-    <PackageReference Include="System.Text.Json" Version="8.0.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+    <PackageReference Include="System.Text.Json" Version="9.0.9" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="2.21.1" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.14.1" />
   </ItemGroup>
 
   <ItemGroup>
