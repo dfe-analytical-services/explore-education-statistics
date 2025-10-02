@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Thinktecture.EntityFrameworkCore.TempTables;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 
@@ -44,8 +45,9 @@ public class FilterItemRepository(
 
     public interface IMatchingFilterItemsQueryGenerator
     {
-        Task<(string, IList<IAsyncDisposable>)> GetMatchingFilterItemsQuery(
+        Task<string> GetMatchingFilterItemsQuery(
             StatisticsDbContext context,
+            ITempTableReference matchedObservationsTableReference,
             CancellationToken cancellationToken);
     }
 
@@ -53,8 +55,9 @@ public class FilterItemRepository(
     {
         public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
 
-        public async Task<(string, IList<IAsyncDisposable>)> GetMatchingFilterItemsQuery(
+        public async Task<string> GetMatchingFilterItemsQuery(
             StatisticsDbContext context,
+            ITempTableReference matchedObservationsTableReference,
             CancellationToken cancellationToken)
         {
             // Generate a keyless temp table to allow quick inserting of
@@ -74,7 +77,7 @@ public class FilterItemRepository(
             var matchingFilterItemsSql = $@"
                 INSERT INTO {matchedFilterItemsTempTable.Name} WITH (TABLOCK)
                 SELECT DISTINCT o.FilterItemId
-                FROM #{nameof(MatchedObservation)} AS mo
+                FROM {matchedObservationsTableReference.Name} AS mo
                 JOIN ObservationFilterItem AS o
                   ON o.ObservationId = mo.Id
                 OPTION(RECOMPILE, MAXDOP 4)";
@@ -86,77 +89,64 @@ public class FilterItemRepository(
                 CREATE UNIQUE CLUSTERED INDEX [IX_MatchedFilterItem_FilterItemId_{Guid.NewGuid()}]
                 ON #MatchedFilterItem(Id) WITH (MAXDOP = 4);";
 
-            return ($"{matchingFilterItemsSql}\n\n{indexSql}", [matchedFilterItemsTempTable]);
+            return $"{matchingFilterItemsSql}\n\n{indexSql}";
         }
     }
 
     public async Task<IEnumerable<FilterItem>> GetFilterItemsFromMatchedObservationIds(
         Guid subjectId,
-        IQueryable<MatchedObservation> matchedObservations,
+        ITempTableReference matchedObservationsTableReference,
         CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
 
-        var (sql, tempTables) = await QueryGenerator.GetMatchingFilterItemsQuery(
+        var sql = await QueryGenerator.GetMatchingFilterItemsQuery(
             context: context,
+            matchedObservationsTableReference,
             cancellationToken: cancellationToken);
 
-        try
+        // Execute the query to find matching FilterItem Ids.
+        await SqlExecutor.ExecuteSqlRaw(
+            sql: sql,
+            context: context,
+            parameters: [],
+            cancellationToken: cancellationToken);
+        
+        if (logger.IsEnabled(LogLevel.Trace))
         {
-            // Execute the query to find matching FilterItem Ids.
-            await SqlExecutor.ExecuteSqlRaw(
-                sql: sql,
-                context: context,
-                parameters: [],
-                cancellationToken: cancellationToken);
-            
-            if (logger.IsEnabled(LogLevel.Trace))
-            {
-                logger.LogTrace(
-                    "Finished finding matching FilterItems in a total of {Milliseconds} ms",
-                    sw.Elapsed.TotalMilliseconds);
-            }
-            
-            sw.Restart();
+            logger.LogTrace(
+                "Finished finding matching FilterItems in a total of {Milliseconds} ms",
+                sw.Elapsed.TotalMilliseconds);
+        }
+        
+        sw.Restart();
 
-            // Using the Ids of the matching FilterItems, fetch the details of the FilterItems,
-            // their FilterGroups and Filters.
-            var filterItems = await context
-                .FilterItem
-                .AsNoTracking()
-                .Include(fi => fi.FilterGroup)
-                .ThenInclude(fg => fg.Filter)
-                .Join(
-                    inner: context.MatchedFilterItems,
-                    outerKeySelector: filterItem => filterItem.Id,
-                    innerKeySelector: matchedFilterItem => matchedFilterItem.Id,
-                    resultSelector: (filterItem, matchedFilterItem) => filterItem)
-                .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
-                .WithSqlServerOptions("OPTION(RECOMPILE)")
-                .ToListAsync(cancellationToken);
-            
-            if (logger.IsEnabled(LogLevel.Trace))
-            {
-                logger.LogTrace(
-                    "Finished fetching {FilterItemCount} FilterItems and their " +
-                    "FilterGroups / Filters in a total of {Milliseconds} ms",
-                    filterItems.Count,
-                    sw.Elapsed.TotalMilliseconds);
-            }
-            
-            return filterItems;
-        }
-        finally
+        // Using the Ids of the matching FilterItems, fetch the details of the FilterItems,
+        // their FilterGroups and Filters.
+        var filterItems = await context
+            .FilterItem
+            .AsNoTracking()
+            .Include(fi => fi.FilterGroup)
+            .ThenInclude(fg => fg.Filter)
+            .Join(
+                inner: context.MatchedFilterItems,
+                outerKeySelector: filterItem => filterItem.Id,
+                innerKeySelector: matchedFilterItem => matchedFilterItem.Id,
+                resultSelector: (filterItem, matchedFilterItem) => filterItem)
+            .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
+            .WithSqlServerOptions("OPTION(RECOMPILE)")
+            .ToListAsync(cancellationToken);
+        
+        if (logger.IsEnabled(LogLevel.Trace))
         {
-            // Although EF and SQL Server will clean temporary tables up eventually themselves when the Controller
-            // method finishes (and thus the DB connection is disposed), it's nice to leave things as cleared down
-            // as possible before exiting this method.
-            await tempTables
-                .ToAsyncEnumerable()
-                // ReSharper disable once MethodSupportsCancellation - don't want to cancel the cleaning up of 
-                // temporary tables.
-                .ForEachAwaitAsync(async tempTable => await tempTable.DisposeAsync());
+            logger.LogTrace(
+                "Finished fetching {FilterItemCount} FilterItems and their " +
+                "FilterGroups / Filters in a total of {Milliseconds} ms",
+                filterItems.Count,
+                sw.Elapsed.TotalMilliseconds);
         }
+        
+        return filterItems;
     }
 
     public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)

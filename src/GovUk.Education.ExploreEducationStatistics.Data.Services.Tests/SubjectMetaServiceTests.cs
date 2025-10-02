@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -839,12 +840,14 @@ public class SubjectMetaServiceTests
 
             var observationService = new Mock<IObservationService>(MockBehavior.Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
                 .Setup(s => s.GetMatchedObservations(
                     It.Is<FullTableQuery>(ctx => ctx
                             .Equals(request.AsFullTableQuery())),
                     cancellationToken))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .ReturnsAsync(matchedObservationsTable);
 
             var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
 
@@ -879,7 +882,7 @@ public class SubjectMetaServiceTests
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
                     // ReSharper disable once AccessToDisposedClosure
-                    releaseSubject.SubjectId, statisticsDbContext.MatchedObservations, default))
+                    releaseSubject.SubjectId, matchedObservationsTable, cancellationToken))
                 .ReturnsAsync(allFilterItems);
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);

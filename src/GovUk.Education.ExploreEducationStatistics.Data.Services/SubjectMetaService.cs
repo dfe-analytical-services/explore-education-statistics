@@ -202,7 +202,7 @@ public class SubjectMetaService(
                                  && rf.File.Type == FileType.Data)
                     .SingleAsync(cancellationToken: cancellationToken);
 
-                var observations =
+                var matchingObservationsTable =
                     await observationService.GetMatchedObservations(
                         request.AsFullTableQuery(),
                         cancellationToken);
@@ -210,7 +210,9 @@ public class SubjectMetaService(
                 stopwatch.Restart();
 
                 var filterItems = await
-                    filterItemRepository.GetFilterItemsFromMatchedObservationIds(request.SubjectId, observations,
+                    filterItemRepository.GetFilterItemsFromMatchedObservationIds(
+                        request.SubjectId,
+                        matchingObservationsTable,
                         cancellationToken);
                 var filters =
                     FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(

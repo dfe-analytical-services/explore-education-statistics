@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -170,6 +172,6 @@ public class FilterItemRepositoryTests
     private static FilterItemRepository BuildFilterItemRepository(
         StatisticsDbContext context)
     {
-        return new(context);
+        return new(context, Mock.Of<ILogger<FilterItemRepository>>());
     }
 }

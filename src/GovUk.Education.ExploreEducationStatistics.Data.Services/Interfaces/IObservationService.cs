@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Thinktecture.EntityFrameworkCore.TempTables;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
@@ -18,7 +19,7 @@ public interface IObservationService
     /// <param name="query">The query to run in order to find matching Observation rows.</param>
     /// <param name="cancellationToken">Cancellation token for cancelling this request.</param>
     /// <returns>A query for selecting the matched Observation Ids from the temporary table.</returns>
-    Task<IQueryable<MatchedObservation>> GetMatchedObservations(
+    Task<ITempTableReference> GetMatchedObservations(
         FullTableQuery query,
         CancellationToken cancellationToken);
 }
