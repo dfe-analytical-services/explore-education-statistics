@@ -651,6 +651,13 @@ Then in your user `settings.json`, add
     },
 ```
 
+#### With Visual Studio
+
+The plugin can be found here: https://marketplace.visualstudio.com/items?itemName=csharpier.CSharpier
+
+Instructions are on that page.
+
+
 #### Manually formatting
 
 You can manually format the entire codebase with
