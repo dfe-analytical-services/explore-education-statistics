@@ -8,45 +8,60 @@ public record PreviewTokenCreateRequest
     public required Guid DataSetVersionId { get; init; }
 
     public required string Label { get; init; }
-    
+
+    /// <summary>
+    /// Business rules:
+    /// - Not in the past (date-only comparison if "today")
+    /// - Within the next 7 days
+    /// </summary>
     public DateTimeOffset? Activates { get; init; }
-    
+
+    /// <summary>
+    /// Business rules:
+    /// - If Activates is set: Expires must fall between Activates and Activates + 7 days
+    /// - Else:                Expires must fall between now and now + 7 days
+    /// </summary>
     public DateTimeOffset? Expires { get; init; }
-    
+
     public class Validator : AbstractValidator<PreviewTokenCreateRequest>
     {
-        public Validator()
+        public Validator(TimeProvider currentTime)
         {
-            var utcNow = DateTimeOffset.UtcNow;
+            var utcNow = currentTime.GetUtcNow();
 
-            RuleFor(request => request.Activates!.Value)
-                .Must(activates => IsLessThanOrEqualToEndDate(activates, utcNow.AddDays(7)))
-                .When(request => request.Activates.HasValue)
-                .WithMessage("Activates date must be within the next 7 days.");
+            // Activates
+            When(r => r.Activates.HasValue, () =>
+            {
+                RuleFor(r => r.Activates)
+                    .Cascade(CascadeMode.Stop)
+                    .Must(a => IsNotInPastWithTolerance(utcNow, a!.Value, TimeSpan.FromSeconds(10)))
+                    .WithMessage("Activates date must not be in the past.")
+                    .Must(a => a!.Value.UtcDateTime<= utcNow.AddDays(7))
+                    .WithMessage("Activates date must be within the next 7 days.");
+            });
 
-            RuleFor(request => request.Activates!.Value)
-                .Must(activates => IsLessThanOrEqualToEndDate(utcNow, activates) )
-                .When(request => request.Activates.HasValue)
-                .WithMessage("Activates date must not be in the past.");
-
-            RuleFor(request => request.Expires!.Value)
-                .Must((request, expires) =>
-                {
-                    var activates = request.Activates ?? utcNow;
-                    var sevenDaysFromCreated = activates.AddDays(7);
-                    return IsLessThanOrEqualToEndDate(expires, sevenDaysFromCreated);
-                })
-                .When(request => request.Expires.HasValue)
-                .WithMessage("Expires date must be no more than 7 days after the activates date.");
-
-            RuleFor(request => request.Expires!.Value)
-                .Must((request, expires) =>
-                {
-                    var activates = request.Activates ?? utcNow;
-                    return IsLessThanOrEqualToEndDate(activates, expires);
-                })
-                .When(request => request.Expires.HasValue)
-                .WithMessage("Activates date must be before or equal to the expires date.");
+            // Expires
+            When(r => r.Expires.HasValue, () =>
+            {
+                When(r => r.Activates.HasValue, () =>
+                    {
+                        RuleFor(r => r)
+                            .Cascade(CascadeMode.Stop)
+                            .Must(r => r.Activates!.Value.UtcDateTime <= r.Expires!.Value.UtcDateTime)
+                            .WithMessage("Activates date must be before or equal to the expires date.")
+                            .Must(r => r.Expires!.Value.UtcDateTime <= r.Activates!.Value.UtcDateTime.AddDays(7))
+                            .WithMessage("Expires date must be no more than 7 days after the activates date.");
+                    })
+                    .Otherwise(() =>
+                    {
+                        RuleFor(r => r.Expires)
+                            .Cascade(CascadeMode.Stop)
+                            .Must(e => utcNow<= e!.Value.UtcDateTime)
+                            .WithMessage("Expires date must not be in the past.")
+                            .Must(e => e!.Value.UtcDateTime <=  utcNow.AddDays(7))
+                            .WithMessage("Expires date must be no more than 7 days from today.");
+                    });
+            });
 
             RuleFor(request => request.DataSetVersionId)
                 .NotEmpty();
@@ -54,15 +69,11 @@ public record PreviewTokenCreateRequest
             RuleFor(request => request.Label)
                 .NotEmpty()
                 .MaximumLength(100);
-            return;
-
-            static bool IsLessThanOrEqualToEndDate(DateTimeOffset startDate, DateTimeOffset endDate)
+            static bool IsNotInPastWithTolerance(DateTimeOffset now, DateTimeOffset value, TimeSpan tolerance)
             {
-                var startUtc = startDate.ToUniversalTime();
-                var endUtc = endDate.ToUniversalTime();
-
-                return startUtc.Date <= endUtc.Date;
+                return value.UtcDateTime >= now.UtcDateTime.Subtract(tolerance);
             }
+
         }
     }
 }
