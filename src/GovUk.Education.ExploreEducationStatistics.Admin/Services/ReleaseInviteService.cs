@@ -26,7 +26,6 @@ public class ReleaseInviteService(
     IUserRepository userRepository,
     IUserService userService,
     IUserRoleService userRoleService,
-    IUserInviteRepository userInviteRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IEmailService emailService,
@@ -49,17 +48,14 @@ public class ReleaseInviteService(
                 var sanitisedEmail = email.Trim();
 
                 var user = await userRepository.FindByEmail(sanitisedEmail);
-                if (user == null)
-                {
-                    return await CreateNewUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title);
-                }
 
-                return await CreateExistingUserContributorInvite(
-                    releaseVersionIds,
-                    user.Id,
-                    sanitisedEmail,
-                    publication.Title
-                );
+                return user is null
+                    ? await CreateNewUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title)
+                    : await CreateExistingUserContributorInvite(
+                        releaseVersionIds,
+                        user.Id,
+                        sanitisedEmail,
+                        publication.Title);
             });
     }
 
@@ -89,30 +85,18 @@ public class ReleaseInviteService(
         string publicationTitle
     )
     {
-        if (
-            await userReleaseInviteRepository.UserHasInvites(
-                releaseVersionIds: releaseVersionIds,
-                email: email,
-                role: Contributor
-            )
-        )
-        {
-            // if the user already has UserReleaseInvites,
-            // we assume they also have a UserInvite outstanding
-            return ValidationActionResult(UserAlreadyHasReleaseRoleInvites);
-        }
-
         var emailResult = await SendContributorInviteEmail(
             publicationTitle: publicationTitle,
             releaseVersionIds: releaseVersionIds,
             email: email
         );
+
         if (emailResult.IsLeft)
         {
             return emailResult;
         }
 
-        await userInviteRepository.CreateOrUpdate(
+        await userRepository.CreateOrUpdate(
             email: email,
             role: Role.Analyst,
             createdById: userService.GetUserId()
