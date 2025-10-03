@@ -18,13 +18,6 @@ import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useState } from 'react';
 
-const pageSectionIds = ['methodology-section', 'contact-us-section'] as const;
-type PageSectionId = (typeof pageSectionIds)[number];
-
-function isValidPageSectionId(value: string): value is PageSectionId {
-  return pageSectionIds.includes(value as PageSectionId);
-}
-
 interface Props {
   methodologiesSummary: PublicationMethodologiesList;
   publicationSummary: PublicationSummaryRedesign;
@@ -37,13 +30,6 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
   releaseVersionSummary,
 }) => {
   const { methodologies, externalMethodology } = methodologiesSummary;
-  const [activeSection, setActiveSection] = useState<PageSectionId>(
-    'methodology-section',
-  );
-
-  const externalMethodologyAttributes = getUrlAttributes(
-    externalMethodology?.url || '',
-  );
 
   const hasMethodologies = methodologies.length > 0 || externalMethodology;
 
@@ -52,8 +38,14 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
     contactUsNavItem,
   ].filter(item => !!item);
 
+  const [activeSection, setActiveSection] = useState(navItems[0].id);
+
+  const externalMethodologyAttributes = getUrlAttributes(
+    externalMethodology?.url || '',
+  );
+
   const setActiveSectionIfValid = (sectionId: string) => {
-    if (isValidPageSectionId(sectionId)) {
+    if (navItems.some(item => item.id === sectionId)) {
       setActiveSection(sectionId);
     }
   };
