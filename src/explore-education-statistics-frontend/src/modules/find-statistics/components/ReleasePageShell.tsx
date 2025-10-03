@@ -4,15 +4,14 @@ import {
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
-import ReleasePageTabNav, {
-  ReleasePageKey,
-} from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
+import ReleasePageTabNav from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
+import { ReleasePageTabRouteKey } from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { NextPage } from 'next';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  activePage: ReleasePageKey;
+  activePage: ReleasePageTabRouteKey;
   publicationSummary: PublicationSummaryRedesign;
   releaseVersionSummary: ReleaseVersionSummary;
   children: ReactNode;
