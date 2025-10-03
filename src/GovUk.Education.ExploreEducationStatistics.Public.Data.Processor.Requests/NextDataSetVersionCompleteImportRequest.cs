@@ -10,8 +10,7 @@ public record NextDataSetVersionCompleteImportRequest
     {
         public Validator()
         {
-            RuleFor(request => request.DataSetVersionId)
-                .NotEmpty();
+            RuleFor(request => request.DataSetVersionId).NotEmpty();
         }
     }
 }

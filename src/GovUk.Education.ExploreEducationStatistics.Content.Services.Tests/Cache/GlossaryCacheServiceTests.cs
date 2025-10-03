@@ -17,10 +17,8 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
     {
         new GlossaryCategoryViewModel(
             Heading: 'A',
-            Entries: new List<GlossaryEntryViewModel>
-            {
-                new(Title: "A title", Slug: "A slug", Body: "A body")
-            })
+            Entries: new List<GlossaryEntryViewModel> { new(Title: "A title", Slug: "A slug", Body: "A body") }
+        ),
     };
 
     [Fact]
@@ -32,15 +30,11 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
             .Setup(s => s.GetItemAsync(cacheKey, typeof(List<GlossaryCategoryViewModel>)))
             .ReturnsAsync((object?)null);
 
-        PublicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _glossary))
-            .Returns(Task.CompletedTask);
+        PublicBlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _glossary)).Returns(Task.CompletedTask);
 
         var glossaryService = new Mock<IGlossaryService>(Strict);
 
-        glossaryService
-            .Setup(s => s.GetGlossary())
-            .ReturnsAsync(_glossary);
+        glossaryService.Setup(s => s.GetGlossary()).ReturnsAsync(_glossary);
 
         var service = BuildService(glossaryService: glossaryService.Object);
 
@@ -72,9 +66,7 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
     {
         var glossaryService = new Mock<IGlossaryService>(Strict);
 
-        glossaryService
-            .Setup(s => s.GetGlossary())
-            .ReturnsAsync(_glossary);
+        glossaryService.Setup(s => s.GetGlossary()).ReturnsAsync(_glossary);
 
         PublicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(new GlossaryCacheKey(), _glossary))
@@ -96,25 +88,15 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
     {
         var original = new GlossaryCategoryViewModel(
             Heading: 'A',
-            Entries: new List<GlossaryEntryViewModel>
-            {
-                new(
-                    Body: "A body",
-                    Slug: "A slug",
-                    Title: "A title"
-                )
-            });
+            Entries: new List<GlossaryEntryViewModel> { new(Body: "A body", Slug: "A slug", Title: "A title") }
+        );
 
         var converted = DeserializeObject<GlossaryCategoryViewModel>(SerializeObject(original));
         converted.AssertDeepEqualTo(original);
     }
 
-    private static GlossaryCacheService BuildService(
-        IGlossaryService? glossaryService = null
-    )
+    private static GlossaryCacheService BuildService(IGlossaryService? glossaryService = null)
     {
-        return new GlossaryCacheService(
-            glossaryService: glossaryService ?? Mock.Of<IGlossaryService>(Strict)
-        );
+        return new GlossaryCacheService(glossaryService: glossaryService ?? Mock.Of<IGlossaryService>(Strict));
     }
 }

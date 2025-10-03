@@ -20,7 +20,7 @@ public class MethodologyApprovalUpdateRequest
     public bool IsStatusUpdateRequired(MethodologyVersion methodologyVersion)
     {
         return methodologyVersion.Status != Status
-               || methodologyVersion.PublishingStrategy != PublishingStrategy
-               || methodologyVersion.ScheduledWithReleaseVersionId != WithReleaseId;
+            || methodologyVersion.PublishingStrategy != PublishingStrategy
+            || methodologyVersion.ScheduledWithReleaseVersionId != WithReleaseId;
     }
 }

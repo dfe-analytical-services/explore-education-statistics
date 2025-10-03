@@ -16,15 +16,17 @@ public static class PublicationAuthorizationHandlersTestUtil
 
     public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        params PublicationRole[] publicationRolesExpectedToPass)
+        params PublicationRole[] publicationRolesExpectedToPass
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var publication = new Publication();
         await AssertHandlerSucceedsWithPublicationRoles<Publication, TRequirement>(
             handlerSupplier: handlerSupplier,
-            entity: publication, 
+            entity: publication,
             publicationId: publication.Id,
-            publicationRolesExpectedToPass: publicationRolesExpectedToPass);
+            publicationRolesExpectedToPass: publicationRolesExpectedToPass
+        );
     }
 
     public class PublicationRoleTestScenario : HandlerTestScenario
@@ -37,7 +39,8 @@ public static class PublicationAuthorizationHandlersTestUtil
         TEntity handleRequirementArgument,
         Action<ContentDbContext> addToDbHandler,
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-        params PublicationRole[] rolesExpectedToSucceed)
+        params PublicationRole[] rolesExpectedToSucceed
+    )
         where TRequirement : IAuthorizationRequirement
     {
         var allPublicationRoles = GetEnums<PublicationRole>();
@@ -51,12 +54,14 @@ public static class PublicationAuthorizationHandlersTestUtil
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     addToDbHandler(contentDbContext);
-                    await contentDbContext.AddAsync(new UserPublicationRole
-                    {
-                        UserId = userId,
-                        Role = role,
-                        PublicationId = publicationId,
-                    });
+                    await contentDbContext.AddAsync(
+                        new UserPublicationRole
+                        {
+                            UserId = userId,
+                            Role = role,
+                            PublicationId = publicationId,
+                        }
+                    );
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -65,7 +70,9 @@ public static class PublicationAuthorizationHandlersTestUtil
                     var user = DataFixture.AuthenticatedUser(userId: userId);
                     var authContext = new AuthorizationHandlerContext(
                         new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                        user, handleRequirementArgument);
+                        user,
+                        handleRequirementArgument
+                    );
 
                     var handler = handlerSupplier(contentDbContext);
                     await handler.HandleAsync(authContext);
@@ -92,7 +99,9 @@ public static class PublicationAuthorizationHandlersTestUtil
             var user = DataFixture.AuthenticatedUser(userId: userId);
             var authContext = new AuthorizationHandlerContext(
                 new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                user, handleRequirementArgument);
+                user,
+                handleRequirementArgument
+            );
 
             var handler = handlerSupplier(contentDbContext);
             await handler.HandleAsync(authContext);

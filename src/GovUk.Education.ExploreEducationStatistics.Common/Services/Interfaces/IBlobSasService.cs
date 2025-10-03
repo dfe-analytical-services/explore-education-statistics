@@ -17,7 +17,8 @@ public interface IBlobSasService
         string filename,
         string path,
         TimeSpan expiryDuration,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// Trade in a secure, short-lived SAS token in order to generate a secure
@@ -26,5 +27,6 @@ public interface IBlobSasService
     /// </summary>
     Task<Either<ActionResult, BlobClient>> CreateSecureBlobClient(
         BlobServiceClient blobServiceClient,
-        BlobDownloadToken token);
+        BlobDownloadToken token
+    );
 }

@@ -38,14 +38,16 @@ public class DataSetFileStorage(
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
     IDataSetService dataSetService,
-    IOptions<FeatureFlagsOptions> featureFlags, 
-    ILogger<DataSetFileStorage> logger) : IDataSetFileStorage
+    IOptions<FeatureFlagsOptions> featureFlags,
+    ILogger<DataSetFileStorage> logger
+) : IDataSetFileStorage
 {
     // TODO (EES-6176): Remove once manual replacement processes have been consolidated to use Upload* methods.
     public async Task<DataFileInfo> UploadDataSet(
         Guid releaseVersionId,
         DataSet dataSet,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
@@ -73,15 +75,13 @@ public class DataSetFileStorage(
             createdById: userService.GetUserId(),
             name: dataSet.Title,
             dataSet.ReplacingFile,
-            order: releaseDataFileOrder);
+            order: releaseDataFileOrder
+        );
 
-        var dataReleaseFile = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
+        var dataReleaseFile = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
             .ThenInclude(f => f.CreatedBy)
-            .SingleAsync(rf =>
-                rf.ReleaseVersionId == releaseVersionId &&
-                rf.FileId == dataFile.Id,
-                cancellationToken);
+            .SingleAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == dataFile.Id, cancellationToken);
 
         var metaFile = await releaseDataFileRepository.Create(
             releaseVersionId,
@@ -89,14 +89,17 @@ public class DataSetFileStorage(
             dataSet.MetaFile.FileName,
             contentLength: dataSet.MetaFile.FileSize,
             type: FileType.Metadata,
-            createdById: userService.GetUserId());
+            createdById: userService.GetUserId()
+        );
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-        
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-            && dataSet.ReplacingFile is not null 
-            && replacedReleaseDataFile!.PublicApiDataSetId != null)
-        { 
+
+        if (
+            featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            && dataSet.ReplacingFile is not null
+            && replacedReleaseDataFile!.PublicApiDataSetId != null
+        )
+        {
             await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
 
@@ -104,45 +107,61 @@ public class DataSetFileStorage(
 
         var permissions = await userService.GetDataFilePermissions(dataFile);
 
-        return new DataFileInfo(dataReleaseFile, dataImport, permissions)
-        {
-            Name = dataSet.Title
-        };
+        return new DataFileInfo(dataReleaseFile, dataImport, permissions) { Name = dataSet.Title };
     }
 
     private async Task CreateDraftDataSetVersion(
         Guid dataReleaseFileId,
         ReleaseFile replacedReleaseDataFile,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
 
-        await dataSetVersionService.GetDataSetVersion(dataSetId!.Value,
-                replacedReleaseDataFile.PublicApiDataSetVersion!,
-                cancellationToken)
+        await dataSetVersionService
+            .GetDataSetVersion(dataSetId!.Value, replacedReleaseDataFile.PublicApiDataSetVersion!, cancellationToken)
             .OnFailureDo(_ =>
             {
                 var errorMessage =
-                    "Failed to find the data set version expected to be linked to the release file that is being replaced for the " +
-                    $"data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
+                    "Failed to find the data set version expected to be linked to the release file that is being replaced for the "
+                    + $"data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
                 logger.LogError(errorMessage);
-                throw new InvalidOperationException("Failed to find the associated API data set version for the release file.");
+                throw new InvalidOperationException(
+                    "Failed to find the associated API data set version for the release file."
+                );
             })
             .OnSuccessDo(async dataSetVersion =>
+            {
+                if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
                 {
-                    if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
-                    {
-                        await DeleteAndRecreateInitialDataSetVersion(dataReleaseFileId, cancellationToken, dataSetVersion, dataSetId);
-                    }
-                    else if (dataSetVersion.Status != DataSetVersionStatus.Published)
-                    {
-                        await DeleteAndRecreateDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
-                    }
-                    else
-                    {
-                        await CreateNextDataSetVersion(dataReleaseFileId, replacedReleaseDataFile, cancellationToken, dataSetVersion, dataSetId);
-                    }
-                });
+                    await DeleteAndRecreateInitialDataSetVersion(
+                        dataReleaseFileId,
+                        cancellationToken,
+                        dataSetVersion,
+                        dataSetId
+                    );
+                }
+                else if (dataSetVersion.Status != DataSetVersionStatus.Published)
+                {
+                    await DeleteAndRecreateDataSetVersion(
+                        dataReleaseFileId,
+                        replacedReleaseDataFile,
+                        cancellationToken,
+                        dataSetVersion,
+                        dataSetId
+                    );
+                }
+                else
+                {
+                    await CreateNextDataSetVersion(
+                        dataReleaseFileId,
+                        replacedReleaseDataFile,
+                        cancellationToken,
+                        dataSetVersion,
+                        dataSetId
+                    );
+                }
+            });
     }
 
     private async Task CreateNextDataSetVersion(
@@ -150,21 +169,25 @@ public class DataSetFileStorage(
         ReleaseFile replacedReleaseDataFile,
         CancellationToken cancellationToken,
         DataSetVersion dataSetVersion,
-        [DisallowNull] Guid? dataSetId)
+        [DisallowNull] Guid? dataSetId
+    )
     {
-        await dataSetVersionService.CreateNextVersion(
-            releaseFileId: dataReleaseFileId,
-            dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
-            dataSetVersionToReplaceId: dataSetVersion.Id,
-            cancellationToken
-        ).OnFailureDo(_ =>
-        {
-            var errorMessage =
-                $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
-            logger.LogError(errorMessage);
-            throw new InvalidOperationException(
-                "Failure detected when creating the next draft version for the data file uploaded.");
-        });
+        await dataSetVersionService
+            .CreateNextVersion(
+                releaseFileId: dataReleaseFileId,
+                dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
+                dataSetVersionToReplaceId: dataSetVersion.Id,
+                cancellationToken
+            )
+            .OnFailureDo(_ =>
+            {
+                var errorMessage =
+                    $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException(
+                    "Failure detected when creating the next draft version for the data file uploaded."
+                );
+            });
     }
 
     private async Task DeleteAndRecreateDataSetVersion(
@@ -172,52 +195,65 @@ public class DataSetFileStorage(
         ReleaseFile replacedReleaseDataFile,
         CancellationToken cancellationToken,
         DataSetVersion dataSetVersion,
-        [DisallowNull] Guid? dataSetId)
+        [DisallowNull] Guid? dataSetId
+    )
     {
-        await dataSetVersionService.DeleteVersion(dataSetVersion.Id, cancellationToken)
+        await dataSetVersionService
+            .DeleteVersion(dataSetVersion.Id, cancellationToken)
             .OnSuccessVoid(async _ =>
             {
-                await dataSetVersionService.CreateNextVersion(
-                    releaseFileId: dataReleaseFileId,
-                    dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
-                    dataSetVersionToReplaceId: null,
-                    cancellationToken
-                ).OnFailureDo(_ =>
-                {
-                    var errorMessage =
-                        $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
-                    logger.LogError(errorMessage);
-                    throw new InvalidOperationException(
-                        "Failure detected when creating the next draft version for the data file uploaded.");
-                });
+                await dataSetVersionService
+                    .CreateNextVersion(
+                        releaseFileId: dataReleaseFileId,
+                        dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
+                        dataSetVersionToReplaceId: null,
+                        cancellationToken
+                    )
+                    .OnFailureDo(_ =>
+                    {
+                        var errorMessage =
+                            $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+                        logger.LogError(errorMessage);
+                        throw new InvalidOperationException(
+                            "Failure detected when creating the next draft version for the data file uploaded."
+                        );
+                    });
             })
             .OnFailureVoid(_ =>
             {
                 var errorMessage = $"Failed whilst deleting the draft version for the data set id: {dataSetId}.";
                 logger.LogError(errorMessage);
                 throw new InvalidOperationException(
-                    "Failure detected when deleting the draft version for the data file uploaded.");
+                    "Failure detected when deleting the draft version for the data file uploaded."
+                );
             });
     }
 
-    private async Task DeleteAndRecreateInitialDataSetVersion(Guid dataReleaseFileId, CancellationToken cancellationToken, DataSetVersion dataSetVersion, [DisallowNull] Guid? dataSetId)
+    private async Task DeleteAndRecreateInitialDataSetVersion(
+        Guid dataReleaseFileId,
+        CancellationToken cancellationToken,
+        DataSetVersion dataSetVersion,
+        [DisallowNull] Guid? dataSetId
+    )
     {
-        await dataSetVersionService.DeleteVersion(dataSetVersion.Id, cancellationToken)
+        await dataSetVersionService
+            .DeleteVersion(dataSetVersion.Id, cancellationToken)
             .OnSuccessVoid(async _ =>
             {
-                await dataSetService.CreateDataSet(dataReleaseFileId, cancellationToken)
+                await dataSetService
+                    .CreateDataSet(dataReleaseFileId, cancellationToken)
                     .OnFailureDo(_ =>
                     {
                         var errorMessage =
                             $"Failed whilst creating the initial draft version for the data set id: {dataSetId}";
                         logger.LogError(errorMessage);
-                        throw new InvalidOperationException(
-                            "Failed whilst creating the initial draft version ");
+                        throw new InvalidOperationException("Failed whilst creating the initial draft version ");
                     });
             })
             .OnFailureVoid(_ =>
             {
-                var errorMessage = $"Failed whilst deleting the initial draft version for the data set id: {dataSetId}.";
+                var errorMessage =
+                    $"Failed whilst deleting the initial draft version for the data set id: {dataSetId}.";
                 logger.LogError(errorMessage);
                 throw new InvalidOperationException("Failed whilst deleting initial the draft version.");
             });
@@ -228,7 +264,8 @@ public class DataSetFileStorage(
         Guid dataFileId,
         Guid metaFileId,
         DataSet dataSet,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{dataFileId}";
         var metaFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{metaFileId}";
@@ -239,7 +276,8 @@ public class DataSetFileStorage(
             dataSet.DataFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
             contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         await privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseFiles,
@@ -247,16 +285,19 @@ public class DataSetFileStorage(
             dataSet.MetaFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
             contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var uploadTasks = dataSets.Select(dataSet
-            => UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken));
+        var uploadTasks = dataSets.Select(dataSet =>
+            UploadDataSetToTemporaryStorage(releaseVersionId, dataSet, cancellationToken)
+        );
 
         var uploads = await Task.WhenAll(uploadTasks);
 
@@ -268,27 +309,30 @@ public class DataSetFileStorage(
         Guid releaseVersionId,
         Guid dataSetUploadId,
         FileType fileType,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await
-            ValidateFileTypeForTemporaryDataSetUploadFile(fileType)
-            .OnSuccess(async () => await contentDbContext
-                .DataSetUploads
-                .SingleOrNotFoundAsync(
+        return await ValidateFileTypeForTemporaryDataSetUploadFile(fileType)
+            .OnSuccess(async () =>
+                await contentDbContext.DataSetUploads.SingleOrNotFoundAsync(
                     upload => upload.Id == dataSetUploadId,
-                    cancellationToken: cancellationToken))
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(upload =>
             {
                 var fileDetails = GetTemporaryDataUploadFileDetails(
                     releaseVersionId: releaseVersionId,
                     fileType: fileType,
-                    upload: upload);
-                
+                    upload: upload
+                );
+
                 return privateBlobStorageService.GetBlobDownloadToken(
                     container: PrivateReleaseTempFiles,
                     filename: fileDetails.FileName,
                     path: fileDetails.FilePath,
-                    cancellationToken: cancellationToken);
+                    cancellationToken: cancellationToken
+                );
             });
     }
 
@@ -299,7 +343,8 @@ public class DataSetFileStorage(
     private async Task<DataSetUpload> UploadDataSetToTemporaryStorage(
         Guid releaseVersionId,
         DataSet dataSet,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var dataFileId = Guid.NewGuid();
         var metaFileId = Guid.NewGuid();
@@ -312,7 +357,8 @@ public class DataSetFileStorage(
             sourceStream: dataSet.DataFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
             contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         await privateBlobStorageService.UploadStream(
             containerName: PrivateReleaseTempFiles,
@@ -320,7 +366,8 @@ public class DataSetFileStorage(
             sourceStream: dataSet.MetaFile.FileStreamProvider(),
             contentType: ContentTypes.Csv,
             contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         return new DataSetUpload
         {
@@ -334,21 +381,26 @@ public class DataSetFileStorage(
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
             Status = DataSetUploadStatus.SCREENING,
             UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
-            ReplacingFileId = dataSet.ReplacingFile?.Id
+            ReplacingFileId = dataSet.ReplacingFile?.Id,
         };
     }
 
     public async Task<DataSetUpload> CreateOrReplaceExistingDataSetUpload(
         Guid releaseVersionId,
         DataSetUpload dataSetUpload,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(existingUpload =>
-            existingUpload.ReleaseVersionId == releaseVersionId &&
-            (
-                (existingUpload.DataSetTitle == dataSetUpload.DataSetTitle) ||
-                (existingUpload.DataFileName == dataSetUpload.DataFileName && existingUpload.MetaFileName == dataSetUpload.MetaFileName)
-            ),
+        var existingUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(
+            existingUpload =>
+                existingUpload.ReleaseVersionId == releaseVersionId
+                && (
+                    (existingUpload.DataSetTitle == dataSetUpload.DataSetTitle)
+                    || (
+                        existingUpload.DataFileName == dataSetUpload.DataFileName
+                        && existingUpload.MetaFileName == dataSetUpload.MetaFileName
+                    )
+                ),
             cancellationToken
         );
 
@@ -366,9 +418,13 @@ public class DataSetFileStorage(
     public async Task AddScreenerResultToUpload(
         Guid dataSetUploadId,
         DataSetScreenerResponse screenerResult,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var upload = await contentDbContext.DataSetUploads.SingleAsync(upload => upload.Id == dataSetUploadId, cancellationToken);
+        var upload = await contentDbContext.DataSetUploads.SingleAsync(
+            upload => upload.Id == dataSetUploadId,
+            cancellationToken
+        );
         upload.ScreenerResult = screenerResult;
 
         var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
@@ -393,17 +449,23 @@ public class DataSetFileStorage(
     public async Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
         List<DataSetUpload> dataSetUploads,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var releaseFiles = new List<ReleaseFile>();
 
         foreach (var dataSetUpload in dataSetUploads)
         {
-            var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
+            var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
+                releaseVersionId
+            );
 
             var replacingFile = dataSetUpload.ReplacingFileId is null
                 ? null
-                : await contentDbContext.Files.FirstAsync(f => f.Id == dataSetUpload.ReplacingFileId, cancellationToken);
+                : await contentDbContext.Files.FirstAsync(
+                    f => f.Id == dataSetUpload.ReplacingFileId,
+                    cancellationToken
+                );
 
             ReleaseFile? replacedReleaseDataFile = null;
 
@@ -423,17 +485,18 @@ public class DataSetFileStorage(
                 createdById: userService.GetUserId(),
                 name: dataSetUpload.DataSetTitle,
                 replacingDataFile: replacingFile,
-                order: releaseDataFileOrder);
+                order: releaseDataFileOrder
+            );
 
             var sourceDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataSetUpload.DataFileId);
             var destinationDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataFile.Id); // Same path, but a new ID has been generated by the creation step above
 
-            var dataReleaseFile = await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File.CreatedBy)
-                .SingleAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersionId &&
-                    rf.FileId == dataFile.Id,
-                    cancellationToken);
+            var dataReleaseFile = await contentDbContext
+                .ReleaseFiles.Include(rf => rf.File.CreatedBy)
+                .SingleAsync(
+                    rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == dataFile.Id,
+                    cancellationToken
+                );
 
             releaseFiles.Add(dataReleaseFile);
 
@@ -443,18 +506,31 @@ public class DataSetFileStorage(
                 dataSetUpload.MetaFileName,
                 dataSetUpload.MetaFileSizeInBytes,
                 type: FileType.Metadata,
-                createdById: userService.GetUserId());
+                createdById: userService.GetUserId()
+            );
 
             var sourceMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSetUpload.MetaFileId);
             var destinationMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, metaFile.Id); // Same path, but a new ID has been generated by the creation step above
 
-            await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceDataFilePath, destinationDataFilePath, PrivateReleaseFiles);
-            await privateBlobStorageService.MoveBlob(PrivateReleaseTempFiles, sourceMetaFilePath, destinationMetaFilePath, PrivateReleaseFiles);
-            
-            if (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
+            await privateBlobStorageService.MoveBlob(
+                PrivateReleaseTempFiles,
+                sourceDataFilePath,
+                destinationDataFilePath,
+                PrivateReleaseFiles
+            );
+            await privateBlobStorageService.MoveBlob(
+                PrivateReleaseTempFiles,
+                sourceMetaFilePath,
+                destinationMetaFilePath,
+                PrivateReleaseFiles
+            );
+
+            if (
+                featureFlags.Value.EnableReplacementOfPublicApiDataSets
                 && replacingFile is not null
-                && replacedReleaseDataFile!.PublicApiDataSetId != null)
-            { 
+                && replacedReleaseDataFile!.PublicApiDataSetId != null
+            )
+            {
                 await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
             }
 
@@ -464,28 +540,28 @@ public class DataSetFileStorage(
         return releaseFiles;
     }
 
-    private async Task<int> GetNextDataFileOrder(
-        Guid releaseVersionId,
-        Guid? fileToBeReplaceId = null)
+    private async Task<int> GetNextDataFileOrder(Guid releaseVersionId, Guid? fileToBeReplaceId = null)
     {
         if (fileToBeReplaceId is not null)
         {
-            var fileToBeReplacedReleaseFile = await contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
+            var fileToBeReplacedReleaseFile = await contentDbContext
+                .ReleaseFiles.Include(rf => rf.File)
                 .SingleAsync(rf =>
                     rf.ReleaseVersionId == releaseVersionId
                     && rf.File.Type == FileType.Data
-                    && rf.File.Id == fileToBeReplaceId);
+                    && rf.File.Id == fileToBeReplaceId
+                );
 
             return fileToBeReplacedReleaseFile.Order;
         }
 
-        var currentMaxOrder = await contentDbContext.ReleaseFiles
-            .Include(releaseFile => releaseFile.File)
+        var currentMaxOrder = await contentDbContext
+            .ReleaseFiles.Include(releaseFile => releaseFile.File)
             .Where(releaseFile =>
-                releaseFile.ReleaseVersionId == releaseVersionId &&
-                releaseFile.File.Type == FileType.Data &&
-                releaseFile.File.ReplacingId == null)
+                releaseFile.ReleaseVersionId == releaseVersionId
+                && releaseFile.File.Type == FileType.Data
+                && releaseFile.File.ReplacingId == null
+            )
             .MaxAsync(releaseFile => (int?)releaseFile.Order);
 
         return currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
@@ -493,30 +569,34 @@ public class DataSetFileStorage(
 
     private async Task<ReleaseFile?> GetReplacedReleaseFile(Guid releaseVersionId, Guid fileToBeReplacedId)
     {
-        return await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
+        return await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
             .SingleAsync(rf =>
                 rf.ReleaseVersionId == releaseVersionId
                 && rf.File.Type == FileType.Data
-                && rf.File.Id == fileToBeReplacedId);
+                && rf.File.Id == fileToBeReplacedId
+            );
     }
 
     private static Either<ActionResult, Unit> ValidateFileTypeForTemporaryDataSetUploadFile(FileType fileType)
     {
         return fileType is FileType.Data or FileType.Metadata
             ? Unit.Instance
-            : ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Message = $"Invalid {nameof(fileType)} value {fileType} for temporary data set upload file type",
-                Path = nameof(fileType),
-                Detail = new InvalidErrorDetail<FileType>(fileType)
-            });
+            : ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Message = $"Invalid {nameof(fileType)} value {fileType} for temporary data set upload file type",
+                    Path = nameof(fileType),
+                    Detail = new InvalidErrorDetail<FileType>(fileType),
+                }
+            );
     }
 
     private static (string FilePath, string FileName) GetTemporaryDataUploadFileDetails(
         Guid releaseVersionId,
         FileType fileType,
-        DataSetUpload upload)
+        DataSetUpload upload
+    )
     {
         if (fileType == FileType.Data)
         {
@@ -525,7 +605,7 @@ public class DataSetFileStorage(
                 FileName: upload.DataFileName
             );
         }
-        
+
         return (
             FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
             FileName: upload.MetaFileName

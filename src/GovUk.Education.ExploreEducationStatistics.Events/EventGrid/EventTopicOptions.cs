@@ -1,7 +1,7 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 
 /// <summary>
-/// Different event topic's configuration 
+/// Different event topic's configuration
 /// </summary>
 public class EventTopicOptions
 {

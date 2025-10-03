@@ -26,9 +26,11 @@ public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTi
 
     public Guid Id { get; set; }
 
-    [JsonIgnore] public ContentSection? ContentSection { get; set; }
+    [JsonIgnore]
+    public ContentSection? ContentSection { get; set; }
 
-    [JsonIgnore] public Guid? ContentSectionId { get; set; }
+    [JsonIgnore]
+    public Guid? ContentSectionId { get; set; }
 
     public Guid ReleaseVersionId { get; set; }
 
@@ -55,18 +57,14 @@ public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTi
 
 public class HtmlBlock : ContentBlock
 {
-    public HtmlBlock()
-    {
-    }
+    public HtmlBlock() { }
 
     public string Body { get; set; }
 }
 
 public class EmbedBlockLink : ContentBlock
 {
-    public EmbedBlockLink()
-    {
-    }
+    public EmbedBlockLink() { }
 
     public Guid EmbedBlockId { get; set; }
 
@@ -76,9 +74,7 @@ public class EmbedBlockLink : ContentBlock
 
 public class DataBlock : ContentBlock
 {
-    public DataBlock()
-    {
-    }
+    public DataBlock() { }
 
     public string Heading { get; set; }
 
@@ -93,15 +89,16 @@ public class DataBlock : ContentBlock
     {
         get
         {
-            return ChartsInternal.Select(chart =>
-            {
-                if (chart.Title.IsNullOrEmpty())
+            return ChartsInternal
+                .Select(chart =>
                 {
-                    chart.Title = Heading;
-                }
-                return chart;
-            }).ToList();
-
+                    if (chart.Title.IsNullOrEmpty())
+                    {
+                        chart.Title = Heading;
+                    }
+                    return chart;
+                })
+                .ToList();
         }
         set => ChartsInternal = value;
     }
@@ -127,7 +124,7 @@ public class ContentBlockClassType : Attribute
 public enum ContentBlockType
 {
     [ContentBlockClassType(Type = typeof(HtmlBlock))]
-    HtmlBlock
+    HtmlBlock,
 }
 
 public static class ContentBlockUtil

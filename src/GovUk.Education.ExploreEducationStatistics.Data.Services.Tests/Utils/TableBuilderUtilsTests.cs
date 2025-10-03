@@ -13,12 +13,7 @@ public class TableBuilderUtilsTests
         /*
          * 2011  Bury  cell1
          */
-        Assert.Equal(
-            1,
-            MaximumTableCellCount(
-                countOfIndicators: 1,
-                countOfLocations: 1,
-                countOfTimePeriods: 1));
+        Assert.Equal(1, MaximumTableCellCount(countOfIndicators: 1, countOfLocations: 1, countOfTimePeriods: 1));
     }
 
     [Fact]
@@ -27,12 +22,7 @@ public class TableBuilderUtilsTests
         /*
          * 2011  Bury  cell1  cell2  cell 3
          */
-        Assert.Equal(
-            3,
-            MaximumTableCellCount(
-                countOfIndicators: 3,
-                countOfLocations: 1,
-                countOfTimePeriods: 1));
+        Assert.Equal(3, MaximumTableCellCount(countOfIndicators: 3, countOfLocations: 1, countOfTimePeriods: 1));
     }
 
     [Fact]
@@ -43,12 +33,7 @@ public class TableBuilderUtilsTests
          * 2011  Kent  cell2
          * 2011  York  cell3
          */
-        Assert.Equal(
-            3,
-            MaximumTableCellCount(
-                countOfIndicators: 1,
-                countOfLocations: 3,
-                countOfTimePeriods: 1));
+        Assert.Equal(3, MaximumTableCellCount(countOfIndicators: 1, countOfLocations: 3, countOfTimePeriods: 1));
     }
 
     [Fact]
@@ -59,12 +44,7 @@ public class TableBuilderUtilsTests
          * 2012  Bury  cell2
          * 2013  Bury  cell3
          */
-        Assert.Equal(
-            3,
-            MaximumTableCellCount(
-                countOfIndicators: 1,
-                countOfLocations: 1,
-                countOfTimePeriods: 3));
+        Assert.Equal(3, MaximumTableCellCount(countOfIndicators: 1, countOfLocations: 1, countOfTimePeriods: 3));
     }
 
     [Fact]
@@ -78,12 +58,7 @@ public class TableBuilderUtilsTests
          * 2013  Bury   cell9  cell10
          * 2013  York  cell11  cell12
          */
-        Assert.Equal(
-            12,
-            MaximumTableCellCount(
-                countOfIndicators: 2,
-                countOfLocations: 2,
-                countOfTimePeriods: 3));
+        Assert.Equal(12, MaximumTableCellCount(countOfIndicators: 2, countOfLocations: 2, countOfTimePeriods: 3));
     }
 
     [Fact]
@@ -103,7 +78,9 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(1)));
+                countsOfFilterItemsByFilter: ListOf(1)
+            )
+        );
     }
 
     [Fact]
@@ -123,7 +100,9 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(1, 1)));
+                countsOfFilterItemsByFilter: ListOf(1, 1)
+            )
+        );
     }
 
     [Fact]
@@ -155,7 +134,9 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(3)));
+                countsOfFilterItemsByFilter: ListOf(3)
+            )
+        );
     }
 
     [Fact]
@@ -205,6 +186,8 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: ListOf(3, 2)));
+                countsOfFilterItemsByFilter: ListOf(3, 2)
+            )
+        );
     }
 }

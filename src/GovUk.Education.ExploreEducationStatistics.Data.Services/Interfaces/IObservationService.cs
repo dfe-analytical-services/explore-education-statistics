@@ -12,13 +12,14 @@ public interface IObservationService
     /// <see cref="MatchedObservation">#MatchedObservation temporary table.</see>
     /// This method then returns the query to select those matching Ids from the temporary table. This query can
     /// be used by client code to then quickly select against the matched Observations by making use of the
-    /// populated temporary table results. 
-    /// 
+    /// populated temporary table results.
+    ///
     /// </summary>
     /// <param name="query">The query to run in order to find matching Observation rows.</param>
     /// <param name="cancellationToken">Cancellation token for cancelling this request.</param>
     /// <returns>A query for selecting the matched Observation Ids from the temporary table.</returns>
     Task<IQueryable<MatchedObservation>> GetMatchedObservations(
         FullTableQuery query,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 }

@@ -15,7 +15,7 @@ class FileInfo
     public readonly string Filename;
 
     // we have a possible list of matching mime types that we'd expect to see, that potentially change when run
-    // on different operating systems, but are considered valid either way 
+    // on different operating systems, but are considered valid either way
     public readonly string[] ExpectedMimeTypes;
 
     public FileInfo(string filename, params string[] expectedMimeTypes)
@@ -29,18 +29,24 @@ public class FileTypeServiceTests
 {
     private static readonly FileInfo Doc = new("test.doc", "application/msword");
 
-    private static readonly FileInfo Docx = new("test.docx",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    private static readonly FileInfo Docx = new(
+        "test.docx",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
 
-    private static readonly FileInfo Ods = new("test.ods",
-        "application/vnd.oasis.opendocument.spreadsheet");
+    private static readonly FileInfo Ods = new("test.ods", "application/vnd.oasis.opendocument.spreadsheet");
 
-    private static readonly FileInfo Odt = new("test.odt",
-        "application/vnd.oasis.opendocument.text");
+    private static readonly FileInfo Odt = new("test.odt", "application/vnd.oasis.opendocument.text");
 
     private static readonly FileInfo Xls = new("test.xls", "application/vnd.ms-excel");
-    private static readonly FileInfo Xlsx = new("test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    private static readonly FileInfo Xlsx2 = new("test2.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    private static readonly FileInfo Xlsx = new(
+        "test.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    private static readonly FileInfo Xlsx2 = new(
+        "test2.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
     private static readonly FileInfo Csv = new("test.csv", "text/csv");
     private static readonly FileInfo SmallCsv = new("small-meta.csv", "text/csv");
     private static readonly FileInfo LongHeaderRowCsv = new("long-header-row.csv", "text/csv");
@@ -54,26 +60,11 @@ public class FileTypeServiceTests
     private static readonly FileInfo SvgNoXml = new("test-no-xml.svg", "image/svg+xml");
     private static readonly FileInfo Zip = new("test.zip", "application/x-compressed");
 
-    private static readonly List<FileInfo> ImageTypes =
-    [
-        Bmp,
-        Gif,
-        Jpg,
-        Png,
-    ];
+    private static readonly List<FileInfo> ImageTypes = [Bmp, Gif, Jpg, Png];
 
-    private static readonly List<FileInfo> CsvTypes =
-    [
-        Csv,
-        SmallCsv,
-        LongHeaderRowCsv,
-        Txt,
-    ];
+    private static readonly List<FileInfo> CsvTypes = [Csv, SmallCsv, LongHeaderRowCsv, Txt];
 
-    private static readonly List<FileInfo> ZipTypes =
-    [
-        Zip,
-    ];
+    private static readonly List<FileInfo> ZipTypes = [Zip];
 
     private static readonly List<FileInfo> AllTypes =
     [
@@ -248,13 +239,14 @@ public class FileTypeServiceTests
 
             var fileInfo = type;
 
-            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", fileInfo.Filename);
+            var filePath = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources",
+                fileInfo.Filename
+            );
 
             var formFile = new Mock<IFormFile>();
-            formFile
-                .Setup(f => f.OpenReadStream())
-                .Returns(() => File.OpenRead(filePath));
+            formFile.Setup(f => f.OpenReadStream()).Returns(() => File.OpenRead(filePath));
 
             var result = service.HasMatchingEncodingType(formFile.Object, allowedEncodingTypes);
 
@@ -269,13 +261,14 @@ public class FileTypeServiceTests
 
         var service = BuildService();
 
-        var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources", fileInfo.Filename);
+        var filePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources",
+            fileInfo.Filename
+        );
 
         var formFile = new Mock<IFormFile>();
-        formFile
-            .Setup(f => f.OpenReadStream())
-            .Returns(() => File.OpenRead(filePath));
+        formFile.Setup(f => f.OpenReadStream()).Returns(() => File.OpenRead(filePath));
 
         var result = service.HasMatchingEncodingType(formFile.Object, AllowedZipFileEncodingTypes);
 
@@ -293,8 +286,11 @@ public class FileTypeServiceTests
 
             var fileInfo = type;
 
-            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", fileInfo.Filename);
+            var filePath = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources",
+                fileInfo.Filename
+            );
 
             await using var stream = File.OpenRead(filePath);
 
@@ -315,13 +311,14 @@ public class FileTypeServiceTests
 
             var fileInfo = type;
 
-            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", fileInfo.Filename);
+            var filePath = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources",
+                fileInfo.Filename
+            );
 
             var formFile = new Mock<IFormFile>();
-            formFile
-                .Setup(f => f.OpenReadStream())
-                .Returns(() => File.OpenRead(filePath));
+            formFile.Setup(f => f.OpenReadStream()).Returns(() => File.OpenRead(filePath));
 
             var result = await service.HasZipFileType(formFile.Object);
 
@@ -333,32 +330,39 @@ public class FileTypeServiceTests
     {
         var service = BuildService();
 
-        var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources", fileInfo.Filename);
+        var filePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources",
+            fileInfo.Filename
+        );
 
         var formFile = new Mock<IFormFile>();
-        formFile
-            .Setup(f => f.OpenReadStream())
-            .Returns(() => File.OpenRead(filePath));
+        formFile.Setup(f => f.OpenReadStream()).Returns(() => File.OpenRead(filePath));
 
         var result = await service.GetMimeType(formFile.Object);
 
-        Assert.True(fileInfo.ExpectedMimeTypes.Contains(result),
-            "Expected " + result + " to be contained in the expected mime types list");
+        Assert.True(
+            fileInfo.ExpectedMimeTypes.Contains(result),
+            "Expected " + result + " to be contained in the expected mime types list"
+        );
     }
 
-    private static async Task AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes,
-        bool expectedToSucceed)
+    private static async Task AssertHasMatchingMimeType(
+        FileInfo fileInfo,
+        List<Regex> availableMimeTypes,
+        bool expectedToSucceed
+    )
     {
         var service = BuildService();
 
-        var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources", fileInfo.Filename);
+        var filePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources",
+            fileInfo.Filename
+        );
 
         var formFile = new Mock<IFormFile>();
-        formFile
-            .Setup(f => f.OpenReadStream())
-            .Returns(() => File.OpenRead(filePath));
+        formFile.Setup(f => f.OpenReadStream()).Returns(() => File.OpenRead(filePath));
 
         var result = await service.HasMatchingMimeType(formFile.Object, availableMimeTypes);
 
@@ -372,8 +376,6 @@ public class FileTypeServiceTests
 
     private static FileTypeService BuildService(IConfiguration? configuration = null)
     {
-        return new FileTypeService(
-            configuration ?? DefaultConfiguration()
-        );
+        return new FileTypeService(configuration ?? DefaultConfiguration());
     }
 }

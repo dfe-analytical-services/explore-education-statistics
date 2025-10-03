@@ -5,13 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
 public record PermalinkCsvMetaViewModel
 {
-    private Lazy<Dictionary<string, FilterCsvMetaViewModel>> FiltersByGroupingColumnLazy => new(
-        () => Filters
-            .Values
-            .Where(filter => filter.GroupCsvColumn != null)
-            .ToDictionary(
-                filter => filter.GroupCsvColumn!,
-                filter => filter));
+    private Lazy<Dictionary<string, FilterCsvMetaViewModel>> FiltersByGroupingColumnLazy =>
+        new(() =>
+            Filters
+                .Values.Where(filter => filter.GroupCsvColumn != null)
+                .ToDictionary(filter => filter.GroupCsvColumn!, filter => filter)
+        );
 
     public IReadOnlyDictionary<string, FilterCsvMetaViewModel> Filters { get; init; } =
         new Dictionary<string, FilterCsvMetaViewModel>();

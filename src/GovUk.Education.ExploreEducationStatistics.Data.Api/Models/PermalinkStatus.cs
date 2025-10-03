@@ -6,5 +6,5 @@ public enum PermalinkStatus
     SubjectRemoved,
     SubjectReplacedOrRemoved,
     NotForLatestRelease,
-    PublicationSuperseded
+    PublicationSuperseded,
 }

@@ -13,18 +13,14 @@ public static class DataTableExtension
 
         dataTable.Columns.Add(column);
 
-        var rows = values?.Select(value => new[]
-        {
-            new ColumnValue(column, value)
-        }).ToMultidimensionalArray();
+        var rows = values?.Select(value => new[] { new ColumnValue(column, value) }).ToMultidimensionalArray();
 
         AddRows(dataTable, rows);
 
         return dataTable;
     }
 
-    public static DataTable AsTimePeriodListTable(
-        this IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> values)
+    public static DataTable AsTimePeriodListTable(this IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> values)
     {
         var dataTable = new DataTable();
         var yearColumn = new DataColumn("year");
@@ -33,11 +29,15 @@ public static class DataTableExtension
         dataTable.Columns.Add(yearColumn);
         dataTable.Columns.Add(timeIdentifierColumn);
 
-        var rows = values.Select(value => new[]
-        {
-            new ColumnValue(yearColumn, value.Year),
-            new ColumnValue(timeIdentifierColumn, value.TimeIdentifier.GetEnumValue())
-        }).ToMultidimensionalArray();
+        var rows = values
+            .Select(value =>
+                new[]
+                {
+                    new ColumnValue(yearColumn, value.Year),
+                    new ColumnValue(timeIdentifierColumn, value.TimeIdentifier.GetEnumValue()),
+                }
+            )
+            .ToMultidimensionalArray();
 
         AddRows(dataTable, rows);
 

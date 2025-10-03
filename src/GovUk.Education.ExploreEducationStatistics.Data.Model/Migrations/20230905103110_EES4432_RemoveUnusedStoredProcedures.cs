@@ -15,7 +15,5 @@ public partial class EES4432_RemoveUnusedStoredProcedures : Migration
         migrationBuilder.Sql("DROP PROCEDURE IF EXISTS dbo.RemoveSoftDeletedSubjectsAndObservationRows");
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

@@ -26,9 +26,8 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
 {
     private readonly DataFixture _fixture = new();
 
-    private DataSetFilesControllerAnalyticsTests(TestApplicationFactory testApp) : base(testApp)
-    {
-    }
+    private DataSetFilesControllerAnalyticsTests(TestApplicationFactory testApp)
+        : base(testApp) { }
 
     public class DownloadDataSetFileAnalyticsTests(TestApplicationFactory testApp)
         : DataSetFilesControllerAnalyticsTests(testApp)
@@ -38,17 +37,17 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
         [Fact]
         public async Task DownloadDataSetFile_RecordAnalytics()
         {
-            Publication publication = _fixture.DefaultPublication()
+            Publication publication = _fixture
+                .DefaultPublication()
                 .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
                 .WithTheme(_fixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+            ReleaseFile releaseFile = _fixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data));
 
-            var testApp = BuildApp(
-                enableAzurite: true,
-                enableAnalytics: true);
+            var testApp = BuildApp(enableAzurite: true, enableAnalytics: true);
             var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
             var analyticsPathResolver = testApp.Services.GetRequiredService<IAnalyticsPathResolver>();
 
@@ -57,7 +56,8 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
             await publicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
                 releaseFile.PublicPath(),
-                formFile);
+                formFile
+            );
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
@@ -70,15 +70,18 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            var analyticsRequestFiles = Directory.GetFiles(
-                    analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths))
+            var analyticsRequestFiles = Directory
+                .GetFiles(
+                    analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths)
+                )
                 .ToList();
 
             var requestFile = Assert.Single(analyticsRequestFiles);
             var requestFileContents = await File.ReadAllTextAsync(requestFile);
             Snapshot.Match(
                 currentResult: requestFileContents,
-                snapshotName: $"{nameof(DownloadDataSetFileAnalyticsTests)}.{nameof(DownloadDataSetFile_RecordAnalytics)}.snap");
+                snapshotName: $"{nameof(DownloadDataSetFileAnalyticsTests)}.{nameof(DownloadDataSetFile_RecordAnalytics)}.snap"
+            );
         }
     }
 
@@ -86,7 +89,8 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
         bool enableAzurite = false,
-        bool enableAnalytics = false)
+        bool enableAnalytics = false
+    )
     {
         List<Action<IWebHostBuilder>> configFuncs = [];
 
@@ -125,17 +129,9 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
         writer.Flush();
         memoryStream.Position = 0;
 
-        var headerDictionary = new HeaderDictionary
-        {
-            ["ContentType"] = "text/csv"
-        };
+        var headerDictionary = new HeaderDictionary { ["ContentType"] = "text/csv" };
 
-        return new FormFile(
-            memoryStream,
-            0,
-            memoryStream.Length,
-            "id_from_form",
-            "dataCsv.csv")
+        return new FormFile(memoryStream, 0, memoryStream.Length, "id_from_form", "dataCsv.csv")
         {
             Headers = headerDictionary,
         };

@@ -10,12 +10,12 @@
 public interface IFileAccessor
 {
     bool DirectoryExists(string directory);
-    
+
     void CreateDirectory(string directory);
-    
+
     void DeleteDirectory(string directory);
-    
+
     IList<string> ListFiles(string directory);
-    
+
     void Move(string sourcePath, string destinationPath);
 }

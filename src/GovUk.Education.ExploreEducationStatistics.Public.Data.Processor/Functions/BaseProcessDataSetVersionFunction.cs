@@ -8,17 +8,19 @@ public abstract class BaseProcessDataSetVersionFunction(PublicDataDbContext publ
 {
     protected async Task<DataSetVersionImport> GetDataSetVersionImport(
         Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await publicDataDbContext.DataSetVersionImports
-            .Include(i => i.DataSetVersion)
+        return await publicDataDbContext
+            .DataSetVersionImports.Include(i => i.DataSetVersion)
             .SingleAsync(i => i.InstanceId == instanceId, cancellationToken: cancellationToken);
     }
 
     protected async Task UpdateImportStage(
         DataSetVersionImport dataSetVersionImport,
         DataSetVersionImportStage stage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         dataSetVersionImport.Stage = stage;
         await publicDataDbContext.SaveChangesAsync(cancellationToken);

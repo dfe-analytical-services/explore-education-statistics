@@ -29,18 +29,13 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         privateBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
 
         var result = await controller.ClearPrivateCache(
-            new ClearPrivateCachePathsViewModel
-            {
-                Paths = SetOf("subject-meta")
-            }
+            new ClearPrivateCachePathsViewModel { Paths = SetOf("subject-meta") }
         );
 
         VerifyAllMocks(privateBlobStorageService);
@@ -66,22 +61,13 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         privateBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
 
         var result = await controller.ClearPrivateCache(
-            new ClearPrivateCachePathsViewModel
-            {
-                Paths =
-                [
-                    "data-blocks",
-                    "subject-meta"
-                ]
-            }
+            new ClearPrivateCachePathsViewModel { Paths = ["data-blocks", "subject-meta"] }
         );
 
         VerifyAllMocks(privateBlobStorageService);
@@ -116,8 +102,7 @@ public class BauCacheControllerTests
     {
         var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
 
-        glossaryCacheService.Setup(s => s.UpdateGlossary())
-            .ReturnsAsync([]);
+        glossaryCacheService.Setup(s => s.UpdateGlossary()).ReturnsAsync([]);
 
         var controller = BuildController(glossaryCacheService: glossaryCacheService.Object);
 
@@ -137,9 +122,7 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
@@ -172,9 +155,7 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
@@ -203,9 +184,7 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
@@ -233,9 +212,7 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
@@ -280,9 +257,7 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         privateBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
@@ -314,9 +289,7 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
@@ -329,16 +302,40 @@ public class BauCacheControllerTests
 
         var guid = Guid.NewGuid();
         var regex = Assert.IsType<Regex>(options.IncludeRegex);
-        Assert.Matches(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-1.json");
-        Assert.Matches(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-12.json");
-        Assert.Matches(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-123.json");
+        Assert.Matches(
+            regex,
+            $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-1.json"
+        );
+        Assert.Matches(
+            regex,
+            $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-12.json"
+        );
+        Assert.Matches(
+            regex,
+            $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-123.json"
+        );
         Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}");
         Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/");
-        Assert.DoesNotMatch(regex, $"publications/publication-1/releases/abcd-ef/data-blocks/{guid}-boundary-levels/{guid}-1.json");
-        Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-1/data-blocks/{guid}-boundary-levels/{guid}-.json");
-        Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-.json");
-        Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-a.json");
-        Assert.DoesNotMatch(regex, $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-1234.json");
+        Assert.DoesNotMatch(
+            regex,
+            $"publications/publication-1/releases/abcd-ef/data-blocks/{guid}-boundary-levels/{guid}-1.json"
+        );
+        Assert.DoesNotMatch(
+            regex,
+            $"publications/publication-1/releases/2020-1/data-blocks/{guid}-boundary-levels/{guid}-.json"
+        );
+        Assert.DoesNotMatch(
+            regex,
+            $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-.json"
+        );
+        Assert.DoesNotMatch(
+            regex,
+            $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-a.json"
+        );
+        Assert.DoesNotMatch(
+            regex,
+            $"publications/publication-1/releases/2020-01/data-blocks/{guid}-boundary-levels/{guid}-1234.json"
+        );
     }
 
     [Fact]
@@ -350,18 +347,13 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
         var result = await controller.ClearPublicCacheReleases(
-            new ClearPublicCacheReleasePathsViewModel
-            {
-                Paths = SetOf("subject-meta")
-            }
+            new ClearPublicCacheReleasePathsViewModel { Paths = SetOf("subject-meta") }
         );
 
         VerifyAllMocks(publicBlobStorageService);
@@ -372,8 +364,7 @@ public class BauCacheControllerTests
         Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
         Assert.DoesNotMatch(regex, "publications/releases/release-1/subject-meta/something");
         Assert.DoesNotMatch(regex, "publications/publication-1/releases/subject-meta/something");
-        Assert.DoesNotMatch(regex,
-            "something/publications/publication-1/releases/release-1/subject-meta/something");
+        Assert.DoesNotMatch(regex, "something/publications/publication-1/releases/release-1/subject-meta/something");
         Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/data-blocks/something");
         Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/invalid/something");
         Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/something");
@@ -388,22 +379,13 @@ public class BauCacheControllerTests
         var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
 
         publicBlobStorageService
-            .Setup(
-                s =>
-                    s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+            .Setup(s => s.DeleteBlobs(PublicContent, null, Capture.With(match)))
             .Returns(Task.CompletedTask);
 
         var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
         var result = await controller.ClearPublicCacheReleases(
-            new ClearPublicCacheReleasePathsViewModel
-            {
-                Paths =
-                [
-                    "data-blocks",
-                    "subject-meta"
-                ]
-            }
+            new ClearPublicCacheReleasePathsViewModel { Paths = ["data-blocks", "subject-meta"] }
         );
 
         VerifyAllMocks(publicBlobStorageService);
@@ -414,8 +396,7 @@ public class BauCacheControllerTests
         Assert.Matches(regex, "publications/publication-1/releases/release-1/data-blocks/something");
         Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
         Assert.DoesNotMatch(regex, "something/publications/publication-1/releases/release-1/data-blocks/something");
-        Assert.DoesNotMatch(regex,
-            "something/publications/publication-1/releases/release-1/subject-meta/something");
+        Assert.DoesNotMatch(regex, "something/publications/publication-1/releases/release-1/subject-meta/something");
         Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/invalid/something");
         Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/something");
     }
@@ -439,19 +420,14 @@ public class BauCacheControllerTests
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        publicationCacheService
-            .Setup(s => s.UpdatePublicationTree())
-            .ReturnsAsync([]);
+        publicationCacheService.Setup(s => s.UpdatePublicationTree()).ReturnsAsync([]);
 
         var controller = BuildController(publicationCacheService: publicationCacheService.Object);
 
         var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
 
         var result = await controller.UpdatePublicCacheTrees(
-            new UpdatePublicCacheTreePathsViewModel
-            {
-                CacheEntries = SetOf(publicationTreeOption)
-            }
+            new UpdatePublicCacheTreePathsViewModel { CacheEntries = SetOf(publicationTreeOption) }
         );
 
         VerifyAllMocks(publicationCacheService);
@@ -465,31 +441,22 @@ public class BauCacheControllerTests
         var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        publicationCacheService
-            .Setup(s => s.UpdatePublicationTree())
-            .ReturnsAsync([]);
+        publicationCacheService.Setup(s => s.UpdatePublicationTree()).ReturnsAsync([]);
 
         methodologyCacheService
             .Setup(s => s.UpdateSummariesTree())
-            .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                []));
+            .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>([]));
 
         var controller = BuildController(
             methodologyCacheService: methodologyCacheService.Object,
-            publicationCacheService: publicationCacheService.Object);
+            publicationCacheService: publicationCacheService.Object
+        );
 
         var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
         var methodologyTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree.ToString();
 
         var result = await controller.UpdatePublicCacheTrees(
-            new UpdatePublicCacheTreePathsViewModel
-            {
-                CacheEntries =
-                [
-                    publicationTreeOption,
-                    methodologyTreeOption
-                ]
-            }
+            new UpdatePublicCacheTreePathsViewModel { CacheEntries = [publicationTreeOption, methodologyTreeOption] }
         );
 
         VerifyAllMocks(publicationCacheService, methodologyCacheService);
@@ -516,7 +483,8 @@ public class BauCacheControllerTests
         IPublicBlobStorageService? publicBlobStorageService = null,
         IGlossaryCacheService? glossaryCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
-        IPublicationCacheService? publicationCacheService = null)
+        IPublicationCacheService? publicationCacheService = null
+    )
     {
         return new BauCacheController(
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),

@@ -15,11 +15,9 @@ public partial class EES4676_UpdatePreReleaseAccessListDefaultText : Migration
     {
         migrationBuilder.SqlFromFile(
             ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4676_UpdatePreReleaseAccessListDefaultText)}.sql");
+            $"{MigrationId}_{nameof(EES4676_UpdatePreReleaseAccessListDefaultText)}.sql"
+        );
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

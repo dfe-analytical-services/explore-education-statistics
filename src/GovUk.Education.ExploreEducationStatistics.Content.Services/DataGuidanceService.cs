@@ -13,29 +13,31 @@ public class DataGuidanceService : IDataGuidanceService
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseCacheService _releaseCacheService;
 
-    public DataGuidanceService(IDataGuidanceDataSetService dataGuidanceDataSetService,
+    public DataGuidanceService(
+        IDataGuidanceDataSetService dataGuidanceDataSetService,
         IPublicationCacheService publicationCacheService,
-        IReleaseCacheService releaseCacheService)
+        IReleaseCacheService releaseCacheService
+    )
     {
         _dataGuidanceDataSetService = dataGuidanceDataSetService;
         _publicationCacheService = publicationCacheService;
         _releaseCacheService = releaseCacheService;
     }
 
-    public async Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(string publicationSlug,
-        string? releaseSlug = null)
+    public async Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(
+        string publicationSlug,
+        string? releaseSlug = null
+    )
     {
-        return await _publicationCacheService.GetPublication(publicationSlug)
+        return await _publicationCacheService
+            .GetPublication(publicationSlug)
             .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
             .OnSuccess(publicationAndRelease =>
             {
                 var (publication, release) = publicationAndRelease;
-                return _dataGuidanceDataSetService.ListDataSets(release.Id)
-                    .OnSuccess(dataSets => new DataGuidanceViewModel(
-                        release,
-                        publication,
-                        dataSets
-                    ));
+                return _dataGuidanceDataSetService
+                    .ListDataSets(release.Id)
+                    .OnSuccess(dataSets => new DataGuidanceViewModel(release, publication, dataSets));
             });
     }
 }

@@ -12,5 +12,5 @@ public enum ReleaseType
 
     OfficialStatistics,
 
-    OfficialStatisticsInDevelopment
+    OfficialStatisticsInDevelopment,
 }

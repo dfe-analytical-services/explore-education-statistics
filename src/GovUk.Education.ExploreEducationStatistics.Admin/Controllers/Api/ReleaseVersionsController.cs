@@ -37,7 +37,8 @@ public class ReleaseVersionsController : ControllerBase
         IReleaseChecklistService releaseChecklistService,
         IDataImportService dataImportService,
         IDataSetUploadRepository dataSetUploadRepository,
-        IDataSetFileStorage dataSetFileStorage)
+        IDataSetFileStorage dataSetFileStorage
+    )
     {
         _releaseVersionService = releaseVersionService;
         _releaseAmendmentService = releaseAmendmentService;
@@ -52,9 +53,7 @@ public class ReleaseVersionsController : ControllerBase
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpDelete("release/{releaseVersionId:guid}")]
-    public async Task<ActionResult> DeleteReleaseVersion(
-        Guid releaseVersionId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteReleaseVersion(Guid releaseVersionId, CancellationToken cancellationToken)
     {
         return await _releaseVersionService
             .DeleteReleaseVersion(releaseVersionId, cancellationToken)
@@ -65,26 +64,24 @@ public class ReleaseVersionsController : ControllerBase
     [HttpPost("release/{releaseVersionId:guid}/amendment")]
     public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
     {
-        return await _releaseAmendmentService
-            .CreateReleaseAmendment(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseAmendmentService.CreateReleaseAmendment(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
     {
-        return await _releaseDataFileService
-            .GetInfo(releaseVersionId, fileId)
-            .HandleFailuresOrOk();
+        return await _releaseDataFileService.GetInfo(releaseVersionId, fileId).HandleFailuresOrOk();
     }
 
     [HttpGet(
-        "releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download-temporary-file/blob-token")]
+        "releaseVersions/{releaseVersionId:guid}/{fileType}/{dataSetUploadId:guid}/download-temporary-file/blob-token"
+    )]
     public async Task<ActionResult<string>> GetTemporaryDataSetUploadFileBlobDownloadToken(
         Guid releaseVersionId,
         FileType fileType,
         Guid dataSetUploadId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _dataSetFileStorage
             .GetTemporaryFileDownloadToken(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
@@ -94,38 +91,37 @@ public class ReleaseVersionsController : ControllerBase
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/accoutrements-summary")]
-    public async Task<ActionResult<DataSetAccoutrementsViewModel>> GetDataSetAccoutrementsSummary(Guid releaseVersionId,
-        Guid fileId)
+    public async Task<ActionResult<DataSetAccoutrementsViewModel>> GetDataSetAccoutrementsSummary(
+        Guid releaseVersionId,
+        Guid fileId
+    )
     {
-        return await _releaseDataFileService.GetAccoutrementsSummary(
-                releaseVersionId: releaseVersionId,
-                fileId: fileId)
+        return await _releaseDataFileService
+            .GetAccoutrementsSummary(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/data")]
     public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
     {
-        return await _releaseDataFileService
-            .ListAll(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseDataFileService.ListAll(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads")]
     public async Task<ActionResult<List<DataSetUploadViewModel>>> GetDataSetUploads(
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await _dataSetUploadRepository
-            .ListAll(releaseVersionId, cancellationToken)
-            .HandleFailuresOrOk();
+        return await _dataSetUploadRepository.ListAll(releaseVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpDelete("releaseVersions/{releaseVersionId:guid}/upload/{dataSetUploadId:guid}")]
     public async Task<ActionResult> DeleteDataSetUpload(
         Guid releaseVersionId,
         Guid dataSetUploadId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _dataSetUploadRepository
             .Delete(releaseVersionId, dataSetUploadId, cancellationToken)
@@ -134,13 +130,9 @@ public class ReleaseVersionsController : ControllerBase
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpPut("release/{releaseVersionId:guid}/data/order")]
-    public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(
-        Guid releaseVersionId,
-        List<Guid> fileIds)
+    public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId, List<Guid> fileIds)
     {
-        return await _releaseDataFileService
-            .ReorderDataFiles(releaseVersionId, fileIds)
-            .HandleFailuresOrOk();
+        return await _releaseDataFileService.ReorderDataFiles(releaseVersionId, fileIds).HandleFailuresOrOk();
     }
 
     [HttpPost("releaseVersions/data")]
@@ -148,18 +140,14 @@ public class ReleaseVersionsController : ControllerBase
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSet(
         [FromForm] UploadDataSetRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await using var dataFile = new ManagedStreamFormFile(request.DataFile);
         await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
 
         return await _releaseDataFileService
-            .Upload(
-                request.ReleaseVersionId,
-                dataFile,
-                metaFile,
-                request.Title,
-                cancellationToken)
+            .Upload(request.ReleaseVersionId, dataFile, metaFile, request.Title, cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -168,16 +156,13 @@ public class ReleaseVersionsController : ControllerBase
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsZip(
         [FromForm] UploadDataSetAsZipRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
 
         return await _releaseDataFileService
-            .UploadFromZip(
-                request.ReleaseVersionId,
-                zipFile,
-                request.Title,
-                cancellationToken)
+            .UploadFromZip(request.ReleaseVersionId, zipFile, request.Title, cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -186,15 +171,13 @@ public class ReleaseVersionsController : ControllerBase
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<ActionResult<List<DataSetUploadViewModel>>> UploadDataSetAsBulkZip(
         [FromForm] UploadDataSetAsBulkZipRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
 
         return await _releaseDataFileService
-            .UploadFromBulkZip(
-                request.ReleaseVersionId,
-                zipFile,
-                cancellationToken)
+            .UploadFromBulkZip(request.ReleaseVersionId, zipFile, cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -202,7 +185,8 @@ public class ReleaseVersionsController : ControllerBase
     public async Task<ActionResult> ImportDataSetsFromTempStorage(
         Guid releaseVersionId,
         List<Guid> dataSetUploadIds,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _releaseDataFileService
             .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetUploadIds, cancellationToken)
@@ -213,43 +197,40 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releases/{releaseVersionId:guid}")]
     public async Task<ActionResult<ReleaseVersionViewModel>> GetReleaseVersion(Guid releaseVersionId)
     {
-        return await _releaseVersionService
-            .GetRelease(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseVersionService.GetRelease(releaseVersionId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/{releaseVersionId:guid}/status")]
     public async Task<ActionResult<List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
     {
-        return await _releaseApprovalService
-            .ListReleaseStatuses(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseApprovalService.ListReleaseStatuses(releaseVersionId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/{releaseVersionId:guid}/publication-status")]
     public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
-        Guid releaseVersionId)
+        Guid releaseVersionId
+    )
     {
-        return await _releaseVersionService
-            .GetReleasePublicationStatus(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseVersionService.GetReleasePublicationStatus(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpPatch("releaseVersions/{releaseVersionId:guid}")]
-    public async Task<ActionResult<ReleaseVersionViewModel>> UpdateReleaseVersion(ReleaseVersionUpdateRequest request,
-        Guid releaseVersionId)
+    public async Task<ActionResult<ReleaseVersionViewModel>> UpdateReleaseVersion(
+        ReleaseVersionUpdateRequest request,
+        Guid releaseVersionId
+    )
     {
-        return await _releaseVersionService
-            .UpdateReleaseVersion(releaseVersionId, request)
-            .HandleFailuresOrOk();
+        return await _releaseVersionService.UpdateReleaseVersion(releaseVersionId, request).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpPost("releases/{releaseVersionId:guid}/status")]
-    public async Task<ActionResult<ReleaseVersionViewModel>> CreateReleaseStatus(ReleaseStatusCreateRequest request,
-        Guid releaseVersionId)
+    public async Task<ActionResult<ReleaseVersionViewModel>> CreateReleaseStatus(
+        ReleaseStatusCreateRequest request,
+        Guid releaseVersionId
+    )
     {
         return await _releaseApprovalService
             .CreateReleaseStatus(releaseVersionId, request)
@@ -259,12 +240,9 @@ public class ReleaseVersionsController : ControllerBase
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("publications/{publicationId:guid}/releases/template")]
-    public async Task<ActionResult<IdTitleViewModel>> GetTemplateRelease(
-        [Required] Guid publicationId)
+    public async Task<ActionResult<IdTitleViewModel>> GetTemplateRelease([Required] Guid publicationId)
     {
-        return await _releaseVersionService
-            .GetLatestPublishedRelease(publicationId)
-            .HandleFailuresOrOk();
+        return await _releaseVersionService.GetLatestPublishedRelease(publicationId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -280,18 +258,14 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releases/approvals")]
     public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval()
     {
-        return await _releaseVersionService
-            .ListUsersReleasesForApproval()
-            .HandleFailuresOrOk();
+        return await _releaseVersionService.ListUsersReleasesForApproval().HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/scheduled")]
     public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases()
     {
-        return await _releaseVersionService
-            .ListScheduledReleases()
-            .HandleFailuresOrOk();
+        return await _releaseVersionService.ListScheduledReleases().HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -299,8 +273,7 @@ public class ReleaseVersionsController : ControllerBase
     public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseVersionId, Guid fileId)
     {
         return _releaseVersionService
-            .GetDataFileImportStatus(releaseVersionId: releaseVersionId,
-                fileId: fileId)
+            .GetDataFileImportStatus(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrOk();
     }
 
@@ -308,7 +281,8 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("release/{releaseVersionId:guid}/delete-plan")]
     public async Task<ActionResult<DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _releaseVersionService
             .GetDeleteReleaseVersionPlan(releaseVersionId, cancellationToken)
@@ -320,13 +294,15 @@ public class ReleaseVersionsController : ControllerBase
     public async Task<ActionResult<DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
         Guid releaseVersionId,
         Guid fileId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await _releaseVersionService
             .GetDeleteDataFilePlan(
                 releaseVersionId: releaseVersionId,
                 fileId: fileId,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -335,8 +311,7 @@ public class ReleaseVersionsController : ControllerBase
     public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
     {
         return await _releaseVersionService
-            .RemoveDataFiles(releaseVersionId: releaseVersionId,
-                fileId: fileId)
+            .RemoveDataFiles(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrNoContent();
     }
 
@@ -345,8 +320,7 @@ public class ReleaseVersionsController : ControllerBase
     public async Task<ActionResult> CancelFileImport(Guid releaseVersionId, Guid fileId)
     {
         return await _dataImportService
-            .CancelImport(releaseVersionId: releaseVersionId,
-                fileId: fileId)
+            .CancelImport(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOr(_ => new AcceptedResult());
     }
 
@@ -354,24 +328,19 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releases/{releaseVersionId:guid}/stage-status")]
     public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseVersionId)
     {
-        return await _releasePublishingStatusService
-            .GetReleaseStatusAsync(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releasePublishingStatusService.GetReleaseStatusAsync(releaseVersionId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/{releaseVersionId:guid}/checklist")]
     public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
     {
-        return await _releaseChecklistService
-            .GetChecklist(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseChecklistService.GetChecklist(releaseVersionId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpPatch("releases/{releaseVersionId:guid}/published")]
-    public async Task<ActionResult> UpdateReleasePublished(Guid releaseVersionId,
-        ReleasePublishedUpdateRequest request)
+    public async Task<ActionResult> UpdateReleasePublished(Guid releaseVersionId, ReleasePublishedUpdateRequest request)
     {
         return await _releaseVersionService
             .UpdateReleasePublished(releaseVersionId, request)

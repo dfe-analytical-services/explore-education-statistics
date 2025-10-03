@@ -34,8 +34,7 @@ public class DataImportRepository : IDataImportRepository
 
     public async Task<DataImport?> GetByFileId(Guid fileId)
     {
-        return await _contentDbContext.DataImports
-            .SingleOrDefaultAsync(i => i.FileId == fileId);
+        return await _contentDbContext.DataImports.SingleOrDefaultAsync(i => i.FileId == fileId);
     }
 
     public async Task<DataImportStatus> GetStatusByFileId(Guid fileId)

@@ -14,7 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 public class RelatedInformationService(
     ContentDbContext context,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
-    IUserService userService) : IRelatedInformationService
+    IUserService userService
+) : IRelatedInformationService
 {
     public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId)
     {
@@ -23,8 +24,10 @@ public class RelatedInformationService(
             .OnSuccess(releaseVersion => releaseVersion.RelatedInformation);
     }
 
-    public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseVersionId,
-        CreateUpdateLinkRequest request)
+    public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(
+        Guid releaseVersionId,
+        CreateUpdateLinkRequest request
+    )
     {
         return persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -36,12 +39,14 @@ public class RelatedInformationService(
                     releaseVersion.RelatedInformation = new List<Link>();
                 }
 
-                releaseVersion.RelatedInformation.Add(new Link
-                {
-                    Id = Guid.NewGuid(),
-                    Description = request.Description,
-                    Url = request.Url
-                });
+                releaseVersion.RelatedInformation.Add(
+                    new Link
+                    {
+                        Id = Guid.NewGuid(),
+                        Description = request.Description,
+                        Url = request.Url,
+                    }
+                );
 
                 context.ReleaseVersions.Update(releaseVersion);
                 await context.SaveChangesAsync();
@@ -52,7 +57,8 @@ public class RelatedInformationService(
     public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformation(
         Guid releaseVersionId,
         List<CreateUpdateLinkRequest> updatedLinkRequests,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -61,13 +67,16 @@ public class RelatedInformationService(
             {
                 var updatedLinks = new List<Link>();
 
-                updatedLinkRequests.ForEach(r => updatedLinks.Add(
-                    new Link
-                    {
-                        Id = Guid.NewGuid(),
-                        Description = r.Description,
-                        Url = r.Url
-                    }));
+                updatedLinkRequests.ForEach(r =>
+                    updatedLinks.Add(
+                        new Link
+                        {
+                            Id = Guid.NewGuid(),
+                            Description = r.Description,
+                            Url = r.Url,
+                        }
+                    )
+                );
 
                 releaseVersion.RelatedInformation = updatedLinks;
                 await context.SaveChangesAsync(cancellationToken);
@@ -76,8 +85,10 @@ public class RelatedInformationService(
             });
     }
 
-    public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseVersionId,
-        Guid relatedInformationId)
+    public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(
+        Guid releaseVersionId,
+        Guid relatedInformationId
+    )
     {
         return persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
@@ -85,7 +96,8 @@ public class RelatedInformationService(
             .OnSuccess(async releaseVersion =>
             {
                 releaseVersion.RelatedInformation.Remove(
-                    releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId));
+                    releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId)
+                );
 
                 context.ReleaseVersions.Update(releaseVersion);
                 await context.SaveChangesAsync();

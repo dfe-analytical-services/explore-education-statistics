@@ -15,7 +15,7 @@ public record FullTableQuery
     public IEnumerable<Guid> Filters
     {
         [Obsolete("Use GetFilterItemIds() or GetNonHierarchicalFilterItemIds")]
-        get; 
+        get;
         set;
     } = new List<Guid>();
 
@@ -36,9 +36,11 @@ public record FullTableQuery
         var filterItemIds = GetNonHierarchicalFilterItemIds().ToList();
         if (FilterHierarchiesOptions != null)
         {
-            filterItemIds.AddRange(FilterHierarchiesOptions
-                .SelectMany(filterHierarchyOptions => filterHierarchyOptions.Options
-                        .SelectMany(hierarchyOption => hierarchyOption)));
+            filterItemIds.AddRange(
+                FilterHierarchiesOptions.SelectMany(filterHierarchyOptions =>
+                    filterHierarchyOptions.Options.SelectMany(hierarchyOption => hierarchyOption)
+                )
+            );
         }
 
         // NOTE: We don't include FilterHierarchiesOptions.LeafFilterIds as they are filterIds, not filterItemIds

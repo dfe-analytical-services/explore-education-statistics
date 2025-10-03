@@ -25,22 +25,10 @@ public class ReplacementServiceHelperTests
                         Label = "Group a",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item a"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item b"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item c"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item a" },
+                            new() { Id = Guid.NewGuid(), Label = "Item b" },
+                            new() { Id = Guid.NewGuid(), Label = "Item c" },
+                        },
                     },
                     new()
                     {
@@ -48,22 +36,10 @@ public class ReplacementServiceHelperTests
                         Label = "Group b",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item d"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item e"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item f"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item d" },
+                            new() { Id = Guid.NewGuid(), Label = "Item e" },
+                            new() { Id = Guid.NewGuid(), Label = "Item f" },
+                        },
                     },
                     new()
                     {
@@ -71,39 +47,27 @@ public class ReplacementServiceHelperTests
                         Label = "Group c",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item g"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item h"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item i"
-                            }
-                        }
-                    }
-                }
+                            new() { Id = Guid.NewGuid(), Label = "Item g" },
+                            new() { Id = Guid.NewGuid(), Label = "Item h" },
+                            new() { Id = Guid.NewGuid(), Label = "Item i" },
+                        },
+                    },
+                },
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Label = "Filter b",
                 Name = "filter_b",
-                FilterGroups = new List<FilterGroup>()
+                FilterGroups = new List<FilterGroup>(),
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Label = "Filter c",
                 Name = "filter_c",
-                FilterGroups = new List<FilterGroup>()
-            }
+                FilterGroups = new List<FilterGroup>(),
+            },
         };
 
         // Define a sequence for the original subject which is expected to be updated after the replacement
@@ -112,12 +76,10 @@ public class ReplacementServiceHelperTests
             FilterSequence = new List<FilterSequenceEntry>
             {
                 // Filter c
-                new(
-                    originalFilters[2].Id,
-                    new List<FilterGroupSequenceEntry>()
-                ),
+                new(originalFilters[2].Id, new List<FilterGroupSequenceEntry>()),
                 // Filter a
-                new(originalFilters[0].Id,
+                new(
+                    originalFilters[0].Id,
                     new List<FilterGroupSequenceEntry>
                     {
                         // Group c
@@ -128,7 +90,7 @@ public class ReplacementServiceHelperTests
                                 // Item i, Item g, Item h
                                 originalFilters[0].FilterGroups[2].FilterItems[2].Id,
                                 originalFilters[0].FilterGroups[2].FilterItems[0].Id,
-                                originalFilters[0].FilterGroups[2].FilterItems[1].Id
+                                originalFilters[0].FilterGroups[2].FilterItems[1].Id,
                             }
                         ),
                         // Group a
@@ -139,7 +101,7 @@ public class ReplacementServiceHelperTests
                                 // Item c, Indicator a, Indicator b
                                 originalFilters[0].FilterGroups[0].FilterItems[2].Id,
                                 originalFilters[0].FilterGroups[0].FilterItems[0].Id,
-                                originalFilters[0].FilterGroups[0].FilterItems[1].Id
+                                originalFilters[0].FilterGroups[0].FilterItems[1].Id,
                             }
                         ),
                         // Group b
@@ -150,17 +112,14 @@ public class ReplacementServiceHelperTests
                                 // Item f, Item d, Item e
                                 originalFilters[0].FilterGroups[1].FilterItems[2].Id,
                                 originalFilters[0].FilterGroups[1].FilterItems[0].Id,
-                                originalFilters[0].FilterGroups[1].FilterItems[1].Id
+                                originalFilters[0].FilterGroups[1].FilterItems[1].Id,
                             }
-                        )
+                        ),
                     }
                 ),
                 // Filter b
-                new(
-                    originalFilters[1].Id,
-                    new List<FilterGroupSequenceEntry>()
-                )
-            }
+                new(originalFilters[1].Id, new List<FilterGroupSequenceEntry>()),
+            },
         };
 
         // Define the set of filters, filter groups and filter items belonging to the replacement subject
@@ -180,7 +139,7 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group e",
-                        FilterItems = new List<FilterItem>()
+                        FilterItems = new List<FilterItem>(),
                     },
                     // Group 'Total' is added
                     new()
@@ -189,29 +148,17 @@ public class ReplacementServiceHelperTests
                         Label = "Total",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item m"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Total"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item l"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item m" },
+                            new() { Id = Guid.NewGuid(), Label = "Total" },
+                            new() { Id = Guid.NewGuid(), Label = "Item l" },
+                        },
                     },
                     // 'Group d' is added
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group d",
-                        FilterItems = new List<FilterItem>()
+                        FilterItems = new List<FilterItem>(),
                     },
                     // 'Group b' is updated
                     new()
@@ -220,30 +167,14 @@ public class ReplacementServiceHelperTests
                         Label = "Group b",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item d"
-                            },
+                            new() { Id = Guid.NewGuid(), Label = "Item d" },
                             // 'Item e' is removed
                             // 'Item k' is added
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item k"
-                            },
+                            new() { Id = Guid.NewGuid(), Label = "Item k" },
                             // 'Item j' is added
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item j"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item f"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item j" },
+                            new() { Id = Guid.NewGuid(), Label = "Item f" },
+                        },
                     },
                     // 'Group c' remains identical
                     new()
@@ -252,24 +183,12 @@ public class ReplacementServiceHelperTests
                         Label = "Group c",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item g"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item h"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item i"
-                            }
-                        }
-                    }
-                }
+                            new() { Id = Guid.NewGuid(), Label = "Item g" },
+                            new() { Id = Guid.NewGuid(), Label = "Item h" },
+                            new() { Id = Guid.NewGuid(), Label = "Item i" },
+                        },
+                    },
+                },
             },
             // 'Filter b' is removed
             // 'Filter e' is added
@@ -278,7 +197,7 @@ public class ReplacementServiceHelperTests
                 Id = Guid.NewGuid(),
                 Label = "Filter e",
                 Name = "filter_e",
-                FilterGroups = new List<FilterGroup>()
+                FilterGroups = new List<FilterGroup>(),
             },
             // 'Filter d' is added
             new()
@@ -292,7 +211,7 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group g",
-                        FilterItems = new List<FilterItem>()
+                        FilterItems = new List<FilterItem>(),
                     },
                     new()
                     {
@@ -300,30 +219,18 @@ public class ReplacementServiceHelperTests
                         Label = "Total",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item o"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Total"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item n"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item o" },
+                            new() { Id = Guid.NewGuid(), Label = "Total" },
+                            new() { Id = Guid.NewGuid(), Label = "Item n" },
+                        },
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group f",
-                        FilterItems = new List<FilterItem>()
-                    }
-                }
+                        FilterItems = new List<FilterItem>(),
+                    },
+                },
             },
             // 'Filter c' remains identical
             new()
@@ -331,14 +238,15 @@ public class ReplacementServiceHelperTests
                 Id = Guid.NewGuid(),
                 Label = "Filter c",
                 Name = "filter_c",
-                FilterGroups = new List<FilterGroup>()
-            }
+                FilterGroups = new List<FilterGroup>(),
+            },
         };
 
         var updatedSequence = ReplacementServiceHelper.ReplaceFilterSequence(
             originalFilters: originalFilters,
             replacementFilters: replacementFilters,
-            originalReleaseFile);
+            originalReleaseFile
+        );
 
         // Verify the updated sequence of filters
         Assert.NotNull(updatedSequence);
@@ -453,21 +361,21 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator a",
-                        Name = "indicator_a"
+                        Name = "indicator_a",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator b",
-                        Name = "indicator_b"
+                        Name = "indicator_b",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator c",
-                        Name = "indicator_c"
-                    }
-                }
+                        Name = "indicator_c",
+                    },
+                },
             },
             new()
             {
@@ -479,21 +387,21 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator d",
-                        Name = "indicator_d"
+                        Name = "indicator_d",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator e",
-                        Name = "indicator_e"
+                        Name = "indicator_e",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator f",
-                        Name = "indicator_f"
-                    }
-                }
+                        Name = "indicator_f",
+                    },
+                },
             },
             new()
             {
@@ -505,22 +413,22 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator g",
-                        Name = "indicator_g"
+                        Name = "indicator_g",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator h",
-                        Name = "indicator_h"
+                        Name = "indicator_h",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator i",
-                        Name = "indicator_i"
-                    }
-                }
-            }
+                        Name = "indicator_i",
+                    },
+                },
+            },
         };
 
         // Define a sequence for the original subject which is expected to be updated after the replacement
@@ -536,7 +444,7 @@ public class ReplacementServiceHelperTests
                         // Indicator i, Indicator g, Indicator h
                         originalGroups[2].Indicators[2].Id,
                         originalGroups[2].Indicators[0].Id,
-                        originalGroups[2].Indicators[1].Id
+                        originalGroups[2].Indicators[1].Id,
                     }
                 ),
                 // Group a
@@ -547,7 +455,7 @@ public class ReplacementServiceHelperTests
                         // Indicator c, Indicator a, Indicator b
                         originalGroups[0].Indicators[2].Id,
                         originalGroups[0].Indicators[0].Id,
-                        originalGroups[0].Indicators[1].Id
+                        originalGroups[0].Indicators[1].Id,
                     }
                 ),
                 // Group b
@@ -558,10 +466,10 @@ public class ReplacementServiceHelperTests
                         // Indicator f, Indicator d, Indicator e
                         originalGroups[1].Indicators[2].Id,
                         originalGroups[1].Indicators[0].Id,
-                        originalGroups[1].Indicators[1].Id
+                        originalGroups[1].Indicators[1].Id,
                     }
-                )
-            }
+                ),
+            },
         };
 
         // Define the set of indicator groups and indicators belonging to the replacement subject
@@ -573,7 +481,7 @@ public class ReplacementServiceHelperTests
             {
                 Id = Guid.NewGuid(),
                 Label = "Group e",
-                Indicators = new List<Indicator>()
+                Indicators = new List<Indicator>(),
             },
             // 'Group d' is added
             new()
@@ -586,21 +494,21 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator n",
-                        Name = "indicator_n"
+                        Name = "indicator_n",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator l",
-                        Name = "indicator_l"
+                        Name = "indicator_l",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator m",
-                        Name = "indicator_m"
-                    }
-                }
+                        Name = "indicator_m",
+                    },
+                },
             },
             // 'Group b' is updated
             new()
@@ -613,7 +521,7 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator d",
-                        Name = "indicator_d"
+                        Name = "indicator_d",
                     },
                     // 'Indicator e' is removed
                     // 'Indicator k' is added
@@ -621,22 +529,22 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator k",
-                        Name = "indicator_k"
+                        Name = "indicator_k",
                     },
                     // 'Indicator j' is added
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator j",
-                        Name = "indicator_j"
+                        Name = "indicator_j",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator f",
-                        Name = "indicator_f"
-                    }
-                }
+                        Name = "indicator_f",
+                    },
+                },
             },
             // 'Group c' remains identical
             new()
@@ -649,28 +557,29 @@ public class ReplacementServiceHelperTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator g",
-                        Name = "indicator_g"
+                        Name = "indicator_g",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator h",
-                        Name = "indicator_h"
+                        Name = "indicator_h",
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Indicator i",
-                        Name = "indicator_i"
-                    }
-                }
-            }
+                        Name = "indicator_i",
+                    },
+                },
+            },
         };
 
         var updatedSequence = ReplacementServiceHelper.ReplaceIndicatorSequence(
             originalIndicatorGroups: originalGroups,
             replacementIndicatorGroups: replacementGroups,
-            originalReleaseFile);
+            originalReleaseFile
+        );
 
         // Verify the updated sequence of indicators
         Assert.NotNull(updatedSequence);
@@ -694,7 +603,7 @@ public class ReplacementServiceHelperTests
         Assert.Equal(4, groupB.ChildSequence.Count);
         // 'Indicator f' is first from the original sequence
         Assert.Equal(replacementGroups[2].Indicators[3].Id, groupB.ChildSequence[0]);
-        // 'Indicator d' is second from the original sequence 
+        // 'Indicator d' is second from the original sequence
         Assert.Equal(replacementGroups[2].Indicators[0].Id, groupB.ChildSequence[1]);
         // 'Indicator j' is appended first alphabetically
         Assert.Equal(replacementGroups[2].Indicators[2].Id, groupB.ChildSequence[2]);

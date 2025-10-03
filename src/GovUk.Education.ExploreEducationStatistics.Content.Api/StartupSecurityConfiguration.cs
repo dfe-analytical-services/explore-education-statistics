@@ -18,16 +18,22 @@ public static class StartupSecurityConfiguration
         services.AddAuthorization(options =>
         {
             // does this use have permission to view a specific MethodologyVersion?
-            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificMethodologyVersion.ToString(), policy =>
-                policy.Requirements.Add(new ViewMethodologyVersionRequirement()));
+            options.AddPolicy(
+                ContentSecurityPolicies.CanViewSpecificMethodologyVersion.ToString(),
+                policy => policy.Requirements.Add(new ViewMethodologyVersionRequirement())
+            );
 
             // does this use have permission to view a specific Publication?
-            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
-                policy.Requirements.Add(new ViewPublicationRequirement()));
+            options.AddPolicy(
+                ContentSecurityPolicies.CanViewSpecificPublication.ToString(),
+                policy => policy.Requirements.Add(new ViewPublicationRequirement())
+            );
 
             // does this use have permission to view a specific Release?
-            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
-                policy.Requirements.Add(new ViewReleaseRequirement()));
+            options.AddPolicy(
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(),
+                policy => policy.Requirements.Add(new ViewReleaseRequirement())
+            );
         });
     }
 

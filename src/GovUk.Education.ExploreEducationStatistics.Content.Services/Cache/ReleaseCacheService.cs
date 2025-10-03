@@ -10,13 +10,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public class ReleaseCacheService(
-    IReleaseService releaseService,
-    IPublicBlobStorageService publicBlobStorageService) : IReleaseCacheService
+public class ReleaseCacheService(IReleaseService releaseService, IPublicBlobStorageService publicBlobStorageService)
+    : IReleaseCacheService
 {
     [BlobCache(typeof(ReleaseCacheKey), ServiceName = "public")]
-    public Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
-        string? releaseSlug = null)
+    public Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
+        string publicationSlug,
+        string? releaseSlug = null
+    )
     {
         return releaseService.GetRelease(publicationSlug, releaseSlug);
     }
@@ -25,7 +26,8 @@ public class ReleaseCacheService(
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
         Guid releaseVersionId,
         string publicationSlug,
-        string? releaseSlug = null)
+        string? releaseSlug = null
+    )
     {
         return releaseService.GetRelease(releaseVersionId);
     }
@@ -35,27 +37,28 @@ public class ReleaseCacheService(
         Guid releaseVersionId,
         DateTime expectedPublishDate,
         string publicationSlug,
-        string? releaseSlug = null)
+        string? releaseSlug = null
+    )
     {
         return releaseService.GetRelease(releaseVersionId, expectedPublishDate);
     }
 
-    public async Task<Either<ActionResult, Unit>> RemoveRelease(
-        string publicationSlug,
-        string releaseSlug)
+    public async Task<Either<ActionResult, Unit>> RemoveRelease(string publicationSlug, string releaseSlug)
     {
         await publicBlobStorageService.DeleteBlob(
             containerName: BlobContainers.PublicContent,
             path: FileStoragePathUtils.PublicContentReleasePath(
                 publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug)
+                releaseSlug: releaseSlug
+            )
         );
 
         await publicBlobStorageService.DeleteBlobs(
             containerName: BlobContainers.PublicContent,
             directoryPath: FileStoragePathUtils.PublicContentReleaseParentPath(
                 publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug)
+                releaseSlug: releaseSlug
+            )
         );
 
         return Unit.Instance;

@@ -62,7 +62,8 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<PublishSpecificReleaseRequirement>(
                 CreateHandler,
                 new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = Approved },
-                Approver);
+                Approver
+            );
         }
     }
 
@@ -70,16 +71,18 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
     {
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+        );
 
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext);
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
         return new PublishSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: userReleaseRoleRepository,
                 userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

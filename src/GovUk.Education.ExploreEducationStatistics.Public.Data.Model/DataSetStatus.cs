@@ -8,5 +8,5 @@ public enum DataSetStatus
     Draft,
     Published,
     Deprecated,
-    Withdrawn
+    Withdrawn,
 }

@@ -23,22 +23,24 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
         public async Task ProduceTwoRequestFiles_Success()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            var strategy = BuildStrategy(
-                pathResolver: pathResolver);
+            var strategy = BuildStrategy(pathResolver: pathResolver);
 
             var releaseVersionId1 = Guid.Parse("5d3c0aec-c147-48ce-ae26-ef765ffa4a5b");
-            await strategy.Report(new CaptureZipDownloadRequest
+            await strategy.Report(
+                new CaptureZipDownloadRequest
                 {
                     PublicationName = "publication name 1",
                     ReleaseVersionId = releaseVersionId1,
                     ReleaseName = "release name 1",
                     ReleaseLabel = "release label 1",
-                    FromPage = AnalyticsFromPage.DataCatalogue
+                    FromPage = AnalyticsFromPage.DataCatalogue,
                 },
-                default);
+                default
+            );
 
             var releaseVersionId2 = Guid.Parse("254d53e4-1194-4285-82bd-d8a3b7c0853d");
-            await strategy.Report(new CaptureZipDownloadRequest
+            await strategy.Report(
+                new CaptureZipDownloadRequest
                 {
                     PublicationName = "publication name 2",
                     ReleaseVersionId = releaseVersionId2,
@@ -48,41 +50,42 @@ public class AnalyticsWritePublicZipDownloadStrategyTests
                     SubjectId = Guid.Parse("39132b60-d4a0-4b62-befe-ba10cea4b30e"),
                     DataSetTitle = "data set title 2",
                 },
-                default);
+                default
+            );
 
-            var files = Directory.GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicZipDownloadStrategy.OutputSubPaths))
+            var files = Directory
+                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWritePublicZipDownloadStrategy.OutputSubPaths))
                 .ToList();
 
             Assert.Equal(2, files.Count);
 
-            var requestFile1 = Assert.Single(
-                files
-                    .Where(file => file.Contains(releaseVersionId1.ToString()))
-                    .ToList());
+            var requestFile1 = Assert.Single(files.Where(file => file.Contains(releaseVersionId1.ToString())).ToList());
             var requestFile1Contents = await File.ReadAllTextAsync(requestFile1);
             Snapshot.Match(
                 currentResult: requestFile1Contents,
-                snapshotName: $"{SnapshotPrefix}.{nameof(ProduceTwoRequestFiles_Success)}.NoSubjectId.snap");
+                snapshotName: $"{SnapshotPrefix}.{nameof(ProduceTwoRequestFiles_Success)}.NoSubjectId.snap"
+            );
 
-            var requestFile2 = Assert.Single(
-                files
-                    .Where(file => file.Contains(releaseVersionId2.ToString()))
-                    .ToList());
+            var requestFile2 = Assert.Single(files.Where(file => file.Contains(releaseVersionId2.ToString())).ToList());
             var requestFile2Contents = await File.ReadAllTextAsync(requestFile2);
             Snapshot.Match(
                 currentResult: requestFile2Contents,
-                snapshotName: $"{SnapshotPrefix}.{nameof(ProduceTwoRequestFiles_Success)}.WithSubjectId.snap");
+                snapshotName: $"{SnapshotPrefix}.{nameof(ProduceTwoRequestFiles_Success)}.WithSubjectId.snap"
+            );
         }
     }
 
     private AnalyticsWritePublicZipDownloadStrategy BuildStrategy(
         IAnalyticsPathResolver pathResolver,
-        DateTimeProvider? dateTimeProvider = null)
+        DateTimeProvider? dateTimeProvider = null
+    )
     {
         return new AnalyticsWritePublicZipDownloadStrategy(
             pathResolver,
             new CommonAnalyticsWriteStrategyWorkflow<CaptureZipDownloadRequest>(
                 dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
-                Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureZipDownloadRequest>>>()));
+                Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureZipDownloadRequest>>>()
+            )
+        );
     }
 }

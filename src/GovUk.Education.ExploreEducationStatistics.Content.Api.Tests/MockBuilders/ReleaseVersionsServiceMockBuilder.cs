@@ -14,23 +14,23 @@ public class ReleaseVersionsServiceMockBuilder
 
     private ReleaseVersionSummaryDto? _releaseVersionSummary;
 
-    private static readonly Expression<Func<IReleaseVersionsService,
-        Task<Either<ActionResult, ReleaseVersionSummaryDto>>>> GetReleaseVersionSummary =
-        m => m.GetReleaseVersionSummary(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<IReleaseVersionsService, Task<Either<ActionResult, ReleaseVersionSummaryDto>>>
+    > GetReleaseVersionSummary = m =>
+        m.GetReleaseVersionSummary(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public ReleaseVersionsServiceMockBuilder()
     {
-        _mock.Setup(GetReleaseVersionSummary).ReturnsAsync(() =>
-            _releaseVersionSummary ?? new ReleaseVersionSummaryDtoBuilder().Build());
+        _mock
+            .Setup(GetReleaseVersionSummary)
+            .ReturnsAsync(() => _releaseVersionSummary ?? new ReleaseVersionSummaryDtoBuilder().Build());
     }
 
     public IReleaseVersionsService Build() => _mock.Object;
 
     public ReleaseVersionsServiceMockBuilder WhereHasReleaseVersionSummary(
-        ReleaseVersionSummaryDto releaseVersionSummary)
+        ReleaseVersionSummaryDto releaseVersionSummary
+    )
     {
         _releaseVersionSummary = releaseVersionSummary;
         return this;
@@ -38,12 +38,11 @@ public class ReleaseVersionsServiceMockBuilder
 
     public ReleaseVersionsServiceMockBuilder WhereGetReleaseVersionSummaryReturnsNotFound(
         string publicationSlug,
-        string releaseSlug)
+        string releaseSlug
+    )
     {
-        _mock.Setup(m => m.GetReleaseVersionSummary(
-                publicationSlug,
-                releaseSlug,
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m => m.GetReleaseVersionSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -53,15 +52,17 @@ public class ReleaseVersionsServiceMockBuilder
 
     public class Asserter(Mock<IReleaseVersionsService> mock)
     {
-        public void GetReleaseVersionSummaryWasCalled(
-            string? publicationSlug = null,
-            string? releaseSlug = null)
+        public void GetReleaseVersionSummaryWasCalled(string? publicationSlug = null, string? releaseSlug = null)
         {
-            mock.Verify(m => m.GetReleaseVersionSummary(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetReleaseVersionSummary(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                        It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

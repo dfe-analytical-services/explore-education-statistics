@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IRedirectsCacheService
 {
-    Task<Either<ActionResult,RedirectsViewModel>> List();
+    Task<Either<ActionResult, RedirectsViewModel>> List();
 
     Task<Either<ActionResult, RedirectsViewModel>> UpdateRedirects();
 }

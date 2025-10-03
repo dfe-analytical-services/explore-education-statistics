@@ -15,24 +15,22 @@ public partial class EES5062_AddFilterSequenceAndIndicatorSequenceToReleaseFile 
             name: "FilterSequence",
             table: "ReleaseFiles",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "IndicatorSequence",
             table: "ReleaseFiles",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "FilterSequence",
-            table: "ReleaseFiles");
+        migrationBuilder.DropColumn(name: "FilterSequence", table: "ReleaseFiles");
 
-        migrationBuilder.DropColumn(
-            name: "IndicatorSequence",
-            table: "ReleaseFiles");
+        migrationBuilder.DropColumn(name: "IndicatorSequence", table: "ReleaseFiles");
     }
 }

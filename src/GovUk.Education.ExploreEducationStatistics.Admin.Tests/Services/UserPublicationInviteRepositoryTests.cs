@@ -57,16 +57,16 @@ public abstract class UserPublicationInviteRepositoryTests
                         {
                             PublicationId = existingPublicationInvite.PublicationId,
                             PublicationRole = existingPublicationInvite.Role,
-                        }),
+                        }
+                    ),
                     email: "test@test.com",
-                    createdById: createdById);
+                    createdById: createdById
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationInvites = await contentDbContext.UserPublicationInvites
-                    .AsQueryable()
-                    .ToListAsync();
+                var userPublicationInvites = await contentDbContext.UserPublicationInvites.AsQueryable().ToListAsync();
 
                 Assert.Equal(3, userPublicationInvites.Count);
 
@@ -101,12 +101,11 @@ public abstract class UserPublicationInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var targetRole = PublicationRole.Owner;
             var otherRole = PublicationRole.Allower;
-            var targetPublication = _fixture.DefaultPublication()
-                .Generate();
-            var otherPublication = _fixture.DefaultPublication()
-                .Generate();
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
 
-            var userPublicationInvites = _fixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _fixture
+                .DefaultUserPublicationInvite()
                 // This invite should be removed
                 .ForIndex(0, s => s.SetPublication(targetPublication))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
@@ -137,16 +136,12 @@ public abstract class UserPublicationInviteRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                await repository.Remove(
-                    publicationId: targetPublication.Id,
-                    email: targetEmail,
-                    role: targetRole);
+                await repository.Remove(publicationId: targetPublication.Id, email: targetEmail, role: targetRole);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 Assert.Equal(3, remainingInvites.Count);
 
@@ -176,13 +171,13 @@ public abstract class UserPublicationInviteRepositoryTests
                 await repository.Remove(
                     publicationId: Guid.NewGuid(),
                     email: "test1@test.com",
-                    role: PublicationRole.Owner);
+                    role: PublicationRole.Owner
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 Assert.Empty(remainingInvites);
             }
@@ -198,12 +193,11 @@ public abstract class UserPublicationInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var targetRole = PublicationRole.Owner;
             var otherRole = PublicationRole.Allower;
-            var targetPublication = _fixture.DefaultPublication()
-                .Generate();
-            var otherPublication = _fixture.DefaultPublication()
-                .Generate();
+            var targetPublication = _fixture.DefaultPublication().Generate();
+            var otherPublication = _fixture.DefaultPublication().Generate();
 
-            var userPublicationInvites = _fixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _fixture
+                .DefaultUserPublicationInvite()
                 // These 2 invites should be removed
                 .ForIndex(0, s => s.SetPublication(targetPublication))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
@@ -225,11 +219,7 @@ public abstract class UserPublicationInviteRepositoryTests
                 .ForIndex(4, s => s.SetRole(otherRole))
                 .GenerateList(5);
 
-            var userPublicationInvitesToRemove = new[]
-            {
-                userPublicationInvites[0],
-                userPublicationInvites[1],
-            };
+            var userPublicationInvitesToRemove = new[] { userPublicationInvites[0], userPublicationInvites[1] };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -248,8 +238,7 @@ public abstract class UserPublicationInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 Assert.Equal(3, remainingInvites.Count);
 
@@ -270,13 +259,15 @@ public abstract class UserPublicationInviteRepositoryTests
         [Fact]
         public async Task TargetInviteDoesNotExist_ThrowsException()
         {
-            var existingUserPublicationInvite = _fixture.DefaultUserPublicationInvite()
+            var existingUserPublicationInvite = _fixture
+                .DefaultUserPublicationInvite()
                 .WithPublication(_fixture.DefaultPublication())
                 .WithEmail("test@test.com")
                 .WithRole(PublicationRole.Owner)
                 .Generate();
 
-            var targetUserPublicationInvite = _fixture.DefaultUserPublicationInvite()
+            var targetUserPublicationInvite = _fixture
+                .DefaultUserPublicationInvite()
                 .WithPublication(_fixture.DefaultPublication())
                 .WithEmail("test@test.com")
                 .WithRole(PublicationRole.Owner)
@@ -295,14 +286,16 @@ public abstract class UserPublicationInviteRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
-                    await repository.RemoveMany([targetUserPublicationInvite]));
+                    await repository.RemoveMany([targetUserPublicationInvite])
+                );
             }
         }
 
         [Fact]
         public async Task EmptyList_DoesNothing()
         {
-            var existingUserPublicationInvite = _fixture.DefaultUserPublicationInvite()
+            var existingUserPublicationInvite = _fixture
+                .DefaultUserPublicationInvite()
                 .WithPublication(_fixture.DefaultPublication())
                 .WithEmail("test@test.com")
                 .WithRole(PublicationRole.Owner)
@@ -325,8 +318,7 @@ public abstract class UserPublicationInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 var remainingInvite = Assert.Single(remainingInvites);
 
@@ -346,12 +338,11 @@ public abstract class UserPublicationInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var role1 = PublicationRole.Owner;
             var role2 = PublicationRole.Allower;
-            var publication1 = _fixture.DefaultPublication()
-                .Generate();
-            var publication2 = _fixture.DefaultPublication()
-                .Generate();
+            var publication1 = _fixture.DefaultPublication().Generate();
+            var publication2 = _fixture.DefaultPublication().Generate();
 
-            var userPublicationInvites = _fixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _fixture
+                .DefaultUserPublicationInvite()
                 // These 2 invites should be removed
                 .ForIndex(0, s => s.SetPublication(publication1))
                 .ForIndex(0, s => s.SetEmail(targetEmail))
@@ -385,8 +376,7 @@ public abstract class UserPublicationInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 Assert.Equal(2, remainingInvites.Count);
 
@@ -407,12 +397,11 @@ public abstract class UserPublicationInviteRepositoryTests
             var otherEmail = "test2@test.com";
             var role1 = PublicationRole.Owner;
             var role2 = PublicationRole.Allower;
-            var publication1 = _fixture.DefaultPublication()
-                .Generate();
-            var publication2 = _fixture.DefaultPublication()
-                .Generate();
+            var publication1 = _fixture.DefaultPublication().Generate();
+            var publication2 = _fixture.DefaultPublication().Generate();
 
-            var userPublicationInvites = _fixture.DefaultUserPublicationInvite()
+            var userPublicationInvites = _fixture
+                .DefaultUserPublicationInvite()
                 // These invites are for a different email and should not be removed
                 .ForIndex(0, s => s.SetPublication(publication1))
                 .ForIndex(0, s => s.SetEmail(otherEmail))
@@ -439,8 +428,7 @@ public abstract class UserPublicationInviteRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingInvites = await contentDbContext.UserPublicationInvites
-                    .ToListAsync();
+                var remainingInvites = await contentDbContext.UserPublicationInvites.ToListAsync();
 
                 Assert.Equal(2, remainingInvites.Count);
 

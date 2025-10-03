@@ -25,12 +25,13 @@ public abstract class PublicationReleaseServiceTests
         public async Task WhenPublicationExistsWithPublishedReleases_ReturnsPaginatedReleases(
             int numReleases,
             int page,
-            int pageSize)
+            int pageSize
+        )
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 1)
-                    .Generate(numReleases));
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 1).Generate(numReleases));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -47,7 +48,8 @@ public abstract class PublicationReleaseServiceTests
                 var outcome = await sut.GetPublicationReleases(
                     publicationSlug: publication.Slug,
                     page: page,
-                    pageSize: pageSize);
+                    pageSize: pageSize
+                );
 
                 // Assert
                 var pagedResult = outcome.AssertRight();
@@ -55,7 +57,8 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: numReleases,
                     expectedPage: page,
-                    expectedPageSize: pageSize);
+                    expectedPageSize: pageSize
+                );
             }
         }
 
@@ -63,12 +66,9 @@ public abstract class PublicationReleaseServiceTests
         public async Task WhenPublishedReleasesExist_MapsReleasesCorrectly()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1)
-                        .WithLabel("Final")
-                ]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1).WithLabel("Final")]);
             var release = publication.Releases[0];
 
             var contextId = Guid.NewGuid().ToString();
@@ -83,8 +83,7 @@ public abstract class PublicationReleaseServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPublicationReleases(
-                    publicationSlug: publication.Slug);
+                var outcome = await sut.GetPublicationReleases(publicationSlug: publication.Slug);
 
                 // Assert
                 var pagedResult = outcome.AssertRight();
@@ -92,7 +91,8 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 1,
                     expectedPage: 1,
-                    expectedPageSize: 10);
+                    expectedPageSize: 10
+                );
 
                 var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
 
@@ -119,14 +119,14 @@ public abstract class PublicationReleaseServiceTests
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
-                .FinishWith(p => p.ReleaseSeries =
-                [
-                    ..
-                    p.Releases
-                        .Select(r => _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(r.Id))
-                        .ToArray(),
-                    _dataFixture.DefaultLegacyReleaseSeriesItem()
-                ]);
+                .FinishWith(p =>
+                    p.ReleaseSeries = [
+                        .. p
+                            .Releases.Select(r => _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(r.Id))
+                            .ToArray(),
+                        _dataFixture.DefaultLegacyReleaseSeriesItem(),
+                    ]
+                );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -140,8 +140,7 @@ public abstract class PublicationReleaseServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPublicationReleases(
-                    publicationSlug: publication.Slug);
+                var outcome = await sut.GetPublicationReleases(publicationSlug: publication.Slug);
 
                 // Assert
                 var pagedResult = outcome.AssertRight();
@@ -149,7 +148,8 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 2,
                     expectedPage: 1,
-                    expectedPageSize: 10);
+                    expectedPageSize: 10
+                );
 
                 var legacyReleaseEntry = Assert.IsType<LegacyPublicationReleaseEntryDto>(pagedResult.Results[1]);
                 var expectedLegacyReleaseEntry = publication.ReleaseSeries[1];
@@ -168,20 +168,28 @@ public abstract class PublicationReleaseServiceTests
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
-                    _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023)
-                ])
-                .FinishWith(p => p.ReleaseSeries =
-                [
-                    // Specify a custom order for the releases, differing from the chronological year order,
-                    // and include a legacy release in the middle of the series
-                    _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(p.Releases.Single(r => r.Year == 2023).Id),
-                    _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(p.Releases.Single(r => r.Year == 2025).Id),
-                    _dataFixture.DefaultLegacyReleaseSeriesItem(),
-                    _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(p.Releases.Single(r => r.Year == 2024).Id)
-                ]);
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023),
+                    ]
+                )
+                .FinishWith(p =>
+                    p.ReleaseSeries = [
+                        // Specify a custom order for the releases, differing from the chronological year order,
+                        // and include a legacy release in the middle of the series
+                        _dataFixture
+                            .DefaultReleaseSeriesItem()
+                            .WithReleaseId(p.Releases.Single(r => r.Year == 2023).Id),
+                        _dataFixture
+                            .DefaultReleaseSeriesItem()
+                            .WithReleaseId(p.Releases.Single(r => r.Year == 2025).Id),
+                        _dataFixture.DefaultLegacyReleaseSeriesItem(),
+                        _dataFixture
+                            .DefaultReleaseSeriesItem()
+                            .WithReleaseId(p.Releases.Single(r => r.Year == 2024).Id),
+                    ]
+                );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -195,8 +203,7 @@ public abstract class PublicationReleaseServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetPublicationReleases(
-                    publicationSlug: publication.Slug);
+                var outcome = await sut.GetPublicationReleases(publicationSlug: publication.Slug);
 
                 // Assert
                 var pagedResult = outcome.AssertRight();
@@ -204,7 +211,8 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 4,
                     expectedPage: 1,
-                    expectedPageSize: 10);
+                    expectedPageSize: 10
+                );
 
                 var expectedReleases = new[] { (Year: 2023, Index: 0), (Year: 2025, Index: 1), (Year: 2024, Index: 3) };
 
@@ -227,13 +235,15 @@ public abstract class PublicationReleaseServiceTests
         public async Task WhenPublicationHasMultiplePublishedReleases_OnlyFirstIsMarkedAsLatest()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
-                    _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023)
-                ]);
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023),
+                    ]
+                );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -255,11 +265,10 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 3,
                     expectedPage: 1,
-                    expectedPageSize: 10);
+                    expectedPageSize: 10
+                );
 
-                var releaseEntries = pagedResult.Results
-                    .Select(Assert.IsType<PublicationReleaseEntryDto>)
-                    .ToList();
+                var releaseEntries = pagedResult.Results.Select(Assert.IsType<PublicationReleaseEntryDto>).ToList();
 
                 var expectedLatestRelease = publication.Releases.Single(r => r.Year == 2025);
                 Assert.Equal(expectedLatestRelease.Id, releaseEntries[0].ReleaseId);
@@ -272,13 +281,16 @@ public abstract class PublicationReleaseServiceTests
         public async Task WhenReleaseHasMultiplePublishedVersions_ReturnsDetailsOfLatestPublishedVersion()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)]);
             var release = publication.Releases[0];
 
             // Ensure the generated release versions have different published dates
-            Assert.True(release.Versions[0].Published < release.Versions[1].Published,
-                "The first version should have an earlier published date than the second version");
+            Assert.True(
+                release.Versions[0].Published < release.Versions[1].Published,
+                "The first version should have an earlier published date than the second version"
+            );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -300,7 +312,8 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 1,
                     expectedPage: 1,
-                    expectedPageSize: 10);
+                    expectedPageSize: 10
+                );
 
                 var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
                 var expectedReleaseVersion = release.Versions[1];
@@ -317,12 +330,15 @@ public abstract class PublicationReleaseServiceTests
         public async Task WhenReleaseHasNoPublishedVersions_ReleaseIsExcludedFromResults()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases([
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2025),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2023)
-                ]);
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2025),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2023),
+                    ]
+                );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -345,7 +361,8 @@ public abstract class PublicationReleaseServiceTests
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 1,
                     expectedPage: 1,
-                    expectedPageSize: 10);
+                    expectedPageSize: 10
+                );
 
                 var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
                 var expectedRelease = publication.Releases.Single(r => r.Year == 2024);
@@ -398,7 +415,8 @@ public abstract class PublicationReleaseServiceTests
         public async Task WhenPublicationHasNoPublishedReleases_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
             var contextId = Guid.NewGuid().ToString();

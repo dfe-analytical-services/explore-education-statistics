@@ -21,7 +21,8 @@ public class DataSetVersionStatusSchemaFilter : ISchemaFilter
         {
             schema.Type = "string";
 
-            schema.Enum = EnumUtil.GetEnums<DataSetVersionStatus>()
+            schema.Enum = EnumUtil
+                .GetEnums<DataSetVersionStatus>()
                 .Where(_publicStatuses.Contains)
                 .Select(e => new OpenApiString(e.ToString()))
                 .ToList<IOpenApiAny>();

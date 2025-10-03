@@ -15,11 +15,10 @@ public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper out
     {
         // ARRANGE
         var sut = new ContentApiHealthCheckStrategy(
-            Microsoft.Extensions.Options.Options.Create(
-                new ContentApiOptions()),
-                new NullLogger<ContentApiHealthCheckStrategy>(),
-            () => new ContentApiClient(
-                new HttpClient { BaseAddress = new Uri(ContentApiUrl) }));
+            Microsoft.Extensions.Options.Options.Create(new ContentApiOptions()),
+            new NullLogger<ContentApiHealthCheckStrategy>(),
+            () => new ContentApiClient(new HttpClient { BaseAddress = new Uri(ContentApiUrl) })
+        );
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);

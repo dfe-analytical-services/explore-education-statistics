@@ -30,7 +30,8 @@ public class ContentService : IContentService
         IReleaseService releaseService,
         IMethodologyCacheService methodologyCacheService,
         IReleaseCacheService releaseCacheService,
-        IPublicationCacheService publicationCacheService)
+        IPublicationCacheService publicationCacheService
+    )
     {
         _contentDbContext = contentDbContext;
         _privateBlobCacheService = privateBlobCacheService;
@@ -59,25 +60,34 @@ public class ContentService : IContentService
             await DeleteLazilyCachedReleaseResults(
                 releaseVersionId: previousReleaseVersion.Id,
                 publicationSlug: releaseVersion.Release.Publication.Slug,
-                releaseSlug: previousReleaseVersion.Release.Slug);
+                releaseSlug: previousReleaseVersion.Release.Slug
+            );
         }
     }
 
-    private async Task DeleteLazilyCachedReleaseResults(Guid releaseVersionId,
+    private async Task DeleteLazilyCachedReleaseResults(
+        Guid releaseVersionId,
         string publicationSlug,
-        string releaseSlug)
+        string releaseSlug
+    )
     {
-        await _privateBlobCacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
+        await _privateBlobCacheService.DeleteCacheFolderAsync(
+            new PrivateReleaseContentFolderCacheKey(releaseVersionId)
+        );
 
-        await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+        await _publicBlobCacheService.DeleteCacheFolderAsync(
+            new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug)
+        );
         await _publicBlobCacheService.DeleteItemAsync(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
-        await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
+        await _publicBlobCacheService.DeleteCacheFolderAsync(
+            new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug)
+        );
     }
 
     public async Task DeletePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds)
     {
-        var releaseVersions = await _contentDbContext.ReleaseVersions
-            .Where(rv => releaseVersionIds.Contains(rv.Id))
+        var releaseVersions = await _contentDbContext
+            .ReleaseVersions.Where(rv => releaseVersionIds.Contains(rv.Id))
             .Include(rv => rv.PreviousVersion)
             .ToListAsync();
 
@@ -87,41 +97,43 @@ public class ContentService : IContentService
             {
                 await _publicBlobStorageService.DeleteBlobs(
                     containerName: PublicReleaseFiles,
-                    directoryPath: $"{releaseVersion.PreviousVersion.Id}/");
+                    directoryPath: $"{releaseVersion.PreviousVersion.Id}/"
+                );
             }
         }
     }
 
     public async Task UpdateContent(Guid releaseVersionId)
     {
-        var releaseVersion = await _contentDbContext.ReleaseVersions
-            .Include(rv => rv.Release)
+        var releaseVersion = await _contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         await _releaseCacheService.UpdateRelease(
             releaseVersion.Id,
             publicationSlug: releaseVersion.Release.Publication.Slug,
-            releaseSlug: releaseVersion.Release.Slug);
+            releaseSlug: releaseVersion.Release.Slug
+        );
 
         var publication = releaseVersion.Release.Publication;
 
         // Cache the latest release version for the publication as a separate cache entry
         var latestReleaseVersion = await _releaseService.GetLatestPublishedReleaseVersion(
             publicationId: publication.Id,
-            includeUnpublishedVersionIds: [releaseVersion.Id]);
+            includeUnpublishedVersionIds: [releaseVersion.Id]
+        );
 
         await _releaseCacheService.UpdateRelease(
             releaseVersionId: latestReleaseVersion.Id,
-            publicationSlug: publication.Slug);
+            publicationSlug: publication.Slug
+        );
     }
 
-    public async Task UpdateContentStaged(
-        DateTime expectedPublishDate,
-        params Guid[] releaseVersionIds)
+    public async Task UpdateContentStaged(DateTime expectedPublishDate, params Guid[] releaseVersionIds)
     {
-        var releaseVersions = await _contentDbContext.ReleaseVersions
-            .Where(rv => releaseVersionIds.Contains(rv.Id))
+        var releaseVersions = await _contentDbContext
+            .ReleaseVersions.Where(rv => releaseVersionIds.Contains(rv.Id))
             .Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .ToListAsync();
@@ -132,25 +144,25 @@ public class ContentService : IContentService
                 releaseVersion.Id,
                 expectedPublishDate,
                 publicationSlug: releaseVersion.Release.Publication.Slug,
-                releaseSlug: releaseVersion.Release.Slug);
+                releaseSlug: releaseVersion.Release.Slug
+            );
         }
 
-        var publications = releaseVersions
-            .Select(rv => rv.Release.Publication)
-            .DistinctBy(p => p.Id)
-            .ToList();
+        var publications = releaseVersions.Select(rv => rv.Release.Publication).DistinctBy(p => p.Id).ToList();
 
         foreach (var publication in publications)
         {
             // Cache the latest release version for the publication as a separate cache entry
             var latestReleaseVersion = await _releaseService.GetLatestPublishedReleaseVersion(
-                    publicationId: publication.Id,
-                    includeUnpublishedVersionIds: releaseVersionIds);
+                publicationId: publication.Id,
+                includeUnpublishedVersionIds: releaseVersionIds
+            );
 
             await _releaseCacheService.UpdateReleaseStaged(
                 latestReleaseVersion.Id,
                 expectedPublishDate,
-                publicationSlug: publication.Slug);
+                publicationSlug: publication.Slug
+            );
         }
     }
 

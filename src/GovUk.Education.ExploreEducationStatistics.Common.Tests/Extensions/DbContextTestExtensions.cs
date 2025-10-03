@@ -5,12 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class DbContextTestExtensions
 {
-    public static async Task ClearTestData<TDbContext>(this TDbContext context) where TDbContext : DbContext
+    public static async Task ClearTestData<TDbContext>(this TDbContext context)
+        where TDbContext : DbContext
     {
         if (context.Database.IsNpgsql())
         {
 #pragma warning disable EF1002
-            var tables = context.Model.GetEntityTypes()
+            var tables = context
+                .Model.GetEntityTypes()
                 .Select(type => type.GetTableName())
                 .OfType<string>()
                 .Distinct()
@@ -32,7 +34,8 @@ public static class DbContextTestExtensions
         else
         {
             throw new NotImplementedException(
-                $"Clearing test data is not supported for type {context.Database.ProviderName}");
+                $"Clearing test data is not supported for type {context.Database.ProviderName}"
+            );
         }
     }
 }

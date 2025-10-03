@@ -4,5 +4,5 @@ public enum ContentSecurityPolicies
 {
     CanViewSpecificMethodologyVersion,
     CanViewSpecificPublication,
-    CanViewSpecificReleaseVersion
+    CanViewSpecificReleaseVersion,
 }

@@ -11,5 +11,6 @@ public interface IPublicationReleasesService
         string publicationSlug,
         int page = 1,
         int pageSize = 10,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

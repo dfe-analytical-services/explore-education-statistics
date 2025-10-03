@@ -13,8 +13,7 @@ public class OrganisationServiceMockBuilder
 
     public IOrganisationService Build()
     {
-        _mock.Setup(m => m.GetAllOrganisations(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_organisations ?? []);
+        _mock.Setup(m => m.GetAllOrganisations(It.IsAny<CancellationToken>())).ReturnsAsync(_organisations ?? []);
 
         return _mock.Object;
     }

@@ -9,9 +9,7 @@ public record ExternalMethodologyViewModel
 
     public string Url { get; init; } = string.Empty;
 
-    public ExternalMethodologyViewModel()
-    {
-    }
+    public ExternalMethodologyViewModel() { }
 
     public ExternalMethodologyViewModel(ExternalMethodology externalMethodology)
     {

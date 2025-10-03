@@ -34,22 +34,27 @@ public partial class ReleaseService(
     IAdminEventRaiser adminEventRaiser,
     IGuidGenerator guidGenerator,
     IOrganisationsValidator organisationsValidator,
-    IReleaseSlugValidator releaseSlugValidator) : IReleaseService
+    IReleaseSlugValidator releaseSlugValidator
+) : IReleaseService
 {
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {
-        return await ReleaseCreateRequestValidator.Validate(request)
-            .OnSuccess(async () => await context.Publications
-                .SingleOrNotFoundAsync(p => p.Id == request.PublicationId))
+        return await ReleaseCreateRequestValidator
+            .Validate(request)
+            .OnSuccess(async () => await context.Publications.SingleOrNotFoundAsync(p => p.Id == request.PublicationId))
             .OnSuccess(userService.CheckCanCreateReleaseForPublication)
             .OnSuccessDo(async _ =>
                 await releaseSlugValidator.ValidateNewSlug(
                     newReleaseSlug: request.Slug,
-                    publicationId: request.PublicationId))
+                    publicationId: request.PublicationId
+                )
+            )
             .OnSuccessCombineWith(async _ =>
                 await organisationsValidator.ValidateOrganisations(
                     organisationIds: request.PublishingOrganisations,
-                    path: nameof(ReleaseCreateRequest.PublishingOrganisations).ToLowerFirst()))
+                    path: nameof(ReleaseCreateRequest.PublishingOrganisations).ToLowerFirst()
+                )
+            )
             .OnSuccess(async publicationAndPublishingOrganisations =>
             {
                 var (publication, publishingOrganisations) = publicationAndPublishingOrganisations;
@@ -69,25 +74,24 @@ public partial class ReleaseService(
                     Type = request.Type!.Value,
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     PublicationId = release.PublicationId,
-                    PublishingOrganisations = [.. publishingOrganisations]
+                    PublishingOrganisations = [.. publishingOrganisations],
                 };
 
                 if (request.TemplateReleaseId.HasValue)
                 {
-                    await CreateGenericContentFromTemplate(request.TemplateReleaseId.Value,
-                        newReleaseVersion);
+                    await CreateGenericContentFromTemplate(request.TemplateReleaseId.Value, newReleaseVersion);
                 }
                 else
                 {
                     newReleaseVersion.GenericContent = new List<ContentSection>();
                 }
 
-                newReleaseVersion.SummarySection = new ContentSection { Type = ContentSectionType.ReleaseSummary, };
+                newReleaseVersion.SummarySection = new ContentSection { Type = ContentSectionType.ReleaseSummary };
                 newReleaseVersion.KeyStatisticsSecondarySection = new ContentSection
                 {
                     Type = ContentSectionType.KeyStatisticsSecondary,
                 };
-                newReleaseVersion.HeadlinesSection = new ContentSection { Type = ContentSectionType.Headlines, };
+                newReleaseVersion.HeadlinesSection = new ContentSection { Type = ContentSectionType.Headlines };
                 newReleaseVersion.RelatedDashboardsSection = new ContentSection
                 {
                     Type = ContentSectionType.RelatedDashboards,
@@ -97,8 +101,10 @@ public partial class ReleaseService(
 
                 context.ReleaseVersions.Add(newReleaseVersion);
 
-                publication.ReleaseSeries.Insert(0,
-                    new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = release.Id });
+                publication.ReleaseSeries.Insert(
+                    0,
+                    new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = release.Id }
+                );
                 context.Publications.Update(publication);
 
                 await context.SaveChangesAsync();
@@ -109,25 +115,29 @@ public partial class ReleaseService(
     public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
         Guid releaseId,
         ReleaseUpdateRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await GetRelease(releaseId)
             .OnSuccess(userService.CheckCanUpdateRelease)
-            .OnSuccess(async release => await ValidateUpdateRequest(
-                release: release,
-                request: request,
-                cancellationToken: cancellationToken))
-            .OnSuccessDo(async releaseAndSlugs => await UpdateRelease(
-                release: releaseAndSlugs.release,
-                newReleaseSlug: releaseAndSlugs.newReleaseSlug,
-                request: request,
-                cancellationToken: cancellationToken))
+            .OnSuccess(async release =>
+                await ValidateUpdateRequest(release: release, request: request, cancellationToken: cancellationToken)
+            )
+            .OnSuccessDo(async releaseAndSlugs =>
+                await UpdateRelease(
+                    release: releaseAndSlugs.release,
+                    newReleaseSlug: releaseAndSlugs.newReleaseSlug,
+                    request: request,
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(async releaseAndSlugs =>
             {
                 var latestPublishedReleaseVersion = await GetLatestPublishedReleaseVersion(
                     publicationId: releaseAndSlugs.release.PublicationId,
                     releaseSlug: releaseAndSlugs.newReleaseSlug,
-                    cancellationToken: cancellationToken);
+                    cancellationToken: cancellationToken
+                );
 
                 var releaseIsLive = latestPublishedReleaseVersion is not null;
                 var slugHasChanged = releaseAndSlugs.oldReleaseSlug != releaseAndSlugs.newReleaseSlug;
@@ -136,12 +146,13 @@ public partial class ReleaseService(
 
                 return releaseIsLive
                     ? await UpdateReleaseCache(
-                        slugHasChanged: slugHasChanged,
-                        oldReleaseSlug: releaseAndSlugs.oldReleaseSlug,
-                        newReleaseSlug: releaseAndSlugs.newReleaseSlug,
-                        publicationSlug: releaseAndSlugs.release.Publication.Slug,
-                        latestReleaseVersionId: latestPublishedReleaseVersion!.Id)
-                    .OnSuccess(_ => releaseData)
+                            slugHasChanged: slugHasChanged,
+                            oldReleaseSlug: releaseAndSlugs.oldReleaseSlug,
+                            newReleaseSlug: releaseAndSlugs.newReleaseSlug,
+                            publicationSlug: releaseAndSlugs.release.Publication.Slug,
+                            latestReleaseVersionId: latestPublishedReleaseVersion!.Id
+                        )
+                        .OnSuccess(_ => releaseData)
                     : releaseData;
             })
             .OnSuccessDo(async releaseData =>
@@ -149,46 +160,44 @@ public partial class ReleaseService(
                     ? await CreateReleaseRedirect(
                         releaseId: releaseId,
                         oldReleaseSlug: releaseData.releaseAndSlugs.oldReleaseSlug,
-                        cancellationToken: cancellationToken)
+                        cancellationToken: cancellationToken
+                    )
                     : Unit.Instance
             )
             .OnSuccessDo(async releaseData =>
+            {
+                if (releaseData.releaseIsLive && releaseData.slugHasChanged)
                 {
-                    if (releaseData.releaseIsLive && releaseData.slugHasChanged)
-                    {
-                        await adminEventRaiser.OnReleaseSlugChanged(
-                            releaseId, 
-                            releaseData.releaseAndSlugs.newReleaseSlug,
-                            releaseData.releaseAndSlugs.release.PublicationId,
-                            releaseData.releaseAndSlugs.release.Publication.Slug,
-                            releaseData.releaseAndSlugs.release.Publication.IsArchived()
-                            );
-                    }
-                })
+                    await adminEventRaiser.OnReleaseSlugChanged(
+                        releaseId,
+                        releaseData.releaseAndSlugs.newReleaseSlug,
+                        releaseData.releaseAndSlugs.release.PublicationId,
+                        releaseData.releaseAndSlugs.release.Publication.Slug,
+                        releaseData.releaseAndSlugs.release.Publication.IsArchived()
+                    );
+                }
+            })
             .OnSuccess(async () => await GetRelease(releaseId))
             .OnSuccess(MapRelease);
     }
 
-    private async Task CreateGenericContentFromTemplate(
-        Guid templateReleaseVersionId,
-        ReleaseVersion newReleaseVersion)
+    private async Task CreateGenericContentFromTemplate(Guid templateReleaseVersionId, ReleaseVersion newReleaseVersion)
     {
         var templateReleaseVersion = await context
-            .ReleaseVersions
-            .AsNoTracking()
+            .ReleaseVersions.AsNoTracking()
             .Include(releaseVersion => releaseVersion.Content)
             .FirstAsync(rv => rv.Id == templateReleaseVersionId);
 
         newReleaseVersion.Content = templateReleaseVersion
-            .Content
-            .Where(section => section.Type == ContentSectionType.Generic)
+            .Content.Where(section => section.Type == ContentSectionType.Generic)
             .Select(section => CloneContentSectionFromReleaseTemplate(section, newReleaseVersion))
             .ToList();
     }
 
     private static ContentSection CloneContentSectionFromReleaseTemplate(
         ContentSection originalSection,
-        ReleaseVersion newReleaseVersion)
+        ReleaseVersion newReleaseVersion
+    )
     {
         // Create a new ContentSection based upon the original template.
         return new ContentSection
@@ -202,41 +211,40 @@ public partial class ReleaseService(
             // Copy certain fields from the original.
             Heading = originalSection.Heading,
             Order = originalSection.Order,
-            Type = originalSection.Type
+            Type = originalSection.Type,
         };
     }
 
-    private async Task<Either<ActionResult, (Release release, string oldReleaseSlug, string newReleaseSlug)>>
-        ValidateUpdateRequest(
-            Release release,
-            ReleaseUpdateRequest request,
-            CancellationToken cancellationToken)
+    private async Task<
+        Either<ActionResult, (Release release, string oldReleaseSlug, string newReleaseSlug)>
+    > ValidateUpdateRequest(Release release, ReleaseUpdateRequest request, CancellationToken cancellationToken)
     {
         var newReleaseSlug = NamingUtils.CreateReleaseSlug(
             year: release.Year,
             timePeriodCoverage: release.TimePeriodCoverage,
-            label: request.Label);
+            label: request.Label
+        );
 
         var oldReleaseSlug = release.Slug;
 
-        return await releaseSlugValidator.ValidateNewSlug(
-                newReleaseSlug: newReleaseSlug, 
-                publicationId: release.PublicationId, 
+        return await releaseSlugValidator
+            .ValidateNewSlug(
+                newReleaseSlug: newReleaseSlug,
+                publicationId: release.PublicationId,
                 releaseId: release.Id,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .OnSuccess(async _ => await ValidateReleaseIsNotUndergoingPublishing(release.Id, cancellationToken))
             .OnSuccess(_ => (release, oldReleaseSlug, newReleaseSlug));
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateReleaseIsNotUndergoingPublishing(
         Guid releaseId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var latestUnpublishedReleaseVersion = await context.ReleaseVersions
-            .LatestReleaseVersion(
-                releaseId: releaseId,
-                publishedOnly: false
-                )
+        var latestUnpublishedReleaseVersion = await context
+            .ReleaseVersions.LatestReleaseVersion(releaseId: releaseId, publishedOnly: false)
             .Where(rv => rv!.Published == null)
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
 
@@ -245,10 +253,10 @@ public partial class ReleaseService(
             return Unit.Instance;
         }
 
-        var releaseVersionPublishingStartedStatuses = await releasePublishingStatusRepository
-            .GetAllByOverallStage(
-                latestUnpublishedReleaseVersion.Id,
-                ReleasePublishingStatusOverallStage.Started);
+        var releaseVersionPublishingStartedStatuses = await releasePublishingStatusRepository.GetAllByOverallStage(
+            latestUnpublishedReleaseVersion.Id,
+            ReleasePublishingStatusOverallStage.Started
+        );
 
         return releaseVersionPublishingStartedStatuses.Any()
             ? ValidationActionResult(ReleaseUndergoingPublishing)
@@ -259,7 +267,8 @@ public partial class ReleaseService(
         Release release,
         string newReleaseSlug,
         ReleaseUpdateRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var newLabel = FormatReleaseLabel(request.Label);
 
@@ -273,25 +282,23 @@ public partial class ReleaseService(
 
     private static string? FormatReleaseLabel(string? releaseLabel)
     {
-        var trimmedNewLabel = string.IsNullOrWhiteSpace(releaseLabel)
-            ? null
-            : releaseLabel.Trim();
+        var trimmedNewLabel = string.IsNullOrWhiteSpace(releaseLabel) ? null : releaseLabel.Trim();
 
-        return trimmedNewLabel.HasValue()
-            ? MatchWhitespaceRegex().Replace(trimmedNewLabel, " ")
-            : null;
+        return trimmedNewLabel.HasValue() ? MatchWhitespaceRegex().Replace(trimmedNewLabel, " ") : null;
     }
 
     private async Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
         Guid publicationId,
         string releaseSlug,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.ReleaseVersions
-            .LatestReleaseVersions(
+        return await context
+            .ReleaseVersions.LatestReleaseVersions(
                 publicationId: publicationId,
                 releaseSlug: releaseSlug,
-                publishedOnly: true)
+                publishedOnly: true
+            )
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
@@ -300,27 +307,28 @@ public partial class ReleaseService(
         string oldReleaseSlug,
         string newReleaseSlug,
         string publicationSlug,
-        Guid latestReleaseVersionId)
+        Guid latestReleaseVersionId
+    )
     {
         if (slugHasChanged)
         {
             // Remove release-specific path cache as the release slug has changed - hence,
             // the path should also change
-            await releaseCacheService.RemoveRelease(
-                publicationSlug: publicationSlug,
-                releaseSlug: oldReleaseSlug);
+            await releaseCacheService.RemoveRelease(publicationSlug: publicationSlug, releaseSlug: oldReleaseSlug);
         }
 
         // Update release-specific path cache
         await releaseCacheService.UpdateRelease(
             releaseVersionId: latestReleaseVersionId,
             publicationSlug: publicationSlug,
-            releaseSlug: newReleaseSlug);
+            releaseSlug: newReleaseSlug
+        );
 
         // Update latest release path cache
         await releaseCacheService.UpdateRelease(
             releaseVersionId: latestReleaseVersionId,
-            publicationSlug: publicationSlug);
+            publicationSlug: publicationSlug
+        );
 
         // Update publication cache (view-model contains release related data that has now been updated)
         await publicationCacheService.UpdatePublication(publicationSlug);
@@ -331,7 +339,8 @@ public partial class ReleaseService(
     private async Task<Either<ActionResult, Unit>> CreateReleaseRedirect(
         Guid releaseId,
         string oldReleaseSlug,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var newReleaseRedirect = new ReleaseRedirect { ReleaseId = releaseId, Slug = oldReleaseSlug };
 
@@ -345,8 +354,8 @@ public partial class ReleaseService(
 
     private async Task<Either<ActionResult, Release>> GetRelease(Guid releaseId)
     {
-        return await context.Releases
-            .Include(r => r.Publication)
+        return await context
+            .Releases.Include(r => r.Publication)
             .ThenInclude(p => p.SupersededBy)
             .SingleOrNotFoundAsync(p => p.Id == releaseId);
     }

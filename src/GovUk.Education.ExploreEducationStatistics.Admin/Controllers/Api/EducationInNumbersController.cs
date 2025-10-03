@@ -13,70 +13,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [Route("api")]
 [ApiController]
 [Authorize(Roles = GlobalRoles.RoleNames.BauUser)]
-public class EducationInNumbersController(
-    IEducationInNumbersService einService) : ControllerBase
+public class EducationInNumbersController(IEducationInNumbersService einService) : ControllerBase
 {
     [HttpGet("education-in-numbers/{id:guid}")]
-    public async Task<ActionResult<EinSummaryViewModel>> GetLatestPage(
-        [FromRoute] Guid id)
+    public async Task<ActionResult<EinSummaryViewModel>> GetLatestPage([FromRoute] Guid id)
     {
-        return await einService.GetPage(id)
-            .HandleFailuresOrOk();
+        return await einService.GetPage(id).HandleFailuresOrOk();
     }
 
     [HttpGet("education-in-numbers")]
     public async Task<ActionResult<List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
-        return await einService.ListLatestPages()
-            .HandleFailuresOrOk();
+        return await einService.ListLatestPages().HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers")]
     public async Task<ActionResult<EinSummaryViewModel>> CreateEducationInNumbersPage(
-        [FromBody] CreateEducationInNumbersPageRequest request)
+        [FromBody] CreateEducationInNumbersPageRequest request
+    )
     {
-        return await einService.CreatePage(request)
-            .HandleFailuresOrOk();
+        return await einService.CreatePage(request).HandleFailuresOrOk();
     }
 
     [HttpPost("education-in-numbers/{id:Guid}/amendment")]
-    public async Task<ActionResult<EinSummaryViewModel>> CreateAmendment(
-        [FromRoute] Guid id)
+    public async Task<ActionResult<EinSummaryViewModel>> CreateAmendment([FromRoute] Guid id)
     {
-        return await einService.CreateAmendment(id)
-            .HandleFailuresOrOk();
+        return await einService.CreateAmendment(id).HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/{id:Guid}")]
     public async Task<ActionResult<EinSummaryViewModel>> UpdatePage(
         [FromRoute] Guid id,
-        [FromBody] UpdateEducationInNumbersPageRequest request)
+        [FromBody] UpdateEducationInNumbersPageRequest request
+    )
     {
-        return await einService.UpdatePage(id, request)
-            .HandleFailuresOrOk();
+        return await einService.UpdatePage(id, request).HandleFailuresOrOk();
     }
 
     [HttpPatch("education-in-numbers/{id:Guid}/publish")]
-    public async Task<ActionResult<EinSummaryViewModel>> PublishPage(
-        [FromRoute] Guid id)
+    public async Task<ActionResult<EinSummaryViewModel>> PublishPage([FromRoute] Guid id)
     {
-        return await einService.PublishPage(id)
-            .HandleFailuresOrOk();
+        return await einService.PublishPage(id).HandleFailuresOrOk();
     }
 
     [HttpPut("education-in-numbers/order")]
-    public async Task<ActionResult<List<EinSummaryViewModel>>> Reorder(
-        [FromBody] List<Guid> pageIds)
+    public async Task<ActionResult<List<EinSummaryViewModel>>> Reorder([FromBody] List<Guid> pageIds)
     {
-        return await einService.Reorder(pageIds)
-            .HandleFailuresOrOk();
+        return await einService.Reorder(pageIds).HandleFailuresOrOk();
     }
 
     [HttpDelete("education-in-numbers/{id:guid}")]
-    public async Task<ActionResult<Unit>> Delete(
-        [FromRoute] Guid id)
+    public async Task<ActionResult<Unit>> Delete([FromRoute] Guid id)
     {
-        return await einService.Delete(id)
-            .HandleFailuresOrOk();
+        return await einService.Delete(id).HandleFailuresOrOk();
     }
 }

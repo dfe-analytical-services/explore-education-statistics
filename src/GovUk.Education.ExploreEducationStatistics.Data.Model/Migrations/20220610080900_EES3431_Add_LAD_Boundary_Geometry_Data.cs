@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
 
 #nullable disable
@@ -14,8 +14,9 @@ public partial class EES3431_Add_LAD_Boundary_Geometry_Data : Migration
     {
         migrationBuilder.Sql("SET IDENTITY_INSERT BoundaryLevel ON");
         migrationBuilder.Sql(
-            "INSERT INTO dbo.BoundaryLevel (Id, Level, Label, Published, Created) " + 
-            "VALUES (11, 'LAD', 'Local Authority Districts (December 2021) UK BUC', '2021-12-15 11:39:00.0000000', '2022-06-10 00:00:00.0000000')");
+            "INSERT INTO dbo.BoundaryLevel (Id, Level, Label, Published, Created) "
+                + "VALUES (11, 'LAD', 'Local Authority Districts (December 2021) UK BUC', '2021-12-15 11:39:00.0000000', '2022-06-10 00:00:00.0000000')"
+        );
         migrationBuilder.Sql("SET IDENTITY_INSERT BoundaryLevel OFF");
         migrationBuilder.SqlFromFileByLine(MigrationsPath, $"{MigrationId}_GeometryData.sql");
     }

@@ -1,35 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
-
   <ItemGroup>
-    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
-
   <ItemGroup>
-    <CompilerVisibleProperty Include="RootNamespace"/>
-    <CompilerVisibleProperty Include="ProjectDir"/>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/> <!-- Required to execute unit tests in IDE -->
-    <PackageReference Include="MockQueryable.Moq" Version="7.0.3"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <!-- Required to execute unit tests in IDE -->
+    <PackageReference Include="MockQueryable.Moq" Version="7.0.3" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj"/>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj"/>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj"/>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="StrategiesTests\__snapshots__\" />
   </ItemGroup>
-
 </Project>

@@ -23,7 +23,8 @@ public class AzureSearchIndexerClientFactory(IOptions<AzureSearchOptions> option
             return new AzureSearchIndexerClientWrapper(
                 string.IsNullOrEmpty(_accessKey)
                     ? new AzureSearchIndexerClient(new Uri(_searchServiceEndpoint), new DefaultAzureCredential())
-                    : new AzureSearchIndexerClient(new Uri(_searchServiceEndpoint), new AzureKeyCredential(_accessKey)));
+                    : new AzureSearchIndexerClient(new Uri(_searchServiceEndpoint), new AzureKeyCredential(_accessKey))
+            );
         }
         catch (UriFormatException)
         {

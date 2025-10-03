@@ -126,7 +126,7 @@ public class FixedInformationDataFileReader
         PlanningAreaCode,
 
         [EnumLabelValue("planning_area_name")]
-        PlanningAreaName
+        PlanningAreaName,
     }
 
     private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
@@ -142,9 +142,12 @@ public class FixedInformationDataFileReader
         _timeIdentifierColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_identifier"));
         _yearColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_period"));
         _geographicLevelColumnIndex = csvHeaders.FindIndex(h => h.Equals("geographic_level"));
-        _locationColumnIndexes = EnumUtil.GetEnums<LocationColumn>().ToDictionary(
-            enumValue => enumValue,
-            enumValue => csvHeaders.FindIndex(h => h.Equals(enumValue.GetEnumLabel())));
+        _locationColumnIndexes = EnumUtil
+            .GetEnums<LocationColumn>()
+            .ToDictionary(
+                enumValue => enumValue,
+                enumValue => csvHeaders.FindIndex(h => h.Equals(enumValue.GetEnumLabel()))
+            );
     }
 
     public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues)
@@ -153,7 +156,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
+            return (TimeIdentifier)TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -179,7 +182,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (GeographicLevel) GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
+            return (GeographicLevel)GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -209,7 +212,7 @@ public class FixedInformationDataFileReader
             RscRegion = GetRscRegion(rowValues),
             School = GetSchool(rowValues),
             Sponsor = GetSponsor(rowValues),
-            Ward = GetWard(rowValues)
+            Ward = GetWard(rowValues),
         };
     }
 
@@ -239,9 +242,7 @@ public class FixedInformationDataFileReader
         var oldCode = GetLocationAttributeValue(LocationColumn.OldLaCode, rowValues);
         var newCode = GetLocationAttributeValue(LocationColumn.NewLaCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LaName, rowValues);
-        return GetLocationAttributeOrDefault(
-            () => new LocalAuthority(newCode, oldCode, name),
-            oldCode, newCode, name);
+        return GetLocationAttributeOrDefault(() => new LocalAuthority(newCode, oldCode, name), oldCode, newCode, name);
     }
 
     private LocalAuthorityDistrict? GetLocalAuthorityDistrict(IReadOnlyList<string> rowValues)
@@ -349,7 +350,8 @@ public class FixedInformationDataFileReader
 
     private TLocationAttribute? GetLocationAttributeOrDefault<TLocationAttribute>(
         Func<TLocationAttribute> creatorFunc,
-        params string?[] attributeValues)
+        params string?[] attributeValues
+    )
         where TLocationAttribute : LocationAttribute
     {
         return !attributeValues.All(v => v.IsNullOrEmpty()) ? creatorFunc.Invoke() : default;

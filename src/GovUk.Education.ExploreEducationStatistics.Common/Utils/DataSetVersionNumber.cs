@@ -17,16 +17,15 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
 
         var successful = SemVersion.TryParse(
             versionString,
-            SemVersionStyles.OptionalMinorPatch
-                | SemVersionStyles.AllowWhitespace
-                | SemVersionStyles.AllowLowerV,
-        out var sv);
+            SemVersionStyles.OptionalMinorPatch | SemVersionStyles.AllowWhitespace | SemVersionStyles.AllowLowerV,
+            out var sv
+        );
 
         if (!successful)
         {
             return false;
         }
-        
+
         version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch);
         return successful;
     }
@@ -48,8 +47,7 @@ public static class DataSetVersionWildcardHelper
             parts = versionString
                 .Trim(' ', 'v')
                 .Split('.')
-                .Select(a => a != "*" ? (int?)int.Parse(a, NumberStyles.None)
-                : null)
+                .Select(a => a != "*" ? (int?)int.Parse(a, NumberStyles.None) : null)
                 .ToArray();
         }
         catch (FormatException)
@@ -65,9 +63,11 @@ public static class DataSetVersionWildcardHelper
         if (indexOfWildcard != -1 && parts.Skip(indexOfWildcard + 1).Any(part => part != null))
             return false; // reject version strings like 1.*.1
 
-        version = new DataSetVersionNumber(parts[0],
+        version = new DataSetVersionNumber(
+            parts[0],
             parts.Length > 1 ? parts[1] : null,
-            parts.Length > 2 ? parts[2] : null);
+            parts.Length > 2 ? parts[2] : null
+        );
 
         return true;
     }

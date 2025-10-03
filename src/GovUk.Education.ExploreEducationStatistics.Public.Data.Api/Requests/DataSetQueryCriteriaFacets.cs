@@ -23,7 +23,7 @@ public record DataSetQueryCriteriaFacets : IDataSetQueryCriteria
     /// Query criteria relating to location options.
     /// </summary>
     public DataSetQueryCriteriaLocations? Locations { get; init; }
- 
+
     /// <summary>
     /// Query criteria relating to time periods.
     /// </summary>

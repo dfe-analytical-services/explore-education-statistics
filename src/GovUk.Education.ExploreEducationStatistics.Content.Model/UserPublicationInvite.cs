@@ -6,17 +6,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class UserPublicationInvite : ICreatedTimestamp<DateTime>
 {
-    [Key] 
+    [Key]
     [Required]
     public Guid Id { get; set; }
 
-    [Required] public string Email { get; set; } = null!;
+    [Required]
+    public string Email { get; set; } = null!;
 
-    [Required] public Publication Publication { get; set; } = null!;
+    [Required]
+    public Publication Publication { get; set; } = null!;
 
     [Required]
     public Guid PublicationId { get; set; }
-    
+
     [Required]
     public PublicationRole Role { get; set; }
 

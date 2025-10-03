@@ -84,7 +84,8 @@ public static class EitherExtensions
     /// return a list of the failure results.
     /// </summary>
     public static Either<List<TFailure>, List<TSuccess>> AggregateSuccessesAndFailures<TFailure, TSuccess>(
-        this IEnumerable<Either<TFailure, TSuccess>> items)
+        this IEnumerable<Either<TFailure, TSuccess>> items
+    )
     {
         var successes = new List<TSuccess>();
         var failures = new List<TFailure>();
@@ -108,10 +109,10 @@ public static class EitherExtensions
     /// If all Eithers in the provided list are successful, return a list of successes. Otherwise, return the first failure.
     /// </summary>
     public static Either<TFailure, List<TSuccess>> OnSuccessAll<TFailure, TSuccess>(
-        this IEnumerable<Either<TFailure, TSuccess>> items)
+        this IEnumerable<Either<TFailure, TSuccess>> items
+    )
     {
-        var result = items
-            .AggregateSuccessesAndFailures();
+        var result = items.AggregateSuccessesAndFailures();
 
         if (result.IsLeft)
         {
@@ -125,13 +126,13 @@ public static class EitherExtensions
     /// If all Eithers in the provided list are successful, return Unit.Instance. Otherwise, return the first failure.
     /// </summary>
     public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
-        this IEnumerable<Either<TFailure, TSuccess>> items)
+        this IEnumerable<Either<TFailure, TSuccess>> items
+    )
     {
         return items.OnSuccessAll().OnSuccessVoid();
     }
 
-    public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(
-        this Either<TFailure, TSuccess> either)
+    public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(this Either<TFailure, TSuccess> either)
     {
         if (either.IsLeft)
         {
@@ -156,21 +157,24 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Action successTask)
+        Action successTask
+    )
     {
         return await task.OnSuccessDo(_ => successTask());
     }
 
     public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<Task> successTask)
+        Func<Task> successTask
+    )
     {
         return await task.OnSuccessDo(async _ => await successTask());
     }
 
     public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Action<TSuccess> successTask)
+        Action<TSuccess> successTask
+    )
     {
         var firstResult = await task;
 
@@ -185,7 +189,8 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TSuccess, Task> successTask)
+        Func<TSuccess, Task> successTask
+    )
     {
         var firstResult = await task;
 
@@ -200,28 +205,32 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<Task<Either<TFailure, TSuccess2>>> successTask)
+        Func<Task<Either<TFailure, TSuccess2>>> successTask
+    )
     {
         return await task.OnSuccessDo(async _ => await successTask());
     }
 
     public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<Either<TFailure, TSuccess2>> successTask)
+        Func<Either<TFailure, TSuccess2>> successTask
+    )
     {
         return await task.OnSuccessDo(async _ => await Task.FromResult(successTask()));
     }
 
     public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Either<TFailure, TSuccess2>> successTask)
+        Func<TSuccess1, Either<TFailure, TSuccess2>> successTask
+    )
     {
         return await task.OnSuccessDo(async result => await Task.FromResult(successTask(result)));
     }
 
     public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> successTask)
+        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> successTask
+    )
     {
         var firstResult = await task;
 
@@ -246,7 +255,8 @@ public static class EitherTaskExtensions
      */
     public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<Task> func)
+        Func<Task> func
+    )
     {
         var firstResult = await task;
 
@@ -266,7 +276,8 @@ public static class EitherTaskExtensions
      */
     public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Action action)
+        Action action
+    )
     {
         var firstResult = await task;
 
@@ -285,14 +296,16 @@ public static class EitherTaskExtensions
      * it.
      */
     public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
-        this Task<Either<TFailure, TSuccess>> task)
+        this Task<Either<TFailure, TSuccess>> task
+    )
     {
         return OnSuccessVoid(task, () => { });
     }
 
     public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<Task<TSuccess2>> func)
+        Func<Task<TSuccess2>> func
+    )
     {
         var firstResult = await task;
 
@@ -307,14 +320,16 @@ public static class EitherTaskExtensions
     [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
     public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Task> func)
+        Func<TSuccess1, Task> func
+    )
     {
         return await task.OnSuccessVoid(func);
     }
 
     public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<Task<Either<TFailure, TSuccess2>>> func)
+        Func<Task<Either<TFailure, TSuccess2>>> func
+    )
     {
         var firstResult = await task;
 
@@ -332,7 +347,8 @@ public static class EitherTaskExtensions
      */
     public static async Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TSuccess, Task> func)
+        Func<TSuccess, Task> func
+    )
     {
         var firstResult = await task;
 
@@ -352,11 +368,10 @@ public static class EitherTaskExtensions
      */
     public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> task2)
+        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> task2
+    )
     {
-        return task
-            .OnSuccess(task2.Invoke)
-            .OnSuccessVoid();
+        return task.OnSuccess(task2.Invoke).OnSuccessVoid();
     }
 
     /**
@@ -365,17 +380,16 @@ public static class EitherTaskExtensions
      */
     public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<Task<Either<TFailure, TSuccess2>>> func)
+        Func<Task<Either<TFailure, TSuccess2>>> func
+    )
     {
-        return task
-            .OnSuccess(func.Invoke)
-            .OnSuccessVoid();
+        return task.OnSuccess(func.Invoke).OnSuccessVoid();
     }
-
 
     public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, TSuccess2> func)
+        Func<TSuccess1, TSuccess2> func
+    )
     {
         return await task.OnSuccess(async success => await Task.FromResult(func(success)));
     }
@@ -387,10 +401,11 @@ public static class EitherTaskExtensions
      *
      * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
      */
-    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
-        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
-            this Either<TFailure, TSuccess1> task,
-            Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> OnSuccessCombineWith<
+        TFailure,
+        TSuccess1,
+        TSuccess2
+    >(this Either<TFailure, TSuccess1> task, Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
     {
         return await task.OnSuccess(success =>
         {
@@ -405,10 +420,11 @@ public static class EitherTaskExtensions
      *
      * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
      */
-    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
-        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> OnSuccessCombineWith<
+        TFailure,
+        TSuccess1,
+        TSuccess2
+    >(this Task<Either<TFailure, TSuccess1>> task, Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
     {
         return await task.OnSuccess(success =>
         {
@@ -423,15 +439,24 @@ public static class EitherTaskExtensions
      *
      * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
      */
-    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2, TSuccess3>>>
-        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2, TSuccess3>(
-            this Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> task,
-            Func<Tuple<TSuccess1, TSuccess2>, Task<Either<TFailure, TSuccess3>>> func)
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2, TSuccess3>>> OnSuccessCombineWith<
+        TFailure,
+        TSuccess1,
+        TSuccess2,
+        TSuccess3
+    >(
+        this Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> task,
+        Func<Tuple<TSuccess1, TSuccess2>, Task<Either<TFailure, TSuccess3>>> func
+    )
     {
         return await task.OnSuccess(success =>
         {
-            return func(success).OnSuccess(combinator =>
-                new Tuple<TSuccess1, TSuccess2, TSuccess3>(success.Item1, success.Item2, combinator));
+            return func(success)
+                .OnSuccess(combinator => new Tuple<TSuccess1, TSuccess2, TSuccess3>(
+                    success.Item1,
+                    success.Item2,
+                    combinator
+                ));
         });
     }
 
@@ -442,10 +467,11 @@ public static class EitherTaskExtensions
      *
      * When C# allows better destructuring, we will be able to destructure the resulting Tuple much better.
      */
-    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>>
-        OnSuccessCombineWith<TFailure, TSuccess1, TSuccess2>(
-            this Task<Either<TFailure, TSuccess1>> task,
-            Func<TSuccess1, Either<TFailure, TSuccess2>> func)
+    public static async Task<Either<TFailure, Tuple<TSuccess1, TSuccess2>>> OnSuccessCombineWith<
+        TFailure,
+        TSuccess1,
+        TSuccess2
+    >(this Task<Either<TFailure, TSuccess1>> task, Func<TSuccess1, Either<TFailure, TSuccess2>> func)
     {
         return await task.OnSuccess(success =>
         {
@@ -455,7 +481,8 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Task<TSuccess2>> func)
+        Func<TSuccess1, Task<TSuccess2>> func
+    )
     {
         var firstResult = await task;
 
@@ -469,14 +496,16 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Either<TFailure, TSuccess2>> func)
+        Func<TSuccess1, Either<TFailure, TSuccess2>> func
+    )
     {
         return await task.OnSuccess(async success => await Task.FromResult(func(success)));
     }
 
     public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
-        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func)
+        Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> func
+    )
     {
         var firstResult = await task;
 
@@ -490,7 +519,8 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<Unit, TSuccess>> OnFailureVoid<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Action<TFailure> failureTask)
+        Action<TFailure> failureTask
+    )
     {
         var firstResult = await task;
 
@@ -505,7 +535,8 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TFailure, Task> failureTask)
+        Func<TFailure, Task> failureTask
+    )
     {
         var firstResult = await task;
 
@@ -520,7 +551,8 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Action<TFailure> failureAction)
+        Action<TFailure> failureAction
+    )
     {
         var firstResult = await task;
 
@@ -538,7 +570,8 @@ public static class EitherTaskExtensions
     /// </summary>
     public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TFailure> func)
+        Func<TFailure> func
+    )
     {
         return await task.OnFailureFailWith(async _ => await Task.FromResult(func()));
     }
@@ -548,7 +581,8 @@ public static class EitherTaskExtensions
     /// </summary>
     public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TFailure, TFailure> func)
+        Func<TFailure, TFailure> func
+    )
     {
         return await task.OnFailureFailWith(async result => await Task.FromResult(func(result)));
     }
@@ -558,7 +592,8 @@ public static class EitherTaskExtensions
     /// </summary>
     public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TFailure, Task<TFailure>> func)
+        Func<TFailure, Task<TFailure>> func
+    )
     {
         var firstResult = await task;
 
@@ -577,7 +612,8 @@ public static class EitherTaskExtensions
     /// </summary>
     public static async Task<Either<TFailure, TSuccess>> OnFailureSucceedWith<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TFailure, Task<TSuccess>> func)
+        Func<TFailure, Task<TSuccess>> func
+    )
     {
         var firstResult = await task;
 
@@ -591,7 +627,8 @@ public static class EitherTaskExtensions
 
     public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<Task<TSuccess>> func)
+        Func<Task<TSuccess>> func
+    )
     {
         var firstResult = await task;
 
@@ -605,7 +642,8 @@ public static class EitherTaskExtensions
 
     public static async Task<Either<TFailure, TSuccess>> OrElse<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<Task<Either<TFailure, TSuccess>>> func)
+        Func<Task<Either<TFailure, TSuccess>>> func
+    )
     {
         var firstResult = await task;
 
@@ -619,7 +657,8 @@ public static class EitherTaskExtensions
 
     public static async Task<TSuccess> OrElse<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TSuccess> func)
+        Func<TSuccess> func
+    )
     {
         var firstResult = await task;
 
@@ -633,7 +672,8 @@ public static class EitherTaskExtensions
 
     public static async Task<TSuccess> OrThrow<TFailure, TSuccess>(
         this Task<Either<TFailure, TSuccess>> task,
-        Func<TFailure, Exception> func)
+        Func<TFailure, Exception> func
+    )
     {
         var firstResult = await task;
 
@@ -646,7 +686,8 @@ public static class EitherTaskExtensions
     }
 
     public static async Task<Either<TFailure, List<TSuccess>>> OnSuccessAll<TFailure, TSuccess>(
-        this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
+        this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks
+    )
     {
         var result = new List<TSuccess>();
         foreach (var task in tasks)
@@ -664,7 +705,8 @@ public static class EitherTaskExtensions
     }
 
     public static Task<Either<TFailure, Unit>> OnSuccessAllReturnVoid<TFailure, TSuccess>(
-        this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
+        this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks
+    )
     {
         return tasks.OnSuccessAll().OnSuccessVoid();
     }

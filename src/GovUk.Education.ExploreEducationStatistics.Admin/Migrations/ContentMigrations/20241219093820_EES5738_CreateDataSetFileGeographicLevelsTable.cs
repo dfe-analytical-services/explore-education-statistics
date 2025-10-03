@@ -16,18 +16,23 @@ public partial class EES5738_CreateDataSetFileGeographicLevelsTable : Migration
             columns: table => new
             {
                 DataSetFileVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                GeographicLevel = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false)
+                GeographicLevel = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_DataSetFileVersionGeographicLevels", x => new { x.DataSetFileVersionId, x.GeographicLevel });
+                table.PrimaryKey(
+                    "PK_DataSetFileVersionGeographicLevels",
+                    x => new { x.DataSetFileVersionId, x.GeographicLevel }
+                );
                 table.ForeignKey(
                     name: "FK_DataSetFileVersionGeographicLevels_Files_DataSetFileVersionId",
                     column: x => x.DataSetFileVersionId,
                     principalTable: "Files",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
+                    onDelete: ReferentialAction.Cascade
+                );
+            }
+        );
         migrationBuilder.Sql("GRANT SELECT ON dbo.DataSetFileVersionGeographicLevels TO [content];");
         migrationBuilder.Sql("GRANT INSERT ON dbo.DataSetFileVersionGeographicLevels TO [importer];");
 
@@ -44,7 +49,6 @@ public partial class EES5738_CreateDataSetFileGeographicLevelsTable : Migration
         migrationBuilder.Sql("REVOKE SELECT ON dbo.DataSetFileGeographicLevels TO [data];");
         migrationBuilder.Sql("REVOKE SELECT ON dbo.DataSetFileGeographicLevels TO [publisher];");
 
-        migrationBuilder.DropTable(
-            name: "DataSetFileVersionGeographicLevels");
+        migrationBuilder.DropTable(name: "DataSetFileVersionGeographicLevels");
     }
 }

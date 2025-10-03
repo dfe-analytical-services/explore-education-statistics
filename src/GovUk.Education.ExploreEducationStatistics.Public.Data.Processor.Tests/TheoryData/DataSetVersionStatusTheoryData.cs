@@ -16,10 +16,10 @@ public static class DataSetVersionStatusTheoryData
     public static readonly TheoryData<DataSetVersionStatus> DeletableStatuses = new(DeletableStatusList);
 
     public static readonly TheoryData<DataSetVersionStatus> NonDeletableStatuses = new(
-        EnumUtil.GetEnums<DataSetVersionStatus>().Except(DeletableStatusList));
+        EnumUtil.GetEnums<DataSetVersionStatus>().Except(DeletableStatusList)
+    );
 
     public static readonly TheoryData<DataSetVersionStatus> StatusesExceptMapping = new(
-        EnumUtil.GetEnums<DataSetVersionStatus>().Except([
-            DataSetVersionStatus.Mapping,
-        ]));
+        EnumUtil.GetEnums<DataSetVersionStatus>().Except([DataSetVersionStatus.Mapping])
+    );
 }

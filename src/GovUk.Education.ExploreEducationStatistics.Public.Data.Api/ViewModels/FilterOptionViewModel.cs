@@ -21,10 +21,6 @@ public record FilterOptionViewModel
 
     public static FilterOptionViewModel Create(FilterOptionMetaChange.State changeState)
     {
-        return new FilterOptionViewModel
-        {
-            Id = changeState.PublicId,
-            Label = changeState.Option.Label,
-        };
+        return new FilterOptionViewModel { Id = changeState.PublicId, Label = changeState.Option.Label };
     }
 }

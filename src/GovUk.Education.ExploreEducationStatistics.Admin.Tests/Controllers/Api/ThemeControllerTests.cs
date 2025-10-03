@@ -10,15 +10,9 @@ public class ThemeControllerTests
     [Fact]
     public async Task CreateTheme_Returns_Ok()
     {
-        var request = new ThemeSaveViewModel
-        {
-            Title = "Test theme"
-        };
+        var request = new ThemeSaveViewModel { Title = "Test theme" };
 
-        var viewModel = new ThemeViewModel
-        {
-            Id = Guid.NewGuid()
-        };
+        var viewModel = new ThemeViewModel { Id = Guid.NewGuid() };
 
         var themeService = new Mock<IThemeService>();
         themeService.Setup(s => s.CreateTheme(request)).ReturnsAsync(viewModel);
@@ -32,13 +26,7 @@ public class ThemeControllerTests
     [Fact]
     public async Task GetThemes_Returns_Ok()
     {
-        var themes = new List<ThemeViewModel>
-        {
-            new ThemeViewModel
-            {
-                Title = "Theme A",
-            }
-        };
+        var themes = new List<ThemeViewModel> { new ThemeViewModel { Title = "Theme A" } };
 
         var themeService = new Mock<IThemeService>();
         themeService.Setup(s => s.GetThemes()).ReturnsAsync(themes);

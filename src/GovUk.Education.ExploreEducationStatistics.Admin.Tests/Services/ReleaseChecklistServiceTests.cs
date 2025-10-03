@@ -38,8 +38,7 @@ public class ReleaseChecklistServiceTests
     [InlineData(DataSetVersionStatus.Finalising)]
     public async Task GetChecklist_AllErrors(DataSetVersionStatus mappingStatus)
     {
-        Release release = _dataFixture.DefaultRelease()
-            .WithPublication(_dataFixture.DefaultPublication());
+        Release release = _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication());
 
         var originalReleaseVersion = new ReleaseVersion
         {
@@ -48,11 +47,7 @@ public class ReleaseChecklistServiceTests
             Created = DateTime.UtcNow.AddMonths(-2),
             Updates = new List<Update>
             {
-                new()
-                {
-                    Reason = "Original release note",
-                    Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
-                }
+                new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) },
             },
         };
 
@@ -62,53 +57,41 @@ public class ReleaseChecklistServiceTests
             PreviousVersion = originalReleaseVersion,
             Version = 1,
             Created = DateTime.UtcNow.AddMonths(-1),
-            GenericContent =
-                new List<ContentSection>
-                {
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>()
-                    },
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content =
-                            new List<ContentBlock>
-                            {
-                                new HtmlBlock { Body = "<p>Test</p>" },
-                                new DataBlock(),
-                                new HtmlBlock { Body = "" }
-                            }
-                    }
-                },
-            RelatedDashboardsSection =
-                new ContentSection
-                {
-                    Type = ContentSectionType.RelatedDashboards,
-                    Content = new List<ContentBlock> { new HtmlBlock { Body = "" } }
-                },
-            SummarySection =
-                new ContentSection
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    Content = new List<ContentBlock> { new HtmlBlock { Body = "" } }
-                },
-            Updates = new List<Update>
+            GenericContent = new List<ContentSection>
             {
+                new() { Type = ContentSectionType.Generic, Content = new List<ContentBlock>() },
                 new()
                 {
-                    Reason = "Original release note",
-                    Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
-                }
-            }
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock { Body = "<p>Test</p>" },
+                        new DataBlock(),
+                        new HtmlBlock { Body = "" },
+                    },
+                },
+            },
+            RelatedDashboardsSection = new ContentSection
+            {
+                Type = ContentSectionType.RelatedDashboards,
+                Content = new List<ContentBlock> { new HtmlBlock { Body = "" } },
+            },
+            SummarySection = new ContentSection
+            {
+                Type = ContentSectionType.ReleaseSummary,
+                Content = new List<ContentBlock> { new HtmlBlock { Body = "" } },
+            },
+            Updates = new List<Update>
+            {
+                new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) },
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            context.ReleaseVersions.AddRange( releaseVersion);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -124,19 +107,13 @@ public class ReleaseChecklistServiceTests
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(new List<MethodologyVersion>());
 
-            releaseDataFileRepository
-                .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync(new List<File>());
 
             releaseDataFileRepository
                 .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                .ReturnsAsync(
-                    new List<File> { new() }
-                );
+                .ReturnsAsync(new List<File> { new() });
 
-            dataImportService
-                .Setup(s => s.HasIncompleteImports(releaseVersion.Id))
-                .ReturnsAsync(true);
+            dataImportService.Setup(s => s.HasIncompleteImports(releaseVersion.Id)).ReturnsAsync(true);
 
             dataGuidanceService
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
@@ -144,24 +121,12 @@ public class ReleaseChecklistServiceTests
 
             List<DataSetVersionStatusSummary> dataSetVersionStatusSummaries =
             [
-                new(
-                    Id: Guid.NewGuid(),
-                    Title: "Data set 1",
-                    Status: DataSetVersionStatus.Cancelled),
-                new(
-                    Id: Guid.NewGuid(),
-                    Title: "Data set 2",
-                    Status: mappingStatus),
-                new(
-                    Id: Guid.NewGuid(),
-                    Title: "Data set 3",
-                    Status: DataSetVersionStatus.Processing),
-                new(
-                    Id: Guid.NewGuid(),
-                    Title: "Data set 4",
-                    Status: DataSetVersionStatus.Failed)
+                new(Id: Guid.NewGuid(), Title: "Data set 1", Status: DataSetVersionStatus.Cancelled),
+                new(Id: Guid.NewGuid(), Title: "Data set 2", Status: mappingStatus),
+                new(Id: Guid.NewGuid(), Title: "Data set 3", Status: DataSetVersionStatus.Processing),
+                new(Id: Guid.NewGuid(), Title: "Data set 4", Status: DataSetVersionStatus.Failed),
             ];
-            
+
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(dataSetVersionStatusSummaries);
@@ -177,19 +142,19 @@ public class ReleaseChecklistServiceTests
 
             var result = await service.GetChecklist(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(dataImportService,
+            MockUtils.VerifyAllMocks(
+                dataImportService,
                 dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository,
-                dataSetVersionService);
+                dataSetVersionService
+            );
 
             var checklist = result.AssertRight();
 
             Assert.False(checklist.Valid);
 
-            var errors = checklist.Errors
-                .Select(error => error.Code)
-                .ToList();
+            var errors = checklist.Errors.Select(error => error.Code).ToList();
 
             Assert.Equal(13, errors.Count);
             Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
@@ -211,9 +176,9 @@ public class ReleaseChecklistServiceTests
     [Fact]
     public async Task GetChecklist_AllWarningsWithNoDataFiles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
             .WithPreReleaseAccessList(string.Empty);
 
@@ -236,9 +201,7 @@ public class ReleaseChecklistServiceTests
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(new List<MethodologyVersion>());
 
-            releaseDataFileRepository
-                .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync(new List<File>());
 
             releaseDataFileRepository
                 .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
@@ -262,10 +225,12 @@ public class ReleaseChecklistServiceTests
 
             var result = await service.GetChecklist(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(dataGuidanceService,
+            MockUtils.VerifyAllMocks(
+                dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository,
-                dataSetVersionService);
+                dataSetVersionService
+            );
 
             var checklist = result.AssertRight();
 
@@ -282,9 +247,9 @@ public class ReleaseChecklistServiceTests
     [Fact]
     public async Task GetChecklist_AllWarningsWithDataFiles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
             .WithPreReleaseAccessList(string.Empty);
 
@@ -323,15 +288,15 @@ public class ReleaseChecklistServiceTests
                             Id = Guid.NewGuid(),
                             Filename = "test-file-1.csv",
                             Type = FileType.Data,
-                            SubjectId = subject.Id
+                            SubjectId = subject.Id,
                         },
                         new()
                         {
                             Id = Guid.NewGuid(),
                             Filename = "test-file-2.csv",
                             Type = FileType.Data,
-                            SubjectId = otherSubject.Id
-                        }
+                            SubjectId = otherSubject.Id,
+                        },
                     }
                 );
 
@@ -341,12 +306,7 @@ public class ReleaseChecklistServiceTests
 
             footnoteRepository
                 .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
-                .ReturnsAsync(
-                    new List<Subject>
-                    {
-                        subject,
-                    }
-                );
+                .ReturnsAsync(new List<Subject> { subject });
 
             releaseDataFileRepository
                 .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
@@ -354,13 +314,7 @@ public class ReleaseChecklistServiceTests
 
             dataBlockService
                 .Setup(s => s.ListDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(
-                    new List<DataBlock>
-                    {
-                        new(),
-                        new(),
-                    }
-                );
+                .ReturnsAsync(new List<DataBlock> { new(), new() });
 
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
@@ -378,12 +332,14 @@ public class ReleaseChecklistServiceTests
 
             var result = await service.GetChecklist(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(dataBlockService,
+            MockUtils.VerifyAllMocks(
+                dataBlockService,
                 footnoteRepository,
                 dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository,
-                dataSetVersionService);
+                dataSetVersionService
+            );
 
             var checklist = result.AssertRight();
 
@@ -405,9 +361,9 @@ public class ReleaseChecklistServiceTests
     [Fact]
     public async Task GetChecklist_AllWarningsWithUnapprovedMethodology()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
             .WithPreReleaseAccessList(string.Empty);
 
@@ -432,9 +388,7 @@ public class ReleaseChecklistServiceTests
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(AsList(methodologyVersion));
 
-            releaseDataFileRepository
-                .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync(new List<File>());
 
             releaseDataFileRepository
                 .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
@@ -458,11 +412,13 @@ public class ReleaseChecklistServiceTests
 
             var result = await service.GetChecklist(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(dataGuidanceService,
+            MockUtils.VerifyAllMocks(
+                dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository,
                 dataGuidanceService,
-                dataSetVersionService);
+                dataSetVersionService
+            );
 
             var checklist = result.AssertRight();
 
@@ -470,8 +426,7 @@ public class ReleaseChecklistServiceTests
 
             Assert.Equal(4, checklist.Warnings.Count);
 
-            var methodologyMustBeApprovedError =
-                Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
+            var methodologyMustBeApprovedError = Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
             Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
             Assert.Equal(methodologyVersion.Id, methodologyMustBeApprovedError.MethodologyId);
 
@@ -484,8 +439,7 @@ public class ReleaseChecklistServiceTests
     [Fact]
     public async Task GetChecklist_FullyValid()
     {
-        Release release = _dataFixture.DefaultRelease()
-            .WithPublication(_dataFixture.DefaultPublication());
+        Release release = _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication());
 
         var methodologyVersion = new MethodologyVersion { Status = Approved };
 
@@ -506,43 +460,35 @@ public class ReleaseChecklistServiceTests
             Created = DateTime.UtcNow.AddMonths(-1),
             DataGuidance = "Test guidance",
             PreReleaseAccessList = "Test access list",
-            GenericContent =
-                new List<ContentSection>
-                {
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock> { new HtmlBlock { Body = "<p>test</p>" } }
-                    },
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock> { new DataBlock { Id = dataBlockId } }
-                    }
-                },
-            HeadlinesSection =
-                new ContentSection
-                {
-                    Type = ContentSectionType.Headlines,
-                    Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } }
-                },
-            RelatedDashboardsSection =
-                new ContentSection
-                {
-                    Type = ContentSectionType.RelatedDashboards,
-                    Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } }
-                },
-            SummarySection =
-                new ContentSection
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } }
-                },
-            NextReleaseDate = new PartialDate
+            GenericContent = new List<ContentSection>
             {
-                Month = "12",
-                Year = "2021"
+                new()
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock> { new HtmlBlock { Body = "<p>test</p>" } },
+                },
+                new()
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock> { new DataBlock { Id = dataBlockId } },
+                },
             },
+            HeadlinesSection = new ContentSection
+            {
+                Type = ContentSectionType.Headlines,
+                Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } },
+            },
+            RelatedDashboardsSection = new ContentSection
+            {
+                Type = ContentSectionType.RelatedDashboards,
+                Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } },
+            },
+            SummarySection = new ContentSection
+            {
+                Type = ContentSectionType.ReleaseSummary,
+                Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } },
+            },
+            NextReleaseDate = new PartialDate { Month = "12", Year = "2021" },
             Updates = new List<Update>
             {
                 new()
@@ -551,14 +497,11 @@ public class ReleaseChecklistServiceTests
                     // To avoid checklist error, this amendment requires an Update
                     // created after release.Created
                     Created = DateTime.UtcNow,
-                }
+                },
             },
         };
 
-        var featuredTable = new FeaturedTable
-        {
-            DataBlockId = dataBlockId,
-        };
+        var featuredTable = new FeaturedTable { DataBlockId = dataBlockId };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -613,22 +556,25 @@ public class ReleaseChecklistServiceTests
 
             dataBlockService
                 .Setup(s => s.ListDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(
-                    new List<DataBlock> { new() { Id = dataBlockId } }
-                );
+                .ReturnsAsync(new List<DataBlock> { new() { Id = dataBlockId } });
 
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
-                .ReturnsAsync(new[]
+                .ReturnsAsync(
+                    new[]
                     {
-                        DataSetVersionStatus.Draft, DataSetVersionStatus.Withdrawn,
-                        DataSetVersionStatus.Published, DataSetVersionStatus.Deprecated
+                        DataSetVersionStatus.Draft,
+                        DataSetVersionStatus.Withdrawn,
+                        DataSetVersionStatus.Published,
+                        DataSetVersionStatus.Deprecated,
                     }
-                    .Select(status => new DataSetVersionStatusSummary(
-                        Id: Guid.NewGuid(),
-                        Title: "",
-                        Status: status))
-                    .ToList());
+                        .Select(status => new DataSetVersionStatusSummary(
+                            Id: Guid.NewGuid(),
+                            Title: "",
+                            Status: status
+                        ))
+                        .ToList()
+                );
 
             var service = BuildReleaseChecklistService(
                 context,
@@ -648,12 +594,14 @@ public class ReleaseChecklistServiceTests
             Assert.True(checklist.Valid);
         }
 
-        MockUtils.VerifyAllMocks(dataBlockService,
+        MockUtils.VerifyAllMocks(
+            dataBlockService,
             footnoteRepository,
             dataGuidanceService,
             methodologyVersionRepository,
             releaseDataFileRepository,
-            dataSetVersionService);
+            dataSetVersionService
+        );
     }
 
     [Fact]
@@ -676,7 +624,8 @@ public class ReleaseChecklistServiceTests
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
-        IDataSetVersionService? dataSetVersionService = null)
+        IDataSetVersionService? dataSetVersionService = null
+    )
     {
         return new(
             contentDbContext,

@@ -12,11 +12,14 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
 {
     [Function(nameof(OnPublicationLatestPublishedReleaseReordered))]
     public async Task<OnPublicationLatestPublishedReleaseReorderedOutput> OnPublicationLatestPublishedReleaseReordered(
-        [QueueTrigger("%PublicationLatestPublishedReleaseReorderedQueueName%")]
-        EventGridEvent eventDto,
-        FunctionContext context) =>
-        await eventGridEventHandler.Handle<PublicationLatestPublishedReleaseReorderedEventDto, OnPublicationLatestPublishedReleaseReorderedOutput>(
-            context, 
+        [QueueTrigger("%PublicationLatestPublishedReleaseReorderedQueueName%")] EventGridEvent eventDto,
+        FunctionContext context
+    ) =>
+        await eventGridEventHandler.Handle<
+            PublicationLatestPublishedReleaseReorderedEventDto,
+            OnPublicationLatestPublishedReleaseReorderedOutput
+        >(
+            context,
             eventDto,
             (payload, _) =>
             {
@@ -26,18 +29,23 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
                 }
 
                 // Create searchable document for the release version that has become the latest version
-                RefreshSearchableDocumentMessageDto[] newSearchableDocuments = [new() { PublicationSlug = payload.Slug }];
+                RefreshSearchableDocumentMessageDto[] newSearchableDocuments =
+                [
+                    new() { PublicationSlug = payload.Slug },
+                ];
 
-                // Remove the previous "latest" release version's searchable document 
-                RemoveSearchableDocumentDto[] removeSearchableDocuments =
-                    !payload.PreviousReleaseId.IsBlank()
-                        ? [ new RemoveSearchableDocumentDto{ ReleaseId = payload.PreviousReleaseId.Value} ]
-                        : [];
-                
-                return Task.FromResult(new OnPublicationLatestPublishedReleaseReorderedOutput
-                {
-                    RefreshSearchableDocuments = newSearchableDocuments,
-                    RemoveSearchableDocuments = removeSearchableDocuments
-                });
-            });
+                // Remove the previous "latest" release version's searchable document
+                RemoveSearchableDocumentDto[] removeSearchableDocuments = !payload.PreviousReleaseId.IsBlank()
+                    ? [new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousReleaseId.Value }]
+                    : [];
+
+                return Task.FromResult(
+                    new OnPublicationLatestPublishedReleaseReorderedOutput
+                    {
+                        RefreshSearchableDocuments = newSearchableDocuments,
+                        RemoveSearchableDocuments = removeSearchableDocuments,
+                    }
+                );
+            }
+        );
 }

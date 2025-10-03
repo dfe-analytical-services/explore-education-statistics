@@ -18,8 +18,8 @@ public class PublishingService(
     IMethodologyService methodologyService,
     IReleaseService releaseService,
     IOptions<AppOptions> appOptions,
-    ILogger<PublishingService> logger)
-    : IPublishingService
+    ILogger<PublishingService> logger
+) : IPublishingService
 {
     private readonly AppOptions _appOptions = appOptions.Value;
 
@@ -63,27 +63,19 @@ public class PublishingService(
     {
         var releaseVersion = await releaseService.Get(releaseVersionId);
 
-        var files = await releaseService.GetFiles(
-            releaseVersionId,
-            Ancillary,
-            Chart,
-            FileType.Data,
-            Image
-        );
+        var files = await releaseService.GetFiles(releaseVersionId, Ancillary, Chart, FileType.Data, Image);
 
         var destinationDirectoryPath = $"{releaseVersion.Id}/";
 
         // Delete any existing blobs in public storage
         await publicBlobStorageService.DeleteBlobs(
             containerName: PublicReleaseFiles,
-            directoryPath: destinationDirectoryPath);
+            directoryPath: destinationDirectoryPath
+        );
 
         // Get a list of source directory paths for all the files.
         // There will be multiple root paths if they were created on different amendment Releases
-        var sourceDirectoryPaths = files
-            .Select(f => $"{f.RootPath}/")
-            .Distinct()
-            .ToList();
+        var sourceDirectoryPaths = files.Select(f => $"{f.RootPath}/").Distinct().ToList();
 
         // Copy the blobs of those directories in private storage to the destination directory in public storage
         foreach (var sourceDirectoryPath in sourceDirectoryPaths)
@@ -102,8 +94,10 @@ public class PublishingService(
                             source: source,
                             files: files,
                             sourceContainerName: PrivateReleaseFiles,
-                            logger: logger)
-                });
+                            logger: logger
+                        ),
+                }
+            );
         }
     }
 
@@ -114,10 +108,7 @@ public class PublishingService(
         var directoryPath = $"{methodologyVersion.Id}/";
 
         // Delete any existing blobs in public storage
-        await publicBlobStorageService.DeleteBlobs(
-            containerName: PublicMethodologyFiles,
-            directoryPath: directoryPath
-        );
+        await publicBlobStorageService.DeleteBlobs(containerName: PublicMethodologyFiles, directoryPath: directoryPath);
 
         // Copy the blobs from private to public storage
         await privateBlobStorageService.CopyDirectory(
@@ -134,7 +125,9 @@ public class PublishingService(
                         source: source,
                         files: files,
                         sourceContainerName: PrivateMethodologyFiles,
-                        logger: logger)
-            });
+                        logger: logger
+                    ),
+            }
+        );
     }
 }

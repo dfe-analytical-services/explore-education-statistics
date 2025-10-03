@@ -17,9 +17,7 @@ public static class HttpRequestExtensions
     {
         return request.Accepts(
             exact: exact,
-            mediaTypes: mediaTypes
-                .Select(mediaType => MediaTypeHeaderValue.Parse(mediaType))
-                .ToArray()
+            mediaTypes: mediaTypes.Select(mediaType => MediaTypeHeaderValue.Parse(mediaType)).ToArray()
         );
     }
 
@@ -60,8 +58,8 @@ public static class HttpRequestExtensions
         }
 
         return accept?.Any(acceptedType =>
-            mediaTypes.Any(type => exact ? type.Equals(acceptedType) : type.IsSubsetOf(acceptedType))
-        ) ?? false;
+                mediaTypes.Any(type => exact ? type.Equals(acceptedType) : type.IsSubsetOf(acceptedType))
+            ) ?? false;
     }
 
     public static async Task<TJsonType?> GetJsonBody<TJsonType>(this HttpRequest request, bool allowEmptyBody = true)
@@ -74,47 +72,33 @@ public static class HttpRequestExtensions
             return null;
         }
 
-        return JsonConvert.DeserializeObject<TJsonType>(requestBody) ??
-               throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
+        return JsonConvert.DeserializeObject<TJsonType>(requestBody)
+            ?? throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
     }
 
-    public static bool TryGetHeader(
-        this HttpRequest httpRequest,
-        string headerName,
-        out StringValues headerValues)
+    public static bool TryGetHeader(this HttpRequest httpRequest, string headerName, out StringValues headerValues)
     {
         return httpRequest.Headers.TryGetValue(headerName, out headerValues);
     }
 
-    public static string? GetRequestParam(
-        this HttpRequest httpRequest,
-        string paramName)
+    public static string? GetRequestParam(this HttpRequest httpRequest, string paramName)
     {
         return httpRequest.Query[paramName];
     }
 
-    public static string GetRequestParam(
-        this HttpRequest httpRequest,
-        string paramName,
-        string defaultValue)
+    public static string GetRequestParam(this HttpRequest httpRequest, string paramName, string defaultValue)
     {
         var value = GetRequestParam(httpRequest, paramName);
         return !value.IsNullOrEmpty() ? value : defaultValue;
     }
 
-    public static bool GetRequestParamBool(
-        this HttpRequest httpRequest,
-        string paramName,
-        bool defaultValue)
+    public static bool GetRequestParamBool(this HttpRequest httpRequest, string paramName, bool defaultValue)
     {
         var paramValue = GetRequestParam(httpRequest, paramName, defaultValue.ToString());
         return bool.Parse(paramValue);
     }
 
-    public static int GetRequestParamInt(
-        this HttpRequest httpRequest,
-        string paramName,
-        int defaultValue)
+    public static int GetRequestParamInt(this HttpRequest httpRequest, string paramName, int defaultValue)
     {
         var paramValue = GetRequestParam(httpRequest, paramName, defaultValue.ToString());
         return int.Parse(paramValue);

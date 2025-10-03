@@ -13,43 +13,39 @@ public partial class EES1238_AlterReleaseSubjectForOrdering : Migration
             name: "Created",
             table: "ReleaseSubject",
             type: "datetime2",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "FilterSequence",
             table: "ReleaseSubject",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "IndicatorSequence",
             table: "ReleaseSubject",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<DateTime>(
             name: "Updated",
             table: "ReleaseSubject",
             type: "datetime2",
-            nullable: true);
+            nullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Created",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "Created", table: "ReleaseSubject");
 
-        migrationBuilder.DropColumn(
-            name: "FilterSequence",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "FilterSequence", table: "ReleaseSubject");
 
-        migrationBuilder.DropColumn(
-            name: "IndicatorSequence",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "IndicatorSequence", table: "ReleaseSubject");
 
-        migrationBuilder.DropColumn(
-            name: "Updated",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "Updated", table: "ReleaseSubject");
     }
 }

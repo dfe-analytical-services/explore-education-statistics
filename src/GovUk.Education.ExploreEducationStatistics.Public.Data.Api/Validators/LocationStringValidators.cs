@@ -17,85 +17,88 @@ public static partial class LocationStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> LocationString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.NotEmpty().Custom((value, context) =>
-        {
-            if (value.IsNullOrWhitespace())
-            {
-                return;
-            }
-
-            if (!HasValidFormat(value))
-            {
-                context.AddFailure(
-                    message: ValidationMessages.LocationFormat,
-                    detail: new FormatErrorDetail(value, ExpectedFormat: ExpectedFormat)
-                );
-                return;
-            }
-
-            var parts = value.Split('|');
-            var level = parts[0];
-            var property = parts[1];
-
-            if (!HasAllowedLevel(level))
-            {
-                context.AddFailure(
-                    message: ValidationMessages.LocationAllowedLevel,
-                    detail: new LocationAllowedLevelErrorDetail(
-                        Value: level,
-                        AllowedLevels: EnumUtil.GetEnumValues<GeographicLevel>().Order().ToList()
-                    )
-                );
-                return;
-            }
-
-            if (!HasAllowedProperty(level: level, property: property))
-            {
-                context.AddFailure(
-                    message: ValidationMessages.LocationAllowedProperty,
-                    detail: new LocationAllowedPropertyErrorDetail(property, GetAllowedProperties(level: level))
-                );
-                return;
-            }
-
-            var queryLocation = IDataSetQueryLocation.Parse(value);
-
-            var validator = queryLocation.CreateValidator();
-            var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(queryLocation));
-
-            if (result.IsValid)
-            {
-                return;
-            }
-
-            foreach (var error in result.Errors)
-            {
-                var propertyName = error.PropertyName.ToLowerFirst();
-
-                switch (error.ErrorCode)
+        return rule.NotEmpty()
+            .Custom(
+                (value, context) =>
                 {
-                    case FluentValidationKeys.NotEmptyValidator:
-                        error.ErrorCode = ValidationMessages.LocationValueNotEmpty.Code;
-                        error.ErrorMessage = context.MessageFormatter
-                            .AppendArgument("Property", propertyName)
-                            .BuildMessage(ValidationMessages.LocationValueNotEmpty.Message);
-                        break;
+                    if (value.IsNullOrWhitespace())
+                    {
+                        return;
+                    }
 
-                    case FluentValidationKeys.MaximumLengthValidator:
-                        error.ErrorCode = ValidationMessages.LocationValueMaxLength.Code;
-                        error.ErrorMessage = context.MessageFormatter
-                            .AppendArgument("Property", propertyName)
-                            .AppendArgument("MaxLength", error.FormattedMessagePlaceholderValues["MaxLength"])
-                            .BuildMessage(ValidationMessages.LocationValueMaxLength.Message);
-                        break;
+                    if (!HasValidFormat(value))
+                    {
+                        context.AddFailure(
+                            message: ValidationMessages.LocationFormat,
+                            detail: new FormatErrorDetail(value, ExpectedFormat: ExpectedFormat)
+                        );
+                        return;
+                    }
+
+                    var parts = value.Split('|');
+                    var level = parts[0];
+                    var property = parts[1];
+
+                    if (!HasAllowedLevel(level))
+                    {
+                        context.AddFailure(
+                            message: ValidationMessages.LocationAllowedLevel,
+                            detail: new LocationAllowedLevelErrorDetail(
+                                Value: level,
+                                AllowedLevels: EnumUtil.GetEnumValues<GeographicLevel>().Order().ToList()
+                            )
+                        );
+                        return;
+                    }
+
+                    if (!HasAllowedProperty(level: level, property: property))
+                    {
+                        context.AddFailure(
+                            message: ValidationMessages.LocationAllowedProperty,
+                            detail: new LocationAllowedPropertyErrorDetail(property, GetAllowedProperties(level: level))
+                        );
+                        return;
+                    }
+
+                    var queryLocation = IDataSetQueryLocation.Parse(value);
+
+                    var validator = queryLocation.CreateValidator();
+                    var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(queryLocation));
+
+                    if (result.IsValid)
+                    {
+                        return;
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        var propertyName = error.PropertyName.ToLowerFirst();
+
+                        switch (error.ErrorCode)
+                        {
+                            case FluentValidationKeys.NotEmptyValidator:
+                                error.ErrorCode = ValidationMessages.LocationValueNotEmpty.Code;
+                                error.ErrorMessage = context
+                                    .MessageFormatter.AppendArgument("Property", propertyName)
+                                    .BuildMessage(ValidationMessages.LocationValueNotEmpty.Message);
+                                break;
+
+                            case FluentValidationKeys.MaximumLengthValidator:
+                                error.ErrorCode = ValidationMessages.LocationValueMaxLength.Code;
+                                error.ErrorMessage = context
+                                    .MessageFormatter.AppendArgument("Property", propertyName)
+                                    .AppendArgument("MaxLength", error.FormattedMessagePlaceholderValues["MaxLength"])
+                                    .BuildMessage(ValidationMessages.LocationValueMaxLength.Message);
+                                break;
+                        }
+
+                        error.FormattedMessagePlaceholderValues["Property"] = propertyName;
+                        error.PropertyName = context.PropertyPath;
+
+                        context.AddFailure(error);
+                    }
                 }
-
-                error.FormattedMessagePlaceholderValues["Property"] = propertyName;
-                error.PropertyName = context.PropertyPath;
-
-                context.AddFailure(error);
-            }
-        });
+            );
     }
 
     // Note this regex only does basic checks on delimiters to allow other
@@ -107,11 +110,10 @@ public static partial class LocationStringValidators
 
     private static bool HasValidFormat(string value) => FormatRegex.IsMatch(value);
 
-    private static bool HasAllowedLevel(string level)
-        => EnumUtil.TryGetFromEnumValue<GeographicLevel>(level, out _);
+    private static bool HasAllowedLevel(string level) => EnumUtil.TryGetFromEnumValue<GeographicLevel>(level, out _);
 
-    private static bool HasAllowedProperty(string level, string property)
-        => GetAllowedProperties(level).Contains(property);
+    private static bool HasAllowedProperty(string level, string property) =>
+        GetAllowedProperties(level).Contains(property);
 
     private static string[] GetAllowedProperties(string level)
     {
@@ -123,32 +125,19 @@ public static partial class LocationStringValidators
             [
                 nameof(DataSetQueryLocationId.Id),
                 nameof(DataSetQueryLocationLocalAuthorityCode.Code),
-                nameof(DataSetQueryLocationLocalAuthorityOldCode.OldCode)
+                nameof(DataSetQueryLocationLocalAuthorityOldCode.OldCode),
             ],
             GeographicLevel.School =>
             [
                 nameof(DataSetQueryLocationId.Id),
                 nameof(LocationSchoolOptionMeta.Urn),
-                nameof(LocationSchoolOptionMeta.LaEstab)
+                nameof(LocationSchoolOptionMeta.LaEstab),
             ],
-            GeographicLevel.Provider =>
-            [
-                nameof(DataSetQueryLocationId.Id),
-                nameof(LocationProviderOptionMeta.Ukprn)
-            ],
-            GeographicLevel.RscRegion =>
-            [
-                nameof(DataSetQueryLocationId.Id)
-            ],
-            _ =>
-            [
-                nameof(DataSetQueryLocationId.Id),
-                nameof(DataSetQueryLocationCode.Code)
-            ]
+            GeographicLevel.Provider => [nameof(DataSetQueryLocationId.Id), nameof(LocationProviderOptionMeta.Ukprn)],
+            GeographicLevel.RscRegion => [nameof(DataSetQueryLocationId.Id)],
+            _ => [nameof(DataSetQueryLocationId.Id), nameof(DataSetQueryLocationCode.Code)],
         };
 
-        return properties
-            .Select(property => property.ToLowerFirst())
-            .ToArray();
+        return properties.Select(property => property.ToLowerFirst()).ToArray();
     }
 }

@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 
-public class ViewMethodologyVersionRequirement : IAuthorizationRequirement
-{
-}
+public class ViewMethodologyVersionRequirement : IAuthorizationRequirement { }
 
-public class ViewMethodologyVersionAuthorizationHandler :
-    AuthorizationHandler<ViewMethodologyVersionRequirement, MethodologyVersion>
+public class ViewMethodologyVersionAuthorizationHandler
+    : AuthorizationHandler<ViewMethodologyVersionRequirement, MethodologyVersion>
 {
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
 
@@ -19,9 +17,11 @@ public class ViewMethodologyVersionAuthorizationHandler :
         _methodologyVersionRepository = methodologyVersionRepository;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         ViewMethodologyVersionRequirement requirement,
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {

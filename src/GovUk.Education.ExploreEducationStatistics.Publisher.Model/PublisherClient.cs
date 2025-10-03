@@ -9,54 +9,77 @@ public class PublisherClient(string connectionString) : IPublisherClient
 
     public async Task PublishMethodologyFiles(Guid methodologyId, CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.PublishMethodologyFilesQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.PublishMethodologyFilesQueue,
             new PublishMethodologyFilesMessage(methodologyId),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task PublishReleaseContent(
-        ReleasePublishingKey releasePublishingKey, CancellationToken cancellationToken = default)
+        ReleasePublishingKey releasePublishingKey,
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.PublishReleaseContentQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.PublishReleaseContentQueue,
             new PublishReleaseContentMessage(releasePublishingKey),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task PublishReleaseFiles(
-        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys, CancellationToken cancellationToken = default)
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.PublishReleaseFilesQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.PublishReleaseFilesQueue,
             new PublishReleaseFilesMessage(releasePublishingKeys),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task PublishTaxonomy(CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.PublishTaxonomyQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.PublishTaxonomyQueue,
             new PublishTaxonomyMessage(),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task HandleReleaseChanged(
-        ReleasePublishingKey releasePublishingKey, bool immediate, CancellationToken cancellationToken = default)
+        ReleasePublishingKey releasePublishingKey,
+        bool immediate,
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.NotifyChangeQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.NotifyChangeQueue,
             new NotifyChangeMessage(immediate, releasePublishingKey),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task RetryReleasePublishing(Guid releaseVersionId, CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.RetryReleasePublishingQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.RetryReleasePublishingQueue,
             new RetryReleasePublishingMessage(releaseVersionId),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task StageReleaseContent(
-        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys, CancellationToken cancellationToken = default)
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
+        CancellationToken cancellationToken = default
+    )
     {
-        await _queueServiceClient.SendMessageAsJson(PublisherQueues.StageReleaseContentQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            PublisherQueues.StageReleaseContentQueue,
             new StageReleaseContentMessage(releasePublishingKeys),
-            cancellationToken);
+            cancellationToken
+        );
     }
 }

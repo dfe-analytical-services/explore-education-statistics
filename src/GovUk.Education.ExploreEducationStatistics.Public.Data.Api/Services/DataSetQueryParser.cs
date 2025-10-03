@@ -14,34 +14,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 internal class DataSetQueryParser(
     IParquetFilterRepository filterRepository,
     IParquetLocationRepository locationRepository,
-    IParquetTimePeriodRepository timePeriodRepository)
-    : IDataSetQueryParser
+    IParquetTimePeriodRepository timePeriodRepository
+) : IDataSetQueryParser
 {
     public async Task<IInterpolatedSql> ParseCriteria(
         IDataSetQueryCriteria criteria,
         DataSetVersion dataSetVersion,
         QueryState queryState,
         string basePath = "",
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        using var _ = MiniProfiler.Current
-            .Step($"{nameof(DataSetQueryParser)}.{nameof(ParseCriteria)}");
+        using var _ = MiniProfiler.Current.Step($"{nameof(DataSetQueryParser)}.{nameof(ParseCriteria)}");
 
         var facets = ExtractFacets(criteria);
 
-        var filterOptionMetas =
-            filterRepository.ListOptions(dataSetVersion, facets.Filters, cancellationToken);
-        var locationOptionMetas =
-            locationRepository.ListOptions(dataSetVersion, facets.Locations, cancellationToken);
-        var timePeriodMetas =
-            timePeriodRepository.List(dataSetVersion, facets.TimePeriods, cancellationToken);
+        var filterOptionMetas = filterRepository.ListOptions(dataSetVersion, facets.Filters, cancellationToken);
+        var locationOptionMetas = locationRepository.ListOptions(dataSetVersion, facets.Locations, cancellationToken);
+        var timePeriodMetas = timePeriodRepository.List(dataSetVersion, facets.TimePeriods, cancellationToken);
 
         await Task.WhenAll(filterOptionMetas, locationOptionMetas, timePeriodMetas);
 
         IFacetsParser[] parsers =
         [
             new FilterFacetsParser(queryState, filterOptionMetas.Result),
-            new GeographicLevelFacetsParser(queryState, [..dataSetVersion.MetaSummary!.GeographicLevels]),
+            new GeographicLevelFacetsParser(queryState, [.. dataSetVersion.MetaSummary!.GeographicLevels]),
             new LocationFacetsParser(queryState, locationOptionMetas.Result),
             new TimePeriodFacetsParser(queryState, timePeriodMetas.Result),
         ];
@@ -81,7 +78,8 @@ internal class DataSetQueryParser(
         IDataSetQueryCriteria criteria,
         IEnumerable<IFacetsParser> facetParsers,
         string path,
-        string facetJoinCondition = "AND")
+        string facetJoinCondition = "AND"
+    )
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -96,13 +94,10 @@ internal class DataSetQueryParser(
                 break;
 
             case DataSetQueryCriteriaAnd andCriteria:
-                var andFragments = andCriteria.And
-                    .Select(
-                        (fragment, index) => ParseCriteriaFragment(
-                            fragment,
-                            facetParsers,
-                            path: QueryUtils.Path(path, $"and[{index}]")
-                        )
+                var andFragments = andCriteria
+                    .And.Select(
+                        (fragment, index) =>
+                            ParseCriteriaFragment(fragment, facetParsers, path: QueryUtils.Path(path, $"and[{index}]"))
                     )
                     .ToList();
 
@@ -118,13 +113,10 @@ internal class DataSetQueryParser(
                 break;
 
             case DataSetQueryCriteriaOr orCriteria:
-                var orFragments = orCriteria.Or
-                    .Select(
-                        (fragment, index) => ParseCriteriaFragment(
-                            fragment,
-                            facetParsers,
-                            path: QueryUtils.Path(path, $"or[{index}]")
-                        )
+                var orFragments = orCriteria
+                    .Or.Select(
+                        (fragment, index) =>
+                            ParseCriteriaFragment(fragment, facetParsers, path: QueryUtils.Path(path, $"or[{index}]"))
                     )
                     .ToList();
 

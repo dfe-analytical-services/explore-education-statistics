@@ -38,7 +38,7 @@ public record FilterViewModel
             Id = meta.PublicId,
             Column = meta.Column,
             Label = meta.Label,
-            Hint = meta.Hint
+            Hint = meta.Hint,
         };
     }
 }

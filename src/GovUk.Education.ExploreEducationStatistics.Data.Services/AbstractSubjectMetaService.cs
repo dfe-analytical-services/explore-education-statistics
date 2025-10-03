@@ -6,7 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 public abstract class AbstractSubjectMetaService
 {
     protected static IEnumerable<LocationAttributeViewModel> DeduplicateLocationViewModels(
-        IEnumerable<LocationAttributeViewModel> viewModels)
+        IEnumerable<LocationAttributeViewModel> viewModels
+    )
     {
         var list = viewModels.ToList();
 
@@ -24,8 +25,7 @@ public abstract class AbstractSubjectMetaService
             These don't need any action.
         */
 
-        var case1 = list
-            .GroupBy(model => (model.Value, model.Label))
+        var case1 = list.GroupBy(model => (model.Value, model.Label))
             .Where(grouping => grouping.Count() > 1)
             .SelectMany(grouping => grouping)
             .ToList();

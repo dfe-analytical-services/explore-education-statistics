@@ -11,14 +11,14 @@ public class ReleasePublishingStatusBuilder(ReleasePublishingKey releasePublishi
     {
         var releasePublishingStatus = new ReleasePublishingStatus
         {
-            
             PartitionKey = releasePublishingKey.ReleaseVersionId.ToString(),
             RowKey = releasePublishingKey.ReleaseStatusId.ToString(),
             State = new(
                 _contentStatus,
                 _filesStatus,
                 ReleasePublishingStatusPublishingStage.NotStarted,
-                ReleasePublishingStatusOverallStage.Started)
+                ReleasePublishingStatusOverallStage.Started
+            ),
         };
         return releasePublishingStatus;
     }

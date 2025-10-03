@@ -19,9 +19,7 @@ public class UserReleaseRoleServiceTests
     {
         var (publication, publicationIgnored) = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                .Generate(2))
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2))
             .GenerateTuple2();
 
         var userReleaseRole1 = new UserReleaseRole
@@ -60,16 +58,19 @@ public class UserReleaseRoleServiceTests
         {
             contentDbContext.Publications.AddRange(publication, publicationIgnored);
             contentDbContext.UserReleaseRoles.AddRange(
-                userReleaseRole1, userReleaseRole2, userReleaseRole3,
-                userReleaseRoleIgnored1, userReleaseRoleIgnored2);
+                userReleaseRole1,
+                userReleaseRole2,
+                userReleaseRole3,
+                userReleaseRoleIgnored1,
+                userReleaseRoleIgnored2
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = BuildService(contentDbContext);
-            var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor,
-                publication.Id);
+            var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor, publication.Id);
 
             Assert.Equal(3, userReleaseRoles.Count);
 
@@ -90,11 +91,8 @@ public class UserReleaseRoleServiceTests
         }
     }
 
-    private static UserReleaseRoleService BuildService(
-        ContentDbContext contentDbContext)
+    private static UserReleaseRoleService BuildService(ContentDbContext contentDbContext)
     {
-        return new(
-            contentDbContext,
-            new ReleaseVersionRepository(contentDbContext));
+        return new(contentDbContext, new ReleaseVersionRepository(contentDbContext));
     }
 }

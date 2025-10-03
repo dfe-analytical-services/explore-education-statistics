@@ -10,13 +10,12 @@ public partial class EES968AddNotifySubscribersColumnToReleaseStatus : Migration
             name: "NotifySubscribers",
             table: "ReleaseStatus",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "NotifySubscribers",
-            table: "ReleaseStatus");
+        migrationBuilder.DropColumn(name: "NotifySubscribers", table: "ReleaseStatus");
     }
 }

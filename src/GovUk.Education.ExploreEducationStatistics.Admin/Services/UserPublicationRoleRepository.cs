@@ -6,22 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(ContentDbContext contentDbContext) :
-    UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(contentDbContext),
-    IUserPublicationRoleRepository
+public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
+    : UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(
+        contentDbContext
+    ),
+        IUserPublicationRoleRepository
 {
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
     {
-        return ContentDbContext
-            .UserPublicationRoles
-            .Where(role => role.PublicationId == publicationId);
+        return ContentDbContext.UserPublicationRoles.Where(role => role.PublicationId == publicationId);
     }
 
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceIds(List<Guid> publicationIds)
     {
-        return ContentDbContext
-            .UserPublicationRoles
-            .Where(role => publicationIds.Contains(role.PublicationId));
+        return ContentDbContext.UserPublicationRoles.Where(role => publicationIds.Contains(role.PublicationId));
     }
 
     public async Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
@@ -34,7 +32,11 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) :
         return await GetAllResourceRolesByUserAndResource(userId, publicationId);
     }
 
-    public async Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role)
+    public async Task<UserPublicationRole?> GetUserPublicationRole(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role
+    )
     {
         return await GetResourceRole(userId, publicationId, role);
     }
@@ -44,26 +46,23 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) :
         return await UserHasRoleOnResource(userId, publicationId, role);
     }
 
-    public new async Task Remove(
-        UserPublicationRole userPublicationRole,
-        CancellationToken cancellationToken = default)
+    public new async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
         await base.Remove(userPublicationRole, cancellationToken);
     }
 
     public new async Task RemoveMany(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await base.RemoveMany(userPublicationRoles, cancellationToken);
     }
 
-    public async Task RemoveForUser(
-        Guid userId,
-        CancellationToken cancellationToken = default)
+    public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userPublicationRoles = await ContentDbContext.UserPublicationRoles
-            .Where(urr => urr.UserId == userId)
+        var userPublicationRoles = await ContentDbContext
+            .UserPublicationRoles.Where(urr => urr.UserId == userId)
             .ToListAsync(cancellationToken);
 
         await base.RemoveMany(userPublicationRoles, cancellationToken);

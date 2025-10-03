@@ -16,8 +16,5 @@ public partial class EES5768_RemoveTimePeriodAYNTP : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

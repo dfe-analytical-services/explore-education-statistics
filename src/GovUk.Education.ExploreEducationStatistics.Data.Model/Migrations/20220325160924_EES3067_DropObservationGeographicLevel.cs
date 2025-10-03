@@ -24,14 +24,10 @@ public partial class EES3067_DropObservationGeographicLevel : Migration
         // CREATE NONCLUSTERED INDEX NCI_WI_Observation_SubjectId ON dbo.Observation (SubjectId) INCLUDE (LocationId, TimeIdentifier, Year) WITH (ONLINE = ON, DROP_EXISTING = ON);");
 
         // Drop the index on the GeographicLevel column
-        migrationBuilder.DropIndex(
-            name: "IX_Observation_GeographicLevel",
-            table: "Observation");
+        migrationBuilder.DropIndex(name: "IX_Observation_GeographicLevel", table: "Observation");
 
         // Drop the GeographicLevel column
-        migrationBuilder.DropColumn(
-            name: "GeographicLevel",
-            table: "Observation");
+        migrationBuilder.DropColumn(name: "GeographicLevel", table: "Observation");
 
         // Update ObservationType used by the Importer
         migrationBuilder.Sql("DROP PROCEDURE InsertObservations");
@@ -58,18 +54,28 @@ public partial class EES3067_DropObservationGeographicLevel : Migration
             type: "nvarchar(6)",
             maxLength: 6,
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Observation_GeographicLevel",
             table: "Observation",
-            column: "GeographicLevel");
+            column: "GeographicLevel"
+        );
 
-        migrationBuilder.Sql("CREATE NONCLUSTERED INDEX NCI_WI_Observation_SubjectId ON dbo.Observation (SubjectId) INCLUDE (GeographicLevel, LocationId, TimeIdentifier, Year) WITH (ONLINE = ON, DROP_EXISTING = ON);");
+        migrationBuilder.Sql(
+            "CREATE NONCLUSTERED INDEX NCI_WI_Observation_SubjectId ON dbo.Observation (SubjectId) INCLUDE (GeographicLevel, LocationId, TimeIdentifier, Year) WITH (ONLINE = ON, DROP_EXISTING = ON);"
+        );
 
         migrationBuilder.Sql("DROP PROCEDURE InsertObservations");
         migrationBuilder.Sql("DROP TYPE ObservationType");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousObservationTypeMigrationId}_TableType_ObservationType.sql");
-        migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousInsertObservationsMigrationId}_Routine_InsertObservations.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousObservationTypeMigrationId}_TableType_ObservationType.sql"
+        );
+        migrationBuilder.SqlFromFile(
+            MigrationsPath,
+            $"{PreviousInsertObservationsMigrationId}_Routine_InsertObservations.sql"
+        );
     }
 }

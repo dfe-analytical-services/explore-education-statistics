@@ -21,12 +21,9 @@ public class PublicationControllerTests
 
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication("publication-a"))
-            .ReturnsAsync(new PublicationCacheViewModel
-            {
-                Id = publicationId,
-                Title = "Test title",
-            });
+        publicationCacheService
+            .Setup(mock => mock.GetPublication("publication-a"))
+            .ReturnsAsync(new PublicationCacheViewModel { Id = publicationId, Title = "Test title" });
 
         var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
 
@@ -45,7 +42,8 @@ public class PublicationControllerTests
     {
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-        publicationCacheService.Setup(mock => mock.GetPublication("missing-publication"))
+        publicationCacheService
+            .Setup(mock => mock.GetPublication("missing-publication"))
             .ReturnsAsync(new NotFoundResult());
 
         var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
@@ -66,16 +64,7 @@ public class PublicationControllerTests
 
         publicationCacheService
             .Setup(s => s.GetPublicationTree(PublicationTreeFilter.DataCatalogue))
-            .ReturnsAsync(new List<PublicationTreeThemeViewModel>
-            {
-                new()
-                {
-                    Publications =
-                    [
-                        new()
-                    ]
-                }
-            });
+            .ReturnsAsync(new List<PublicationTreeThemeViewModel> { new() { Publications = [new()] } });
 
         var result = await controller.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 

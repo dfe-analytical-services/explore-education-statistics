@@ -7,11 +7,8 @@ public class PublicationMethodologiesDtoBuilder
     private PublicationMethodologyDto[] _methodologies = [];
     private PublicationExternalMethodologyDto? _externalMethodology;
 
-    public PublicationMethodologiesDto Build() => new()
-    {
-        Methodologies = _methodologies,
-        ExternalMethodology = _externalMethodology
-    };
+    public PublicationMethodologiesDto Build() =>
+        new() { Methodologies = _methodologies, ExternalMethodology = _externalMethodology };
 
     public PublicationMethodologiesDtoBuilder WithMethodologies(PublicationMethodologyDto[] methodologies)
     {
@@ -20,7 +17,8 @@ public class PublicationMethodologiesDtoBuilder
     }
 
     public PublicationMethodologiesDtoBuilder WithExternalMethodology(
-        PublicationExternalMethodologyDto? externalMethodology)
+        PublicationExternalMethodologyDto? externalMethodology
+    )
     {
         _externalMethodology = externalMethodology;
         return this;
@@ -33,12 +31,13 @@ public class PublicationMethodologyDtoBuilder
     private string _slug = "Slug";
     private string _title = "Title";
 
-    public PublicationMethodologyDto Build() => new()
-    {
-        MethodologyId = _methodologyId,
-        Slug = _slug,
-        Title = _title
-    };
+    public PublicationMethodologyDto Build() =>
+        new()
+        {
+            MethodologyId = _methodologyId,
+            Slug = _slug,
+            Title = _title,
+        };
 
     public PublicationMethodologyDtoBuilder WithMethodologyId(Guid methodologyId)
     {
@@ -64,11 +63,7 @@ public class PublicationExternalMethodologyDtoBuilder
     private string _title = "Title";
     private string _url = "Url";
 
-    public PublicationExternalMethodologyDto Build() => new()
-    {
-        Title = _title,
-        Url = _url
-    };
+    public PublicationExternalMethodologyDto Build() => new() { Title = _title, Url = _url };
 
     public PublicationExternalMethodologyDtoBuilder WithTitle(string title)
     {

@@ -101,8 +101,7 @@ public record LocationOptionChangeViewModel : ChangeViewModel<LocationOptionView
     {
         if (CurrentState is not null && PreviousState is not null)
         {
-            return CurrentState.Id != PreviousState.Id
-                   || CurrentState.HasMajorChange(PreviousState);
+            return CurrentState.Id != PreviousState.Id || CurrentState.HasMajorChange(PreviousState);
         }
 
         return CurrentState is null && PreviousState is not null;
@@ -118,8 +117,7 @@ public record TimePeriodOptionChangeViewModel : ChangeViewModel<TimePeriodOption
     {
         if (CurrentState is not null && PreviousState is not null)
         {
-            return CurrentState.Code != PreviousState.Code
-                || CurrentState.Period != PreviousState.Period;
+            return CurrentState.Code != PreviousState.Code || CurrentState.Period != PreviousState.Period;
         }
 
         return CurrentState is null && PreviousState is not null;

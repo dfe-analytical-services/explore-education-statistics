@@ -12,8 +12,7 @@ public static class StringExtensionTests
         [Fact]
         public void ReturnsSingleLine()
         {
-            var lines = "Test line 1"
-                .ToLinesList();
+            var lines = "Test line 1".ToLinesList();
 
             Assert.Single(lines);
             Assert.Equal("Test line 1", lines[0]);
@@ -22,8 +21,7 @@ public static class StringExtensionTests
         [Fact]
         public void ReturnsMultipleLines()
         {
-            var lines = "Test line 1\nTest line 2\nTest line 3"
-                .ToLinesList();
+            var lines = "Test line 1\nTest line 2\nTest line 3".ToLinesList();
 
             Assert.Equal(3, lines.Count);
             Assert.Equal("Test line 1", lines[0]);
@@ -34,8 +32,7 @@ public static class StringExtensionTests
         [Fact]
         public void EmptyStringReturnsNoLines()
         {
-            var lines = ""
-                .ToLinesList();
+            var lines = "".ToLinesList();
 
             Assert.Empty(lines);
         }
@@ -256,7 +253,6 @@ Test
             Assert.True(input.IsNullOrEmpty());
         }
 
-
         [Fact]
         public void TrueForEmptyString()
         {
@@ -286,7 +282,6 @@ Test
             string? input = null;
             Assert.True(input.IsNullOrWhitespace());
         }
-
 
         [Fact]
         public void TrueForEmptyString()
@@ -579,7 +574,7 @@ Test
                 "z5",
                 "abcd",
                 "z11",
-                "z22"
+                "z22",
             ];
             string[] expected =
             [

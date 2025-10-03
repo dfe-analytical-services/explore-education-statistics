@@ -23,7 +23,8 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IUserService userService,
         IMethodologyService methodologyService,
-        ContentDbContext context)
+        ContentDbContext context
+    )
     {
         _persistenceHelper = persistenceHelper;
         _userService = userService;
@@ -32,19 +33,21 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
     }
 
     public async Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodologyAmendment(
-        Guid originalMethodologyVersionId)
+        Guid originalMethodologyVersionId
+    )
     {
-        return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(originalMethodologyVersionId)
+        return await _persistenceHelper
+            .CheckEntityExists<MethodologyVersion>(originalMethodologyVersionId)
             .OnSuccess(_userService.CheckCanMakeAmendmentOfMethodology)
             .OnSuccess(HydrateMethodologyVersionForAmendment)
             .OnSuccess(CreateAndSaveAmendment)
             .OnSuccessDo(LinkOriginalMethodologyFilesToAmendment)
-            .OnSuccess(amendment =>
-                _methodologyService.BuildMethodologyVersionViewModel(amendment));
+            .OnSuccess(amendment => _methodologyService.BuildMethodologyVersionViewModel(amendment));
     }
 
     private async Task<Either<ActionResult, MethodologyVersion>> CreateAndSaveAmendment(
-        MethodologyVersion originalMethodologyVersion)
+        MethodologyVersion originalMethodologyVersion
+    )
     {
         var amendment = CreateMethodologyAmendment(originalMethodologyVersion, _userService.GetUserId());
         var savedAmendment = (await _context.MethodologyVersions.AddAsync(amendment)).Entity;
@@ -54,7 +57,8 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
 
     public MethodologyVersion CreateMethodologyAmendment(
         MethodologyVersion originalMethodologyVersion,
-        Guid createdByUserId)
+        Guid createdByUserId
+    )
     {
         var methodologyVersionAmendmentId = Guid.NewGuid();
 
@@ -78,7 +82,7 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
 
             MethodologyContent = CopyMethodologyContent(originalMethodologyVersion, createdByUserId),
             Notes = CopyNotes(originalMethodologyVersion, methodologyVersionAmendmentId, createdByUserId),
-            CreatedById = createdByUserId
+            CreatedById = createdByUserId,
         };
 
         return amendment;
@@ -87,11 +91,11 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
     private List<MethodologyNote> CopyNotes(
         MethodologyVersion originalMethodologyVersion,
         Guid methodologyVersionAmendmentId,
-        Guid createdByUserId)
+        Guid createdByUserId
+    )
     {
         return originalMethodologyVersion
-            .Notes
-            .Select(originalNote => new MethodologyNote
+            .Notes.Select(originalNote => new MethodologyNote
             {
                 // Assign a new Id.
                 Id = Guid.NewGuid(),
@@ -110,7 +114,8 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
 
     private MethodologyVersionContent CopyMethodologyContent(
         MethodologyVersion originalMethodologyVersion,
-        Guid methodologyVersionAmendmentId)
+        Guid methodologyVersionAmendmentId
+    )
     {
         return new MethodologyVersionContent
         {
@@ -158,31 +163,31 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
                         // Manually set the created date, as Methodology content is currently saved in JSON and
                         // therefore not able to make use of the ICreated interface's automatic setting of
                         // created dates.
-                        Created = DateTime.UtcNow
+                        Created = DateTime.UtcNow,
                     };
                 }
 
                 throw new ArgumentException(
-                    $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment");
+                    $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment"
+                );
             })
             .ToList();
     }
 
     private async Task<Either<ActionResult, Unit>> LinkOriginalMethodologyFilesToAmendment(
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         var originalFiles = await _context
-            .MethodologyFiles
-            .AsQueryable()
+            .MethodologyFiles.AsQueryable()
             .Where(f => f.MethodologyVersionId == methodologyVersion.PreviousVersionId)
             .ToListAsync();
 
-        var fileCopies = originalFiles
-            .Select(f => new MethodologyFile
-            {
-                FileId = f.FileId,
-                MethodologyVersionId = methodologyVersion.Id
-            });
+        var fileCopies = originalFiles.Select(f => new MethodologyFile
+        {
+            FileId = f.FileId,
+            MethodologyVersionId = methodologyVersion.Id,
+        });
 
         await _context.AddRangeAsync(fileCopies);
         await _context.SaveChangesAsync();
@@ -190,22 +195,14 @@ public class MethodologyAmendmentService : IMethodologyAmendmentService
     }
 
     private async Task<Either<ActionResult, MethodologyVersion>> HydrateMethodologyVersionForAmendment(
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
-        await _context
-            .Entry(methodologyVersion)
-            .Collection(m => m.Notes)
-            .LoadAsync();
+        await _context.Entry(methodologyVersion).Collection(m => m.Notes).LoadAsync();
 
-        await _context
-            .Entry(methodologyVersion)
-            .Reference(m => m.Methodology)
-            .LoadAsync();
+        await _context.Entry(methodologyVersion).Reference(m => m.Methodology).LoadAsync();
 
-        await _context
-            .Entry(methodologyVersion)
-            .Reference(m => m.MethodologyContent)
-            .LoadAsync();
+        await _context.Entry(methodologyVersion).Reference(m => m.MethodologyContent).LoadAsync();
 
         return methodologyVersion;
     }

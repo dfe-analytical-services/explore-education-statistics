@@ -28,22 +28,29 @@ public abstract class CronExpressionUtilTests(ITestOutputHelper output)
     public class GetNextOccurrenceTests(ITestOutputHelper output) : CronExpressionUtilTests(output)
     {
         [Theory]
-        [MemberData(nameof(CronExpressionUtilTestsTheoryData.UtcTimeZoneTestData),
-            MemberType = typeof(CronExpressionUtilTestsTheoryData))]
-        [MemberData(nameof(CronExpressionUtilTestsTheoryData.UkTimeZoneTestData),
-            MemberType = typeof(CronExpressionUtilTestsTheoryData))]
+        [MemberData(
+            nameof(CronExpressionUtilTestsTheoryData.UtcTimeZoneTestData),
+            MemberType = typeof(CronExpressionUtilTestsTheoryData)
+        )]
+        [MemberData(
+            nameof(CronExpressionUtilTestsTheoryData.UkTimeZoneTestData),
+            MemberType = typeof(CronExpressionUtilTestsTheoryData)
+        )]
         public void GetNextOccurrence_ReturnsExpectedResult(
             DateTimeOffset from,
             DateTimeOffset expectedNextOccurrence,
             string cronExpression,
             TimeZoneInfo timezone,
-            string significance)
+            string significance
+        )
         {
-            Print($"Cron expression: '{cronExpression}'\n" +
-                  $"From: {from}\n" +
-                  $"Significance: '{significance}'\n" +
-                  $"Time zone the next occurrence should be evaluated in: {timezone.Id}\n" +
-                  $"Expected next occurrence: {expectedNextOccurrence}");
+            Print(
+                $"Cron expression: '{cronExpression}'\n"
+                    + $"From: {from}\n"
+                    + $"Significance: '{significance}'\n"
+                    + $"Time zone the next occurrence should be evaluated in: {timezone.Id}\n"
+                    + $"Expected next occurrence: {expectedNextOccurrence}"
+            );
 
             var result = CronExpressionUtil.GetNextOccurrence(cronExpression, from, timezone);
 
@@ -81,7 +88,8 @@ public abstract class CronExpressionUtilTests(ITestOutputHelper output)
             var from = DateTimeOffset.Parse("2025-01-01T12:00:00Z");
 
             Assert.Throws<CronFormatException>(() =>
-                CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc));
+                CronExpressionUtil.GetNextOccurrence(cronExpression, from, TimeZoneInfo.Utc)
+            );
         }
     }
 }

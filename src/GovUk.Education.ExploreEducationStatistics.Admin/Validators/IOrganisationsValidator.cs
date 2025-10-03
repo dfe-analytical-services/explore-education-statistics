@@ -10,5 +10,6 @@ public interface IOrganisationsValidator
     Task<Either<ActionResult, Organisation[]>> ValidateOrganisations(
         Guid[]? organisationIds,
         string? path = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

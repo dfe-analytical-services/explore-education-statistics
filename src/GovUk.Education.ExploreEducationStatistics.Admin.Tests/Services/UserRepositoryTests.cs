@@ -15,8 +15,7 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindByEmail()
     {
-        var user = _dataFixture.DefaultUser()
-            .Generate();
+        var user = _dataFixture.DefaultUser().Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -38,9 +37,7 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindByEmail_DifferentCase()
     {
-        var user = _dataFixture.DefaultUser()
-            .WithEmail("test@test.com")
-            .Generate();
+        var user = _dataFixture.DefaultUser().WithEmail("test@test.com").Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -78,7 +75,8 @@ public class UserRepositoryTests
     [Fact]
     public async Task FindDeletedUserPlaceholder()
     {
-        var user = _dataFixture.DefaultUser()
+        var user = _dataFixture
+            .DefaultUser()
             .WithEmail(User.DeletedUserPlaceholderEmail)
             .WithActive(false)
             .WithSoftDeleted(DateTime.UtcNow)
@@ -115,8 +113,7 @@ public class UserRepositoryTests
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.FindDeletedUserPlaceholder());
     }
 
-    private static UserRepository SetupUserRepository(
-        ContentDbContext contentDbContext)
+    private static UserRepository SetupUserRepository(ContentDbContext contentDbContext)
     {
         return new(contentDbContext);
     }

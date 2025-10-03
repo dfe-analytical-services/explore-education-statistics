@@ -40,61 +40,44 @@ public record DataSetQueryCriteriaGeographicLevels
     [SwaggerEnum(typeof(GeographicLevel))]
     public virtual IReadOnlyList<string>? NotIn { get; init; }
 
-    public GeographicLevel? ParsedEq()
-        => Eq is not null ? EnumUtil.GetFromEnumValue<GeographicLevel>(Eq) : null;
+    public GeographicLevel? ParsedEq() => Eq is not null ? EnumUtil.GetFromEnumValue<GeographicLevel>(Eq) : null;
 
-    public GeographicLevel? ParsedNotEq()
-        => NotEq is not null ? EnumUtil.GetFromEnumValue<GeographicLevel>(NotEq) : null;
+    public GeographicLevel? ParsedNotEq() =>
+        NotEq is not null ? EnumUtil.GetFromEnumValue<GeographicLevel>(NotEq) : null;
 
-    public IReadOnlyList<GeographicLevel>? ParsedIn()
-        => In?.Select(EnumUtil.GetFromEnumValue<GeographicLevel>).ToList();
+    public IReadOnlyList<GeographicLevel>? ParsedIn() =>
+        In?.Select(EnumUtil.GetFromEnumValue<GeographicLevel>).ToList();
 
-    public IReadOnlyList<GeographicLevel>? ParsedNotIn()
-        => NotIn?.Select(EnumUtil.GetFromEnumValue<GeographicLevel>).ToList();
+    public IReadOnlyList<GeographicLevel>? ParsedNotIn() =>
+        NotIn?.Select(EnumUtil.GetFromEnumValue<GeographicLevel>).ToList();
 
     public HashSet<GeographicLevel> GetOptions()
     {
-        List<GeographicLevel?> options =
-        [
-            ParsedEq(),
-            ParsedNotEq(),
-            ..ParsedIn() ?? [],
-            ..ParsedNotIn() ?? []
-        ];
+        List<GeographicLevel?> options = [ParsedEq(), ParsedNotEq(), .. ParsedIn() ?? [], .. ParsedNotIn() ?? []];
 
-        return options
-            .OfType<GeographicLevel>()
-            .ToHashSet();
+        return options.OfType<GeographicLevel>().ToHashSet();
     }
 
     public static DataSetQueryCriteriaGeographicLevels Create(
         string comparator,
-        IList<GeographicLevel> geographicLevels)
-        => Create(comparator, geographicLevels.Select(l => l.GetEnumValue()).ToList());
+        IList<GeographicLevel> geographicLevels
+    ) => Create(comparator, geographicLevels.Select(l => l.GetEnumValue()).ToList());
 
-    public static DataSetQueryCriteriaGeographicLevels Create(
-        string comparator,
-        IList<string> geographicLevels)
+    public static DataSetQueryCriteriaGeographicLevels Create(string comparator, IList<string> geographicLevels)
     {
         return comparator switch
         {
             nameof(Eq) => new DataSetQueryCriteriaGeographicLevels
             {
-                Eq = geographicLevels.Count > 0 ? geographicLevels[0] : null
+                Eq = geographicLevels.Count > 0 ? geographicLevels[0] : null,
             },
             nameof(NotEq) => new DataSetQueryCriteriaGeographicLevels
             {
-                NotEq = geographicLevels.Count > 0 ? geographicLevels[0] : null
+                NotEq = geographicLevels.Count > 0 ? geographicLevels[0] : null,
             },
-            nameof(In) => new DataSetQueryCriteriaGeographicLevels
-            {
-                In = geographicLevels.ToList()
-            },
-            nameof(NotIn) => new DataSetQueryCriteriaGeographicLevels
-            {
-                NotIn = geographicLevels.ToList()
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+            nameof(In) => new DataSetQueryCriteriaGeographicLevels { In = geographicLevels.ToList() },
+            nameof(NotIn) => new DataSetQueryCriteriaGeographicLevels { NotIn = geographicLevels.ToList() },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null),
         };
     }
 
@@ -102,29 +85,27 @@ public record DataSetQueryCriteriaGeographicLevels
     {
         public Validator()
         {
-            RuleFor(q => q.Eq)
-                .AllowedValue(GeographicLevelUtils.OrderedCodes)
-                .When(q => q.Eq is not null);
+            RuleFor(q => q.Eq).AllowedValue(GeographicLevelUtils.OrderedCodes).When(q => q.Eq is not null);
 
-            RuleFor(q => q.NotEq)
-                .AllowedValue(GeographicLevelUtils.OrderedCodes)
-                .When(q => q.NotEq is not null);
+            RuleFor(q => q.NotEq).AllowedValue(GeographicLevelUtils.OrderedCodes).When(q => q.NotEq is not null);
 
-            When(q => q.In is not null, () =>
-            {
-                RuleFor(q => q.In)
-                    .NotEmpty();
-                RuleForEach(q => q.In)
-                    .AllowedValue(GeographicLevelUtils.OrderedCodes);
-            });
+            When(
+                q => q.In is not null,
+                () =>
+                {
+                    RuleFor(q => q.In).NotEmpty();
+                    RuleForEach(q => q.In).AllowedValue(GeographicLevelUtils.OrderedCodes);
+                }
+            );
 
-            When(q => q.NotIn is not null, () =>
-            {
-                RuleFor(q => q.NotIn)
-                    .NotEmpty();
-                RuleForEach(q => q.NotIn)
-                    .AllowedValue(GeographicLevelUtils.OrderedCodes);
-            });
+            When(
+                q => q.NotIn is not null,
+                () =>
+                {
+                    RuleFor(q => q.NotIn).NotEmpty();
+                    RuleForEach(q => q.NotIn).AllowedValue(GeographicLevelUtils.OrderedCodes);
+                }
+            );
         }
     }
 }

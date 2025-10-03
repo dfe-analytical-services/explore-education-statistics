@@ -1,7 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public class UserDetailsPermissionsViewModel
-
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

@@ -5,14 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Theor
 
 public class DataSetStatusTheoryData
 {
-    private static readonly List<DataSetStatus> AvailableStatusesList = [
+    private static readonly List<DataSetStatus> AvailableStatusesList =
+    [
         DataSetStatus.Deprecated,
         DataSetStatus.Published,
     ];
-    
-    public static readonly TheoryData<DataSetStatus> AllStatuses = new(
-        EnumUtil.GetEnums<DataSetStatus>()
-    );
+
+    public static readonly TheoryData<DataSetStatus> AllStatuses = new(EnumUtil.GetEnums<DataSetStatus>());
 
     public static readonly TheoryData<DataSetStatus> AvailableStatuses = new(AvailableStatusesList);
 

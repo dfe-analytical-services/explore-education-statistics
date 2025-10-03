@@ -9,9 +9,7 @@ public class IndicatorGroup
     public Guid SubjectId { get; set; }
     public List<Indicator> Indicators { get; set; } = new();
 
-    public IndicatorGroup()
-    {
-    }
+    public IndicatorGroup() { }
 
     public IndicatorGroup(string label, Guid subjectId)
     {

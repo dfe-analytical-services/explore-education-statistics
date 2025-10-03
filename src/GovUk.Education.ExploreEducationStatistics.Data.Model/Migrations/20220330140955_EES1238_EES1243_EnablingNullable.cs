@@ -9,7 +9,7 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         // Not directly related to EES-1238 but corrects nullability of the Name and Label columns,
-        // seen after enbabling nullable on types Filter/FilterGroup/FilterItem/IndicatorGroup/Indicator. 
+        // seen after enbabling nullable on types Filter/FilterGroup/FilterItem/IndicatorGroup/Indicator.
         migrationBuilder.AlterColumn<string>(
             name: "Label",
             table: "IndicatorGroup",
@@ -18,7 +18,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Name",
@@ -28,7 +29,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(450)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -38,7 +40,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -48,7 +51,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -58,7 +62,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Name",
@@ -68,7 +73,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(450)",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -78,7 +84,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -89,7 +96,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Name",
@@ -97,7 +105,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(450)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(450)");
+            oldType: "nvarchar(450)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -105,7 +114,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -113,7 +123,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -121,7 +132,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Name",
@@ -129,7 +141,8 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(450)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(450)");
+            oldType: "nvarchar(450)"
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -137,6 +150,7 @@ public partial class EES1238_EES1243_EnablingNullable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

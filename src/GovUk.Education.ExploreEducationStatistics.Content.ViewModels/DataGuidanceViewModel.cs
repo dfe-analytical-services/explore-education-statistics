@@ -13,7 +13,9 @@ public record DataGuidanceViewModel : ReleaseSummaryViewModel
     public DataGuidanceViewModel(
         ReleaseCacheViewModel release,
         PublicationCacheViewModel publication,
-        List<DataGuidanceDataSetViewModel> dataSets) : base(release, publication)
+        List<DataGuidanceDataSetViewModel> dataSets
+    )
+        : base(release, publication)
     {
         DataGuidance = release.DataGuidance;
         DataSets = dataSets;

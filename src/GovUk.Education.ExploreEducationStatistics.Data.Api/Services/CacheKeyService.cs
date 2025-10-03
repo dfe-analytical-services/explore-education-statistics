@@ -11,17 +11,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 public class CacheKeyService(ContentDbContext contentDbContext) : ICacheKeyService
 {
     public async Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(
-        Guid releaseVersionId)
+        Guid releaseVersionId
+    )
     {
         var releaseVersion = await contentDbContext
-            .ReleaseVersions
-            .Include(rv => rv.Release)
+            .ReleaseVersions.Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         return new ReleaseSubjectsCacheKey(
             publicationSlug: releaseVersion.Release.Publication.Slug,
             releaseSlug: releaseVersion.Release.Slug,
-            releaseVersionId: releaseVersion.Id);
+            releaseVersionId: releaseVersion.Id
+        );
     }
 }

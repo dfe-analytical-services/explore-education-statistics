@@ -7,4 +7,5 @@ public record GlobalPermissionsViewModel(
     bool CanAccessPrereleasePages,
     bool CanManageAllTaxonomy,
     bool IsBauUser,
-    bool IsApprover);
+    bool IsApprover
+);

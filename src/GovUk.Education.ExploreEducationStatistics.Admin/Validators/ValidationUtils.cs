@@ -32,7 +32,6 @@ public static class ValidationUtils
         var badRequest = actionResult as BadRequestObjectResult;
         var validationProblem = badRequest?.Value as ValidationProblemViewModel;
         var validationErrors = validationProblem?.Errors;
-        return validationErrors != null
-               && validationErrors.Any(error => error.Code == validationMessage.ToString());
+        return validationErrors != null && validationErrors.Any(error => error.Code == validationMessage.ToString());
     }
 }

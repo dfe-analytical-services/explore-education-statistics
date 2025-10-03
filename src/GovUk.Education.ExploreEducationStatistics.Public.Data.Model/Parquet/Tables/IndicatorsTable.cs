@@ -18,8 +18,8 @@ public static class IndicatorsTable
 
     private static readonly TableRef DefaultRef = new(TableName);
 
-    public static TableRef Ref(IndicatorMeta? indicator = null)
-        => indicator is not null ? new(Alias(indicator)) : DefaultRef;
+    public static TableRef Ref(IndicatorMeta? indicator = null) =>
+        indicator is not null ? new(Alias(indicator)) : DefaultRef;
 
     public class TableRef(string table)
     {

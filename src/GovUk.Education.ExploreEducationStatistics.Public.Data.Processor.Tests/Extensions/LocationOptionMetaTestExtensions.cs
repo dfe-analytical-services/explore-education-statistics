@@ -51,7 +51,8 @@ public static class LocationOptionMetaTestExtensions
             default:
                 throw new ArgumentOutOfRangeException(
                     paramName: nameof(expectedOption),
-                    $"Unsupported {expectedOption.GetType().Name} type");
+                    $"Unsupported {expectedOption.GetType().Name} type"
+                );
         }
     }
 }

@@ -41,17 +41,9 @@ public class FiltersMetaViewModelBuilderTests
                         Label = "Group a",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item a"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item b"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item a" },
+                            new() { Id = Guid.NewGuid(), Label = "Item b" },
+                        },
                     },
                     new()
                     {
@@ -59,19 +51,11 @@ public class FiltersMetaViewModelBuilderTests
                         Label = "Group b",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item c"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item d"
-                            }
-                        }
-                    }
-                }
+                            new() { Id = Guid.NewGuid(), Label = "Item c" },
+                            new() { Id = Guid.NewGuid(), Label = "Item d" },
+                        },
+                    },
+                },
             },
             new()
             {
@@ -87,17 +71,9 @@ public class FiltersMetaViewModelBuilderTests
                         Label = "Group c",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item e"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item f"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item e" },
+                            new() { Id = Guid.NewGuid(), Label = "Item f" },
+                        },
                     },
                     new()
                     {
@@ -105,23 +81,15 @@ public class FiltersMetaViewModelBuilderTests
                         Label = "Group d",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item g"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item h"
-                            }
-                        }
-                    }
-                }
-            }
+                            new() { Id = Guid.NewGuid(), Label = "Item g" },
+                            new() { Id = Guid.NewGuid(), Label = "Item h" },
+                        },
+                    },
+                },
+            },
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters);
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(filters);
 
         Assert.Equal(2, result.Count);
 
@@ -134,7 +102,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Null(filterA.AutoSelectFilterItemId);
 
         // Verify filter A's filter groups
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(2, filterAGroups.Count);
 
         // Verify filter group A
@@ -176,7 +144,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Null(filterB.AutoSelectFilterItemId);
 
         // Verify filter B's filter groups
-        var filterBGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterB.Options;
+        var filterBGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterB.Options;
         Assert.Equal(2, filterBGroups.Count);
 
         // Verify filter group C
@@ -228,22 +196,14 @@ public class FiltersMetaViewModelBuilderTests
                     Label = "Group a",
                     FilterItems = new List<FilterItem>
                     {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item a"
-                        },
-                        new()
-                        {
-                            Id = autoSelectFilterItemId,
-                            Label = "Total"
-                        }
-                    }
-                }
-            }
+                        new() { Id = Guid.NewGuid(), Label = "Item a" },
+                        new() { Id = autoSelectFilterItemId, Label = "Total" },
+                    },
+                },
+            },
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(ListOf(filter));
 
         Assert.Single(result);
         var filterA = Assert.Contains("FilterA", result);
@@ -260,7 +220,7 @@ public class FiltersMetaViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 Label = "Filter c",
-                FilterGroups = new List<FilterGroup>()
+                FilterGroups = new List<FilterGroup>(),
             },
             new()
             {
@@ -272,7 +232,7 @@ public class FiltersMetaViewModelBuilderTests
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group c",
-                        FilterItems = new List<FilterItem>()
+                        FilterItems = new List<FilterItem>(),
                     },
                     new()
                     {
@@ -280,40 +240,28 @@ public class FiltersMetaViewModelBuilderTests
                         Label = "Group a",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item c"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item a"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item b"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item c" },
+                            new() { Id = Guid.NewGuid(), Label = "Item a" },
+                            new() { Id = Guid.NewGuid(), Label = "Item b" },
+                        },
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group b",
-                        FilterItems = new List<FilterItem>()
-                    }
-                }
+                        FilterItems = new List<FilterItem>(),
+                    },
+                },
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Label = "Filter b",
-                FilterGroups = new List<FilterGroup>()
-            }
+                FilterGroups = new List<FilterGroup>(),
+            },
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters);
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(filters);
 
         Assert.Equal(3, result.Count);
 
@@ -327,7 +275,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(2, filterC.Order);
 
         // Verify filter A's filter groups are sorted by label
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(3, filterAGroups.Count);
         var groupA = Assert.Contains("GroupA", filterAGroups);
         var groupB = Assert.Contains("GroupB", filterAGroups);
@@ -357,7 +305,7 @@ public class FiltersMetaViewModelBuilderTests
                 {
                     Id = Guid.NewGuid(),
                     Label = "Group a",
-                    FilterItems = new List<FilterItem>()
+                    FilterItems = new List<FilterItem>(),
                 },
                 new()
                 {
@@ -365,33 +313,21 @@ public class FiltersMetaViewModelBuilderTests
                     Label = "Total",
                     FilterItems = new List<FilterItem>
                     {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item a"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Total"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item b"
-                        }
-                    }
+                        new() { Id = Guid.NewGuid(), Label = "Item a" },
+                        new() { Id = Guid.NewGuid(), Label = "Total" },
+                        new() { Id = Guid.NewGuid(), Label = "Item b" },
+                    },
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Label = "Group b",
-                    FilterItems = new List<FilterItem>()
-                }
-            }
+                    FilterItems = new List<FilterItem>(),
+                },
+            },
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(ListOf(filter));
 
         Assert.Single(result);
 
@@ -399,7 +335,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(0, filterA.Order);
 
         // Verify the filter groups are sorted by label with the "Total" group first
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(3, filterAGroups.Count);
         var groupTotal = Assert.Contains("Total", filterAGroups);
         var groupA = Assert.Contains("GroupA", filterAGroups);
@@ -409,7 +345,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(1, groupA.Order);
         Assert.Equal(2, groupB.Order);
 
-        // Verify the "Total" group's items are sorted by label with the "Total" item first 
+        // Verify the "Total" group's items are sorted by label with the "Total" item first
         Assert.Equal(3, groupTotal.Options.Count);
         Assert.Equal("Total", groupTotal.Options[0].Label);
         Assert.Equal("Item a", groupTotal.Options[1].Label);
@@ -436,49 +372,37 @@ public class FiltersMetaViewModelBuilderTests
                         Label = "Group a",
                         FilterItems = new List<FilterItem>
                         {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item a"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item b"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Item c"
-                            }
-                        }
+                            new() { Id = Guid.NewGuid(), Label = "Item a" },
+                            new() { Id = Guid.NewGuid(), Label = "Item b" },
+                            new() { Id = Guid.NewGuid(), Label = "Item c" },
+                        },
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group b",
-                        FilterItems = new List<FilterItem>()
+                        FilterItems = new List<FilterItem>(),
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Label = "Group c",
-                        FilterItems = new List<FilterItem>()
-                    }
-                }
+                        FilterItems = new List<FilterItem>(),
+                    },
+                },
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Label = "Filter b",
-                FilterGroups = new List<FilterGroup>()
+                FilterGroups = new List<FilterGroup>(),
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Label = "Filter c",
-                FilterGroups = new List<FilterGroup>()
-            }
+                FilterGroups = new List<FilterGroup>(),
+            },
         };
 
         // Define a sequence to sort each of the filters / groups and items into the following order.
@@ -498,32 +422,17 @@ public class FiltersMetaViewModelBuilderTests
             // A filter that does not exist in the input list
             new(
                 Guid.NewGuid(),
-                new List<FilterGroupSequenceEntry>
-                {
-                    new(
-                        Guid.NewGuid(),
-                        new List<Guid>
-                        {
-                            Guid.NewGuid()
-                        }
-                    )
-                }
+                new List<FilterGroupSequenceEntry> { new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() }) }
             ),
             // Filter c
-            new(
-                filters[2].Id,
-                new List<FilterGroupSequenceEntry>()
-            ),
+            new(filters[2].Id, new List<FilterGroupSequenceEntry>()),
             // Filter a
             new(
                 filters[0].Id,
                 new List<FilterGroupSequenceEntry>
                 {
                     // Group c
-                    new(
-                        filters[0].FilterGroups[2].Id,
-                        new List<Guid>()
-                    ),
+                    new(filters[0].FilterGroups[2].Id, new List<Guid>()),
                     // Group a
                     new(
                         filters[0].FilterGroups[0].Id,
@@ -532,38 +441,23 @@ public class FiltersMetaViewModelBuilderTests
                             // Item c, Item a, Item b
                             filters[0].FilterGroups[0].FilterItems[2].Id,
                             filters[0].FilterGroups[0].FilterItems[0].Id,
-                            filters[0].FilterGroups[0].FilterItems[1].Id
+                            filters[0].FilterGroups[0].FilterItems[1].Id,
                         }
                     ),
                     // Group b
-                    new(
-                        filters[0].FilterGroups[1].Id,
-                        new List<Guid>()
-                    )
+                    new(filters[0].FilterGroups[1].Id, new List<Guid>()),
                 }
             ),
             // Filter b
-            new(
-                filters[1].Id,
-                new List<FilterGroupSequenceEntry>()
-            ),
+            new(filters[1].Id, new List<FilterGroupSequenceEntry>()),
             // Another filter that does not exist in the input list
             new(
                 Guid.NewGuid(),
-                new List<FilterGroupSequenceEntry>
-                {
-                    new(
-                        Guid.NewGuid(),
-                        new List<Guid>
-                        {
-                            Guid.NewGuid()
-                        }
-                    )
-                }
-            )
+                new List<FilterGroupSequenceEntry> { new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() }) }
+            ),
         };
 
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters, ordering);
+        var result = (IDictionary<string, FilterMetaViewModel>)BuildFilters(filters, ordering);
 
         Assert.Equal(3, result.Count);
 
@@ -577,7 +471,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(2, filterB.Order);
 
         // Verify filter A's filter groups are sorted by the defined sequence
-        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
+        var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>)filterA.Options;
         Assert.Equal(3, filterAGroups.Count);
         var groupA = Assert.Contains("GroupA", filterAGroups);
         var groupB = Assert.Contains("GroupB", filterAGroups);

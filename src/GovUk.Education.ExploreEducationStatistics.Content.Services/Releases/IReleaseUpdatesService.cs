@@ -12,5 +12,6 @@ public interface IReleaseUpdatesService
         string releaseSlug,
         int page = 1,
         int pageSize = 10,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

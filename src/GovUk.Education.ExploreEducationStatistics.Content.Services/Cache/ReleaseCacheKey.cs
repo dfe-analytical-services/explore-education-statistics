@@ -18,7 +18,8 @@ public record ReleaseCacheKey : IBlobCacheKey
 
     public IBlobContainer Container => BlobContainers.PublicContent;
 
-    public string Key => ReleaseSlug == null
-        ? PublicContentLatestReleasePath(PublicationSlug)
-        : PublicContentReleasePath(PublicationSlug, ReleaseSlug);
+    public string Key =>
+        ReleaseSlug == null
+            ? PublicContentLatestReleasePath(PublicationSlug)
+            : PublicContentReleasePath(PublicationSlug, ReleaseSlug);
 }

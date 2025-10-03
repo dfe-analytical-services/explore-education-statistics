@@ -10,8 +10,7 @@ public class BoundaryDataRepository : IBoundaryDataRepository
     private readonly DataServiceMemoryCache<BoundaryData> _cache;
     private readonly StatisticsDbContext _context;
 
-    public BoundaryDataRepository(StatisticsDbContext context,
-        DataServiceMemoryCache<BoundaryData> cache)
+    public BoundaryDataRepository(StatisticsDbContext context, DataServiceMemoryCache<BoundaryData> cache)
     {
         _context = context;
         _cache = cache;
@@ -26,16 +25,16 @@ public class BoundaryDataRepository : IBoundaryDataRepository
 
         var dbResult = FindAndCache(boundaryLevelId, codesNotCached);
 
-        return cached
-            .Union(dbResult)
-            .ToDictionary(boundaryData => boundaryData.Code);
+        return cached.Union(dbResult).ToDictionary(boundaryData => boundaryData.Code);
     }
 
     private IEnumerable<BoundaryData> FindAndCache(long boundaryLevelId, IEnumerable<string> codes)
     {
-        var boundaryDataList = _context.BoundaryData.Where(boundaryData =>
-            boundaryData.BoundaryLevel.Id == boundaryLevelId &&
-            codes.Contains(boundaryData.Code)).ToList();
+        var boundaryDataList = _context
+            .BoundaryData.Where(boundaryData =>
+                boundaryData.BoundaryLevel.Id == boundaryLevelId && codes.Contains(boundaryData.Code)
+            )
+            .ToList();
 
         AddAllToCache(boundaryLevelId, boundaryDataList);
 
@@ -44,10 +43,7 @@ public class BoundaryDataRepository : IBoundaryDataRepository
 
     private List<BoundaryData> TryCacheLookup(long boundaryLevelId, IEnumerable<string> codes)
     {
-        return codes
-            .Select(code => TryCacheLookup(boundaryLevelId, code))
-            .WhereNotNull()
-            .ToList();
+        return codes.Select(code => TryCacheLookup(boundaryLevelId, code)).WhereNotNull().ToList();
     }
 
     private BoundaryData? TryCacheLookup(long boundaryLevelId, string code)

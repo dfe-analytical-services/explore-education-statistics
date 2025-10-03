@@ -9,9 +9,7 @@ public partial class EES4426_RemoveInternalReleaseNoteFromMethodologyVersionTabl
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "InternalReleaseNote",
-            table: "MethodologyVersions");
+        migrationBuilder.DropColumn(name: "InternalReleaseNote", table: "MethodologyVersions");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -20,6 +18,7 @@ public partial class EES4426_RemoveInternalReleaseNoteFromMethodologyVersionTabl
             name: "InternalReleaseNote",
             table: "MethodologyVersions",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

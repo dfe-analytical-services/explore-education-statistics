@@ -18,12 +18,9 @@ public record DataSetVersionListRequest
     {
         public Validator()
         {
-            RuleFor(request => request.DataSetId)
-                .NotEmpty();
-            RuleFor(request => request.Page)
-                .GreaterThanOrEqualTo(1);
-            RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 20);
+            RuleFor(request => request.DataSetId).NotEmpty();
+            RuleFor(request => request.Page).GreaterThanOrEqualTo(1);
+            RuleFor(request => request.PageSize).InclusiveBetween(1, 20);
         }
     }
 }

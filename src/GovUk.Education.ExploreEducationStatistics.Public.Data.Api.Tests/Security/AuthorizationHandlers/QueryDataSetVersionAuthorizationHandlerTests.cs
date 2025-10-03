@@ -20,13 +20,13 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     private readonly DataFixture _dataFixture = new();
 
     [Theory]
-    [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
-        MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+    [MemberData(
+        nameof(DataSetVersionStatusQueryTheoryData.AvailableStatuses),
+        MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+    )]
     public async Task Success(DataSetVersionStatus status)
     {
-        DataSetVersion dataSetVersion = _dataFixture
-            .DefaultDataSetVersion()
-            .WithStatus(status);
+        DataSetVersion dataSetVersion = _dataFixture.DefaultDataSetVersion().WithStatus(status);
 
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
@@ -37,13 +37,13 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     }
 
     [Theory]
-    [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
-        MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+    [MemberData(
+        nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatuses),
+        MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+    )]
     public async Task Failure(DataSetVersionStatus status)
     {
-        DataSetVersion dataSetVersion = _dataFixture
-            .DefaultDataSetVersion()
-            .WithStatus(status);
+        DataSetVersion dataSetVersion = _dataFixture.DefaultDataSetVersion().WithStatus(status);
 
         var handler = BuildHandler();
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
@@ -54,17 +54,15 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     }
 
     [Theory]
-    [MemberData(nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
-        MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+    [MemberData(
+        nameof(DataSetVersionStatusQueryTheoryData.AvailableStatusesIncludingDraft),
+        MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+    )]
     public async Task Success_PreviewTokenIsActive(DataSetVersionStatus status)
     {
-        DataSetVersion dataSetVersion = _dataFixture
-            .DefaultDataSetVersion()
-            .WithStatus(status);
+        DataSetVersion dataSetVersion = _dataFixture.DefaultDataSetVersion().WithStatus(status);
 
-        PreviewToken previewToken = _dataFixture
-            .DefaultPreviewToken()
-            .WithDataSetVersion(dataSetVersion);
+        PreviewToken previewToken = _dataFixture.DefaultPreviewToken().WithDataSetVersion(dataSetVersion);
 
         var publicDataDbContext = new Mock<PublicDataDbContext>();
         publicDataDbContext.SetupGet(dbContext => dbContext.DataSetVersions).ReturnsDbSet([dataSetVersion]);
@@ -72,10 +70,8 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(previewToken)
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(previewToken)]
+        );
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
@@ -87,13 +83,9 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     [Fact]
     public async Task Failure_PreviewTokenIsExpired()
     {
-        DataSetVersion dataSetVersion = _dataFixture
-            .DefaultDataSetVersion()
-            .WithStatus(DataSetVersionStatus.Draft);
+        DataSetVersion dataSetVersion = _dataFixture.DefaultDataSetVersion().WithStatus(DataSetVersionStatus.Draft);
 
-        PreviewToken previewToken = _dataFixture
-            .DefaultPreviewToken(expired: true)
-            .WithDataSetVersion(dataSetVersion);
+        PreviewToken previewToken = _dataFixture.DefaultPreviewToken(expired: true).WithDataSetVersion(dataSetVersion);
 
         var publicDataDbContext = new Mock<PublicDataDbContext>();
         publicDataDbContext.SetupGet(dbContext => dbContext.DataSetVersions).ReturnsDbSet([dataSetVersion]);
@@ -101,10 +93,8 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(previewToken)
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(previewToken)]
+        );
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
@@ -121,21 +111,18 @@ public class QueryDataSetVersionAuthorizationHandlerTests
             .WithStatus(DataSetVersionStatus.Draft)
             .GenerateTuple2();
 
-        PreviewToken previewToken = _dataFixture
-            .DefaultPreviewToken()
-            .WithDataSetVersion(dataSetVersion2);
+        PreviewToken previewToken = _dataFixture.DefaultPreviewToken().WithDataSetVersion(dataSetVersion2);
 
         var publicDataDbContext = new Mock<PublicDataDbContext>();
-        publicDataDbContext.SetupGet(dbContext => dbContext.DataSetVersions)
+        publicDataDbContext
+            .SetupGet(dbContext => dbContext.DataSetVersions)
             .ReturnsDbSet([dataSetVersion1, dataSetVersion2]);
         publicDataDbContext.SetupGet(dbContext => dbContext.PreviewTokens).ReturnsDbSet([previewToken]);
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(previewToken)
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(previewToken)]
+        );
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion1);
 
@@ -145,17 +132,15 @@ public class QueryDataSetVersionAuthorizationHandlerTests
     }
 
     [Theory]
-    [MemberData(nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
-        MemberType = typeof(DataSetVersionStatusQueryTheoryData))]
+    [MemberData(
+        nameof(DataSetVersionStatusQueryTheoryData.UnavailableStatusesExceptDraft),
+        MemberType = typeof(DataSetVersionStatusQueryTheoryData)
+    )]
     public async Task Failure_PreviewTokenIsForUnavailableDataSetVersion(DataSetVersionStatus status)
     {
-        DataSetVersion dataSetVersion = _dataFixture
-            .DefaultDataSetVersion()
-            .WithStatus(status);
+        DataSetVersion dataSetVersion = _dataFixture.DefaultDataSetVersion().WithStatus(status);
 
-        PreviewToken previewToken = _dataFixture
-            .DefaultPreviewToken()
-            .WithDataSetVersion(dataSetVersion);
+        PreviewToken previewToken = _dataFixture.DefaultPreviewToken().WithDataSetVersion(dataSetVersion);
 
         var publicDataDbContext = new Mock<PublicDataDbContext>();
         publicDataDbContext.SetupGet(dbContext => dbContext.DataSetVersions).ReturnsDbSet([dataSetVersion]);
@@ -163,10 +148,8 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var handler = BuildHandler(
             publicDataDbContext: publicDataDbContext.Object,
-            requestHeaders:
-            [
-                PreviewTokenRequestHeader(previewToken)
-            ]);
+            requestHeaders: [PreviewTokenRequestHeader(previewToken)]
+        );
 
         var context = CreateAnonymousAuthContext<QueryDataSetVersionRequirement, DataSetVersion>(dataSetVersion);
 
@@ -182,7 +165,8 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
     private static QueryDataSetVersionAuthorizationHandler BuildHandler(
         List<KeyValuePair<string, StringValues>>? requestHeaders = null,
-        PublicDataDbContext? publicDataDbContext = null)
+        PublicDataDbContext? publicDataDbContext = null
+    )
     {
         publicDataDbContext ??= Mock.Of<PublicDataDbContext>();
 
@@ -193,9 +177,9 @@ public class QueryDataSetVersionAuthorizationHandlerTests
 
         var previewTokenService = new PreviewTokenService(
             publicDataDbContext: publicDataDbContext,
-            httpContextAccessor: new HttpContextAccessor { HttpContext = httpContext });
+            httpContextAccessor: new HttpContextAccessor { HttpContext = httpContext }
+        );
 
-        return new QueryDataSetVersionAuthorizationHandler(
-            previewTokenService);
+        return new QueryDataSetVersionAuthorizationHandler(previewTokenService);
     }
 }

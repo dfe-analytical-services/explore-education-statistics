@@ -18,7 +18,7 @@ public abstract class JsonSerializationUtilsTests
 
         public TestClass? Child { get; init; }
     }
-    
+
     public class DefaultSettingsTests : JsonSerializationUtilsTests
     {
         [Fact]
@@ -26,23 +26,23 @@ public abstract class JsonSerializationUtilsTests
         {
             var obj = new TestClass
             {
-                Field2 = "Value2", 
-                Field1 = "Value1", 
+                Field2 = "Value2",
+                Field1 = "Value1",
                 Field3 = "Value3",
                 Child = new TestClass
                 {
                     Field2 = "ChildValue2",
                     Field1 = "ChildValue1",
                     Field3 = "ChildValue3",
-                }
+                },
             };
-            
+
             var serialized = JsonSerializationUtils.Serialize(obj: obj);
-            
+
             Snapshot.Match(serialized);
         }
     }
-    
+
     public class IndentsTests : JsonSerializationUtilsTests
     {
         [Fact]
@@ -50,25 +50,23 @@ public abstract class JsonSerializationUtilsTests
         {
             var obj = new TestClass
             {
-                Field2 = "Value2", 
-                Field1 = "Value1", 
+                Field2 = "Value2",
+                Field1 = "Value1",
                 Field3 = "Value3",
                 Child = new TestClass
                 {
                     Field2 = "ChildValue2",
                     Field1 = "ChildValue1",
                     Field3 = "ChildValue3",
-                }
+                },
             };
-            
-            var serialized = JsonSerializationUtils.Serialize(
-                obj: obj,
-                formatting: Formatting.Indented);
-            
+
+            var serialized = JsonSerializationUtils.Serialize(obj: obj, formatting: Formatting.Indented);
+
             Snapshot.Match(serialized);
         }
     }
-    
+
     public class OrderedPropertiesTests : JsonSerializationUtilsTests
     {
         [Fact]
@@ -76,26 +74,27 @@ public abstract class JsonSerializationUtilsTests
         {
             var obj = new TestClass
             {
-                Field2 = "Value2", 
-                Field1 = "Value1", 
+                Field2 = "Value2",
+                Field1 = "Value1",
                 Field3 = "Value3",
                 Child = new TestClass
                 {
                     Field2 = "ChildValue2",
                     Field1 = "ChildValue1",
                     Field3 = "ChildValue3",
-                }
+                },
             };
-            
+
             var serialized = JsonSerializationUtils.Serialize(
                 obj: obj,
                 formatting: Formatting.Indented,
-                orderedProperties: true);
-            
+                orderedProperties: true
+            );
+
             Snapshot.Match(serialized);
         }
     }
-    
+
     public class CamelCaseTests : JsonSerializationUtilsTests
     {
         [Fact]
@@ -103,26 +102,27 @@ public abstract class JsonSerializationUtilsTests
         {
             var obj = new TestClass
             {
-                Field2 = "Value2", 
-                Field1 = "Value1", 
+                Field2 = "Value2",
+                Field1 = "Value1",
                 Field3 = "Value3",
                 Child = new TestClass
                 {
                     Field2 = "ChildValue2",
                     Field1 = "ChildValue1",
                     Field3 = "ChildValue3",
-                }
+                },
             };
-            
+
             var serialized = JsonSerializationUtils.Serialize(
                 obj: obj,
                 formatting: Formatting.Indented,
-                camelCase: true);
-            
+                camelCase: true
+            );
+
             Snapshot.Match(serialized);
         }
     }
-    
+
     public class CamelCaseOrderedTests : JsonSerializationUtilsTests
     {
         [Fact]
@@ -130,23 +130,24 @@ public abstract class JsonSerializationUtilsTests
         {
             var obj = new TestClass
             {
-                Field2 = "Value2", 
-                Field1 = "Value1", 
+                Field2 = "Value2",
+                Field1 = "Value1",
                 Field3 = "Value3",
                 Child = new TestClass
                 {
                     Field2 = "ChildValue2",
                     Field1 = "ChildValue1",
                     Field3 = "ChildValue3",
-                }
+                },
             };
-            
+
             var serialized = JsonSerializationUtils.Serialize(
                 obj: obj,
                 formatting: Formatting.Indented,
                 camelCase: true,
-                orderedProperties: true);
-            
+                orderedProperties: true
+            );
+
             Snapshot.Match(serialized);
         }
     }

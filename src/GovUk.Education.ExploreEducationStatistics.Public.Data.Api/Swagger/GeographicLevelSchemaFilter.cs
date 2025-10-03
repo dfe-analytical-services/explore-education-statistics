@@ -15,8 +15,7 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
             schema.Type = "string";
             schema.Format = null;
 
-            schema.Description =
-                """
+            schema.Description = """
                 The code for a geographic level that locations are grouped by.
 
                 The allowed values are:
@@ -43,8 +42,8 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
 
             schema.Example = new OpenApiString("NAT");
 
-            schema.Enum = GeographicLevelUtils.OrderedCodes
-                .Select(code => new OpenApiString(code))
+            schema.Enum = GeographicLevelUtils
+                .OrderedCodes.Select(code => new OpenApiString(code))
                 .ToList<IOpenApiAny>();
         }
     }

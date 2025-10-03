@@ -17,8 +17,8 @@ public class PublishingService(
     ContentDbContext context,
     IPublisherClient publisherClient,
     IUserService userService,
-    ILogger<PublishingService> logger)
-    : IPublishingService
+    ILogger<PublishingService> logger
+) : IPublishingService
 {
     /// <summary>
     /// Retry the publishing of a release version.
@@ -30,10 +30,12 @@ public class PublishingService(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<Either<ActionResult, Unit>> RetryReleasePublishing(
-        Guid releaseVersionId, CancellationToken cancellationToken = default)
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.ReleaseVersions
-            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
+        return await context
+            .ReleaseVersions.FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanPublishReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -44,8 +46,10 @@ public class PublishingService(
 
                 await publisherClient.RetryReleasePublishing(releaseVersionId, cancellationToken);
 
-                logger.LogTrace("Sent publishing retry message for ReleaseVersion: {ReleaseVersionId}",
-                    releaseVersionId);
+                logger.LogTrace(
+                    "Sent publishing retry message for ReleaseVersion: {ReleaseVersionId}",
+                    releaseVersionId
+                );
                 return new Either<ActionResult, Unit>(Unit.Instance);
             });
     }
@@ -73,10 +77,14 @@ public class PublishingService(
     public async Task<Either<ActionResult, Unit>> ReleaseChanged(
         ReleasePublishingKey releasePublishingKey,
         bool immediate = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.ReleaseVersions
-            .FirstOrNotFoundAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId, cancellationToken)
+        return await context
+            .ReleaseVersions.FirstOrNotFoundAsync(
+                rv => rv.Id == releasePublishingKey.ReleaseVersionId,
+                cancellationToken
+            )
             .OnSuccessVoid(async _ =>
             {
                 await publisherClient.HandleReleaseChanged(releasePublishingKey, immediate, cancellationToken);
@@ -84,7 +92,8 @@ public class PublishingService(
                 logger.LogTrace(
                     "Sent message for ReleaseVersion: {ReleaseVersionId}, ReleaseStatusId: {ReleaseStatusId}",
                     releasePublishingKey.ReleaseVersionId,
-                    releasePublishingKey.ReleaseStatusId);
+                    releasePublishingKey.ReleaseStatusId
+                );
             });
     }
 
@@ -95,16 +104,17 @@ public class PublishingService(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<Either<ActionResult, Unit>> PublishMethodologyFiles(
-        Guid methodologyVersionId, CancellationToken cancellationToken = default)
+        Guid methodologyVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.MethodologyVersions
-            .FirstOrNotFoundAsync(mv => mv.Id == methodologyVersionId, cancellationToken)
+        return await context
+            .MethodologyVersions.FirstOrNotFoundAsync(mv => mv.Id == methodologyVersionId, cancellationToken)
             .OnSuccessVoid(async _ =>
             {
                 await publisherClient.PublishMethodologyFiles(methodologyVersionId, cancellationToken);
 
-                logger.LogTrace("Sent message for MethodologyVersion: {MethodologyVersionId}",
-                    methodologyVersionId);
+                logger.LogTrace("Sent message for MethodologyVersion: {MethodologyVersionId}", methodologyVersionId);
             });
     }
 

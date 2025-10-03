@@ -15,31 +15,34 @@ public class ImporterLocationService
     private readonly ILogger<ImporterLocationCache> _logger;
 
     public ImporterLocationService(
-        IGuidGenerator guidGenerator, 
-        IImporterLocationCache importerLocationCache, 
-        ILogger<ImporterLocationCache> logger)
+        IGuidGenerator guidGenerator,
+        IImporterLocationCache importerLocationCache,
+        ILogger<ImporterLocationCache> logger
+    )
     {
         _guidGenerator = guidGenerator;
         _importerLocationCache = importerLocationCache;
         _logger = logger;
     }
-    
+
     public Location Get(Location location)
     {
         return _importerLocationCache.Get(location);
     }
 
     public async Task<List<Location>> CreateIfNotExistsAndCache(
-        StatisticsDbContext context, 
-        List<Location> locationsToCheck)
+        StatisticsDbContext context,
+        List<Location> locationsToCheck
+    )
     {
         var newLocationsCount = 0;
-        
+
         var cachedLocations = await locationsToCheck
             .ToAsyncEnumerable()
             .SelectAwait(async location =>
-                await _importerLocationCache
-                    .GetOrCreateAndCache(location, async () =>
+                await _importerLocationCache.GetOrCreateAndCache(
+                    location,
+                    async () =>
                     {
                         // Save and cache the new Location as soon as possible, as Locations are shareable between
                         // ongoing imports.  Therefore it is best to track it for database entry and cache it as
@@ -49,7 +52,9 @@ public class ImporterLocationService
                         var newLocation = (await context.AddAsync(location)).Entity;
                         newLocationsCount++;
                         return newLocation;
-                    }))
+                    }
+                )
+            )
             .ToListAsync();
 
         if (newLocationsCount > 0)
@@ -57,7 +62,7 @@ public class ImporterLocationService
             await context.SaveChangesAsync();
             _logger.LogInformation($"Added {newLocationsCount} new Locations");
         }
-        
+
         return cachedLocations;
     }
 

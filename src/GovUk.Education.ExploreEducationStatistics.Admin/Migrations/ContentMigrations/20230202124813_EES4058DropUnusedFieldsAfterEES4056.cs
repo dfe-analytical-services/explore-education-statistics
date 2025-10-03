@@ -10,21 +10,13 @@ public partial class EES4058DropUnusedFieldsAfterEES4056 : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "NotifiedOn",
-            table: "ReleaseStatus");
+        migrationBuilder.DropColumn(name: "NotifiedOn", table: "ReleaseStatus");
 
-        migrationBuilder.DropColumn(
-            name: "NotifySubscribers",
-            table: "ReleaseStatus");
+        migrationBuilder.DropColumn(name: "NotifySubscribers", table: "ReleaseStatus");
 
-        migrationBuilder.DropColumn(
-            name: "DataLastPublished",
-            table: "Releases");
+        migrationBuilder.DropColumn(name: "DataLastPublished", table: "Releases");
 
-        migrationBuilder.DropColumn(
-            name: "Published",
-            table: "Publications");
+        migrationBuilder.DropColumn(name: "Published", table: "Publications");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -33,25 +25,29 @@ public partial class EES4058DropUnusedFieldsAfterEES4056 : Migration
             name: "NotifiedOn",
             table: "ReleaseStatus",
             type: "datetime2",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<bool>(
             name: "NotifySubscribers",
             table: "ReleaseStatus",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
 
         migrationBuilder.AddColumn<DateTime>(
             name: "DataLastPublished",
             table: "Releases",
             type: "datetime2",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<DateTime>(
             name: "Published",
             table: "Publications",
             type: "datetime2",
-            nullable: true);
+            nullable: true
+        );
     }
 }

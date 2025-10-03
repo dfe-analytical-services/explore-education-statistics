@@ -21,12 +21,10 @@ using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileTyp
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateDataSetFunctionTests(
-    ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class CreateDataSetTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateDataSetFunctionTests(fixture)
     {
         [Fact]
@@ -34,21 +32,21 @@ public abstract class CreateDataSetFunctionTests(
         {
             var subjectId = Guid.NewGuid();
 
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
             var release = publication.Releases.Single();
 
-            var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
+            var (releaseFile, releaseMetaFile) = DataFixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(release.Versions.Single())
-                .WithFiles([
-                    DataFixture
-                        .DefaultFile(FileType.Data)
-                        .WithSubjectId(subjectId),
-                    DataFixture
-                        .DefaultFile(FileType.Metadata)
-                        .WithSubjectId(subjectId)
-                ])
+                .WithFiles(
+                    [
+                        DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                        DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+                    ]
+                )
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
@@ -60,25 +58,30 @@ public abstract class CreateDataSetFunctionTests(
 
             ProcessDataSetVersionContext? processInitialDataSetVersionContext = null;
             StartOrchestrationOptions? startOrchestrationOptions = null;
-            durableTaskClientMock.Setup(client =>
+            durableTaskClientMock
+                .Setup(client =>
                     client.ScheduleNewOrchestrationInstanceAsync(
                         nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion),
                         It.IsAny<ProcessDataSetVersionContext>(),
                         It.IsAny<StartOrchestrationOptions>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync((TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
-                    options?.InstanceId ?? Guid.NewGuid().ToString())
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    (TaskName _, object _, StartOrchestrationOptions? options, CancellationToken _) =>
+                        options?.InstanceId ?? Guid.NewGuid().ToString()
+                )
                 .Callback<TaskName, object, StartOrchestrationOptions?, CancellationToken>(
                     (_, input, options, _) =>
                     {
-                        processInitialDataSetVersionContext =
-                            Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input);
+                        processInitialDataSetVersionContext = Assert.IsAssignableFrom<ProcessDataSetVersionContext>(
+                            input
+                        );
                         startOrchestrationOptions = options;
-                    });
+                    }
+                );
 
-            var result = await CreateDataSet(
-                releaseFileId: releaseFile.Id,
-                durableTaskClientMock.Object);
+            var result = await CreateDataSet(releaseFileId: releaseFile.Id, durableTaskClientMock.Object);
 
             VerifyAllMocks(durableTaskClientMock);
 
@@ -87,10 +90,12 @@ public abstract class CreateDataSetFunctionTests(
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             // Assert a single data set was created
-            var dataSet = Assert.Single(await publicDataDbContext.DataSets
-                .Include(ds => ds.Versions)
-                .ThenInclude(dsv => dsv.Imports)
-                .ToListAsync());
+            var dataSet = Assert.Single(
+                await publicDataDbContext
+                    .DataSets.Include(ds => ds.Versions)
+                    .ThenInclude(dsv => dsv.Imports)
+                    .ToListAsync()
+            );
 
             Assert.Equal(DataSetStatus.Draft, dataSet.Status);
             Assert.Equal(releaseFile.Name, dataSet.Title);
@@ -128,10 +133,14 @@ public abstract class CreateDataSetFunctionTests(
             // Assert the processing orchestrator was scheduled with the correct arguments
             Assert.NotNull(processInitialDataSetVersionContext);
             Assert.NotNull(startOrchestrationOptions);
-            Assert.Equal(new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersion.Id },
-                processInitialDataSetVersionContext);
-            Assert.Equal(new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
-                startOrchestrationOptions);
+            Assert.Equal(
+                new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersion.Id },
+                processInitialDataSetVersionContext
+            );
+            Assert.Equal(
+                new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
+                startOrchestrationOptions
+            );
         }
 
         [Fact]
@@ -141,8 +150,7 @@ public abstract class CreateDataSetFunctionTests(
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-            validationProblem.AssertHasNotEmptyError(
-                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
+            validationProblem.AssertHasNotEmptyError(nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
         }
 
         [Fact]
@@ -154,24 +162,27 @@ public abstract class CreateDataSetFunctionTests(
 
             result.AssertNotFoundWithValidationProblem<ReleaseFile, Guid>(
                 expectedId: releaseFileId,
-                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst());
+                expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst()
+            );
         }
 
         [Fact]
         public async Task ReleaseFileIdHasDataSetVersion_ReturnsValidationProblem()
         {
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion()
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseFile.Id))
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .WithDataSet(dataSet);
 
             await AddTestData<ContentDbContext>(context =>
@@ -192,7 +203,8 @@ public abstract class CreateDataSetFunctionTests(
 
             validationProblem.AssertHasError(
                 expectedPath: nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
-                expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code);
+                expectedCode: ValidationMessages.FileHasApiDataSetVersion.Code
+            );
         }
 
         [Fact]
@@ -200,19 +212,19 @@ public abstract class CreateDataSetFunctionTests(
         {
             var subjectId = Guid.NewGuid();
 
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
+            var (releaseFile, releaseMetaFile) = DataFixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
-                .WithFiles([
-                    DataFixture
-                        .DefaultFile(FileType.Data)
-                        .WithSubjectId(subjectId),
-                    DataFixture
-                        .DefaultFile(FileType.Metadata)
-                        .WithSubjectId(subjectId)
-                ])
+                .WithFiles(
+                    [
+                        DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                        DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+                    ]
+                )
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
@@ -233,10 +245,12 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseFileTypeNotData_ReturnsValidationProblem()
         {
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Ancillary));
 
@@ -258,10 +272,12 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseFileHasNoMetaFile_ReturnsValidationProblem()
         {
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
@@ -280,14 +296,14 @@ public abstract class CreateDataSetFunctionTests(
             );
         }
 
-        private async Task<IActionResult> CreateDataSet(
-            Guid releaseFileId,
-            DurableTaskClient? durableTaskClient = null)
+        private async Task<IActionResult> CreateDataSet(Guid releaseFileId, DurableTaskClient? durableTaskClient = null)
         {
             var function = GetRequiredService<CreateDataSetFunction>();
-            return await function.CreateDataSet(new DataSetCreateRequest { ReleaseFileId = releaseFileId },
+            return await function.CreateDataSet(
+                new DataSetCreateRequest { ReleaseFileId = releaseFileId },
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
-                CancellationToken.None);
+                CancellationToken.None
+            );
         }
     }
 }

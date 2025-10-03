@@ -21,16 +21,17 @@ public interface IDataSetFileService
         SortDirection? sortDirection,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetFileId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
-    Task<ActionResult> DownloadDataSetFile(
-        Guid dataSetFileId,
-        CancellationToken cancellationToken);
+    Task<ActionResult> DownloadDataSetFile(Guid dataSetFileId, CancellationToken cancellationToken);
 
     Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

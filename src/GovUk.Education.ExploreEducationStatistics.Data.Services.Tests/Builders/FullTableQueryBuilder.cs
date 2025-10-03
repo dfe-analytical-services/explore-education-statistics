@@ -25,13 +25,21 @@ public class FullTableQueryBuilder
                 new()
                 {
                     LeafFilterId = Guid.NewGuid(),
-                    Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]],
+                    Options =
+                    [
+                        [Guid.NewGuid(), Guid.NewGuid()],
+                        [Guid.NewGuid(), Guid.NewGuid()],
+                    ],
                 },
                 new()
                 {
                     LeafFilterId = Guid.NewGuid(),
-                    Options = [[Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]],
-                }
-            }
+                    Options =
+                    [
+                        [Guid.NewGuid(), Guid.NewGuid()],
+                        [Guid.NewGuid(), Guid.NewGuid()],
+                    ],
+                },
+            },
         };
 }

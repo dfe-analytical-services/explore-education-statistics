@@ -16,14 +16,18 @@ public partial class EES6434_ImproveLoggingInRemoveSoftDeletedSubjectsSP : Migra
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{MigrationId}_Routine_RemoveSoftDeletedSubjects.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{MigrationId}_Routine_RemoveSoftDeletedSubjects.sql"
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{PreviousRemoveSoftDeletedSubjectsMigrationId}_Routine_RemoveSoftDeletedSubjects.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{PreviousRemoveSoftDeletedSubjectsMigrationId}_Routine_RemoveSoftDeletedSubjects.sql"
+        );
     }
 }

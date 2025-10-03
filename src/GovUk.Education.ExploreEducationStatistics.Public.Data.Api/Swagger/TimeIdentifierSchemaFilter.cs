@@ -16,8 +16,7 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
             schema.Type = "string";
             schema.Format = null;
 
-            schema.Description =
-                """
+            schema.Description = """
                 The code identifying the time period's type.
 
                 The allowed values are:
@@ -43,8 +42,8 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
 
             schema.Example = new OpenApiString("CY");
 
-            schema.Enum = TimeIdentifierUtils.Codes
-                .NaturalOrder()
+            schema.Enum = TimeIdentifierUtils
+                .Codes.NaturalOrder()
                 .Select(code => new OpenApiString(code))
                 .ToList<IOpenApiAny>();
         }

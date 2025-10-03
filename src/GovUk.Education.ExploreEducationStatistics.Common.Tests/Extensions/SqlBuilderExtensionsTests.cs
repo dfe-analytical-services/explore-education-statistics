@@ -71,7 +71,8 @@ public abstract class SqlBuilderExtensionsTests
             string expectedSql,
             object[] expectedParams,
             string? joinString,
-            IInterpolatedSql[] fragments)
+            IInterpolatedSql[] fragments
+        )
         {
             var builder = new SqlBuilder();
 
@@ -86,11 +87,7 @@ public abstract class SqlBuilderExtensionsTests
 
         [Theory]
         [MemberData(nameof(SqlBuildersData))]
-        public void SqlBuilders(
-            string expectedSql,
-            object[] expectedParams,
-            string? joinString,
-            SqlBuilder[] builders)
+        public void SqlBuilders(string expectedSql, object[] expectedParams, string? joinString, SqlBuilder[] builders)
         {
             var builder = new SqlBuilder();
 
@@ -109,7 +106,8 @@ public abstract class SqlBuilderExtensionsTests
             string expectedSql,
             object[] expectedParams,
             string? joinString,
-            FormattableString[] strings)
+            FormattableString[] strings
+        )
         {
             var builder = new SqlBuilder();
 
@@ -129,32 +127,20 @@ public abstract class SqlBuilderExtensionsTests
                 new(
                     ExpectedSql: "field_a = @p0 AND field_b = @p1",
                     ExpectedParameters: [ParamBool, ParamInt],
-                    Builders:
-                    [
-                        new SqlBuilder($"field_a = {ParamBool}"),
-                        new SqlBuilder($"field_b = {ParamInt}")
-                    ],
+                    Builders: [new SqlBuilder($"field_a = {ParamBool}"), new SqlBuilder($"field_b = {ParamInt}")],
                     JoinString: " AND "
                 ),
                 new(
                     ExpectedSql: "field_a = @param AND field_b = @otherParam",
                     // Not binding any parameters as we're using literal text
                     ExpectedParameters: [],
-                    Builders:
-                    [
-                        new SqlBuilder($"field_a = @param"),
-                        new SqlBuilder($"field_b = @otherParam")
-                    ],
+                    Builders: [new SqlBuilder($"field_a = @param"), new SqlBuilder($"field_b = @otherParam")],
                     JoinString: "AND "
                 ),
                 new(
                     ExpectedSql: "FieldB = @p0 OR FieldC = @p1",
                     ExpectedParameters: [ParamStr, ParamInt],
-                    Builders:
-                    [
-                        new SqlBuilder($"FieldB = {ParamStr}"),
-                        new SqlBuilder($"FieldC = {ParamInt}")
-                    ],
+                    Builders: [new SqlBuilder($"FieldB = {ParamStr}"), new SqlBuilder($"FieldC = {ParamInt}")],
                     JoinString: " OR "
                 ),
                 new(
@@ -164,7 +150,7 @@ public abstract class SqlBuilderExtensionsTests
                     [
                         new SqlBuilder($"{ParamStr}"),
                         new SqlBuilder($"{ParamBool}"),
-                        new SqlBuilder($"{ParamInt}")
+                        new SqlBuilder($"{ParamInt}"),
                     ],
                     JoinString: ", "
                 ),
@@ -175,18 +161,14 @@ public abstract class SqlBuilderExtensionsTests
                     [
                         new SqlBuilder($"IN ({ParamStr}"),
                         new SqlBuilder($"{ParamBool}"),
-                        new SqlBuilder($"{ParamInt})")
+                        new SqlBuilder($"{ParamInt})"),
                     ],
                     JoinString: ", "
                 ),
                 new(
                     ExpectedSql: "some_field = @p0",
                     ExpectedParameters: [ParamInt],
-                    Builders:
-                    [
-                        new SqlBuilder($"some_field"),
-                        new SqlBuilder($" = {ParamInt}")
-                    ]
+                    Builders: [new SqlBuilder($"some_field"), new SqlBuilder($" = {ParamInt}")]
                 ),
                 new(
                     ExpectedSql: "WHERE field_a = @p0 AND field_b = @p1 OR field_c = @p2",
@@ -196,23 +178,23 @@ public abstract class SqlBuilderExtensionsTests
                         new SqlBuilder($"WHERE"),
                         new SqlBuilder($"field_a = {ParamBool}"),
                         new SqlBuilder($"AND field_b = {ParamInt}"),
-                        new SqlBuilder($"OR field_c = {ParamStr}")
+                        new SqlBuilder($"OR field_c = {ParamStr}"),
                     ]
                 ),
             };
         }
 
-        public static TheoryData<string, object[], string?, IInterpolatedSql[]> InterpolatedSqlData
-            => CreateData(b => b.Build());
+        public static TheoryData<string, object[], string?, IInterpolatedSql[]> InterpolatedSqlData =>
+            CreateData(b => b.Build());
 
-        public static TheoryData<string, object[], string?, SqlBuilder[]> SqlBuildersData
-            => CreateData(b => b);
+        public static TheoryData<string, object[], string?, SqlBuilder[]> SqlBuildersData => CreateData(b => b);
 
-        public static TheoryData<string, object[], string?, FormattableString[]> FormattableStringsData
-            => CreateData(b => b.AsFormattableString());
+        public static TheoryData<string, object[], string?, FormattableString[]> FormattableStringsData =>
+            CreateData(b => b.AsFormattableString());
 
         private static TheoryData<string, object[], string?, TFragment[]> CreateData<TFragment>(
-            Func<SqlBuilder, TFragment> build)
+            Func<SqlBuilder, TFragment> build
+        )
         {
             var data = new TheoryData<string, object[], string?, TFragment[]>();
 
@@ -233,6 +215,7 @@ public abstract class SqlBuilderExtensionsTests
             string ExpectedSql,
             object[] ExpectedParameters,
             SqlBuilder[] Builders,
-            string? JoinString = null);
+            string? JoinString = null
+        );
     }
 }

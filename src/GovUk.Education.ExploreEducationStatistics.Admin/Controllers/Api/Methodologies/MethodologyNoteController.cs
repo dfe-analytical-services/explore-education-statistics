@@ -22,7 +22,8 @@ public class MethodologyNoteController : ControllerBase
     [HttpPost("methodologies/{methodologyVersionId:guid}/notes")]
     public async Task<ActionResult<MethodologyNoteViewModel>> AddNote(
         Guid methodologyVersionId,
-        MethodologyNoteAddRequest request)
+        MethodologyNoteAddRequest request
+    )
     {
         return await _methodologyNoteService
             .AddNote(methodologyVersionId, request)
@@ -30,9 +31,7 @@ public class MethodologyNoteController : ControllerBase
     }
 
     [HttpDelete("methodologies/{methodologyVersionId:guid}/notes/{methodologyNoteId:guid}")]
-    public async Task<ActionResult> DeleteNote(
-        Guid methodologyVersionId,
-        Guid methodologyNoteId)
+    public async Task<ActionResult> DeleteNote(Guid methodologyVersionId, Guid methodologyNoteId)
     {
         return await _methodologyNoteService
             .DeleteNote(methodologyVersionId, methodologyNoteId)
@@ -41,7 +40,10 @@ public class MethodologyNoteController : ControllerBase
 
     [HttpPut("methodologies/{methodologyVersionId:guid}/notes/{methodologyNoteId:guid}")]
     public async Task<ActionResult<MethodologyNoteViewModel>> UpdateNote(
-        Guid methodologyVersionId, Guid methodologyNoteId, MethodologyNoteUpdateRequest request)
+        Guid methodologyVersionId,
+        Guid methodologyNoteId,
+        MethodologyNoteUpdateRequest request
+    )
     {
         return await _methodologyNoteService
             .UpdateNote(methodologyVersionId, methodologyNoteId, request)

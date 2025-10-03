@@ -10,17 +10,13 @@ public class EmailService : IEmailService
     private readonly INotificationClient _client;
     private readonly ILogger<IEmailService> _logger;
 
-    public EmailService(INotificationClient client,
-        ILogger<IEmailService> logger)
+    public EmailService(INotificationClient client, ILogger<IEmailService> logger)
     {
         _client = client;
         _logger = logger;
     }
 
-    public Either<ActionResult, Unit> SendEmail(
-        string email,
-        string templateId,
-        Dictionary<string, dynamic> values)
+    public Either<ActionResult, Unit> SendEmail(string email, string templateId, Dictionary<string, dynamic> values)
     {
         try
         {

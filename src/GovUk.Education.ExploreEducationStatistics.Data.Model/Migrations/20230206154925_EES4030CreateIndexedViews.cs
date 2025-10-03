@@ -13,11 +13,15 @@ public partial class EES4030CreateIndexedViews : Migration
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{MigrationId}_View_ObservationSubjectIdGeographicLevel.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{MigrationId}_View_ObservationSubjectIdGeographicLevel.sql"
+        );
 
-        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-            $"{MigrationId}_View_ObservationSubjectIdYearTimeIdentifier.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.MigrationsPath,
+            $"{MigrationId}_View_ObservationSubjectIdYearTimeIdentifier.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

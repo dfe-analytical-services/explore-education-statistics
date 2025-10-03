@@ -14,10 +14,7 @@ public static class EducationInNumbersContentExtensions
             Order = section.Order,
             Heading = section.Heading,
             EducationInNumbersPageId = newPageId,
-            Content = section.Content
-                .Select(block => block.Clone(newSectionId))
-                .OrderBy(block => block.Order)
-                .ToList(),
+            Content = section.Content.Select(block => block.Clone(newSectionId)).OrderBy(block => block.Order).ToList(),
         };
     }
 
@@ -38,12 +35,9 @@ public static class EducationInNumbersContentExtensions
                 Order = groupBlock.Order,
                 EinContentSectionId = newSectionId,
                 Title = groupBlock.Title,
-                Tiles = groupBlock.Tiles
-                    .Select(tile => tile.Clone(groupBlock.Id))
-                    .OrderBy(tile => tile.Order)
-                    .ToList(),
+                Tiles = groupBlock.Tiles.Select(tile => tile.Clone(groupBlock.Id)).OrderBy(tile => tile.Order).ToList(),
             },
-            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
+            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found"),
         };
     }
 
@@ -62,7 +56,7 @@ public static class EducationInNumbersContentExtensions
                 LinkUrl = statTile.LinkUrl,
                 LinkText = statTile.LinkText,
             },
-            _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found")
+            _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
     }
 }

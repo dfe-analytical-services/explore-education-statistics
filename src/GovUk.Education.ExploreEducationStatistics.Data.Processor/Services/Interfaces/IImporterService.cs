@@ -12,18 +12,21 @@ public interface IImporterService
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
         Subject subject,
-        StatisticsDbContext context);
+        StatisticsDbContext context
+    );
 
     Task ImportObservations(
         DataImport dataImport,
         Func<Task<Stream>> dataFileStreamProvider,
         Func<Task<Stream>> metaFileStreamProvider,
         Subject subject,
-        StatisticsDbContext context);
+        StatisticsDbContext context
+    );
 
     Task ImportFiltersAndLocations(
         DataImport dataImport,
         Func<Task<Stream>> dataFileStreamProvider,
         SubjectMeta subjectMeta,
-        StatisticsDbContext context);
+        StatisticsDbContext context
+    );
 }

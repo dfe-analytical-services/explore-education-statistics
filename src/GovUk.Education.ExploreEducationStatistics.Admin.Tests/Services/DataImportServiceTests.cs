@@ -33,11 +33,9 @@ public class DataImportServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ReleaseFiles.AddAsync(new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = file
-            });
+            await contentDbContext.ReleaseFiles.AddAsync(
+                new ReleaseFile { ReleaseVersion = releaseVersion, File = file }
+            );
             await contentDbContext.DataImports.AddAsync(import);
             await contentDbContext.SaveChangesAsync();
         }
@@ -46,29 +44,24 @@ public class DataImportServiceTests
         var releaseFileService = new Mock<IReleaseFileService>(Strict);
         var userService = new Mock<IUserService>(Strict);
 
-        dataProcessorClient
-            .Setup(s => s.CancelImport(import.Id, CancellationToken.None))
-            .Returns(Task.CompletedTask);
+        dataProcessorClient.Setup(s => s.CancelImport(import.Id, CancellationToken.None)).Returns(Task.CompletedTask);
 
-        releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
-                file.Id,
-                FileType.Data))
-            .ReturnsAsync(file);
+        releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id, file.Id, FileType.Data)).ReturnsAsync(file);
 
         userService
-            .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id),
-                SecurityPolicies.CanCancelOngoingImports))
+            .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id), SecurityPolicies.CanCancelOngoingImports))
             .ReturnsAsync(true);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = BuildDataImportService(contentDbContext: contentDbContext,
+            var service = BuildDataImportService(
+                contentDbContext: contentDbContext,
                 releaseFileService: releaseFileService.Object,
                 dataProcessorClient: dataProcessorClient.Object,
-                userService: userService.Object);
+                userService: userService.Object
+            );
 
-            var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
-                fileId: file.Id);
+            var result = await service.CancelImport(releaseVersionId: releaseVersion.Id, fileId: file.Id);
 
             MockUtils.VerifyAllMocks(releaseFileService, userService, dataProcessorClient);
 
@@ -89,11 +82,9 @@ public class DataImportServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ReleaseFiles.AddAsync(new ReleaseFile
-            {
-                ReleaseVersion = releaseVersion,
-                File = file
-            });
+            await contentDbContext.ReleaseFiles.AddAsync(
+                new ReleaseFile { ReleaseVersion = releaseVersion, File = file }
+            );
             await contentDbContext.DataImports.AddAsync(import);
             await contentDbContext.SaveChangesAsync();
         }
@@ -101,24 +92,21 @@ public class DataImportServiceTests
         var releaseFileService = new Mock<IReleaseFileService>(Strict);
         var userService = new Mock<IUserService>(Strict);
 
-        releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
-                file.Id,
-                FileType.Data))
-            .ReturnsAsync(file);
+        releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id, file.Id, FileType.Data)).ReturnsAsync(file);
 
         userService
-            .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id),
-                SecurityPolicies.CanCancelOngoingImports))
+            .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id), SecurityPolicies.CanCancelOngoingImports))
             .ReturnsAsync(false);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = BuildDataImportService(contentDbContext: contentDbContext,
+            var service = BuildDataImportService(
+                contentDbContext: contentDbContext,
                 releaseFileService: releaseFileService.Object,
-                userService: userService.Object);
+                userService: userService.Object
+            );
 
-            var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
-                fileId: file.Id);
+            var result = await service.CancelImport(releaseVersionId: releaseVersion.Id, fileId: file.Id);
 
             MockUtils.VerifyAllMocks(releaseFileService, userService);
 
@@ -136,22 +124,15 @@ public class DataImportServiceTests
 
         // Incomplete imports for other Releases should be ignored
 
-        var release2Import1 = new DataImport
-        {
-            File = release2File1,
-            Status = DataImportStatus.STAGE_1
-        };
+        var release2Import1 = new DataImport { File = release2File1, Status = DataImportStatus.STAGE_1 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.ReleaseFiles.AddRangeAsync(
-                new ReleaseFile
-                {
-                    ReleaseVersion = releaseVersion2,
-                    File = release2File1
-                });
+                new ReleaseFile { ReleaseVersion = releaseVersion2, File = release2File1 }
+            );
             await contentDbContext.DataImports.AddRangeAsync(release2Import1);
             await contentDbContext.SaveChangesAsync();
         }
@@ -177,46 +158,23 @@ public class DataImportServiceTests
 
         var release2File1 = new File { Type = FileType.Data };
 
-        var release1Import1 = new DataImport
-        {
-            File = release1File1,
-            Status = DataImportStatus.COMPLETE
-        };
+        var release1Import1 = new DataImport { File = release1File1, Status = DataImportStatus.COMPLETE };
 
-        var release1Import2 = new DataImport
-        {
-            File = release1File2,
-            Status = DataImportStatus.COMPLETE
-        };
+        var release1Import2 = new DataImport { File = release1File2, Status = DataImportStatus.COMPLETE };
 
         // Incomplete imports for other Releases should be ignored
 
-        var release2Import1 = new DataImport
-        {
-            File = release2File1,
-            Status = DataImportStatus.STAGE_1
-        };
+        var release2Import1 = new DataImport { File = release2File1, Status = DataImportStatus.STAGE_1 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.ReleaseFiles.AddRangeAsync(
-                new ReleaseFile
-                {
-                    ReleaseVersion = release1,
-                    File = release1File1
-                },
-                new ReleaseFile
-                {
-                    ReleaseVersion = release1,
-                    File = release1File2
-                },
-                new ReleaseFile
-                {
-                    ReleaseVersion = release2,
-                    File = release2File1
-                });
+                new ReleaseFile { ReleaseVersion = release1, File = release1File1 },
+                new ReleaseFile { ReleaseVersion = release1, File = release1File2 },
+                new ReleaseFile { ReleaseVersion = release2, File = release2File1 }
+            );
             await contentDbContext.DataImports.AddRangeAsync(release1Import1, release1Import2, release2Import1);
             await contentDbContext.SaveChangesAsync();
         }
@@ -239,33 +197,18 @@ public class DataImportServiceTests
 
         var file2 = new File { Type = FileType.Data };
 
-        var import1 = new DataImport
-        {
-            File = file1,
-            Status = DataImportStatus.COMPLETE
-        };
+        var import1 = new DataImport { File = file1, Status = DataImportStatus.COMPLETE };
 
-        var import2 = new DataImport
-        {
-            File = file2,
-            Status = DataImportStatus.STAGE_1
-        };
+        var import2 = new DataImport { File = file2, Status = DataImportStatus.STAGE_1 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.ReleaseFiles.AddRangeAsync(
-                new ReleaseFile
-                {
-                    ReleaseVersion = releaseVersion,
-                    File = file1
-                },
-                new ReleaseFile
-                {
-                    ReleaseVersion = releaseVersion,
-                    File = file2
-                });
+                new ReleaseFile { ReleaseVersion = releaseVersion, File = file1 },
+                new ReleaseFile { ReleaseVersion = releaseVersion, File = file2 }
+            );
             await contentDbContext.DataImports.AddRangeAsync(import1, import2);
             await contentDbContext.SaveChangesAsync();
         }
@@ -316,13 +259,14 @@ public class DataImportServiceTests
 
         var dataProcessorClient = new Mock<IDataProcessorClient>(Strict);
 
-        dataProcessorClient.Setup(s => s.Import(It.IsAny<Guid>(), CancellationToken.None))
-            .Returns(Task.CompletedTask);
+        dataProcessorClient.Setup(s => s.Import(It.IsAny<Guid>(), CancellationToken.None)).Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = BuildDataImportService(contentDbContext: contentDbContext,
-                dataProcessorClient: dataProcessorClient.Object);
+            var service = BuildDataImportService(
+                contentDbContext: contentDbContext,
+                dataProcessorClient: dataProcessorClient.Object
+            );
 
             var result = await service.Import(subjectId, dataFile, metaFile, sourceFile);
 
@@ -342,13 +286,15 @@ public class DataImportServiceTests
         IDataImportRepository? dataImportRepository = null,
         IDataProcessorClient? dataProcessorClient = null,
         IReleaseFileService? releaseFileService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new DataImportService(
             contentDbContext,
             dataImportRepository ?? new DataImportRepository(contentDbContext),
             dataProcessorClient ?? Mock.Of<IDataProcessorClient>(Strict),
             releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
-            userService ?? MockUtils.AlwaysTrueUserService().Object);
+            userService ?? MockUtils.AlwaysTrueUserService().Object
+        );
     }
 }

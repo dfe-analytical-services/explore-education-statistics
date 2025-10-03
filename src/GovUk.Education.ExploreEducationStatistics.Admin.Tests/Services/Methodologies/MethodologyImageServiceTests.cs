@@ -31,9 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyImageServiceTests
 {
-    private readonly User _user = new DataFixture()
-        .DefaultUser()
-        .WithId(Guid.NewGuid());
+    private readonly User _user = new DataFixture().DefaultUser().WithId(Guid.NewGuid());
 
     [Fact]
     public async Task Delete()
@@ -47,8 +45,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image1.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile2 = new MethodologyFile
@@ -58,8 +56,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image2.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile3 = new MethodologyFile
@@ -69,8 +67,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image3.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -89,11 +87,12 @@ public class MethodologyImageServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(methodologyVersion.Id,
-                AsList(imageFile1.File.Id, imageFile2.File.Id));
+            var result = await service.Delete(methodologyVersion.Id, AsList(imageFile1.File.Id, imageFile2.File.Id));
 
             result.AssertRight();
 
@@ -126,8 +125,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image1.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile2 = new MethodologyFile
@@ -137,14 +136,14 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image2.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile2UsedByAnotherMethodology = new MethodologyFile
         {
             MethodologyVersion = anotherVersion,
-            File = imageFile2.File
+            File = imageFile2.File,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -152,8 +151,11 @@ public class MethodologyImageServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-            await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2,
-                imageFile2UsedByAnotherMethodology);
+            await contentDbContext.MethodologyFiles.AddRangeAsync(
+                imageFile1,
+                imageFile2,
+                imageFile2UsedByAnotherMethodology
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -163,11 +165,12 @@ public class MethodologyImageServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
-            var result = await service.Delete(methodologyVersion.Id,
-                AsList(imageFile1.File.Id, imageFile2.File.Id));
+            var result = await service.Delete(methodologyVersion.Id, AsList(imageFile1.File.Id, imageFile2.File.Id));
 
             result.AssertRight();
 
@@ -185,11 +188,11 @@ public class MethodologyImageServiceTests
             // its link to anotherMethodology.
             Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(imageFile2UsedByAnotherMethodology.Id));
 
-            var filesForFileLinkedToDeletingMethodology =
-                await contentDbContext.Files.FindAsync(imageFile2.File.Id);
+            var filesForFileLinkedToDeletingMethodology = await contentDbContext.Files.FindAsync(imageFile2.File.Id);
 
-            var filesForFileLinkedToAnotherMethodology =
-                await contentDbContext.Files.FindAsync(imageFile2UsedByAnotherMethodology.File.Id);
+            var filesForFileLinkedToAnotherMethodology = await contentDbContext.Files.FindAsync(
+                imageFile2UsedByAnotherMethodology.File.Id
+            );
 
             Assert.NotNull(filesForFileLinkedToAnotherMethodology);
 
@@ -211,8 +214,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         var imageFile = new MethodologyFile
@@ -222,8 +225,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -239,8 +242,7 @@ public class MethodologyImageServiceTests
         {
             var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
-            var result = await service.Delete(methodologyVersion.Id,
-                AsList(ancillaryFile.File.Id, imageFile.File.Id));
+            var result = await service.Delete(methodologyVersion.Id, AsList(ancillaryFile.File.Id, imageFile.File.Id));
 
             result.AssertBadRequest(FileTypeInvalid);
         }
@@ -268,8 +270,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -285,8 +287,7 @@ public class MethodologyImageServiceTests
         {
             var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
-            var result = await service.Delete(Guid.NewGuid(),
-                AsList(imageFile.File.Id));
+            var result = await service.Delete(Guid.NewGuid(), AsList(imageFile.File.Id));
 
             result.AssertNotFound();
         }
@@ -311,8 +312,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -328,8 +329,7 @@ public class MethodologyImageServiceTests
         {
             var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
-            var result = await service.Delete(methodologyVersion.Id,
-                AsList(imageFile.File.Id, Guid.NewGuid()));
+            var result = await service.Delete(methodologyVersion.Id, AsList(imageFile.File.Id, Guid.NewGuid()));
 
             result.AssertNotFound();
         }
@@ -355,8 +355,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image1.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile2 = new MethodologyFile
@@ -366,8 +366,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image2.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile3 = new MethodologyFile
@@ -377,8 +377,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image3.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -397,8 +397,10 @@ public class MethodologyImageServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.DeleteAll(methodologyVersion.Id);
 
@@ -470,8 +472,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image1.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile2 = new MethodologyFile
@@ -481,14 +483,14 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image2.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var imageFile2UsedByAnotherMethodology = new MethodologyFile
         {
             MethodologyVersion = anotherVersion,
-            File = imageFile2.File
+            File = imageFile2.File,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -496,8 +498,11 @@ public class MethodologyImageServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-            await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2,
-                imageFile2UsedByAnotherMethodology);
+            await contentDbContext.MethodologyFiles.AddRangeAsync(
+                imageFile1,
+                imageFile2,
+                imageFile2UsedByAnotherMethodology
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -507,8 +512,10 @@ public class MethodologyImageServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.DeleteAll(methodologyVersion.Id);
 
@@ -528,11 +535,11 @@ public class MethodologyImageServiceTests
             // its link to anotherMethodology.
             Assert.NotNull(await contentDbContext.MethodologyFiles.FindAsync(imageFile2UsedByAnotherMethodology.Id));
 
-            var filesForFileLinkedToDeletingMethodology =
-                await contentDbContext.Files.FindAsync(imageFile2.File.Id);
+            var filesForFileLinkedToDeletingMethodology = await contentDbContext.Files.FindAsync(imageFile2.File.Id);
 
-            var filesForFileLinkedToAnotherMethodology =
-                await contentDbContext.Files.FindAsync(imageFile2UsedByAnotherMethodology.File.Id);
+            var filesForFileLinkedToAnotherMethodology = await contentDbContext.Files.FindAsync(
+                imageFile2UsedByAnotherMethodology.File.Id
+            );
 
             Assert.NotNull(filesForFileLinkedToAnotherMethodology);
 
@@ -555,8 +562,8 @@ public class MethodologyImageServiceTests
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
                 ContentType = "image/png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var fileData = new byte[] { 0 };
@@ -572,13 +579,14 @@ public class MethodologyImageServiceTests
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 
-        privateBlobStorageService
-            .SetupGetDownloadStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
+        privateBlobStorageService.SetupGetDownloadStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
@@ -600,8 +608,8 @@ public class MethodologyImageServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -658,8 +666,8 @@ public class MethodologyImageServiceTests
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
                 ContentType = "image/png",
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -677,8 +685,10 @@ public class MethodologyImageServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object);
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object
+            );
 
             var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
@@ -705,22 +715,25 @@ public class MethodologyImageServiceTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
         var fileValidatorService = new Mock<IFileValidatorService>(MockBehavior.Strict);
 
-        privateBlobStorageService.Setup(mock =>
-            mock.UploadFile(PrivateMethodologyFiles,
-                It.Is<string>(path =>
-                    path.Contains(FilesPath(methodologyVersion.Id, Image))),
-                formFile
-            )).Returns(Task.CompletedTask);
+        privateBlobStorageService
+            .Setup(mock =>
+                mock.UploadFile(
+                    PrivateMethodologyFiles,
+                    It.Is<string>(path => path.Contains(FilesPath(methodologyVersion.Id, Image))),
+                    formFile
+                )
+            )
+            .Returns(Task.CompletedTask);
 
-        fileValidatorService.Setup(mock =>
-                mock.ValidateFileForUpload(formFile, Image))
-            .ReturnsAsync(Unit.Instance);
+        fileValidatorService.Setup(mock => mock.ValidateFileForUpload(formFile, Image)).ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
+            var service = SetupMethodologyImageService(
+                contentDbContext: contentDbContext,
                 privateBlobStorageService: privateBlobStorageService.Object,
-                fileValidatorService: fileValidatorService.Object);
+                fileValidatorService: fileValidatorService.Object
+            );
 
             var result = await service.Upload(methodologyVersion.Id, formFile);
 
@@ -728,15 +741,17 @@ public class MethodologyImageServiceTests
 
             var upload = result.AssertRight();
 
-            fileValidatorService.Verify(mock =>
-                mock.ValidateFileForUpload(formFile, Image), Times.Once);
+            fileValidatorService.Verify(mock => mock.ValidateFileForUpload(formFile, Image), Times.Once);
 
-            privateBlobStorageService.Verify(mock =>
-                mock.UploadFile(PrivateMethodologyFiles,
-                    It.Is<string>(path =>
-                        path.Contains(FilesPath(methodologyVersion.Id, Image))),
-                    formFile
-                ), Times.Once);
+            privateBlobStorageService.Verify(
+                mock =>
+                    mock.UploadFile(
+                        PrivateMethodologyFiles,
+                        It.Is<string>(path => path.Contains(FilesPath(methodologyVersion.Id, Image))),
+                        formFile
+                    ),
+                Times.Once
+            );
 
             Assert.True(upload.ContainsKey("default"));
             Assert.Contains($"/api/methodologies/{methodologyVersion.Id}/images/", upload["default"]);
@@ -744,8 +759,8 @@ public class MethodologyImageServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var methodologyFile = await contentDbContext.MethodologyFiles
-                .Include(mf => mf.File)
+            var methodologyFile = await contentDbContext
+                .MethodologyFiles.Include(mf => mf.File)
                 .SingleOrDefaultAsync(mf =>
                     mf.MethodologyVersionId == methodologyVersion.Id
                     && mf.File.Filename == filename
@@ -782,7 +797,8 @@ public class MethodologyImageServiceTests
         IFileValidatorService? fileValidatorService = null,
         IFileRepository? fileRepository = null,
         IMethodologyFileRepository? methodologyFileRepository = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         contentDbContext.Users.Add(_user);
         contentDbContext.SaveChanges();

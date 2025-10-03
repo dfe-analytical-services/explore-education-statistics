@@ -10,7 +10,8 @@ public static class UserServiceExtensions
 {
     public static async Task<Either<ActionResult, ReleaseSubject>> CheckCanViewSubjectData(
         this IUserService userService,
-        ReleaseSubject releaseSubject)
+        ReleaseSubject releaseSubject
+    )
     {
         if (await userService.MatchesPolicy(releaseSubject, DataSecurityPolicies.CanViewSubjectData))
         {

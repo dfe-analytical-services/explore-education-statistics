@@ -8,7 +8,8 @@ public interface IReleasePublishingStatusService
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatusState state,
         bool immediate,
-        IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);
+        IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null
+    );
 
     /// <summary>
     /// Retrieves a list of release publishing keys for release versions scheduled for publishing,
@@ -22,7 +23,8 @@ public interface IReleasePublishingStatusService
     /// </returns>
     Task<IReadOnlyList<ReleasePublishingKey>> GetScheduledReleasesForPublishingRelativeToDate(
         DateComparison comparison,
-        DateTimeOffset referenceDate);
+        DateTimeOffset referenceDate
+    );
 
     /// <summary>
     /// Retrieves a list of release publishing keys for release versions that are ready to be published at their
@@ -46,28 +48,30 @@ public interface IReleasePublishingStatusService
     /// </returns>
     Task<IReadOnlyList<ReleasePublishingKey>> GetReleasesWithOverallStages(
         Guid releaseVersionId,
-        ReleasePublishingStatusOverallStage[] overallStages);
+        ReleasePublishingStatusOverallStage[] overallStages
+    );
 
     Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey);
 
     Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId);
 
-    Task UpdateState(
-        ReleasePublishingKey releasePublishingKey,
-        ReleasePublishingStatusState state);
+    Task UpdateState(ReleasePublishingKey releasePublishingKey, ReleasePublishingStatusState state);
 
     Task UpdateContentStage(
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatusContentStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null);
+        ReleasePublishingStatusLogMessage? logMessage = null
+    );
 
     Task UpdateFilesStage(
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatusFilesStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null);
+        ReleasePublishingStatusLogMessage? logMessage = null
+    );
 
     Task UpdatePublishingStage(
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatusPublishingStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null);
+        ReleasePublishingStatusLogMessage? logMessage = null
+    );
 }

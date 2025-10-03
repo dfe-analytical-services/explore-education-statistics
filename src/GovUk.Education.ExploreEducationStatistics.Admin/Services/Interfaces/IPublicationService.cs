@@ -17,48 +17,54 @@ public interface IPublicationService
 
     Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
-    Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
-        PublicationCreateRequest publication);
+    Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(PublicationCreateRequest publication);
 
     Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
         Guid publicationId,
-        PublicationSaveRequest updatedPublication);
+        PublicationSaveRequest updatedPublication
+    );
 
-    Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool includePermissions = false);
+    Task<Either<ActionResult, PublicationViewModel>> GetPublication(
+        Guid publicationId,
+        bool includePermissions = false
+    );
 
     Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
 
     Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
-        Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology);
+        Guid publicationId,
+        ExternalMethodologySaveRequest updatedExternalMethodology
+    );
 
-    Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
-        Guid publicationId);
+    Task<Either<ActionResult, Unit>> RemoveExternalMethodology(Guid publicationId);
 
     Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
 
-    Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId,
-        ContactSaveRequest updatedContact);
+    Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact);
 
     Task<Either<ActionResult, PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListReleaseVersionsPaginated(
         Guid publicationId,
         ReleaseVersionsType versionsType,
         int page,
         int pageSize,
-        bool includePermissions = false);
+        bool includePermissions = false
+    );
 
     Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleaseVersions(
         Guid publicationId,
         ReleaseVersionsType versionsType,
-        bool includePermissions = false);
+        bool includePermissions = false
+    );
 
-    Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(
-        Guid publicationId);
+    Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId);
 
     Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
         Guid publicationId,
-        ReleaseSeriesLegacyLinkAddRequest newLegacyLink);
+        ReleaseSeriesLegacyLinkAddRequest newLegacyLink
+    );
 
     Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
-       Guid publicationId,
-       List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems);
+        Guid publicationId,
+        List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems
+    );
 }

@@ -46,4 +46,5 @@ public abstract record KeyStatisticTextSaveRequest
 }
 
 public record KeyStatisticTextCreateRequest : KeyStatisticTextSaveRequest;
+
 public record KeyStatisticTextUpdateRequest : KeyStatisticTextSaveRequest;

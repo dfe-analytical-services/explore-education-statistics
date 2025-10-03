@@ -36,7 +36,7 @@ public static class StringBuilderExtensions
         {
             range = ..range.End;
         }
-        
+
         if (!range.End.IsFromEnd && range.End.Value > builder.Length)
         {
             range = range.Start..builder.Length;

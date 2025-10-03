@@ -25,12 +25,13 @@ public abstract class PublicationsSearchControllerTests
                 Summary = "summary",
                 Theme = "theme",
                 Title = "title",
-                Type = ReleaseType.OfficialStatistics
-            }
+                Type = ReleaseType.OfficialStatistics,
+            },
         ],
         totalResults: 1,
         page: 1,
-        pageSize: 10);
+        pageSize: 10
+    );
 
     public class GetPublicationsByGetRequestTests : PublicationsSearchControllerTests
     {
@@ -45,7 +46,8 @@ public abstract class PublicationsSearchControllerTests
                 PublicationsSortBy.Published,
                 SortDirection.Asc,
                 Page: 1,
-                PageSize: 10);
+                PageSize: 10
+            );
             _publicationsSearchService.WhereHasPublications(_publications);
 
             var sut = BuildController();
@@ -73,7 +75,8 @@ public abstract class PublicationsSearchControllerTests
                 SortDirection.Asc,
                 Page: 1,
                 PageSize: 10,
-                PublicationIds: [Guid.NewGuid()]);
+                PublicationIds: [Guid.NewGuid()]
+            );
             _publicationsSearchService.WhereHasPublications(_publications);
 
             var sut = BuildController();

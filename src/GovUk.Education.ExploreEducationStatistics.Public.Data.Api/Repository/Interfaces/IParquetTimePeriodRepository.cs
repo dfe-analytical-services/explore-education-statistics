@@ -9,10 +9,12 @@ public interface IParquetTimePeriodRepository
     Task<IList<ParquetTimePeriod>> List(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<IList<ParquetTimePeriod>> List(
         DataSetVersion dataSetVersion,
         IEnumerable<DataSetQueryTimePeriod> timePeriods,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

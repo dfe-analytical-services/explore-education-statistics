@@ -11,17 +11,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Analyti
 public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
 {
     private readonly AnalyticsPathResolverMockBuilder _analyticsPathResolverMockBuilder = new();
-    private readonly CommonAnalyticsWriteStrategyWorkflowMockBuilder<CaptureTableToolDownloadCall> _commonAnalyticsWriteStrategyWorkflowMockBuilder = new();
+    private readonly CommonAnalyticsWriteStrategyWorkflowMockBuilder<CaptureTableToolDownloadCall> _commonAnalyticsWriteStrategyWorkflowMockBuilder =
+        new();
 
     private CaptureTableToolDownloadCallAnalyticsWriteStrategy GetSut() =>
-        new(
-            _analyticsPathResolverMockBuilder.Build(),
-            _commonAnalyticsWriteStrategyWorkflowMockBuilder.Build()
-        );
+        new(_analyticsPathResolverMockBuilder.Build(), _commonAnalyticsWriteStrategyWorkflowMockBuilder.Build());
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
-    
+
     [Fact]
     public void RequestType_is_correct()
     {
@@ -35,7 +33,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
         // ARRANGE
         var differentTypeRequest = new TestAnalyticsCaptureRequest();
         var sut = GetSut();
-        
+
         // ACT
         var exception = await Record.ExceptionAsync(() => sut.Report(differentTypeRequest));
 
@@ -43,7 +41,7 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
         Assert.NotNull(exception);
         Assert.IsType<ArgumentException>(exception);
     }
-    
+
     [Fact]
     public async Task GivenACaptureRequest_WhenRecordIsCalled_ThenWorkflowCalled()
     {
@@ -51,18 +49,20 @@ public class CaptureTableToolDownloadCallAnalyticsWriteStrategyTests
         _analyticsPathResolverMockBuilder.WhereOutputDirectoryIs("c:\\temp\\output\\");
         var request = new CaptureTableToolDownloadCallBuilder().Build();
         var sut = GetSut();
-        
+
         // ACT
         await sut.Report(request);
 
         // ASSERT
-        _analyticsPathResolverMockBuilder.Assert.BuildOutputDirectoryCalled(CaptureTableToolDownloadCallAnalyticsWriteStrategy.OutputSubPaths);
+        _analyticsPathResolverMockBuilder.Assert.BuildOutputDirectoryCalled(
+            CaptureTableToolDownloadCallAnalyticsWriteStrategy.OutputSubPaths
+        );
         _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.ReportCalled(actual => actual == request);
-        
-        _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.WorkflowActor(
-            workflowActor => Assert.Equal("c:\\temp\\output\\", workflowActor.GetAnalyticsPath()));
-        
+
+        _commonAnalyticsWriteStrategyWorkflowMockBuilder.Assert.WorkflowActor(workflowActor =>
+            Assert.Equal("c:\\temp\\output\\", workflowActor.GetAnalyticsPath())
+        );
     }
-    
+
     private record TestAnalyticsCaptureRequest : IAnalyticsCaptureRequest;
 }

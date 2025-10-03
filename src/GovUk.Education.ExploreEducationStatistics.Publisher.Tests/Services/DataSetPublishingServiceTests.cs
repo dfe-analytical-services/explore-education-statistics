@@ -24,23 +24,19 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
         [Fact]
         public async Task FirstDataSetVersionPublished()
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseFile releaseDataFile = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .WithReleaseVersion(releaseVersion);
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusDraft();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseDataFile.Id));
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseDataFile.Id));
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
             await AddTestData<PublicDataDbContext>(context =>
@@ -53,7 +49,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
                 dataSet.LatestDraftVersionId = dataSetVersion.Id;
             });
-            
+
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
             Directory.CreateDirectory(draftFolderPath);
@@ -64,8 +60,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var publishedDataSet = await publicDataDbContext
-                .DataSets
-                .Include(ds => ds.LatestLiveVersion)
+                .DataSets.Include(ds => ds.LatestLiveVersion)
                 .SingleAsync(ds => ds.Id == dataSet.Id);
 
             publishedDataSet.Published.AssertUtcNow();
@@ -80,7 +75,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             // Data set should be published at the same time as the latest live version
             Assert.Equal(publishedDataSet.LatestLiveVersion.Published, publishedDataSet.Published);
-            
+
             // The Public API folder for the data set version should be updated to reflect its
             // version number at the time of publishing.
             var versionedFolderPath = dataSetVersionPathResolver.DirectoryPath(publishedDataSet.LatestLiveVersion);
@@ -92,8 +87,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
         [Fact]
         public async Task SecondDataSetVersionPublished()
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseFile releaseDataFile = DataFixture
                 .DefaultReleaseFile()
@@ -109,10 +103,12 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
                 .ForIndex(0, s => s.SetStatusPublished())
-                .ForIndex(1,
-                    s => s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseDataFile.Id))
-                        .SetStatusDraft())
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseDataFile.Id))
+                            .SetStatusDraft()
+                )
                 .GenerateList(2);
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
@@ -127,7 +123,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 dataSet.LatestLiveVersionId = dataSetVersions[0].Id;
                 dataSet.LatestDraftVersionId = dataSetVersions[1].Id;
             });
-            
+
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersions[1]);
             Directory.CreateDirectory(draftFolderPath);
@@ -138,8 +134,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var publishedDataSet = await publicDataDbContext
-                .DataSets
-                .Include(ds => ds.LatestDraftVersion)
+                .DataSets.Include(ds => ds.LatestDraftVersion)
                 .Include(ds => ds.LatestLiveVersion)
                 .Include(ds => ds.Versions)
                 .SingleAsync(ds => ds.Id == dataSet.Id);
@@ -157,9 +152,8 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             publishedDataSet.LatestLiveVersion.Published.AssertUtcNow();
 
             Assert.Equal(2, publishedDataSet.Versions.Count);
-            publishedDataSet.Versions.ForEach(version =>
-                Assert.Equal(DataSetVersionStatus.Published, version.Status));
-            
+            publishedDataSet.Versions.ForEach(version => Assert.Equal(DataSetVersionStatus.Published, version.Status));
+
             // The Public API folder for the data set version should be updated to reflect its
             // version number at the time of publishing.
             var versionedFolderPath = dataSetVersionPathResolver.DirectoryPath(publishedDataSet.LatestLiveVersion);
@@ -171,8 +165,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
         [Fact]
         public async Task NoDraftDataSetVersionsToPublish()
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseFile releaseDataFile = DataFixture
                 .DefaultReleaseFile()
@@ -188,8 +181,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
                 .WithStatusPublished()
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseDataFile.Id));
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseDataFile.Id));
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
             await AddTestData<PublicDataDbContext>(context =>
@@ -209,8 +201,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var retrievedDataSet = await publicDataDbContext
-                .DataSets
-                .Include(ds => ds.LatestDraftVersion)
+                .DataSets.Include(ds => ds.LatestDraftVersion)
                 .Include(ds => ds.LatestLiveVersion)
                 .Include(ds => ds.Versions)
                 .SingleAsync(ds => ds.Id == dataSet.Id);
@@ -225,21 +216,20 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             Assert.Equal(dataSet.LatestLiveVersion!.Status, retrievedDataSet.LatestLiveVersion!.Status);
             Assert.Equal(
                 dataSet.LatestLiveVersion.Published.TruncateNanoseconds(),
-                retrievedDataSet.LatestLiveVersion.Published);
+                retrievedDataSet.LatestLiveVersion.Published
+            );
         }
 
         [Fact]
         public async Task ReleaseAmendmentPublished_UpdatesReleaseFileId()
         {
-            ReleaseVersion originalReleaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion originalReleaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseVersion amendmentReleaseVersion = DataFixture
                 .DefaultReleaseVersion()
                 .WithPreviousVersionId(originalReleaseVersion.Id);
 
-            File dataFile = DataFixture
-                .DefaultFile(FileType.Data);
+            File dataFile = DataFixture.DefaultFile(FileType.Data);
 
             var (originalReleaseDataFile, amendmentReleaseDataFile) = DataFixture
                 .DefaultReleaseFile()
@@ -248,19 +238,17 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .ForIndex(1, s => s.SetReleaseVersion(amendmentReleaseVersion))
                 .GenerateTuple2();
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(originalReleaseDataFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(originalReleaseDataFile.Id))
                 .WithStatusPublished();
 
             await AddTestData<ContentDbContext>(context =>
-                context.ReleaseFiles.AddRange(originalReleaseDataFile, amendmentReleaseDataFile));
+                context.ReleaseFiles.AddRange(originalReleaseDataFile, amendmentReleaseDataFile)
+            );
 
             await AddTestData<PublicDataDbContext>(context =>
             {
@@ -279,8 +267,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var publishedDataSet = await publicDataDbContext
-                .DataSets
-                .Include(ds => ds.LatestLiveVersion)
+                .DataSets.Include(ds => ds.LatestLiveVersion)
                 .SingleAsync(ds => ds.Id == dataSet.Id);
 
             Assert.Equal(dataSet.Published.TruncateNanoseconds(), publishedDataSet.Published);
@@ -290,10 +277,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             Assert.NotNull(publishedDataSet.LatestLiveVersion);
             Assert.Equal(DataSetVersionStatus.Published, publishedDataSet.LatestLiveVersion.Status);
-            Assert.Equal(
-                dataSetVersion.Published.TruncateNanoseconds(),
-                publishedDataSet.LatestLiveVersion.Published
-            );
+            Assert.Equal(dataSetVersion.Published.TruncateNanoseconds(), publishedDataSet.LatestLiveVersion.Published);
 
             // The version should have be updated to reference the amendment's ReleaseFile
             Assert.Equal(amendmentReleaseDataFile.Id, publishedDataSet.LatestLiveVersion.Release.ReleaseFileId);
@@ -302,18 +286,17 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task ReleaseAmendmentPublishedWithNewDataSetVersion_CorrectReleaseFileIds(bool amendmentResultedInPatchReplacement)
+        public async Task ReleaseAmendmentPublishedWithNewDataSetVersion_CorrectReleaseFileIds(
+            bool amendmentResultedInPatchReplacement
+        )
         {
-            ReleaseVersion originalReleaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion originalReleaseVersion = DataFixture.DefaultReleaseVersion();
 
             ReleaseVersion amendmentReleaseVersion = DataFixture
                 .DefaultReleaseVersion()
                 .WithPreviousVersionId(originalReleaseVersion.Id);
 
-            var (dataFile, newDataFile) = DataFixture
-                .DefaultFile(FileType.Data)
-                .GenerateTuple2();
+            var (dataFile, newDataFile) = DataFixture.DefaultFile(FileType.Data).GenerateTuple2();
 
             var (originalReleaseDataFile, amendmentReleaseDataFile) = DataFixture
                 .DefaultReleaseFile()
@@ -335,30 +318,28 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .WithFile(newDataFile)
                 .WithReleaseVersion(amendmentReleaseVersion);
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
             DataSetVersion dataSetVersion1 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(originalReleaseDataFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(originalReleaseDataFile.Id))
                 .WithStatusPublished();
 
             DataSetVersion dataSetVersion2 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSetId(dataSet.Id)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(newReleaseDataFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(newReleaseDataFile.Id))
                 .WithVersionNumber(
-                    major: amendmentResultedInPatchReplacement ? 1 : 2, 
-                    minor: 0, 
-                    patch: amendmentResultedInPatchReplacement ? 1 : 0)
+                    major: amendmentResultedInPatchReplacement ? 1 : 2,
+                    minor: 0,
+                    patch: amendmentResultedInPatchReplacement ? 1 : 0
+                )
                 .WithStatusDraft();
-            
+
             await AddTestData<ContentDbContext>(context =>
-                context.ReleaseFiles.AddRange(originalReleaseDataFile, amendmentReleaseDataFile, newReleaseDataFile));
+                context.ReleaseFiles.AddRange(originalReleaseDataFile, amendmentReleaseDataFile, newReleaseDataFile)
+            );
 
             await AddTestData<PublicDataDbContext>(context =>
             {
@@ -371,7 +352,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 dataSet.LatestLiveVersionId = dataSetVersion1.Id;
                 dataSet.LatestDraftVersionId = dataSetVersion2.Id;
             });
-            
+
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion2);
             Directory.CreateDirectory(draftFolderPath);
@@ -382,8 +363,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var publishedDataSet = await publicDataDbContext
-                .DataSets
-                .Include(ds => ds.LatestLiveVersion)
+                .DataSets.Include(ds => ds.LatestLiveVersion)
                 .Include(ds => ds.Versions)
                 .SingleAsync(ds => ds.Id == dataSet.Id);
 
@@ -412,7 +392,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
 
             if (amendmentResultedInPatchReplacement)
             {
-                // The ReleaseFileId shouldn't get overwritten with a new release file after a patch replacement. 
+                // The ReleaseFileId shouldn't get overwritten with a new release file after a patch replacement.
                 Assert.Equal(originalReleaseDataFile.Id, savedDataSetVersion1.Release.ReleaseFileId);
             }
             else

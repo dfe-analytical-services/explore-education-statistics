@@ -16,8 +16,8 @@ public class FilterRepository : IFilterRepository
 
     public Task<List<Filter>> GetFiltersIncludingItems(Guid subjectId)
     {
-        return _context.Filter
-            .Include(filter => filter.FilterGroups)
+        return _context
+            .Filter.Include(filter => filter.FilterGroups)
             .ThenInclude(group => group.FilterItems)
             .Where(filter => filter.SubjectId == subjectId)
             .ToListAsync();
