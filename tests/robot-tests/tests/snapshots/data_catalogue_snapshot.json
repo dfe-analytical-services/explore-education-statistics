@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1015 data sets",
+  "num_datasets": "1018 data sets",
   "themes": [
     {
       "publications": [
@@ -175,6 +175,7 @@
         "Initial teacher training performance profiles",
         "Median teacher pay using teacher pension scheme data",
         "Postgraduate initial teacher training targets",
+        "School Leadership retention",
         "School workforce in England",
         "Teacher and leader development: ECF and NPQs"
       ],
