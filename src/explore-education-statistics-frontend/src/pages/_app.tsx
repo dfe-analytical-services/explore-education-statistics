@@ -6,7 +6,6 @@ import {
   ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
-import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import composeProviders from '@common/hocs/composeProviders';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
@@ -93,7 +92,6 @@ App.getInitialProps = async (appContext: AppContext) => {
 
 const Providers = composeProviders(
   ApplicationInsightsContextProvider,
-  NetworkActivityContextProvider,
   QueryClientProvider,
 );
 
