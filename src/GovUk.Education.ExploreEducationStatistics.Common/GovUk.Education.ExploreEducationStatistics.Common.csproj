@@ -42,7 +42,7 @@
         <PackageReference Include="Namotion.Reflection" Version="3.4.2" />
         <PackageReference Include="NaturalSort.Extension" Version="4.3.0" />
         <PackageReference Include="NCrontab.Signed" Version="3.3.3" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
         <PackageReference Include="Azure.Storage.Queues" Version="12.23.0" />
         <PackageReference Include="ObjectCloner" Version="2.2.2" />
