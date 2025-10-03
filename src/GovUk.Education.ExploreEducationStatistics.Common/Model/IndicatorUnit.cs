@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;

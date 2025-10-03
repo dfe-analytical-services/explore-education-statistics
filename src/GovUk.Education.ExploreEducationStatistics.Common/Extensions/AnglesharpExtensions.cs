@@ -1,4 +1,3 @@
-#nullable enable
 using AngleSharp.Dom;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

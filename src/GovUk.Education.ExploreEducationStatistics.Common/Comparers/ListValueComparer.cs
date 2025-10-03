@@ -1,4 +1,3 @@
-#nullable enable
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Comparers;
