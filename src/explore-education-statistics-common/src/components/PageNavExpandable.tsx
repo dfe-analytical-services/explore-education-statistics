@@ -118,6 +118,7 @@ function NavItem({
         )}
         href={`#${id}`}
         onClick={() => onClick?.(id)}
+        aria-current={isActive ? 'true' : undefined}
       >
         {text}
       </a>
