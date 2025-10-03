@@ -3,35 +3,34 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations;
+
+// ReSharper disable once InconsistentNaming
+public partial class EES6080_AddActivatesInPreviewTokensTable : Migration
 {
     /// <inheritdoc />
-    public partial class EES6080_AddActivatesInPreviewTokensTable : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<DateTimeOffset>(
-                name: "Activates",
-                table: "PreviewTokens",
-                type: "timestamp with time zone",
-                nullable: true);
+        migrationBuilder.AddColumn<DateTimeOffset>(
+            name: "Activates",
+            table: "PreviewTokens",
+            type: "timestamp with time zone",
+            nullable: true);
 
-            migrationBuilder.Sql(
-                @"UPDATE ""PreviewTokens"" SET ""Activates"" = ""Created"";");
+        migrationBuilder.Sql(
+            @"UPDATE ""PreviewTokens"" SET ""Activates"" = ""Created"";");
 
-            migrationBuilder.AlterColumn<DateTimeOffset>(
-                name: "Activates",
-                table: "PreviewTokens",
-                nullable: false);
-        }
+        migrationBuilder.AlterColumn<DateTimeOffset>(
+            name: "Activates",
+            table: "PreviewTokens",
+            nullable: false);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "Activates",
-                table: "PreviewTokens");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "Activates",
+            table: "PreviewTokens");
     }
 }
