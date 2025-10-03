@@ -58,9 +58,12 @@ const ChartBuilderFormsContext = createContext<
   ChartBuilderFormsContextValue | undefined
 >(undefined);
 
-const defaultFormState = (): FormState => {
+const defaultFormState = (
+  formName: ChartBuilderFormKeys,
+  initialValid?: ChartBuilderFormKeys[],
+): FormState => {
   return {
-    isValid: false,
+    isValid: initialValid?.includes(formName) ?? false,
     submitCount: 0,
   };
 };
@@ -70,6 +73,7 @@ export interface ChartBuilderFormContextProviderProps {
   definition?: ChartDefinition;
   id?: string;
   initialForms?: ChartBuilderForms;
+  initialValid?: ChartBuilderFormKeys[];
   onSubmit?: () => void;
 }
 
@@ -77,6 +81,7 @@ export const ChartBuilderFormsContextProvider = ({
   children,
   definition,
   id = 'chartBuilder',
+  initialValid,
   initialForms,
   onSubmit,
 }: ChartBuilderFormContextProviderProps) => {
@@ -88,7 +93,7 @@ export const ChartBuilderFormsContextProvider = ({
 
     return {
       options: {
-        ...defaultFormState(),
+        ...defaultFormState('options', initialValid),
         id: `${id}-options`,
         title: 'Chart configuration',
       },
@@ -105,7 +110,7 @@ export const ChartBuilderFormsContextProvider = ({
 
       if (definition.capabilities.hasLegend) {
         nextForms.legend = {
-          ...defaultFormState(),
+          ...defaultFormState('legend', initialValid),
           ...(prevForms.legend ?? {}),
           id: `${id}-legend`,
           title: 'Legend',
@@ -114,14 +119,14 @@ export const ChartBuilderFormsContextProvider = ({
 
       if (definition.type === 'map') {
         nextForms.boundaryLevels = {
-          ...defaultFormState(),
+          ...defaultFormState('boundaryLevels', initialValid),
           ...(prevForms.boundaryLevels ?? {}),
           id: `${id}-boundaryLevels`,
           title: 'Boundary levels',
         };
 
         nextForms.dataGroupings = {
-          ...defaultFormState(),
+          ...defaultFormState('dataGroupings', initialValid),
           ...(prevForms.dataGroupings ?? {}),
           id: `${id}-dataGroupings`,
           title: 'Data groupings',
@@ -130,7 +135,7 @@ export const ChartBuilderFormsContextProvider = ({
 
       if (definition.axes.major) {
         nextForms.dataSets = {
-          ...defaultFormState(),
+          ...defaultFormState('dataSets', initialValid),
           ...(prevForms.dataSets ?? {}),
           id: `${id}-dataSets`,
           title: 'Data sets',
@@ -158,7 +163,7 @@ export const ChartBuilderFormsContextProvider = ({
         options: prevForms.options,
       };
     });
-  }, [definition, id]);
+  }, [definition, id, initialValid]);
 
   const updateForm = useCallback(
     ({ formKey, ...nextFormState }: UpdateFormState) => {

@@ -33,6 +33,10 @@ export default function ChartDataGroupingsConfiguration({
     return <p>No data groupings to edit.</p>;
   }
 
+  if (map.categoricalDataConfig?.length) {
+    return <p>Data groupings cannot be set for categorical data.</p>;
+  }
+
   return (
     <>
       <Effect

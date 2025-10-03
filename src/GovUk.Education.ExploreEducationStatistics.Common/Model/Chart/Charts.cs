@@ -107,6 +107,8 @@ public class MapChart : Chart
 public class MapChartConfig
 {
     public List<ChartDataSetConfig> DataSetConfigs { get; set; } = new();
+
+    public List<ChartCategoricalDataConfig> CategoricalDataConfig { get; set; } = new();
 }
 
 public class InfographicChart : Chart
