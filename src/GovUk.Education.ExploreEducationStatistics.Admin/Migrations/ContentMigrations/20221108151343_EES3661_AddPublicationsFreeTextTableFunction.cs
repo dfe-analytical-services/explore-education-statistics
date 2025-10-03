@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 // ReSharper disable once InconsistentNaming
 public partial class EES3661_AddPublicationsFreeTextTableFunction : Migration
 {
-    private const string MigrationId = "20221108151343";
+    internal const string MigrationId = "20221108151343";
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
