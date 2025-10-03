@@ -1,5 +1,7 @@
 import SectionBreak from '@common/components/SectionBreak';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ContactUsSection, {
+  contactUsNavItem,
+} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
   PublicationMethodologiesList,
@@ -14,7 +16,7 @@ import ReleasePageShell from '@frontend/modules/find-statistics/components/Relea
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   methodologiesSummary: PublicationMethodologiesList;
@@ -29,11 +31,24 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
 }) => {
   const { methodologies, externalMethodology } = methodologiesSummary;
 
+  const hasMethodologies = methodologies.length > 0 || externalMethodology;
+
+  const navItems = [
+    hasMethodologies && { id: 'methodology-section', text: 'Methodology' },
+    contactUsNavItem,
+  ].filter(item => !!item);
+
+  const [activeSection, setActiveSection] = useState(navItems[0].id);
+
   const externalMethodologyAttributes = getUrlAttributes(
     externalMethodology?.url || '',
   );
 
-  const hasMethodologies = methodologies.length > 0 || externalMethodology;
+  const setActiveSectionIfValid = (sectionId: string) => {
+    if (navItems.some(item => item.id === sectionId)) {
+      setActiveSection(sectionId);
+    }
+  };
 
   return (
     <ReleasePageShell
@@ -41,10 +56,15 @@ const ReleaseMethodologyPage: NextPage<Props> = ({
       publicationSummary={publicationSummary}
       releaseVersionSummary={releaseVersionSummary}
     >
-      <ReleasePageLayout>
+      <ReleasePageLayout
+        activeSection={activeSection}
+        navItems={navItems}
+        onClickNavItem={setActiveSectionIfValid}
+        onChangeSection={setActiveSectionIfValid}
+      >
         {hasMethodologies && (
           <>
-            <section id="methodology-section">
+            <section id="methodology-section" data-page-section>
               <h2>Methodology</h2>
               <p>
                 Find out how and why we collect, process and publish these

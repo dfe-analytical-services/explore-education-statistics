@@ -1,6 +1,11 @@
 import { Contact } from '@common/services/publicationService';
 import React from 'react';
 
+export const contactUsNavItem = {
+  id: 'contact-us-section',
+  text: 'Contact us',
+};
+
 const ContactUsSection = ({
   sectionTitle = 'Contact us',
   publicationContact,
@@ -11,7 +16,7 @@ const ContactUsSection = ({
   publicationTitle: string;
 }) => {
   return (
-    <section id="contact-us-section">
+    <section id="contact-us-section" data-page-section>
       <h2 id="contact-us">{sectionTitle}</h2>
 
       <p>
