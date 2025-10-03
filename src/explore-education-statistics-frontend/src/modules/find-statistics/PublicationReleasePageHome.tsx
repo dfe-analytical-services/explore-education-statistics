@@ -11,13 +11,6 @@ import ReleasePageShell from '@frontend/modules/find-statistics/components/Relea
 import { NextPage } from 'next';
 import React, { useState } from 'react';
 
-const pageSectionIds = ['headlines-section', 'contact-us-section'] as const;
-type PageSectionId = (typeof pageSectionIds)[number];
-
-function isValidPageSectionId(value: string): value is PageSectionId {
-  return pageSectionIds.includes(value as PageSectionId);
-}
-
 interface Props {
   publicationSummary: PublicationSummaryRedesign;
   releaseVersionSummary: ReleaseVersionSummary;
@@ -27,16 +20,15 @@ const PublicationReleasePage: NextPage<Props> = ({
   publicationSummary,
   releaseVersionSummary,
 }) => {
-  const [activeSection, setActiveSection] =
-    useState<PageSectionId>('headlines-section');
-
   const navItems = [
     { id: 'headlines-section', text: 'Headlines facts and figures' },
     contactUsNavItem,
   ];
 
+  const [activeSection, setActiveSection] = useState(navItems[0].id);
+
   const setActiveSectionIfValid = (sectionId: string) => {
-    if (isValidPageSectionId(sectionId)) {
+    if (navItems.some(item => item.id === sectionId)) {
       setActiveSection(sectionId);
     }
   };
